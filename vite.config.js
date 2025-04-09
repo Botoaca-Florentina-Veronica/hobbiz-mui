@@ -3,17 +3,14 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',
   build: {
     rollupOptions: {
-      external: [
-        'react-slick',
-        'slick-carousel/slick/slick.css',
-        'slick-carousel/slick/slick-theme.css'
-      ]
+      external: ['react-slick'],
+      output: {
+        globals: {
+          'react-slick': 'ReactSlick'
+        }
+      }
     }
-  },
-  optimizeDeps: {
-    include: ['react-slick', 'slick-carousel']
   }
 })
