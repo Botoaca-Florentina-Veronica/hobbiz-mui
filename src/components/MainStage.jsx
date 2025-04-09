@@ -1,4 +1,5 @@
 import { FaSearch, FaBars } from "react-icons/fa"; // Adăugăm FaBars pentru iconița de meniu
+import hobby from '../assets/images/hobby_img.jpg';
 
 export default function MainStage() {
   return (
@@ -36,7 +37,7 @@ export default function MainStage() {
           <button className="sign-up-button">Sign up</button>
         </div>
         <div className="main-stage-image">
-          <img src="/src/assets/images/hobby_img.jpg" alt="hobby" />
+          <img src={hobby} alt="hobby" />
         </div>
       </div>
     </div>

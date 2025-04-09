@@ -1,11 +1,13 @@
 import { HiOutlineUser, HiOutlineHeart } from "react-icons/hi";
+import logo from '../assets/images/logo.jpg';
+
 
 export default function Header() {
   return (
     <div className="header">
       <ul className="logo">
         <li>
-          <img src="/src/assets/images/logo.jpg" alt="Logo" />
+          <img src = {logo} alt="Logo" />
         </li>
       </ul>
       <ul className="nav-right">
