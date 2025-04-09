@@ -5,7 +5,7 @@ export default function Header() {
     <div className="header">
       <ul className="logo">
         <li>
-          <img src="/src/assets/logo.jpg" alt="Logo" />
+          <img src="/src/assets/images/logo.jpg" alt="Logo" />
         </li>
       </ul>
       <ul className="nav-right">
