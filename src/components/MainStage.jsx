@@ -36,7 +36,7 @@ export default function MainStage() {
           <button className="sign-up-button">Sign up</button>
         </div>
         <div className="main-stage-image">
-          <img src="/src/assets/images/hobby_img.png" alt="hobby" />
+          <img src="/src/assets/images/hobby_img.jpg" alt="hobby" />
         </div>
       </div>
     </div>
