@@ -8,8 +8,14 @@ export default defineConfig({
     include: ['react-slick']
   },
   build: {
+    assetsInclude: ['**/*.{jpg,jpeg,png,webp,svg}'], // Include toate formatele
     commonjsOptions: {
       include: [/react-slick/, /node_modules/]
+    },
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name].[hash].[ext]' // Organizare automata
+      }
     }
   }
 });
