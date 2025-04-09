@@ -1,0 +1,502 @@
+/* ************** header ************************* */
+.header {
+  font-size: 18px;
+  height: 72px;
+  background-color: #406b92;
+  color: #F8B195;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0px;
+}
+
+.header ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 150px;
+}
+
+.header .logo img{
+  height: 200px;
+  width: 200px;
+  padding-right: 70px;
+  margin-left: -70px;
+  margin-top: 20px;
+}
+
+.add-button{
+  background-color: white;
+  color: #355C7D;
+  border: none;
+  border-radius: 4px;
+  padding: 14px 24px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 40px;
+  transition: background-color 0.3s; 
+}
+
+.favorite-btn {
+  margin-right: 20px; /* sau cât vrei tu */
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  transition: all 0.3s ease;
+  color: #F8B195;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #F8B195;
+  font-size: 1.8rem;
+  margin-right: 120px;
+  padding: 5px;
+  transition: all 0.3s ease;
+}
+
+.icon-btn:hover, .favorite-btn:hover {
+  transform: scale(1.1);
+  color: #ffffff;
+}
+
+/* ***************** MAIN STAGE CONTAINER ******************** */
+.main-stage {
+  display: flex;
+  flex-direction: column; /* Așezare verticală */
+  background-color: #F8B195;
+  padding: 40px 100px 100px; /* Top | L/R | Bottom */
+  align-items: center;
+}
+
+/* ***************** SEARCH BAR ******************** */
+/* Stiluri pentru top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+/* Stiluri pentru butonul categorii */
+.categories-button {
+  display: flex;
+  align-items: center;
+  background-color: #355C7D;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.categories-button:hover {
+  background-color: #2a4a65;
+}
+
+.categories-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Ajustări pentru search container */
+.search-container {
+  display: flex;
+  width: 70%; 
+  max-width: 500px;
+  margin-left: 250px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 15px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px 0 0 8px;
+  font-size: 1.1rem;
+  outline: none;
+  color: #333;
+}
+
+.search-button {
+  display: flex;
+  align-items: center;
+  padding: 0 25px;
+  background-color: #355C7D;
+  color: white;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.3s;
+}
+
+.search-button:hover {
+  background-color: #2a4a65;
+}
+
+.search-icon {
+  margin-left: 10px;
+  font-size: 1.2rem;
+}
+
+/* ***************** CONTENT (text + image) ******************** */
+.main-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.main-text {
+  flex: 1;
+  padding: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.1);
+  margin-right: 50px;
+  font-size: 1.5rem;
+}
+
+#main-title {
+  color: #355C7D;
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.main-stage-image img {
+  width: 500px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ***************** BUTTONS ******************** */
+.sign-up-button {
+  margin-top: 20px;
+  padding: 15px 30px;
+  background-color: #355C7D;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sign-up-button:hover {
+  background-color: #2a4a65;
+  transform: translateY(-3px);
+}
+
+/* ***************** RESPONSIVE ******************** */
+@media (max-width: 1200px) {
+  .main-stage {
+    padding: 30px 50px;
+  }
+  
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .main-text {
+    margin-right: 0;
+    margin-bottom: 40px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    max-width: 100%;
+  }
+  
+  .main-stage-image img {
+    width: 100%;
+  }
+}
+
+/* ****************  content  ******************** */
+.content {
+  padding: 150px 0px 150px 0px;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  background-color: #F67280;
+}
+
+.content h2 {
+  text-align: center;
+  color: #1f2937;
+  font-size: 60px;
+  font-weight: bolder;
+  padding: 50px 70px 70px 50px;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-around;
+  width: 1200px;
+  position: relative;
+  margin-top: 3rem;
+  margin-left: 6rem;
+  height: 50vh;
+}
+
+.wrapper i {
+  top: 55%;
+  height: 44px;
+  width: 44px;
+  color: #343F4F;
+  cursor: pointer;
+  font-size: 1.15rem;
+  position: absolute;
+  text-align: center;
+  line-height: 44px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.1s linear;
+}
+
+.wrapper i:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.wrapper i:hover {
+  background: #929090;
+}
+
+.wrapper i:first-child {
+  left: -32px;
+  display: none;
+}
+
+.wrapper i:last-child {
+  right: -32px;
+}
+
+.wrapper .carousel {
+  font-size: 0px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+}
+
+.carousel.dragging {
+  cursor: grab;
+  scroll-behavior: auto;
+}
+
+.carousel.dragging img {
+  pointer-events: none;
+}
+
+.carousel img {
+  height: 300px;
+  object-fit: cover;
+  user-select: none;
+  margin-left: 10px;
+  width: calc(100% / 3);
+  padding: 0.5rem;
+}
+
+.carousel img:first-child {
+  margin-left: 0px;
+}
+
+/* *************  quote  *******************/
+.quote-assembly {
+  display: flex;
+  flex-direction: column;
+  background-color: #C06C84;
+  padding: 100px 20% 100px 20%;
+}
+
+.quote-text {
+  font-style: italic;
+  font-size: 80px;
+  font-weight: lighter;
+  justify-content: center;
+  align-items: center;
+  color: black;
+}
+
+.quote-author {
+  font-size: 35px;
+  text-align: right;
+  font-weight: bolder;
+  color: black;
+}
+
+/********************  call to action  ******************/
+.hole-action {
+  background-color: #6C5B7B;
+}
+
+.call-to-action {
+  display: flex;
+  border-radius: 5px;
+  background-color: #F67280;
+  color: #f9faf8;
+  align-items: center;
+  justify-content: space-around;
+  margin: 100px auto 100px auto;
+  width: 75%;
+  padding: 50px;
+  font-size: 28px;
+}
+
+.second-button {
+  border-radius: 10px;
+  border: #f9faf8 2px solid;
+  background-color: #dfccaf;
+  color: #F8B195;
+}
+
+.second-button:hover {
+  color: #F67280;
+  background-color: #F8B195;
+}
+
+/*********************  footer  ***********************/
+.footer {
+  height: 72px;
+  font-size: 30px;
+  background: #F8B195;
+  color: #e2e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-arrow {
+  width: 150px;
+  height: 150px;
+  cursor: pointer;
+  margin-right: -100px;
+  margin-bottom: -470px;
+}
+
+/* ****************** Dark Mode Styles ********************** */
+body.dark-mode {
+  background-color: #342b2b;
+  color: #c7c7c7;
+}
+
+.dark-mode .header,
+.dark-mode .main-stage,
+.dark-mode .content,
+.dark-mode .quote-assembly,
+.dark-mode .hole-action,
+.dark-mode .footer {
+  background-color: #342b2b;
+  color: #c7c7c7;
+}
+
+.dark-mode .header .logo {
+  color: #eceeef;
+}
+
+.dark-mode .header ul a {
+  color: #eceeef;
+  background-color: #342b2b;
+}
+
+.dark-mode .main-text {
+  color: #eceeef;
+  border-color: #f9f1ea;
+}
+
+.dark-mode .main-text #main-title {
+  color: #f9faf8;
+}
+
+.dark-mode .sign-up-button {
+  color: #3e271b;
+  background-color: #eceeef;
+}
+
+.dark-mode .sign-up-button:hover {
+  color: #eceeef;
+  background-color: #1a1a1a;
+}
+
+.dark-mode .content {
+  background-color: #412b24;
+  color: #eceeef;
+}
+
+.dark-mode .content h2 {
+  color: #eceeef;
+}
+
+.dark-mode .card img {
+  border-color: #2f2119;
+}
+
+.dark-mode .quote-assembly {
+  background-color: #2c1b1b;
+  color: #e2e7eb;
+}
+
+.dark-mode .quote-text {
+  color: #e2e7eb;
+}
+
+.dark-mode .quote-author {
+  color: #eceeef;
+}
+
+.dark-mode .call-to-action {
+  background-color: #5a3f2f;
+  color: #eceeef;
+}
+
+.dark-mode .second-button {
+  color: #362318;
+  background-color: #eceeef;
+}
+
+.dark-mode .second-button:hover {
+  color: #eceeef;
+  background-color: #301717;
+}
+
+.dark-mode .footer {
+  background: #4e3222;
+  color: #eceeef;
+}
+
+/* ******************* Dark mode toggle button ********************** */
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.dark-mode-toggle button {
+  background-color: #3f1b0f;
+  color: #e2e7eb;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dark-mode-toggle button:hover {
+  background-color: #503f25;
+  cursor: pointer;
+}
