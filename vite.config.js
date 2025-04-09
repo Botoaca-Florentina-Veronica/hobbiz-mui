@@ -1,16 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    include: ['react-slick']
+  },
   build: {
-    rollupOptions: {
-      external: ['react-slick'],
-      output: {
-        globals: {
-          'react-slick': 'ReactSlick'
-        }
-      }
+    commonjsOptions: {
+      include: [/react-slick/, /node_modules/]
     }
   }
-})
+});
