@@ -334,7 +334,7 @@
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -348,10 +348,10 @@
 
 .category-button {
   width: 100%;
-  padding: 1rem;
+  padding: 0.1rem;
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -360,14 +360,20 @@
   justify-content: center;
 }
 
+.category-button:hover {
+  transform: scale(1.05); /* Mărește butonul cu 5% */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Adaugă umbră pentru efect de ridicare */
+  z-index: 1; /* Asigură că butonul mărit apare deasupra celorlalte */
+}
+
 /* Container pentru imagine */
 .image-container {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 0.5rem;
-  height: 80px; /* Înălțime fixă */
+  margin-bottom: 0.1rem;
+  height: 120px; /* Înălțime fixă */
 }
 
 /* Imaginea propriu-zisă */

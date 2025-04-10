@@ -1,13 +1,15 @@
 import fridge from '../assets/images/fridge-logo.jpg';
+import muzica from '../assets/images/guitar-logo.jpg';
+import dancing from '../assets/images/dancing-logo.jpg';
 
 export default function Categories() {
   // Lista de categorii cu descrieri și imagini
   const categories = [
     { description: "Fotografie", image: null },
     { description: "Prajituri", image: null },
-    { description: "Muzica", image: null },
+    { description: "Muzica", image: muzica },
     { description: "Reparații", image: fridge },
-    { description: "Dans", image: null },
+    { description: "Dans", image: dancing },
     { description: "Artizanat", image: null },
     { description: "Gradinarit", image: null },
     { description: "Sport", image: null },
