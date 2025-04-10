@@ -1,9 +1,18 @@
+import fridge from '../assets/images/fridge-logo.jpg';
+
 export default function Categories() {
-  // Lista de categorii
+  // Lista de categorii cu descrieri și imagini
   const categories = [
-    "Fotografie", "Prajituri", "Muzica", "Reparatii", 
-    "Dans", "Artizanat", "Gradinarit", "Sport",
-    "Arta", "Tehnologie"
+    { description: "Fotografie", image: null },
+    { description: "Prajituri", image: null },
+    { description: "Muzica", image: null },
+    { description: "Reparații", image: fridge },
+    { description: "Dans", image: null },
+    { description: "Artizanat", image: null },
+    { description: "Gradinarit", image: null },
+    { description: "Sport", image: null },
+    { description: "Arta", image: null },
+    { description: "Tehnologie", image: null }
   ];
 
   return (
@@ -11,16 +20,22 @@ export default function Categories() {
       <h2 className="categories-title">Explorează categorii</h2>
       <div className="categories-grid">
         {categories.map((category, index) => (
-          <button 
-            key={index}
-            className="category-button"
-            aria-label={category}
-            // onClick poate fi adăugat ulterior
-          >
-            <span className="button-text">{category}</span>
-            {/* Spațiu rezervat pentru imagine */}
-            <div className="image-placeholder"></div>
-          </button>
+          <div key={index} className="category-card">
+            <button className="category-button">
+              <div className="image-container">
+                {category.image ? (
+                  <img 
+                    src={category.image} 
+                    alt={category.description}
+                    className="category-image"
+                  />
+                ) : (
+                  <div className="image-placeholder"></div>
+                )}
+              </div>
+            </button>
+            <p className="category-description">{category.description}</p>
+          </div>
         ))}
       </div>
     </div>
