@@ -41,9 +41,8 @@ export default function Content() {
   };
 
   return (
-    <section className="content" style={{ padding: '100px 0', backgroundColor: '#F67280' }}>
+    <section className="content">
       <h2 style={{ 
-        textAlign: 'center', 
         color: '#1f2937', 
         fontSize: '3.5rem', 
         marginBottom: '2rem',
@@ -53,7 +52,7 @@ export default function Content() {
       </h2>
 
       <Box sx={{ 
-        maxWidth: '1200px', 
+        maxWidth: '1100px', 
         margin: '0 auto',
         position: 'relative',
         padding: '0 50px'
