@@ -1,7 +1,21 @@
-import { FaSearch, FaBars } from "react-icons/fa"; // Adăugăm FaBars pentru iconița de meniu
+import { FaSearch, FaBars } from "react-icons/fa";
 import hobby from '../assets/images/hobby_img.jpg';
 
 export default function MainStage() {
+  const scrollToContent = () => {
+    // Selectează PRIMUL element cu clasa 'content'
+    const categoriesElement = document.querySelector('.categories-container');
+    
+    if (categoriesElement) {
+      categoriesElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      console.warn("Elementul cu clasa 'content' nu a fost găsit");
+    }
+  };
+
   return (
     <div className="main-stage">
       {/* Container pentru butonul categorii și search bar */}
@@ -9,7 +23,7 @@ export default function MainStage() {
         {/* Butonul Categorii */}
         <button 
           className="categories-button"
-          onClick={() => {}} // Funcționalitate viitoare
+          onClick={scrollToContent} // Acum are funcționalitate
         >
           <FaBars className="categories-icon" />
           <span>Categorii</span>
