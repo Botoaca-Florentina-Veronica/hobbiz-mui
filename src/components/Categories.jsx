@@ -1,20 +1,24 @@
 import fridge from '../assets/images/fridge-logo.jpg';
 import muzica from '../assets/images/guitar-logo.jpg';
 import dancing from '../assets/images/dancing-logo.jpg';
+import gardening from '../assets/images/gardening-logo.jpg';
+import tennis from '../assets/images/tennis-logo.jpg';
+import it from '../assets/images/it-logo.jpg';
+import camera from '../assets/images/camera-logo.jpg';
 
 export default function Categories() {
   // Lista de categorii cu descrieri și imagini
   const categories = [
-    { description: "Fotografie", image: null },
+    { description: "Fotografie", image: camera },
     { description: "Prajituri", image: null },
     { description: "Muzica", image: muzica },
     { description: "Reparații", image: fridge },
     { description: "Dans", image: dancing },
     { description: "Artizanat", image: null },
-    { description: "Gradinarit", image: null },
-    { description: "Sport", image: null },
+    { description: "Gradinarit", image: gardening },
+    { description: "Sport", image: tennis },
     { description: "Arta", image: null },
-    { description: "Tehnologie", image: null }
+    { description: "Tehnologie", image: it }
   ];
 
   return (
