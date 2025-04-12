@@ -52,20 +52,33 @@
   color: #F8B195;
 }
 
-.icon-btn {
-  background: none;
+/* Butonul unificat pentru cont */
+.user-account-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Spațiu între iconiță și text */
+  background: transparent;
   border: none;
   cursor: pointer;
-  color: #F8B195;
-  font-size: 1.8rem;
-  margin-right: 120px;
-  padding: 5px;
-  transition: all 0.3s ease;
+  padding: 0.5rem 1rem; /* Padding pentru a mări zona de click */
+  font-size: 1.2rem;
+  color: inherit; /* Preia culoarea din context */
+  transition: all 0.2s ease;
+  margin-right: 6rem;
 }
 
-.icon-btn:hover, .favorite-btn:hover {
+.user-account-btn:hover {
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.05); /* Efect de hover subtil */
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+.favorite-btn:hover, .user-account-btn:hover {
   transform: scale(1.1);
   color: #ffffff;
+  cursor: pointer;
 }
 
 /* ***************** MAIN STAGE CONTAINER ******************** */
