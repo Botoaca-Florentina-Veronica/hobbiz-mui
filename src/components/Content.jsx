@@ -42,15 +42,7 @@ export default function Content() {
 
   return (
     <section className="content">
-      <h2 style={{ 
-        color: '#1f2937', 
-        fontSize: '3.5rem', 
-        marginBottom: '2rem',
-        fontWeight: 'bolder'
-      }}>
-        Anunțuri populare
-      </h2>
-
+      <h2>Anunțuri populare</h2>
       <Box sx={{ 
         maxWidth: '1100px', 
         margin: '0 auto',

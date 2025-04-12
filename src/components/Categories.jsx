@@ -18,7 +18,9 @@ export default function Categories() {
     { description: "Gradinarit", image: gardening },
     { description: "Sport", image: tennis },
     { description: "Arta", image: null },
-    { description: "Tehnologie", image: it }
+    { description: "Tehnologie", image: it },
+    { description: "Altele", image: null },
+    { description: "Servicii", image: null },
   ];
 
   return (
