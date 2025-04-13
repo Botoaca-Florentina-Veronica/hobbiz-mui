@@ -9,3 +9,7 @@ hobbiz-mui/                  # Rădăcina proiectului (opțional)
     ├── routes/
     ├── package.json
     └── ...
+
+Observatii:
+-daca nu merge ceva la deploy pe netlify, e posibil sa fie de la faptul
+ca nu ai dat cu import la imaginile folosite(trebuie sa apara neaparat in dist)

@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "cd frontend && npm install && npm run build"  # Intră în folderul frontend înainte de build
+  publish = "frontend/dist"  # Calea către folderul `dist` generat
 
 [build.environment]
   NODE_VERSION = "22"
