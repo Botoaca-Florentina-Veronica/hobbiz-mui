@@ -13,3 +13,5 @@ hobbiz-mui/                  # Rădăcina proiectului (opțional)
 Observatii:
 -daca nu merge ceva la deploy pe netlify, e posibil sa fie de la faptul
 ca nu ai dat cu import la imaginile folosite(trebuie sa apara neaparat in dist)
+-pui doar "dist", nu "frontend/dist" (base se adaugă automat) cand faci deploy 
+si modifici netlify.toml
