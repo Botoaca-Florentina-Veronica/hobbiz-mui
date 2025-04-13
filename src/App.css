@@ -585,6 +585,7 @@ body.dark-mode {
 
 /* *******************  Login page  ********************** */
 .login-container {
+  background-color: white;
   max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
@@ -654,4 +655,9 @@ body.dark-mode {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  cursor: pointer;
+}
+
+.submit-btn {
+  height: 2.5rem;
 }

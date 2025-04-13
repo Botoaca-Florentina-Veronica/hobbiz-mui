@@ -5,12 +5,13 @@ import gardening from '../assets/images/gardening-logo.jpg';
 import tennis from '../assets/images/tennis-logo.jpg';
 import it from '../assets/images/it-logo.jpg';
 import camera from '../assets/images/camera-logo.jpg';
+import prajituri from '../assets/images/prajituri.jpg';
 
 export default function Categories() {
   // Lista de categorii cu descrieri și imagini
   const categories = [
     { description: "Fotografie", image: camera },
-    { description: "Prajituri", image: null },
+    { description: "Prajituri", image: prajituri },
     { description: "Muzica", image: muzica },
     { description: "Reparații", image: fridge },
     { description: "Dans", image: dancing },

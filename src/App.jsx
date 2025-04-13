@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Outlet } from "react-router-dom"; // Adaugă Outlet
+import { Routes, Route } from "react-router-dom";
 import Header from './components/Header';
 import MainStage from './components/MainStage';
 import Content from './components/Content';
@@ -30,26 +30,22 @@ function App() {
 
   return (
     <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
-      <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      <Header />
-      
-      {/* Configurare rute */}
       <Routes>
-        {/* Ruta principală (acasă) */}
-        <Route
-          path="/"
-          element={
-            <>
-              <MainStage />
-              <Content />
-              <Categories />
-              <CallToAction />
-              <Footer />
-            </>
-          }
-        />
-        {/* Ruta pentru login */}
+        {/* Ruta de login - fără Header, Footer și DarkModeToggle */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Toate celelalte rute - cu Header, Footer și DarkModeToggle */}
+        <Route path="/*" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <MainStage />
+            <Content />
+            <Categories />
+            <CallToAction />
+            <Footer />
+          </>
+        } />
       </Routes>
     </div>
   );

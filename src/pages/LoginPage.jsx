@@ -1,8 +1,14 @@
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons'; // Componente personalizate
 import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
+   // Adaugă clasa la mount și o elimină la unmount
+  useEffect(() => {
+    document.body.classList.add('login-page');
+    return () => document.body.classList.remove('login-page');
+  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -40,7 +46,7 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Intră în cont</button>
+        <button className ="submit-btn" type="submit">Intră în cont</button>
       </form>
 
       <div className="login-links">

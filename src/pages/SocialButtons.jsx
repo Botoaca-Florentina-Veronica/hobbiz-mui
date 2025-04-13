@@ -1,4 +1,6 @@
-import googleLogo from '../assets/images/google-icon-logo.svg';
+import googleLogo from '../assets/images/google-logo.svg';
+import facebookLogo from '../assets/images/facebook-logo.png';
+import appleLogo from '../assets/images/apple-logo.png';
 // Buton Google
 export function GoogleLoginButton({ onClick }) {
     return (
@@ -13,7 +15,7 @@ export function GoogleLoginButton({ onClick }) {
   export function FacebookLoginButton({ onClick }) {
     return (
       <button className="social-btn facebook" onClick={onClick}>
-        <img src="/icons/facebook.svg" alt="Facebook" />
+        <img src={facebookLogo} alt="Facebook" />
         Continuă cu Facebook
       </button>
     );
@@ -23,7 +25,7 @@ export function GoogleLoginButton({ onClick }) {
   export function AppleLoginButton({ onClick }) {
     return (
       <button className="social-btn apple" onClick={onClick}>
-        <img src="/icons/apple.svg" alt="Apple" />
+        <img src={appleLogo} alt="Apple" />
         Continuă cu Apple
       </button>
     );
