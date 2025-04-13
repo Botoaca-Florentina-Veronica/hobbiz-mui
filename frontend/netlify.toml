@@ -2,7 +2,8 @@
 [build]
   base = "frontend"  # Spune Netlify să caute în folderul `frontend`
   command = "npm run build"
-  publish = "frontend/dist"  # Calea către build-ul generat
+  publish = "dist"  # Calea către build-ul generat
+  
 
 [build.environment]
   NODE_VERSION = "22"
