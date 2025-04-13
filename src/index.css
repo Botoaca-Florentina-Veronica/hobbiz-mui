@@ -24,7 +24,7 @@ a, .btn {
 
 /* login page */
 body.login-page {
-  background-color: #F8B195 !important;
+  background-color: #f0c0adf2 !important;
   margin: 0;
   min-height: 100vh;
 }
