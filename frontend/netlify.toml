@@ -1,6 +1,7 @@
+
 [build]
   base = "frontend"  # Spune Netlify să caute în folderul `frontend`
-  command = "npm install && npm run build"
+  command = "npm run build"
   publish = "frontend/dist"  # Calea către build-ul generat
 
 [build.environment]
