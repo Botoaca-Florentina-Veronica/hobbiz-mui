@@ -1,0 +1,11 @@
+hobbiz-mui/                  # Rădăcina proiectului (opțional)
+├── frontend/                # Proiect React.js/Vite (deja existent)
+│   ├── src/
+│   ├── package.json
+│   └── ...
+└── backend/                 # Proiect Node.js/Express (nou)
+    ├── server.js
+    ├── models/
+    ├── routes/
+    ├── package.json
+    └── ...
