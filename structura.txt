@@ -1,14 +1,43 @@
 hobbiz-mui/                  # Rădăcina proiectului (opțional)
 ├── frontend/                # Proiect React.js/Vite (deja existent)
-│   ├── src/
-│   ├── package.json
-│   └── ...
-└── backend/                 # Proiect Node.js/Express (nou)
-    ├── server.js
-    ├── models/
-    ├── routes/
+    ├── dist/
+    ├── node_modules/
+    ├── public/         
+    ├── src/
+        ├── assets/
+            ├── images/
+        ├── components/
+            ├── CallToAction.jsx
+            ├── Categories.jsx
+            ├── Content.jsx
+            ├── DarkModeToggle.jsx
+            ├── Footer.jsx
+            ├── Header.jsx
+            ├── MainStage.jsx
+        ├── pages/
+            ├── LoginPage.jsx
+            ├── SocialButtons.jsx
+        ├── App.css
+        ├── App.jsx
+        ├── index.css
+        ├── main.jsx
     ├── package.json
+    ├── package-lock.json
+    ├── vite.config.js
+    ├── index.html
+    ├── .gitattributes
+    ├── .gitignore
+    ├── eslint.config.js
     └── ...
+└── backend/                 # Proiect Node.js/Express 
+    ├── server.js         # Punctul de intrare al serverului (deja îl ai)
+    ├── package.json      # Dependințele Node.js (deja îl ai)
+    ├── package-lock.json # Generat automat de npm
+    ├── models/           # Modelele MongoDB (esential!)
+    │   └── User.js       # Exemplu: model pentru utilizatori
+    ├── routes/           # Rutele API (organizate pe fișiere separate)
+    │   └── userRoutes.js # Exemplu: rute pentru utilizatori
+    └── .env              # Variabile de mediu (optional, dar recomandat)
 
 Observatii:
 -daca nu merge ceva la deploy pe netlify, e posibil sa fie de la faptul
