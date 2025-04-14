@@ -1,34 +1,34 @@
 hobbiz-mui/                  # Rădăcina proiectului (opțional)
 ├── frontend/                # Proiect React.js/Vite (deja existent)
-    ├── dist/
-    ├── node_modules/
-    ├── public/         
-    ├── src/
-        ├── assets/
-            ├── images/
-        ├── components/
-            ├── CallToAction.jsx
-            ├── Categories.jsx
-            ├── Content.jsx
-            ├── DarkModeToggle.jsx
-            ├── Footer.jsx
-            ├── Header.jsx
-            ├── MainStage.jsx
-        ├── pages/
-            ├── LoginPage.jsx
-            ├── SocialButtons.jsx
-        ├── App.css
-        ├── App.jsx
-        ├── index.css
-        ├── main.jsx
-    ├── package.json
-    ├── package-lock.json
-    ├── vite.config.js
-    ├── index.html
-    ├── .gitattributes
-    ├── .gitignore
-    ├── eslint.config.js
-    └── ...
+|    ├── dist/
+|    ├── node_modules/
+|    ├── public/         
+|    ├── src/
+|    |    ├── assets/
+|    |    |    ├── images/
+|    |    ├── components/
+|    |    |    ├── CallToAction.jsx
+|    |    |    ├── Categories.jsx
+|    |    |    ├── Content.jsx
+|    |    |    ├── DarkModeToggle.jsx
+|    |    |    ├── Footer.jsx
+|    |    |    ├── Header.jsx
+|    |    |    ├── MainStage.jsx
+|    |    ├── pages/
+|    |    |    ├── LoginPage.jsx
+|    |    |    ├── SocialButtons.jsx
+|    |    ├── App.css
+|    |    ├── App.jsx
+|    |    ├── index.css
+|    |    ├── main.jsx
+|    ├── package.json
+|    ├── package-lock.json
+|    ├── vite.config.js
+|    ├── index.html
+|    ├── .gitattributes
+|    ├── .gitignore
+|    ├── eslint.config.js
+|    └── ...
 └── backend/                 # Proiect Node.js/Express 
     ├── server.js         # Punctul de intrare al serverului (deja îl ai)
     ├── package.json      # Dependințele Node.js (deja îl ai)
