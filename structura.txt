@@ -30,14 +30,16 @@ hobbiz-mui/                  # Rădăcina proiectului (opțional)
 |    ├── eslint.config.js
 |    └── ...
 └── backend/                 # Proiect Node.js/Express 
-    ├── server.js         # Punctul de intrare al serverului (deja îl ai)
-    ├── package.json      # Dependințele Node.js (deja îl ai)
-    ├── package-lock.json # Generat automat de npm
-    ├── models/           # Modelele MongoDB (esential!)
-    │   └── User.js       # Exemplu: model pentru utilizatori
-    ├── routes/           # Rutele API (organizate pe fișiere separate)
-    │   └── userRoutes.js # Exemplu: rute pentru utilizatori
-    └── .env              # Variabile de mediu (optional, dar recomandat)
+|    ├── server.js         # Punctul de intrare al serverului (deja îl ai)   
+|    ├── package.json      # Dependințele Node.js (deja îl ai)
+|    ├── package-lock.json # Generat automat de npm
+|    ├── routes/           # Rutele API (organizate pe fișiere separate)
+|    │   └── userRoutes.js # Exemplu: rute pentru utilizatori
+|    ├── services/
+|    |   └── UserService.js    
+|    ├── controllers/
+|    |   └── UserController.js    
+|    └── .env              # Variabile de mediu (optional, dar recomandat)
 
 Observatii:
 -daca nu merge ceva la deploy pe netlify, e posibil sa fie de la faptul

@@ -1,20 +1,44 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons'; // Componente personalizate
-import { Link } from 'react-router-dom';
+import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Sau folosește fetch
 
 export default function LoginPage() {
-   // Adaugă clasa la mount și o elimină la unmount
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.body.classList.add('login-page');
     return () => document.body.classList.remove('login-page');
   }, []);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logica de autentificare
+    setLoading(true);
+    setError('');
+
+    try {
+      // Trimite cererea la backend
+      const response = await axios.post('http://localhost:5000/api/users/login', {
+        email,
+        password
+      });
+
+      // Salvează token-ul în localStorage/sessionStorage
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userId', response.data.userId);
+
+      // Redirect către pagina principală sau dashboard
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Autentificare eșuată');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +56,8 @@ export default function LoginPage() {
 
       {/* Formular clasic */}
       <form onSubmit={handleSubmit} className="email-login">
+        {error && <div className="error-message">{error}</div>}
+        
         <input
           type="email"
           placeholder="Adresa ta de email"
@@ -46,7 +72,13 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button className ="submit-btn" type="submit">Intră în cont</button>
+        <button 
+          className="submit-btn" 
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Se încarcă...' : 'Intră în cont'}
+        </button>
       </form>
 
       <div className="login-links">
