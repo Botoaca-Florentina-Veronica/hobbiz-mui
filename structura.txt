@@ -39,6 +39,8 @@ hobbiz-mui/                  # Rădăcina proiectului (opțional)
 |    |   └── UserService.js    
 |    ├── controllers/
 |    |   └── UserController.js    
+|    ├── models/
+|    |   └── User.js    
 |    └── .env              # Variabile de mediu (optional, dar recomandat)
 
 Observatii:

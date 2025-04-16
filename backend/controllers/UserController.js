@@ -1,17 +1,29 @@
-const User = require('../models/user');
+// controllers/userController.js
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Înregistrare
 exports.register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    const user = new User({ username, email, password });
+    const { firstName, lastName, email, password, phone } = req.body;
+    
+    // Verifică dacă emailul există deja
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Emailul este deja înregistrat' });
+    }
+
+    // Creează noul utilizator
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+      phone
+    });
+
     await user.save();
-    
-    // Generează token JWT
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    
-    res.status(201).json({ token, userId: user._id });
+    res.status(201).json({ message: 'Cont creat cu succes' });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

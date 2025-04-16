@@ -8,6 +8,7 @@ import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
+import SignupPage from './pages/SignupPage';
 import './App.css';
 
 function App() {
@@ -31,10 +32,11 @@ function App() {
   return (
     <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
       <Routes>
-        {/* Ruta de login - fără Header, Footer și DarkModeToggle */}
+        {/* Rute de autentificare - fără Header/Footer */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-        {/* Toate celelalte rute - cu Header, Footer și DarkModeToggle */}
+        {/* Toate celelalte rute - cu layout complet */}
         <Route path="/*" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
