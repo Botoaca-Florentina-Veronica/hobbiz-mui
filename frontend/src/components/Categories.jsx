@@ -6,6 +6,7 @@ import tennis from '../assets/images/tennis-logo.jpg';
 import it from '../assets/images/it-logo.jpg';
 import camera from '../assets/images/camera-logo.jpg';
 import prajituri from '../assets/images/prajituri.jpg';
+import carte from '../assets/images/carte.png';
 
 export default function Categories() {
   // Lista de categorii cu descrieri și imagini
@@ -21,7 +22,7 @@ export default function Categories() {
     { description: "Arta", image: null },
     { description: "Tehnologie", image: it },
     { description: "Altele", image: null },
-    { description: "Servicii", image: null },
+    { description: "Meditații", image: carte },
   ];
 
   return (
