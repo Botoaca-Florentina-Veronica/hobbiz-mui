@@ -5,7 +5,7 @@ https://hobbiz.netlify.app/
 ---
 
 # 🚀 **Hobbiz**  
-*A MERN Stack Web App for Hobby Management & Social Connection*  
+*A MERN Stack Web App for Hobby Management & Side-hustles*  
 
 ---
 
@@ -80,8 +80,8 @@ hobbiz-mui/
 ---
 
 ## 🌐 **Deployment**  
-- **Frontend**: Hosted on Vercel  
-- **Backend**: Deployed on Render  
+- **Frontend**: Hosted on Netlify 
+- **Backend**: -
 - **Database**: MongoDB Atlas cluster  
 - **CI/CD**: GitHub Actions  
 
@@ -91,5 +91,6 @@ hobbiz-mui/
 - [MERN Stack Documentation](https://www.mongodb.com/mern-stack)  
 - [React Official Docs](https://react.dev/)  
 - [Mongoose Guide](https://mongoosejs.com/docs/guide.html)  
+- [Express](https://expressjs.com/)
 
 ---
