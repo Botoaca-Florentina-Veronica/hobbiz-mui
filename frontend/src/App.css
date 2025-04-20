@@ -211,33 +211,6 @@
   transform: translateY(-3px);
 }
 
-/* ***************** RESPONSIVE ******************** */
-@media (max-width: 1200px) {
-  .main-stage {
-    padding: 30px 50px;
-  }
-  
-  .main-content {
-    flex-direction: column;
-  }
-  
-  .main-text {
-    margin-right: 0;
-    margin-bottom: 40px;
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .search-container {
-    max-width: 100%;
-  }
-  
-  .main-stage-image img {
-    width: 100%;
-  }
-}
-
 /* ****************  content  ******************** */
 .content {
   padding: 150px 0px 150px 0px;
@@ -354,12 +327,6 @@
   gap: 2rem;
   max-width: 1000px; /* Mărește lățimea maximă pentru a încăpea mai multe categorii */
   margin: 0 auto;
-}
-
-@media (max-width: 768px) {
-  .categories-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 coloane pe mobile */
-  }
 }
 
 .category-card {

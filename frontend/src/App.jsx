@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route } from "react-router-dom";
+import { FiUser, FiHeart, FiCompass } from 'react-icons/fi';
 import Header from './components/Header';
 import MainStage from './components/MainStage';
 import Content from './components/Content';
@@ -10,6 +11,7 @@ import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
 import './App.css';
+import './mediaQueries.css';
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
