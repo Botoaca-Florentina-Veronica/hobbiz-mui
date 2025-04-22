@@ -1,15 +1,36 @@
 import { useNavigate } from "react-router-dom";
 import { HiOutlineUser, HiOutlineHeart } from "react-icons/hi";
-import logo from '../assets/images/logo.jpg';
+import logoLight from '../assets/images/logo.jpg';
+import logoDark from '../assets/images/logo-dark-mode.png';
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Verifică dacă body are clasa 'dark-mode' la montarea componentei
+    const body = document.body;
+    setIsDarkMode(body.classList.contains('dark-mode'));
+
+    // Opțional: Ascultă modificări ale clasei 'dark-mode' pe body
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(body.classList.contains('dark-mode'));
+    });
+
+    observer.observe(body, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="header">
       <ul className="logo">
         <li>
-          <img src={logo} alt="Logo" />
+          <img src={isDarkMode ? logoDark : logoLight} alt="Logo" />
         </li>
       </ul>
       <ul className="nav-right">
@@ -24,9 +45,9 @@ export default function Header() {
         <li>
           <button 
             className="user-account-btn" 
-            onClick={() => navigate("/login")} // Navigare către login
+            onClick={() => navigate("/login")}
           >
-            <HiOutlineUser size={24} /> {/* Mărește la 24px */}
+            <HiOutlineUser size={24} />
             <span>Contul tău</span>
           </button>
         </li>

@@ -477,12 +477,12 @@ body.dark-mode {
 }
 
 .dark-mode .add-button {
-  background-color: #ff7e95;
+  background-color: #ffabb7;
   color: #282828;
 }
 
 .dark-mode .categories-button {
-  background-color: #F51866;
+  background-color: #ffabb7;
   color: #282828  ;
 }
 
@@ -494,6 +494,11 @@ body.dark-mode {
   background-color: #282828;
   border-color: #282828;
   color: #eceeef;
+}
+
+.dark-mode .search-button{
+  background-color: #F51866;
+  color: #282828;
 }
 
 .dark-mode .main-text #main-title {
