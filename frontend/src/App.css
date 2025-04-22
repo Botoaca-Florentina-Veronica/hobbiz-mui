@@ -233,7 +233,7 @@
 .content {
   padding: 150px 0px 150px 0px;
   color: black;
-  font-size: 20px;
+  font-size: 40px;
   font-weight: bold;
   background-color: white;
   height: 80vh;
@@ -546,6 +546,10 @@ body.dark-mode {
   border-color: #2f2119;
 }
 
+.dark-mode .categories-title{
+  color: #fa4875;
+}
+
 .dark-mode .category-button {
   width: 100%;
   padding: 0.1rem;
@@ -580,16 +584,21 @@ body.dark-mode {
   color: #eceeef;
 }
 
+.dark-mode .dark-mode-toggle button{
+  background-color: #f51866;
+  color: #e2e7eb;
+}
+
 /* ******************* Dark mode toggle button ********************** */
 .dark-mode-toggle {
   position: fixed;
-  top: 20px;
+  top: 15px;
   right: 20px;
   z-index: 9999;
 }
 
 .dark-mode-toggle button {
-  background-color: #3f1b0f;
+  background-color: #eaac8bd7;
   color: #e2e7eb;
   border: none;
   padding: 10px 20px;

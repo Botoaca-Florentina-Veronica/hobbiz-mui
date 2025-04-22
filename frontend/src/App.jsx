@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route } from "react-router-dom";
 import { FiUser, FiHeart, FiCompass } from 'react-icons/fi';
+import { FiSun, FiMoon } from 'react-icons/fi';
 import Header from './components/Header';
 import MainStage from './components/MainStage';
 import Content from './components/Content';

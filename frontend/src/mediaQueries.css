@@ -6,6 +6,14 @@
       height: auto;
       padding: 1rem;
     }
+
+    .main-stage, 
+    .content, 
+    .categories-container, 
+    .call-to-action {
+      margin-top: 108px; /* Înălțimea header-ului */
+    }
+        
   
     .header ul {
       margin-left: 0;
