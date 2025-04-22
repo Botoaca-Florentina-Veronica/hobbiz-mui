@@ -31,7 +31,7 @@
 
 .add-button{
   background-color: white;
-  color: #355C7D;
+  color: #355070; 
   border: none;
   border-radius: 4px;
   padding: 14px 24px;
@@ -103,7 +103,7 @@
 .categories-button {
   display: flex;
   align-items: center;
-  background-color: #355C7D;
+  background-color: #355070;
   color: white;
   border: none;
   border-radius: 4px;
@@ -114,7 +114,7 @@
 }
 
 .categories-button:hover {
-  background-color: #2a4a65;
+  background-color: #355070;
 }
 
 .categories-icon {
@@ -144,7 +144,7 @@
   display: flex;
   align-items: center;
   padding: 0 25px;
-  background-color: #355C7D;
+  background-color: #355070;
   color: white;
   border: none;
   border-radius: 0 8px 8px 0;
@@ -154,7 +154,7 @@
 }
 
 .search-button:hover {
-  background-color: #2a4a65;
+  background-color: #355070;
 }
 
 .search-icon {
@@ -181,7 +181,7 @@
 }
 
 #main-title {
-  color: #355C7D;
+  color: #355070;
   font-size: 2.8rem;
   margin-bottom: 20px;
 }
@@ -197,7 +197,7 @@
 .sign-up-button {
   margin-top: 20px;
   padding: 15px 30px;
-  background-color: #355C7D;
+  background-color: #355070;
   color: white;
   border: none;
   border-radius: 8px;
@@ -207,7 +207,7 @@
 }
 
 .sign-up-button:hover {
-  background-color: #2a4a65;
+  background-color: #355070;
   transform: translateY(-3px);
 }
 
@@ -308,7 +308,7 @@
 .categories-container {
   padding: 2rem;
   text-align: center;
-  background-color: #355C7D;
+  background-color: #355070;
   height: auto;
   min-height: 102vh;
 }
@@ -437,19 +437,22 @@
   margin-bottom: -470px;
 }
 
+
 /* ****************** Dark Mode Styles ********************** */
 body.dark-mode {
-  background-color: #342b2b;
+  background-color: #121212;
   color: #c7c7c7;
 }
 
-.dark-mode .header,
+.dark-mode .header {
+  background-color: #282828;
+  color: #c7c7c7;
+}
 .dark-mode .main-stage,
 .dark-mode .content,
-.dark-mode .quote-assembly,
 .dark-mode .hole-action,
 .dark-mode .footer {
-  background-color: #342b2b;
+  background-color: #121212;
   color: #c7c7c7;
 }
 
@@ -463,8 +466,34 @@ body.dark-mode {
 }
 
 .dark-mode .main-text {
-  color: #eceeef;
+  color: #F51866;
   border-color: #f9f1ea;
+  background-color: #282828;
+}
+
+.dark-mode .favorite-btn, 
+.dark-mode .user-account-btn {
+  color: #ff7e95;
+}
+
+.dark-mode .add-button {
+  background-color: #ff7e95;
+  color: #282828;
+}
+
+.dark-mode .categories-button {
+  background-color: #F51866;
+  color: #282828  ;
+}
+
+.dark-mode .categories-container{
+  background-color: #121212;
+}
+
+.dark-mode .search-input{
+  background-color: #282828;
+  border-color: #282828;
+  color: #eceeef;
 }
 
 .dark-mode .main-text #main-title {
@@ -482,7 +511,7 @@ body.dark-mode {
 }
 
 .dark-mode .content {
-  background-color: #412b24;
+  background-color: #282828;
   color: #eceeef;
 }
 
@@ -492,19 +521,6 @@ body.dark-mode {
 
 .dark-mode .card img {
   border-color: #2f2119;
-}
-
-.dark-mode .quote-assembly {
-  background-color: #2c1b1b;
-  color: #e2e7eb;
-}
-
-.dark-mode .quote-text {
-  color: #e2e7eb;
-}
-
-.dark-mode .quote-author {
-  color: #eceeef;
 }
 
 .dark-mode .call-to-action {

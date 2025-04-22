@@ -32,10 +32,14 @@
   
     /* ----------------- Search Bar ----------------- */
     .search-container {
-      width: 100% !important;
+      width: 6rem !important;
       margin: 1rem 0 !important;
-      order: 2; /* Pune search bar-ul sub logo */
+      margin-left: -17rem !important;
     }
+
+    .search-button {
+        width: 6rem;
+      }
 
     .top-bar {
        flex-direction: column;
@@ -54,6 +58,10 @@
       margin-right: 0;
       margin-bottom: 2rem;
     }
+
+    .main-stage-image img {
+        width: 320px;
+      }
   
     /* ----------------- Footer Fixat (Mobile Menu) ----------------- */
     .footer {
