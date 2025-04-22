@@ -57,7 +57,7 @@ export default function Content() {
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 1,
-            backgroundColor: '#355C7D',
+            backgroundColor: '#f51866',
             color: 'white',
             '&:hover': {
               backgroundColor: '#2a4a65'
@@ -93,7 +93,7 @@ export default function Content() {
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 1,
-            backgroundColor: '#355C7D',
+            backgroundColor: '#f51866',
             color: 'white',
             '&:hover': {
               backgroundColor: '#2a4a65'

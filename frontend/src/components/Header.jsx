@@ -9,11 +9,9 @@ export default function Header() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // Verifică dacă body are clasa 'dark-mode' la montarea componentei
     const body = document.body;
     setIsDarkMode(body.classList.contains('dark-mode'));
 
-    // Opțional: Ascultă modificări ale clasei 'dark-mode' pe body
     const observer = new MutationObserver(() => {
       setIsDarkMode(body.classList.contains('dark-mode'));
     });
@@ -27,7 +25,7 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="header">
+    <div className="header fixed-header"> {/* Adaugă clasa fixed-header */}
       <ul className="logo">
         <li>
           <img src={isDarkMode ? logoDark : logoLight} alt="Logo" />
