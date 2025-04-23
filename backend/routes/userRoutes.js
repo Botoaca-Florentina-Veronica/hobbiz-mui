@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/UserController');
+const { register, login, getProfile } = require('../controllers/UserController');
 const auth = require('../middleware/auth');
 
-// Rute pentru autentificare
-router.post('/register', userController.register);
-router.post('/login', userController.login);
-
-// Rută protejată (necesită autentificare)
-router.get('/profile', auth, userController.getProfile);
+// Rute
+router.post('/register', register);  // User e folosit în controller
+router.post('/login', login);       // User e folosit în controller
+router.get('/profile', auth, getProfile); // User e folosit în controller
 
 module.exports = router;
