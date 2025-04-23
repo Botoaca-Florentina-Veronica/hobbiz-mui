@@ -1,32 +1,35 @@
-// server.js
-require('dotenv').config(); // Încarcă variabilele din .env
+// backend/server.js
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const userRoutes = require('./routes/userRoutes'); // Importă rutele pentru utilizatori
+const connectDB = require('./config/db'); // Importă conexiunea
+const userRoutes = require('./routes/userRoutes');
 
-// Inițializează aplicația Express
 const app = express();
 
 // Middleware
-app.use(cors()); // Permite cereri cross-origin (pentru frontend)
-app.use(express.json()); // Parsează corpul cererilor JSON
+app.use(cors());
+app.use(express.json());
 
-// Conectare la MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ Conectat la MongoDB'))
-  .catch(err => console.error('❌ Eroare la conectarea la MongoDB:', err));
+// Conectare la baza de date
+connectDB(); // Apelează funcția exportată
 
 // Rute
-app.use('/api/users', userRoutes); // Folosește rutele pentru utilizatori
+app.use('/api/users', userRoutes);
 
-// Ruta de bază (test)
 app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
 });
 
-// Pornește serverul
+// Pornire server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🔥 Serverul rulează pe http://localhost:${PORT}`);
+  console.log(`🔥 Server pe http://localhost:${PORT}`);
+});
+
+// Gestionare închidere grațioasă (opțional)
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  console.log('⏹️ Conexiune MongoDB închisă grațios');
+  process.exit(0);
 });

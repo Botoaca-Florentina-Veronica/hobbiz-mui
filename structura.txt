@@ -29,7 +29,7 @@ hobbiz-mui/                  # Rădăcina proiectului (opțional)
 |    ├── .gitignore
 |    ├── eslint.config.js
 |    └── ...
-└── backend/                 # Proiect Node.js/Express 
+└── backend/               # Proiect Node.js/Express 
 |    ├── server.js         # Punctul de intrare al serverului (deja îl ai)   
 |    ├── package.json      # Dependințele Node.js (deja îl ai)
 |    ├── package-lock.json # Generat automat de npm
@@ -40,7 +40,9 @@ hobbiz-mui/                  # Rădăcina proiectului (opțional)
 |    ├── controllers/
 |    |   └── UserController.js    
 |    ├── models/
-|    |   └── User.js    
+|    |   └── User.js
+|    ├── config/
+|    │   └── db.js         # Conexiunea la MongoDB    
 |    └── .env              # Variabile de mediu (optional, dar recomandat)
 
 Observatii:
