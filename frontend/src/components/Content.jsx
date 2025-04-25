@@ -1,59 +1,47 @@
 import React, { useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 
-// Importuri corecte pentru imagini
-import prajituri from '../assets/images/prajituri-asortate.jpg';
-import guitar from '../assets/images/guitar-lessons.jpg';
+// Importuri imagini
+import guitar from '../assets/images/guitar-lessons.jpg'
+import crosetat from '../assets/images/crosetat.png';
 import fridge from '../assets/images/Fridge-Repair.jpg';
 import dancing from '../assets/images/dancing.jpg';
+import cooking from '../assets/images/cooking.png';
+import pregatire from '../assets/images/pregatire.png';
 
 export default function Content() {
-  const sliderRef = useRef(null);
-  
+  const carouselRef = useRef(null);
+
+  const handleScroll = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = 400; // Valoare fixă pentru scroll sau poți calcula dinamic
+      carouselRef.current.scrollLeft += direction === 'left' ? -scrollAmount : scrollAmount;
+    }
+  };
+
   const images = [
-    { src: prajituri, alt: "Prăjituri asortate" },
+    { src: cooking, alt: "Gătind prăjituri" },
+    { src: crosetat, alt: "Croșetare" },
     { src: guitar, alt: "Lecții de chitară" },
     { src: fridge, alt: "Reparații frigidere" },
+    { src: pregatire, alt: "Pregătire pentru examen" },
     { src: dancing, alt: "Dans" }
   ];
-
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    arrows: false,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: 2 }
-      },
-      {
-        breakpoint: 600,
-        settings: { slidesToShow: 1 }
-      }
-    ]
-  };
 
   return (
     <section className="content">
       <h2>Anunțuri populare</h2>
       <Box sx={{ 
-        maxWidth: '1100px', 
+        maxWidth: '1100px',
         margin: '0 auto',
-        position: 'relative',
-        padding: '0 50px'
+        position: 'relative'
       }}>
         <IconButton 
-          onClick={() => sliderRef.current.slickPrev()}
+          onClick={() => handleScroll('left')}
           sx={{
             position: 'absolute',
-            left: 0,
+            left: '-50px',
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 1,
@@ -67,11 +55,40 @@ export default function Content() {
           <ChevronLeft fontSize="large" />
         </IconButton>
 
-        <Slider ref={sliderRef} {...settings}>
+        {/* Carusel cu scrollbar vizibil */}
+        <Box
+          ref={carouselRef}
+          sx={{
+            display: 'flex',
+            gap: '20px',
+            overflowX: 'auto',
+            scrollBehavior: 'smooth',
+            padding: '20px 10px',
+            '&::-webkit-scrollbar': {
+              height: '8px',
+              backgroundColor: '#f5f5f5'
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#f51866',
+              borderRadius: '4px'
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px'
+            }
+          }}
+        >
           {images.map((img, index) => (
-            <Box key={index} sx={{ padding: '0 10px' }}>
+            <Box 
+              key={index}
+              sx={{ 
+                minWidth: '380px',
+                flexShrink: 0,
+                position: 'relative'
+              }}
+            >
               <img
-                src={img.src} 
+                src={img.src}
                 alt={img.alt}
                 style={{
                   width: '100%',
@@ -83,13 +100,13 @@ export default function Content() {
               />
             </Box>
           ))}
-        </Slider>
+        </Box>
 
         <IconButton
-          onClick={() => sliderRef.current.slickNext()}
+          onClick={() => handleScroll('right')}
           sx={{
             position: 'absolute',
-            right: 0,
+            right: '-50px',
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 1,
