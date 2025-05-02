@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 // Înregistrare utilizator
 exports.register = async (req, res) => {
-  try {
+  try { 
     const { firstName, lastName, email, password, phone } = req.body;
 
     // Validare date
