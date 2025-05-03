@@ -21,12 +21,12 @@ export default function Content() {
   };
 
   const images = [
-    { src: cooking, alt: "Gătind prăjituri" },
+    { src: dancing, alt: "Dans" },
     { src: crosetat, alt: "Croșetare" },
     { src: guitar, alt: "Lecții de chitară" },
     { src: fridge, alt: "Reparații frigidere" },
     { src: pregatire, alt: "Pregătire pentru examen" },
-    { src: dancing, alt: "Dans" }
+    { src: cooking, alt: "Gătind prăjituri" }
   ];
 
   return (

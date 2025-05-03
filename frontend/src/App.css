@@ -247,8 +247,8 @@
 .search-container {
   display: flex;
   width: 70%; 
-  max-width: 500px;
-  margin-left: 250px;
+  max-width: 1400px;
+  margin-left: 100px;
 }
 
 .search-input {
@@ -281,6 +281,39 @@
 .search-icon {
   margin-left: 10px;
   font-size: 1.2rem;
+}
+
+/* Stilizare pentru secțiunea de locație din search-bar */
+.location-section {
+  display: flex; /* Flex pentru aliniere pe același rând */
+  align-items: center; /* Aliniere verticală */
+  justify-content: center; /* Centrare orizontală */
+  gap: 10px; /* Spațiu între iconiță și text */
+  padding: 0 15px; /* Padding uniform */
+  border: 2px solid #e0e0e0;
+  font-size: 1rem;
+  color: #333;
+  background-color: #fff;
+  white-space: nowrap; /* Previne textul să treacă pe alt rând */
+}
+
+/* Stilizare pentru input-ul din secțiunea 'Toată țara' */
+.location-input {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  color: #333;
+  background-color: transparent;
+}
+
+.location-input::placeholder {
+  color: #aaa; /* Gri deschis pentru textul placeholder */
+}
+
+.location-input:focus::placeholder {
+  color: transparent; /* Dispare când utilizatorul tastează */
 }
 
 /* ***************** CONTENT (text + image) ******************** */
