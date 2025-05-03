@@ -2,8 +2,22 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom"; // Adaugă această linie
+import axios from 'axios';
 import App from "./App";
 import "./index.css";
+
+axios.defaults.baseURL = 'http://localhost:5000';
+axios.interceptors.request.use((config) => {
+  console.log('Cerere trimisă:', config);
+  console.log('Antetul cererii:', config.headers);
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

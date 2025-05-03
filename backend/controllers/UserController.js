@@ -77,6 +77,8 @@ exports.login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    console.log('Token generat:', token);
+
     res.json({ 
       message: 'Autentificare reușită',
       token,

@@ -99,6 +99,92 @@
   cursor: pointer;
 }
 
+/* Dropdown menu styles */
+.user-account-container {
+  position: relative;
+}
+
+.user-account-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+.user-account-btn:hover {
+  color: #007BFF;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  width: 200px;
+  display: flex;
+  flex-direction: column; /* Asigură afișarea pe verticală */
+}
+
+/* Forțare afișare pe verticală */
+.dropdown-menu {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.dropdown-menu li {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+  display: block; /* Asigură afișarea fiecărui element pe un rând */
+}
+
+.dropdown-menu li:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-menu li strong {
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+}
+
+.dropdown-menu li button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dropdown-menu li button:hover {
+  color: #007BFF;
+}
+
+/* Section titles */
+.dropdown-menu .section-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #888;
+  margin: 8px 16px 4px;
+  text-transform: uppercase;
+}
+
 /* ***************** MAIN STAGE CONTAINER ******************** */
 .main-stage {
   display: flex;

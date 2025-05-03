@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 module.exports = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
+    console.log('Token primit:', token);
     
     if (!token) {
       return res.status(401).json({ error: 'Acces neautorizat' });
