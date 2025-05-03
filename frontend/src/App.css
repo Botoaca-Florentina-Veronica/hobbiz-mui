@@ -99,90 +99,107 @@
   cursor: pointer;
 }
 
-/* Dropdown menu styles */
+/* Dropdown Styles */
 .user-account-container {
   position: relative;
+  margin-right: 6rem;
 }
 
-.user-account-btn {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
+.dropdown {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+}
+
+.for-dropdown {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  color: #333;
+  gap: 0.5rem;
+  color: #F8B195;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
 }
 
-.user-account-btn:hover {
-  color: #007BFF;
+.for-dropdown:hover {
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
 }
 
-.dropdown-menu {
+.section-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
+  width: 220px;
   background-color: #fff;
-  border: 1px solid #ddd;
   border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  z-index: 1000;
-  width: 200px;
-  display: flex;
-  flex-direction: column; /* Asigură afișarea pe verticală */
+  padding: 5px;
+  box-shadow: 0 14px 35px 0 rgba(9,9,12,0.4);
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 200ms ease-out;
+  margin-top: 10px;
 }
 
-/* Forțare afișare pe verticală */
-.dropdown-menu {
-  display: flex !important;
-  flex-direction: column !important;
+.dropdown:checked ~ .section-dropdown,
+.user-account-container:hover .section-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
-.dropdown-menu li {
-  padding: 12px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #333;
+.section-dropdown a {
+  display: block;
+  color: #355070;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: all 100ms linear;
+  border-radius: 2px;
   text-align: left;
-  display: block; /* Asigură afișarea fiecărui element pe un rând */
 }
 
-.dropdown-menu li:hover {
-  background-color: #f5f5f5;
-}
-
-.dropdown-menu li strong {
-  font-weight: bold;
-  font-size: 16px;
-  color: #000;
-}
-
-.dropdown-menu li button {
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  padding: 0;
-  font-size: inherit;
-  color: inherit;
+.section-dropdown a:hover {
+  color: #fff;
+  background-color: #355070;
   cursor: pointer;
 }
 
-.dropdown-menu li button:hover {
-  color: #007BFF;
+/* Arrow */
+.section-dropdown:after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 20px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
 }
 
-/* Section titles */
-.dropdown-menu .section-title {
-  font-size: 12px;
-  font-weight: bold;
-  color: #888;
-  margin: 8px 16px 4px;
-  text-transform: uppercase;
+/* Dark Mode Styles */
+.dark-mode .for-dropdown {
+  color: #ff7e95;
+}
+
+.dark-mode .section-dropdown {
+  background-color: #222121;
+  box-shadow: 0 14px 35px 0 #282828;
+}
+
+.dark-mode .section-dropdown a {
+  background-color: #222121 !important;
+  color: #fff !important;
+}
+
+.dark-mode .section-dropdown a:hover {
+  color: #121212 !important;
+  background-color:#f51866!important; 
+}
+
+.dark-mode .section-dropdown:after {
+  border-bottom-color: #222121;
 }
 
 /* ***************** MAIN STAGE CONTAINER ******************** */

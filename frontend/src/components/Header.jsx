@@ -4,7 +4,6 @@ import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
 import { useEffect, useState } from "react";
 import axios from 'axios';
-import { Menu, MenuItem } from '@mui/material';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -48,7 +47,7 @@ export default function Header() {
   };
 
   const handleMouseLeave = () => {
-    setShowDropdown(false);
+    setTimeout(() => setShowDropdown(false), 200); // Adaugă un delay de 200ms înainte de a închide meniul
   };
 
   const handleLogout = () => {
@@ -60,6 +59,8 @@ export default function Header() {
   const handleAccountClick = () => {
     if (!isAuthenticated) {
       navigate('/login');
+    } else {
+      setShowDropdown(!showDropdown);
     }
   };
 
@@ -84,19 +85,31 @@ export default function Header() {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <button className="user-account-btn" onClick={handleAccountClick}>
+          <input 
+            type="checkbox" 
+            id="account-dropdown" 
+            className="dropdown" 
+            checked={showDropdown}
+            onChange={() => setShowDropdown(!showDropdown)} 
+          />
+          <label 
+            htmlFor="account-dropdown" 
+            className="for-dropdown" 
+            onClick={handleAccountClick}
+          >
             <HiOutlineUser size={24} />
             <span>Contul tău</span>
-          </button>
-          {isAuthenticated && showDropdown && (
-            <ul className="dropdown-menu">
-              <li><button onClick={() => navigate('/setari')}>Setări</button></li>
-              <li><button onClick={() => navigate('/anunturile-mele')}>Anunțurile mele</button></li>
-              <li><button onClick={() => navigate('/profil')}>Profil</button></li>
-              <li><button onClick={() => navigate('/plati')}>Plăți</button></li>
-              <li><button onClick={() => navigate('/contul-tau')}>Contul tău</button></li>
-              <li><button onClick={handleLogout}>Deconectează-te</button></li>
-            </ul>
+          </label>
+          
+          {isAuthenticated && (
+            <div className="section-dropdown">
+              <a onClick={(e) => { e.preventDefault(); navigate('/setari'); }}>Setări</a>
+              <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>Anunțurile mele</a>
+              <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>Profil</a>
+              <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>
+              <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); }}>Contul tău</a>
+              <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>Deconectează-te</a>
+            </div>
           )}
         </li>
       </ul>
