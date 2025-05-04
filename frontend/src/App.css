@@ -646,7 +646,13 @@ body.dark-mode {
 
 .dark-mode .search-input{
   background-color: #282828;
-  border-color: #282828;
+  border-color: #3f3f3f;
+  color: #eceeef;
+}
+
+.dark-mode .location-section{
+  background-color: #282828;
+  border-color: #3f3f3f;
   color: #eceeef;
 }
 
