@@ -1,12 +1,15 @@
-import fridge from '../assets/images/fridge-logo.jpg';
-import muzica from '../assets/images/guitar-logo.jpg';
-import dancing from '../assets/images/dancing-logo.jpg';
+import reparatii from '../assets/images/pipe.png';
+import muzica from '../assets/images/guitar.png';
+import dancing from '../assets/images/salsa.png';
 import gardening from '../assets/images/gardening-logo.jpg';
-import tennis from '../assets/images/tennis-logo.jpg';
-import it from '../assets/images/it-logo.jpg';
-import camera from '../assets/images/camera-logo.jpg';
+import tennis from '../assets/images/tennis.png';
+import it from '../assets/images/laptop.png';
+import camera from '../assets/images/camera.png';
 import prajituri from '../assets/images/prajituri.jpg';
 import carte from '../assets/images/carte.png';
+import arta from '../assets/images/arta.png';
+import masina from '../assets/images/car.png';
+import curatenie from '../assets/images/cleaning.png';
 
 export default function Categories() {
   // Lista de categorii cu descrieri și imagini
@@ -14,14 +17,14 @@ export default function Categories() {
     { description: "Fotografie", image: camera },
     { description: "Prajituri", image: prajituri },
     { description: "Muzica", image: muzica },
-    { description: "Reparații", image: fridge },
+    { description: "Reparații", image: reparatii },
     { description: "Dans", image: dancing },
-    { description: "Artizanat", image: null },
+    { description: "Curățenie", image: curatenie },
     { description: "Gradinarit", image: gardening },
     { description: "Sport", image: tennis },
-    { description: "Arta", image: null },
+    { description: "Arta", image: arta },
     { description: "Tehnologie", image: it },
-    { description: "Altele", image: null },
+    { description: "Auto", image: masina },
     { description: "Meditații", image: carte },
   ];
 
