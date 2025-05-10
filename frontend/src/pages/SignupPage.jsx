@@ -27,7 +27,7 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/users/register`, formData);
       
       // Redirecționează către login cu mesaj de succes
       navigate('/login', { state: { success: 'Cont creat cu succes! Te poți autentifica.' } });
