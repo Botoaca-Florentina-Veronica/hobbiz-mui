@@ -5,6 +5,7 @@ import logoDark from '../assets/images/logo-dark-mode.png';
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
+import apiClient from '../api/api';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -32,9 +33,10 @@ export default function Header() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('/api/users/auth/check');
+        const response = await apiClient.get('/api/users/auth/check');
         setIsAuthenticated(response.data.isAuthenticated);
       } catch (error) {
+        console.error('Eroare la verificarea autentificării:', error);
         setIsAuthenticated(false);
       }
     };

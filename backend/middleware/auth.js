@@ -4,6 +4,8 @@ module.exports = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     console.log('Token primit:', token);
+    console.log('🔍 Verificare token în middleware auth:', token);
+    console.log('🔍 JWT_SECRET utilizat:', process.env.JWT_SECRET);
     
     if (!token) {
       return res.status(401).json({ error: 'Acces neautorizat' });
