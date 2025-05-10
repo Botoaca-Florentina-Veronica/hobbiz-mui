@@ -6,7 +6,7 @@ import axios from 'axios';
 import App from "./App";
 import "./index.css";
 
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = 'https://api.render.com/deploy/srv-d0fljpa4d50c73f1ia80?key=avPZG38IhSo';
 axios.interceptors.request.use((config) => {
   console.log('Cerere trimisă:', config);
   console.log('Antetul cererii:', config.headers);

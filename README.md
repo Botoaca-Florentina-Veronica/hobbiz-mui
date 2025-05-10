@@ -78,7 +78,7 @@ hobbiz-mui/
 
 ## 🌐 **Deployment**  
 - **Frontend**: Hosted on Netlify 
-- **Backend**: -
+- **Backend**: - Hosted on Render
 - **Database**: MongoDB Atlas cluster  
 - **CI/CD**: GitHub Actions  
 
