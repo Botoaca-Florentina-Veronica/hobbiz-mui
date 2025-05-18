@@ -8,7 +8,12 @@ const userRoutes = require('./routes/userRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: ['https://hobbiz.netlify.app'], // Domeniul frontend-ului
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Metodele permise
+  credentials: true, // Permite trimiterea cookie-urilor
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Conectare la baza de date

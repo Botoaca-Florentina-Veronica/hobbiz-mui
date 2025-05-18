@@ -139,7 +139,8 @@ export default function MainStage() {
               anchorEl={anchorEl}
               onClose={handleClose}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              PaperProps={{ sx: { minWidth: 260, maxHeight: 400 } }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }} // Poziționare strict sub input
+              PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }} // Adăugare de margine suplimentară pentru poziționare mai precisă
             >
               {!selectedJudet ? (
                 <>

@@ -3,35 +3,37 @@
   /* ----------------- Header ----------------- */
   .header {
     flex-direction: column;
+    align-items: center;
     height: auto;
-    padding: 1rem;
+    padding: 1.5rem 0 1rem 0; /* Mai mult padding sus pentru search-bar */
+    position: relative;
+    z-index: 100;
+    background: #355070; /* Fundal solid pentru header */
   }
 
+  /* Ajustare pentru a compensa înălțimea header-ului */
   .main-stage, 
   .content, 
   .categories-container, 
   .call-to-action {
-    margin-top: 108px; /* Înălțimea header-ului */
+    margin-top: 6rem;
   }
       
-
   .header ul {
-    margin-left: 0;
+    margin: 1.5rem 0 0 0; /* Margine mai mare deasupra meniului */
+    padding: 0;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.5rem;
     width: 100%;
   }
 
-  .header .logo img {
-    height: 200px;
-    width: 200px;
-    margin-top: -3rem;
-    margin-bottom: -7rem;
-    padding: 0;
-
+  /* Ascunde logo-ul */
+  .header .logo {
+    display: none;
   }
 
-  /* Ascunde butoanele din header (le voi muta în footer) */
+  /* Ascunde butoanele din header */
   .add-button,
   .favorite-btn,
   .user-account-btn {
@@ -40,26 +42,46 @@
 
   /* ----------------- Search Bar ----------------- */
   .search-container {
-    width: 6rem !important;
-    margin: 1rem 0 !important;
-    margin-left: -17rem !important;
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+    right: 0;
+    width: 60% !important; /* Forțează lățimea mai mică */
+    max-width: 300px; /* Adaugă o limită maximă pentru lățime */
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    z-index: 110; /* Peste header */
+    padding: 0.3rem; /* Păstrează padding-ul compact */
   }
 
   .search-button {
-      width: 6rem;
-    }
+    width: auto;
+    font-size: 0.9rem; /* Reduce dimensiunea textului butonului */
+    padding: 0.3rem 0.8rem; /* Ajustează padding-ul butonului */
+  }
 
-  .top-bar {
-     flex-direction: column;
-    }
+  .search-input {
+    font-size: 0.9rem; /* Reduce dimensiunea textului din input */
+    padding: 0.3rem; /* Ajustează padding-ul input-ului */
+  }
+
+  /* Asigură că search-bar-ul este vizibil */
+  .search-container {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 
   /* ----------------- Main Content ----------------- */
   .main-stage {
-    padding: 20px !important;
+    padding: 1rem !important;
   }
 
   .main-content {
     flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .main-text {
@@ -68,8 +90,10 @@
   }
 
   .main-stage-image img {
-      width: 320px;
-    }
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
 
   /* ----------------- Footer Fixat (Mobile Menu) ----------------- */
   .footer {
@@ -83,15 +107,13 @@
     align-items: center;
     background: #F67280;
     z-index: 1000;
-    padding: 0;
+    padding: 0.5rem;
   }
 
-  /* Iconițe pentru footer */
   .footer-icons {
     display: flex;
     justify-content: space-around;
     width: 100%;
-    margin-right: 16rem
   }
 
   .footer-icon {
@@ -99,11 +121,11 @@
     flex-direction: column;
     align-items: center;
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 
   .footer-icon svg {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-bottom: 0.2rem;
   }
 
@@ -112,15 +134,21 @@
     display: none;
   }
 
-  /* Ajustări pentru conținutul principal (compensează footer-ul fixat) */
+  /* Ajustări pentru conținutul principal */
   body {
-    padding-bottom: 60px;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 60px; /* Compensează pentru footer-ul fixat */
+  }
+
+  .content {
+    padding: 1rem;
   }
 }
 
 /* =============== Tabletă (769px - 1024px) =============== */
 @media (min-width: 769px) and (max-width: 1024px) {
-  /* ----------------- Header ----------------- */
+  /* (Păstrează codul existent pentru tabletă) */
   .header {
     flex-wrap: wrap;
     padding: 1rem;
@@ -131,14 +159,12 @@
     padding-right: 2rem;
   }
 
-  /* Search bar mai mic */
   .search-container {
     width: 100%;
     margin: 1rem 0 0 0;
     order: 3;
   }
 
-  /* ----------------- Footer ----------------- */
   .footer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
