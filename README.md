@@ -3,7 +3,7 @@ https://hobbiz.netlify.app/
 
 # 🚀 **Hobbiz**  
 *A MERN Stack Web App for Hobby Management & Side-hustles*  
-
+(still in working)
 ---
 
 ## 📖 **Description**  

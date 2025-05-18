@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 const corsOptions = {
-  origin: ['https://hobbiz.netlify.app'], // Domeniul frontend-ului
+  origin: ['https://hobbiz.netlify.app', 'http://localhost:5173'], // Domeniul frontend-ului și localhost pentru development
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Metodele permise
   credentials: true, // Permite trimiterea cookie-urilor
 };
