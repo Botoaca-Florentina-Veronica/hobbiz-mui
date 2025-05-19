@@ -2,35 +2,30 @@
 @media (max-width: 768px) {
   /* ----------------- Header ----------------- */
   .header {
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    justify-content: flex-start;
     height: auto;
-    padding: 1.5rem 0 1rem 0; /* Mai mult padding sus pentru search-bar */
+    padding: 1.2rem 1rem 1rem 1rem;
+    background: #355070;
     position: relative;
     z-index: 100;
-    background: #355070; /* Fundal solid pentru header */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   }
 
-  /* Ajustare pentru a compensa înălțimea header-ului */
-  .main-stage, 
-  .content, 
-  .categories-container, 
-  .call-to-action {
-    margin-top: 6rem;
-  }
-      
-  .header ul {
-    margin: 1.5rem 0 0 0; /* Margine mai mare deasupra meniului */
-    padding: 0;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  /* Ascunde logo-ul */
   .header .logo {
     display: none;
+  }
+
+  .header ul {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+    margin: 1rem 0 0 0;
+    padding: 0;
+    width: 100%;
   }
 
   /* Ascunde butoanele din header */
@@ -42,57 +37,67 @@
 
   /* ----------------- Search Bar ----------------- */
   .search-container {
-    position: absolute;
-    top: 0.5rem;
-    left: 0;
-    right: 0;
-    width: 60% !important; /* Forțează lățimea mai mică */
-    max-width: 300px; /* Adaugă o limită maximă pentru lățime */
-    margin: 0 auto;
-    display: flex;
+    position: static;
+    width: 100% !important;
+    max-width: 100%;
+    margin: 0.5rem 0 0 0;
+    display: flex !important;
     justify-content: center;
-    z-index: 110; /* Peste header */
-    padding: 0.3rem; /* Păstrează padding-ul compact */
-  }
-
-  .search-button {
-    width: auto;
-    font-size: 0.9rem; /* Reduce dimensiunea textului butonului */
-    padding: 0.3rem 0.8rem; /* Ajustează padding-ul butonului */
+    z-index: 110;
+    padding: 0.2rem 0.5rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
 
   .search-input {
-    font-size: 0.9rem; /* Reduce dimensiunea textului din input */
-    padding: 0.3rem; /* Ajustează padding-ul input-ului */
+    font-size: 1rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    flex: 1;
+    min-width: 0;
   }
 
-  /* Asigură că search-bar-ul este vizibil */
-  .search-container {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  .search-button {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    border-radius: 6px;
   }
 
   /* ----------------- Main Content ----------------- */
   .main-stage {
-    padding: 1rem !important;
+    padding: 1.2rem 0.5rem 0.5rem 0.5rem !important;
+    margin-top: 0;
   }
 
   .main-content {
+    display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding: 0.5rem 0;
   }
 
   .main-text {
-    margin-right: 0;
-    margin-bottom: 2rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
   }
 
   .main-stage-image img {
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
     height: auto;
+    border-radius: 10px;
+    margin: 0 auto;
+  }
+
+  .call-to-action {
+    margin-top: 1.5rem;
+    padding: 1rem 0.5rem;
+    font-size: 1.1rem;
   }
 
   /* ----------------- Footer Fixat (Mobile Menu) ----------------- */
@@ -102,18 +107,21 @@
     left: 0;
     right: 0;
     height: 60px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
     background: #F67280;
     z-index: 1000;
-    padding: 0.5rem;
+    padding: 0.5rem 0;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
   }
 
   .footer-icons {
     display: flex;
     justify-content: space-around;
     width: 100%;
+    gap: 1.5rem;
   }
 
   .footer-icon {
@@ -121,28 +129,59 @@
     flex-direction: column;
     align-items: center;
     color: white;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+    gap: 0.1rem;
   }
 
   .footer-icon svg {
-    font-size: 1.2rem;
-    margin-bottom: 0.2rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.1rem;
   }
 
-  /* Ascunde conținutul original al footer-ului */
   .footer > *:not(.footer-icons) {
     display: none;
   }
 
-  /* Ajustări pentru conținutul principal */
+  /* ----------------- General Mobile Adjustments ----------------- */
   body {
     padding: 0;
     margin: 0;
-    padding-bottom: 60px; /* Compensează pentru footer-ul fixat */
+    padding-bottom: 65px;
+    font-size: 1rem;
+    background: #f8f9fa;
   }
 
   .content {
-    padding: 1rem;
+    padding: 0.7rem 0.2rem;
+  }
+
+  button, input, select, textarea {
+    font-size: 1rem;
+    border-radius: 6px;
+  }
+
+  /* Touch-friendly tap targets */
+  a, button, .footer-icon {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* ----------------- Category Cards ----------------- */
+
+  .image-container {
+    margin-bottom: 0.1rem;
+    height: 60px;
+    width: 60px;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  }
+
+  .category-card img,
+  .category-card svg {
+    width: 60px;
+    height: 60px;
   }
 }
 
