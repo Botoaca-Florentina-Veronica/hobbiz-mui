@@ -61,7 +61,11 @@ frontend/
 │   │   │   ├── LoginSignup.css
 │   │   │   ├── SocialButtons.jsx, SocialButtons.css
 │   │   ├── services/
-│   │   ├── App.jsx, App.css, index.css, main.jsx, mediaQueries.css
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── mediaQueries.css
 │   ├── vite.config.js
 │   ├── package.json
 │   ├── index.html
