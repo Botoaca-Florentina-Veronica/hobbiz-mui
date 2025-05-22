@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Sau folosește fetch
+import '../pages/LoginSignup.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

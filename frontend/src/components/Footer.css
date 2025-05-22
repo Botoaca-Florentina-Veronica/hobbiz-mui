@@ -1,0 +1,22 @@
+/* Stiluri pentru Footer */
+.footer {
+  font-size: 25px;
+  background: #F67280;
+  color: #e2e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-arrow {
+  width: 150px;
+  height: 150px;
+  cursor: pointer;
+  margin-right: -100px;
+  margin-bottom: -470px;
+}
+
+.dark-mode .footer {
+  background: #4e3222;
+  color: #eceeef;
+}

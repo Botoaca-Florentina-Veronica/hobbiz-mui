@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
+import AccountSettings from './pages/AccountSettings';
 import './App.css';
 import './mediaQueries.css';
 
@@ -51,6 +52,7 @@ function App() {
             <Footer />
           </>
         } />
+        <Route path="/setari-cont" element={<AccountSettings />} />
       </Routes>
     </div>
   );

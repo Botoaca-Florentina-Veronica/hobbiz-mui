@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import './Content.css';
 
 // Importuri imagini
 import guitar from '../assets/images/guitar-lessons.jpg'

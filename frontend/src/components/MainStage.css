@@ -1,0 +1,52 @@
+/* Stiluri pentru MainStage */
+.main-stage {
+  display: flex;
+  flex-direction: column;
+  background-color: #F8B195;
+  padding: 40px 100px 100px;
+  align-items: center;
+}
+
+.main-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.main-text {
+  flex: 1;
+  padding: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.1);
+  margin-right: 50px;
+  font-size: 1.5rem;
+}
+
+#main-title {
+  color: #355070;
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.main-stage-image img {
+  width: 500px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .main-stage {
+  background-color: #121212;
+}
+
+.dark-mode .main-text {
+  color: #F51866;
+  border-color: #f9f1ea;
+  background-color: #282828;
+}
+
+.dark-mode .main-text #main-title {
+  color: #f9faf8;
+}

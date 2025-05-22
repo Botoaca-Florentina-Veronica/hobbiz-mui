@@ -1,6 +1,8 @@
 import googleLogo from '../assets/images/google-logo.svg';
 import facebookLogo from '../assets/images/facebook-logo.png';
 import appleLogo from '../assets/images/apple-logo.png';
+import '../pages/SocialButtons.css';
+
 // Buton Google
 export function GoogleLoginButton({ onClick }) {
     return (

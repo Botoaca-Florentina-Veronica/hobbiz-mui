@@ -1,0 +1,22 @@
+/* Stiluri pentru DarkModeToggle */
+.dark-mode-toggle {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.dark-mode-toggle button {
+  background-color: #eaac8bd7;
+  color: #e2e7eb;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dark-mode-toggle button:hover {
+  background-color: #503f25;
+  cursor: pointer;
+}

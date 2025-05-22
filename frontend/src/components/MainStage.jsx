@@ -6,6 +6,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import './MainStage.css';
 
 // Lista statică de județe și localități (toate județele, ordonate alfabetic, cu localități exemplu)
 const judete = {

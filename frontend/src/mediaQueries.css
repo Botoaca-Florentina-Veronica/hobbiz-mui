@@ -38,16 +38,18 @@
   /* ----------------- Search Bar ----------------- */
   .search-container {
     position: static;
-    width: 100% !important;
+    width: 100%;
     max-width: 100%;
-    margin: 0.5rem 0 0 0;
+    margin: 0.7rem 0 0 0;
     display: flex !important;
     justify-content: center;
+    align-items: center;
     z-index: 110;
     padding: 0.2rem 0.5rem;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    order: 2; /* asigură plasarea sub logo dacă header-ul folosește flex */
   }
 
   .search-input {
@@ -170,18 +172,18 @@
 
   .image-container {
     margin-bottom: 0.1rem;
-    height: 60px;
-    width: 60px;
+    height: 85px;
+    width:85px;
   }
 
   .categories-grid {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
   }
 
   .category-card img,
   .category-card svg {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
   }
 }
 
@@ -226,3 +228,4 @@
     font-size: 1.8rem;
   }
 }
+

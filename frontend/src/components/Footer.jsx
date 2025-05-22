@@ -1,5 +1,6 @@
 import { FiUser, FiHeart, FiCompass } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import './Footer.css';
 
 export default function Footer() {
   const navigate = useNavigate();

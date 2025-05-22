@@ -1,3 +1,5 @@
+import './CallToAction.css';
+
 export default function CallToAction() {
     return (
       <div className="hole-action">

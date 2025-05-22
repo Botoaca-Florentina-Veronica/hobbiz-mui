@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
 import apiClient from '../api/api';
+import './Header.css';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -116,7 +117,7 @@ export default function Header() {
             
             {isAuthenticated && (
               <div className="section-dropdown">
-                <a onClick={(e) => { e.preventDefault(); navigate('/setari'); }}>Setări</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>Setări</a>
                 <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>Anunțurile mele</a>
                 <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>Profil</a>
                 <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>

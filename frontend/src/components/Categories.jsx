@@ -5,11 +5,12 @@ import gardening from '../assets/images/gardening-logo.jpg';
 import tennis from '../assets/images/tennis.png';
 import it from '../assets/images/laptop.png';
 import camera from '../assets/images/camera.png';
-import prajituri from '../assets/images/prajituri.jpg';
+import prajituri from '../assets/images/bake.png';
 import carte from '../assets/images/carte.png';
 import arta from '../assets/images/arta.png';
 import masina from '../assets/images/car.png';
 import curatenie from '../assets/images/cleaning.png';
+import './Categories.css';
 
 export default function Categories() {
   // Lista de categorii cu descrieri și imagini

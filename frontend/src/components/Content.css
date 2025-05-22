@@ -1,0 +1,27 @@
+/* Stiluri pentru Content */
+.content {
+  padding: 150px 0px 150px 0px;
+  color: black;
+  font-size: 40px;
+  font-weight: bold;
+  background-color: white;
+  height: 80vh;
+}
+
+.content h2 {
+  text-align: center;
+  color: #1f2937;
+  font-size: 3.5rem;
+  font-weight: bolder;
+  padding: 50px 70px 70px 50px;
+  margin-top: -60px;
+}
+
+.dark-mode .content {
+  background-color: #282828;
+  color: #eceeef;
+}
+
+.dark-mode .content h2 {
+  color: #eceeef;
+}

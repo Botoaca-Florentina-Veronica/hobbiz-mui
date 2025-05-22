@@ -1,0 +1,44 @@
+/* Stiluri pentru CallToAction */
+.hole-action {
+  background-color: white;
+}
+
+.call-to-action {
+  display: flex;
+  border-radius: 5px;
+  background-color: #F8B195;
+  color: #f9faf8;
+  align-items: center;
+  justify-content: space-around;
+  margin: 100px auto 100px auto;
+  width: 75%;
+  padding: 50px;
+  font-size: 28px;
+}
+
+.second-button {
+  border-radius: 10px;
+  border: #f9faf8 2px solid;
+  background-color: #dfccaf;
+  color: #F8B195;
+}
+
+.second-button:hover {
+  color: #F67280;
+  background-color: #F8B195;
+}
+
+.dark-mode .call-to-action {
+  background-color: #5a3f2f;
+  color: #eceeef;
+}
+
+.dark-mode .second-button {
+  color: #362318;
+  background-color: #eceeef;
+}
+
+.dark-mode .second-button:hover {
+  color: #eceeef;
+  background-color: #301717;
+}
