@@ -20,3 +20,58 @@
   background: #4e3222;
   color: #eceeef;
 }
+
+.footer-mobile-buttons {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .footer-mobile-buttons {
+    display: flex !important;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    background: #F67280;
+    color: #e2e7eb;
+    font-size: 1.6rem;
+    padding: 10px 0;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 1002;
+  }
+  .footer-mobile-buttons .footer-icon {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    font-size: 1.8rem;
+    color: #e2e7eb;
+  }
+  .footer-mobile-buttons .footer-icon svg {
+    width: 28px;
+    height: 28px;
+    display: block;
+    stroke: #e2e7eb;
+    fill: none;
+    color: #e2e7eb;
+    stroke-width: 2.2;
+  }
+  .footer-mobile-buttons .footer-icon span {
+    font-size: 1.15rem;
+    margin-top: 4px;
+    display: block;
+    color: #e2e7eb;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+  .desktop-footer {
+    display: none;
+  }
+}
+
+.desktop-footer {
+  display: block;
+}

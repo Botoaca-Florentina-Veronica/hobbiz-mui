@@ -80,7 +80,7 @@ export default function Header() {
   return (
     <>
       <div className="header fixed-header">
-        <ul className="logo">
+        <ul className="logo" onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
           <li>
             <img src={isDarkMode ? logoDark : logoLight} alt="Logo" />
           </li>

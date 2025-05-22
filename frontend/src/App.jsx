@@ -52,7 +52,14 @@ function App() {
             <Footer />
           </>
         } />
-        <Route path="/setari-cont" element={<AccountSettings />} />
+        <Route path="/setari-cont" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AccountSettings />
+            <Footer />
+          </>
+        } />
       </Routes>
     </div>
   );

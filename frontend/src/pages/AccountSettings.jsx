@@ -7,7 +7,7 @@ export default function AccountSettings() {
       <h1 className="settings-title">Setări</h1>
       <div className="settings-menu">
         <div className="settings-item">Schimbă parola</div>
-        <div className="settings-item">Schimbă e-mail-ul</div>
+        <div className="settings-item">Schimbă email-ul</div>
         <div className="settings-item">Setează notificările</div>
         <div className="settings-item">Administrare cont</div>
         <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>
