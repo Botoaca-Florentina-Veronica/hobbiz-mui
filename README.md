@@ -39,31 +39,56 @@ Hobbiz is a full-stack web application built with the MERN stack (MongoDB, Expre
 ---
 
 ## 🏗 **Project Structure**  
-```markdown
-hobbiz-mui/
-├── frontend/               # React Application
-│   ├── public/             # Static assets
-│   ├── src/
-│   │   ├── assets/         # Images, fonts
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Route pages (Auth, Dashboard)
-│   │   ├── contexts/       # Global state
-│   │   ├── services/       # API service layer
-│   │   ├── App.jsx         # Main component
-│   │   └── main.jsx        # Vite entry point
-│   └── vite.config.js      # Build configuration
-│
-├── backend/                # Node.js Server
-│   ├── config/             # DB connection
-│   ├── controllers/        # Route handlers
-│   ├── models/             # Mongoose schemas
-│   ├── routes/             # API endpoints
-│   ├── middleware/         # Auth, error handling
-│   ├── server.js           # Server setup
-│   └── .env                # Environment variables
-│
-└── README.md               # Project documentation
 ```
+frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   │   └── images/           # logo-uri, poze pentru categorii, etc
+│   │   ├── api/
+│   │   │   └── api.js
+│   │   ├── components/
+│   │   │   ├── CallToAction.jsx, CallToAction.css
+│   │   │   ├── Categories.jsx, Categories.css
+│   │   │   ├── Content.jsx, Content.css
+│   │   │   ├── DarkModeToggle.jsx, DarkModeToggle.css
+│   │   │   ├── Footer.jsx, Footer.css
+│   │   │   ├── Header.jsx, Header.css
+│   │   │   └── MainStage.jsx, MainStage.css
+│   │   ├── pages/
+│   │   │   ├── AccountSettings.jsx, AccountSettings.css
+│   │   │   ├── LoginPage.jsx, SignupPage.jsx
+│   │   │   ├── LoginSignup.css
+│   │   │   ├── SocialButtons.jsx, SocialButtons.css
+│   │   ├── services/
+│   │   ├── App.jsx, App.css, index.css, main.jsx, mediaQueries.css
+│   ├── vite.config.js
+│   ├── package.json
+│   ├── index.html
+│   └── netlify.toml
+backend/
+│   ├── config/
+│   │   └── db.js
+│   ├── controllers/
+│   │   └── UserController.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── models/
+│   │   └── User.js
+│   ├── routes/
+│   │   └── userRoutes.js
+│   ├── services/
+│   │   └── UserService.js
+│   ├── server.js
+│   └── package.json
+├── README.md
+├── schiță-db.md
+└── structura.txt
+```
+- Toate componentele și paginile au fișiere CSS dedicate.
+- Stilurile globale și pentru search-baruri/butoane sunt în `App.css`.
+- Imaginile sunt în `src/assets/images/`.
+- Backend-ul este organizat pe controllers, middleware, models, routes, services.
 
 ---
 
@@ -89,5 +114,3 @@ hobbiz-mui/
 - [React Official Docs](https://react.dev/)  
 - [Mongoose Guide](https://mongoosejs.com/docs/guide.html)  
 - [Express](https://expressjs.com/)
-
----
