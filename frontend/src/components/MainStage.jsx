@@ -1,4 +1,5 @@
 import { FaSearch, FaBars, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
 import hobby from '../assets/images/hobby_img.jpg';
 import { useState, useRef } from "react";
 import Popover from '@mui/material/Popover';
@@ -55,21 +56,38 @@ const judete = {
 };
 
 const categoriesList = [
-  "Fotografie, Video, Audio",
-  "Prajituri, Dulciuri, Mancare",
-  "Gaming, Jocuri, Carti",
-  "TV, Audio-Video, Foto",
-  "Electrocasnice mari",
-  "Electrocasnice mici, Vesela",
-  "Racire, Purificare aer, Incalzire",
-  "Curatenie, Intretinere casa",
-  "Bauturi, Cafea, Petshop",
-  "Cosmetice, Beauty, Sanatate",
-  "Copii, Jucarii, Bebe, Rechizite",
-  "Bricolaj, Sanitare, Mobila",
-  "Anvelope, Electronica auto",
-  "Trotinete, Biciclete, Sport, Voiaj"
+  "Fotografie",
+  "Prajituri, Băcănie, Gătit",
+  "Traduceri & Redactare",
+  "Finanțe & Contabilitate",
+  "Video & Animație",
+  "Business",
+  "Meditații & Cursuri",
+  "Grafică & Design",
+  "Curatenie, Întreținere casă",
+  "Reparații, Instalatii, Bricolaj",
+  "Muzică, Teatru, Dans",
+  "Auto, Moto, Biciclete",
+  "Imobiliare, Construcții, Amenajari",
+  "Transport, Logistică, Curierat",
 ];
+
+const categoryIcons = {
+  "Fotografie": <FaCamera />,
+  "Prajituri, Băcănie, Gătit": <FaUtensils />,
+  "Traduceri & Redactare": <FaBook />,
+  "Finanțe & Contabilitate": <FaMoneyBillWave />,
+  "Video & Animație": <FaVideo />,
+  "Business": <FaBriefcase />,
+  "Meditații & Cursuri": <FaGraduationCap />,
+  "Grafică & Design": <FaPalette />,
+  "Curatenie, Întreținere casă": <FaBroom />,
+  "Reparații, Instalatii, Bricolaj": <FaTools />,
+  "Muzică, Teatru, Dans": <FaMusic />,
+  "Auto, Moto, Biciclete": <FaCar />,
+  "Imobiliare, Construcții, Amenajari": <FaBuilding />,
+  "Transport, Logistică, Curierat": <FaTruck />,
+};
 
 export default function MainStage() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -132,6 +150,7 @@ export default function MainStage() {
             <ul>
               {categoriesList.map((cat) => (
                 <li key={cat} onClick={handleCloseCategories}>
+                  {categoryIcons[cat]}
                   <span>{cat}</span>
                   <span className="arrow">&gt;</span>
                 </li>
