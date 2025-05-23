@@ -110,7 +110,8 @@ export default function MainStage() {
   };
 
   const handleCategoriesClick = (event) => {
-    setCategoriesOpen(!categoriesOpen);
+    event.stopPropagation();
+    setCategoriesOpen(prev => !prev);
   };
 
   const handleCloseCategories = () => {
@@ -140,13 +141,19 @@ export default function MainStage() {
         </>
       )}
       <div className="top-bar">
-        <button 
+        <div 
           className="categories-button"
           onClick={handleCategoriesClick}
-          type="button">
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleCategoriesClick(e);
+            }
+          }}>
           <FaBars />
           <span>Categorii</span>
-        </button>
+        </div>
 
         <div className="search-container">
           <input 

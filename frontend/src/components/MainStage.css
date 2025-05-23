@@ -125,7 +125,7 @@
 }
 
 .categories-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
@@ -136,6 +136,15 @@
   color: #355070;
   font-size: 1rem;
   transition: background-color 0.2s ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+  position: relative;
+  z-index: 1000;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .categories-button:hover {
@@ -146,8 +155,13 @@
   background-color: rgba(53, 80, 112, 0.2);
 }
 
-.categories-button svg {
-  font-size: 1.2rem;
+.categories-button svg,
+.categories-button span {
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .top-bar {
