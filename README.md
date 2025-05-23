@@ -59,13 +59,13 @@ frontend/
 │   │   │   ├── AccountSettings.jsx, AccountSettings.css
 │   │   │   ├── LoginPage.jsx, SignupPage.jsx
 │   │   │   ├── LoginSignup.css
-│   │   │   ├── SocialButtons.jsx, SocialButtons.css
+│   │   │   └── SocialButtons.jsx, SocialButtons.css
 │   │   ├── services/
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   ├── index.css
 │   │   ├── main.jsx
-│   │   ├── mediaQueries.css
+│   │   └── mediaQueries.css
 │   ├── vite.config.js
 │   ├── package.json
 │   ├── index.html

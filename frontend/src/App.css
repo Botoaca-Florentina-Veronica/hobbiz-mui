@@ -40,9 +40,11 @@
 
 .search-container {
   display: flex;
-  width: 70%; 
+  width: 85%; 
+  height: 65px;
   max-width: 1400px;
-  margin-left: 100px;
+  margin-left: 70px;
+  margin-right:20px;
 }
 
 .search-input {

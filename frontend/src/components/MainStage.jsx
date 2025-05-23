@@ -54,11 +54,30 @@ const judete = {
   "Vrancea": ["Focșani", "Adjud", "Mărășești", "Odobești", "Panciu"]
 };
 
+const categoriesList = [
+  "Fotografie, Video, Audio",
+  "Prajituri, Dulciuri, Mancare",
+  "Gaming, Jocuri, Carti",
+  "TV, Audio-Video, Foto",
+  "Electrocasnice mari",
+  "Electrocasnice mici, Vesela",
+  "Racire, Purificare aer, Incalzire",
+  "Curatenie, Intretinere casa",
+  "Bauturi, Cafea, Petshop",
+  "Cosmetice, Beauty, Sanatate",
+  "Copii, Jucarii, Bebe, Rechizite",
+  "Bricolaj, Sanitare, Mobila",
+  "Anvelope, Electronica auto",
+  "Trotinete, Biciclete, Sport, Voiaj"
+];
+
 export default function MainStage() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [localitatiAnchorEl, setLocalitatiAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const categoriesButtonRef = useRef(null);
 
   const handleInputClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -90,30 +109,42 @@ export default function MainStage() {
     setLocalitatiAnchorEl(null);
   };
 
+  const handleCategoriesClick = (event) => {
+    setCategoriesOpen(!categoriesOpen);
+  };
+
+  const handleCloseCategories = () => {
+    setCategoriesOpen(false);
+  };
+
   const open = Boolean(anchorEl);
   const openLocalitati = Boolean(localitatiAnchorEl);
   const id = open ? 'judete-popover' : undefined;
   const idLocalitati = openLocalitati ? 'localitati-popover' : undefined;
 
-  const scrollToContent = () => {
-    const categoriesElement = document.querySelector('.categories-container');
-    if (categoriesElement) {
-      categoriesElement.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    } else {
-      console.warn("Elementul cu clasa 'categories-container' nu a fost găsit");
-    }
-  };
-
   return (
     <div className="main-stage">
+      {categoriesOpen && (
+        <>
+          <div className="categories-overlay" onClick={handleCloseCategories}></div>
+          <div className="categories-dropdown">
+            <ul>
+              {categoriesList.map((cat) => (
+                <li key={cat} onClick={handleCloseCategories}>
+                  <span>{cat}</span>
+                  <span className="arrow">&gt;</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
       <div className="top-bar">
         <button 
           className="categories-button"
-          onClick={scrollToContent}>
-          <FaBars className="categories-icon" />
+          onClick={handleCategoriesClick}
+          type="button">
+          <FaBars />
           <span>Categorii</span>
         </button>
 
@@ -140,8 +171,8 @@ export default function MainStage() {
               anchorEl={anchorEl}
               onClose={handleClose}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }} // Poziționare strict sub input
-              PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }} // Adăugare de margine suplimentară pentru poziționare mai precisă
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
             >
               {!selectedJudet ? (
                 <>
@@ -162,7 +193,7 @@ export default function MainStage() {
                     {Object.keys(judete).map((judet) => (
                       <ListItemButton
                         key={judet}
-                        onClick={() => setSelectedJudet(judet)}
+                        onClick={(e) => handleJudetClick(e, judet)}
                         divider
                       >
                         <ListItemText primary={judet} />
@@ -181,7 +212,7 @@ export default function MainStage() {
                         sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
                         onClick={() => {
                           setSelectedLocalitate(localitate);
-                          setAnchorEl(null);
+                          setanchorEl(null);
                           setSelectedJudet(null);
                         }}
                       />
