@@ -115,6 +115,21 @@
   padding: 12px 22px;
   cursor: pointer;
   transition: background 0.15s;
+  position: relative;
+}
+
+.categories-dropdown li:hover > ul {
+  display: block;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: white;
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.categories-dropdown li > ul {
+  display: none;
 }
 
 .categories-dropdown li svg {
@@ -155,41 +170,30 @@
 .categories-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
+  gap: 12px;
+  padding: 18px 36px;
+  background: #355070;
+  border: 6px solid #fff; /* contur alb, grosime mare */
+  border-radius: 12px;
   cursor: pointer;
-  color: #355070;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: bold;
+  box-shadow: 0 4px 18px rgba(53,80,112,0.10);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
   outline: none;
-  position: relative;
   z-index: 1000;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.categories-button:hover {
-  background-color: rgba(53, 80, 112, 0.1);
+.categories-button:hover, .categories-button:focus {
+  background: #27405a;
+  color: #fff;
+  border-color: #fff;
+  box-shadow: 0 6px 24px rgba(53,80,112,0.18);
 }
 
-.categories-button:active {
-  background-color: rgba(53, 80, 112, 0.2);
-}
-
-.categories-button svg,
-.categories-button span {
-  pointer-events: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+.categories-button svg {
+  font-size: 1.6em;
 }
 
 .top-bar {

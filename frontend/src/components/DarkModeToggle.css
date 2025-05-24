@@ -20,3 +20,172 @@
   background-color: #503f25;
   cursor: pointer;
 }
+
+
+/* --------- DARK MODE  --------- */
+body.dark-mode {
+  background-color: #121212;
+  color: #c7c7c7;
+}
+
+.dark-mode .header {
+  background-color: #282828;
+  color: #c7c7c7;
+}
+.dark-mode .main-stage,
+.dark-mode .content,
+.dark-mode .hole-action,
+.dark-mode .footer {
+  background-color: #121212;
+  color: #c7c7c7;
+}
+
+.dark-mode .header .logo {
+  color: #eceeef;
+}
+
+.dark-mode .header ul a {
+  color: #eceeef;
+  background-color: #342b2b;
+}
+
+.dark-mode .main-text {
+  color: #F51866;
+  border-color: #f9f1ea;
+  background-color: #282828;
+}
+
+.dark-mode .favorite-btn, 
+.dark-mode .user-account-btn {
+  color: #ff7e95;
+}
+
+.dark-mode .add-button {
+  background-color: #ffabb7;
+  color: #282828;
+}
+
+.dark-mode .categories-button {
+  background-color: #ffabb7;
+  color: #282828  ;
+}
+
+.dark-mode .categories-container{
+  background-color: #121212;
+}
+
+.dark-mode .search-input{
+  background-color: #282828;
+  border-color: #3f3f3f;
+  color: #eceeef;
+}
+
+.dark-mode .location-section{
+  background-color: #282828;
+  border-color: #3f3f3f;
+  color: #eceeef;
+}
+
+.dark-mode .search-button{
+  background-color: #F51866;
+  color: #282828;
+}
+
+.dark-mode .main-text #main-title {
+  color: #f9faf8;
+}
+
+.dark-mode .sign-up-button {
+  color: #3e271b;
+  background-color: #eceeef;
+}
+
+.dark-mode .sign-up-button:hover {
+  color: #eceeef;
+  background-color: #1a1a1a;
+}
+
+.dark-mode .second-button {
+  color: #362318;
+  background-color: #eceeef;
+}
+
+.dark-mode .second-button:hover {
+  color: #eceeef;
+  background-color: #301717;
+}
+
+.dark-mode .content {
+  background-color: #282828;
+  color: #eceeef;
+}
+
+.dark-mode .content h2 {
+  color: #eceeef;
+}
+
+.dark-mode .card img {
+  border-color: #2f2119;
+}
+
+.dark-mode .categories-title{
+  color: #fa4875;
+}
+
+.dark-mode .category-description{
+  color: #fe6585;
+}
+
+.dark-mode .call-to-action {
+  background-color: #5a3f2f;
+  color: #eceeef;
+}
+
+.dark-mode .second-button {
+  color: #362318;
+  background-color: #eceeef;
+}
+
+.dark-mode .second-button:hover {
+  color: #eceeef;
+  background-color: #301717;
+}
+
+.dark-mode .footer {
+  background: #4e3222;
+  color: #eceeef;
+}
+
+.dark-mode .dark-mode-toggle button{
+  background-color: #f51866;
+  color: #e2e7eb;
+}
+
+.sign-up-button {
+  margin-top: 20px;
+  padding: 15px 30px;
+  background-color: #355070;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sign-up-button:hover {
+  background-color: #355070;
+  transform: translateY(-3px);
+}
+
+.second-button {
+  border-radius: 10px;
+  border: #f9faf8 2px solid;
+  background-color: #dfccaf;
+  color: #F8B195;
+}
+
+.second-button:hover {
+  color: #F67280;
+  background-color: #F8B195;
+}

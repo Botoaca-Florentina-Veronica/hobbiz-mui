@@ -91,7 +91,6 @@ const categoryIcons = {
 
 export default function MainStage() {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [localitatiAnchorEl, setLocalitatiAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -101,30 +100,21 @@ export default function MainStage() {
     setAnchorEl(event.currentTarget);
     setSelectedJudet(null);
     setSelectedLocalitate("");
-    setLocalitatiAnchorEl(null);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
     setSelectedJudet(null);
-    setLocalitatiAnchorEl(null);
   };
 
   const handleJudetClick = (event, judet) => {
     setSelectedJudet(judet);
-    setLocalitatiAnchorEl(event.currentTarget);
-  };
-
-  const handleLocalitatiClose = () => {
-    setLocalitatiAnchorEl(null);
-    setSelectedJudet(null);
   };
 
   const handleLocalitateClick = (localitate) => {
     setSelectedLocalitate(localitate);
     setAnchorEl(null);
     setSelectedJudet(null);
-    setLocalitatiAnchorEl(null);
   };
 
   const handleCategoriesClick = (event) => {
@@ -137,9 +127,7 @@ export default function MainStage() {
   };
 
   const open = Boolean(anchorEl);
-  const openLocalitati = Boolean(localitatiAnchorEl);
-  const id = open ? 'judete-popover' : undefined;
-  const idLocalitati = openLocalitati ? 'localitati-popover' : undefined;
+  const id = open ? 'location-popover' : undefined;
 
   return (
     <div className="main-stage">
@@ -196,8 +184,14 @@ export default function MainStage() {
               open={open}
               anchorEl={anchorEl}
               onClose={handleClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
               PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
             >
               {!selectedJudet ? (
@@ -237,9 +231,7 @@ export default function MainStage() {
                         primary={localitate}
                         sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
                         onClick={() => {
-                          setSelectedLocalitate(localitate);
-                          setanchorEl(null);
-                          setSelectedJudet(null);
+                          handleLocalitateClick(localitate);
                         }}
                       />
                     ))}
@@ -249,33 +241,6 @@ export default function MainStage() {
                   </ListItemButton>
                 </>
               )}
-            </Popover>
-            <Popover
-              id={idLocalitati}
-              open={openLocalitati}
-              anchorEl={localitatiAnchorEl}
-              onClose={handleLocalitatiClose}
-              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              PaperProps={{ sx: { minWidth: 220, maxHeight: 400 } }}
-            >
-              <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
-              <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                {(selectedJudet && judete[selectedJudet].length > 0) ? (
-                  judete[selectedJudet].map((localitate) => (
-                    <ListItemText
-                      key={localitate}
-                      primary={localitate}
-                      sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
-                      onClick={() => handleLocalitateClick(localitate)}
-                    />
-                  ))
-                ) : (
-                  <Typography sx={{ px: 2, py: 1.5, color: '#888' }}>
-                    (Nu există localități definite)
-                  </Typography>
-                )}
-              </List>
             </Popover>
           </div>
           <button className="search-button">
