@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db'); // Importă conexiunea
 const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes'); // Importă rutele de autentificare
 
 const app = express();
 
@@ -21,6 +22,7 @@ connectDB(); // Apelează funcția exportată
 
 // Rute
 app.use('/api/users', userRoutes);
+app.use('/auth', authRoutes); // Adaugă rutele de autentificare
 
 app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
