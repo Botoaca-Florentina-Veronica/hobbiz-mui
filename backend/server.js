@@ -5,6 +5,8 @@ const cors = require('cors');
 const connectDB = require('./config/db'); // Importă conexiunea
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes'); // Importă rutele de autentificare
+const session = require('express-session'); // Import express-session
+const passport = require('passport'); // Import passport
 
 const app = express();
 
@@ -16,6 +18,18 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Configure session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'a_very_secret_key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Conectare la baza de date
 connectDB(); // Apelează funcția exportată

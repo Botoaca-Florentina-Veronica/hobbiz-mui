@@ -8,17 +8,38 @@ passport.use(new GoogleStrategy({
   callbackURL: process.env.GOOGLE_CALLBACK_URL,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    // Caută sau creează utilizatorul în baza de date
+    // Try to find the user by googleId
     let user = await User.findOne({ googleId: profile.id });
-    if (!user) {
-      user = await User.create({
-        googleId: profile.id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        avatar: profile.photos[0].value,
-      });
+
+    if (user) {
+      // If user found by googleId, return that user
+      return done(null, user);
+    } else {
+      // If not found by googleId, try to find by email
+      user = await User.findOne({ email: profile.emails[0].value });
+
+      if (user) {
+        // If user found by email, update their googleId and return
+        user.googleId = profile.id;
+        // Optionally update other fields like name or avatar if needed
+        // user.name = profile.displayName; // Assuming you added 'name' field
+        // user.avatar = profile.photos[0].value; // Assuming you added 'avatar' field
+        await user.save();
+        return done(null, user);
+      } else {
+        // If user not found by either googleId or email, create a new one
+        user = await User.create({
+          googleId: profile.id,
+          firstName: profile.name.givenName, // Use givenName for firstName
+          lastName: profile.name.familyName, // Use familyName for lastName
+          email: profile.emails[0].value,
+          avatar: profile.photos[0].value,
+          // Password is not required for Google users
+        });
+        return done(null, user);
+      }
     }
-    return done(null, user);
+
   } catch (err) {
     return done(err, null);
   }
