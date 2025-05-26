@@ -10,7 +10,6 @@ https://hobbiz.netlify.app/
 Hobbiz is a full-stack web application built with the MERN stack (MongoDB, Express, React, Node.js) that enables users to:  
 - Discover and monetize personal hobbies  
 - Connect with like-minded enthusiasts  
-
 ---
 
 ## 💻 **Tech Stack**  
@@ -30,6 +29,9 @@ Hobbiz is a full-stack web application built with the MERN stack (MongoDB, Expre
 - **JSON Web Tokens** (User authentication)  
 - **Bcrypt.js** (Password hashing)  
 - **CORS** (Cross-origin requests)  
+- **Passport.js** (Authentication middleware)
+- **Passport-Google-OAuth20** (Google OAuth strategy for Passport)
+- **Express-Session** (Session management middleware)
 
 ### **Development Tools**  
 - **ESLint** + **Prettier** (Code quality)  
@@ -72,7 +74,8 @@ frontend/
 │   └── netlify.toml
 backend/
 │   ├── config/
-│   │   └── db.js
+│   │   ├── db.js
+│   │   └── passport.js           # Passport configuration for OAuth
 │   ├── controllers/
 │   │   └── UserController.js
 │   ├── middleware/
@@ -80,6 +83,7 @@ backend/
 │   ├── models/
 │   │   └── User.js
 │   ├── routes/
+│   │   ├── authRoutes.js         # Authentication routes (including Google OAuth)
 │   │   └── userRoutes.js
 │   ├── services/
 │   │   └── UserService.js
@@ -97,7 +101,7 @@ backend/
 ---
 
 ## ✨ **Key Features**  
-✅ **User authentication** (JWT-based registration/login)  
+✅ **User authentication** (JWT-based registration/login and **Google OAuth**)  
 ✅ **Hobby tracking system** with categories  
 ✅ **User profile customization**  
 ✅ **Social features** (follow users, join groups)  
