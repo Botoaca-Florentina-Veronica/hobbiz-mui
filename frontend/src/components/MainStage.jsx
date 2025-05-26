@@ -69,9 +69,10 @@ const categoriesList = [
   "Muzică, Teatru, Dans",
   "Auto, Moto, Biciclete",
   "Imobiliare, Construcții, Amenajari",
-  "Transport, Logistică, Curierat",
+  "Transport, Logistică, Curierat"
 ];
 
+// Iconuri pentru fiecare categorie
 const categoryIcons = {
   "Fotografie": <FaCamera />,
   "Prajituri, Băcănie, Gătit": <FaUtensils />,
@@ -86,7 +87,122 @@ const categoryIcons = {
   "Muzică, Teatru, Dans": <FaMusic />,
   "Auto, Moto, Biciclete": <FaCar />,
   "Imobiliare, Construcții, Amenajari": <FaBuilding />,
-  "Transport, Logistică, Curierat": <FaTruck />,
+  "Transport, Logistică, Curierat": <FaTruck />
+};
+
+const categoriesDetails = {
+  "Fotografie": {
+    columns: [
+      { title: "Servicii Foto", items: ["Evenimente", "Portret", "Produse", "Imobiliare"] },
+      { title: "Echipament Recomandat", items: ["Camere DSLR/Mirrorless", "Obiective", "Blitz-uri", "Trepiede"] },
+      { title: "Tutoriale & Resurse", items: ["Cursuri Online", "Editare Foto", "Comunități"] },
+      { title: "Sfaturi Utile", items: ["Compoziție", "Lumină", "Marketing"] }
+    ]
+  },
+  "Prajituri, Băcănie, Gătit": {
+    columns: [
+      { title: "Produse & Servicii", items: ["Torturi Personalizate", "Catering Mic", "Dulciuri de Casă"] },
+      { title: "Echipamente Cheie", items: ["Mixer Planetar", "Cuptor Electric", "Forme & Ustensile"] },
+      { title: "Rețete & Inspirație", items: ["Tradiționale", "Internaționale", "Sfaturi Patiserie"] },
+      { title: "Gestionare & Vânzare", items: ["Ambalare", "Autorizații", "Strategii Preț"] }
+    ]
+  },
+  "Traduceri & Redactare": {
+    columns: [
+      { title: "Tipuri de Servicii", items: ["Traduceri Autorizate", "Redactare Conținut", "Corectură & Editare"] },
+      { title: "Instrumente", items: ["Software CAT", "Dicționare", "Resurse Online"] },
+      { title: "Specializări", items: ["Juridic", "Tehnic", "Medical", "Marketing"] },
+      { title: "Sfaturi Profesionale", items: ["Tarife", "Contracte", "Clienți"] }
+    ]
+  },
+  "Finanțe & Contabilitate": {
+    columns: [
+      { title: "Servicii Oferite", items: ["Consultanță Financiară", "Evidență Contabilă", "Declarații Fiscale"] },
+      { title: "Programe & Unelte", items: ["Software Contabil", "Excel", "Resurse Legislative"] },
+      { title: "Domenii", items: ["PFA/SRL", "Asociații", "Persoane Fizice"] },
+      { title: "Optimizare", items: ["Planificare Buget", "Reducere Costuri", "Analiză Performanță"] }
+    ]
+  },
+  "Video & Animație": {
+    columns: [
+      { title: "Servicii Creație", items: ["Clipuri Promoționale", "Animații Explicative", "Editare Video"] },
+      { title: "Echipament Utilizat", items: ["Camere Video", "Software Editare", "Microfoane"] },
+      { title: "Tehnici", items: ["Storyboarding", "Motion Graphics", "Post-producție"] },
+      { title: "Distribuție", items: ["Social Media", "Platforme Video", "Targetare"] }
+    ]
+  },
+  "Business": {
+    columns: [
+      { title: "Tipuri de Consultanță", items: ["Start-up", "Dezvoltare Afacere", "Marketing"] },
+      { title: "Strategii", items: ["Planificare Afacere", "Analiză Piață", "Branding"] },
+      { title: "Resurse & Unelte", items: ["Modele Business Plan", "Studii de Caz", "Software Management"] },
+      { title: "Networking", items: ["Evenimente", "Parteneriate", "Comunități"] }
+    ]
+  },
+  "Meditații & Cursuri": {
+    columns: [
+      { title: "Discipline", items: ["Matematică", "Română", "Limbi Străine", "Informatică"] },
+      { title: "Format", items: ["Individual", "Grup", "Online", "Fizic"] },
+      { title: "Materiale Didactice", items: ["Culegeri", "Teste", "Prezentări"] },
+      { title: "Pregătire Specifică", items: ["Evaluare Națională", "Bacalaureat", "Admitere"] }
+    ]
+  },
+  "Grafică & Design": {
+    columns: [
+      { title: "Servicii Design", items: ["Logo Design", "Grafică Print", "Grafică Digitală"] },
+      { title: "Software Utilizat", items: ["Adobe Photoshop", "Illustrator", "Figma"] },
+      { title: "Domenii", items: ["Branding", "Web Design", "Ilustrație"] },
+      { title: "Resurse", items: ["Fonturi", "Mockups", "Stock Images"] }
+    ]
+  },
+  "Curatenie, Întreținere casă": {
+    columns: [
+      { title: "Servicii Curățenie", items: ["Curățenie Generală", "După Constructor", "Geamuri"] },
+      { title: "Întreținere", items: ["Grădinărit Mic", "Reparații Minore", "Instalații Sanitare Simple"] },
+      { title: "Produse Recomandate", items: ["Eco", "Profesionale", "Specifice"] },
+      { title: "Organizare", items: ["Planificare", "Echipă", "Logistica"] }
+    ]
+  },
+  "Reparații, Instalatii, Bricolaj": {
+    columns: [
+      { title: "Tipuri de Reparații", items: ["Electrice", "Sanitare", "Mobilier"] },
+      { title: "Instalații", items: ["Montaj", "Verificare", "Modernizare"] },
+      { title: "Unelte Esențiale", items: ["Trusă Bricolaj", "Scule Electrice", "Consumabile"] },
+      { title: "Proiecte DIY", items: ["Mic Mobilier", "Decorațiuni", "Amenajări"] }
+    ]
+  },
+  "Muzică, Teatru, Dans": {
+    columns: [
+      { title: "Activități", items: ["Lecții Instrument", "Actorie", "Coregrafie"] },
+      { title: "Genuri", items: ["Clasic", "Modern", "Popular"] },
+      { title: "Pregătire", items: ["Audiții", "Spectacole", "Concursuri"] },
+      { title: "Resurse", items: ["Partituri", "Scenarii", "Tutoriale Video"] }
+    ]
+  },
+  "Auto, Moto, Biciclete": {
+    columns: [
+      { title: "Servicii Vehicule", items: ["Mecanică", "Estetică", "Verificări"] },
+      { title: "Tipuri", items: ["Autoturisme", "Motociclete", "Biciclete"] },
+      { title: "Accesorii & Piese", items: ["Anvelope", "Consumabile", "Echipament Protecție"] },
+      { title: "Sfaturi Întreținere", items: ["Revizii", "Sezon", "Curățare"] }
+    ]
+  },
+  "Imobiliare, Construcții, Amenajari": {
+    columns: [
+      { title: "Servicii Imobiliare", items: ["Evaluare", "Tranzacții", "Consultanță"] },
+      { title: "Construcții", items: ["Planificare", "Materiale", "Execuție"] },
+      { title: "Amenajări", items: ["Design Interior", "Renovări", "Peisagistică"] },
+      { title: "Legislație", items: ["Autorizații", "Cadastru", "Intabulare"] }
+    ]
+  },
+  "Transport, Logistică, Curierat": {
+    columns: [
+      { title: "Servicii Transport", items: ["Persoane", "Marfă", "Specializat"] },
+      { title: "Logistică", items: ["Optimizare Rute", "Depozitare", "Management Flotă"] },
+      { title: "Curierat", items: ["Local", "Național", "Internațional"] },
+      { title: "Reglementări", items: ["Licențe", "Legislație Rutieră", "Siguranță"] }
+    ]
+  }
 };
 
 export default function MainStage() {
@@ -94,6 +210,7 @@ export default function MainStage() {
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
   const categoriesButtonRef = useRef(null);
 
   const handleInputClick = (event) => {
@@ -137,13 +254,33 @@ export default function MainStage() {
           <div className="categories-dropdown">
             <ul>
               {categoriesList.map((cat) => (
-                <li key={cat} onClick={handleCloseCategories}>
+                <li
+                  key={cat}
+                  onClick={handleCloseCategories}
+                  onMouseEnter={() => setHoveredCategory(cat)}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                  style={{ position: 'relative' }}
+                >
                   {categoryIcons[cat]}
                   <span>{cat}</span>
                   <span className="arrow">&gt;</span>
                 </li>
               ))}
             </ul>
+            {hoveredCategory && categoriesDetails[hoveredCategory] && (
+              <div className="category-details-inline category-details-inline--top">
+                {categoriesDetails[hoveredCategory].columns.map((col, idx) => (
+                  <div key={idx} className="category-details-col-inline">
+                    <div className="category-details-title-inline">{col.title}</div>
+                    <ul>
+                      {col.items.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}

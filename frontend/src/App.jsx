@@ -12,6 +12,7 @@ import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
 import AccountSettings from './pages/AccountSettings';
+import OAuthSuccess from './pages/OAuthSuccess';
 import './App.css';
 import './mediaQueries.css';
 
@@ -39,6 +40,7 @@ function App() {
         {/* Rute de autentificare - fără Header/Footer */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
 
         {/* Toate celelalte rute - cu layout complet */}
         <Route path="/*" element={

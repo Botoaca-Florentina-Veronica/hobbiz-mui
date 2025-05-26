@@ -48,7 +48,7 @@ export default function LoginPage() {
       
       {/* Butoane sociale */}
       <div className="social-login">
-        <GoogleLoginButton onClick={() => console.log('Google login')} />
+        <GoogleLoginButton />
         <FacebookLoginButton onClick={() => console.log('Facebook login')} />
         <AppleLoginButton onClick={() => console.log('Apple login')} />
       </div>

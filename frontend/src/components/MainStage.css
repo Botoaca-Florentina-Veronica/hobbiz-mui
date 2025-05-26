@@ -278,3 +278,112 @@
 .sign-up-button:hover {
   background: #2a4059;
 }
+
+/* Detalii categorie pe hover */
+.category-details-panel {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 520px;
+  max-width: 900px;
+  background: #fff;
+  border-radius: 0 12px 12px 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 28px 36px 28px 32px;
+  display: flex;
+  gap: 36px;
+  z-index: 10010;
+  animation: fadeIn .18s;
+  height: 100%;
+}
+
+.category-details-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.category-details-col {
+  min-width: 170px;
+  margin-bottom: 10px;
+}
+
+.category-details-col div {
+  font-size: 1.04rem;
+  margin-bottom: 4px;
+  color: #222;
+}
+
+.category-details-col div:first-child {
+  font-weight: bold;
+  color: #355070;
+  margin-bottom: 8px;
+}
+
+/* Detalii categorie pe hover, integrate peste dropdown */
+.category-details-inline {
+  display: flex;
+  gap: 36px;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 18px 0 18px 32px;
+  z-index: 10010;
+  min-width: 400px;
+  max-width: 900px;
+  height: 100%;
+  align-items: flex-start;
+}
+
+.category-details-inline--top {
+  top: 0;
+  transform: translateY(-10px);
+}
+
+.category-details-columns-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.category-details-col-inline {
+  min-width: 150px;
+  margin-bottom: 10px;
+}
+
+.category-details-title-inline {
+  font-weight: bold;
+  color: #355070;
+  margin-bottom: 8px;
+  font-size: 1.05rem;
+}
+
+.category-details-col-inline div {
+  font-size: 1.01rem;
+  margin-bottom: 4px;
+  color: #222;
+}
+
+@media (max-width: 900px) {
+  .category-details-panel {
+    min-width: 320px;
+    max-width: 98vw;
+    padding: 18px 10px 18px 10px;
+    gap: 10px;
+  }
+  .category-details-col {
+    min-width: 120px;
+  }
+  .category-details-inline {
+    min-width: 220px;
+    max-width: 98vw;
+    padding: 10px 0 10px 10px;
+    gap: 10px;
+  }
+  .category-details-col-inline {
+    min-width: 90px;
+  }
+}
