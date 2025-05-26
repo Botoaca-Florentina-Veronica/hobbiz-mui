@@ -20,16 +20,15 @@ router.get('/google/callback',
       { id: user._id, email: user.email, name: user.name },
       process.env.JWT_SECRET || 'jwt_secret',
       { expiresIn: '7d' }
-    );
-    // Redirecționează către frontend cu tokenul în query string
-    res.redirect(`http://localhost:5173/oauth-success?token=${token}`);
+    );    // Redirecționează către frontend cu tokenul în query string
+    res.redirect(`https://hobbiz.netlify.app/oauth-success?token=${token}`);
   }
 );
 
 // Logout
 router.get('/logout', (req, res) => {
   req.logout(() => {
-    res.redirect('http://localhost:5173');
+    res.redirect('https://hobbiz.netlify.app');
   });
 });
 
