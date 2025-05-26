@@ -17,7 +17,7 @@ dist-ssr/
 
 # Local environment variables
 .env
-.secret
+secret.txt
 
 # Editor directories and files
 .vscode/

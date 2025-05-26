@@ -4,8 +4,6 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db'); // Importă conexiunea
 const userRoutes = require('./routes/userRoutes');
-const session = require('express-session');
-const passport = require('./config/passport');
 
 const app = express();
 
@@ -17,21 +15,12 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }, // setează true dacă folosești HTTPS
-}));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Conectare la baza de date
 connectDB(); // Apelează funcția exportată
 
 // Rute
 app.use('/api/users', userRoutes);
-app.use('/auth', require('./routes/authRoutes'));
 
 app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
