@@ -10,7 +10,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 32px;
-  color: #15302b;
+  color: #0B2D5A;
 }
 .settings-menu {
   display: flex;
@@ -23,12 +23,90 @@
   padding: 28px 32px;
   font-size: 1.35rem;
   font-weight: 500;
-  color: #15302b;
+  color: #0B2D5A;
   box-shadow: 0 1px 6px rgba(0,0,0,0.04);
   cursor: pointer;
   transition: box-shadow 0.2s, background 0.2s;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
 }
 .settings-item:hover {
-  background: #e6f2ef;
-  box-shadow: 0 2px 12px rgba(21,48,43,0.08);
+  background: #E3F2FD;
+  box-shadow: 0 2px 12px rgba(11,45,90,0.08);
+}
+
+/* Styles for the email change section */
+.email-change-section {
+  background: #eef3f4;
+  border-radius: 12px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: -16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+.email-change-section label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #0B2D5A;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.email-change-section input[type="email"] {
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #f0f0f0;
+  width: 90%;
+  box-sizing: border-box;
+}
+
+.email-change-section input[type="email"]:focus {
+  border-color: #0B2D5A;
+}
+
+.email-change-section button {
+  background-color: #0B2D5A;
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+  min-width: 120px;
+}
+
+.email-change-section button:hover {
+  background-color: #0D47A1;
+}
+
+/* Styles for messages */
+.message {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.message.success {
+  background-color: #E3F2FD;
+  color: #0D47A1;
+  border: 1px solid #BBDEFB;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }

@@ -21,6 +21,7 @@ apiClient.interceptors.request.use((config) => {
 export const login = (credentials) => apiClient.post('/api/users/login', credentials);
 export const getProfile = () => apiClient.get('/api/users/profile');
 export const register = (userData) => apiClient.post('/api/users/register', userData);
+export const updateEmail = (newEmailData) => apiClient.put('/api/users/update-email', newEmailData);
 
 // Alte endpoint-uri...
 

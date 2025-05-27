@@ -105,3 +105,43 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: 'Eroare server la obținerea profilului' });
   }
 };
+
+// Actualizează email utilizator
+exports.updateEmail = async (req, res) => {
+  try {
+    const userId = req.userId; // Obținut din middleware-ul de autentificare
+    const { newEmail } = req.body;
+
+    // Validare email
+    if (!newEmail) {
+      return res.status(400).json({ error: 'Noul email este obligatoriu' });
+    }
+
+    // Basic email format validation (can be more robust)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+        return res.status(400).json({ error: 'Format email invalid' });
+    }
+
+    // Verifică dacă noul email există deja pentru un alt utilizator
+    const existingUserWithNewEmail = await User.findOne({ email: newEmail, _id: { $ne: userId } });
+    if (existingUserWithNewEmail) {
+      return res.status(400).json({ error: 'Acest email este deja utilizat' });
+    }
+
+    // Găsește utilizatorul și actualizează email-ul
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit' });
+    }
+
+    user.email = newEmail;
+    await user.save();
+
+    res.json({ message: 'Email actualizat cu succes!' });
+
+  } catch (error) {
+    console.error('Eroare la actualizarea email-ului:', error);
+    res.status(500).json({ error: 'Eroare server la actualizarea email-ului' });
+  }
+};
