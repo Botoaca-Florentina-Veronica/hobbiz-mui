@@ -145,3 +145,36 @@ exports.updateEmail = async (req, res) => {
     res.status(500).json({ error: 'Eroare server la actualizarea email-ului' });
   }
 };
+
+// Actualizează parola utilizator
+exports.updatePassword = async (req, res) => {
+  try {
+    const userId = req.userId; // Obținut din middleware-ul de autentificare
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii' });
+    }
+
+    // Găsește utilizatorul
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit' });
+    }
+
+    // Verifică parola curentă
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Parola curentă este incorectă' });
+    }
+
+    // Setează noua parolă (va fi hash-uită automat de pre-save hook)
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Parola a fost schimbată cu succes!' });
+  } catch (error) {
+    console.error('Eroare la schimbarea parolei:', error);
+    res.status(500).json({ error: 'Eroare server la schimbarea parolei' });
+  }
+};
