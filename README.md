@@ -81,22 +81,42 @@ backend/
 │   ├── middleware/
 │   │   └── auth.js
 │   ├── models/
-│   │   └── User.js
+│   │   ├── User.js
+│   │   └── Alert.js   # <--- NEW: stores MITM alerts
 │   ├── routes/
 │   │   ├── authRoutes.js         # Authentication routes (including Google OAuth)
+│   │   ├── mitmRoutes.js  # (now empty, detection is automatic)
 │   │   └── userRoutes.js
 │   ├── services/
 │   │   └── UserService.js
 │   ├── server.js
 │   └── package.json
-├── README.md
-├── schiță-db.md
-└── structura.txt
+mitm_detector.exe   # <--- NEW: MITM detection script
+README.md
+schiță-db.md
+structura.txt
 ```
 - Toate componentele și paginile au fișiere CSS dedicate.
 - Stilurile globale și pentru search-baruri/butoane sunt în `App.css`.
 - Imaginile sunt în `src/assets/images/`.
 - Backend-ul este organizat pe controllers, middleware, models, routes, services.
+
+---
+
+# 🛡️ MITM Detection Integration
+
+A new security feature has been added to the backend: **automatic detection of Man-in-the-Middle (MITM) attacks at login**.
+
+## How it works
+- On every login attempt (`POST /login`), the backend runs the `mitm_detector.exe` script.
+- If a MITM attack is detected (based on the script output), the login is blocked and an alert is saved in the MongoDB `alerts` collection.
+- Alerts contain the username, the alert message, and a timestamp.
+- This process is invisible to the user—there is no UI button for MITM detection.
+
+
+## Notes
+- MITM detection is fully automated and runs in the backend only.
+- All alerts are visible in the `alerts` collection in MongoDB Atlas (use Compass to view them).
 
 ---
 
@@ -106,6 +126,7 @@ backend/
 ✅ **User profile customization**  
 ✅ **Social features** (follow users, join groups)  
 ✅ **Responsive design** (Mobile-friendly UI)  
+✅ **MITM detection** (Automatic detection of Man-in-the-Middle attacks at login)  
 
 ---
 
@@ -114,6 +135,7 @@ backend/
 - **Backend**: Hosted on Render
 - **Database**: MongoDB Atlas cluster  
 - **CI/CD**: GitHub Actions  
+
 
 ---
 
