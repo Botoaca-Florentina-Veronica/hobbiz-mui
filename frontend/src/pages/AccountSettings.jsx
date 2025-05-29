@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './AccountSettings.css';
-import { updateEmail, updatePassword } from '../api/api'; // Importă și updatePassword
+import { updateEmail, updatePassword, detectMitm } from '../api/api'; // Importă detectMitm
 
 export default function AccountSettings() {
   const [showEmailChange, setShowEmailChange] = useState(false);
@@ -8,6 +8,8 @@ export default function AccountSettings() {
   const [newEmail, setNewEmail] = useState('');
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '' });
   const [message, setMessage] = useState(null); // State for messages (success/error)
+  const [mitmResult, setMitmResult] = useState(null);
+  const [mitmLoading, setMitmLoading] = useState(false);
 
   const handleEmailChangeClick = () => {
     console.log('Schimbă email-ul clicked!');
@@ -60,6 +62,19 @@ export default function AccountSettings() {
     }
   };
 
+  const handleDetectMitm = async () => {
+    setMitmLoading(true);
+    setMitmResult(null);
+    try {
+      const response = await detectMitm();
+      setMitmResult(response.data.output);
+    } catch (error) {
+      setMitmResult('Eroare la detectarea MITM: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setMitmLoading(false);
+    }
+  };
+
   return (
     <div className="account-settings-container">
       <h1 className="settings-title">Setări</h1>
@@ -78,7 +93,7 @@ export default function AccountSettings() {
               onChange={e => setPasswords(p => ({ ...p, currentPassword: e.target.value }))}
               placeholder="Introduceți parola curentă"
             />
-            <label htmlFor="new-password">Parolă nouă</label>
+            <label htmlFor="new-password">Parola nouă</label>
             <input
               type="password"
               id="new-password"
@@ -106,10 +121,15 @@ export default function AccountSettings() {
             <button onClick={handleSaveEmail}>Salvează</button>
           </div>
         )}
+        <div className="settings-item" onClick={handleDetectMitm}>Detectează atac MITM</div>
+        {mitmLoading && <div className="message info">Se detectează atacuri MITM...</div>}
+        {mitmResult && <div className="message info">Rezultat MITM: {mitmResult}</div>}
+        <div className="settings-item">Profil</div>
+        <div className="settings-item">Anunțuri</div>
         <div className="settings-item">Setează notificările</div>
-        <div className="settings-item">Administrare cont</div>
-        <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>
         <div className="settings-item">Date de facturare</div>
+        <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>
+        <div className="settings-item">Șterge contul</div>
       </div>
     </div>
   );
