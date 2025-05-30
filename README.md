@@ -103,13 +103,13 @@ hobbiz-mui
 # 🛡️ MITM Detection Integration
 
 What is MITM?
-MITM (Man-in-the-Middle) is an attack where an attacker intercepts communication between two parties without their knowledge. This code detects such attacks by analyzing network traffic and the ARP table.
+MITM (Man-in-the-Middle) is an attack where someone intercepts communication between two parties without their knowledge. This code detects such attacks by analyzing network traffic and the ARP table.
 
 ## How it works
 - On every login attempt (`POST /login`), the backend runs the `mitm_detector.exe` script.
 - If a MITM attack is detected (based on the script output), the login is blocked and an alert is saved in the MongoDB `alerts` collection.
 - Alerts contain the username, the alert message, and a timestamp.
-- This process is invisible to the user—there is no UI button for MITM detection.
+- This process is invisible to the user.
 
 
 ## Notes
