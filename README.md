@@ -43,59 +43,61 @@ Hobbiz is a full-stack web application built with the MERN stack (MongoDB, Expre
 ## 🏗 **Project Structure**  
 ```
 hobbiz-mui
-|    frontend/
-|    │   ├── public/
-|    │   ├── src/
-|    │   │   ├── assets/
-|    │   │   │   └── images/           # logo-uri, poze pentru categorii, etc
-|    │   │   ├── api/
-|    │   │   │   └── api.js
-|    │   │   ├── components/
-|    │   │   │   ├── CallToAction.jsx, CallToAction.css
-|    │   │   │   ├── Categories.jsx, Categories.css
-|    │   │   │   ├── Content.jsx, Content.css
-|    │   │   │   ├── DarkModeToggle.jsx, DarkModeToggle.css
-|    │   │   │   ├── Footer.jsx, Footer.css
-|    │   │   │   ├── Header.jsx, Header.css
-|    │   │   │   └── MainStage.jsx, MainStage.css
-|    │   │   ├── pages/
-|    │   │   │   ├── AccountSettings.jsx, AccountSettings.css
-|    │   │   │   ├── LoginPage.jsx, SignupPage.jsx
-|    │   │   │   ├── LoginSignup.css
-|    │   │   │   └── SocialButtons.jsx, SocialButtons.css
-|    │   │   ├── services/
-|    │   │   ├── App.jsx
-|    │   │   ├── App.css
-|    │   │   ├── index.css
-|    │   │   ├── main.jsx
-|    │   │   └── mediaQueries.css
-|    │   ├── vite.config.js
-|    │   ├── package.json
-|    │   ├── index.html
-|    │   └── netlify.toml
-|    backend/
-|    │   ├── config/
-|    │   │   ├── db.js
-|    │   │   └── passport.js           # Passport configuration for OAuth
-|    │   ├── controllers/
-|    │   │   └── UserController.js
-|    │   ├── middleware/
-|    │   │   └── auth.js
-|    │   ├── models/
-|    │   │   ├── User.js
-|    │   │   └── Alert.js   # <--- NEW: stores MITM alerts
-|    │   ├── routes/
-|    │   │   ├── authRoutes.js         # Authentication routes (including Google OAuth)
-|    │   │   ├── mitmRoutes.js  # (now empty, detection is automatic)
-|    │   │   └── userRoutes.js
-|    │   ├── services/
-|    │   │   └── UserService.js
-|    │   ├── server.js
-|    │   └── package.json
-├── mitm_detector.exe   # <--- NEW: MITM detection script
-├── README.md
-├── schiță-db.md
-└──structura.txt
+    ├──frontend/
+    |   ├── public/
+    |   ├── src/
+    |   │   ├── assets/
+    |   │   │   └── images/           # logo-uri, poze pentru categorii, etc
+    |   │   ├── api/
+    |   │   │   └── api.js
+    |   │   ├── components/
+    |   │   │   ├── CallToAction.jsx, CallToAction.css
+    |   │   │   ├── Categories.jsx, Categories.css
+    |   │   │   ├── Content.jsx, Content.css
+    |   │   │   ├── DarkModeToggle.jsx, DarkModeToggle.css
+    |   │   │   ├── Footer.jsx, Footer.css
+    |   │   │   ├── Header.jsx, Header.css
+    |   │   │   └── MainStage.jsx, MainStage.css
+    |   │   ├── pages/
+    |   │   │   ├── AccountSettings.jsx, AccountSettings.css
+    |   │   │   ├── LoginPage.jsx, SignupPage.jsx
+    |   │   │   ├── LoginSignup.css
+    |   │   │   └── SocialButtons.jsx, SocialButtons.css
+    |   │   ├── services/
+    |   │   ├── App.jsx
+    |   │   ├── App.css
+    |   │   ├── index.css
+    |   │   ├── main.jsx
+    |   │   └── mediaQueries.css
+    |   ├── vite.config.js
+    |   ├── package.json
+    |   ├── index.html
+    |   └── netlify.toml
+    |
+    |
+    ├── backend/
+    |   ├── config/
+    |   │   ├── db.js
+    |   │   └── passport.js           # Passport configuration for OAuth
+    |   ├── controllers/
+    |   │   └── UserController.js
+    |   ├── middleware/
+    |   │   └── auth.js
+    |   ├── models/
+    |   │   ├── User.js
+    |   │   └── Alert.js   # <--- NEW: stores MITM alerts
+    |   ├── routes/
+    |   │   ├── authRoutes.js         # Authentication routes (including Google OAuth)
+    |   │   ├── mitmRoutes.js  # (now empty, detection is automatic)
+    |   │   └── userRoutes.js
+    |   ├── services/
+    |   │   └── UserService.js
+    |   ├── server.js
+    |   └── package.json
+    ├── mitm_detector.exe   # <--- NEW: MITM detection script
+    ├── README.md
+    ├── schiță-db.md
+    └──structura.txt
 ```
 
 ---
