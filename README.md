@@ -144,3 +144,4 @@ MITM (Man-in-the-Middle) is an attack where someone intercepts communication bet
 - [React Official Docs](https://react.dev/)  
 - [Mongoose Guide](https://mongoosejs.com/docs/guide.html)  
 - [Express](https://expressjs.com/)
+- [Icons](https://www.flaticon.com/)
