@@ -60,8 +60,10 @@ hobbiz-mui
     |   │   │   └── MainStage.jsx, MainStage.css
     |   │   ├── pages/
     |   │   │   ├── AccountSettings.jsx, AccountSettings.css
-    |   │   │   ├── LoginPage.jsx, SignupPage.jsx
-    |   │   │   ├── LoginSignup.css
+    |   |   |   ├── AddAnnouncementPage.jsx, AddAnnouncementPage.css 
+    |   │   │   ├── LoginPage.jsx, LoginSignup.css
+    |   │   │   ├── SignupPage.jsx
+    |   |   |   ├── OAuthSuccess.jsx
     |   │   │   └── SocialButtons.jsx, SocialButtons.css
     |   │   ├── services/
     |   │   ├── App.jsx

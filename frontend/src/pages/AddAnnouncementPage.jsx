@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './AddAnnouncementPage.css';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 
 const CATEGORIES = [
   'Electronics',
@@ -72,6 +72,17 @@ export default function AddAnnouncementPage() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
+  // Contact information state
+  const [contactPerson, setContactPerson] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  // Images state
+  const imageInputRef = useRef(null);
+  const [images, setImages] = useState([]);
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImages(prev => [...prev, ...files]);
+  };
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -137,8 +148,39 @@ export default function AddAnnouncementPage() {
           ))}
         </select>
       </form>
+      <div className="add-announcement-images-section">
+        <h2 className="add-announcement-subtitle">Imagini</h2>
+        <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Glisează și fixează imaginile în ordinea dorită.</div>
+        <div className="add-announcement-images-grid">
+          <button
+            type="button"
+            className="add-announcement-image-upload add-announcement-image-upload-main"
+            onClick={() => imageInputRef.current.click()}
+          >
+            <span className="add-announcement-image-upload-text">Adaugă imagini</span>
+            <span className="add-announcement-image-upload-underline"></span>
+          </button>
+          <button
+            type="button"
+            className="add-announcement-image-upload"
+            onClick={() => imageInputRef.current.click()}
+          >
+            <span className="add-announcement-image-upload-icon">
+              <FaCamera size={38} color="#46626a" />
+            </span>
+          </button>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            ref={imageInputRef}
+            style={{ display: 'none' }}
+            onChange={handleImageChange}
+          />
+        </div>
+      </div>
       <div className="add-announcement-description-section">
-        <label className="add-announcement-label">Descriere *</label>
+        <label className="add-announcement-label">Descriere*</label>
         <textarea
           className="add-announcement-description-input"
           placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
@@ -239,10 +281,43 @@ export default function AddAnnouncementPage() {
           </Popover>
         </div>
       </div>
+      <div className="add-announcement-contact-section">
+        <h2 className="add-announcement-subtitle">Informații de contact</h2>
+        <label className="add-announcement-label">Persoana de contact*</label>
+        <div className="add-announcement-contact-input-wrapper">
+          <input
+            className="add-announcement-contact-input"
+            type="text"
+            placeholder="Nume și prenume"
+            value={contactPerson || ''}
+            onChange={e => setContactPerson(e.target.value)}
+            required
+          />
+          {contactPerson && (
+            <span className="add-announcement-location-check">✓</span>
+          )}
+        </div>
+        <label className="add-announcement-label">Adresa de email</label>
+        <input
+          className="add-announcement-contact-input"
+          type="email"
+          placeholder="ex: exemplu@gmail.com"
+          value={contactEmail || ''}
+          onChange={e => setContactEmail(e.target.value)}
+        />
+        <label className="add-announcement-label">Numărul de telefon</label>
+        <input
+          className="add-announcement-contact-input"
+          type="tel"
+          placeholder="ex: 07xxxxxxxx"
+          value={contactPhone || ''}
+          onChange={e => setContactPhone(e.target.value)}
+        />
+      </div>
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
-          <button className="add-announcement-preview">Previzualizati anuntul</button>
+          <button className="add-announcement-preview">Previzualizați anunțul</button>
           <button className="add-announcement-submit" type="submit">Publică un anunț</button>
         </div>
       </div>
