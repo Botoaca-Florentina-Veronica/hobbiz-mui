@@ -77,6 +77,15 @@ export default function Header() {
     }
   };
 
+  const handleAddAnnouncement = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      // TODO: Navighează către pagina de adăugare anunț când va exista
+      // navigate('/adauga-anunt');
+    }
+  };
+
   return (
     <>
       <div className="header fixed-header">
@@ -87,7 +96,7 @@ export default function Header() {
         </ul>
         <ul className="nav-right">
           <li>
-            <button className="add-button">Adaugă un anunț</button>
+            <button className="add-button" onClick={handleAddAnnouncement}>Adaugă un anunț</button>
           </li>
           <li>
             <button className="favorite-btn">

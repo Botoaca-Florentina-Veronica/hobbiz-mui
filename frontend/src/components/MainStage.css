@@ -179,10 +179,9 @@
   color: #fff;
   font-size: 1.45rem;
   font-weight: bold;
-  box-shadow: 0 4px 18px rgba(53,80,112,0.10);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
   outline: none;
-  z-index: 1000;
 }
 
 .categories-button:hover, .categories-button:focus {
