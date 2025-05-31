@@ -1,13 +1,13 @@
 /* Stiluri pentru CallToAction */
 .hole-action {
-  background-color: white;
+  background-color: #f3f5f6;
 }
 
 .call-to-action {
   display: flex;
   border-radius: 5px;
   background-color: #F8B195;
-  color: #f9faf8;
+  color: #f3f5f6;
   align-items: center;
   justify-content: space-around;
   margin: 100px auto 100px auto;

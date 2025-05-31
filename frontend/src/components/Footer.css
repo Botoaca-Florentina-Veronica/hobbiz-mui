@@ -1,9 +1,10 @@
 /* Stiluri pentru Footer */
 .footer {
   font-size: 25px;
-  background: #F67280;
-  color: #e2e7eb;
+  background: #f3f5f6;
+  color: #355070;
   display: flex;
+  flex-direction: column; /* asigura aranjarea pe verticala */
   justify-content: center;
   align-items: center;
 }
@@ -74,4 +75,14 @@
 
 .desktop-footer {
   display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.footer-separator {
+  width: 100%;
+  height: 1.5px; /* Bara si mai subtire */
+  background: #183642; /* albastru inchis */
+  margin-bottom: 0;
 }

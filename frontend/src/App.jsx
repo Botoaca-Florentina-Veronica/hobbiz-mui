@@ -13,6 +13,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
 import AccountSettings from './pages/AccountSettings';
 import OAuthSuccess from './pages/OAuthSuccess';
+import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import './App.css';
 import './mediaQueries.css';
 
@@ -59,6 +60,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AccountSettings />
+            <Footer />
+          </>
+        } />
+        <Route path="/add-announcement" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AddAnnouncementPage />
             <Footer />
           </>
         } />

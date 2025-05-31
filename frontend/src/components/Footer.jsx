@@ -8,7 +8,9 @@ export default function Footer() {
 
   return (
     <div className="footer">
-      {/* Versiunea desktop - doar copyright */}
+      {/* Bara separator subtire */}
+      <div className="footer-separator" />
+      {/* Versiunea desktop - copyright sub bara */}
       <footer className="desktop-footer">
         <p>©Copyright Hobbiz 2025</p>
       </footer>

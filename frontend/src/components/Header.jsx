@@ -81,8 +81,7 @@ export default function Header() {
     if (!isAuthenticated) {
       navigate('/login');
     } else {
-      // TODO: Navighează către pagina de adăugare anunț când va exista
-      // navigate('/adauga-anunt');
+      navigate('/add-announcement');
     }
   };
 
