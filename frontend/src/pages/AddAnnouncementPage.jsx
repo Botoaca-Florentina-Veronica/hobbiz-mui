@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
-import { categories } from '../components/categories.jsx';
+import { categories } from '../components/Categories.jsx';
 import '../components/Categories.css';
 
 const CATEGORIES = [
