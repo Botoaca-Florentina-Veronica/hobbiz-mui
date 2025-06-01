@@ -12,27 +12,15 @@ import masina from '../assets/images/car.png';
 import curatenie from '../assets/images/cleaning.png';
 import './Categories.css';
 
+// Restore the default export of the Categories component
 export default function Categories() {
-  // Lista de categorii cu descrieri și imagini
-  const categories = [
-    { description: "Fotografie", image: camera },
-    { description: "Prajituri", image: prajituri },
-    { description: "Muzica", image: muzica },
-    { description: "Reparații", image: reparatii },
-    { description: "Dans", image: dancing },
-    { description: "Curățenie", image: curatenie },
-    { description: "Gradinarit", image: gardening },
-    { description: "Sport", image: tennis },
-    { description: "Arta", image: arta },
-    { description: "Tehnologie", image: it },
-    { description: "Auto", image: masina },
-    { description: "Meditații", image: carte },
-  ];
+  // The categories array is now imported from the named export below
 
   return (
     <div className="categories-container">
       <h2 className="categories-title">Explorează categorii</h2>
       <div className="categories-grid">
+        {/* Use the imported categories array */}
         {categories.map((category, index) => (
           <div key={index} className="category-card">
             <button className="category-button">
@@ -55,3 +43,19 @@ export default function Categories() {
     </div>
   );
 }
+
+// Export the categories array
+export const categories = [
+  { description: "Fotografie", image: camera },
+  { description: "Prajituri", image: prajituri },
+  { description: "Muzica", image: muzica },
+  { description: "Reparații", image: reparatii },
+  { description: "Dans", image: dancing },
+  { description: "Curățenie", image: curatenie },
+  { description: "Gradinarit", image: gardening },
+  { description: "Sport", image: tennis },
+  { description: "Arta", image: arta },
+  { description: "Tehnologie", image: it },
+  { description: "Auto", image: masina },
+  { description: "Meditații", image: carte },
+];

@@ -6,6 +6,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
+import { categories } from '../components/categories.jsx';
+import '../components/Categories.css';
 
 const CATEGORIES = [
   'Electronics',
@@ -16,7 +18,25 @@ const CATEGORIES = [
   'Other'
 ];
 
-// Lista statică de județe și localități (toate județele, ordonate alfabetic, cu localități exemplu)
+// Helper function for category hints
+const getCategoryHint = (category) => {
+  const hints = {
+    "Fotografie": "Servicii foto, cursuri, echipamente",
+    "Prajituri": "Cofetărie, patiserie, cursuri de coacere",
+    "Muzica": "Lecții, instrumente, evenimente muzicale",
+    "Reparații": "Service-uri, mentenanță, instalări",
+    "Dans": "Cursuri, evenimente, coregrafii",
+    "Curățenie": "Servicii de menaj, curățenie profesională",
+    "Gradinarit": "Amenajări, întreținere, plante",
+    "Sport": "Echipamente, antrenamente, evenimente",
+    "Arta": "Pictură, sculptură, arte vizuale",
+    "Tehnologie": "IT, electronice, gadget-uri",
+    "Auto": "Mașini, piese, service",
+    "Meditații": "Lecții particulare, pregătire"
+  };
+  return hints[category] || "Servicii și produse din această categorie";
+};
+
 const judete = {
   "Alba": ["Alba Iulia", "Aiud", "Blaj", "Cugir", "Ocna Mureș"],
   "Arad": ["Arad", "Ineu", "Lipova", "Curtici", "Pecica"],
@@ -68,17 +88,16 @@ export default function AddAnnouncementPage() {
   const [titleChars, setTitleChars] = useState(0);
   const [description, setDescription] = useState("");
   const [descriptionChars, setDescriptionChars] = useState(0);
-  // Location dropdown state
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
-  // Contact information state
   const [contactPerson, setContactPerson] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
-  // Images state
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
+  const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages(prev => [...prev, ...files]);
@@ -89,13 +108,8 @@ export default function AddAnnouncementPage() {
     setTitleChars(e.target.value.length);
   };
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Send data to backend
     alert('Announcement submitted!');
   };
 
@@ -113,8 +127,24 @@ export default function AddAnnouncementPage() {
     handleClose();
   };
 
+  const handleCategoryClick = (event) => {
+    setCategoryAnchorEl(event.currentTarget);
+  };
+
+  const handleCategoryClose = () => {
+    setCategoryAnchorEl(null);
+  };
+
+  const handleCategorySelect = (selectedCategory) => {
+    setCategory(selectedCategory);
+    handleCategoryClose();
+  };
+
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+  const categoryOpen = Boolean(categoryAnchorEl);
+  const categoryId = categoryOpen ? 'category-popover' : undefined;
 
   return (
     <div className="add-announcement-container">
@@ -136,21 +166,63 @@ export default function AddAnnouncementPage() {
           <div className="add-announcement-charcount">{titleChars}/70</div>
         </div>
         <label className="add-announcement-label">Categoria*</label>
-        <select
+        <input
           className="add-announcement-category-select"
+          type="text"
+          placeholder="Alege categoria"
           value={category}
-          onChange={handleCategoryChange}
+          readOnly
+          onClick={handleCategoryClick}
           required
+        />
+        <Popover
+          id={categoryId}
+          open={categoryOpen}
+          anchorEl={categoryAnchorEl}
+          onClose={handleCategoryClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          PaperProps={{ 
+            sx: { 
+              minWidth: 800,
+              maxWidth: 1000,
+              minHeight: 600,
+              maxHeight: 'calc(100vh - 100px)',
+              overflowY: 'auto',
+              '& .categories-grid-popover': {
+                padding: '2rem'
+              }
+            } 
+          }}
         >
-          <option value="">Alege categoria</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
+          <div className="categories-grid-popover">
+            {categories.map((cat, index) => (
+              <div
+                key={index}
+                className="category-card-popover"
+                onClick={() => handleCategorySelect(cat.description)}
+              >
+                <div className="image-container-popover">
+                  {cat.image ? (
+                    <img
+                      src={cat.image}
+                      alt={cat.description}
+                      className="category-image-popover"
+                    />
+                  ) : (
+                    <div className="image-placeholder-popover"></div>
+                  )}
+                </div>
+                <p className="category-description-popover">{cat.description}</p>
+                <p className="category-hint-popover">{getCategoryHint(cat.description)}</p>
+              </div>
+            ))}
+          </div>
+        </Popover>
       </form>
       <div className="add-announcement-images-section">
         <h2 className="add-announcement-subtitle">Imagini</h2>
-        <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Glisează și fixează imaginile în ordinea dorită.</div>
+        <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
         <div className="add-announcement-images-grid">
           <button
             type="button"
