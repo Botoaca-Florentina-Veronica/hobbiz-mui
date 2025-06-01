@@ -1,94 +1,129 @@
 .account-settings-container {
-  max-width: 900px;
-  margin: 40px auto;
-  background: #f6f8f9;
-  border-radius: 18px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-  padding: 40px 32px 32px 32px;
+  background: #f5f7f8;
+  min-height: 100vh;
+  padding: 40px 0;
+  margin-top: 4rem;
+  max-width: 100vw;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 .settings-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #183642;
   margin-bottom: 32px;
-  color: #15302b;
+  margin-left: 8vw;
+  text-align: left;
+  background: none;
+  padding-left: 0;
+  letter-spacing: -1px;
+  line-height: 1.1;
 }
 .settings-menu {
+  background: #fff;
+  border-radius: 8px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 48px 36px 48px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 .settings-item {
-  background: #fff;
-  border-radius: 12px;
-  padding: 28px 32px;
-  font-size: 1.35rem;
+  background: #f3f5f6;
+  border-radius: 8px;
+  padding: 24px 32px;
+  font-size: 1.2rem;
+  color: #183642;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   font-weight: 500;
-  color: #15302b;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
   cursor: pointer;
   transition: box-shadow 0.2s, background 0.2s;
   position: relative;
   z-index: 1;
   pointer-events: auto;
+  display: flex;
+  align-items: center;
 }
 .settings-item:hover {
-  background: #e6f2ef;
-  box-shadow: 0 2px 12px rgba(21,48,43,0.08);
+  background: #f8fafb;
+  box-shadow: 0 4px 16px rgba(24,54,66,0.08);
 }
 
 /* Styles for the email change section */
 .email-change-section {
-  background: #eef3f4; /* Slightly darker background, adjust if needed to match image */
-  border-radius: 12px; /* Match settings item border-radius */
-  padding: 24px 32px; /* Adjust padding as needed */
+  background: #f3f5f6;
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 12px;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Spacing between elements - adjust if needed */
-  margin-top: -16px; /* Pull it up slightly to align visually */
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04); /* Subtle shadow */
+  gap: 16px;
+  margin-top: -16px;
 }
 
 .email-change-section label {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #15302b;
-  display: block; /* Ensure label is on its own line */
-  margin-bottom: 4px; /* Add slight space below label */
+  color: #0B2D5A;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .email-change-section input[type="email"] {
-  padding: 12px 16px; /* Adjust padding */
-  border: 1px solid #ccc; /* Adjust border color if needed */
-  border-radius: 8px; /* Adjust border-radius to match image */
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
-  background-color: #f0f0f0; /* Light grey background from image */
-  width: 90%; /* Make input take full width */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  background-color: #f0f0f0;
+  width: 90%;
+  box-sizing: border-box;
 }
 
 .email-change-section input[type="email"]:focus {
-  border-color: #15302b; /* Highlight on focus */
+  border-color: #0B2D5A;
+}
+
+.email-change-section input[type="password"] {
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #f0f0f0;
+  width: 90%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.email-change-section input[type="password"]:focus {
+  border-color: #0B2D5A;
 }
 
 .email-change-section button {
-  background-color: #15302b; /* Darker button */
+  background-color: #0B2D5A;
   color: #fff;
-  padding: 12px 24px; /* Adjust padding */
+  padding: 12px 24px;
   border: none;
-  border-radius: 8px; /* Adjust border-radius */
+  border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  /* align-self: flex-start; /* Keep aligned to the left */
-  text-align: center; /* Ensure text is centered if button width is fixed */
-  min-width: 120px; /* Give the button a minimum width similar to the image */
+  text-align: center;
+  min-width: 120px;
 }
 
 .email-change-section button:hover {
-  background-color: #0d1f1c; /* Darker hover */
+  background-color: #0D47A1;
 }
 
 /* Styles for messages */
@@ -101,13 +136,13 @@
 }
 
 .message.success {
-  background-color: #d4edda; /* Light green background */
-  color: #155724; /* Dark green text */
-  border: 1px solid #c3e6cb;
+  background-color: #E3F2FD;
+  color: #0D47A1;
+  border: 1px solid #BBDEFB;
 }
 
 .message.error {
-  background-color: #f8d7da; /* Light red background */
-  color: #721c24; /* Dark red text */
+  background-color: #f8d7da;
+  color: #721c24;
   border: 1px solid #f5c6cb;
 }
