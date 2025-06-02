@@ -14,3 +14,4 @@ baza de date
 - cumpara un domeniu pentru aplicatia web, sa nu mai scrie netlify in el
 - citeste despre login throtling
 - fa cumva sa retii si avatarul contului google/facebook pentru contul de hobbiz
+- ia in vedere adaugarea unei licente pentru acest proiect

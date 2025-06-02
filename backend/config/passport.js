@@ -19,11 +19,12 @@ passport.use(new GoogleStrategy({
       user = await User.findOne({ email: profile.emails[0].value });
 
       if (user) {
-        // If user found by email, update their googleId and return
+        // If user found by email, update their googleId and also sync name and avatar
         user.googleId = profile.id;
-        // Optionally update other fields like name or avatar if needed
-        // user.name = profile.displayName; // Assuming you added 'name' field
-        // user.avatar = profile.photos[0].value; // Assuming you added 'avatar' field
+        user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
+        user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
+        user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
+        // Optionally: sync other fields if needed
         await user.save();
         return done(null, user);
       } else {
