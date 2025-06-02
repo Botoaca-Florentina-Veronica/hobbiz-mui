@@ -5,15 +5,32 @@
 
 .call-to-action {
   display: flex;
-  border-radius: 5px;
+  border-radius: 15px;
   background-color: #F8B195;
-  color: #f3f5f6;
+  color: #1a237e;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   margin: 100px auto 100px auto;
-  width: 75%;
-  padding: 50px;
+  width: 80%;
+  padding: 50px 80px;
   font-size: 28px;
+  gap: 60px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.call-to-action h3 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.call-to-action p {
+  font-size: 22px;
+  margin: 0;
+  margin-left: 60px;
+  margin-right: 30px;
+  line-height: 1.5;
+  flex: 1;
 }
 
 .second-button {
@@ -30,7 +47,8 @@
 
 .dark-mode .call-to-action {
   background-color: #5a3f2f;
-  color: #eceeef;
+  color: #b3e5fc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dark-mode .second-button {

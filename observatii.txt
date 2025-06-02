@@ -1,0 +1,16 @@
+Observatii:
+- daca nu merge ceva la deploy pe netlify, e posibil sa fie de la faptul
+ca nu ai dat cu import la imaginile folosite(trebuie sa apara neaparat in dist)
+- pui doar "dist", nu "frontend/dist" (base se adaugă automat) cand faci deploy 
+si modifici netlify.toml
+- env-urile(environment variables) sa fie mereu locale, le pui in gitignore, apoi
+le pui separat pe render si netlify
+- render iti ofera un meniu de logs, daca ai probleme cu ceva in backend si nu
+reusesti sa prinzi erorile doar folosind consola din browser, e cea mai buna varianta
+- pe viitor ia in vedere sa te muti pe aws sau cumpara varianta render premium, 
+acum dupa 15 minute de inactivitate, site-ului ii ia foarte mult sa se conecteze la
+baza de date
+- nu uita sa pui functionalitate butoanelor de login cu facebook/apple cum ai la google
+- cumpara un domeniu pentru aplicatia web, sa nu mai scrie netlify in el
+- citeste despre login throtling
+- fa cumva sa retii si avatarul contului google/facebook pentru contul de hobbiz

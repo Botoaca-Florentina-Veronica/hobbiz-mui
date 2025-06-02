@@ -99,7 +99,7 @@ hobbiz-mui
     ├── mitm_detector.exe   # <--- NEW: MITM detection script
     ├── README.md
     ├── schiță-db.md
-    └──structura.txt
+    └── observații.txt
 ```
 
 ---
