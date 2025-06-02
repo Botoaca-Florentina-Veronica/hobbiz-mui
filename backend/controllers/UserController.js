@@ -64,6 +64,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Date de autentificare invalide' });
     }
 
+    // Dacă utilizatorul are avatar Google salvat, folosește-l ca avatar implicit
+    if (user.googleId && user.avatar && !user.avatar.startsWith('http')) {
+      // Dacă avatarul nu e deja un URL (de exemplu, e un string gol sau placeholder), poți adăuga aici logica de fallback dacă vrei
+      // De obicei, avatarul Google e deja URL, deci nu e nevoie de update
+    }
     // Verifică parola
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
