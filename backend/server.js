@@ -8,7 +8,7 @@ const authRoutes = require('./routes/authRoutes'); // Importă rutele de autenti
 const session = require('express-session'); // Import express-session
 const passport = require('passport'); // Import passport
 const mitmRoutes = require('./routes/mitmRoutes'); // Importă rutele pentru mitm
-const { spawn } = require('child_process');
+const { execFile } = require('child_process');
 const Alert = require('./models/Alert');
 
 const app = express();
@@ -49,34 +49,29 @@ app.get('/', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  // Rulează MitmDetector.exe (C# compilat self-contained)
-  const mitm = spawn('./MitmDetector.exe');
-  let output = '';
-  mitm.stdout.on('data', (data) => {
-    output += data.toString();
-  });
-  mitm.stderr.on('data', (data) => {
-    console.error('MITM detector error:', data.toString());
-  });
-  mitm.on('close', async (code) => {
-    // Simulare anomalie pentru test
-    output += '\nARP anomaly: IP 192.168.1.1 has multiple MACs: 00-11-22-33-44-55, 66-77-88-99-aa-bb';
+  // Folosește calea corectă către mitm_detector.exe și interfața de rețea "Ethernet"
+  execFile('../mitm-detector.exe', ['Ethernet'], (error, stdout, stderr) => {
+    if (error) {
+      console.error('Eroare la rularea detectorului:', error);
+      return res.status(500).json({ error: 'Eroare internă la detecție MITM' });
+    }
+
     let alerts = [];
     try {
-      alerts = output.split('\n').filter(line => line.includes('anomaly') || line.includes('Duplicate IP'));
+      alerts = JSON.parse(stdout); // dacă output-ul Rust e JSON
     } catch (e) {
-      alerts = [];
+      alerts = stdout.split('\n').filter(Boolean);
     }
-    console.log('DEBUG ALERTS:', alerts); // DEBUG: vezi ce se detectează
+
     if (alerts.length > 0) {
-      console.log('ALERT TO BE INSERTED:', { username, alert: alerts.join('; '), timestamp: new Date() });
-      await Alert.create({
+      Alert.create({
         username,
         alert: alerts.join('; '),
         timestamp: new Date()
       });
       return res.status(403).json({ error: 'Sesiune suspectă: posibil atac MITM detectat!' });
     }
+
     // Continuă login-ul normal (aici pui logica ta de autentificare)
     res.json({ success: true });
   });
