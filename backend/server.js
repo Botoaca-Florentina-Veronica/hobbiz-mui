@@ -59,13 +59,17 @@ app.post('/login', async (req, res) => {
     console.error('MITM detector error:', data.toString());
   });
   mitm.on('close', async (code) => {
+    // Simulare anomalie pentru test
+    output += '\nARP anomaly: IP 192.168.1.1 has multiple MACs: 00-11-22-33-44-55, 66-77-88-99-aa-bb';
     let alerts = [];
     try {
       alerts = output.split('\n').filter(line => line.includes('anomaly') || line.includes('Duplicate IP'));
     } catch (e) {
       alerts = [];
     }
+    console.log('DEBUG ALERTS:', alerts); // DEBUG: vezi ce se detectează
     if (alerts.length > 0) {
+      console.log('ALERT TO BE INSERTED:', { username, alert: alerts.join('; '), timestamp: new Date() });
       await Alert.create({
         username,
         alert: alerts.join('; '),
