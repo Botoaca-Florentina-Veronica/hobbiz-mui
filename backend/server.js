@@ -49,8 +49,8 @@ app.get('/', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  // Rulează MitmDetector.dll (C# compilat)
-  const mitm = spawn('dotnet', ['MitmDetector.dll']); // sau 'MitmDetector.exe' dacă ai compilat ca exe
+  // Rulează MitmDetector.exe (C# compilat self-contained)
+  const mitm = spawn('./MitmDetector.exe');
   let output = '';
   mitm.stdout.on('data', (data) => {
     output += data.toString();
