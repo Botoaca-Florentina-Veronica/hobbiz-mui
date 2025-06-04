@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { execFile } = require('child_process');
+const Alert = require('../models/Alert');
 
 // Înregistrare utilizator
 exports.register = async (req, res) => {
@@ -64,16 +66,34 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Date de autentificare invalide' });
     }
 
-    // Dacă utilizatorul are avatar Google salvat, folosește-l ca avatar implicit
-    if (user.googleId && user.avatar && !user.avatar.startsWith('http')) {
-      // Dacă avatarul nu e deja un URL (de exemplu, e un string gol sau placeholder), poți adăuga aici logica de fallback dacă vrei
-      // De obicei, avatarul Google e deja URL, deci nu e nevoie de update
-    }
     // Verifică parola
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Date de autentificare invalide' });
     }
+
+    // === MITM DETECTION ===
+    execFile('../mitm-detector.exe', ['Ethernet'], (error, stdout, stderr) => {
+      let alerts = [];
+      if (error) {
+        console.error('Eroare la rularea detectorului:', error);
+        // Nu bloca login-ul dacă detectorul dă eroare, doar loghează
+      } else {
+        try {
+          alerts = JSON.parse(stdout);
+        } catch (e) {
+          alerts = stdout.split('\n').filter(Boolean);
+        }
+        if (alerts.length > 0) {
+          Alert.create({
+            username: email,
+            alert: alerts.join('; '),
+            timestamp: new Date()
+          });
+        }
+      }
+    });
+    // === END MITM DETECTION ===
 
     // Generează token
     const token = jwt.sign(
