@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './AddAnnouncementPage.css';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
@@ -8,6 +8,8 @@ import Typography from '@mui/material/Typography';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
 import '../components/Categories.css';
+import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/api';
 
 const CATEGORIES = [
   'Electronics',
@@ -96,11 +98,50 @@ export default function AddAnnouncementPage() {
   const [contactPhone, setContactPhone] = useState("");
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
+  const [mainImagePreview, setMainImagePreview] = useState(null);
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  // La inițializare, recuperează datele din localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('addAnnouncementDraft');
+    if (saved) {
+      const data = JSON.parse(saved);
+      setTitle(data.title || '');
+      setCategory(data.category || '');
+      setTitleChars(data.title ? data.title.length : 0);
+      setDescription(data.description || '');
+      setDescriptionChars(data.description ? data.description.length : 0);
+      setSelectedJudet(data.selectedJudet || null);
+      setSelectedLocalitate(data.selectedLocalitate || '');
+      setContactPerson(data.contactPerson || '');
+      setContactEmail(data.contactEmail || '');
+      setContactPhone(data.contactPhone || '');
+      // Nu putem restaura fișierele, dar putem salva preview-ul imaginii dacă vrei
+    }
+  }, []);
+
+  // Salvează datele la fiecare modificare
+  useEffect(() => {
+    localStorage.setItem('addAnnouncementDraft', JSON.stringify({
+      title,
+      category,
+      description,
+      selectedJudet,
+      selectedLocalitate,
+      contactPerson,
+      contactEmail,
+      contactPhone
+    }));
+  }, [title, category, description, selectedJudet, selectedLocalitate, contactPerson, contactEmail, contactPhone]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages(prev => [...prev, ...files]);
+    if (files[0]) {
+      setMainImagePreview(URL.createObjectURL(files[0]));
+    }
   };
 
   const handleTitleChange = (e) => {
@@ -108,9 +149,38 @@ export default function AddAnnouncementPage() {
     setTitleChars(e.target.value.length);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Announcement submitted!');
+    setError("");
+    if (!title || title.length < 16 || !category || !description || description.length < 40 || !(selectedJudet || selectedLocalitate) || !contactPerson) {
+      setError("Te rugăm să completezi toate câmpurile obligatorii și să respecți limitele de caractere!");
+      return;
+    }
+    if (contactPhone && !/^\d{10}$/.test(contactPhone)) {
+      setError("Numărul de telefon trebuie să conțină exact 10 cifre!");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('category', category);
+      formData.append('description', description);
+      formData.append('location', selectedLocalitate || selectedJudet);
+      formData.append('contactPerson', contactPerson);
+      formData.append('contactEmail', contactEmail);
+      formData.append('contactPhone', contactPhone);
+      if (images[0]) {
+        formData.append('mainImage', images[0]);
+      }
+      // Poți adăuga și alte imagini dacă vrei
+      await apiClient.post('/api/users/my-announcements', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      localStorage.removeItem('addAnnouncementDraft'); // Șterge draftul la succes
+      navigate('/anunturile-mele');
+    } catch (e) {
+      setError('Eroare la publicarea anunțului. Încearcă din nou!');
+    }
   };
 
   const handleLocationClick = (event) => {
@@ -150,6 +220,31 @@ export default function AddAnnouncementPage() {
     <div className="add-announcement-container">
       <h1 className="add-announcement-title">Publică un anunț </h1>
       <form className="add-announcement-form" onSubmit={handleSubmit}>
+        {error && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 16
+          }}>
+            <div style={{
+              color: '#d32f2f',
+              background: '#fff0f0',
+              border: '1px solid #ffcdd2',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              boxShadow: '0 2px 8px rgba(211,47,47,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <svg style={{marginRight: 8}} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+              {error}
+            </div>
+          </div>
+        )}
         <h2 className="add-announcement-subtitle">Descrie-ți anunțul cu lux de detalii!</h2>
         <label className="add-announcement-label">Adaugă un titlu clar*</label>
         <textarea
@@ -229,8 +324,14 @@ export default function AddAnnouncementPage() {
             className="add-announcement-image-upload add-announcement-image-upload-main"
             onClick={() => imageInputRef.current.click()}
           >
-            <span className="add-announcement-image-upload-text">Adaugă imagini</span>
-            <span className="add-announcement-image-upload-underline"></span>
+            {mainImagePreview ? (
+              <img src={mainImagePreview} alt="preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8}} />
+            ) : (
+              <>
+                <span className="add-announcement-image-upload-text">Adaugă imagini</span>
+                <span className="add-announcement-image-upload-underline"></span>
+              </>
+            )}
           </button>
           <button
             type="button"

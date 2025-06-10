@@ -1,0 +1,16 @@
+const mongoose = require('mongoose');
+
+const announcementSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title: { type: String, required: true },
+  category: { type: String, required: true },
+  description: { type: String, required: true },
+  location: { type: String, required: true },
+  contactPerson: { type: String, required: true },
+  contactEmail: { type: String },
+  contactPhone: { type: String },
+  images: [String],
+  createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('Announcement', announcementSchema);

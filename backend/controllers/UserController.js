@@ -3,6 +3,24 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { execFile } = require('child_process');
 const Alert = require('../models/Alert');
+const Announcement = require('../models/Announcement');
+const multer = require('multer');
+const path = require('path');
+
+// Configurare multer pentru upload imagini
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../../frontend/public/uploads'));
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+
+exports.upload = upload;
 
 // Înregistrare utilizator
 exports.register = async (req, res) => {
@@ -201,5 +219,48 @@ exports.updatePassword = async (req, res) => {
   } catch (error) {
     console.error('Eroare la schimbarea parolei:', error);
     res.status(500).json({ error: 'Eroare server la schimbarea parolei' });
+  }
+};
+
+// Adaugă un anunț nou pentru utilizatorul autentificat
+exports.addAnnouncement = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone, images } = req.body;
+    if (!title || !category || !description || !location || !contactPerson) {
+      return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });
+    }
+    let imagePath = null;
+    if (req.file) {
+      imagePath = '/uploads/' + req.file.filename;
+    }
+    const announcement = new Announcement({
+      user: userId,
+      title,
+      category,
+      description,
+      location,
+      contactPerson,
+      contactEmail,
+      contactPhone,
+      images: imagePath ? [imagePath] : []
+    });
+    await announcement.save();
+    res.status(201).json({ message: 'Anunț adăugat cu succes!' });
+  } catch (error) {
+    console.error('Eroare la adăugare anunț:', error);
+    res.status(500).json({ error: 'Eroare server la adăugare anunț' });
+  }
+};
+
+// Returnează toate anunțurile utilizatorului autentificat
+exports.getMyAnnouncements = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const announcements = await Announcement.find({ user: userId }).sort({ createdAt: -1 });
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la listare anunțuri:', error);
+    res.status(500).json({ error: 'Eroare server la listare anunțuri' });
   }
 };

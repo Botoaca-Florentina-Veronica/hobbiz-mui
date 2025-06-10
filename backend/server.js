@@ -10,6 +10,7 @@ const passport = require('passport'); // Import passport
 const mitmRoutes = require('./routes/mitmRoutes'); // Importă rutele pentru mitm
 const { execFile } = require('child_process');
 const Alert = require('./models/Alert');
+const path = require('path');
 
 const app = express();
 
@@ -41,6 +42,9 @@ connectDB(); // Apelează funcția exportată
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes); // Adaugă rutele de autentificare
 app.use('/api/mitm', mitmRoutes); // Adaugă rutele pentru mitm
+
+// Servire imagini uploadate din frontend/public/uploads
+app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));
 
 app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
