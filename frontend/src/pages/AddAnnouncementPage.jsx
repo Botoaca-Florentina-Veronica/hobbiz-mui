@@ -101,6 +101,7 @@ export default function AddAnnouncementPage() {
   const [mainImagePreview, setMainImagePreview] = useState(null);
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   // La inițializare, recuperează datele din localStorage
@@ -118,7 +119,11 @@ export default function AddAnnouncementPage() {
       setContactPerson(data.contactPerson || '');
       setContactEmail(data.contactEmail || '');
       setContactPhone(data.contactPhone || '');
-      // Nu putem restaura fișierele, dar putem salva preview-ul imaginii dacă vrei
+      // Restaurează preview-ul imaginii principale dacă există
+      const mainImageDataUrl = localStorage.getItem('addAnnouncementMainImagePreview');
+      if (mainImageDataUrl) {
+        setMainImagePreview(mainImageDataUrl);
+      }
     }
   }, []);
 
@@ -136,11 +141,22 @@ export default function AddAnnouncementPage() {
     }));
   }, [title, category, description, selectedJudet, selectedLocalitate, contactPerson, contactEmail, contactPhone]);
 
+  // Salvează preview-ul imaginii principale ca DataURL în localStorage
+  useEffect(() => {
+    if (mainImagePreview) {
+      localStorage.setItem('addAnnouncementMainImagePreview', mainImagePreview);
+    }
+  }, [mainImagePreview]);
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages(prev => [...prev, ...files]);
     if (files[0]) {
-      setMainImagePreview(URL.createObjectURL(files[0]));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMainImagePreview(reader.result);
+      };
+      reader.readAsDataURL(files[0]);
     }
   };
 
@@ -152,6 +168,7 @@ export default function AddAnnouncementPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     if (!title || title.length < 16 || !category || !description || description.length < 40 || !(selectedJudet || selectedLocalitate) || !contactPerson) {
       setError("Te rugăm să completezi toate câmpurile obligatorii și să respecți limitele de caractere!");
       return;
@@ -172,12 +189,13 @@ export default function AddAnnouncementPage() {
       if (images[0]) {
         formData.append('mainImage', images[0]);
       }
-      // Poți adăuga și alte imagini dacă vrei
       await apiClient.post('/api/users/my-announcements', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       localStorage.removeItem('addAnnouncementDraft'); // Șterge draftul la succes
-      navigate('/anunturile-mele');
+      localStorage.removeItem('addAnnouncementMainImagePreview'); // Șterge preview-ul la succes
+      setSuccess('Anunțul a fost publicat cu succes!');
+      setTimeout(() => navigate('/anunturile-mele'), 1200);
     } catch (e) {
       setError('Eroare la publicarea anunțului. Încearcă din nou!');
     }
@@ -242,6 +260,31 @@ export default function AddAnnouncementPage() {
             }}>
               <svg style={{marginRight: 8}} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
               {error}
+            </div>
+          </div>
+        )}
+        {success && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 16
+          }}>
+            <div style={{
+              color: '#388e3c',
+              background: '#e8f5e9',
+              border: '1px solid #a5d6a7',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              boxShadow: '0 2px 8px rgba(56,142,60,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <svg style={{marginRight: 8}} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#388e3c"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              {success}
             </div>
           </div>
         )}
