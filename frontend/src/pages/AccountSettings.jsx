@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AccountSettings.css';
 import { updateEmail, updatePassword, detectMitm } from '../api/api'; // Importă detectMitm
+import { useNavigate } from 'react-router-dom';
 
 export default function AccountSettings() {
   const [showEmailChange, setShowEmailChange] = useState(false);
@@ -10,6 +11,7 @@ export default function AccountSettings() {
   const [message, setMessage] = useState(null); // State for messages (success/error)
   const [mitmResult, setMitmResult] = useState(null);
   const [mitmLoading, setMitmLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleEmailChangeClick = () => {
     console.log('Schimbă email-ul clicked!');
@@ -124,8 +126,8 @@ export default function AccountSettings() {
         <div className="settings-item" onClick={handleDetectMitm}>Detectează atac MITM</div>
         {mitmLoading && <div className="message info">Se detectează atacuri MITM...</div>}
         {mitmResult && <div className="message info">Rezultat MITM: {mitmResult}</div>}
+        <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>Anunțuri</div>
         <div className="settings-item">Profil</div>
-        <div className="settings-item">Anunțuri</div>
         <div className="settings-item">Setează notificările</div>
         <div className="settings-item">Date de facturare</div>
         <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>
