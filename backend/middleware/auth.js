@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
+    req.userId = decoded.userId || decoded.id; // <-- Fix pentru Google OAuth
     next();
   } catch (error) {
     res.status(401).json({ error: 'Token invalid' });
