@@ -226,6 +226,7 @@ exports.updatePassword = async (req, res) => {
 exports.addAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
+    console.log('userId primit în addAnnouncement:', userId); // LOG NOU pentru debug
     const { title, category, description, location, contactPerson, contactEmail, contactPhone, images } = req.body;
     if (!title || !category || !description || !location || !contactPerson) {
       return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });

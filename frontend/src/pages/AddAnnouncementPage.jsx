@@ -278,7 +278,7 @@ export default function AddAnnouncementPage() {
   return (
     <div className="add-announcement-container">
       <h1 className="add-announcement-title">Publică un anunț </h1>
-      <form className="add-announcement-form" onSubmit={handleSubmit}>
+      <form className="add-announcement-form" onSubmit={e => e.preventDefault()} style={{marginBottom: 0}}>
         {error && (
           <div style={{
             display: 'flex',
@@ -398,186 +398,186 @@ export default function AddAnnouncementPage() {
             ))}
           </div>
         </Popover>
-        <div className="add-announcement-images-section">
-          <h2 className="add-announcement-subtitle">Imagini</h2>
-          <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
-          <div className="add-announcement-images-grid">
-            <button
-              type="button"
-              className="add-announcement-image-upload add-announcement-image-upload-main"
-              onClick={() => imageInputRef.current.click()}
-            >
-              {mainImagePreview ? (
-                <img src={mainImagePreview} alt="preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8}} />
-              ) : (
-                <>
-                  <span className="add-announcement-image-upload-text">Adaugă imagini</span>
-                  <span className="add-announcement-image-upload-underline"></span>
-                </>
-              )}
-            </button>
-            <button
-              type="button"
-              className="add-announcement-image-upload"
-              onClick={() => imageInputRef.current.click()}
-            >
-              <span className="add-announcement-image-upload-icon">
-                <FaCamera size={38} color="#46626a" />
-              </span>
-            </button>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              ref={imageInputRef}
-              style={{ display: 'none' }}
-              onChange={handleImageChange}
-            />
-          </div>
-        </div>
-        <div className="add-announcement-description-section">
-          <label className="add-announcement-label">Descriere*</label>
-          <textarea
-            className="add-announcement-description-input"
-            placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
-            minLength={40}
-            maxLength={9000}
-            required
-            value={description}
-            onChange={e => {
-              setDescription(e.target.value);
-              setDescriptionChars(e.target.value.length);
-            }}
-          />
-          <div className="add-announcement-char-helper-row">
-            <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
-            <div className="add-announcement-charcount">{descriptionChars}/9000</div>
-          </div>
-        </div>
-        <div className="add-announcement-location-section">
-          <label className="add-announcement-label">Localitate*</label>
-          <div className="add-announcement-location-input-wrapper">
-            <FaMapMarkerAlt className="location-icon" />
-            <input
-              className={
-                "add-announcement-location-input" +
-                (!(selectedJudet || selectedLocalitate) ? " add-announcement-location-placeholder" : "")
-              }
-              type="text"
-              placeholder="Toată țara"
-              value={selectedLocalitate || selectedJudet || "Toată țara"}
-              readOnly
-              onClick={e => setAnchorEl(e.currentTarget)}
-              style={!(selectedJudet || selectedLocalitate)
-                ? { fontSize: '1.1rem', color: '#888', fontWeight: 400 }
-                : { fontSize: '2.2rem', color: '#183642', fontWeight: 500 }}
-              required
-            />
-            {(selectedJudet || selectedLocalitate) && (
-              <span className="add-announcement-location-check">✓</span>
+      </form>
+      <div className="add-announcement-images-section">
+        <h2 className="add-announcement-subtitle">Imagini</h2>
+        <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
+        <div className="add-announcement-images-grid">
+          <button
+            type="button"
+            className="add-announcement-image-upload add-announcement-image-upload-main"
+            onClick={() => imageInputRef.current.click()}
+          >
+            {mainImagePreview ? (
+              <img src={mainImagePreview} alt="preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8}} />
+            ) : (
+              <>
+                <span className="add-announcement-image-upload-text">Adaugă imagini</span>
+                <span className="add-announcement-image-upload-underline"></span>
+              </>
             )}
-            <Popover
-              id={anchorEl ? 'location-popover' : undefined}
-              open={Boolean(anchorEl)}
-              anchorEl={anchorEl}
-              onClose={() => setAnchorEl(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
-            >
-              {!selectedJudet ? (
-                <>
-                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
-                  <List sx={{ maxHeight: 320, overflow: 'auto' }}>
+          </button>
+          <button
+            type="button"
+            className="add-announcement-image-upload"
+            onClick={() => imageInputRef.current.click()}
+          >
+            <span className="add-announcement-image-upload-icon">
+              <FaCamera size={38} color="#46626a" />
+            </span>
+          </button>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            ref={imageInputRef}
+            style={{ display: 'none' }}
+            onChange={handleImageChange}
+          />
+        </div>
+      </div>
+      <div className="add-announcement-description-section">
+        <label className="add-announcement-label">Descriere*</label>
+        <textarea
+          className="add-announcement-description-input"
+          placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
+          minLength={40}
+          maxLength={9000}
+          required
+          value={description}
+          onChange={e => {
+            setDescription(e.target.value);
+            setDescriptionChars(e.target.value.length);
+          }}
+        />
+        <div className="add-announcement-char-helper-row">
+          <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
+          <div className="add-announcement-charcount">{descriptionChars}/9000</div>
+        </div>
+      </div>
+      <div className="add-announcement-location-section">
+        <label className="add-announcement-label">Localitate*</label>
+        <div className="add-announcement-location-input-wrapper">
+          <FaMapMarkerAlt className="location-icon" />
+          <input
+            className={
+              "add-announcement-location-input" +
+              (!(selectedJudet || selectedLocalitate) ? " add-announcement-location-placeholder" : "")
+            }
+            type="text"
+            placeholder="Toată țara"
+            value={selectedLocalitate || selectedJudet || "Toată țara"}
+            readOnly
+            onClick={e => setAnchorEl(e.currentTarget)}
+            style={!(selectedJudet || selectedLocalitate)
+              ? { fontSize: '1.1rem', color: '#888', fontWeight: 400 }
+              : { fontSize: '2.2rem', color: '#183642', fontWeight: 500 }}
+            required
+          />
+          {(selectedJudet || selectedLocalitate) && (
+            <span className="add-announcement-location-check">✓</span>
+          )}
+          <Popover
+            id={anchorEl ? 'location-popover' : undefined}
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
+          >
+            {!selectedJudet ? (
+              <>
+                <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
+                <List sx={{ maxHeight: 320, overflow: 'auto' }}>
+                  <ListItemButton
+                    onClick={() => {
+                      setSelectedJudet(null);
+                      setSelectedLocalitate("");
+                      setAnchorEl(null);
+                    }}
+                    divider
+                  >
+                    <ListItemText
+                      primary={<span style={{ fontWeight: 'bold' }}>Toată țara</span>}
+                    />
+                  </ListItemButton>
+                  {Object.keys(judete).map((judet) => (
                     <ListItemButton
-                      onClick={() => {
-                        setSelectedJudet(null);
-                        setSelectedLocalitate("");
-                        setAnchorEl(null);
-                      }}
+                      key={judet}
+                      onClick={() => setSelectedJudet(judet)}
                       divider
                     >
-                      <ListItemText
-                        primary={<span style={{ fontWeight: 'bold' }}>Toată țara</span>}
-                      />
+                      <ListItemText primary={judet} />
                     </ListItemButton>
-                    {Object.keys(judete).map((judet) => (
-                      <ListItemButton
-                        key={judet}
-                        onClick={() => setSelectedJudet(judet)}
-                        divider
-                      >
-                        <ListItemText primary={judet} />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </>
-              ) : (
-                <>
-                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
-                  <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                    {judete[selectedJudet].map((localitate) => (
-                      <ListItemText
-                        key={localitate}
-                        primary={localitate}
-                        sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
-                        onClick={() => {
-                          setSelectedLocalitate(localitate);
-                          setAnchorEl(null);
-                          setSelectedJudet(null);
-                        }}
-                      />
-                    ))}
-                  </List>
-                  <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                    <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
-                  </ListItemButton>
-                </>
-              )}
-            </Popover>
-          </div>
-        </div>
-        <div className="add-announcement-contact-section">
-          <h2 className="add-announcement-subtitle">Informații de contact</h2>
-          <label className="add-announcement-label">Persoana de contact*</label>
-          <div className="add-announcement-contact-input-wrapper">
-            <input
-              className="add-announcement-contact-input"
-              type="text"
-              placeholder="Nume și prenume"
-              value={contactPerson || ''}
-              onChange={e => setContactPerson(e.target.value)}
-              required
-            />
-            {contactPerson && (
-              <span className="add-announcement-location-check">✓</span>
+                  ))}
+                </List>
+              </>
+            ) : (
+              <>
+                <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
+                <List sx={{ maxHeight: 320, overflow: 'auto' }}>
+                  {judete[selectedJudet].map((localitate) => (
+                    <ListItemText
+                      key={localitate}
+                      primary={localitate}
+                      sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
+                      onClick={() => {
+                        setSelectedLocalitate(localitate);
+                        setAnchorEl(null);
+                        setSelectedJudet(null);
+                      }}
+                    />
+                  ))}
+                </List>
+                <ListItemButton onClick={() => setSelectedJudet(null)} divider>
+                  <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
+                </ListItemButton>
+              </>
             )}
-          </div>
-          <label className="add-announcement-label">Adresa de email</label>
+          </Popover>
+        </div>
+      </div>
+      <div className="add-announcement-contact-section">
+        <h2 className="add-announcement-subtitle">Informații de contact</h2>
+        <label className="add-announcement-label">Persoana de contact*</label>
+        <div className="add-announcement-contact-input-wrapper">
           <input
             className="add-announcement-contact-input"
-            type="email"
-            placeholder="ex: exemplu@gmail.com"
-            value={contactEmail || ''}
-            onChange={e => setContactEmail(e.target.value)}
+            type="text"
+            placeholder="Nume și prenume"
+            value={contactPerson || ''}
+            onChange={e => setContactPerson(e.target.value)}
+            required
           />
-          <label className="add-announcement-label">Numărul de telefon</label>
-          <input
-            className="add-announcement-contact-input"
-            type="tel"
-            placeholder="ex: 07xxxxxxxx"
-            value={contactPhone || ''}
-            onChange={e => setContactPhone(e.target.value)}
-          />
+          {contactPerson && (
+            <span className="add-announcement-location-check">✓</span>
+          )}
         </div>
-        <div className="add-announcement-actions-section">
-          <div className="add-announcement-actions-left"></div>
-          <div className="add-announcement-actions-right">
-            <button type="button" className="add-announcement-preview">Previzualizați anunțul</button>
-            <button type="submit" className="add-announcement-submit">Publică un anunț</button>
-          </div>
+        <label className="add-announcement-label">Adresa de email</label>
+        <input
+          className="add-announcement-contact-input"
+          type="email"
+          placeholder="ex: exemplu@gmail.com"
+          value={contactEmail || ''}
+          onChange={e => setContactEmail(e.target.value)}
+        />
+        <label className="add-announcement-label">Numărul de telefon</label>
+        <input
+          className="add-announcement-contact-input"
+          type="tel"
+          placeholder="ex: 07xxxxxxxx"
+          value={contactPhone || ''}
+          onChange={e => setContactPhone(e.target.value)}
+        />
+      </div>
+      <div className="add-announcement-actions-section">
+        <div className="add-announcement-actions-left"></div>
+        <div className="add-announcement-actions-right">
+          <button type="button" className="add-announcement-preview">Previzualizați anunțul</button>
+          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>Publică un anunț</button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
