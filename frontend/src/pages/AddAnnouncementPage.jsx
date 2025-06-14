@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
 import '../components/Categories.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 
 const CATEGORIES = [
@@ -103,6 +103,9 @@ export default function AddAnnouncementPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isEdit, setIsEdit] = useState(false);
+  const [announcementId, setAnnouncementId] = useState(null);
 
   // La inițializare, recuperează datele din localStorage
   useEffect(() => {
@@ -148,6 +151,25 @@ export default function AddAnnouncementPage() {
     }
   }, [mainImagePreview]);
 
+  useEffect(() => {
+    if (location.state && location.state.announcement) {
+      const a = location.state.announcement;
+      setTitle(a.title || '');
+      setCategory(a.category || '');
+      setTitleChars(a.title ? a.title.length : 0);
+      setDescription(a.description || '');
+      setDescriptionChars(a.description ? a.description.length : 0);
+      setSelectedJudet(null); // Poți adăuga logica pentru județ/localitate dacă ai nevoie
+      setSelectedLocalitate(a.location || '');
+      setContactPerson(a.contactPerson || '');
+      setContactEmail(a.contactEmail || '');
+      setContactPhone(a.contactPhone || '');
+      setMainImagePreview(a.images && a.images[0] ? a.images[0] : null);
+      setIsEdit(true);
+      setAnnouncementId(a._id);
+    }
+  }, [location.state]);
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages(prev => [...prev, ...files]);
@@ -165,9 +187,7 @@ export default function AddAnnouncementPage() {
     setTitleChars(e.target.value.length);
   };
 
-  const handleSubmit = async (e) => {
-    console.log('Form submitted!');
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError("");
     setSuccess("");
 
@@ -187,43 +207,59 @@ export default function AddAnnouncementPage() {
       return;
     }
     try {
-      console.log('Starting announcement submission...');
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('category', category);
-      formData.append('description', description);
-      formData.append('location', selectedLocalitate || selectedJudet);
-      formData.append('contactPerson', contactPerson);
-      formData.append('contactEmail', contactEmail);
-      formData.append('contactPhone', contactPhone);
-      if (images[0]) {
-        formData.append('mainImage', images[0]);
-      }
-      
-      console.log('Form data prepared:', {
-        title,
-        category,
-        description,
-        location: selectedLocalitate || selectedJudet,
-        contactPerson,
-        contactEmail,
-        contactPhone,
-        hasImage: !!images[0]
-      });
-
-      const response = await apiClient.post('/api/users/my-announcements', formData, {
-        headers: { 
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
+      if (isEdit && announcementId) {
+        // Update anunț existent
+        await apiClient.put(`/api/users/my-announcements/${announcementId}`, {
+          title,
+          category,
+          description,
+          location: selectedLocalitate,
+          contactPerson,
+          contactEmail,
+          contactPhone,
+          images: mainImagePreview ? [mainImagePreview] : []
+        });
+        setSuccess('Anunț actualizat cu succes!');
+        navigate('/adauga-anunt'); // redirecționează către pagina de adăugare anunț
+      } else {
+        console.log('Starting announcement submission...');
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('category', category);
+        formData.append('description', description);
+        formData.append('location', selectedLocalitate || selectedJudet);
+        formData.append('contactPerson', contactPerson);
+        formData.append('contactEmail', contactEmail);
+        formData.append('contactPhone', contactPhone);
+        if (images[0]) {
+          formData.append('mainImage', images[0]);
         }
-      });
-      
-      console.log('Server response:', response.data);
-      
-      localStorage.removeItem('addAnnouncementDraft');
-      localStorage.removeItem('addAnnouncementMainImagePreview');
-      setSuccess('Anunțul a fost publicat cu succes!');
-      setTimeout(() => navigate('/anunturile-mele'), 1200);
+        
+        console.log('Form data prepared:', {
+          title,
+          category,
+          description,
+          location: selectedLocalitate || selectedJudet,
+          contactPerson,
+          contactEmail,
+          contactPhone,
+          hasImage: !!images[0]
+        });
+
+        const response = await apiClient.post('/api/users/my-announcements', formData, {
+          headers: { 
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        console.log('Server response:', response.data);
+        
+        localStorage.removeItem('addAnnouncementDraft');
+        localStorage.removeItem('addAnnouncementMainImagePreview');
+        setSuccess('Anunțul a fost publicat cu succes!');
+        setTimeout(() => navigate('/anunturile-mele'), 1200);
+      }
     } catch (e) {
       console.error('Error submitting announcement:', e);
       console.error('Error details:', {
@@ -280,53 +316,19 @@ export default function AddAnnouncementPage() {
       <h1 className="add-announcement-title">Publică un anunț </h1>
       <form className="add-announcement-form" onSubmit={e => e.preventDefault()} style={{marginBottom: 0}}>
         {error && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 16
-          }}>
-            <div style={{
-              color: '#d32f2f',
-              background: '#fff0f0',
-              border: '1px solid #ffcdd2',
-              borderRadius: 8,
-              padding: '12px 24px',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              boxShadow: '0 2px 8px rgba(211,47,47,0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10
-            }}>
-              <svg style={{marginRight: 8}} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-              {error}
+          <div className="add-announcement-message add-announcement-error">
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
+            {error}
           </div>
         )}
         {success && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 16
-          }}>
-            <div style={{
-              color: '#388e3c',
-              background: '#e8f5e9',
-              border: '1px solid #a5d6a7',
-              borderRadius: 8,
-              padding: '12px 24px',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              boxShadow: '0 2px 8px rgba(56,142,60,0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10
-            }}>
-              <svg style={{marginRight: 8}} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#388e3c"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-              {success}
+          <div className="add-announcement-message add-announcement-success">
+            <div className="add-announcement-success-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#388e3c"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
+            {success}
           </div>
         )}
         <h2 className="add-announcement-subtitle">Descrie-ți anunțul cu lux de detalii!</h2>
@@ -469,9 +471,6 @@ export default function AddAnnouncementPage() {
             value={selectedLocalitate || selectedJudet || "Toată țara"}
             readOnly
             onClick={e => setAnchorEl(e.currentTarget)}
-            style={!(selectedJudet || selectedLocalitate)
-              ? { fontSize: '1.1rem', color: '#888', fontWeight: 400 }
-              : { fontSize: '2.2rem', color: '#183642', fontWeight: 500 }}
             required
           />
           {(selectedJudet || selectedLocalitate) && (
@@ -575,7 +574,7 @@ export default function AddAnnouncementPage() {
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
           <button type="button" className="add-announcement-preview">Previzualizați anunțul</button>
-          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>Publică un anunț</button>
+          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>{isEdit ? 'Actualizează anunțul' : 'Publică un anunț'}</button>
         </div>
       </div>
     </div>

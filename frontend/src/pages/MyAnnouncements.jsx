@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 
 export default function MyAnnouncements() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchAnnouncements() {
@@ -68,7 +70,7 @@ export default function MyAnnouncements() {
                   </div>
                 </div>
                 <div style={{display: 'flex', alignItems: 'center', gap: 16, marginTop: 12}}>
-                  <button style={{border: '1.5px solid #183642', background: '#fff', color: '#183642', borderRadius: 7, padding: '7px 22px', fontWeight: 600, fontSize: 15, cursor: 'pointer'}}>Editează</button>
+                  <button style={{border: '1.5px solid #183642', background: '#fff', color: '#183642', borderRadius: 7, padding: '7px 22px', fontWeight: 600, fontSize: 15, cursor: 'pointer'}} onClick={() => navigate('/adauga-anunt', { state: { announcement: a } })}>Editează</button>
                   <button style={{border: 'none', background: 'none', color: '#183642', fontWeight: 600, fontSize: 15, cursor: 'pointer', borderBottom: '2px solid #183642', padding: '7px 0'}}>Reactualizează</button>
                   <button style={{border: 'none', background: 'none', color: '#183642', fontWeight: 600, fontSize: 15, cursor: 'pointer', borderBottom: '2px solid #d32f2f', padding: '7px 0'}} onClick={() => handleDelete(a._id)}>Șterge</button>
                   <button style={{border: 'none', background: 'none', color: '#183642', fontWeight: 600, fontSize: 15, cursor: 'pointer', borderBottom: '2px solid #183642', padding: '7px 0'}}>Dezactivează</button>

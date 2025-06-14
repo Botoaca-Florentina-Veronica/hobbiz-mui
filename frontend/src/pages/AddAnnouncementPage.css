@@ -224,9 +224,15 @@
 }
 
 .add-announcement-location-check {
-  color: #1de9b6;
-  font-size: 2.2rem;
-  margin-left: 16px;
+  color: #388e3c;
+  font-size: 1.5rem;
+  margin-left: 8px;
+}
+
+.location-icon {
+  margin-right: 8px;
+  color: #183642;
+  font-size: 1.3rem;
 }
 
 .add-announcement-contact-section {
@@ -335,36 +341,25 @@
 }
 
 .add-announcement-image-upload-text {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.1rem;
   color: #183642;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
 .add-announcement-image-upload-underline {
   display: block;
-  width: 80px;
+  width: 60px;
   height: 3px;
-  background: #183642;
-  margin-top: 2px;
+  background: #ffd600;
+  border-radius: 2px;
+  margin-top: 4px;
 }
 
 .add-announcement-image-upload-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.add-announcement-image-upload svg {
-  width: 38px;
-  height: 38px;
-  color: #46626a;
-}
-
-.add-announcement-image-upload:hover,
-.add-announcement-image-upload-main:hover {
-  box-shadow: 0 2px 12px rgba(24,54,66,0.08);
-  background: #f7f7f7;
 }
 
 .categories-grid-popover {
@@ -450,4 +445,37 @@
   color: #757575;
   opacity: 1;
   letter-spacing: 0.01em;
+}
+
+.add-announcement-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.add-announcement-error {
+  color: #d32f2f;
+  background: #fff0f0;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(211,47,47,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.add-announcement-success {
+  color: #388e3c;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(56,142,60,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
