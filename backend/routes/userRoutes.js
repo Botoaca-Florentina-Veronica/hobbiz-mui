@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, upload } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, upload } = require('../controllers/UserController');
 const auth = require('../middleware/auth');
 
 // Rute
@@ -11,7 +11,8 @@ router.put('/update-email', auth, updateEmail); // Noua rută pentru actualizare
 router.put('/update-password', auth, updatePassword); // Rută pentru schimbarea parolei
 router.post('/my-announcements', auth, upload.single('mainImage'), addAnnouncement);
 router.get('/my-announcements', auth, getMyAnnouncements);
-router.delete('/my-announcements/:id', auth, require('../controllers/UserController').deleteAnnouncement);
+router.delete('/my-announcements/:id', auth, deleteAnnouncement);
+router.put('/my-announcements/:id', auth, upload.single('mainImage'), updateAnnouncement);
 
 // Verifică autentificarea utilizatorului
 router.get('/auth/check', auth, (req, res) => {

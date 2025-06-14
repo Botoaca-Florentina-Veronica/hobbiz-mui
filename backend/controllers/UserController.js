@@ -283,3 +283,34 @@ exports.deleteAnnouncement = async (req, res) => {
     res.status(500).json({ error: 'Eroare server la ștergerea anunțului' });
   }
 };
+
+// Actualizează un anunț existent
+exports.updateAnnouncement = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { id } = req.params;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
+    let announcement = await Announcement.findOne({ _id: id, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit' });
+    }
+    // Actualizează câmpurile text
+    announcement.title = title;
+    announcement.category = category;
+    announcement.description = description;
+    announcement.location = location;
+    announcement.contactPerson = contactPerson;
+    announcement.contactEmail = contactEmail;
+    announcement.contactPhone = contactPhone;
+    // Imagine nouă
+    if (req.file) {
+      announcement.images = ['/uploads/' + req.file.filename];
+    }
+    // Dacă nu există fișier nou, păstrează imaginea veche
+    await announcement.save();
+    res.json({ message: 'Anunț actualizat cu succes!' });
+  } catch (error) {
+    console.error('Eroare la actualizare anunț:', error);
+    res.status(500).json({ error: 'Eroare server la actualizare anunț' });
+  }
+};

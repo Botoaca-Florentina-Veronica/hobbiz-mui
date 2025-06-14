@@ -208,19 +208,25 @@ export default function AddAnnouncementPage() {
     }
     try {
       if (isEdit && announcementId) {
-        // Update anunț existent
-        await apiClient.put(`/api/users/my-announcements/${announcementId}`, {
-          title,
-          category,
-          description,
-          location: selectedLocalitate,
-          contactPerson,
-          contactEmail,
-          contactPhone,
-          images: mainImagePreview ? [mainImagePreview] : []
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('category', category);
+        formData.append('description', description);
+        formData.append('location', selectedLocalitate);
+        formData.append('contactPerson', contactPerson);
+        formData.append('contactEmail', contactEmail);
+        formData.append('contactPhone', contactPhone);
+        if (images[0]) {
+          formData.append('mainImage', images[0]);
+        }
+        await apiClient.put(`/api/users/my-announcements/${announcementId}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
         });
         setSuccess('Anunț actualizat cu succes!');
-        navigate('/adauga-anunt'); // redirecționează către pagina de adăugare anunț
+        navigate('/adauga-anunt');
       } else {
         console.log('Starting announcement submission...');
         const formData = new FormData();
