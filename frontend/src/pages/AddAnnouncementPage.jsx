@@ -166,9 +166,18 @@ export default function AddAnnouncementPage() {
   };
 
   const handleSubmit = async (e) => {
+    console.log('Form submitted!');
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Trebuie să fii autentificat pentru a publica un anunț!");
+      return;
+    }
+
     if (!title || title.length < 16 || !category || !description || description.length < 40 || !(selectedJudet || selectedLocalitate) || !contactPerson) {
       setError("Te rugăm să completezi toate câmpurile obligatorii și să respecți limitele de caractere!");
       return;
@@ -178,6 +187,7 @@ export default function AddAnnouncementPage() {
       return;
     }
     try {
+      console.log('Starting announcement submission...');
       const formData = new FormData();
       formData.append('title', title);
       formData.append('category', category);
@@ -189,15 +199,46 @@ export default function AddAnnouncementPage() {
       if (images[0]) {
         formData.append('mainImage', images[0]);
       }
-      await apiClient.post('/api/users/my-announcements', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      
+      console.log('Form data prepared:', {
+        title,
+        category,
+        description,
+        location: selectedLocalitate || selectedJudet,
+        contactPerson,
+        contactEmail,
+        contactPhone,
+        hasImage: !!images[0]
       });
-      localStorage.removeItem('addAnnouncementDraft'); // Șterge draftul la succes
-      localStorage.removeItem('addAnnouncementMainImagePreview'); // Șterge preview-ul la succes
+
+      const response = await apiClient.post('/api/users/my-announcements', formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('Server response:', response.data);
+      
+      localStorage.removeItem('addAnnouncementDraft');
+      localStorage.removeItem('addAnnouncementMainImagePreview');
       setSuccess('Anunțul a fost publicat cu succes!');
       setTimeout(() => navigate('/anunturile-mele'), 1200);
     } catch (e) {
-      setError('Eroare la publicarea anunțului. Încearcă din nou!');
+      console.error('Error submitting announcement:', e);
+      console.error('Error details:', {
+        message: e.message,
+        response: e.response?.data,
+        status: e.response?.status
+      });
+      
+      if (e.response?.status === 401) {
+        setError('Sesiunea a expirat. Te rugăm să te autentifici din nou.');
+      } else if (e.response?.data?.error) {
+        setError(e.response.data.error);
+      } else {
+        setError('Eroare la publicarea anunțului. Încearcă din nou!');
+      }
     }
   };
 
@@ -357,186 +398,186 @@ export default function AddAnnouncementPage() {
             ))}
           </div>
         </Popover>
-      </form>
-      <div className="add-announcement-images-section">
-        <h2 className="add-announcement-subtitle">Imagini</h2>
-        <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
-        <div className="add-announcement-images-grid">
-          <button
-            type="button"
-            className="add-announcement-image-upload add-announcement-image-upload-main"
-            onClick={() => imageInputRef.current.click()}
-          >
-            {mainImagePreview ? (
-              <img src={mainImagePreview} alt="preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8}} />
-            ) : (
-              <>
-                <span className="add-announcement-image-upload-text">Adaugă imagini</span>
-                <span className="add-announcement-image-upload-underline"></span>
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            className="add-announcement-image-upload"
-            onClick={() => imageInputRef.current.click()}
-          >
-            <span className="add-announcement-image-upload-icon">
-              <FaCamera size={38} color="#46626a" />
-            </span>
-          </button>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            ref={imageInputRef}
-            style={{ display: 'none' }}
-            onChange={handleImageChange}
-          />
+        <div className="add-announcement-images-section">
+          <h2 className="add-announcement-subtitle">Imagini</h2>
+          <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
+          <div className="add-announcement-images-grid">
+            <button
+              type="button"
+              className="add-announcement-image-upload add-announcement-image-upload-main"
+              onClick={() => imageInputRef.current.click()}
+            >
+              {mainImagePreview ? (
+                <img src={mainImagePreview} alt="preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8}} />
+              ) : (
+                <>
+                  <span className="add-announcement-image-upload-text">Adaugă imagini</span>
+                  <span className="add-announcement-image-upload-underline"></span>
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              className="add-announcement-image-upload"
+              onClick={() => imageInputRef.current.click()}
+            >
+              <span className="add-announcement-image-upload-icon">
+                <FaCamera size={38} color="#46626a" />
+              </span>
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              ref={imageInputRef}
+              style={{ display: 'none' }}
+              onChange={handleImageChange}
+            />
+          </div>
         </div>
-      </div>
-      <div className="add-announcement-description-section">
-        <label className="add-announcement-label">Descriere*</label>
-        <textarea
-          className="add-announcement-description-input"
-          placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
-          minLength={40}
-          maxLength={9000}
-          required
-          value={description}
-          onChange={e => {
-            setDescription(e.target.value);
-            setDescriptionChars(e.target.value.length);
-          }}
-        />
-        <div className="add-announcement-char-helper-row">
-          <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
-          <div className="add-announcement-charcount">{descriptionChars}/9000</div>
-        </div>
-      </div>
-      <div className="add-announcement-location-section">
-        <label className="add-announcement-label">Localitate*</label>
-        <div className="add-announcement-location-input-wrapper">
-          <FaMapMarkerAlt className="location-icon" />
-          <input
-            className={
-              "add-announcement-location-input" +
-              (!(selectedJudet || selectedLocalitate) ? " add-announcement-location-placeholder" : "")
-            }
-            type="text"
-            placeholder="Toată țara"
-            value={selectedLocalitate || selectedJudet || "Toată țara"}
-            readOnly
-            onClick={e => setAnchorEl(e.currentTarget)}
-            style={!(selectedJudet || selectedLocalitate)
-              ? { fontSize: '1.1rem', color: '#888', fontWeight: 400 }
-              : { fontSize: '2.2rem', color: '#183642', fontWeight: 500 }}
+        <div className="add-announcement-description-section">
+          <label className="add-announcement-label">Descriere*</label>
+          <textarea
+            className="add-announcement-description-input"
+            placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
+            minLength={40}
+            maxLength={9000}
             required
+            value={description}
+            onChange={e => {
+              setDescription(e.target.value);
+              setDescriptionChars(e.target.value.length);
+            }}
           />
-          {(selectedJudet || selectedLocalitate) && (
-            <span className="add-announcement-location-check">✓</span>
-          )}
-          <Popover
-            id={anchorEl ? 'location-popover' : undefined}
-            open={Boolean(anchorEl)}
-            anchorEl={anchorEl}
-            onClose={() => setAnchorEl(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
-          >
-            {!selectedJudet ? (
-              <>
-                <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
-                <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                  <ListItemButton
-                    onClick={() => {
-                      setSelectedJudet(null);
-                      setSelectedLocalitate("");
-                      setAnchorEl(null);
-                    }}
-                    divider
-                  >
-                    <ListItemText
-                      primary={<span style={{ fontWeight: 'bold' }}>Toată țara</span>}
-                    />
-                  </ListItemButton>
-                  {Object.keys(judete).map((judet) => (
+          <div className="add-announcement-char-helper-row">
+            <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
+            <div className="add-announcement-charcount">{descriptionChars}/9000</div>
+          </div>
+        </div>
+        <div className="add-announcement-location-section">
+          <label className="add-announcement-label">Localitate*</label>
+          <div className="add-announcement-location-input-wrapper">
+            <FaMapMarkerAlt className="location-icon" />
+            <input
+              className={
+                "add-announcement-location-input" +
+                (!(selectedJudet || selectedLocalitate) ? " add-announcement-location-placeholder" : "")
+              }
+              type="text"
+              placeholder="Toată țara"
+              value={selectedLocalitate || selectedJudet || "Toată țara"}
+              readOnly
+              onClick={e => setAnchorEl(e.currentTarget)}
+              style={!(selectedJudet || selectedLocalitate)
+                ? { fontSize: '1.1rem', color: '#888', fontWeight: 400 }
+                : { fontSize: '2.2rem', color: '#183642', fontWeight: 500 }}
+              required
+            />
+            {(selectedJudet || selectedLocalitate) && (
+              <span className="add-announcement-location-check">✓</span>
+            )}
+            <Popover
+              id={anchorEl ? 'location-popover' : undefined}
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={() => setAnchorEl(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
+            >
+              {!selectedJudet ? (
+                <>
+                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
+                  <List sx={{ maxHeight: 320, overflow: 'auto' }}>
                     <ListItemButton
-                      key={judet}
-                      onClick={() => setSelectedJudet(judet)}
+                      onClick={() => {
+                        setSelectedJudet(null);
+                        setSelectedLocalitate("");
+                        setAnchorEl(null);
+                      }}
                       divider
                     >
-                      <ListItemText primary={judet} />
+                      <ListItemText
+                        primary={<span style={{ fontWeight: 'bold' }}>Toată țara</span>}
+                      />
                     </ListItemButton>
-                  ))}
-                </List>
-              </>
-            ) : (
-              <>
-                <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
-                <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                  {judete[selectedJudet].map((localitate) => (
-                    <ListItemText
-                      key={localitate}
-                      primary={localitate}
-                      sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
-                      onClick={() => {
-                        setSelectedLocalitate(localitate);
-                        setAnchorEl(null);
-                        setSelectedJudet(null);
-                      }}
-                    />
-                  ))}
-                </List>
-                <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                  <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
-                </ListItemButton>
-              </>
-            )}
-          </Popover>
+                    {Object.keys(judete).map((judet) => (
+                      <ListItemButton
+                        key={judet}
+                        onClick={() => setSelectedJudet(judet)}
+                        divider
+                      >
+                        <ListItemText primary={judet} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </>
+              ) : (
+                <>
+                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
+                  <List sx={{ maxHeight: 320, overflow: 'auto' }}>
+                    {judete[selectedJudet].map((localitate) => (
+                      <ListItemText
+                        key={localitate}
+                        primary={localitate}
+                        sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
+                        onClick={() => {
+                          setSelectedLocalitate(localitate);
+                          setAnchorEl(null);
+                          setSelectedJudet(null);
+                        }}
+                      />
+                    ))}
+                  </List>
+                  <ListItemButton onClick={() => setSelectedJudet(null)} divider>
+                    <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
+                  </ListItemButton>
+                </>
+              )}
+            </Popover>
+          </div>
         </div>
-      </div>
-      <div className="add-announcement-contact-section">
-        <h2 className="add-announcement-subtitle">Informații de contact</h2>
-        <label className="add-announcement-label">Persoana de contact*</label>
-        <div className="add-announcement-contact-input-wrapper">
+        <div className="add-announcement-contact-section">
+          <h2 className="add-announcement-subtitle">Informații de contact</h2>
+          <label className="add-announcement-label">Persoana de contact*</label>
+          <div className="add-announcement-contact-input-wrapper">
+            <input
+              className="add-announcement-contact-input"
+              type="text"
+              placeholder="Nume și prenume"
+              value={contactPerson || ''}
+              onChange={e => setContactPerson(e.target.value)}
+              required
+            />
+            {contactPerson && (
+              <span className="add-announcement-location-check">✓</span>
+            )}
+          </div>
+          <label className="add-announcement-label">Adresa de email</label>
           <input
             className="add-announcement-contact-input"
-            type="text"
-            placeholder="Nume și prenume"
-            value={contactPerson || ''}
-            onChange={e => setContactPerson(e.target.value)}
-            required
+            type="email"
+            placeholder="ex: exemplu@gmail.com"
+            value={contactEmail || ''}
+            onChange={e => setContactEmail(e.target.value)}
           />
-          {contactPerson && (
-            <span className="add-announcement-location-check">✓</span>
-          )}
+          <label className="add-announcement-label">Numărul de telefon</label>
+          <input
+            className="add-announcement-contact-input"
+            type="tel"
+            placeholder="ex: 07xxxxxxxx"
+            value={contactPhone || ''}
+            onChange={e => setContactPhone(e.target.value)}
+          />
         </div>
-        <label className="add-announcement-label">Adresa de email</label>
-        <input
-          className="add-announcement-contact-input"
-          type="email"
-          placeholder="ex: exemplu@gmail.com"
-          value={contactEmail || ''}
-          onChange={e => setContactEmail(e.target.value)}
-        />
-        <label className="add-announcement-label">Numărul de telefon</label>
-        <input
-          className="add-announcement-contact-input"
-          type="tel"
-          placeholder="ex: 07xxxxxxxx"
-          value={contactPhone || ''}
-          onChange={e => setContactPhone(e.target.value)}
-        />
-      </div>
-      <div className="add-announcement-actions-section">
-        <div className="add-announcement-actions-left"></div>
-        <div className="add-announcement-actions-right">
-          <button className="add-announcement-preview">Previzualizați anunțul</button>
-          <button className="add-announcement-submit" type="submit">Publică un anunț</button>
+        <div className="add-announcement-actions-section">
+          <div className="add-announcement-actions-left"></div>
+          <div className="add-announcement-actions-right">
+            <button type="button" className="add-announcement-preview">Previzualizați anunțul</button>
+            <button type="submit" className="add-announcement-submit">Publică un anunț</button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

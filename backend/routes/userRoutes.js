@@ -11,6 +11,7 @@ router.put('/update-email', auth, updateEmail); // Noua rută pentru actualizare
 router.put('/update-password', auth, updatePassword); // Rută pentru schimbarea parolei
 router.post('/my-announcements', auth, upload.single('mainImage'), addAnnouncement);
 router.get('/my-announcements', auth, getMyAnnouncements);
+router.delete('/my-announcements/:id', auth, require('../controllers/UserController').deleteAnnouncement);
 
 // Verifică autentificarea utilizatorului
 router.get('/auth/check', auth, (req, res) => {

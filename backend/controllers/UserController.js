@@ -264,3 +264,21 @@ exports.getMyAnnouncements = async (req, res) => {
     res.status(500).json({ error: 'Eroare server la listare anunțuri' });
   }
 };
+
+// Șterge un anunț după id
+exports.deleteAnnouncement = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const announcementId = req.params.id;
+    const Announcement = require('../models/Announcement');
+    const announcement = await Announcement.findOne({ _id: announcementId, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit sau nu îți aparține.' });
+    }
+    await Announcement.deleteOne({ _id: announcementId });
+    res.json({ message: 'Anunț șters cu succes!' });
+  } catch (error) {
+    console.error('Eroare la ștergerea anunțului:', error);
+    res.status(500).json({ error: 'Eroare server la ștergerea anunțului' });
+  }
+};
