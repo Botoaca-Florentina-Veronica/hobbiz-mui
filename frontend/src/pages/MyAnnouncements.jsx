@@ -53,7 +53,15 @@ export default function MyAnnouncements() {
             }}>
               <div style={{minWidth: 220, maxWidth: 220, background: '#f7f7f7', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                 {a.images && a.images[0] ? (
-                  <img src={a.images[0]} alt="imagine principala" style={{width: 200, height: 150, objectFit: 'cover', borderRadius: 8, margin: 12, boxShadow: '0 1px 6px #eee'}} />
+                  <img
+                    src={
+                      a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
+                        ? a.images[0]
+                        : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`
+                    }
+                    alt="imagine principala"
+                    style={{width: 200, height: 150, objectFit: 'cover', borderRadius: 8, margin: 12, boxShadow: '0 1px 6px #eee'}}
+                  />
                 ) : (
                   <div style={{width: 200, height: 150, background: '#eee', borderRadius: 8, margin: 12}} />
                 )}
