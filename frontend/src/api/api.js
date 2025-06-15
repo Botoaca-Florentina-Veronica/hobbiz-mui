@@ -23,6 +23,7 @@ export const getProfile = () => apiClient.get('/api/users/profile');
 export const register = (userData) => apiClient.post('/api/users/register', userData);
 export const updateEmail = (newEmailData) => apiClient.put('/api/users/update-email', newEmailData);
 export const updatePassword = (passwordData) => apiClient.put('/api/users/update-password', passwordData);
+export const updateProfile = (profileData) => apiClient.put('/api/users/profile', profileData);
 export const detectMitm = () => apiClient.get('/api/mitm/detect-mitm');
 
 // Alte endpoint-uri...

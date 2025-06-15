@@ -316,3 +316,24 @@ exports.updateAnnouncement = async (req, res) => {
     res.status(500).json({ error: 'Eroare server la actualizare anunț' });
   }
 };
+
+// Actualizează profilul utilizatorului (nume, prenume, localitate, telefon)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { firstName, lastName, localitate, phone } = req.body;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit' });
+    }
+    if (firstName !== undefined) user.firstName = firstName;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (localitate !== undefined) user.localitate = localitate;
+    if (phone !== undefined) user.phone = phone;
+    await user.save();
+    res.json({ message: 'Profil actualizat cu succes!' });
+  } catch (error) {
+    console.error('Eroare la actualizarea profilului:', error);
+    res.status(500).json({ error: 'Eroare server la actualizarea profilului' });
+  }
+};

@@ -5,6 +5,7 @@
   border-radius: 16px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.07);
   padding: 32px 24px;
+  margin-top: 7rem;
 }
 .profile-header {
   display: flex;
@@ -74,4 +75,36 @@
 }
 .profile-info-value {
   font-weight: 500;
+}
+.profile-input {
+  padding: 10px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  width: 60%;
+  background: #fff;
+  margin-left: 12px;
+}
+.profile-cancel-btn, .profile-save-btn {
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 12px 36px;
+  border-radius: 8px;
+  border: 2px solid #00363a;
+  background: #fff;
+  color: #00363a;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.profile-save-btn {
+  background: #00363a;
+  color: #fff;
+  border: 2px solid #00363a;
+}
+.profile-cancel-btn:hover {
+  background: #e6f2f3;
+}
+.profile-save-btn:hover {
+  background: #00555a;
+  color: #fff;
 }

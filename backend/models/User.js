@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
   phone: { type: String },
   googleId: { type: String, unique: true, sparse: true },
   avatar: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  localitate: { type: String } // Adăugat câmpul localitate
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

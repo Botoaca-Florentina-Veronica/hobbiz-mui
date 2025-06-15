@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, upload } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, upload, updateProfile } = require('../controllers/UserController');
 const auth = require('../middleware/auth');
 
 // Rute
@@ -13,6 +13,7 @@ router.post('/my-announcements', auth, upload.single('mainImage'), addAnnounceme
 router.get('/my-announcements', auth, getMyAnnouncements);
 router.delete('/my-announcements/:id', auth, deleteAnnouncement);
 router.put('/my-announcements/:id', auth, upload.single('mainImage'), updateAnnouncement);
+router.put('/profile', auth, updateProfile); // Rută pentru actualizarea profilului (nume, prenume, localitate, telefon)
 
 // Verifică autentificarea utilizatorului
 router.get('/auth/check', auth, (req, res) => {
