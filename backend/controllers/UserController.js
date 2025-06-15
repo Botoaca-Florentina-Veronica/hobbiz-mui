@@ -227,6 +227,8 @@ exports.addAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
     console.log('userId primit în addAnnouncement:', userId); // LOG NOU pentru debug
+    console.log('req.body:', req.body); // DEBUG BODY
+    console.log('req.file:', req.file); // DEBUG FILE
     const { title, category, description, location, contactPerson, contactEmail, contactPhone, images } = req.body;
     if (!title || !category || !description || !location || !contactPerson) {
       return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });

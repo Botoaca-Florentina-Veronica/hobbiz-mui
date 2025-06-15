@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
+import ConfirmDialog from './ConfirmDialog';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+
 
 export default function MyAnnouncements() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,12 +27,19 @@ export default function MyAnnouncements() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Sigur vrei să ștergi acest anunț?')) return;
+    setDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await apiClient.delete(`/api/users/my-announcements/${id}`);
-      setAnnouncements(announcements.filter(a => a._id !== id));
+      await apiClient.delete(`/api/users/my-announcements/${deleteId}`);
+      setAnnouncements(announcements.filter(a => a._id !== deleteId));
     } catch (e) {
       alert('Eroare la ștergerea anunțului!');
+    } finally {
+      setConfirmOpen(false);
+      setDeleteId(null);
     }
   };
 
@@ -36,6 +48,11 @@ export default function MyAnnouncements() {
   return (
     <div style={{maxWidth: 900, margin: '0 auto', padding: 24}}>
       <h1>Anunțurile mele</h1>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
       {announcements.length === 0 ? (
         <div>Nu ai publicat niciun anunț încă.</div>
       ) : (
@@ -70,7 +87,13 @@ export default function MyAnnouncements() {
                 <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'}}>
                   <div>
                     <h2 style={{margin: 0, fontSize: '1.35rem', fontWeight: 700}}>{a.title}</h2>
-                    <div style={{color: '#46626a', fontWeight: 500, fontSize: 15, margin: '6px 0'}}>{a.category} • {a.location}</div>
+                    <div style={{color: '#46626a', fontWeight: 500, fontSize: 18, margin: '6px 0', display: 'flex', alignItems: 'center', gap: 8}}>
+                      {a.category}
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center', color: '#23484a', fontWeight: 500, fontSize: 18, margin: '8px 0 8px 0'}}>
+                      <LocationOnIcon sx={{ fontSize: 26, color: '#23484a', marginRight: 1 }} />
+                      {a.location}
+                    </div>
                     <div style={{color: '#888', fontSize: 14, marginBottom: 8}}>{a.description}</div>
                   </div>
                   <div style={{textAlign: 'right', minWidth: 120}}>
