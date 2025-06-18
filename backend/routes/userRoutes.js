@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, upload, updateProfile } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, updateProfile } = require('../controllers/UserController');
 const auth = require('../middleware/auth');
+const upload = require('../config/cloudinaryMulter');
 
 // Rute
 router.post('/register', register);  // User e folosit în controller

@@ -6,21 +6,7 @@ const Alert = require('../models/Alert');
 const Announcement = require('../models/Announcement');
 const multer = require('multer');
 const path = require('path');
-
-// Configurare multer pentru upload imagini
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../../frontend/public/uploads'));
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
-
-exports.upload = upload;
+const cloudinaryUpload = require('../config/cloudinaryMulter');
 
 // Înregistrare utilizator
 exports.register = async (req, res) => {
@@ -226,16 +212,13 @@ exports.updatePassword = async (req, res) => {
 exports.addAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log('userId primit în addAnnouncement:', userId); // LOG NOU pentru debug
-    console.log('req.body:', req.body); // DEBUG BODY
-    console.log('req.file:', req.file); // DEBUG FILE
-    const { title, category, description, location, contactPerson, contactEmail, contactPhone, images } = req.body;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
     if (!title || !category || !description || !location || !contactPerson) {
       return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });
     }
-    let imagePath = null;
-    if (req.file) {
-      imagePath = '/uploads/' + req.file.filename;
+    let imageUrl = null;
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path;
     }
     const announcement = new Announcement({
       user: userId,
@@ -246,7 +229,7 @@ exports.addAnnouncement = async (req, res) => {
       contactPerson,
       contactEmail,
       contactPhone,
-      images: imagePath ? [imagePath] : []
+      images: imageUrl ? [imageUrl] : []
     });
     await announcement.save();
     res.status(201).json({ message: 'Anunț adăugat cu succes!' });
@@ -305,8 +288,8 @@ exports.updateAnnouncement = async (req, res) => {
     announcement.contactEmail = contactEmail;
     announcement.contactPhone = contactPhone;
     // Imagine nouă
-    if (req.file) {
-      announcement.images = ['/uploads/' + req.file.filename];
+    if (req.file && req.file.path) {
+      announcement.images = [req.file.path];
     }
     // Dacă nu există fișier nou, păstrează imaginea veche
     await announcement.save();
