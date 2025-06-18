@@ -152,8 +152,16 @@ export default function AddAnnouncementPage() {
   }, [mainImagePreview]);
 
   useEffect(() => {
+    let a = null;
     if (location.state && location.state.announcement) {
-      const a = location.state.announcement;
+      a = location.state.announcement;
+    } else {
+      const savedEdit = localStorage.getItem('editAnnouncement');
+      if (savedEdit) {
+        a = JSON.parse(savedEdit);
+      }
+    }
+    if (a) {
       setTitle(a.title || '');
       setCategory(a.category || '');
       setTitleChars(a.title ? a.title.length : 0);

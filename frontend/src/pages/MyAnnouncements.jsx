@@ -43,6 +43,11 @@ export default function MyAnnouncements() {
     }
   };
 
+  const handleEdit = (announcement) => {
+    localStorage.setItem('editAnnouncement', JSON.stringify(announcement));
+    navigate('/add-announcement', { state: { announcement } });
+  };
+
   if (loading) return <div>Se încarcă anunțurile...</div>;
 
   return (
@@ -90,7 +95,7 @@ export default function MyAnnouncements() {
                   </div>
                 </div>
                 <div className="my-announcement-actions">
-                  <button className="my-announcement-btn" onClick={() => navigate('/adauga-anunt', { state: { announcement: a } })}>Editează</button>
+                  <button className="my-announcement-btn" onClick={() => handleEdit(a)}>Editează</button>
                   <button className="my-announcement-btn secondary">Reactualizează</button>
                   <button className="my-announcement-btn danger" onClick={() => handleDelete(a._id)}>Șterge</button>
                   <button className="my-announcement-btn secondary">Dezactivează</button>
