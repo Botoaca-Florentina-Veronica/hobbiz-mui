@@ -45,7 +45,7 @@ export default function MyAnnouncements() {
 
   const handleEdit = (announcement) => {
     localStorage.setItem('editAnnouncement', JSON.stringify(announcement));
-    navigate('/add-announcement', { state: { announcement } });
+    navigate('/edit-announcement', { state: { announcement } });
   };
 
   if (loading) return <div>Se încarcă anunțurile...</div>;
