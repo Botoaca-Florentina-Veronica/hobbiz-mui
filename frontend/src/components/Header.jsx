@@ -69,6 +69,7 @@ export default function Header() {
     setIsAuthenticated(false);
     setOpenSnackbar(true); // Deschide Snackbar-ul
     navigate('/');
+    window.location.reload(); // Fortat refresh pentru resetare avatar
   };
 
   const handleCloseSnackbar = (event, reason) => {
