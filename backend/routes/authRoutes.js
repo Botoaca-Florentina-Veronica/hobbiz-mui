@@ -17,7 +17,13 @@ router.get('/google/callback',
     // Generează JWT pentru utilizatorul autentificat
     const user = req.user;
     const token = jwt.sign(
-      { id: user._id, email: user.email, name: user.name },
+      {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatar: user.avatar
+      },
       process.env.JWT_SECRET || 'jwt_secret',
       { expiresIn: '7d' }
     );    // Redirecționează către frontend cu tokenul în query string

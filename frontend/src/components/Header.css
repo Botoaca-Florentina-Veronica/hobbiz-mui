@@ -187,3 +187,12 @@
 .dark-mode .section-dropdown:after {
   border-bottom-color: #222121;
 }
+
+.avatar-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+  vertical-align: middle;
+}

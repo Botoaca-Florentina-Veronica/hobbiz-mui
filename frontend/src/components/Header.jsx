@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
 import apiClient from '../api/api';
+import jwt_decode from 'jwt-decode';
 import './Header.css';
 
 export default function Header() {
@@ -14,6 +15,7 @@ export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(null);
 
   useEffect(() => {
     const body = document.body;
@@ -44,6 +46,25 @@ export default function Header() {
 
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    // Verifică dacă există avatar în tokenul JWT
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwt_decode(token);
+        if (decoded.avatar) {
+          setAvatarUrl(decoded.avatar);
+        } else {
+          setAvatarUrl(null);
+        }
+      } catch (e) {
+        setAvatarUrl(null);
+      }
+    } else {
+      setAvatarUrl(null);
+    }
+  }, [isAuthenticated]);
 
   const handleMouseEnter = () => {
     if (isAuthenticated) {
@@ -119,7 +140,11 @@ export default function Header() {
               className="for-dropdown" 
               onClick={handleAccountClick}
             >
-              <HiOutlineUser size={24} />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="avatar" className="avatar-img" style={{width:24, height:24, borderRadius:'50%', objectFit:'cover', marginRight:8}} />
+              ) : (
+                <HiOutlineUser size={24} />
+              )}
               <span>Contul tău</span>
             </label>
             
