@@ -11,7 +11,7 @@ const cloudinaryUpload = require('../config/cloudinaryMulter');
 // Înregistrare utilizator
 exports.register = async (req, res) => {
   try { 
-    const { firstName, lastName, email, password, phone, avatar } = req.body; // adaugă avatar
+    const { firstName, lastName, email, password, phone } = req.body;
 
     // Validare date
     if (!firstName || !lastName || !email || !password) {
@@ -30,8 +30,7 @@ exports.register = async (req, res) => {
       lastName,
       email,
       password,
-      phone,
-      avatar: avatar || '' // setează avatar dacă există, altfel gol
+      phone
     });
 
     await user.save();
@@ -213,97 +212,111 @@ exports.updatePassword = async (req, res) => {
 exports.addAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
-    const { title, content, image } = req.body;
-
-    // Validare date
-    if (!title || !content) {
-      return res.status(400).json({ error: 'Titlul și conținutul sunt obligatorii' });
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
+    if (!title || !category || !description || !location || !contactPerson) {
+      return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });
     }
-
-    // Creează anunțul
+    let imageUrl = null;
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path;
+    }
     const announcement = new Announcement({
+      user: userId,
       title,
-      content,
-      image,
-      user: userId
+      category,
+      description,
+      location,
+      contactPerson,
+      contactEmail,
+      contactPhone,
+      images: imageUrl ? [imageUrl] : []
     });
-
     await announcement.save();
-
-    res.status(201).json({ message: 'Anunț adăugat cu succes', announcementId: announcement._id });
+    res.status(201).json({ message: 'Anunț adăugat cu succes!' });
   } catch (error) {
-    console.error('Eroare adăugare anunț:', error);
-    res.status(500).json({ error: 'Eroare server la adăugarea anunțului' });
+    console.error('Eroare la adăugare anunț:', error);
+    res.status(500).json({ error: 'Eroare server la adăugare anunț' });
   }
 };
 
-// Obține toate anunțurile pentru utilizatorul autentificat
-exports.getAnnouncements = async (req, res) => {
+// Returnează toate anunțurile utilizatorului autentificat
+exports.getMyAnnouncements = async (req, res) => {
   try {
     const userId = req.userId;
-
-    // Găsește anunțurile utilizatorului
     const announcements = await Announcement.find({ user: userId }).sort({ createdAt: -1 });
-
     res.json(announcements);
   } catch (error) {
-    console.error('Eroare obținere anunțuri:', error);
-    res.status(500).json({ error: 'Eroare server la obținerea anunțurilor' });
+    console.error('Eroare la listare anunțuri:', error);
+    res.status(500).json({ error: 'Eroare server la listare anunțuri' });
   }
 };
 
-// Șterge un anunț
+// Șterge un anunț după id
 exports.deleteAnnouncement = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Șterge anunțul
-    await Announcement.findByIdAndDelete(id);
-
-    res.json({ message: 'Anunț șters cu succes' });
+    const userId = req.userId;
+    const announcementId = req.params.id;
+    const Announcement = require('../models/Announcement');
+    const announcement = await Announcement.findOne({ _id: announcementId, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit sau nu îți aparține.' });
+    }
+    await Announcement.deleteOne({ _id: announcementId });
+    res.json({ message: 'Anunț șters cu succes!' });
   } catch (error) {
-    console.error('Eroare ștergere anunț:', error);
+    console.error('Eroare la ștergerea anunțului:', error);
     res.status(500).json({ error: 'Eroare server la ștergerea anunțului' });
   }
 };
 
-// Login/Signup Google: actualizează avatarul dacă userul există deja
-exports.googleLogin = async (req, res) => {
+// Actualizează un anunț existent
+exports.updateAnnouncement = async (req, res) => {
   try {
-    const { email, firstName, lastName, avatar } = req.body; // primește datele de la Google
-    let user = await User.findOne({ email });
-    if (user) {
-      // Dacă userul există, actualizează avatarul dacă nu există sau e gol
-      if (!user.avatar || user.avatar === '') {
-        user.avatar = avatar;
-        await user.save();
-      }
-      // Poți actualiza și alte câmpuri dacă vrei (ex: firstName, lastName)
-    } else {
-      // Creează user nou cu datele de la Google
-      user = new User({
-        email,
-        firstName: firstName || '',
-        lastName: lastName || '',
-        avatar: avatar || '',
-      });
-      await user.save();
+    const userId = req.userId;
+    const { id } = req.params;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
+    let announcement = await Announcement.findOne({ _id: id, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit' });
     }
-    // Generează token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    res.json({
-      message: 'Autentificare Google reușită',
-      token,
-      userId: user._id,
-      firstName: user.firstName,
-      avatar: user.avatar
-    });
+    // Actualizează câmpurile text
+    announcement.title = title;
+    announcement.category = category;
+    announcement.description = description;
+    announcement.location = location;
+    announcement.contactPerson = contactPerson;
+    announcement.contactEmail = contactEmail;
+    announcement.contactPhone = contactPhone;
+    // Imagine nouă
+    if (req.file && req.file.path) {
+      announcement.images = [req.file.path];
+    }
+    // Dacă nu există fișier nou, păstrează imaginea veche
+    await announcement.save();
+    res.json({ message: 'Anunț actualizat cu succes!' });
   } catch (error) {
-    console.error('Eroare Google login:', error);
-    res.status(500).json({ error: 'Eroare server la login Google' });
+    console.error('Eroare la actualizare anunț:', error);
+    res.status(500).json({ error: 'Eroare server la actualizare anunț' });
+  }
+};
+
+// Actualizează profilul utilizatorului (nume, prenume, localitate, telefon)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { firstName, lastName, localitate, phone } = req.body;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit' });
+    }
+    if (firstName !== undefined) user.firstName = firstName;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (localitate !== undefined) user.localitate = localitate;
+    if (phone !== undefined) user.phone = phone;
+    await user.save();
+    res.json({ message: 'Profil actualizat cu succes!' });
+  } catch (error) {
+    console.error('Eroare la actualizarea profilului:', error);
+    res.status(500).json({ error: 'Eroare server la actualizarea profilului' });
   }
 };

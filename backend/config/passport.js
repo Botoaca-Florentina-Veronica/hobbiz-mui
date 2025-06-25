@@ -12,7 +12,11 @@ passport.use(new GoogleStrategy({
     let user = await User.findOne({ googleId: profile.id });
 
     if (user) {
-      // If user found by googleId, return that user
+      // Sincronizează avatarul și numele la fiecare login cu Google
+      user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
+      user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
+      user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
+      await user.save();
       return done(null, user);
     } else {
       // If not found by googleId, try to find by email
@@ -21,7 +25,6 @@ passport.use(new GoogleStrategy({
       if (user) {
         // If user found by email, update their googleId and also sync name and avatar
         user.googleId = profile.id;
-        // Actualizează avatarul de fiecare dată când se loghează cu Google
         user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
         user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
         user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
