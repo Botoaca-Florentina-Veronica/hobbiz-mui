@@ -14,6 +14,7 @@ export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [googleAvatar, setGoogleAvatar] = useState(null); // Nou: avatar Google
 
   useEffect(() => {
     const body = document.body;
@@ -36,9 +37,16 @@ export default function Header() {
       try {
         const response = await apiClient.get('/api/users/auth/check');
         setIsAuthenticated(response.data.isAuthenticated);
+        // Daca exista avatar Google, salveaza-l
+        if (response.data.googleAvatar) {
+          setGoogleAvatar(response.data.googleAvatar);
+        } else {
+          setGoogleAvatar(null);
+        }
       } catch (error) {
         console.error('Eroare la verificarea autentificării:', error);
         setIsAuthenticated(false);
+        setGoogleAvatar(null);
       }
     };
 
@@ -119,7 +127,11 @@ export default function Header() {
               className="for-dropdown" 
               onClick={handleAccountClick}
             >
-              <HiOutlineUser size={24} />
+              {googleAvatar ? (
+                <img src={googleAvatar} alt="Google Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
+              ) : (
+                <HiOutlineUser size={24} />
+              )}
               <span>Contul tău</span>
             </label>
             
