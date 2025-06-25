@@ -123,9 +123,6 @@ export default function AccountSettings() {
             <button onClick={handleSaveEmail}>Salvează</button>
           </div>
         )}
-        <div className="settings-item" onClick={handleDetectMitm}>Detectează atac MITM</div>
-        {mitmLoading && <div className="message info">Se detectează atacuri MITM...</div>}
-        {mitmResult && <div className="message info">Rezultat MITM: {mitmResult}</div>}
         <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>Anunțuri</div>
         <div className="settings-item">Profil</div>
         <div className="settings-item">Setează notificările</div>

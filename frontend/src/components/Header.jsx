@@ -130,7 +130,7 @@ export default function Header() {
               onClick={handleAccountClick}
             >
               {googleAvatar ? (
-                <img src={googleAvatar} alt="Google Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
+                <img src={googleAvatar} alt="Google Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }} />
               ) : (
                 <HiOutlineUser size={24} />
               )}
