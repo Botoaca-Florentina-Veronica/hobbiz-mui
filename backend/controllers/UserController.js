@@ -11,7 +11,7 @@ const cloudinaryUpload = require('../config/cloudinaryMulter');
 // Înregistrare utilizator
 exports.register = async (req, res) => {
   try { 
-    const { firstName, lastName, email, password, phone } = req.body;
+    const { firstName, lastName, email, password, phone, avatar } = req.body; // adaugă avatar
 
     // Validare date
     if (!firstName || !lastName || !email || !password) {
@@ -30,7 +30,8 @@ exports.register = async (req, res) => {
       lastName,
       email,
       password,
-      phone
+      phone,
+      avatar: avatar || '' // setează avatar dacă există, altfel gol
     });
 
     await user.save();
@@ -304,7 +305,7 @@ exports.updateAnnouncement = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.userId;
-    const { firstName, lastName, localitate, phone } = req.body;
+    const { firstName, lastName, localitate, phone, avatar } = req.body; // adaugă avatar
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit' });
@@ -313,6 +314,7 @@ exports.updateProfile = async (req, res) => {
     if (lastName !== undefined) user.lastName = lastName;
     if (localitate !== undefined) user.localitate = localitate;
     if (phone !== undefined) user.phone = phone;
+    if (avatar !== undefined) user.avatar = avatar; // permite update avatar
     await user.save();
     res.json({ message: 'Profil actualizat cu succes!' });
   } catch (error) {
