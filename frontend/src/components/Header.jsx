@@ -36,6 +36,7 @@ export default function Header() {
     const checkAuth = async () => {
       try {
         const response = await apiClient.get('/api/users/auth/check');
+        console.log('Raspuns auth/check:', response.data); // DEBUG: vezi ce primesti de la backend
         setIsAuthenticated(response.data.isAuthenticated);
         // Daca exista avatar Google, salveaza-l
         if (response.data.googleAvatar) {

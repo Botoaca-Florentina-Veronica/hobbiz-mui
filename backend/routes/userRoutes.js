@@ -17,8 +17,18 @@ router.put('/my-announcements/:id', auth, upload.single('mainImage'), updateAnno
 router.put('/profile', auth, updateProfile); // Rută pentru actualizarea profilului (nume, prenume, localitate, telefon)
 
 // Verifică autentificarea utilizatorului
-router.get('/auth/check', auth, (req, res) => {
-  res.json({ isAuthenticated: true });
+router.get('/auth/check', auth, async (req, res) => {
+  try {
+    const user = await require('../models/User').findById(req.userId);
+    if (!user) return res.json({ isAuthenticated: false });
+    // Trimite avatarul doar dacă utilizatorul are googleId (autentificat cu Google)
+    res.json({
+      isAuthenticated: true,
+      googleAvatar: user.googleId ? user.avatar : null
+    });
+  } catch (e) {
+    res.json({ isAuthenticated: false });
+  }
 });
 
 module.exports = router;
