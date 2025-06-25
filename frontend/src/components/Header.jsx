@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
 import apiClient from '../api/api';
-import jwt_decode from 'jwt-decode';
+import jwt_decode from "jwt-decode";
 import './Header.css';
 
 export default function Header() {
