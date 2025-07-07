@@ -85,6 +85,31 @@ const judete = {
 };
 
 export default function AddAnnouncementPage() {
+  // Șterge draftul de anunț la deconectare și resetează complet starea formularului
+  useEffect(() => {
+    const handleLogout = () => {
+      localStorage.removeItem('addAnnouncementDraft');
+      localStorage.removeItem('addAnnouncementMainImagePreview');
+      setTitle('');
+      setCategory('');
+      setTitleChars(0);
+      setDescription('');
+      setDescriptionChars(0);
+      setSelectedJudet(null);
+      setSelectedLocalitate('');
+      setContactPerson('');
+      setContactEmail('');
+      setContactPhone('');
+      setMainImagePreview(null);
+      setImages([]);
+      setIsEdit(false);
+      setAnnouncementId(null);
+    };
+    window.addEventListener('logout', handleLogout);
+    return () => {
+      window.removeEventListener('logout', handleLogout);
+    };
+  }, []);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [titleChars, setTitleChars] = useState(0);
@@ -107,11 +132,13 @@ export default function AddAnnouncementPage() {
   const [isEdit, setIsEdit] = useState(false);
   const [announcementId, setAnnouncementId] = useState(null);
 
-  // La inițializare, recuperează datele din localStorage
+  // La inițializare, recuperează datele din localStorage DOAR dacă există și utilizatorul este autentificat
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const saved = localStorage.getItem('addAnnouncementDraft');
-    if (saved) {
+    if (token && saved) {
       const data = JSON.parse(saved);
+      // Ignoră orice câmp _id din draft
       setTitle(data.title || '');
       setCategory(data.category || '');
       setTitleChars(data.title ? data.title.length : 0);
@@ -122,16 +149,35 @@ export default function AddAnnouncementPage() {
       setContactPerson(data.contactPerson || '');
       setContactEmail(data.contactEmail || '');
       setContactPhone(data.contactPhone || '');
+      setIsEdit(false);
+      setAnnouncementId(null);
       // Restaurează preview-ul imaginii principale dacă există
       const mainImageDataUrl = localStorage.getItem('addAnnouncementMainImagePreview');
       if (mainImageDataUrl) {
         setMainImagePreview(mainImageDataUrl);
       }
+    } else {
+      // Dacă nu există token sau draft, resetează totul
+      setTitle('');
+      setCategory('');
+      setTitleChars(0);
+      setDescription('');
+      setDescriptionChars(0);
+      setSelectedJudet(null);
+      setSelectedLocalitate('');
+      setContactPerson('');
+      setContactEmail('');
+      setContactPhone('');
+      setMainImagePreview(null);
+      setImages([]);
+      setIsEdit(false);
+      setAnnouncementId(null);
     }
   }, []);
 
   // Salvează datele la fiecare modificare
   useEffect(() => {
+    // Nu salva niciodată _id în draft
     localStorage.setItem('addAnnouncementDraft', JSON.stringify({
       title,
       category,
@@ -152,6 +198,7 @@ export default function AddAnnouncementPage() {
   }, [mainImagePreview]);
 
   useEffect(() => {
+    // Daca esti in mod editare (ai venit cu location.state.announcement SAU ai editAnnouncement in localStorage), seteaza edit
     let a = null;
     if (location.state && location.state.announcement) {
       a = location.state.announcement;
@@ -161,7 +208,13 @@ export default function AddAnnouncementPage() {
         a = JSON.parse(savedEdit);
       }
     }
-    if (a) {
+    // Daca nu exista a sau nu are _id, sau nu are title/category/description, sau nu esti pe o ruta de editare, nu intra in edit
+    if (
+      a &&
+      a._id &&
+      (a.title || a.category || a.description) &&
+      location.pathname.includes('edit')
+    ) {
       setTitle(a.title || '');
       setCategory(a.category || '');
       setTitleChars(a.title ? a.title.length : 0);
@@ -175,6 +228,22 @@ export default function AddAnnouncementPage() {
       setMainImagePreview(a.images && a.images[0] ? a.images[0] : null);
       setIsEdit(true);
       setAnnouncementId(a._id);
+    } else {
+      // Daca nu esti in mod editare, sterge orice draft de edit si reseteaza totul
+      localStorage.removeItem('editAnnouncement');
+      setIsEdit(false);
+      setAnnouncementId(null);
+      setTitle('');
+      setCategory('');
+      setTitleChars(0);
+      setDescription('');
+      setDescriptionChars(0);
+      setSelectedJudet(null);
+      setSelectedLocalitate('');
+      setContactPerson('');
+      setContactEmail('');
+      setContactPhone('');
+      setMainImagePreview(null);
     }
   }, [location.state]);
 
