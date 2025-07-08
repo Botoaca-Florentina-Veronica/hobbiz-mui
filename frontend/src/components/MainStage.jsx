@@ -2,6 +2,7 @@ import { FaSearch, FaBars, FaMapMarkerAlt } from "react-icons/fa";
 import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
 import hobby from '../assets/images/hobby_img.jpg';
 import { useState, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -206,6 +207,7 @@ const categoriesDetails = {
 };
 
 export default function MainStage() {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
@@ -391,7 +393,7 @@ export default function MainStage() {
         <div className="main-text">
           <h1 id="main-title">Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!</h1>
           <p>Fă din pasiunea ta o sursă de venit!</p>
-          <button className="sign-up-button">Sign up</button>
+          <button className="sign-up-button" onClick={() => navigate('/signup')}>Sign up</button>
         </div>
         <div className="main-stage-image">
           <img src={hobby} alt="hobby" />

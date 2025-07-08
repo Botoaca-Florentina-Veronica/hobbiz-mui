@@ -249,13 +249,21 @@ export default function AddAnnouncementPage() {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImages(prev => [...prev, ...files]);
-    if (files[0]) {
+    if (files.length > 0) {
+      const file = files[0];
+      // Acceptă doar imagini jpg/jpeg
+      if (!file.type || (file.type !== 'image/jpeg' && file.type !== 'image/jpg')) {
+        setError('Poți încărca doar imagini în format JPG');
+        setImages([]);
+        setMainImagePreview(null);
+        return;
+      }
+      setImages(prev => [...prev, ...files]);
       const reader = new FileReader();
       reader.onloadend = () => {
         setMainImagePreview(reader.result);
       };
-      reader.readAsDataURL(files[0]);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -398,14 +406,6 @@ export default function AddAnnouncementPage() {
     <div className="add-announcement-container">
       <h1 className="add-announcement-title">Publică un anunț </h1>
       <form className="add-announcement-form" onSubmit={e => e.preventDefault()} style={{marginBottom: 0}}>
-        {error && (
-          <div className="add-announcement-message add-announcement-error">
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {error}
-          </div>
-        )}
         {success && (
           <div className="add-announcement-message add-announcement-success">
             <div className="add-announcement-success-icon">
@@ -485,6 +485,15 @@ export default function AddAnnouncementPage() {
         </Popover>
       </form>
       <div className="add-announcement-images-section">
+        {/* Mesaj de eroare DOAR pentru imagini JPG/JPEG */}
+        {error && error.includes('JPG') && (
+          <div className="add-announcement-message add-announcement-error" style={{marginBottom: 16}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {error}
+          </div>
+        )}
         <h2 className="add-announcement-subtitle">Imagini</h2>
         <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
         <div className="add-announcement-images-grid">
