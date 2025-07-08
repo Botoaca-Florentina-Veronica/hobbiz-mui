@@ -39,50 +39,8 @@ const getCategoryHint = (category) => {
   return hints[category] || "Servicii și produse din această categorie";
 };
 
-const judete = {
-  "Alba": ["Alba Iulia", "Aiud", "Blaj", "Cugir", "Ocna Mureș"],
-  "Arad": ["Arad", "Ineu", "Lipova", "Curtici", "Pecica"],
-  "Arges": ["Pitești", "Curtea de Argeș", "Câmpulung", "Mioveni", "Topoloveni"],
-  "Bacau": ["Bacău", "Onești", "Moinești", "Comănești", "Buhuși"],
-  "Bihor": ["Oradea", "Salonta", "Marghita", "Beiuș", "Aleșd"],
-  "Bistrita-Nasaud": ["Bistrița", "Năsăud", "Sângeorz-Băi", "Beclean", "Teaca"],
-  "Botosani": ["Botoșani", "Dorohoi", "Darabani", "Săveni", "Flămânzi"],
-  "Brasov": ["Brașov", "Făgăraș", "Săcele", "Codlea", "Râșnov"],
-  "Braila": ["Brăila", "Ianca", "Însurăței", "Făurei", "Viziru"],
-  "Bucuresti": ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5", "Sector 6"],
-  "Buzau": ["Buzău", "Râmnicu Sărat", "Nehoiu", "Pătârlagele", "Pogoanele"],
-  "Caras-Severin": ["Reșița", "Caransebeș", "Bocșa", "Oravița", "Oțelu Roșu"],
-  "Calarasi": ["Călărași", "Oltenița", "Lehliu-Gară", "Budești", "Fundulea"],
-  "Cluj": ["Cluj-Napoca", "Turda", "Dej", "Câmpia Turzii", "Gherla"],
-  "Constanta": ["Constanța", "Mangalia", "Medgidia", "Năvodari", "Cernavodă"],
-  "Covasna": ["Sfântu Gheorghe", "Târgu Secuiesc", "Covasna", "Baraolt", "Întorsura Buzăului"],
-  "Dambovita": ["Târgoviște", "Moreni", "Pucioasa", "Găești", "Titu"],
-  "Dolj": ["Craiova", "Băilești", "Calafat", "Filiași", "Segarcea"],
-  "Galati": ["Galați", "Tecuci", "Târgu Bujor", "Berești", "Pechea"],
-  "Giurgiu": ["Giurgiu", "Bolintin-Vale", "Mihăilești", "Ogrezeni", "Roata de Jos"],
-  "Gorj": ["Târgu Jiu", "Motru", "Rovinari", "Bumbești-Jiu", "Târgu Cărbunești"],
-  "Harghita": ["Miercurea Ciuc", "Odorheiu Secuiesc", "Gheorgheni", "Toplița", "Cristuru Secuiesc"],
-  "Hunedoara": ["Deva", "Hunedoara", "Petroșani", "Lupeni", "Orăștie"],
-  "Ialomita": ["Slobozia", "Fetești", "Urziceni", "Țăndărei", "Amara"],
-  "Iasi": ["Iași", "Pașcani", "Târgu Frumos", "Hârlău", "Podu Iloaiei"],
-  "Ilfov": ["Buftea", "Voluntari", "Pantelimon", "Popești-Leordeni", "Chitila"],
-  "Maramures": ["Baia Mare", "Sighetu Marmației", "Borșa", "Vișeu de Sus", "Târgu Lăpuș"],
-  "Mehedinti": ["Drobeta-Turnu Severin", "Strehaia", "Vânju Mare", "Baia de Aramă", "Orșova"],
-  "Mures": ["Târgu Mureș", "Reghin", "Sighișoara", "Luduș", "Târnăveni"],
-  "Neamt": ["Piatra Neamț", "Roman", "Târgu Neamț", "Bicaz", "Roznov"],
-  "Olt": ["Slatina", "Caracal", "Balș", "Corabia", "Drăgănești-Olt"],
-  "Prahova": ["Ploiești", "Câmpina", "Băicoi", "Mizil", "Sinaia"],
-  "Satu Mare": ["Satu Mare", "Carei", "Negrești-Oaș", "Tășnad", "Livada"],
-  "Salaj": ["Zalău", "Șimleu Silvaniei", "Jibou", "Cehu Silvaniei", "Sărmășag"],
-  "Sibiu": ["Sibiu", "Mediaș", "Agnita", "Cisnădie", "Dumbrăveni"],
-  "Suceava": ["Suceava", "Fălticeni", "Rădăuți", "Câmpulung Moldovenesc", "Vatra Dornei"],
-  "Teleorman": ["Alexandria", "Roșiorii de Vede", "Turnu Măgărele", "Zimnicea", "Videle"],
-  "Timis": ["Timișoara", "Lugoj", "Sânnicolau Mare", "Jimbolia", "Recaș"],
-  "Tulcea": ["Tulcea", "Măcin", "Babadag", "Isaccea", "Sulina"],
-  "Vaslui": ["Vaslui", "Bârlad", "Huși", "Negrești", "Murgeni"],
-  "Valcea": ["Râmnicu Vâlcea", "Drăgășani", "Băbeni", "Horezu", "Brezoi"],
-  "Vrancea": ["Focșani", "Adjud", "Mărășești", "Odobești", "Panciu"]
-};
+import { localitatiPeJudet } from '../assets/comunePeJudet';
+const judete = ["Toată țara", ...Object.keys(localitatiPeJudet)];
 
 export default function AddAnnouncementPage() {
   // Șterge draftul de anunț la deconectare și resetează complet starea formularului
@@ -581,25 +539,23 @@ export default function AddAnnouncementPage() {
               <>
                 <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
                 <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                  <ListItemButton
-                    onClick={() => {
-                      setSelectedJudet(null);
-                      setSelectedLocalitate("");
-                      setAnchorEl(null);
-                    }}
-                    divider
-                  >
-                    <ListItemText
-                      primary={<span style={{ fontWeight: 'bold' }}>Toată țara</span>}
-                    />
-                  </ListItemButton>
-                  {Object.keys(judete).map((judet) => (
+                  {judete.map((judet) => (
                     <ListItemButton
                       key={judet}
-                      onClick={() => setSelectedJudet(judet)}
+                      onClick={() => {
+                        if (judet === "Toată țara") {
+                          setSelectedJudet(null);
+                          setSelectedLocalitate("");
+                          setAnchorEl(null);
+                        } else {
+                          setSelectedJudet(judet);
+                        }
+                      }}
                       divider
                     >
-                      <ListItemText primary={judet} />
+                      <ListItemText
+                        primary={judet === "Toată țara" ? <span style={{ fontWeight: 'bold' }}>Toată țara</span> : judet}
+                      />
                     </ListItemButton>
                   ))}
                 </List>
@@ -607,23 +563,29 @@ export default function AddAnnouncementPage() {
             ) : (
               <>
                 <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
+                {/* Mutăm butonul Înapoi la județe deasupra listei */}
                 <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                  {judete[selectedJudet].map((localitate) => (
-                    <ListItemText
-                      key={localitate}
-                      primary={localitate}
-                      sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
-                      onClick={() => {
-                        setSelectedLocalitate(localitate);
-                        setAnchorEl(null);
-                        setSelectedJudet(null);
-                      }}
-                    />
-                  ))}
+                  <ListItemButton onClick={() => setSelectedJudet(null)} divider>
+                    <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
+                  </ListItemButton>
+                  {/* Orase + Comune sortate alfabetic */}
+                  {(() => {
+                    const orase = localitatiPeJudet[selectedJudet]?.orase?.map(o => o.nume) || [];
+                    const comune = localitatiPeJudet[selectedJudet]?.comune || [];
+                    return [...orase, ...comune].sort((a, b) => a.localeCompare(b, 'ro')).map((localitate) => (
+                      <ListItemText
+                        key={localitate}
+                        primary={localitate}
+                        sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
+                        onClick={() => {
+                          setSelectedLocalitate(localitate);
+                          setAnchorEl(null);
+                          setSelectedJudet(null);
+                        }}
+                      />
+                    ));
+                  })()}
                 </List>
-                <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                  <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
-                </ListItemButton>
               </>
             )}
           </Popover>
