@@ -1,5 +1,48 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+// Facebook Strategy
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_CLIENT_ID,
+  clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+  callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+  profileFields: ['id', 'emails', 'name', 'picture.type(large)']
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ facebookId: profile.id });
+    if (user) {
+      user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
+      user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
+      user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
+      await user.save();
+      return done(null, user);
+    } else {
+      // Try by email
+      const email = profile.emails && profile.emails[0] ? profile.emails[0].value : undefined;
+      user = email ? await User.findOne({ email }) : null;
+      if (user) {
+        user.facebookId = profile.id;
+        user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
+        user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
+        user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
+        await user.save();
+        return done(null, user);
+      } else {
+        // Create new user
+        user = await User.create({
+          facebookId: profile.id,
+          firstName: profile.name && profile.name.givenName ? profile.name.givenName : '',
+          lastName: profile.name && profile.name.familyName ? profile.name.familyName : '',
+          email: email || '',
+          avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
+        });
+        return done(null, user);
+      }
+    }
+  } catch (err) {
+    return done(err, null);
+  }
+}));
 const User = require('../models/User');
 
 passport.use(new GoogleStrategy({

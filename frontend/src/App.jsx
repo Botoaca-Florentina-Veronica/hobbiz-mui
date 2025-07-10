@@ -17,6 +17,7 @@ import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import MyAnnouncements from './pages/MyAnnouncements';
+import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
 import './App.css';
 import './mediaQueries.css';
 
@@ -46,7 +47,15 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/oauth-success" element={<OAuthSuccess />} />
 
-        {/* Toate celelalte rute - cu layout complet */}
+        {/* Rute pentru pagini cu layout complet */}
+        <Route path="/anunturi-categorie/:category" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AnnouncementsByCategory />
+            <Footer />
+          </>
+        } />
         <Route path="/*" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />

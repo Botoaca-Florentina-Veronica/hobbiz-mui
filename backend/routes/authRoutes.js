@@ -1,3 +1,28 @@
+// Inițiază autentificarea cu Facebook
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+// Callback după autentificare Facebook
+router.get('/facebook/callback',
+  passport.authenticate('facebook', {
+    failureRedirect: '/login',
+    session: true,
+  }),
+  (req, res) => {
+    const user = req.user;
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatar: user.avatar
+      },
+      process.env.JWT_SECRET || 'jwt_secret',
+      { expiresIn: '7d' }
+    );
+    res.redirect(`https://hobbiz.netlify.app/oauth-success?token=${token}`);
+  }
+);
 const express = require('express');
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');

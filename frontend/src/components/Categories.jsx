@@ -11,23 +11,26 @@ import arta from '../assets/images/arta.png';
 import masina from '../assets/images/car.png';
 import curatenie from '../assets/images/cleaning.png';
 import './Categories.css';
+import { useNavigate } from 'react-router-dom';
 
 // Restore the default export of the Categories component
 export default function Categories() {
-  // The categories array is now imported from the named export below
+  const navigate = useNavigate();
 
   return (
     <div className="categories-container">
       <h2 className="categories-title">Explorează categorii</h2>
       <div className="categories-grid">
-        {/* Use the imported categories array */}
         {categories.map((category, index) => (
           <div key={index} className="category-card">
-            <button className="category-button">
+            <button
+              className="category-button"
+              onClick={() => navigate(`/anunturi-categorie/${encodeURIComponent(category.description)}`)}
+            >
               <div className="image-container">
                 {category.image ? (
-                  <img 
-                    src={category.image} 
+                  <img
+                    src={category.image}
                     alt={category.description}
                     className="category-image"
                   />
@@ -43,7 +46,6 @@ export default function Categories() {
     </div>
   );
 }
-
 // Export the categories array
 export const categories = [
   { description: "Fotografie", image: camera },

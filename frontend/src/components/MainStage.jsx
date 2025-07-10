@@ -223,7 +223,10 @@ export default function MainStage() {
               {categoriesList.map((cat) => (
                 <li
                   key={cat}
-                  onClick={handleCloseCategories}
+                  onClick={() => {
+                    handleCloseCategories();
+                    navigate(`/anunturi-categorie/${encodeURIComponent(cat)}`);
+                  }}
                   onMouseEnter={() => setHoveredCategory(cat)}
                   onMouseLeave={() => setHoveredCategory(null)}
                   style={{ position: 'relative' }}
