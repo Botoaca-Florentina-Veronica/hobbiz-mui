@@ -1,49 +1,59 @@
+
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-// Facebook Strategy
+const User = require('../models/User');
+
+/*
+// Facebook OAuth2.0 Strategy
 passport.use(new FacebookStrategy({
-  clientID: process.env.FACEBOOK_CLIENT_ID,
-  clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET,
   callbackURL: process.env.FACEBOOK_CALLBACK_URL,
   profileFields: ['id', 'emails', 'name', 'picture.type(large)']
 }, async (accessToken, refreshToken, profile, done) => {
   try {
+    // Try to find the user by facebookId
     let user = await User.findOne({ facebookId: profile.id });
+
     if (user) {
+      // Sync avatar and name at every Facebook login
       user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
       user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
       user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
       await user.save();
       return done(null, user);
     } else {
-      // Try by email
+      // If not found by facebookId, try to find by email
       const email = profile.emails && profile.emails[0] ? profile.emails[0].value : undefined;
-      user = email ? await User.findOne({ email }) : null;
-      if (user) {
-        user.facebookId = profile.id;
-        user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
-        user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
-        user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
-        await user.save();
-        return done(null, user);
-      } else {
-        // Create new user
-        user = await User.create({
-          facebookId: profile.id,
-          firstName: profile.name && profile.name.givenName ? profile.name.givenName : '',
-          lastName: profile.name && profile.name.familyName ? profile.name.familyName : '',
-          email: email || '',
-          avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
-        });
-        return done(null, user);
+      if (email) {
+        user = await User.findOne({ email });
+        if (user) {
+          user.facebookId = profile.id;
+          user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
+          user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
+          user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
+          await user.save();
+          return done(null, user);
+        }
       }
+      // If user not found by either facebookId or email, create a new one
+      user = await User.create({
+        facebookId: profile.id,
+        firstName: profile.name && profile.name.givenName ? profile.name.givenName : '',
+        lastName: profile.name && profile.name.familyName ? profile.name.familyName : '',
+        email: email || '',
+        avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
+        // Password is not required for Facebook users
+      });
+      return done(null, user);
     }
   } catch (err) {
     return done(err, null);
   }
 }));
-const User = require('../models/User');
+
+*/
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,

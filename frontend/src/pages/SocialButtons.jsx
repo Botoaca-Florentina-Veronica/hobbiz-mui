@@ -17,9 +17,32 @@ export function GoogleLoginButton() {
 }
 
 // Buton Facebook
-export function FacebookLoginButton({ onClick }) {
+export function FacebookLoginButton() {
+  const handleFacebookLogin = () => {
+    window.FB.login(function(response) {
+      if (response.authResponse) {
+        // Trimite tokenul la backend pentru validare și login
+        fetch(`${import.meta.env.VITE_API_URL || 'https://hobbiz-mui.onrender.com'}/api/auth/facebook/token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: response.authResponse.accessToken })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.token) {
+            localStorage.setItem('token', data.token);
+            window.location.href = '/';
+          } else {
+            alert('Autentificare Facebook eșuată!');
+          }
+        });
+      } else {
+        alert('Autentificare Facebook anulată!');
+      }
+    }, {scope: 'email,public_profile'});
+  };
   return (
-    <button className="social-btn facebook" onClick={onClick}>
+    <button className="social-btn facebook" onClick={handleFacebookLogin}>
       <img src={facebookLogo} alt="Facebook" />
       Continuă cu Facebook
     </button>
