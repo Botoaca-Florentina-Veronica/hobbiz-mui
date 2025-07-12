@@ -22,6 +22,19 @@
   overflow: hidden;
   align-items: stretch;
   min-height: 180px;
+  position: relative;
+}
+
+.favorite-heart {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+.favorite-heart:hover {
+  transform: scale(1.2);
 }
 
 .my-announcement-image {

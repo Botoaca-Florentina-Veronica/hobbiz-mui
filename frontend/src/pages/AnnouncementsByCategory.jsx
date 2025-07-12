@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useParams } from 'react-router-dom';
 import apiClient from '../api/api';
 import './MyAnnouncements.css';
@@ -7,6 +9,7 @@ export default function AnnouncementsByCategory() {
   const { category } = useParams();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState([]); // local state pentru favorite
 
   useEffect(() => {
     async function fetchAnnouncements() {
@@ -33,7 +36,7 @@ export default function AnnouncementsByCategory() {
       ) : (
         <div style={{display: 'flex', flexDirection: 'column', gap: 32}}>
           {announcements.map((a) => (
-            <div key={a._id} className="my-announcement-card">
+            <div key={a._id} className="my-announcement-card" style={{ position: 'relative' }}>
               <div className="my-announcement-image">
                 {a.images && a.images[0] ? (
                   <img
@@ -46,6 +49,33 @@ export default function AnnouncementsByCategory() {
                 ) : (
                   <div className="my-announcement-img" style={{background: '#eee'}} />
                 )}
+                {/* Iconiță inimă pentru favorite */}
+                <div
+                  className="favorite-heart"
+                  style={{
+                    position: 'absolute',
+                    right: 16,
+                    bottom: 16,
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    zIndex: 2
+                  }}
+                  onClick={() => {
+                    setFavoriteIds((prev) =>
+                      prev.includes(a._id)
+                        ? prev.filter((id) => id !== a._id)
+                        : [...prev, a._id]
+                    );
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  {favoriteIds.includes(a._id) ? (
+                    <FavoriteIcon sx={{ color: 'red', fontSize: 32 }} />
+                  ) : (
+                    <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 32 }} />
+                  )}
+                </div>
               </div>
               <div className="my-announcement-info">
                 <div className="my-announcement-header">
