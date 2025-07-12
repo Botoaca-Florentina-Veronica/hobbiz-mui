@@ -59,6 +59,7 @@ export default function AnnouncementsByCategory() {
                     ID: {a._id?.slice(-9) || ''}
                   </div>
                 </div>
+                {/* Fără butoane de acțiune */}
               </div>
             </div>
           ))}

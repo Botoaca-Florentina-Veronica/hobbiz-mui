@@ -1,0 +1,24 @@
+const express = require('express');
+const router = express.Router();
+const Announcement = require('../models/Announcement');
+
+// GET /api/announcements?category=CategoryName
+router.get('/', async (req, res) => {
+  try {
+    const { category } = req.query;
+    let filter = {};
+    if (category) {
+      // Caută insensibil la majuscule/minuscule și ignoră spațiile
+      filter.category = { $regex: `^${category.trim()}$`, $options: 'i' };
+    }
+    console.log('Filtru categorie:', filter);
+    const announcements = await Announcement.find(filter).sort({ createdAt: -1 });
+    console.log('Anunturi gasite:', announcements.length);
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la filtrare anunțuri:', error);
+    res.status(500).json({ error: 'Eroare server la filtrare anunțuri' });
+  }
+});
+
+module.exports = router;
