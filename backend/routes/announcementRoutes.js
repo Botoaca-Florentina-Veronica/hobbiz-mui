@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 // GET /api/announcements/:id - detalii anunț
 router.get('/:id', async (req, res) => {
   try {
-    const announcement = await Announcement.findById(req.params.id);
+    const announcement = await Announcement.findById(req.params.id).populate('user', 'firstName lastName email phone avatar createdAt');
     if (!announcement) {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit.' });
     }

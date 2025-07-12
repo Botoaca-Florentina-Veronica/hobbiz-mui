@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import apiClient from '../api/api';
 import './AnnouncementDetails.css';
+import SellerDetails from '../components/SellerDetails';
 
 export default function AnnouncementDetails() {
   const { id } = useParams();
@@ -45,6 +46,14 @@ export default function AnnouncementDetails() {
         <h1 className="announcement-details-title">{announcement.title}</h1>
         <div className="announcement-details-description">{announcement.description}</div>
       </div>
+      <SellerDetails 
+        user={{
+          ...announcement.user,
+          contactPerson: announcement.contactPerson // trimite numele de contact ca prop în user
+        }}
+        contactPhone={announcement.contactPhone}
+        contactEmail={announcement.contactEmail}
+      />
     </div>
   );
 }

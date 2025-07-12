@@ -1,0 +1,114 @@
+.seller-details-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f8fafb;
+  border-radius: 12px;
+  margin: 48px 0 0 0;
+  padding: 32px 32px 24px 32px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  gap: 32px;
+}
+.seller-details-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.seller-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #e3e9ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.seller-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.seller-avatar-placeholder {
+  font-size: 2.2rem;
+  color: #23484a;
+  font-weight: bold;
+}
+.seller-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.seller-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #23484a;
+}
+.seller-joined, .seller-active {
+  color: #6a7a7a;
+  font-size: 1rem;
+}
+.seller-details-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 18px;
+}
+.seller-message-btn {
+  background: #043136;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: background 0.2s;
+}
+.seller-message-btn:hover {
+  background: #23484a;
+}
+.seller-phone-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.seller-phone-icon {
+  font-size: 1.5rem;
+  color: #00e3e3;
+  background: #e3f8f8;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.seller-phone-number {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #043136;
+  letter-spacing: 2px;
+}
+.seller-show-btn {
+  background: #fff;
+  color: #043136;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 2px solid #043136;
+  border-radius: 8px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.seller-show-btn:hover {
+  background: #043136;
+  color: #fff;
+}
+.seller-email {
+  color: #23484a;
+  font-size: 1rem;
+  margin-top: 8px;
+}
