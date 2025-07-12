@@ -211,6 +211,9 @@ exports.updatePassword = async (req, res) => {
 // Adaugă un anunț nou pentru utilizatorul autentificat
 exports.addAnnouncement = async (req, res) => {
   try {
+    console.log('--- [addAnnouncement] req.body:', req.body);
+    console.log('--- [addAnnouncement] req.file:', req.file);
+    console.log('--- [addAnnouncement] req.userId:', req.userId);
     const userId = req.userId;
     const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
     if (!title || !category || !description || !location || !contactPerson) {
@@ -235,7 +238,7 @@ exports.addAnnouncement = async (req, res) => {
     res.status(201).json({ message: 'Anunț adăugat cu succes!' });
   } catch (error) {
     console.error('Eroare la adăugare anunț:', error);
-    res.status(500).json({ error: 'Eroare server la adăugare anunț' });
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 };
 

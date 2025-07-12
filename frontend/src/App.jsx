@@ -19,6 +19,7 @@ import ProfilePage from './pages/ProfilePage';
 import MyAnnouncements from './pages/MyAnnouncements';
 import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
 import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
+import AnnouncementDetails from './pages/AnnouncementDetails';
 import './App.css';
 import './mediaQueries.css';
 
@@ -116,6 +117,7 @@ function App() {
             <Footer />
           </>
         } />
+        <Route path="/announcement/:id" element={<AnnouncementDetails />} />
       </Routes>
     </div>
   );

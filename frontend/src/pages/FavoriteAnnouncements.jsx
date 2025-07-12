@@ -82,7 +82,13 @@ export default function FavoriteAnnouncements() {
       ) : (
         <div style={{display: 'flex', flexWrap: 'wrap', gap: 32, justifyContent: 'center'}}>
           {announcements.map((a) => (
-            <div key={a._id} className="my-announcement-card" style={{ width: 370, minHeight: 420, flexDirection: 'column', position: 'relative' }}>
+            <div key={a._id} className="my-announcement-card" style={{ width: 370, minHeight: 420, flexDirection: 'column', position: 'relative', cursor: 'pointer' }}
+              onClick={e => {
+                // Nu declanșa navigarea dacă s-a dat click pe inimă
+                if (e.target.closest('.favorite-heart')) return;
+                window.location.href = `/announcement/${a._id}`;
+              }}
+            >
               <div className="my-announcement-image" style={{ minWidth: '100%', maxWidth: '100%', marginRight: 0 }}>
                 {a.images && a.images[0] ? (
                   <img
@@ -97,7 +103,7 @@ export default function FavoriteAnnouncements() {
                   <div className="my-announcement-img" style={{background: '#eee', width: '100%', height: 220, borderRadius: 12}} />
                 )}
                 <div className="favorite-heart" style={{ position: 'absolute', right: 16, bottom: 16, cursor: 'pointer', transition: 'transform 0.2s', zIndex: 2 }}
-                  onClick={() => handleToggleFavorite(a._id)}
+                  onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
                   onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                 >
@@ -108,7 +114,7 @@ export default function FavoriteAnnouncements() {
                 <h2 className="my-announcement-title" style={{ fontSize: 22, marginBottom: 8 }}>{a.title}</h2>
                 <div className="my-announcement-category" style={{ fontWeight: 500, color: '#23484a', marginBottom: 8 }}>{a.category}</div>
                 <div className="my-announcement-location" style={{ color: '#23484a', marginBottom: 8 }}>{a.location}</div>
-                <div className="my-announcement-description" style={{ color: '#23484a', marginBottom: 8, minHeight: 40 }}>{a.description}</div>
+                {/* Descrierea a fost eliminată pentru un aspect mai curat al listei de favorite */}
                 {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#003b3b', marginTop: 12 }}>{a.price} €</div>}
               </div>
             </div>

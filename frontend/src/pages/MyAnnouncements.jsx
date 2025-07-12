@@ -63,7 +63,13 @@ export default function MyAnnouncements() {
       ) : (
         <div style={{display: 'flex', flexDirection: 'column', gap: 32}}>
           {announcements.map((a) => (
-            <div key={a._id} className="my-announcement-card">
+            <div key={a._id} className="my-announcement-card" style={{ cursor: 'pointer' }}
+              onClick={e => {
+                // Nu declanșa navigarea dacă s-a dat click pe un buton de acțiune
+                if (e.target.closest('.my-announcement-btn')) return;
+                window.location.href = `/announcement/${a._id}`;
+              }}
+            >
               <div className="my-announcement-image">
                 {a.images && a.images[0] ? (
                   <img
@@ -88,7 +94,7 @@ export default function MyAnnouncements() {
                       <LocationOnIcon sx={{ fontSize: 26, color: '#23484a', marginRight: 1 }} />
                       {a.location}
                     </div>
-                    <div className="my-announcement-description">{a.description}</div>
+                    {/* Descrierea a fost eliminată pentru un aspect mai curat al listei de anunțuri */}
                   </div>
                   <div className="my-announcement-id">
                     ID: {a._id?.slice(-9) || ''}

@@ -21,4 +21,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+
+// GET /api/announcements/:id - detalii anunț
+router.get('/:id', async (req, res) => {
+  try {
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit.' });
+    }
+    res.json(announcement);
+  } catch (error) {
+    res.status(500).json({ error: 'Eroare server la preluarea anunțului.' });
+  }
+});
+
 module.exports = router;

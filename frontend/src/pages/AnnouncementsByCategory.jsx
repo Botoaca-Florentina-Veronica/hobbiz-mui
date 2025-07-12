@@ -40,7 +40,13 @@ export default function AnnouncementsByCategory() {
       ) : (
         <div style={{display: 'flex', flexDirection: 'column', gap: 32}}>
           {announcements.map((a) => (
-            <div key={a._id} className="my-announcement-card" style={{ position: 'relative' }}>
+            <div key={a._id} className="my-announcement-card" style={{ position: 'relative', cursor: 'pointer' }}
+              onClick={e => {
+                // Nu declanșa navigarea dacă s-a dat click pe inimă
+                if (e.target.closest('.favorite-heart')) return;
+                window.location.href = `/announcement/${a._id}`;
+              }}
+            >
               <div className="my-announcement-image">
                 {a.images && a.images[0] ? (
                   <img
@@ -64,7 +70,8 @@ export default function AnnouncementsByCategory() {
                     transition: 'transform 0.2s',
                     zIndex: 2
                   }}
-                  onClick={() => {
+                  onClick={ev => {
+                    ev.stopPropagation();
                     setFavoriteIds((prev) => {
                       let updated;
                       if (prev.includes(a._id)) {
@@ -92,7 +99,7 @@ export default function AnnouncementsByCategory() {
                     <h2 className="my-announcement-title">{a.title}</h2>
                     <div className="my-announcement-category">{a.category}</div>
                     <div className="my-announcement-location">{a.location}</div>
-                    <div className="my-announcement-description">{a.description}</div>
+                    {/* Descrierea a fost eliminată pentru un aspect mai curat al listei de anunțuri */}
                   </div>
                   <div className="my-announcement-id">
                     ID: {a._id?.slice(-9) || ''}
