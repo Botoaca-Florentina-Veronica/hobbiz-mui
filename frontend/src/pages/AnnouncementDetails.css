@@ -1,10 +1,11 @@
+/* Adaugă padding-top pentru a nu fi acoperit de headerul fix */
 .announcement-details-container {
   max-width: 700px;
   margin: 32px auto;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-  padding: 0 0 32px 0;
+  margin-top: 8rem;
 }
 .announcement-details-image-wrapper {
   width: 100%;

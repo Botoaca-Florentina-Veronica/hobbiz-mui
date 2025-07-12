@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import apiClient from '../api/api';
 import './AnnouncementDetails.css';
 import SellerDetails from '../components/SellerDetails';
+import Header from '../components/Header';
 
 export default function AnnouncementDetails() {
   const { id } = useParams();
@@ -28,7 +29,9 @@ export default function AnnouncementDetails() {
   if (!announcement) return <div>Anunțul nu a fost găsit.</div>;
 
   return (
-    <div className="announcement-details-container">
+    <>
+      <Header />
+      <div className="announcement-details-container">
       <div className="announcement-details-image-wrapper">
         {announcement.images && announcement.images[0] ? (
           <img
@@ -54,6 +57,7 @@ export default function AnnouncementDetails() {
         contactPhone={announcement.contactPhone}
         contactEmail={announcement.contactEmail}
       />
-    </div>
+      </div>
+    </>
   );
 }

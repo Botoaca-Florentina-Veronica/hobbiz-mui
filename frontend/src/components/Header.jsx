@@ -65,17 +65,17 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    // Șterge doar tokenul și userId-ul, nu și favoritele altor utilizatori
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      // Nu șterge favoritele, doar deconectează utilizatorul
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-    }
-    setIsAuthenticated(false);
-    setOpenSnackbar(true); // Deschide Snackbar-ul
-    navigate('/');
-    window.location.reload(); // Fortat refresh pentru resetare avatar
+    // Deconectare completă: și local, și server (cookie/session)
+    import('../api/api').then(({ logout }) => {
+      logout().finally(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        setIsAuthenticated(false);
+        setOpenSnackbar(true);
+        navigate('/');
+        window.location.reload();
+      });
+    });
   };
 
   const handleCloseSnackbar = (event, reason) => {

@@ -26,6 +26,8 @@ export const updatePassword = (passwordData) => apiClient.put('/api/users/update
 export const updateProfile = (profileData) => apiClient.put('/api/users/profile', profileData);
 export const detectMitm = () => apiClient.get('/api/mitm/detect-mitm');
 
-// Alte endpoint-uri...
+
+// Logout request (pentru sesiuni/cookie-uri)
+export const logout = () => apiClient.get('/auth/logout', { withCredentials: true });
 
 export default apiClient;
