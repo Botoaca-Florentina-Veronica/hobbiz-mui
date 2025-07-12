@@ -9,7 +9,10 @@ export default function AnnouncementsByCategory() {
   const { category } = useParams();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [favoriteIds, setFavoriteIds] = useState([]); // local state pentru favorite
+  const [favoriteIds, setFavoriteIds] = useState(() => {
+    // Citim favoritele din localStorage la inițializare
+    return JSON.parse(localStorage.getItem('favoriteAnnouncements') || '[]');
+  });
 
   useEffect(() => {
     async function fetchAnnouncements() {
@@ -61,11 +64,16 @@ export default function AnnouncementsByCategory() {
                     zIndex: 2
                   }}
                   onClick={() => {
-                    setFavoriteIds((prev) =>
-                      prev.includes(a._id)
-                        ? prev.filter((id) => id !== a._id)
-                        : [...prev, a._id]
-                    );
+                    setFavoriteIds((prev) => {
+                      let updated;
+                      if (prev.includes(a._id)) {
+                        updated = prev.filter((id) => id !== a._id);
+                      } else {
+                        updated = [...prev, a._id];
+                      }
+                      localStorage.setItem('favoriteAnnouncements', JSON.stringify(updated));
+                      return updated;
+                    });
                   }}
                   onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}

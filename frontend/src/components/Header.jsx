@@ -108,7 +108,7 @@ export default function Header() {
             <button className="add-button" onClick={handleAddAnnouncement}>Adaugă un anunț</button>
           </li>
           <li>
-            <button className="favorite-btn">
+            <button className="favorite-btn" onClick={() => navigate('/favorite-announcements')}>
               <HiOutlineHeart />
             </button>
           </li>

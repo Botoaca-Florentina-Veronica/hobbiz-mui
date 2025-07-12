@@ -18,6 +18,7 @@ import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import MyAnnouncements from './pages/MyAnnouncements';
 import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
+import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
 import './App.css';
 import './mediaQueries.css';
 
@@ -53,6 +54,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AnnouncementsByCategory />
+            <Footer />
+          </>
+        } />
+        <Route path="/favorite-announcements" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <FavoriteAnnouncements />
             <Footer />
           </>
         } />
