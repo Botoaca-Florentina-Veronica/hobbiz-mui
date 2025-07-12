@@ -36,8 +36,11 @@ function Toast({ message, onClose }) {
 
 export default function FavoriteAnnouncements() {
   const [announcements, setAnnouncements] = useState([]);
+  // Cheie unică pentru favorite per utilizator
+  const userId = localStorage.getItem('userId');
+  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    return JSON.parse(localStorage.getItem('favoriteAnnouncements') || '[]');
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
   });
   const [showToast, setShowToast] = useState(false);
 
@@ -51,7 +54,7 @@ export default function FavoriteAnnouncements() {
         setAnnouncements(res.data.filter(a => favoriteIds.includes(a._id)));
       })
       .catch(() => setAnnouncements([]));
-  }, [favoriteIds]);
+  }, [favoriteIds, FAVORITES_KEY]);
 
   const handleToggleFavorite = (id) => {
     setFavoriteIds((prev) => {
@@ -62,7 +65,7 @@ export default function FavoriteAnnouncements() {
       } else {
         updated = [...prev, id];
       }
-      localStorage.setItem('favoriteAnnouncements', JSON.stringify(updated));
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       return updated;
     });
   };

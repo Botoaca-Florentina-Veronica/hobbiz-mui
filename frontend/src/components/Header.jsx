@@ -65,7 +65,13 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // Șterge doar tokenul și userId-ul, nu și favoritele altor utilizatori
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      // Nu șterge favoritele, doar deconectează utilizatorul
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+    }
     setIsAuthenticated(false);
     setOpenSnackbar(true); // Deschide Snackbar-ul
     navigate('/');

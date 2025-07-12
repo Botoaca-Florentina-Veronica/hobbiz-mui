@@ -9,9 +9,10 @@ export default function AnnouncementsByCategory() {
   const { category } = useParams();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const userId = localStorage.getItem('userId');
+  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    // Citim favoritele din localStorage la inițializare
-    return JSON.parse(localStorage.getItem('favoriteAnnouncements') || '[]');
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
   });
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function AnnouncementsByCategory() {
                       } else {
                         updated = [...prev, a._id];
                       }
-                      localStorage.setItem('favoriteAnnouncements', JSON.stringify(updated));
+                      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
                       return updated;
                     });
                   }}
