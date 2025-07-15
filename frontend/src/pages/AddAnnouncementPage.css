@@ -1,4 +1,104 @@
 @media (max-width: 600px) {
+  .categories-grid-popover {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.3rem !important;
+    padding: 0.3rem 0.1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 80px;
+    box-sizing: border-box;
+    background: #fff;
+    overflow-x: unset;
+  }
+  .category-card-popover {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 48px !important;
+    padding: 0.3rem 0.7rem !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 1rem !important;
+    transition: background 0.2s;
+    min-height: 44px;
+    overflow: visible !important;
+    gap: 0.7rem !important;
+  }
+  .category-card-popover:hover {
+    background: #f3f5f6 !important;
+  }
+  .category-description-popover {
+    display: none !important;
+  }
+  .category-hint-popover {
+    display: none !important;
+  }
+  .image-container-popover {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    overflow: visible !important;
+    background: none !important;
+  }
+  .category-image-popover {
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+    border-radius: 7px !important;
+    display: block !important;
+    background: none !important;
+  }
+  .category-title-popover {
+    font-size: 1.13rem !important;
+    color: #183642 !important;
+    font-weight: 500 !important;
+    margin-left: 0.7rem !important;
+    text-align: left !important;
+    flex: 1 1 auto !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline !important;
+  }
+  .category-image-popover {
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+    border-radius: 7px !important;
+    display: block !important;
+    background: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  .image-container-popover {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    overflow: visible !important;
+    background: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+@media (max-width: 380px) {
   .add-announcement-title-input,
   .add-announcement-category-select,
   .add-announcement-description-input,
@@ -15,16 +115,36 @@
     font-size: 1.08rem !important;
     margin-left: auto;
     margin-right: auto;
+    height: 4.5rem !important;
   }
   .add-announcement-form,
   .add-announcement-location-section,
   .add-announcement-contact-section {
     padding-left: 0 !important;
     padding-right: 0 !important;
+    max-width: 330px !important;
   }
   .add-announcement-title {
-    margin-left: 0 !important;
-    font-size: 1.3rem !important;
+    margin-left: 1rem !important;
+    font-size: 2.3rem !important;
+  }
+}
+@media (max-width: 600px) {
+  .category-title-popover {
+    display: inline !important;
+  }
+  .category-description-popover,
+  .category-hint-popover {
+    display: none !important;
+  }
+}
+@media (min-width: 601px) {
+  .category-title-popover {
+    display: none !important;
+  }
+  .category-description-popover,
+  .category-hint-popover {
+    display: block !important;
   }
 }
 /* Styles for Add Announcement Page */
@@ -447,13 +567,7 @@
   border-radius: 8px;
 }
 
-.category-description-popover {
-  color: #183642;
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin: 0 0 0.4rem 0;
-  text-align: center;
-}
+/* eliminat: orice regulă pentru .category-title-popover în afara media queries */
 
 .category-hint-popover {
   color: #5b7a88;

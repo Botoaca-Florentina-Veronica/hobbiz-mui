@@ -7,6 +7,9 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
+
+// Fix: Ensure all category images are imported and used for mobile/tablet
+// This is the same array as in Categories.jsx, so images are imported there and exported as 'categories'.
 import '../components/Categories.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
@@ -424,17 +427,22 @@ export default function AddAnnouncementPage() {
                 className="category-card-popover"
                 onClick={() => handleCategorySelect(cat.description)}
               >
+                {/* Show image only for mobile/tablet, always use cat.image from Categories.jsx */}
                 <div className="image-container-popover">
                   {cat.image ? (
                     <img
                       src={cat.image}
                       alt={cat.description}
                       className="category-image-popover"
+                      style={{ display: 'block' }}
                     />
                   ) : (
                     <div className="image-placeholder-popover"></div>
                   )}
                 </div>
+                {/* Titlu vizibil doar pe mobil/tabletă, ascuns pe desktop (controlat doar din CSS) */}
+                <span className="category-title-popover">{cat.description}</span>
+                {/* Desktop: descriere și hint, ascunse pe mobil/tabletă */}
                 <p className="category-description-popover">{cat.description}</p>
                 <p className="category-hint-popover">{getCategoryHint(cat.description)}</p>
               </div>
