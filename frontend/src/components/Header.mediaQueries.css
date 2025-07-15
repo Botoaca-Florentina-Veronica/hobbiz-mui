@@ -1,0 +1,13 @@
+/* Media queries pentru Header */
+
+@media (max-width: 900px) {
+  .header {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    display: none !important;
+  }
+}

@@ -1,0 +1,20 @@
+/* Media queries pentru CallToAction */
+
+@media (max-width: 800px) {
+  .call-to-action {
+    flex-direction: column;
+    width: 98%;
+    padding: 24px 8px;
+    font-size: 1.1rem;
+    gap: 18px;
+    margin: 40px auto 40px auto;
+  }
+  .call-to-action h3 {
+    font-size: 1.3rem;
+  }
+  .call-to-action p {
+    font-size: 1rem;
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+}

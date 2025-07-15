@@ -1,0 +1,19 @@
+/* Media queries pentru Categories */
+
+@media (max-width: 700px) {
+  .categories-container {
+    padding: 1rem 0.3rem;
+    min-height: 80vh;
+  }
+  .categories-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+  }
+  .categories-grid {
+    gap: 1rem;
+  }
+  .category-description {
+    font-size: 0.95rem;
+  }
+}

@@ -269,7 +269,8 @@ export default function MainStage() {
           <span>Categorii</span>
         </div>
 
-        <div className="search-container">
+        {typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches ? null : (
+          <div className="search-container mainstage-search-desktop">
           <input 
             type="text" 
             placeholder="Ce anume cauți?" 
@@ -352,7 +353,8 @@ export default function MainStage() {
             <span>Căutare</span>
             <FaSearch className="search-icon" />
           </button>
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="main-content">

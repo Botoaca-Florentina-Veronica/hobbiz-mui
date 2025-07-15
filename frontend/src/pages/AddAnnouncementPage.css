@@ -1,3 +1,32 @@
+@media (max-width: 600px) {
+  .add-announcement-title-input,
+  .add-announcement-category-select,
+  .add-announcement-description-input,
+  .add-announcement-location-input,
+  .add-announcement-contact-input {
+    max-width: 350px !important;
+    min-width: 0 !important;
+    width: 94% !important;
+    box-sizing: border-box;
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 1.08rem !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .add-announcement-form,
+  .add-announcement-location-section,
+  .add-announcement-contact-section {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .add-announcement-title {
+    margin-left: 0 !important;
+    font-size: 1.3rem !important;
+  }
+}
 /* Styles for Add Announcement Page */
 .add-announcement-container {
   background: #f5f7f8;

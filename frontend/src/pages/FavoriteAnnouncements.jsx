@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import './MyAnnouncements.css';
 
@@ -36,6 +38,7 @@ function Toast({ message, onClose }) {
 
 export default function FavoriteAnnouncements() {
   const [announcements, setAnnouncements] = useState([]);
+  const navigate = useNavigate();
   // Cheie unică pentru favorite per utilizator
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
@@ -73,6 +76,27 @@ export default function FavoriteAnnouncements() {
   return (
     <div className="my-announcements-container">
       {showToast && <Toast message="Șters din favorite" onClose={() => setShowToast(false)} />}
+      {/* Buton back */}
+      <button
+        className="favorite-back-btn-mobile"
+        onClick={() => navigate('/')}
+        aria-label="Înapoi la pagina principală"
+        style={{
+          background: 'none',
+          border: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          color: '#073b4c',
+          fontSize: 22,
+          fontWeight: 500,
+          marginBottom: 8,
+          cursor: 'pointer',
+          padding: 0
+        }}
+      >
+        <ArrowBackIcon style={{ fontSize: 28, marginRight: 8 }} />
+        <span style={{ fontSize: 0 }}>Înapoi</span>
+      </button>
       <h1 className="my-announcements-title">Anunturile tale favorite</h1>
       <div style={{ textAlign: 'center', fontWeight: 600, fontSize: 22, margin: '32px 0 24px 0' }}>
         Anunțuri favorite ({announcements.length}/150)

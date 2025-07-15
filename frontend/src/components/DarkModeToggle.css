@@ -189,3 +189,9 @@ body.dark-mode {
   color: #F67280;
   background-color: #F8B195;
 }
+
+@media (max-width: 900px) {
+  .dark-mode-toggle {
+    display: none !important;
+  }
+}

@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { HiOutlineUser, HiOutlineHeart } from "react-icons/hi";
 import logoLight from '../assets/images/logo.jpg';
@@ -7,6 +8,8 @@ import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
 import apiClient from '../api/api';
 import './Header.css';
+import MobileHeader from './MobileHeader';
+import './MobileHeader.css';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -101,71 +104,77 @@ export default function Header() {
     }
   };
 
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
   return (
     <>
-      <div className="header fixed-header">
-        <ul className="logo" onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
-          <li>
-            <img src={isDarkMode ? logoDark : logoLight} alt="Logo" />
-          </li>
-        </ul>
-        <ul className="nav-right">
-          <li>
-            <button className="add-button" onClick={handleAddAnnouncement}>Adaugă un anunț</button>
-          </li>
-          <li>
-            <button className="favorite-btn" onClick={() => navigate('/favorite-announcements')}>
-              <HiOutlineHeart />
-            </button>
-          </li>
-          <li
-            className="user-account-container"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+      {isMobile ? (
+        <MobileHeader notificationCount={5} />
+      ) : (
+        <>
+          <div className="header fixed-header">
+            <ul className="logo" onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
+              <li>
+                <img src={isDarkMode ? logoDark : logoLight} alt="Logo" />
+              </li>
+            </ul>
+            <ul className="nav-right">
+              <li>
+                <button className="add-button" onClick={handleAddAnnouncement}>Adaugă un anunț</button>
+              </li>
+              <li>
+                <button className="favorite-btn" onClick={() => navigate('/favorite-announcements')}>
+                  <HiOutlineHeart />
+                </button>
+              </li>
+              <li
+                className="user-account-container"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <input 
+                  type="checkbox" 
+                  id="account-dropdown" 
+                  className="dropdown" 
+                  checked={showDropdown}
+                  onChange={() => setShowDropdown(!showDropdown)} 
+                />
+                <label 
+                  htmlFor="account-dropdown" 
+                  className="for-dropdown" 
+                  onClick={handleAccountClick}
+                >
+                  {googleAvatar ? (
+                    <img src={googleAvatar} alt="Google Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }} />
+                  ) : (
+                    <HiOutlineUser size={24} />
+                  )}
+                  <span>Contul tău</span>
+                </label>
+                {isAuthenticated && (
+                  <div className="section-dropdown">
+                    <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>Setări</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>Anunțurile mele</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>Profil</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); }}>Contul tău</a>
+                    <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>Deconectează-te</a>
+                  </div>
+                )}
+              </li>
+            </ul>
+          </div>
+          <Snackbar 
+            open={openSnackbar} 
+            autoHideDuration={3000} 
+            onClose={handleCloseSnackbar} 
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           >
-            <input 
-              type="checkbox" 
-              id="account-dropdown" 
-              className="dropdown" 
-              checked={showDropdown}
-              onChange={() => setShowDropdown(!showDropdown)} 
-            />
-            <label 
-              htmlFor="account-dropdown" 
-              className="for-dropdown" 
-              onClick={handleAccountClick}
-            >
-              {googleAvatar ? (
-                <img src={googleAvatar} alt="Google Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }} />
-              ) : (
-                <HiOutlineUser size={24} />
-              )}
-              <span>Contul tău</span>
-            </label>
-            
-            {isAuthenticated && (
-              <div className="section-dropdown">
-                <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>Setări</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>Anunțurile mele</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>Profil</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); }}>Contul tău</a>
-                <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>Deconectează-te</a>
-              </div>
-            )}
-          </li>
-        </ul>
-      </div>
-      <Snackbar 
-        open={openSnackbar} 
-        autoHideDuration={3000} 
-        onClose={handleCloseSnackbar} 
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity="info" sx={{ width: '100%', fontSize: '1.2rem', padding: '16px' }}>
-          Ai fost deconectat din cont.
-        </Alert>
-      </Snackbar>
+            <Alert onClose={handleCloseSnackbar} severity="info" sx={{ width: '100%', fontSize: '1.2rem', padding: '16px' }}>
+              Ai fost deconectat din cont.
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </>
   );
 }

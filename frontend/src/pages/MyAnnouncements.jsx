@@ -91,7 +91,7 @@ export default function MyAnnouncements() {
                     <h2 className="my-announcement-title">{a.title}</h2>
                     <div className="my-announcement-category">{a.category}</div>
                     <div className="my-announcement-location">
-                      <LocationOnIcon sx={{ fontSize: 26, color: '#23484a', marginRight: 1 }} />
+                      <LocationOnIcon sx={{ fontSize: 26, color: '#355070', marginRight: 1 }} />
                       {a.location}
                     </div>
                     {/* Descrierea a fost eliminată pentru un aspect mai curat al listei de anunțuri */}

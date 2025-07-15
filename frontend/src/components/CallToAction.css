@@ -18,6 +18,25 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 800px) {
+  .call-to-action {
+    flex-direction: column;
+    width: 98%;
+    padding: 24px 8px;
+    font-size: 1.1rem;
+    gap: 18px;
+    margin: 40px auto 40px auto;
+  }
+  .call-to-action h3 {
+    font-size: 1.3rem;
+  }
+  .call-to-action p {
+    font-size: 1rem;
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+}
+
 .call-to-action h3 {
   margin: 0;
   font-size: 40px;
@@ -36,13 +55,13 @@
 .second-button {
   border-radius: 10px;
   border: #f9faf8 2px solid;
-  background-color: #dfccaf;
-  color: #F8B195;
+  background-color: #1a237e !important;
+  color: #f9faf8 !important;
 }
 
 .second-button:hover {
-  color: #F67280;
-  background-color: #F8B195;
+  color: #1a237e !important;
+  background-color: #f9faf8 !important;
 }
 
 .dark-mode .call-to-action {

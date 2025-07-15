@@ -7,6 +7,24 @@
   min-height: 102vh;
 }
 
+@media (max-width: 700px) {
+  .categories-container {
+    padding: 1rem 0.3rem;
+    min-height: 80vh;
+  }
+  .categories-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+  }
+  .categories-grid {
+    gap: 1rem;
+  }
+  .category-description {
+    font-size: 0.95rem;
+  }
+}
+
 .categories-title {
   text-align: center;
   font-size: 3.5rem;
@@ -74,9 +92,10 @@
 }
 
 .category-description {
-  margin-top: 0.5rem;
+  margin-top: 0.8rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: bold;
   color: white;
 }
 
