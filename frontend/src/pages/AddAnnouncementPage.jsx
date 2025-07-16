@@ -427,7 +427,6 @@ export default function AddAnnouncementPage() {
                 className="category-card-popover"
                 onClick={() => handleCategorySelect(cat.description)}
               >
-                {/* Show image only for mobile/tablet, always use cat.image from Categories.jsx */}
                 <div className="image-container-popover">
                   {cat.image ? (
                     <img
@@ -437,12 +436,12 @@ export default function AddAnnouncementPage() {
                       style={{ display: 'block' }}
                     />
                   ) : (
-                    <div className="image-placeholder-popover"></div>
+                    <div className="image-placeholder-popover">Fără imagine</div>
                   )}
                 </div>
-                {/* Titlu vizibil doar pe mobil/tabletă, ascuns pe desktop (controlat doar din CSS) */}
-                <span className="category-title-popover">{cat.description}</span>
-                {/* Desktop: descriere și hint, ascunse pe mobil/tabletă */}
+                <span className="category-title-popover">
+                  {cat.description || 'Fără titlu'}
+                </span>
                 <p className="category-description-popover">{cat.description}</p>
                 <p className="category-hint-popover">{getCategoryHint(cat.description)}</p>
               </div>
