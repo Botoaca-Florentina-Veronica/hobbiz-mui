@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AddAnnouncementPage.css';
+import './AddAnnouncementPage.mobile.css';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
