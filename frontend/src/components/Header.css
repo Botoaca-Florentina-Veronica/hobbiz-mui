@@ -30,12 +30,18 @@
   margin-left: 150px;
 }
 
-.header .logo img{
-  height: 200px;
-  width: 200px;
-  padding-right: 70px;
-  margin-left: -70px;
-  margin-top: 20px;
+.puzzle-logo {
+  height: 45px;
+  width: auto;
+  margin-right: 2px;
+  margin-left: -4rem;
+}
+.main-logo {
+  height: 220px;
+  width: 220px;
+  padding-right: 24px;
+  margin-left: 0;
+  margin-top: 1rem;
 }
 
 .add-button{

@@ -1,0 +1,86 @@
+.legal-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background: #f3f5f6;
+  color: #fff;
+  padding: 2.5rem 2rem 1.5rem 2rem;
+  border-radius: 12px 12px 0 0;
+  /* Eliminăm margin-bottom pentru a lipi de footer */
+  margin-bottom: 0;
+  gap: 2rem;
+}
+.legal-section__column {
+  flex: 1 1 180px;
+  min-width: 180px;
+  margin-bottom: 1rem;
+}
+.legal-section__logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.legal-section__icon {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+  color: #ff6a00;
+}
+.legal-section__brand {
+  color: #F8B195;
+}
+.legal-section__desc {
+  font-size: 1rem;
+  color: #355070;
+  margin-bottom: 0.5rem;
+}
+.legal-section__column h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  color: #355070;
+  margin-top: 1rem;
+}
+.legal-section__column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.legal-section__column ul li {
+  margin-bottom: 0.3rem;
+}
+.legal-section__column ul li a {
+  color: #355070;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 1.1rem;
+}
+.legal-section__column ul li a:hover {
+  color: #ff6a00;
+}
+.legal-section__socials {
+  min-width: 120px;
+}
+.legal-section__icons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.legal-section__icons a {
+  color: #fff;
+  font-size: 1.4rem;
+  transition: color 0.2s;
+}
+.legal-section__icons a:hover {
+  color: #ff6a00;
+}
+@media (max-width: 900px) {
+  .legal-section {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem 1rem 1rem 1rem;
+  }
+  .legal-section__column {
+    min-width: 0;
+  }
+}

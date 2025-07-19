@@ -8,6 +8,7 @@ import Content from './components/Content';
 import Categories from './components/Categories';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
+import LegalSection from './components/LegalSection';
 import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
@@ -17,9 +18,12 @@ import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import MyAnnouncements from './pages/MyAnnouncements';
+
 import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
 import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
 import AnnouncementDetails from './pages/AnnouncementDetails';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import About from './pages/About';
 import './App.css';
 import './mediaQueries.css';
 
@@ -66,6 +70,22 @@ function App() {
             <Footer />
           </>
         } />
+        <Route path="/despre" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <About />
+          </>
+        } />
+        <Route path="/confidentialitate" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <PrivacyPolicy />
+            <div className="footer-separator" />
+            <LegalSection />
+            <Footer />
+          </>
+        } />
         <Route path="/*" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -74,6 +94,8 @@ function App() {
             <Content />
             <Categories />
             <CallToAction />
+            <div className="footer-separator" />
+            <LegalSection />
             <Footer />
           </>
         } />
