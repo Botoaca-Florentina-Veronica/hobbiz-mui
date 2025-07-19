@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const upload = require('../config/cloudinaryMulter');
 const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount } = require('../controllers/UserController');
 // Șterge contul utilizatorului și toate anunțurile sale
 router.delete('/delete-account', auth, deleteAccount);
-const auth = require('../middleware/auth');
-const upload = require('../config/cloudinaryMulter');
 
 // Rute
 router.post('/register', register);  // User e folosit în controller
