@@ -8,6 +8,21 @@ const multer = require('multer');
 const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
 
+// Șterge utilizatorul și toate anunțurile sale
+exports.deleteAccount = async (req, res) => {
+  try {
+    const userId = req.userId;
+    // Șterge toate anunțurile utilizatorului
+    await Announcement.deleteMany({ user: userId });
+    // Șterge utilizatorul
+    await User.findByIdAndDelete(userId);
+    res.json({ message: 'Contul și toate anunțurile au fost șterse cu succes.' });
+  } catch (error) {
+    console.error('Eroare la ștergerea contului:', error);
+    res.status(500).json({ error: 'Eroare server la ștergerea contului' });
+  }
+};
+
 // Înregistrare utilizator
 exports.register = async (req, res) => {
   try { 

@@ -5,7 +5,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-export default function ConfirmDialog({ open, onClose, onConfirm }) {
+export default function ConfirmDialog({ open, onClose, onConfirm, title, description }) {
   return (
     <Dialog
       open={open}
@@ -20,10 +20,15 @@ export default function ConfirmDialog({ open, onClose, onConfirm }) {
         }
       }}
     >
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 60 }}>
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 60 }}>
         <Typography variant="h5" fontWeight={700} align="center" gutterBottom>
-          Sigur vrei să ștergi acest anunț?
+          {title || 'Sigur vrei să ștergi?'}
         </Typography>
+        {description && (
+          <Typography variant="body1" align="center" color="text.secondary" sx={{mt:1}}>
+            {description}
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
         <Button onClick={onClose} color="primary" variant="outlined" size="large">

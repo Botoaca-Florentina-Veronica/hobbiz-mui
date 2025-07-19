@@ -25,9 +25,11 @@ export default function About() {
           </p>
           <h2>Ce poți face pe Hobbiz?</h2>
           <ul>
+            <li>Descoperă o nouă sursă de venit.</li>
             <li>Publică anunțuri pentru serviciile sau produsele tale.</li>
-            <li>Descoperă oferte locale sau naționale de la alți pasionați.</li>
+            <li>Află despre ofertele locale sau naționale.</li>
             <li>Salvează anunțurile preferate și contactează direct vânzătorii.</li>
+            <li>Cunoaște alți oameni cu aceleași pasiuni și colaborează sau conversează cu ei.</li>
             <li>Gestionează-ți contul și anunțurile rapid și intuitiv.</li>
           </ul>
           <h2>De ce să alegi Hobbiz?</h2>

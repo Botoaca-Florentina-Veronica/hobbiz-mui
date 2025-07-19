@@ -1,3 +1,5 @@
+// Șterge contul utilizatorului și toate anunțurile sale
+export const deleteAccount = () => apiClient.delete('/api/users/delete-account');
 // frontend/src/api/index.js
 import axios from 'axios';
 

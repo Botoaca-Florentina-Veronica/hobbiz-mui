@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './AccountSettings.css';
-import { updateEmail, updatePassword, detectMitm } from '../api/api'; // Importă detectMitm
+import { updateEmail, updatePassword, detectMitm, deleteAccount, logout } from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import ConfirmDialog from './ConfirmDialog';
 
 export default function AccountSettings() {
   const [showEmailChange, setShowEmailChange] = useState(false);
@@ -11,7 +12,27 @@ export default function AccountSettings() {
   const [message, setMessage] = useState(null); // State for messages (success/error)
   const [mitmResult, setMitmResult] = useState(null);
   const [mitmLoading, setMitmLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [successDelete, setSuccessDelete] = useState(false);
   const navigate = useNavigate();
+
+  // Ștergere cont
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteAccount();
+      await logout();
+      setShowDeleteDialog(false);
+      setSuccessDelete(true);
+      localStorage.removeItem('token');
+      setTimeout(() => {
+        setSuccessDelete(false);
+        navigate('/');
+      }, 2000);
+    } catch (error) {
+      setShowDeleteDialog(false);
+      setMessage({ type: 'error', text: 'Eroare la ștergerea contului.' });
+    }
+  };
 
   const handleEmailChangeClick = () => {
     console.log('Schimbă email-ul clicked!');
@@ -128,7 +149,17 @@ export default function AccountSettings() {
         <div className="settings-item">Setează notificările</div>
         <div className="settings-item">Date de facturare</div>
         <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>
-        <div className="settings-item">Șterge contul</div>
+        <div className="settings-item" onClick={() => setShowDeleteDialog(true)}>Șterge contul</div>
+        <ConfirmDialog
+          open={showDeleteDialog}
+          onClose={() => setShowDeleteDialog(false)}
+          onConfirm={handleDeleteAccount}
+          title="Sigur vrei să ștergi contul?"
+          description="Această acțiune este ireversibilă. Toate anunțurile tale vor fi șterse."
+        />
+        {successDelete && (
+          <div className="message success" style={{textAlign:'center',marginTop:20}}>Contul tău a fost șters cu succes!</div>
+        )}
       </div>
     </div>
   );
