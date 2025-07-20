@@ -37,24 +37,28 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    // Dacă nu există token, nu ești autentificat
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setIsAuthenticated(false);
+      setGoogleAvatar(null);
+      return;
+    }
+    // Dacă există token, verifică și cu backendul (pentru sesiuni Google etc)
     const checkAuth = async () => {
       try {
         const response = await apiClient.get('/api/users/auth/check');
-        console.log('Raspuns auth/check:', response.data); // DEBUG: vezi ce primesti de la backend
         setIsAuthenticated(response.data.isAuthenticated);
-        // Daca exista avatar Google, salveaza-l
         if (response.data.googleAvatar) {
           setGoogleAvatar(response.data.googleAvatar);
         } else {
           setGoogleAvatar(null);
         }
       } catch (error) {
-        console.error('Eroare la verificarea autentificării:', error);
         setIsAuthenticated(false);
         setGoogleAvatar(null);
       }
     };
-
     checkAuth();
   }, []);
 

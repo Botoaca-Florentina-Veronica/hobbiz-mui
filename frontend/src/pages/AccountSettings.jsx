@@ -27,7 +27,10 @@ export default function AccountSettings() {
       setTimeout(() => {
         setSuccessDelete(false);
         navigate('/');
-      }, 2000);
+        setTimeout(() => {
+          window.location.reload();
+        }, 100); // mic delay pentru a permite navigarea
+      }, 1500);
     } catch (error) {
       setShowDeleteDialog(false);
       setMessage({ type: 'error', text: 'Eroare la ștergerea contului.' });
