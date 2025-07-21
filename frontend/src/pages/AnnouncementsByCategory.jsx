@@ -38,7 +38,7 @@ export default function AnnouncementsByCategory() {
       {announcements.length === 0 ? (
         <div>Nu există anunțuri pentru această categorie.</div>
       ) : (
-        <div style={{display: 'flex', flexDirection: 'column', gap: 32}}>
+        <div className="favorite-announcements-list">
           {announcements.map((a) => (
             <div key={a._id} className="my-announcement-card" style={{ position: 'relative', cursor: 'pointer' }}
               onClick={e => {

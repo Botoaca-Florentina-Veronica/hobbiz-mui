@@ -61,7 +61,7 @@ export default function MyAnnouncements() {
       {announcements.length === 0 ? (
         <div>Nu ai publicat niciun anunț încă.</div>
       ) : (
-        <div style={{display: 'flex', flexDirection: 'column', gap: 32}}>
+        <div className="my-announcements-list">
           {announcements.map((a) => (
             <div key={a._id} className="my-announcement-card" style={{ cursor: 'pointer' }}
               onClick={e => {
