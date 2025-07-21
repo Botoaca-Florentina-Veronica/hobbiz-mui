@@ -234,9 +234,10 @@ exports.addAnnouncement = async (req, res) => {
     if (!title || !category || !description || !location || !contactPerson) {
       return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });
     }
-    let imageUrl = null;
-    if (req.file && req.file.path) {
-      imageUrl = req.file.path;
+    // Salvează toate imaginile încărcate (upload multiplu)
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(f => f.path);
     }
     const announcement = new Announcement({
       user: userId,
@@ -247,7 +248,7 @@ exports.addAnnouncement = async (req, res) => {
       contactPerson,
       contactEmail,
       contactPhone,
-      images: imageUrl ? [imageUrl] : []
+      images
     });
     await announcement.save();
     res.status(201).json({ message: 'Anunț adăugat cu succes!' });
@@ -305,11 +306,11 @@ exports.updateAnnouncement = async (req, res) => {
     announcement.contactPerson = contactPerson;
     announcement.contactEmail = contactEmail;
     announcement.contactPhone = contactPhone;
-    // Imagine nouă
-    if (req.file && req.file.path) {
-      announcement.images = [req.file.path];
+    // Imagini noi (upload multiplu)
+    if (req.files && req.files.length > 0) {
+      announcement.images = req.files.map(f => f.path);
     }
-    // Dacă nu există fișier nou, păstrează imaginea veche
+    // Dacă nu există fișiere noi, păstrează imaginile vechi
     await announcement.save();
     res.json({ message: 'Anunț actualizat cu succes!' });
   } catch (error) {
