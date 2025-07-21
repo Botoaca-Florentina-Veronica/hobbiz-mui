@@ -86,6 +86,8 @@ export default function AddAnnouncementPage() {
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
+  // Preview pentru toate imaginile
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -211,22 +213,23 @@ export default function AddAnnouncementPage() {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      const file = files[0];
-      // Acceptă doar imagini jpg/jpeg
-      if (!file.type || (file.type !== 'image/jpeg' && file.type !== 'image/jpg')) {
-        setError('Poți încărca doar imagini în format JPG');
-        setImages([]);
-        setMainImagePreview(null);
-        return;
-      }
-      setImages(prev => [...prev, ...files]);
+    // Acceptă doar imagini jpg/jpeg
+    const validFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
+    if (validFiles.length !== files.length) {
+      setError('Poți încărca doar imagini în format JPG');
+      return;
+    }
+    setImages(prev => [...prev, ...validFiles]);
+    // Generează preview pentru fiecare imagine
+    validFiles.forEach((file, idx) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setMainImagePreview(reader.result);
+        setImagePreviews(prev => [...prev, reader.result]);
+        // Prima imagine devine mainImagePreview
+        if (imagePreviews.length === 0 && idx === 0) setMainImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
   const handleTitleChange = (e) => {
@@ -254,18 +257,19 @@ export default function AddAnnouncementPage() {
       return;
     }
     try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('category', category);
+      formData.append('description', description);
+      formData.append('location', selectedLocalitate || selectedJudet);
+      formData.append('contactPerson', contactPerson);
+      formData.append('contactEmail', contactEmail);
+      formData.append('contactPhone', contactPhone);
+      // Adaugă toate imaginile
+      images.forEach((img) => {
+        formData.append('images', img);
+      });
       if (isEdit && announcementId) {
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('category', category);
-        formData.append('description', description);
-        formData.append('location', selectedLocalitate);
-        formData.append('contactPerson', contactPerson);
-        formData.append('contactEmail', contactEmail);
-        formData.append('contactPhone', contactPhone);
-        if (images[0]) {
-          formData.append('mainImage', images[0]);
-        }
         await apiClient.put(`/api/users/my-announcements/${announcementId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -275,39 +279,12 @@ export default function AddAnnouncementPage() {
         setSuccess('Anunț actualizat cu succes!');
         navigate('/adauga-anunt');
       } else {
-        console.log('Starting announcement submission...');
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('category', category);
-        formData.append('description', description);
-        formData.append('location', selectedLocalitate || selectedJudet);
-        formData.append('contactPerson', contactPerson);
-        formData.append('contactEmail', contactEmail);
-        formData.append('contactPhone', contactPhone);
-        if (images[0]) {
-          formData.append('mainImage', images[0]);
-        }
-        
-        console.log('Form data prepared:', {
-          title,
-          category,
-          description,
-          location: selectedLocalitate || selectedJudet,
-          contactPerson,
-          contactEmail,
-          contactPhone,
-          hasImage: !!images[0]
-        });
-
         const response = await apiClient.post('/api/users/my-announcements', formData, {
           headers: { 
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`
           }
         });
-        
-        console.log('Server response:', response.data);
-        
         localStorage.removeItem('addAnnouncementDraft');
         localStorage.removeItem('addAnnouncementMainImagePreview');
         setSuccess('Anunțul a fost publicat cu succes!');
@@ -315,12 +292,6 @@ export default function AddAnnouncementPage() {
       }
     } catch (e) {
       console.error('Error submitting announcement:', e);
-      console.error('Error details:', {
-        message: e.message,
-        response: e.response?.data,
-        status: e.response?.status
-      });
-      
       if (e.response?.status === 401) {
         setError('Sesiunea a expirat. Te rugăm să te autentifici din nou.');
       } else if (e.response?.data?.error) {
@@ -461,21 +432,15 @@ export default function AddAnnouncementPage() {
           </div>
         )}
         <h2 className="add-announcement-subtitle">Imagini</h2>
-        <div className="add-announcement-images-helper">Aceasta va fi imaginea principală a anunțului tău. Este primul lucru care îi sare în ochi unui potențial client!</div>
-        <div className="add-announcement-images-grid">
+        <div className="add-announcement-images-helper">Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.</div>
+        <div className="add-announcement-images-grid" style={{display: 'flex', gap: 16, flexWrap: 'wrap'}}>
           <button
             type="button"
             className="add-announcement-image-upload add-announcement-image-upload-main"
             onClick={() => imageInputRef.current.click()}
           >
-            {mainImagePreview ? (
-              <img src={mainImagePreview} alt="preview" style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8}} />
-            ) : (
-              <>
-                <span className="add-announcement-image-upload-text">Adaugă imagini</span>
-                <span className="add-announcement-image-upload-underline"></span>
-              </>
-            )}
+            <span className="add-announcement-image-upload-text">Adaugă imagini</span>
+            <span className="add-announcement-image-upload-underline"></span>
           </button>
           <button
             type="button"
@@ -488,12 +453,32 @@ export default function AddAnnouncementPage() {
           </button>
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/jpg"
             multiple
             ref={imageInputRef}
             style={{ display: 'none' }}
             onChange={handleImageChange}
           />
+          {/* Previews pentru toate imaginile */}
+          {imagePreviews.map((preview, idx) => (
+            <div key={idx} style={{position: 'relative', display: 'inline-block'}}>
+              <img src={preview} alt={`preview-${idx}`} style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: idx === 0 ? '2px solid #388e3c' : '1px solid #ccc'}} />
+              <button
+                type="button"
+                style={{position: 'absolute', top: 4, right: 4, background: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', padding: 2}}
+                onClick={() => {
+                  setImages(images.filter((_, i) => i !== idx));
+                  setImagePreviews(imagePreviews.filter((_, i) => i !== idx));
+                  if (idx === 0 && imagePreviews.length > 1) setMainImagePreview(imagePreviews[1]);
+                  if (imagePreviews.length === 1) setMainImagePreview(null);
+                }}
+                title="Șterge imaginea"
+              >
+                <span style={{fontWeight: 'bold', color: '#d32f2f'}}>×</span>
+              </button>
+              {idx === 0 && <div style={{position: 'absolute', bottom: 4, left: 4, background: '#388e3c', color: '#fff', fontSize: 12, borderRadius: 4, padding: '2px 6px'}}>Principală</div>}
+            </div>
+          ))}
         </div>
       </div>
       <div className="add-announcement-description-section">
