@@ -12,10 +12,10 @@ router.post('/login', login);       // User e folosit în controller
 router.get('/profile', auth, getProfile); // User e folosit în controller
 router.put('/update-email', auth, updateEmail); // Noua rută pentru actualizarea email-ului
 router.put('/update-password', auth, updatePassword); // Rută pentru schimbarea parolei
-router.post('/my-announcements', auth, upload.single('mainImage'), addAnnouncement);
+router.post('/my-announcements', auth, upload.array('images', 10), addAnnouncement);
 router.get('/my-announcements', auth, getMyAnnouncements);
 router.delete('/my-announcements/:id', auth, deleteAnnouncement);
-router.put('/my-announcements/:id', auth, upload.single('mainImage'), updateAnnouncement);
+router.put('/my-announcements/:id', auth, upload.array('images', 10), updateAnnouncement);
 router.put('/profile', auth, updateProfile); // Rută pentru actualizarea profilului (nume, prenume, localitate, telefon)
 
 // Verifică autentificarea utilizatorului
