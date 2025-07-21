@@ -3,7 +3,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
-import './MyAnnouncements.css';
+import './FavoriteAnnouncements.css';
+import LegalSection from '../components/LegalSection';
+import Footer from '../components/Footer';
 
 function Toast({ message, onClose }) {
   useEffect(() => {
@@ -74,77 +76,80 @@ export default function FavoriteAnnouncements() {
   };
 
   return (
-    <div className="my-announcements-container">
-      {showToast && <Toast message="Șters din favorite" onClose={() => setShowToast(false)} />}
-      {/* Buton back */}
-      <button
-        className="favorite-back-btn-mobile"
-        onClick={() => navigate('/')}
-        aria-label="Înapoi la pagina principală"
-        style={{
-          background: 'none',
-          border: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          color: '#073b4c',
-          fontSize: 22,
-          fontWeight: 500,
-          marginBottom: 8,
-          cursor: 'pointer',
-          padding: 0
-        }}
-      >
-        <ArrowBackIcon style={{ fontSize: 28, marginRight: 8 }} />
-        <span style={{ fontSize: 0 }}>Înapoi</span>
-      </button>
-      <h1 className="my-announcements-title">Anunturile tale favorite</h1>
-      <div style={{ textAlign: 'center', fontWeight: 600, fontSize: 22, margin: '32px 0 24px 0' }}>
-        Anunțuri favorite ({announcements.length}/150)
-      </div>
-      {announcements.length === 0 ? (
-        <div>Nu ai anunțuri favorite salvate.</div>
-      ) : (
-        <div style={{display: 'flex', flexWrap: 'wrap', gap: 32, justifyContent: 'center'}}>
-          {announcements.map((a) => (
-            <div key={a._id} className="my-announcement-card" style={{ width: 370, minHeight: 420, flexDirection: 'column', position: 'relative', cursor: 'pointer' }}
-              onClick={e => {
-                // Nu declanșa navigarea dacă s-a dat click pe inimă
-                if (e.target.closest('.favorite-heart')) return;
-                window.location.href = `/announcement/${a._id}`;
-              }}
-            >
-              <div className="my-announcement-image" style={{ minWidth: '100%', maxWidth: '100%', marginRight: 0 }}>
-                {a.images && a.images[0] ? (
-                  <img
-                    src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
-                      ? a.images[0]
-                      : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
-                    alt="imagine principala"
-                    className="my-announcement-img"
-                    style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 12 }}
-                  />
-                ) : (
-                  <div className="my-announcement-img" style={{background: '#eee', width: '100%', height: 220, borderRadius: 12}} />
-                )}
-                <div className="favorite-heart" style={{ position: 'absolute', right: 16, bottom: 16, cursor: 'pointer', transition: 'transform 0.2s', zIndex: 2 }}
-                  onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  <FavoriteIcon sx={{ color: 'red', fontSize: 32 }} />
+    <>
+      <div className="my-announcements-container">
+        {showToast && <Toast message="Șters din favorite" onClose={() => setShowToast(false)} />}
+        {/* Buton back */}
+        <button
+          className="favorite-back-btn-mobile"
+          onClick={() => navigate('/')}
+          aria-label="Înapoi la pagina principală"
+          style={{
+            background: 'none',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            color: '#073b4c',
+            fontSize: 22,
+            fontWeight: 500,
+            marginBottom: 8,
+            cursor: 'pointer',
+            padding: 0
+          }}
+        >
+          <ArrowBackIcon style={{ fontSize: 28, marginRight: 8 }} />
+          <span style={{ fontSize: 0 }}>Înapoi</span>
+        </button>
+        <h1 className="my-announcements-title">Anunturile tale favorite</h1>
+        <div style={{ textAlign: 'center', fontWeight: 600, fontSize: 22, margin: '32px 0 24px 0' }}>
+          Anunțuri favorite ({announcements.length}/150)
+        </div>
+        {announcements.length === 0 ? (
+          <div>Nu ai anunțuri favorite salvate.</div>
+        ) : (
+          <div className="favorite-announcements-list">
+            {announcements.map((a) => (
+              <div
+                key={a._id}
+                className="my-announcement-card"
+                onClick={e => {
+                  if (e.target.closest('.favorite-heart')) return;
+                  window.location.href = `/announcement/${a._id}`;
+                }}
+              >
+                <div className="my-announcement-image">
+                  {a.images && a.images[0] ? (
+                    <img
+                      src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
+                        ? a.images[0]
+                        : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
+                      alt="imagine principala"
+                      className="my-announcement-img"
+                    />
+                  ) : (
+                    <div className="my-announcement-img" style={{background: '#eee'}} />
+                  )}
+                  <div className="favorite-heart"
+                    onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
+                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <FavoriteIcon sx={{ color: 'red', fontSize: 32 }} />
+                  </div>
+                </div>
+                <div className="my-announcement-info">
+                  <h2 className="my-announcement-title">{a.title}</h2>
+                  <div className="my-announcement-category">{a.category}</div>
+                  <div className="my-announcement-location">{a.location}</div>
+                  {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#003b3b', marginTop: 12 }}>{a.price} €</div>}
                 </div>
               </div>
-              <div className="my-announcement-info" style={{ padding: 24 }}>
-                <h2 className="my-announcement-title" style={{ fontSize: 22, marginBottom: 8 }}>{a.title}</h2>
-                <div className="my-announcement-category" style={{ fontWeight: 500, color: '#23484a', marginBottom: 8 }}>{a.category}</div>
-                <div className="my-announcement-location" style={{ color: '#23484a', marginBottom: 8 }}>{a.location}</div>
-                {/* Descrierea a fost eliminată pentru un aspect mai curat al listei de favorite */}
-                {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#003b3b', marginTop: 12 }}>{a.price} €</div>}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="footer-separator" />
+      <LegalSection />
+    </>
   );
 }

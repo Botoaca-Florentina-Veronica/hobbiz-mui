@@ -1,0 +1,117 @@
+/* Separator consistent cu Footer.css */
+.footer-separator {
+  width: 100%;
+  height: 1px;
+  background: #183642;
+  margin-bottom: 0;
+}
+
+.favorite-announcements-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 24px;
+}
+
+
+ .my-announcement-card {
+  width: 280px;
+  min-height: 340px;
+  flex: 1 1 280px;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  transition: box-shadow 0.2s;
+ }
+.my-announcement-card:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.13);
+}
+
+.my-announcement-image {
+  min-width: 100%;
+  max-width: 100%;
+  margin-right: 0;
+}
+
+ .my-announcement-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+ }
+
+.favorite-heart {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+
+
+.my-announcement-info {
+  padding: 12px;
+}
+.my-announcement-title {
+  font-size: 15px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.my-announcement-category {
+  font-weight: 500;
+  color: #23484a;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.my-announcement-location {
+  color: #23484a;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+
+
+@media (min-width: 1200px) {
+  .favorite-announcements-list {
+    gap: 24px;
+    padding: 0 48px;
+    justify-content: flex-start;
+  }
+  .my-announcement-card {
+    width: 320px;
+    max-width: 320px;
+    min-height: 380px;
+  }
+  .my-announcement-img {
+    height: 180px;
+  }
+}
+
+
+
+@media (max-width: 700px) {
+  .favorite-announcements-list {
+    gap: 10px;
+    padding: 0 4px;
+    justify-content: flex-start;
+  }
+  .my-announcement-card {
+    width: 100%;
+    max-width: 100%;
+    min-height: 200px;
+  }
+  .my-announcement-img {
+    height: 100px;
+  }
+}

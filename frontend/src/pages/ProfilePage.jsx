@@ -6,6 +6,8 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({ firstName: '', lastName: '', localitate: '', phone: '' });
+  const fileInputRef = React.useRef(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -48,13 +50,58 @@ export default function ProfilePage() {
     }
   };
 
+  // ...existing code...
+  const handleAvatarClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      // Presupunem că endpoint-ul /api/users/avatar salvează imaginea și returnează url-ul nou
+      const res = await apiClient.post('/api/users/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      // Șterge avatarul vechi dacă există
+      if (profile?.avatar) {
+        await apiClient.delete('/api/users/avatar', { data: { url: profile.avatar } });
+      }
+      setProfile({ ...profile, avatar: res.data.avatar });
+    } catch (err) {
+      // handle error
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
   return (
     <div className="profile-container">
       <div className="profile-header">
+        <input
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          ref={fileInputRef}
+          onChange={handleAvatarChange}
+        />
         {profile && profile.avatar ? (
-          <img src={profile.avatar} alt="avatar" className="profile-avatar" />
+          <img
+            src={profile.avatar}
+            alt="avatar"
+            className="profile-avatar"
+            style={{ cursor: 'pointer', opacity: avatarUploading ? 0.5 : 1 }}
+            onClick={handleAvatarClick}
+          />
         ) : (
-          <div className="profile-avatar" />
+          <div
+            className="profile-avatar"
+            style={{ cursor: 'pointer', opacity: avatarUploading ? 0.5 : 1 }}
+            onClick={handleAvatarClick}
+          />
         )}
         <div>
           <span className="profile-private">CONT PRIVAT</span>
