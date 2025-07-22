@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { HiOutlineUser, HiOutlineHeart } from "react-icons/hi";
+import { HiOutlineUser, HiOutlineHeart, HiOutlineBell, HiOutlineChat } from "react-icons/hi";
 import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
 import puzzleLogo from '../assets/images/puzzle.png';
@@ -130,6 +130,16 @@ export default function Header() {
               <li>
                 <button className="favorite-btn" onClick={() => navigate('/favorite-announcements')}>
                   <HiOutlineHeart />
+                </button>
+              </li>
+              <li>
+                <button className="favorite-btn" style={{marginLeft: 0}}>
+                  <HiOutlineBell />
+                </button>
+              </li>
+              <li>
+                <button className="favorite-btn" style={{marginLeft: 0}}>
+                  <HiOutlineChat />
                 </button>
               </li>
               <li
