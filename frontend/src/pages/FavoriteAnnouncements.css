@@ -1,10 +1,3 @@
-/* Separator consistent cu Footer.css */
-.footer-separator {
-  width: 100%;
-  height: 1px;
-  background: #183642;
-  margin-bottom: 0;
-}
 
 .favorite-announcements-list {
   display: flex;

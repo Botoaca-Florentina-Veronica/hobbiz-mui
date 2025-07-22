@@ -8,7 +8,6 @@ import Content from './components/Content';
 import Categories from './components/Categories';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
-import LegalSection from './components/LegalSection';
 import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
@@ -81,8 +80,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <PrivacyPolicy />
-            <div className="footer-separator" />
-            <LegalSection />
+            {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
           </>
         } />
@@ -94,8 +92,7 @@ function App() {
             <Content />
             <Categories />
             <CallToAction />
-            <div className="footer-separator" />
-            <LegalSection />
+            {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
           </>
         } />

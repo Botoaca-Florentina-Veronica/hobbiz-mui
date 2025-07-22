@@ -5,7 +5,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import './FavoriteAnnouncements.css';
-import LegalSection from '../components/LegalSection';
 import Footer from '../components/Footer';
 
 function Toast({ message, onClose }) {
@@ -158,8 +157,7 @@ export default function FavoriteAnnouncements() {
           </div>
         )}
       </div>
-      <div className="footer-separator" />
-      <LegalSection />
+      {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
     </>
   );
 }

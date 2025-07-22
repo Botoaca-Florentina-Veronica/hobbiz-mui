@@ -2,7 +2,6 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import LegalSection from '../components/LegalSection';
 import './About.css';
 
 export default function About() {
@@ -40,8 +39,7 @@ export default function About() {
           </ul>
         </section>
       </div>
-      <div className="footer-separator" />
-      <LegalSection />
+      {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
       <Footer />
     </>
   );
