@@ -12,6 +12,7 @@ const announcementRoutes = require('./routes/announcementRoutes');
 const { execFile } = require('child_process');
 const Alert = require('./models/Alert');
 const path = require('path');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 
@@ -43,7 +44,9 @@ connectDB(); // Apelează funcția exportată
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes); // Adaugă rutele de autentificare
 app.use('/api/mitm', mitmRoutes); // Adaugă rutele pentru mitm
+
 app.use('/api/announcements', announcementRoutes); // Rute pentru anunturi publice
+app.use('/api/messages', messageRoutes); // Rute pentru mesaje chat
 
 // Servire imagini uploadate din frontend/public/uploads
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));

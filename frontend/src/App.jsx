@@ -9,6 +9,7 @@ import Categories from './components/Categories';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
+
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
 import AccountSettings from './pages/AccountSettings';
@@ -17,6 +18,7 @@ import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import MyAnnouncements from './pages/MyAnnouncements';
+import ChatPage from './pages/ChatPage';
 
 import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
 import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
@@ -66,6 +68,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <FavoriteAnnouncements />
+            <Footer />
+          </>
+        } />
+        <Route path="/chat" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <ChatPage />
             <Footer />
           </>
         } />

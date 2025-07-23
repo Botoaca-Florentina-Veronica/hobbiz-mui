@@ -170,6 +170,12 @@ export default function AnnouncementDetails() {
           }}
           contactPhone={announcement.contactPhone}
           contactEmail={announcement.contactEmail}
+          announcement={{
+            id: announcement._id || announcement.id,
+            title: announcement.title,
+            price: announcement.price,
+            images: announcement.images
+          }}
         />
       </div>
       <Footer />

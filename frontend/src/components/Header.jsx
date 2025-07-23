@@ -138,7 +138,7 @@ export default function Header() {
                 </button>
               </li>
               <li>
-                <button className="favorite-btn" style={{marginLeft: 0}}>
+                <button className="favorite-btn" style={{marginLeft: 0}} onClick={() => navigate('/chat')}>
                   <HiOutlineChat />
                 </button>
               </li>
