@@ -132,24 +132,32 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                         : "chat-popup-message-other" 
                       )
                     }
-                    title={msg.senderRole === 'vanzator' ? 'Vânzător' : 'Cumpărător'}
                     onMouseEnter={() => setHoveredMsgId(msg._id)}
                     onMouseLeave={() => { setHoveredMsgId(null); setDeleteHover(false); }}
                   >
                     {msg.senderId === userId && hoveredMsgId === msg._id && (
                       <div
                         className="chat-popup-message-delete"
-                        onMouseEnter={() => setDeleteHover(true)}
-                        onMouseLeave={() => { setDeleteHover(false); setHoveredMsgId(null); }}
                       >
-                        <span className="chat-popup-message-delete-label">Șterge</span>
                         <button
                           className="chat-popup-message-delete-btn"
-                          title="Șterge mesaj"
+                          onMouseEnter={() => {
+                            setDeleteHover(msg._id);
+                            window.deleteTooltipTimeout = setTimeout(() => {
+                              setDeleteHover('show-' + msg._id);
+                            }, 1000);
+                          }}
+                          onMouseLeave={() => {
+                            setDeleteHover(false);
+                            clearTimeout(window.deleteTooltipTimeout);
+                          }}
                           onClick={() => handleDeleteMessage(msg._id)}
                         >
                           <DeleteIcon sx={{ color: '#222', fontSize: 18 }} />
                         </button>
+                        {deleteHover === 'show-' + msg._id && (
+                          <span className="chat-popup-message-delete-tooltip">Șterge</span>
+                        )}
                       </div>
                     )}
                     {msg.text}
