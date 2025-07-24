@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import './SellerDetails.css';
 import ChatPopup from './ChatPopup';
@@ -11,6 +10,13 @@ export default function SellerDetails({ user, contactPhone, contactEmail, announ
     ? `${user.firstName[0] || ''}${user.lastName[0] || ''}`.toUpperCase()
     : (user.firstName ? user.firstName[0].toUpperCase() : 'U');
   const joined = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long' }) : '';
+
+  const loggedUserId = localStorage.getItem('userId');
+  let loggedUserRole = 'cumparator';
+  if (user && loggedUserId && user._id === loggedUserId) {
+    loggedUserRole = 'vanzator';
+  }
+
   return (
     <>
       <div className="seller-details-box">
@@ -38,7 +44,14 @@ export default function SellerDetails({ user, contactPhone, contactEmail, announ
           {contactEmail && <div className="seller-email">{contactEmail}</div>}
         </div>
       </div>
-      <ChatPopup open={showChat} onClose={() => setShowChat(false)} announcement={announcement} seller={user} />
+      <ChatPopup 
+        open={showChat} 
+        onClose={() => setShowChat(false)} 
+        announcement={announcement} 
+        seller={user} 
+        userId={loggedUserId} 
+        userRole={loggedUserRole} 
+      />
     </>
   );
 }

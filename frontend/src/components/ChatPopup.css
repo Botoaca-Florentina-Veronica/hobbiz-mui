@@ -61,7 +61,8 @@
 }
 
 .chat-popup-box {
-  width: 410px;
+  width: 440px;
+  height: 450px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 32px rgba(0,0,0,0.18);
