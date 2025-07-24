@@ -16,8 +16,14 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const messagesEndRef = useRef(null);
 
   // Creează un id unic pentru conversație (ex: anuntId + sellerId + cumparatorId)
-  const conversationId = announcement && seller && userId
-    ? [announcement.id, seller._id, userId].sort().join("-")
+  const annId = announcement?.id || announcement?._id;
+  const sellerId = seller?._id;
+  // Warn dacă lipsesc id-uri
+  if (!annId || !sellerId || !userId) {
+    console.warn('ChatPopup: id-uri lipsă', { annId, sellerId, userId });
+  }
+  const conversationId = annId && sellerId && userId
+    ? [annId, sellerId, userId].sort().join("-")
     : "";
 
   // Fetch messages când se deschide popup-ul sau se schimbă conversația
