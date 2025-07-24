@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
-import { sendMessage, getMessages } from '../api/api';
+import { sendMessage, getMessages, deleteMessage } from '../api/api';
 import './ChatPopup.css';
 
 // userId și userRole ar trebui să vină din contextul de autentificare sau ca prop
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole }) {
+  const [hoveredMsgId, setHoveredMsgId] = useState(null);
+  const [deleteHover, setDeleteHover] = useState(false);
   const [attachHover, setAttachHover] = useState(false);
   const [emojiHover, setEmojiHover] = useState(false);
   const [emojiAnchor, setEmojiAnchor] = useState(null);
@@ -44,7 +47,6 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     }
   }, [messages]);
 
-  // Trimite mesaj
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -58,6 +60,16 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       const res = await sendMessage(msg);
       setMessages(prev => [...prev, res.data]);
       setInput("");
+    } catch (err) {
+      // handle error
+    }
+  };
+
+  // Șterge mesaj
+  const handleDeleteMessage = async (msgId) => {
+    try {
+      await deleteMessage(msgId);
+      setMessages(prev => prev.filter(m => m._id !== msgId));
     } catch (err) {
       // handle error
     }
@@ -105,25 +117,43 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                 <div
                   key={msg._id || idx}
                   className={
-                    "chat-popup-message " +
+                    "chat-popup-message-row " +
                     (msg.senderId === userId
-                      ? "chat-popup-message-own"
-                      : "chat-popup-message-other" 
+                      ? "chat-popup-message-own-row"
+                      : "chat-popup-message-other-row" 
                     )
                   }
-                  style={{
-                    alignSelf: msg.senderId === userId ? 'flex-end' : 'flex-start',
-                    background: msg.senderId === userId ? '#2ec4b6' : '#e0e0e0',
-                    color: msg.senderId === userId ? '#fff' : '#13344b',
-                    borderRadius: msg.senderId === userId ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                    margin: '4px 0',
-                    padding: '8px 14px',
-                    maxWidth: '75%',
-                    fontSize: 16,
-                  }}
-                  title={msg.senderRole === 'vanzator' ? 'Vânzător' : 'Cumpărător'}
                 >
-                  {msg.text}
+                  <div
+                    className={
+                      "chat-popup-message " +
+                      (msg.senderId === userId
+                        ? "chat-popup-message-own"
+                        : "chat-popup-message-other" 
+                      )
+                    }
+                    title={msg.senderRole === 'vanzator' ? 'Vânzător' : 'Cumpărător'}
+                    onMouseEnter={() => setHoveredMsgId(msg._id)}
+                    onMouseLeave={() => { setHoveredMsgId(null); setDeleteHover(false); }}
+                  >
+                    {msg.senderId === userId && hoveredMsgId === msg._id && (
+                      <div
+                        className="chat-popup-message-delete"
+                        onMouseEnter={() => setDeleteHover(true)}
+                        onMouseLeave={() => { setDeleteHover(false); setHoveredMsgId(null); }}
+                      >
+                        <span className="chat-popup-message-delete-label">Șterge</span>
+                        <button
+                          className="chat-popup-message-delete-btn"
+                          title="Șterge mesaj"
+                          onClick={() => handleDeleteMessage(msg._id)}
+                        >
+                          <DeleteIcon sx={{ color: '#222', fontSize: 18 }} />
+                        </button>
+                      </div>
+                    )}
+                    {msg.text}
+                  </div>
                 </div>
               ))
             )

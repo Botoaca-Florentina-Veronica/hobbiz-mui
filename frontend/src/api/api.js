@@ -1,6 +1,7 @@
 // Chat messages
 export const sendMessage = (data) => apiClient.post('/api/messages', data);
 export const getMessages = (conversationId) => apiClient.get(`/api/messages/${conversationId}`);
+export const deleteMessage = (id) => apiClient.delete(`/api/messages/${id}`);
 // Șterge contul utilizatorului și toate anunțurile sale
 export const deleteAccount = () => apiClient.delete('/api/users/delete-account');
 // frontend/src/api/index.js

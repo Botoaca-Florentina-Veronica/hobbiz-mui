@@ -1,3 +1,14 @@
+// Șterge un mesaj după id
+exports.deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Message.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ error: 'Mesajul nu a fost găsit.' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Eroare la ștergerea mesajului.' });
+  }
+};
 const Message = require('../models/Message');
 
 // Creează un mesaj nou
