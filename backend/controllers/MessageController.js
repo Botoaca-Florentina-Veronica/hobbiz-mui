@@ -2,12 +2,14 @@ const Message = require('../models/Message');
 
 // Creează un mesaj nou
 exports.createMessage = async (req, res) => {
+  console.log('BODY:', req.body); // DEBUG
   try {
     const { conversationId, senderId, senderRole, text } = req.body;
     const message = new Message({ conversationId, senderId, senderRole, text });
     await message.save();
     res.status(201).json(message);
   } catch (err) {
+    console.error('EROARE LA CREARE MESAJ:', err); // DEBUG
     res.status(500).json({ error: err.message });
   }
 };
