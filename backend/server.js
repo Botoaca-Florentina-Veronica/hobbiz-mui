@@ -1,5 +1,10 @@
 // backend/server.js
-require('dotenv').config();
+require('dotenv').config({ path: './backend/.env' });
+console.log('🔍 DEBUG ENV VARS:');
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db'); // Importă conexiunea
@@ -95,6 +100,7 @@ app.listen(PORT, () => {
 });
 
 // Gestionare închidere grațioasă (opțional)
+const mongoose = require('mongoose');
 process.on('SIGINT', async () => {
   await mongoose.connection.close();
   console.log('⏹️ Conexiune MongoDB închisă grațios');

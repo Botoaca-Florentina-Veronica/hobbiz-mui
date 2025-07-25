@@ -16,6 +16,11 @@ const { Types } = require('mongoose');
 // Creează un mesaj nou și notificare pentru destinatar
 exports.createMessage = async (req, res) => {
   try {
+    console.log('=== CREEAZĂ MESAJ - REQUEST BODY ===');
+    console.log(JSON.stringify(req.body, null, 2));
+    console.log('=== HEADERS ===');
+    console.log(JSON.stringify(req.headers, null, 2));
+    
     const { conversationId, senderId, senderRole, text, destinatarId, announcementId, sellerId, userId } = req.body;
     const message = new Message({ conversationId, senderId, senderRole, text });
     await message.save();
@@ -33,12 +38,17 @@ exports.createMessage = async (req, res) => {
         notificationUserId = ids.find(id => id !== senderId && id !== announcementId);
       }
     }
-    // Validare ObjectId
+    // Validare și conversie ObjectId robustă
     if (typeof notificationUserId === 'string' && /^[a-fA-F0-9]{24}$/.test(notificationUserId)) {
-      notificationUserId = Types.ObjectId(notificationUserId);
+      try {
+        notificationUserId = new Types.ObjectId(notificationUserId);
+      } catch (e) {
+        console.error('Eroare la conversia ObjectId:', e);
+        return res.status(400).json({ error: 'ID destinatar invalid pentru notificare.' });
+      }
     }
     if (!notificationUserId || !Types.ObjectId.isValid(notificationUserId)) {
-      console.error('Nu s-a putut identifica destinatarul pentru notificare!');
+      console.error('Nu s-a putut identifica destinatarul pentru notificare!', notificationUserId);
       return res.status(400).json({ error: 'ID destinatar invalid pentru notificare.' });
     }
     // Creează notificare

@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/hobbiz';
+    await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('✅ Conectat la MongoDB Atlas');
+    console.log('✅ Conectat la MongoDB:', uri);
   } catch (err) {
     console.error('❌ Eroare de conexiune MongoDB:', err.message);
     process.exit(1); // Închide aplicația la eroare critică
