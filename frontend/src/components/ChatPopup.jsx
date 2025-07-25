@@ -21,12 +21,13 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   // Creează un id unic pentru conversație (ex: anuntId + sellerId + cumparatorId)
   const annId = announcement?.id || announcement?._id;
   const sellerId = seller?._id;
-  // Warn dacă lipsesc id-uri
-  if (!annId || !sellerId || !userId) {
-    console.warn('ChatPopup: id-uri lipsă', { annId, sellerId, userId });
+  // Fallback pentru userId dacă nu e primit ca prop
+  const effectiveUserId = userId || localStorage.getItem('userId');
+  if (!annId || !sellerId || !effectiveUserId) {
+    console.warn('ChatPopup: id-uri lipsă', { annId, sellerId, userId: effectiveUserId });
   }
-  const conversationId = annId && sellerId && userId
-    ? [annId, sellerId, userId].sort().join("-")
+  const conversationId = annId && sellerId && effectiveUserId
+    ? [annId, sellerId, effectiveUserId].sort().join("-")
     : "";
 
   // Fetch messages când se deschide popup-ul sau se schimbă conversația
@@ -51,10 +52,10 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     e.preventDefault();
     if (!input.trim()) return;
     // Determină destinatarul: dacă userul logat e cumpărător, destinatarul e vânzătorul, altfel e userul logat
-    const destinatarId = userRole === 'cumparator' ? sellerId : userId;
+    const destinatarId = userRole === 'cumparator' ? sellerId : effectiveUserId;
     const msg = {
       conversationId,
-      senderId: userId,
+      senderId: effectiveUserId,
       senderRole: userRole,
       text: input.trim(),
       destinatarId,
