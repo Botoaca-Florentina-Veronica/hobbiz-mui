@@ -13,25 +13,39 @@ const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const { Types } = require('mongoose');
 
-// Creează un mesaj nou
+// Creează un mesaj nou și notificare pentru destinatar
 exports.createMessage = async (req, res) => {
   try {
     const { conversationId, senderId, senderRole, text, destinatarId, announcementId } = req.body;
     const message = new Message({ conversationId, senderId, senderRole, text });
     await message.save();
 
-    // Creează notificare direct pentru destinatarId primit din body
-    if (destinatarId) {
-      console.log('DEBUG destinatarId primit pentru notificare:', destinatarId, typeof destinatarId);
-      let userIdValue = destinatarId;
-      if (typeof destinatarId === 'string') {
-        userIdValue = Types.ObjectId(destinatarId);
+    // Identifică destinatarul dacă nu e primit explicit
+    let userIdValue = destinatarId;
+    if (!userIdValue) {
+      // conversationId = [annId, sellerId, userId].sort().join('-')
+      const ids = conversationId.split('-');
+      // Exclude senderId și annId
+      const annId = announcementId || ids[0];
+      userIdValue = ids.find(id => id !== senderId && id !== annId);
+    }
+    // Validare ObjectId
+    if (typeof userIdValue === 'string' && /^[a-fA-F0-9]{24}$/.test(userIdValue)) {
+      userIdValue = Types.ObjectId(userIdValue);
+    }
+
+    // Creează notificare
+    if (userIdValue) {
+      try {
+        const notif = await Notification.create({
+          userId: userIdValue,
+          message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
+          link: `/chat/${conversationId}`,
+        });
+        console.log('Notificare salvată:', notif);
+      } catch (err) {
+        console.error('EROARE LA SALVAREA NOTIFICĂRII:', err);
       }
-      await Notification.create({
-        userId: userIdValue,
-        message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
-        link: `/chat/${conversationId}`,
-      });
     }
 
     res.status(201).json(message);

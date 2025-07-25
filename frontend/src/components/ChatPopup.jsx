@@ -6,7 +6,7 @@ import { sendMessage, getMessages, deleteMessage } from '../api/api';
 import './ChatPopup.css';
 
 // userId și userRole ar trebui să vină din contextul de autentificare sau ca prop
-export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole }) {
+export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
   const [hoveredMsgId, setHoveredMsgId] = useState(null);
   const [deleteHover, setDeleteHover] = useState(false);
   const [attachHover, setAttachHover] = useState(false);
@@ -67,6 +67,9 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       const res = await getMessages(conversationId);
       setMessages(res.data);
       setInput("");
+      if (typeof onMessageSent === 'function') {
+        onMessageSent(); // refetch notificări instant
+      }
     } catch (err) {
       // handle error
     }

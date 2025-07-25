@@ -1,32 +1,46 @@
+
 const Notification = require('../models/Notification');
-const Message = require('../models/Message');
 
-// Creează un mesaj nou și notificare pentru destinatar
-exports.createMessage = async (req, res) => {
+// Obține toate notificările pentru un user
+exports.getNotifications = async (req, res) => {
   try {
-    const { conversationId, senderId, senderRole, text } = req.body;
-    const message = new Message({ conversationId, senderId, senderRole, text });
-    await message.save();
-
-    // Identifică destinatarul
-    // conversationId = [annId, sellerId, userId].sort().join('-')
-    const ids = conversationId.split('-');
-    // senderId este expeditorul, destinatarul e celălalt id (excluzând senderId și annId)
-    const annId = ids.find(id => id === message.conversationId.split('-')[0] || id === message.conversationId.split('-')[1]);
-    const destinatarId = ids.find(id => id !== senderId && id !== annId);
-
-    // Creează notificare
-    if (destinatarId) {
-      await Notification.create({
-        userId: destinatarId,
-        message: `Ai primit un mesaj nou la anunțul #${annId}`,
-        link: `/chat/${conversationId}`,
-      });
-    }
-
-    res.status(201).json(message);
+    const { userId } = req.params;
+    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+    res.json(notifications);
   } catch (err) {
-    console.error('EROARE LA CREARE MESAJ:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Creează o notificare nouă
+exports.createNotification = async (req, res) => {
+  try {
+    const { userId, message, link } = req.body;
+    const notif = await Notification.create({ userId, message, link });
+    res.status(201).json(notif);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Marchează o notificare ca citită
+exports.markAsRead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notif = await Notification.findByIdAndUpdate(id, { read: true }, { new: true });
+    res.json(notif);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Șterge o notificare
+exports.deleteNotification = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Notification.findByIdAndDelete(id);
+    res.json({ success: true });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };

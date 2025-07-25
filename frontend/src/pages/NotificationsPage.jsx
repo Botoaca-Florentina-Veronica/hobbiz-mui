@@ -1,8 +1,37 @@
 
-import React, { useEffect, useState } from 'react';
+
+
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import '../pages/AccountSettings.css';
+
+// Helper pentru obținerea datelor userului
+const getUserName = async (userId) => {
+  try {
+    const res = await fetch(`/api/users/${userId}`);
+    if (!res.ok) return 'Expeditor necunoscut';
+    const user = await res.json();
+    if (user.firstName) return `${user.firstName} ${user.lastName || ''}`;
+    return user.email || 'Expeditor necunoscut';
+  } catch {
+    return 'Expeditor necunoscut';
+  }
+};
+
+// Helper pentru obținerea preview-ului ultimului mesaj dintr-o conversație
+const getLastMessagePreview = async (convId) => {
+  try {
+    const res = await fetch(`/api/messages/conversation/${convId}`);
+    if (!res.ok) return { senderName: '', preview: '' };
+    const msgs = await res.json();
+    if (!msgs.length) return { senderName: '', preview: '' };
+    const lastMsg = msgs[msgs.length - 1];
+    const senderName = await getUserName(lastMsg.senderId);
+    return { senderName, preview: lastMsg.text };
+  } catch {
+    return { senderName: '', preview: '' };
+  }
+};
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -10,34 +39,24 @@ export default function NotificationsPage() {
   const userId = localStorage.getItem('userId');
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     fetch(`/api/notifications/${userId}`)
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : [])
       .then(async data => {
-        // Enrich notificări de tip chat cu preview și sender
+        // Enrich chat notifications cu preview și sender
         const enriched = await Promise.all(data.map(async notif => {
           if (notif.link && notif.link.startsWith('/chat/')) {
-            try {
-              const convId = notif.link.split('/chat/')[1];
-              const msgRes = await fetch(`/api/messages/conversation/${convId}`);
-              const msgs = await msgRes.json();
-              if (msgs.length > 0) {
-                const lastMsg = msgs[msgs.length - 1];
-                let senderName = '';
-                try {
-                  const userRes = await fetch(`/api/users/${lastMsg.senderId}`);
-                  const user = await userRes.json();
-                  senderName = user.firstName ? `${user.firstName} ${user.lastName || ''}` : user.email;
-                } catch {
-                  senderName = 'Expeditor necunoscut';
-                }
-                return { ...notif, senderName, preview: lastMsg.text };
-              }
-            } catch {}
+            const convId = notif.link.split('/chat/')[1];
+            const { senderName, preview } = await getLastMessagePreview(convId);
+            return { ...notif, senderName, preview };
           }
           // Notificare non-chat
-          return { ...notif, senderName: '', preview: '' };
+          return { ...notif, senderName: '', preview: notif.message || '' };
         }));
         setNotifications(enriched);
         setLoading(false);
@@ -63,12 +82,12 @@ export default function NotificationsPage() {
               {notifications.map(n => (
                 <li key={n._id} className="settings-item">
                   <div style={{ fontWeight: 500 }}>
-                    {n.senderName && n.senderName !== '' && (
+                    {n.senderName && (
                       <span style={{ color: '#2ec4b6', fontWeight: 600 }}>{n.senderName}: </span>
                     )}
-                    {n.preview ? n.preview : n.message}
+                    {n.preview}
                   </div>
-                  <div style={{ fontSize: 13, color: '#666', marginTop: 8 }}>{new Date(n.createdAt).toLocaleString('ro-RO')}</div>
+                  <div style={{ fontSize: 13, color: '#666', marginTop: 8 }}>{n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}</div>
                   {n.link && (
                     <a href={n.link} style={{ color: '#2ec4b6', fontSize: 14 }}>Deschide chat</a>
                   )}
