@@ -25,6 +25,7 @@ import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
 import AnnouncementDetails from './pages/AnnouncementDetails';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import About from './pages/About';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import './App.css';
 import './mediaQueries.css';
 
@@ -63,6 +64,7 @@ function App() {
             <Footer />
           </>
         } />
+        <Route path="/notificari" element={<NotificationsPage />} />
         <Route path="/favorite-announcements" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />

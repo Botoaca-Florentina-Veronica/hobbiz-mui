@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom"; // Adaugă această linie
 import axios from 'axios';
 import App from "./App";
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import "./index.css";
 
 axios.defaults.baseURL = 'https://api.render.com/deploy/srv-d0fljpa4d50c73f1ia80?key=avPZG38IhSo';
