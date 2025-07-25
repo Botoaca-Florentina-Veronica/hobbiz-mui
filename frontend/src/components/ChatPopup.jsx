@@ -50,11 +50,15 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
+    // Determină destinatarul: dacă userul logat e cumpărător, destinatarul e vânzătorul, altfel e userul logat
+    const destinatarId = userRole === 'cumparator' ? sellerId : userId;
     const msg = {
       conversationId,
       senderId: userId,
       senderRole: userRole,
       text: input.trim(),
+      destinatarId,
+      announcementId: annId,
     };
     try {
       const res = await sendMessage(msg);

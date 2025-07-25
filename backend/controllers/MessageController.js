@@ -15,21 +15,15 @@ const Notification = require('../models/Notification');
 // Creează un mesaj nou
 exports.createMessage = async (req, res) => {
   try {
-    const { conversationId, senderId, senderRole, text } = req.body;
+    const { conversationId, senderId, senderRole, text, destinatarId, announcementId } = req.body;
     const message = new Message({ conversationId, senderId, senderRole, text });
     await message.save();
 
-    // Identifică destinatarul
-    const ids = conversationId.split('-');
-    // annId e primul id din conversationId (sau poate fi _id anunț)
-    const annId = ids.find(id => id === message.conversationId.split('-')[0] || id === message.conversationId.split('-')[1]);
-    const destinatarId = ids.find(id => id !== senderId && id !== annId);
-
-    // Creează notificare
+    // Creează notificare direct pentru destinatarId primit din body
     if (destinatarId) {
       await Notification.create({
         userId: destinatarId,
-        message: `Ai primit un mesaj nou la anunțul #${annId}`,
+        message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
         link: `/chat/${conversationId}`,
       });
     }
