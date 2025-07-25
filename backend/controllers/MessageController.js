@@ -21,9 +21,9 @@ exports.createMessage = async (req, res) => {
 
     // Creează notificare direct pentru destinatarId primit din body
     if (destinatarId) {
-      const mongoose = require('mongoose');
+      const { Types } = require('mongoose');
       await Notification.create({
-        userId: mongoose.Types.ObjectId(destinatarId),
+        userId: Types.ObjectId(destinatarId),
         message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
         link: `/chat/${conversationId}`,
       });
