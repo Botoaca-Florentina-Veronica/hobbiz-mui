@@ -11,6 +11,7 @@ exports.deleteMessage = async (req, res) => {
 };
 const Message = require('../models/Message');
 const Notification = require('../models/Notification');
+const { Types } = require('mongoose');
 
 // Creează un mesaj nou
 exports.createMessage = async (req, res) => {
@@ -21,9 +22,13 @@ exports.createMessage = async (req, res) => {
 
     // Creează notificare direct pentru destinatarId primit din body
     if (destinatarId) {
-      const { Types } = require('mongoose');
+      console.log('DEBUG destinatarId primit pentru notificare:', destinatarId, typeof destinatarId);
+      let userIdValue = destinatarId;
+      if (typeof destinatarId === 'string') {
+        userIdValue = Types.ObjectId(destinatarId);
+      }
       await Notification.create({
-        userId: Types.ObjectId(destinatarId),
+        userId: userIdValue,
         message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
         link: `/chat/${conversationId}`,
       });

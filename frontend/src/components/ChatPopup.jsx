@@ -62,8 +62,10 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       announcementId: annId,
     };
     try {
-      const res = await sendMessage(msg);
-      setMessages(prev => [...prev, res.data]);
+      await sendMessage(msg);
+      // Refă fetch la toate mesajele conversației pentru sincronizare corectă
+      const res = await getMessages(conversationId);
+      setMessages(res.data);
       setInput("");
     } catch (err) {
       // handle error
