@@ -13,6 +13,7 @@ const { execFile } = require('child_process');
 const Alert = require('./models/Alert');
 const path = require('path');
 const messageRoutes = require('./routes/messageRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use('/api/notifications', notificationRoutes);
 
 // Configure session middleware
 app.use(session({

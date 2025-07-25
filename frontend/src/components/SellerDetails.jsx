@@ -16,6 +16,12 @@ export default function SellerDetails({ user, contactPhone, contactEmail, announ
   if (user && loggedUserId && user._id === loggedUserId) {
     loggedUserRole = 'vanzator';
   }
+  console.log('DEBUG ChatPopup:', {
+    loggedUserId,
+    userId: user._id,
+    userRole: loggedUserRole,
+    announcementId: announcement?.id || announcement?._id
+  });
 
   return (
     <>

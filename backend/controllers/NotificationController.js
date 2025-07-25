@@ -1,18 +1,7 @@
-// Șterge un mesaj după id
-exports.deleteMessage = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deleted = await Message.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ error: 'Mesajul nu a fost găsit.' });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Eroare la ștergerea mesajului.' });
-  }
-};
-const Message = require('../models/Message');
 const Notification = require('../models/Notification');
+const Message = require('../models/Message');
 
-// Creează un mesaj nou
+// Creează un mesaj nou și notificare pentru destinatar
 exports.createMessage = async (req, res) => {
   try {
     const { conversationId, senderId, senderRole, text } = req.body;
@@ -20,8 +9,9 @@ exports.createMessage = async (req, res) => {
     await message.save();
 
     // Identifică destinatarul
+    // conversationId = [annId, sellerId, userId].sort().join('-')
     const ids = conversationId.split('-');
-    // annId e primul id din conversationId (sau poate fi _id anunț)
+    // senderId este expeditorul, destinatarul e celălalt id (excluzând senderId și annId)
     const annId = ids.find(id => id === message.conversationId.split('-')[0] || id === message.conversationId.split('-')[1]);
     const destinatarId = ids.find(id => id !== senderId && id !== annId);
 
@@ -37,17 +27,6 @@ exports.createMessage = async (req, res) => {
     res.status(201).json(message);
   } catch (err) {
     console.error('EROARE LA CREARE MESAJ:', err);
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Obține toate mesajele pentru o conversație
-exports.getMessages = async (req, res) => {
-  try {
-    const { conversationId } = req.params;
-    const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
-    res.json(messages);
-  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
