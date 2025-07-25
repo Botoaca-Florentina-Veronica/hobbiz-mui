@@ -6,12 +6,14 @@ import '../pages/AccountSettings.css';
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const userId = localStorage.getItem('userId');
+  console.log('userId folosit pentru notificări:', userId);
 
   useEffect(() => {
     if (!userId) return;
     fetch(`/api/notifications/${userId}`)
       .then(res => res.json())
       .then(async data => {
+        console.log('Notificări primite de la backend:', data);
         // Pentru fiecare notificare, ia mesajul și expeditorul
         const enriched = await Promise.all(data.map(async notif => {
           let senderName = '';
