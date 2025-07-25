@@ -72,6 +72,7 @@ export default function NotificationsPage() {
       <Header />
       <div className="account-settings-container">
         <div className="settings-title">Notificări</div>
+        {/* Formularul de test eliminat. Doar notificări */}
         <div className="settings-menu">
           {loading ? (
             <div style={{ color: '#888', textAlign: 'center', fontSize: '1.2rem' }}>Se încarcă notificările...</div>

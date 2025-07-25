@@ -19,12 +19,12 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const messagesEndRef = useRef(null);
 
   // Creează un id unic pentru conversație (ex: anuntId + sellerId + cumparatorId)
-  const annId = announcement?.id || announcement?._id;
-  const sellerId = seller?._id;
+  const annId = (announcement?.id && /^[a-fA-F0-9]{24}$/.test(announcement.id)) ? announcement.id : (announcement?._id && /^[a-fA-F0-9]{24}$/.test(announcement._id)) ? announcement._id : null;
+  const sellerId = seller?._id && /^[a-fA-F0-9]{24}$/.test(seller._id) ? seller._id : null;
   // Fallback pentru userId dacă nu e primit ca prop
-  const effectiveUserId = userId || localStorage.getItem('userId');
+  const effectiveUserId = userId && /^[a-fA-F0-9]{24}$/.test(userId) ? userId : (localStorage.getItem('userId') && /^[a-fA-F0-9]{24}$/.test(localStorage.getItem('userId')) ? localStorage.getItem('userId') : null);
   if (!annId || !sellerId || !effectiveUserId) {
-    console.warn('ChatPopup: id-uri lipsă', { annId, sellerId, userId: effectiveUserId });
+    console.error('ChatPopup: id-uri lipsă sau invalide', { annId, sellerId, userId: effectiveUserId });
   }
   const conversationId = annId && sellerId && effectiveUserId
     ? [annId, sellerId, effectiveUserId].sort().join("-")
@@ -53,6 +53,12 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     if (!input.trim()) return;
     // Determină destinatarul: dacă userul logat e cumpărător, destinatarul e vânzătorul, altfel e userul logat
     const destinatarId = userRole === 'cumparator' ? sellerId : effectiveUserId;
+    // Validare destinatarId
+    if (!destinatarId || !/^[a-fA-F0-9]{24}$/.test(destinatarId)) {
+      console.error('ID destinatar invalid pentru notificare!', { destinatarId });
+      alert('Eroare: ID destinatar invalid. Nu se poate trimite mesajul.');
+      return;
+    }
     const msg = {
       conversationId,
       senderId: effectiveUserId,
@@ -71,7 +77,8 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         onMessageSent(); // refetch notificări instant
       }
     } catch (err) {
-      // handle error
+      console.error('Eroare la trimiterea mesajului:', err);
+      alert('Eroare la trimiterea mesajului.');
     }
   };
 
