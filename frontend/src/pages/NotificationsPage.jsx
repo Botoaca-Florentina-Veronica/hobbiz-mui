@@ -4,13 +4,13 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import apiClient from '../api/api';
 
 // Helper pentru obținerea datelor userului
 const getUserName = async (userId) => {
   try {
-    const res = await fetch(`/api/users/${userId}`);
-    if (!res.ok) return 'Expeditor necunoscut';
-    const user = await res.json();
+    const res = await apiClient.get(`/api/users/${userId}`);
+    const user = res.data;
     if (user.firstName) return `${user.firstName} ${user.lastName || ''}`;
     return user.email || 'Expeditor necunoscut';
   } catch {
@@ -21,9 +21,8 @@ const getUserName = async (userId) => {
 // Helper pentru obținerea preview-ului ultimului mesaj dintr-o conversație
 const getLastMessagePreview = async (convId) => {
   try {
-    const res = await fetch(`/api/messages/conversation/${convId}`);
-    if (!res.ok) return { senderName: '', preview: '' };
-    const msgs = await res.json();
+    const res = await apiClient.get(`/api/messages/conversation/${convId}`);
+    const msgs = res.data;
     if (!msgs.length) return { senderName: '', preview: '' };
     const lastMsg = msgs[msgs.length - 1];
     const senderName = await getUserName(lastMsg.senderId);
@@ -45,8 +44,13 @@ export default function NotificationsPage() {
       return;
     }
     setLoading(true);
-    fetch(`/api/notifications/${userId}`)
-      .then(res => res.ok ? res.json() : [])
+    console.log('🔔 Frontend: Încarcă notificări pentru userId:', userId);
+    
+    apiClient.get(`/api/notifications/${userId}`)
+      .then(res => {
+        console.log('🔔 Frontend: Răspuns primit:', res.data);
+        return res.data;
+      })
       .then(async data => {
         // Enrich chat notifications cu preview și sender
         const enriched = await Promise.all(data.map(async notif => {
@@ -61,7 +65,8 @@ export default function NotificationsPage() {
         setNotifications(enriched);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('❌ Frontend: Eroare la încărcarea notificărilor:', err);
         setNotifications([]);
         setLoading(false);
       });

@@ -5,9 +5,15 @@ const Notification = require('../models/Notification');
 exports.getNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log(`🔔 GET /api/notifications/${userId} - cerere primită`);
+    
     const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+    console.log(`🔔 Găsite ${notifications.length} notificări pentru userId: ${userId}`);
+    console.log('📋 Notificări găsite:', notifications);
+    
     res.json(notifications);
   } catch (err) {
+    console.error(`❌ Eroare la obținerea notificărilor pentru ${userId}:`, err);
     res.status(500).json({ error: err.message });
   }
 };
