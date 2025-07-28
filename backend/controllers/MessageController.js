@@ -11,6 +11,7 @@ exports.deleteMessage = async (req, res) => {
 };
 const Message = require('../models/Message');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 const { Types } = require('mongoose');
 
 // Creează un mesaj nou și notificare pentru destinatar
@@ -71,12 +72,106 @@ exports.createMessage = async (req, res) => {
   }
 };
 
-// Obține toate mesajele pentru o conversație
+// Obține toate conversațiile pentru un utilizator
+exports.getConversations = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Găsim toate mesajele în care utilizatorul este implicat
+    const messages = await Message.find({
+      $or: [
+        { senderId: userId },
+        { conversationId: { $regex: userId } } // conversationId conține userId-ul
+      ]
+    }).sort({ createdAt: -1 });
+    
+    // Grupăm mesajele pe conversații și obținem ultimul mesaj pentru fiecare
+    const conversationMap = new Map();
+    
+    for (const message of messages) {
+      const convId = message.conversationId;
+      
+      if (!conversationMap.has(convId)) {
+        // Identificăm celalalt participant din conversație
+        const participants = convId.split('-').filter(id => 
+          id !== message.senderId && 
+          id.length === 24 && // ObjectId length
+          /^[a-fA-F0-9]{24}$/.test(id) // Valid ObjectId
+        );
+        
+        let otherParticipantId = null;
+        if (message.senderId === userId) {
+          // Mesajul este trimis de utilizatorul curent, căutăm destinatarul
+          otherParticipantId = participants.find(id => id !== userId);
+        } else {
+          // Mesajul este primit, expeditorul este celalalt participant
+          otherParticipantId = message.senderId;
+        }
+        
+        if (otherParticipantId) {
+          try {
+            const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar');
+            
+            conversationMap.set(convId, {
+              conversationId: convId,
+              otherParticipant: {
+                id: otherParticipantId,
+                firstName: otherUser?.firstName || 'Utilizator',
+                lastName: otherUser?.lastName || 'Necunoscut',
+                avatar: otherUser?.avatar || null
+              },
+              lastMessage: {
+                text: message.text,
+                senderId: message.senderId,
+                createdAt: message.createdAt
+              },
+              unread: false // Aici poți implementa logica pentru mesaje necitite
+            });
+          } catch (error) {
+            console.error('Eroare la preluarea datelor utilizatorului:', error);
+          }
+        }
+      }
+    }
+    
+    const conversations = Array.from(conversationMap.values());
+    res.json(conversations);
+  } catch (err) {
+    console.error('Eroare la preluarea conversațiilor:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Obține toate mesajele pentru o conversație cu datele utilizatorilor
 exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
-    res.json(messages);
+    
+    // Preluam informațiile utilizatorilor pentru fiecare mesaj
+    const messagesWithUserData = await Promise.all(
+      messages.map(async (message) => {
+        try {
+          const sender = await User.findById(message.senderId).select('firstName lastName avatar');
+          return {
+            ...message.toObject(),
+            senderInfo: sender ? {
+              firstName: sender.firstName,
+              lastName: sender.lastName,
+              avatar: sender.avatar
+            } : null
+          };
+        } catch (error) {
+          console.error('Eroare la preluarea datelor utilizatorului:', error);
+          return {
+            ...message.toObject(),
+            senderInfo: null
+          };
+        }
+      })
+    );
+    
+    res.json(messagesWithUserData);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

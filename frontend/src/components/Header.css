@@ -65,6 +65,62 @@
   font-size: 2rem;
   transition: all 0.3s ease;
   color: #F8B195;
+  position: relative; /* Pentru pozitionarea badge-ului */
+}
+
+/* Stiluri pentru butonul de notificări cu badge */
+.notification-btn {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #fbbf24;
+  color: #1f2937;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 2px solid #406b92;
+  min-width: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+/* Pentru numere cu două cifre */
+.notification-badge:has-text,
+.notification-badge:is(:has-text),
+.notification-badge:contains('10'),
+.notification-badge:contains('11'),
+.notification-badge:contains('12'),
+.notification-badge:contains('13'),
+.notification-badge:contains('14'),
+.notification-badge:contains('15'),
+.notification-badge:contains('16'),
+.notification-badge:contains('17'),
+.notification-badge:contains('18'),
+.notification-badge:contains('19'),
+.notification-badge:contains('20') {
+  padding: 0 4px;
+  border-radius: 10px;
+  min-width: 20px;
+  width: auto;
+  font-size: 0.7rem;
+}
+
+/* Pentru numere foarte mari (99+) */
+.notification-badge-large {
+  padding: 0 6px;
+  border-radius: 12px;
+  min-width: 24px;
+  width: auto;
+  font-size: 0.65rem;
 }
 
 .user-account-btn {

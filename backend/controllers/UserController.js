@@ -139,7 +139,10 @@ exports.login = async (req, res) => {
 // Obține profil utilizator
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password');
+    // Verificăm dacă există userId în parametri (profil public) sau folosim userId din auth (profil propriu)
+    const targetUserId = req.params.userId || req.userId;
+    
+    const user = await User.findById(targetUserId).select('-password');
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit' });
     }

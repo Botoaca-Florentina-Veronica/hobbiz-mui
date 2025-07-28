@@ -1,5 +1,5 @@
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { HiOutlineUser, HiOutlineHeart, HiOutlineBell, HiOutlineChat } from "react-icons/hi";
 import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
@@ -14,11 +14,29 @@ import './MobileHeader.css';
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [googleAvatar, setGoogleAvatar] = useState(null); // Nou: avatar Google
+  const [unreadCount, setUnreadCount] = useState(0); // Nou: numărul de notificări necitite
+
+  // Funcție pentru a obține numărul de notificări necitite
+  const fetchUnreadCount = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+      
+      const response = await apiClient.get(`/api/notifications/${userId}`);
+      const notifications = response.data;
+      const unreadNotifications = notifications.filter(n => !n.read);
+      setUnreadCount(unreadNotifications.length);
+    } catch (error) {
+      console.error('Eroare la obținerea notificărilor necitite:', error);
+      setUnreadCount(0);
+    }
+  };
 
   useEffect(() => {
     const body = document.body;
@@ -42,6 +60,7 @@ export default function Header() {
     if (!token) {
       setIsAuthenticated(false);
       setGoogleAvatar(null);
+      setUnreadCount(0);
       return;
     }
     // Dacă există token, verifică și cu backendul (pentru sesiuni Google etc)
@@ -54,13 +73,37 @@ export default function Header() {
         } else {
           setGoogleAvatar(null);
         }
+        
+        // Dacă utilizatorul este autentificat, obține numărul de notificări necitite
+        if (response.data.isAuthenticated) {
+          fetchUnreadCount();
+        }
       } catch (error) {
         setIsAuthenticated(false);
         setGoogleAvatar(null);
+        setUnreadCount(0);
       }
     };
     checkAuth();
   }, []);
+
+  // Actualizează contorul când se schimbă pagina (pentru a reflecta citirea notificărilor)
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUnreadCount();
+    }
+  }, [location.pathname, isAuthenticated]);
+
+  // Polling pentru actualizarea în timp real a contorului (la fiecare 30 de secunde)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const interval = setInterval(() => {
+      fetchUnreadCount();
+    }, 30000); // 30 secunde
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   const handleMouseEnter = () => {
     if (isAuthenticated) {
@@ -133,8 +176,13 @@ export default function Header() {
                 </button>
               </li>
               <li>
-                <button className="favorite-btn" style={{marginLeft: 0}} onClick={() => navigate('/notificari')}>
+                <button className="favorite-btn notification-btn" style={{marginLeft: 0}} onClick={() => navigate('/notificari')}>
                   <HiOutlineBell />
+                  {unreadCount > 0 && (
+                    <span className={`notification-badge ${unreadCount > 99 ? 'notification-badge-large' : ''}`}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </button>
               </li>
               <li>

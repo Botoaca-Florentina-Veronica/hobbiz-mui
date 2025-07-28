@@ -1,24 +1,297 @@
+/* Pagina de notificări modernă și atractivă */
 .notifications-page {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
+  background: #f5f7f8;
+  min-height: 100vh;
+  padding: 40px 0;
+  margin-top: 4rem;
+}
+
+.notifications-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.notifications-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #183642;
+  margin-bottom: 32px;
+  text-align: left;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.notifications-content {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
+
 .notifications-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
+
 .notification-item {
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
+  border: 1px solid #e8ecef;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
+
+.notification-item.unread {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-color: #355070;
+  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.1);
+}
+
+.notification-item.read {
+  opacity: 0.8;
+}
+
+.unread-indicator {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 8px;
+  height: 8px;
+  background: #355070;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.notification-main-content {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notification-item.unread .notification-main-content:hover {
+  /* Eliminăm transformarea care mută punctul albastru */
+  /* transform: translateX(4px); */
+  background: rgba(53, 80, 112, 0.02);
+}
+
 .notification-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
+
+.notification-item:hover {
+  box-shadow: 0 8px 25px rgba(53, 80, 112, 0.15);
+  border-color: #355070;
+}
+
+.notification-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #355070, #406b92);
+  border-radius: 0 4px 4px 0;
+}
+
+.notification-content {
+  margin-left: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notification-main-content {
+  flex: 1;
+}
+
+.notification-delete-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.notification-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.notification-delete-btn:active {
+  transform: scale(0.95);
+}
+
+.notification-sender {
+  color: #355070;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.notification-message {
+  color: #183642;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
 .notification-date {
-  font-size: 0.85em;
-  color: #888;
-  margin-top: 0.5em;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notification-date::before {
+  content: '🕒';
+  font-size: 0.75rem;
+}
+
+.notification-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #355070;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  background: rgba(53, 80, 112, 0.1);
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(53, 80, 112, 0.2);
+}
+
+.notification-link:hover {
+  background: rgba(53, 80, 112, 0.2);
+  transform: translateX(2px);
+  text-decoration: none;
+  color: #355070;
+}
+
+.notification-link::after {
+  content: '→';
+  transition: transform 0.2s ease;
+}
+
+.notification-link:hover::after {
+  transform: translateX(2px);
+}
+
+/* Stări pentru loading și fără notificări */
+.notifications-empty,
+.notifications-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.notifications-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e8ecef;
+  border-top: 3px solid #355070;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.notifications-empty::before {
+  content: '🔔';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* Responsivitate */
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 20px 0;
+    margin-top: 2rem;
+  }
+  
+  .notifications-container {
+    padding: 0 16px;
+  }
+  
+  .notifications-title {
+    font-size: 2.2rem;
+    margin-bottom: 24px;
+  }
+  
+  .notifications-content {
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .notification-item {
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  
+  .notification-message {
+    font-size: 0.95rem;
+  }
+  
+  .notification-header {
+    gap: 8px;
+  }
+  
+  .notification-delete-btn {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
 }

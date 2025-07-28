@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
 const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount } = require('../controllers/UserController');
 // Șterge contul utilizatorului și toate anunțurile sale
@@ -10,6 +11,7 @@ router.delete('/delete-account', auth, deleteAccount);
 router.post('/register', register);  // User e folosit în controller
 router.post('/login', login);       // User e folosit în controller
 router.get('/profile', auth, getProfile); // User e folosit în controller
+router.get('/profile/:userId', optionalAuth, getProfile); // Profil public pentru orice utilizator
 router.put('/update-email', auth, updateEmail); // Noua rută pentru actualizarea email-ului
 router.put('/update-password', auth, updatePassword); // Rută pentru schimbarea parolei
 router.post('/my-announcements', auth, upload.array('images', 10), addAnnouncement);

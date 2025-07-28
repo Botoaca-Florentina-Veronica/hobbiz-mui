@@ -1,41 +1,342 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Header from '../components/Header';
+import apiClient from '../api/api';
 import './ChatPage.css';
 
 export default function ChatPage() {
+  const [activeTab, setActiveTab] = useState('buying'); // 'buying' sau 'selling'
+  const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
+  const messagesEndRef = useRef(null);
+  const userId = localStorage.getItem('userId');
+
+  // Fetch current user avatar
+  useEffect(() => {
+    if (!userId) return;
+    
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await apiClient.get(`/api/users/profile/${userId}`);
+        if (response.data && response.data.avatar) {
+          setCurrentUserAvatar(response.data.avatar);
+        }
+      } catch (error) {
+        console.error('Eroare la încărcarea profilului utilizatorului:', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, [userId]);
+
+  // Fetch conversations
+  useEffect(() => {
+    if (!userId) return;
+    
+    const fetchConversations = async () => {
+      try {
+        setLoading(true);
+        // Folosim noul endpoint pentru conversații
+        const response = await apiClient.get(`/api/messages/conversations/${userId}`);
+        const conversationsData = response.data;
+        
+        // Formatează datele pentru UI
+        const formattedConversations = conversationsData.map(conv => ({
+          id: conv.otherParticipant.id,
+          conversationId: conv.conversationId,
+          name: `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`,
+          lastMessage: conv.lastMessage.text,
+          time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          avatar: conv.otherParticipant.avatar || 
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.otherParticipant.firstName[0] + conv.otherParticipant.lastName[0])}&background=355070&color=fff`,
+          unread: conv.unread,
+          otherParticipant: conv.otherParticipant
+        }));
+        
+        setConversations(formattedConversations);
+      } catch (error) {
+        console.error('Eroare la încărcarea conversațiilor:', error);
+        setConversations([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConversations();
+  }, [userId, activeTab]);
+
+  // Fetch messages pentru conversația selectată
+  useEffect(() => {
+    if (!selectedConversation) return;
+    
+    const fetchMessages = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get(`/api/messages/conversation/${selectedConversation.conversationId}`);
+        setMessages(response.data || []);
+      } catch (error) {
+        console.error('Eroare la încărcarea mesajelor:', error);
+        setMessages([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, [selectedConversation]);
+
+  // Scroll la ultimul mesaj
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  // Trimite mesaj
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedConversation) return;
+
+    try {
+      const messageData = {
+        conversationId: selectedConversation.conversationId,
+        senderId: userId,
+        text: newMessage.trim(),
+        destinatarId: selectedConversation.id // va fi ajustat în backend
+      };
+
+      // Adaugă mesajul local
+      const tempMessage = {
+        ...messageData,
+        _id: Date.now().toString(),
+        createdAt: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, tempMessage]);
+      setNewMessage('');
+
+      // Trimite la server
+      const response = await apiClient.post('/api/messages', messageData);
+      
+      // Înlocuiește mesajul temporar cu cel de pe server
+      if (response.data) {
+        setMessages(prev => prev.map(msg => 
+          msg._id === tempMessage._id ? response.data : msg
+        ));
+      }
+    } catch (error) {
+      console.error('Eroare la trimiterea mesajului:', error);
+      // Elimină mesajul temporar în caz de eroare
+      setMessages(prev => prev.filter(msg => msg._id !== tempMessage._id));
+    }
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleString('ro-RO', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const unreadConversations = conversations.filter(conv => conv.unread);
+  const readConversations = conversations.filter(conv => !conv.unread);
+
   return (
-    <div className="chat-page-container">
-      <aside className="chat-sidebar">
-        <div className="chat-tabs">
-          <button className="chat-tab active">De cumpărat</button>
-          <button className="chat-tab">De vândut</button>
-        </div>
-        <div className="chat-section-label">NECITITE</div>
-        <div className="chat-empty-state">
-          <span role="img" aria-label="party">🎉</span> Ești la zi!
-        </div>
-        <div className="chat-section-label">CITITE</div>
-        <div className="chat-conversation-list">
-          <div className="chat-conversation-item read">
-            <img className="chat-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Ciprian" />
-            <div className="chat-conversation-info">
-              <div className="chat-conversation-name">Ciprian</div>
-              <div className="chat-conversation-message">Pregătire/meditații fizică bac<br/>Ok..</div>
-            </div>
-            <div className="chat-conversation-time">16.05</div>
-            <div className="chat-conversation-saved" title="Salvat">
-              <svg width="18" height="18" fill="none" stroke="#355070" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 3a2 2 0 0 0-2 2v16l9-4 9 4V5a2 2 0 0 0-2-2H5z"/></svg>
-            </div>
+    <>
+      <Header />
+      <div className="chat-page-container">
+        <aside className="chat-sidebar">
+          <div className="chat-tabs">
+            <button 
+              className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`}
+              onClick={() => setActiveTab('buying')}
+            >
+              <span>De cumpărat</span>
+            </button>
+            <button 
+              className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`}
+              onClick={() => setActiveTab('selling')}
+            >
+              <span>De vândut</span>
+            </button>
           </div>
-        </div>
-      </aside>
-      <main className="chat-main">
-        <div className="chat-empty-main">
-          <div className="chat-empty-icon">
-            <svg width="120" height="120" viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="60" fill="#E3EDFF"/><circle cx="85" cy="85" r="40" fill="#407BFF"/><path d="M60 80c11.046 0 20-8.954 20-20s-8.954-20-20-20-20 8.954-20 20 8.954 20 20 20z" fill="#D6E4FF"/><circle cx="60" cy="60" r="10" fill="#00394C"/><path d="M65 65c-2.5 2.5-7.5 2.5-10 0" stroke="#00394C" strokeWidth="2" strokeLinecap="round"/></svg>
-          </div>
-          <div className="chat-empty-text">Selectează o conversație pentru a o citi</div>
-        </div>
-      </main>
-    </div>
+
+          {unreadConversations.length > 0 && (
+            <>
+              <div className="chat-section-label">NECITITE ({unreadConversations.length})</div>
+              <div className="chat-conversation-list">
+                {unreadConversations.map((conversation) => (
+                  <div 
+                    key={conversation.id}
+                    className={`chat-conversation-item ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedConversation(conversation)}
+                  >
+                    <img 
+                      className="chat-avatar" 
+                      src={conversation.avatar} 
+                      alt={conversation.name}
+                      onError={(e) => {
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=355070&color=fff`;
+                      }}
+                    />
+                    <div className="chat-conversation-info">
+                      <div className="chat-conversation-name">{conversation.name}</div>
+                      <div className="chat-conversation-message">{conversation.lastMessage}</div>
+                    </div>
+                    <div className="chat-conversation-time">{conversation.time}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {unreadConversations.length === 0 && (
+            <>
+              <div className="chat-section-label">NECITITE</div>
+              <div className="chat-empty-state">
+                <span role="img" aria-label="party">🎉</span> Ești la zi!
+              </div>
+            </>
+          )}
+
+          {readConversations.length > 0 && (
+            <>
+              <div className="chat-section-label">CITITE ({readConversations.length})</div>
+              <div className="chat-conversation-list">
+                {readConversations.map((conversation) => (
+                  <div 
+                    key={conversation.id}
+                    className={`chat-conversation-item read ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedConversation(conversation)}
+                  >
+                    <img 
+                      className="chat-avatar" 
+                      src={conversation.avatar} 
+                      alt={conversation.name}
+                      onError={(e) => {
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=355070&color=fff`;
+                      }}
+                    />
+                    <div className="chat-conversation-info">
+                      <div className="chat-conversation-name">{conversation.name}</div>
+                      <div className="chat-conversation-message">{conversation.lastMessage}</div>
+                    </div>
+                    <div className="chat-conversation-time">{conversation.time}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </aside>
+
+        <main className="chat-main">
+          {!selectedConversation ? (
+            <div className="chat-empty-main">
+              <div className="chat-empty-icon">
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                  <circle cx="60" cy="60" r="60" fill="#E3EDFF"/>
+                  <circle cx="85" cy="85" r="40" fill="#355070"/>
+                  <path d="M60 80c11.046 0 20-8.954 20-20s-8.954-20-20-20-20 8.954-20 20 8.954 20 20 20z" fill="#D6E4FF"/>
+                  <circle cx="60" cy="60" r="10" fill="#00394C"/>
+                  <path d="M65 65c-2.5 2.5-7.5 2.5-10 0" stroke="#00394C" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <div className="chat-empty-text">Selectează o conversație pentru a o citi</div>
+              <div className="chat-empty-subtitle">
+                Alege o conversație din lista de pe stânga pentru a începe să comunici
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="chat-main-header">
+                <img 
+                  className="chat-main-avatar" 
+                  src={selectedConversation.avatar} 
+                  alt={selectedConversation.name}
+                />
+                <div className="chat-main-user-info">
+                  <h3>{selectedConversation.name}</h3>
+                  <p>Activ recent</p>
+                </div>
+              </div>
+
+              <div className="chat-messages-container">
+                {loading ? (
+                  <div style={{textAlign: 'center', color: '#6b7280', padding: '20px'}}>
+                    Se încarcă mesajele...
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div style={{textAlign: 'center', color: '#6b7280', padding: '20px'}}>
+                    Nicio conversație încă. Scrie primul mesaj!
+                  </div>
+                ) : (
+                  messages.map((message) => {
+                    // Determinăm avatarul pentru mesaj
+                    let messageAvatar;
+                    if (message.senderId === userId) {
+                      // Mesaj trimis de utilizatorul curent
+                      messageAvatar = currentUserAvatar || 
+                                    `https://ui-avatars.com/api/?name=Tu&background=355070&color=fff`;
+                    } else {
+                      // Mesaj primit - folosim avatarul din senderInfo
+                      messageAvatar = message.senderInfo?.avatar || 
+                                    `https://ui-avatars.com/api/?name=${encodeURIComponent((message.senderInfo?.firstName?.[0] || '') + (message.senderInfo?.lastName?.[0] || ''))}&background=355070&color=fff`;
+                    }
+
+                    return (
+                      <div 
+                        key={message._id} 
+                        className={`chat-message ${message.senderId === userId ? 'own' : ''}`}
+                      >
+                        <img 
+                          className="chat-message-avatar" 
+                          src={messageAvatar}
+                          alt="avatar"
+                          onError={(e) => {
+                            e.target.src = `https://ui-avatars.com/api/?name=${message.senderId === userId ? 'Tu' : 'U'}&background=355070&color=fff`;
+                          }}
+                        />
+                        <div className="chat-message-bubble">
+                          <p className="chat-message-text">{message.text}</p>
+                          <div className="chat-message-time">
+                            {formatTime(message.createdAt)}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <form className="chat-input-container" onSubmit={handleSendMessage}>
+                <input
+                  type="text"
+                  className="chat-input"
+                  placeholder="Scrie mesajul tău..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                />
+                <button 
+                  type="submit" 
+                  className="chat-send-button"
+                  disabled={!newMessage.trim()}
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M22 2L11 13"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                  </svg>
+                </button>
+              </form>
+            </>
+          )}
+        </main>
+      </div>
+    </>
   );
 }

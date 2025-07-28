@@ -1,5 +1,5 @@
 // backend/server.js
-require('dotenv').config({ path: './backend/.env' });
+require('dotenv').config();
 console.log('🔍 DEBUG ENV VARS:');
 console.log('JWT_SECRET:', process.env.JWT_SECRET);
 console.log('MONGODB_URI:', process.env.MONGODB_URI);

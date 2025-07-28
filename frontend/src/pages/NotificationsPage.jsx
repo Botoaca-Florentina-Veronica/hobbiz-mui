@@ -4,7 +4,9 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../api/api';
+import './NotificationsPage.css';
 
 // Helper pentru obținerea datelor userului
 const getUserName = async (userId) => {
@@ -36,6 +38,48 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const userId = localStorage.getItem('userId');
+
+  // Funcție pentru a marca o notificare ca citită
+  const markAsRead = async (notificationId) => {
+    try {
+      await apiClient.patch(`/api/notifications/${notificationId}/read`);
+      // Actualizează starea locală
+      setNotifications(prev => 
+        prev.map(n => 
+          n._id === notificationId ? { ...n, read: true } : n
+        )
+      );
+    } catch (error) {
+      console.error('Eroare la marcarea notificării ca citită:', error);
+    }
+  };
+
+  // Funcție pentru ștergerea unei notificări
+  const deleteNotification = async (notificationId) => {
+    try {
+      console.log('🗑️ Ștergere notificare cu ID:', notificationId);
+      console.log('🔗 URL apel:', `${apiClient.defaults.baseURL}/api/notifications/${notificationId}`);
+      
+      const response = await apiClient.delete(`/api/notifications/${notificationId}`);
+      console.log('✅ Răspuns server pentru ștergere:', response.data);
+      console.log('📊 Status răspuns:', response.status);
+      
+      // Actualizează lista locală eliminând notificarea ștearsă
+      setNotifications(prev => {
+        const newNotifications = prev.filter(n => n._id !== notificationId);
+        console.log('📝 Notificări înainte de filtrare:', prev.length);
+        console.log('📝 Notificări după filtrare:', newNotifications.length);
+        return newNotifications;
+      });
+      console.log('✅ Lista de notificări actualizată local');
+    } catch (error) {
+      console.error('❌ Eroare la ștergerea notificării:', error);
+      console.error('❌ Detalii eroare:', error.response?.data);
+      console.error('❌ Status eroare:', error.response?.status);
+      console.error('❌ Mesaj eroare:', error.message);
+      // Poți adăuga aici o notificare de eroare pentru utilizator
+    }
+  };
 
   useEffect(() => {
     if (!userId) {
@@ -75,32 +119,58 @@ export default function NotificationsPage() {
   return (
     <>
       <Header />
-      <div className="account-settings-container">
-        <div className="settings-title">Notificări</div>
-        {/* Formularul de test eliminat. Doar notificări */}
-        <div className="settings-menu">
-          {loading ? (
-            <div style={{ color: '#888', textAlign: 'center', fontSize: '1.2rem' }}>Se încarcă notificările...</div>
-          ) : notifications.length === 0 ? (
-            <div style={{ color: '#888', textAlign: 'center', fontSize: '1.2rem' }}>Nu ai notificări.</div>
-          ) : (
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {notifications.map(n => (
-                <li key={n._id} className="settings-item">
-                  <div style={{ fontWeight: 500 }}>
-                    {n.senderName && (
-                      <span style={{ color: '#2ec4b6', fontWeight: 600 }}>{n.senderName}: </span>
-                    )}
-                    {n.preview}
-                  </div>
-                  <div style={{ fontSize: 13, color: '#666', marginTop: 8 }}>{n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}</div>
-                  {n.link && (
-                    <a href={n.link} style={{ color: '#2ec4b6', fontSize: 14 }}>Deschide chat</a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+      <div className="notifications-page">
+        <div className="notifications-container">
+          <h1 className="notifications-title">Notificări</h1>
+          <div className="notifications-content">
+            {loading ? (
+              <div className="notifications-loading">
+                <div className="loading-spinner"></div>
+                <span>Se încarcă notificările...</span>
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="notifications-empty">
+                Nu ai notificări noi.
+              </div>
+            ) : (
+              <ul className="notifications-list">
+                {notifications.map(n => (
+                  <li key={n._id} className={`notification-item ${!n.read ? 'unread' : 'read'}`}>
+                    <div className="notification-content">
+                      <div className="notification-header">
+                        <div className="notification-main-content" onClick={() => !n.read && markAsRead(n._id)}>
+                          {!n.read && <div className="unread-indicator"></div>}
+                          {n.senderName && (
+                            <div className="notification-sender">{n.senderName}</div>
+                          )}
+                          <div className="notification-message">{n.preview}</div>
+                          <div className="notification-date">
+                            {n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}
+                          </div>
+                          {n.link && (
+                            <a 
+                              href={n.link} 
+                              className="notification-link"
+                              onClick={() => !n.read && markAsRead(n._id)}
+                            >
+                              Deschide chat
+                            </a>
+                          )}
+                        </div>
+                        <button 
+                          className="notification-delete-btn"
+                          onClick={() => deleteNotification(n._id)}
+                          title="Șterge notificarea"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
       <Footer />
