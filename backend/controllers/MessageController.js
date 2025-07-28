@@ -85,40 +85,54 @@ exports.getConversations = async (req, res) => {
       ]
     }).sort({ createdAt: -1 });
     
-    // Grupăm mesajele pe conversații și obținem ultimul mesaj pentru fiecare
-    const conversationMap = new Map();
+    console.log(`Găsite ${messages.length} mesaje pentru utilizatorul ${userId}`);
+    
+    // Grupăm mesajele pe utilizatori (nu pe conversații)
+    const userConversationMap = new Map();
     
     for (const message of messages) {
-      const convId = message.conversationId;
+      // Identificăm celalalt participant mai robust
+      let otherParticipantId = null;
       
-      if (!conversationMap.has(convId)) {
-        // Identificăm celalalt participant din conversație
-        const participants = convId.split('-').filter(id => 
-          id !== message.senderId && 
+      if (message.senderId === userId) {
+        // Mesajul este trimis de utilizatorul curent, căutăm destinatarul în conversationId
+        const participants = message.conversationId.split('-').filter(id => 
+          id !== userId && 
           id.length === 24 && // ObjectId length
           /^[a-fA-F0-9]{24}$/.test(id) // Valid ObjectId
         );
         
-        let otherParticipantId = null;
-        if (message.senderId === userId) {
-          // Mesajul este trimis de utilizatorul curent, căutăm destinatarul
-          otherParticipantId = participants.find(id => id !== userId);
-        } else {
-          // Mesajul este primit, expeditorul este celalalt participant
-          otherParticipantId = message.senderId;
+        // Găsim primul participant valid care nu este userId-ul curent
+        for (const participantId of participants) {
+          if (participantId !== userId) {
+            otherParticipantId = participantId;
+            break;
+          }
         }
-        
-        if (otherParticipantId) {
-          try {
-            const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar');
-            
-            conversationMap.set(convId, {
-              conversationId: convId,
+      } else {
+        // Mesajul este primit, expeditorul este celalalt participant
+        otherParticipantId = message.senderId;
+      }
+      
+      // Validăm că am găsit un participant valid
+      if (!otherParticipantId || otherParticipantId === userId) {
+        console.log(`Ignorăm mesajul ${message._id} - participant invalid:`, otherParticipantId);
+        continue;
+      }
+      
+      // Dacă nu avem deja acest utilizator în map, îl adăugăm
+      if (!userConversationMap.has(otherParticipantId)) {
+        try {
+          const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar');
+          
+          if (otherUser) {
+            userConversationMap.set(otherParticipantId, {
+              conversationId: message.conversationId, // Folosim conversationId din ultimul mesaj
               otherParticipant: {
                 id: otherParticipantId,
-                firstName: otherUser?.firstName || 'Utilizator',
-                lastName: otherUser?.lastName || 'Necunoscut',
-                avatar: otherUser?.avatar || null
+                firstName: otherUser.firstName || 'Utilizator',
+                lastName: otherUser.lastName || 'Necunoscut',
+                avatar: otherUser.avatar || null
               },
               lastMessage: {
                 text: message.text,
@@ -127,17 +141,107 @@ exports.getConversations = async (req, res) => {
               },
               unread: false // Aici poți implementa logica pentru mesaje necitite
             });
-          } catch (error) {
-            console.error('Eroare la preluarea datelor utilizatorului:', error);
+          } else {
+            console.log(`Utilizatorul ${otherParticipantId} nu a fost găsit în baza de date`);
           }
+        } catch (error) {
+          console.error('Eroare la preluarea datelor utilizatorului:', error);
+        }
+      } else {
+        // Actualizăm ultimul mesaj dacă mesajul curent este mai recent
+        const existingConversation = userConversationMap.get(otherParticipantId);
+        if (new Date(message.createdAt) > new Date(existingConversation.lastMessage.createdAt)) {
+          existingConversation.lastMessage = {
+            text: message.text,
+            senderId: message.senderId,
+            createdAt: message.createdAt
+          };
+          existingConversation.conversationId = message.conversationId;
         }
       }
     }
     
-    const conversations = Array.from(conversationMap.values());
+    // Convertim Map-ul în array și sortăm după data ultimului mesaj
+    const conversations = Array.from(userConversationMap.values()).sort((a, b) => 
+      new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
+    );
+    
+    console.log(`Găsite ${conversations.length} conversații unice pentru utilizatorul ${userId}`);
+    
     res.json(conversations);
   } catch (err) {
     console.error('Eroare la preluarea conversațiilor:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Obține toate mesajele între doi utilizatori
+exports.getMessagesBetweenUsers = async (req, res) => {
+  try {
+    const { userId1, userId2 } = req.params;
+    
+    console.log(`Căutăm mesaje între ${userId1} și ${userId2}`);
+    
+    // Căutăm toate mesajele unde ambii utilizatori sunt implicați
+    // Fie unul trimite către celălalt, fie sunt în aceeași conversație
+    const messages = await Message.find({
+      $or: [
+        // Mesaje directe între cei doi utilizatori
+        { senderId: userId1, conversationId: { $regex: userId2 } },
+        { senderId: userId2, conversationId: { $regex: userId1 } },
+        // Mesaje în conversații comune (să zicem că conversationId conține ambii)
+        {
+          $and: [
+            { conversationId: { $regex: userId1 } },
+            { conversationId: { $regex: userId2 } }
+          ]
+        }
+      ]
+    }).sort({ createdAt: 1 });
+    
+    console.log(`Query găsit: ${messages.length} mesaje brute`);
+    
+    // Verificăm fiecare mesaj pentru a ne asigura că este relevant
+    const relevantMessages = [];
+    for (const message of messages) {
+      const convParticipants = message.conversationId.split('-');
+      const hasUser1 = convParticipants.includes(userId1);
+      const hasUser2 = convParticipants.includes(userId2);
+      
+      if (hasUser1 && hasUser2) {
+        relevantMessages.push(message);
+      }
+    }
+    
+    console.log(`Mesaje relevante după verificare: ${relevantMessages.length}`);
+    
+    // Preluam informațiile utilizatorilor pentru fiecare mesaj
+    const messagesWithUserData = await Promise.all(
+      relevantMessages.map(async (message) => {
+        try {
+          const sender = await User.findById(message.senderId).select('firstName lastName avatar');
+          return {
+            ...message.toObject(),
+            senderInfo: sender ? {
+              firstName: sender.firstName,
+              lastName: sender.lastName,
+              avatar: sender.avatar
+            } : null
+          };
+        } catch (error) {
+          console.error('Eroare la preluarea datelor utilizatorului:', error);
+          return {
+            ...message.toObject(),
+            senderInfo: null
+          };
+        }
+      })
+    );
+    
+    console.log(`Răspuns final: ${messagesWithUserData.length} mesaje cu date utilizatori`);
+    res.json(messagesWithUserData);
+  } catch (err) {
+    console.error('Eroare la preluarea mesajelor între utilizatori:', err);
     res.status(500).json({ error: err.message });
   }
 };

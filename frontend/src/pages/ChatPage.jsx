@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import apiClient from '../api/api';
 import './ChatPage.css';
@@ -13,6 +14,7 @@ export default function ChatPage() {
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
   const messagesEndRef = useRef(null);
   const userId = localStorage.getItem('userId');
+  const location = useLocation();
 
   // Fetch current user avatar
   useEffect(() => {
@@ -39,9 +41,13 @@ export default function ChatPage() {
     const fetchConversations = async () => {
       try {
         setLoading(true);
+        console.log(`Încărcăm conversații pentru utilizatorul ${userId}`);
+        
         // Folosim noul endpoint pentru conversații
         const response = await apiClient.get(`/api/messages/conversations/${userId}`);
         const conversationsData = response.data;
+        
+        console.log(`Primite ${conversationsData.length} conversații din backend`);
         
         // Formatează datele pentru UI
         const formattedConversations = conversationsData.map(conv => ({
@@ -59,7 +65,14 @@ export default function ChatPage() {
           otherParticipant: conv.otherParticipant
         }));
         
-        setConversations(formattedConversations);
+        // Eliminăm duplicatele pe baza ID-ului participantului (extra verificare)
+        const uniqueConversations = formattedConversations.filter((conv, index, arr) => 
+          arr.findIndex(c => c.otherParticipant.id === conv.otherParticipant.id) === index
+        );
+        
+        console.log(`Conversații originale: ${formattedConversations.length}, unice: ${uniqueConversations.length}`);
+        
+        setConversations(uniqueConversations);
       } catch (error) {
         console.error('Eroare la încărcarea conversațiilor:', error);
         setConversations([]);
@@ -71,6 +84,25 @@ export default function ChatPage() {
     fetchConversations();
   }, [userId, activeTab]);
 
+  // Auto-selectează conversația din state (din notificări)
+  useEffect(() => {
+    if (location.state?.conversationId && conversations.length > 0) {
+      // Extragem participanții din conversationId pentru a găsi utilizatorul
+      const conversationId = location.state.conversationId;
+      const participantIds = conversationId.split('-');
+      const otherParticipantId = participantIds.find(id => id !== userId);
+      
+      if (otherParticipantId) {
+        const targetConversation = conversations.find(conv => 
+          conv.otherParticipant.id === otherParticipantId
+        );
+        if (targetConversation) {
+          setSelectedConversation(targetConversation);
+        }
+      }
+    }
+  }, [location.state, conversations, userId]);
+
   // Fetch messages pentru conversația selectată
   useEffect(() => {
     if (!selectedConversation) return;
@@ -78,7 +110,12 @@ export default function ChatPage() {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.get(`/api/messages/conversation/${selectedConversation.conversationId}`);
+        console.log(`Încărcăm mesaje între ${userId} și ${selectedConversation.otherParticipant.id}`);
+        
+        // Folosim noul endpoint pentru mesajele între doi utilizatori
+        const response = await apiClient.get(`/api/messages/between/${userId}/${selectedConversation.otherParticipant.id}`);
+        
+        console.log(`Primite ${response.data.length} mesaje din backend`);
         setMessages(response.data || []);
       } catch (error) {
         console.error('Eroare la încărcarea mesajelor:', error);
@@ -89,7 +126,7 @@ export default function ChatPage() {
     };
 
     fetchMessages();
-  }, [selectedConversation]);
+  }, [selectedConversation, userId]);
 
   // Scroll la ultimul mesaj
   useEffect(() => {
@@ -104,18 +141,28 @@ export default function ChatPage() {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
+      // Generăm conversationId din IDs-urile participanților (sortate pentru consistență)
+      const participantIds = [userId, selectedConversation.otherParticipant.id].sort();
+      const conversationId = participantIds.join('-');
+      
       const messageData = {
-        conversationId: selectedConversation.conversationId,
+        conversationId: conversationId,
         senderId: userId,
+        senderRole: 'cumparator', // sau determină rolul în funcție de context
         text: newMessage.trim(),
-        destinatarId: selectedConversation.id // va fi ajustat în backend
+        destinatarId: selectedConversation.otherParticipant.id
       };
 
       // Adaugă mesajul local
       const tempMessage = {
         ...messageData,
         _id: Date.now().toString(),
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        senderInfo: {
+          firstName: 'Tu',
+          lastName: '',
+          avatar: currentUserAvatar
+        }
       };
       setMessages(prev => [...prev, tempMessage]);
       setNewMessage('');
@@ -126,7 +173,10 @@ export default function ChatPage() {
       // Înlocuiește mesajul temporar cu cel de pe server
       if (response.data) {
         setMessages(prev => prev.map(msg => 
-          msg._id === tempMessage._id ? response.data : msg
+          msg._id === tempMessage._id ? {
+            ...response.data,
+            senderInfo: tempMessage.senderInfo
+          } : msg
         ));
       }
     } catch (error) {

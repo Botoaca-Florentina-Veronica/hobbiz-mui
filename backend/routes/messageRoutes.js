@@ -8,6 +8,9 @@ router.post('/', MessageController.createMessage);
 // Obține conversațiile pentru un utilizator
 router.get('/conversations/:userId', MessageController.getConversations);
 
+// Obține mesajele între doi utilizatori
+router.get('/between/:userId1/:userId2', MessageController.getMessagesBetweenUsers);
+
 // Obține toate mesajele pentru o conversație
 router.get('/conversation/:conversationId', MessageController.getMessages);
 

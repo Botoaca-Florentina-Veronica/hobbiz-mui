@@ -199,6 +199,8 @@
   border-radius: 20px;
   transition: all 0.2s ease;
   border: 1px solid rgba(53, 80, 112, 0.2);
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .notification-link:hover {

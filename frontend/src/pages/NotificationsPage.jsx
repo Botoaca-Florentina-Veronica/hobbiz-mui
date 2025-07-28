@@ -2,6 +2,7 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -38,6 +39,23 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const userId = localStorage.getItem('userId');
+  const navigate = useNavigate();
+
+  // Funcție pentru navigarea la chat
+  const handleChatNavigation = (notificationId, chatLink) => {
+    // Marchează notificarea ca citită
+    markAsRead(notificationId);
+    
+    // Extrage conversationId din link
+    if (chatLink && chatLink.startsWith('/chat/')) {
+      const conversationId = chatLink.split('/chat/')[1];
+      // Navighează la pagina de chat cu conversationId în state sau ca query param
+      navigate('/chat', { state: { conversationId } });
+    } else {
+      // Navighează la pagina de chat generală
+      navigate('/chat');
+    }
+  };
 
   // Funcție pentru a marca o notificare ca citită
   const markAsRead = async (notificationId) => {
@@ -148,13 +166,12 @@ export default function NotificationsPage() {
                             {n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}
                           </div>
                           {n.link && (
-                            <a 
-                              href={n.link} 
+                            <button 
                               className="notification-link"
-                              onClick={() => !n.read && markAsRead(n._id)}
+                              onClick={() => handleChatNavigation(n._id, n.link)}
                             >
                               Deschide chat
-                            </a>
+                            </button>
                           )}
                         </div>
                         <button 
