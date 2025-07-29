@@ -1,24 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Container,
-  Paper,
-  Avatar,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  TextField,
-  Button,
-  Chip,
-  IconButton,
-  Fade,
   Alert,
   CircularProgress,
-  Divider,
-  Stack,
-  ThemeProvider,
-  createTheme
+  Fade
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -32,62 +16,7 @@ import {
   Visibility as VisibilityIcon
 } from '@mui/icons-material';
 import apiClient from '../api/api';
-
-// Tema personalizată cu culoarea #355070
-const customTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#355070',
-      light: '#5c7a9a',
-      dark: '#1e3a4e',
-      contrastText: '#ffffff',
-    },
-    success: {
-      main: '#355070',
-      light: '#5c7a9a',
-      dark: '#1e3a4e',
-    },
-    text: {
-      primary: '#333333',
-      secondary: '#666666',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            '&:hover fieldset': {
-              borderColor: '#355070',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: '#355070',
-            },
-          },
-          '& .MuiInputLabel-root': {
-            color: '#355070',
-          },
-        },
-      },
-    },
-    MuiTypography: {
-      styleOverrides: {
-        body2: {
-          fontWeight: 600,
-        },
-      },
-    },
-  },
-});
+import './ProfilePage.css';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
@@ -196,275 +125,229 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-          <CircularProgress size={60} />
-        </Box>
-      </Container>
+      <div className="profile-page-container">
+        <div className="profile-loading-container">
+          <CircularProgress className="profile-loading-spinner" />
+        </div>
+      </div>
     );
   }
 
   return (
-    <ThemeProvider theme={customTheme}>
-      <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
-        {/* Alerts */}
-        {error && (
-          <Fade in={!!error}>
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          </Fade>
-        )}
-        {success && (
-          <Fade in={!!success}>
-            <Alert severity="success" sx={{ mb: 3 }}>
-              {success}
-            </Alert>
-          </Fade>
-        )}
+    <div className="profile-page-container">
+      {/* Alerts */}
+      {error && (
+        <Fade in={!!error}>
+          <Alert severity="error" className="profile-alert">
+            {error}
+          </Alert>
+        </Fade>
+      )}
+      {success && (
+        <Fade in={!!success}>
+          <Alert severity="success" className="profile-alert">
+            {success}
+          </Alert>
+        </Fade>
+      )}
 
-        {/* Header Card */}
-        <Paper elevation={3} sx={{ p: 4, mb: 3, borderRadius: 3 }}>
-          <Grid container spacing={3} alignItems="center">
-            <Grid item>
-              <Box position="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  ref={fileInputRef}
-                  onChange={handleAvatarChange}
+      {/* Header Card */}
+      <div className="profile-header-card">
+        <div className="profile-header-grid">
+          <div className="profile-avatar-container">
+            <input
+              type="file"
+              accept="image/*"
+              className="profile-hidden-input"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+            />
+            <div
+              className={`profile-avatar-main ${avatarUploading ? 'uploading' : ''}`}
+              onClick={handleAvatarClick}
+            >
+              {profile?.avatar ? (
+                <img 
+                  src={profile.avatar} 
+                  alt="Avatar" 
+                  className="profile-avatar-image"
                 />
-                <Avatar
-                  src={profile?.avatar}
-                  sx={{ 
-                    width: 120, 
-                    height: 120, 
-                    cursor: 'pointer',
-                    border: '4px solid',
-                    borderColor: 'primary.main',
-                    opacity: avatarUploading ? 0.7 : 1,
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
-                    }
-                  }}
-                  onClick={handleAvatarClick}
-                >
-                  {!profile?.avatar && <PersonIcon sx={{ fontSize: 50 }} />}
-                </Avatar>
-                <IconButton
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    width: 36,
-                    height: 36,
-                    '&:hover': {
-                      backgroundColor: 'primary.dark',
-                    }
-                  }}
-                  onClick={handleAvatarClick}
-                  disabled={avatarUploading}
-                >
-                  {avatarUploading ? (
-                    <CircularProgress size={16} color="inherit" />
-                  ) : (
-                    <PhotoCameraIcon sx={{ fontSize: 18 }} />
-                  )}
-                </IconButton>
-              </Box>
-            </Grid>
-            <Grid item xs>
-              <Stack spacing={2}>
-                <Chip 
-                  label="CONT PRIVAT" 
-                  color="success" 
-                  variant="outlined" 
-                  size="small"
-                  sx={{ alignSelf: 'flex-start', fontWeight: 600 }}
-                />
-                <Typography variant="h4" fontWeight="bold" color="primary.main">
-                  Editează-ți profilul
-                </Typography>
-                <Button
-                  startIcon={<VisibilityIcon />}
-                  variant="text"
-                  color="primary"
-                  sx={{ alignSelf: 'flex-start' }}
-                >
-                  Vezi cum îți văd alții profilul
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Paper>
-
-        {/* Profile Information Card */}
-        <Card elevation={3} sx={{ borderRadius: 3 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-              <Typography variant="h6" fontWeight="bold" color="text.primary">
-                INFORMAȚII DE BAZĂ
-              </Typography>
-              {!editMode && (
-                <Button
-                  startIcon={<EditIcon />}
-                  variant="outlined"
-                  onClick={handleEdit}
-                  sx={{ borderRadius: 2 }}
-                >
-                  Editează
-                </Button>
+              ) : (
+                <PersonIcon className="profile-person-icon" />
               )}
-            </Box>
-
-            <Divider sx={{ mb: 3 }} />
-
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Stack spacing={3}>
-                  {/* Nume */}
-                  <Box>
-                    <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, color: '#355070' }}>
-                      <PersonIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                      Nume
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="lastName"
-                        value={form.lastName}
-                        onChange={handleChange}
-                        placeholder="Introduceți numele"
-                        variant="outlined"
-                        size="small"
-                      />
-                    ) : (
-                      <Typography variant="body1" fontWeight={500}>
-                        {profile?.lastName || 'Nespecificat'}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* Prenume */}
-                  <Box>
-                    <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, color: '#355070' }}>
-                      <PersonIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                      Prenume
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="firstName"
-                        value={form.firstName}
-                        onChange={handleChange}
-                        placeholder="Introduceți prenumele"
-                        variant="outlined"
-                        size="small"
-                      />
-                    ) : (
-                      <Typography variant="body1" fontWeight={500}>
-                        {profile?.firstName || 'Nespecificat'}
-                      </Typography>
-                    )}
-                  </Box>
-                </Stack>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Stack spacing={3}>
-                  {/* Localitate */}
-                  <Box>
-                    <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, color: '#355070' }}>
-                      <LocationOnIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                      Localitate
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="localitate"
-                        value={form.localitate}
-                        onChange={handleChange}
-                        placeholder="Introduceți localitatea"
-                        variant="outlined"
-                        size="small"
-                      />
-                    ) : (
-                      <Typography variant="body1" fontWeight={500}>
-                        {profile?.localitate || 'Nespecificat'}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* Telefon */}
-                  <Box>
-                    <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, color: '#355070' }}>
-                      <PhoneIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                      Număr de telefon
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder="Introduceți numărul de telefon"
-                        variant="outlined"
-                        size="small"
-                      />
-                    ) : (
-                      <Typography variant="body1" fontWeight={500}>
-                        {profile?.phone || 'Nespecificat'}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* Email (readonly) */}
-                  <Box>
-                    <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, color: '#355070' }}>
-                      <EmailIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-                      Email
-                    </Typography>
-                    <Typography variant="body1" fontWeight={500} color="text.secondary">
-                      {profile?.email || 'Nespecificat'}
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Grid>
-            </Grid>
-
-            {editMode && (
-              <>
-                <Divider sx={{ my: 3 }} />
-                <Stack direction="row" spacing={2} justifyContent="flex-end">
-                  <Button
-                    variant="outlined"
-                    startIcon={<CancelIcon />}
-                    onClick={handleCancel}
-                    disabled={saving}
-                    sx={{ borderRadius: 2 }}
-                  >
-                    Renunță
-                  </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={saving ? <CircularProgress size={16} /> : <SaveIcon />}
-                    onClick={handleSave}
-                    disabled={saving}
-                    sx={{ borderRadius: 2, minWidth: 120 }}
-                  >
-                    {saving ? 'Se salvează...' : 'Salvează'}
-                  </Button>
-                </Stack>
-              </>
+            </div>
+            <button
+              className="profile-camera-button"
+              onClick={handleAvatarClick}
+              disabled={avatarUploading}
+            >
+              {avatarUploading ? (
+                <CircularProgress className="profile-loading-spinner-small" style={{color: 'white'}} />
+              ) : (
+                <PhotoCameraIcon className="profile-camera-icon" />
+              )}
+            </button>
+          </div>
+          <div className="profile-header-info">
+            <span className="profile-private-chip">CONT PRIVAT</span>
+            <h1 className="profile-main-title">Editează-ți profilul</h1>
+            <button className="profile-view-button">
+              <VisibilityIcon className="profile-icon" />
+              Vezi cum îți văd alții profilul
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Profile Information Card */}
+      <div className="profile-info-main-card">
+        <div className="profile-info-content">
+          <div className="profile-info-header-section">
+            <h2 className="profile-info-main-title">INFORMAȚII DE BAZĂ</h2>
+            {!editMode && (
+              <button className="profile-edit-button" onClick={handleEdit}>
+                <EditIcon className="profile-icon" />
+                Editează
+              </button>
             )}
-          </CardContent>
-        </Card>
-      </Container>
-    </ThemeProvider>
+          </div>
+
+          <hr className="profile-divider" />
+
+          <div className="profile-form-grid">
+            <div className="profile-form-column">
+              {/* Nume */}
+              <div className="profile-field-container">
+                <div className="profile-field-label">
+                  <PersonIcon className="profile-icon" />
+                  Nume
+                </div>
+                {editMode ? (
+                  <input
+                    className="profile-field-input"
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleChange}
+                    placeholder="Introduceți numele"
+                  />
+                ) : (
+                  <div className={`profile-field-value ${!profile?.lastName ? 'unspecified' : ''}`}>
+                    {profile?.lastName || 'Nespecificat'}
+                  </div>
+                )}
+              </div>
+
+              {/* Prenume */}
+              <div className="profile-field-container">
+                <div className="profile-field-label">
+                  <PersonIcon className="profile-icon" />
+                  Prenume
+                </div>
+                {editMode ? (
+                  <input
+                    className="profile-field-input"
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleChange}
+                    placeholder="Introduceți prenumele"
+                  />
+                ) : (
+                  <div className={`profile-field-value ${!profile?.firstName ? 'unspecified' : ''}`}>
+                    {profile?.firstName || 'Nespecificat'}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="profile-form-column">
+              {/* Localitate */}
+              <div className="profile-field-container">
+                <div className="profile-field-label">
+                  <LocationOnIcon className="profile-icon" />
+                  Localitate
+                </div>
+                {editMode ? (
+                  <input
+                    className="profile-field-input"
+                    name="localitate"
+                    value={form.localitate}
+                    onChange={handleChange}
+                    placeholder="Introduceți localitatea"
+                  />
+                ) : (
+                  <div className={`profile-field-value ${!profile?.localitate ? 'unspecified' : ''}`}>
+                    {profile?.localitate || 'Nespecificat'}
+                  </div>
+                )}
+              </div>
+
+              {/* Telefon */}
+              <div className="profile-field-container">
+                <div className="profile-field-label">
+                  <PhoneIcon className="profile-icon" />
+                  Număr de telefon
+                </div>
+                {editMode ? (
+                  <input
+                    className="profile-field-input"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="Introduceți numărul de telefon"
+                  />
+                ) : (
+                  <div className={`profile-field-value ${!profile?.phone ? 'unspecified' : ''}`}>
+                    {profile?.phone || 'Nespecificat'}
+                  </div>
+                )}
+              </div>
+
+              {/* Email (readonly) */}
+              <div className="profile-field-container">
+                <div className="profile-field-label">
+                  <EmailIcon className="profile-icon" />
+                  Email
+                </div>
+                <div className="profile-field-value unspecified">
+                  {profile?.email || 'Nespecificat'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {editMode && (
+            <>
+              <hr className="profile-actions-divider" />
+              <div className="profile-actions-container">
+                <button
+                  className="profile-action-button cancel"
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
+                  <CancelIcon className="profile-icon" />
+                  Renunță
+                </button>
+                <button
+                  className="profile-action-button save"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <CircularProgress className="profile-loading-spinner-small" style={{color: 'white'}} />
+                      <span className="profile-loading-text">Se salvează...</span>
+                    </>
+                  ) : (
+                    <>
+                      <SaveIcon className="profile-icon" />
+                      Salvează
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

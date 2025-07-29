@@ -123,7 +123,7 @@ exports.getConversations = async (req, res) => {
       // Dacă nu avem deja acest utilizator în map, îl adăugăm
       if (!userConversationMap.has(otherParticipantId)) {
         try {
-          const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar');
+          const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar lastSeen');
           
           if (otherUser) {
             userConversationMap.set(otherParticipantId, {
@@ -132,7 +132,8 @@ exports.getConversations = async (req, res) => {
                 id: otherParticipantId,
                 firstName: otherUser.firstName || 'Utilizator',
                 lastName: otherUser.lastName || 'Necunoscut',
-                avatar: otherUser.avatar || null
+                avatar: otherUser.avatar || null,
+                lastSeen: otherUser.lastSeen
               },
               lastMessage: {
                 text: message.text,

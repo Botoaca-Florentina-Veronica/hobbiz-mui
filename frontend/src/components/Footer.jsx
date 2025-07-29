@@ -86,7 +86,7 @@ export default function Footer() {
 
       {/* Footer propriu-zis: copyright și bara mobilă */}
       <footer className="desktop-footer">
-        <p>©Copyright Hobbiz 2025</p>
+        <p>©Copyright Hobbiz 2025. Toate drepturile rezervate</p>
       </footer>
       <div className="footer-mobile-buttons">
         <div className="footer-icon footer-account" onClick={handleAccountClick} style={{ position: 'relative' }}>

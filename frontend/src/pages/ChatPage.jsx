@@ -62,7 +62,8 @@ export default function ChatPage() {
           avatar: conv.otherParticipant.avatar || 
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.otherParticipant.firstName[0] + conv.otherParticipant.lastName[0])}&background=355070&color=fff`,
           unread: conv.unread,
-          otherParticipant: conv.otherParticipant
+          otherParticipant: conv.otherParticipant,
+          lastSeen: conv.otherParticipant.lastSeen
         }));
         
         // Eliminăm duplicatele pe baza ID-ului participantului (extra verificare)
@@ -193,6 +194,33 @@ export default function ChatPage() {
     });
   };
 
+  const formatLastSeen = (lastSeenDate) => {
+    if (!lastSeenDate) return 'Necunoscut';
+    
+    const now = new Date();
+    const lastSeen = new Date(lastSeenDate);
+    const diffInMinutes = Math.floor((now - lastSeen) / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    
+    if (diffInMinutes < 5) {
+      return 'Online acum';
+    } else if (diffInMinutes < 60) {
+      return `Activ acum ${diffInMinutes} minute`;
+    } else if (diffInHours < 24) {
+      return `Activ acum ${diffInHours} ${diffInHours === 1 ? 'oră' : 'ore'}`;
+    } else if (diffInDays === 1) {
+      return 'Activ ieri';
+    } else if (diffInDays < 7) {
+      return `Activ acum ${diffInDays} zile`;
+    } else {
+      return lastSeen.toLocaleDateString('ro-RO', {
+        day: 'numeric',
+        month: 'short'
+      });
+    }
+  };
+
   const unreadConversations = conversations.filter(conv => conv.unread);
   const readConversations = conversations.filter(conv => !conv.unread);
 
@@ -311,7 +339,7 @@ export default function ChatPage() {
                 />
                 <div className="chat-main-user-info">
                   <h3>{selectedConversation.name}</h3>
-                  <p>Activ recent</p>
+                  <p>{formatLastSeen(selectedConversation.lastSeen)}</p>
                 </div>
               </div>
 

@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
   googleId: { type: String, unique: true, sparse: true },
   avatar: { type: String },
   createdAt: { type: Date, default: Date.now },
-  localitate: { type: String } // Adăugat câmpul localitate
+  localitate: { type: String }, // Adăugat câmpul localitate
+  lastSeen: { type: Date, default: Date.now } // Adăugat câmpul pentru ultima activitate
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

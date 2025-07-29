@@ -36,27 +36,61 @@ export default function About() {
         <div className="about-container">
           {/* Hero Section */}
           <div className="about-hero">
-            <span className="about-hero-icon" role="img" aria-label="puzzle">🧩</span>
-            <h1>Despre Hobbiz</h1>
-            <p className="about-hero-subtitle">
-              Platforma dedicată pasionaților care doresc să descopere, să vândă sau să cumpere servicii și produse unice, realizate cu pasiune.
-            </p>
+            <div className="hero-badge">
+              <span className="hero-badge-icon">✨</span>
+              <span>Platforma pasionaților</span>
+            </div>
+            <h1 className="hero-title">
+              Transformă-ți <span className="highlight">pasiunea</span> în oportunitate
+            </h1>
           </div>
 
-          {/* Main Content */}
-          <div className="about-content">
-            <section className="about-section">
-              <h2>
-                <span className="about-section-icon">🎯</span>
-                Misiunea noastră
-              </h2>
-              <p>
-                Ne dorim să construim o comunitate în care fiecare utilizator să se simtă apreciat, să poată interacționa ușor și în siguranță, și să aibă acces la o gamă variată de servicii și produse autentice.
-              </p>
-              <p>
-                Hobbiz este o platformă dedicată pasionaților care doresc să descopere, să vândă sau să cumpere servicii și produse unice, realizate cu pasiune. Fie că ești un creator, un artizan sau doar un curios în căutare de ceva special, Hobbiz îți oferă spațiul perfect pentru a-ți promova talentele sau pentru a găsi inspirație.
-              </p>
-            </section>
+          {/* Mission Section */}
+          <div className="mission-section">
+            <div className="mission-content">
+              <div className="mission-header">
+                <div className="mission-icon">
+                  <span>🎯</span>
+                </div>
+                <div className="mission-text">
+                  <h2 className="mission-title">Misiunea noastră</h2>
+                  <p className="mission-subtitle">Construim punți între talente și oportunități</p>
+                </div>
+              </div>
+              
+              <div className="mission-body">
+                <p className="mission-description">
+                  <strong>Hobbiz</strong> nu este doar o platformă - este o comunitate care celebrează autenticitatea și creativitatea. 
+                  Ne-am născut din convingerea că fiecare pasiune merită să fie împărtășită și că fiecare talent merită să fie valorificat.
+                </p>
+                
+                <div className="mission-pillars">
+                  <div className="pillar-item">
+                    <div className="pillar-icon">🌟</div>
+                    <div className="pillar-content">
+                      <h4>Autenticitate</h4>
+                      <p>Promovăm produse și servicii unice, create cu pasiune și dedicare</p>
+                    </div>
+                  </div>
+                  
+                  <div className="pillar-item">
+                    <div className="pillar-icon">🤝</div>
+                    <div className="pillar-content">
+                      <h4>Comunitate</h4>
+                      <p>Creăm legături puternice între creatori și pasionați</p>
+                    </div>
+                  </div>
+                  
+                  <div className="pillar-item">
+                    <div className="pillar-icon">🚀</div>
+                    <div className="pillar-content">
+                      <h4>Creștere</h4>
+                      <p>Oferim instrumentele necesare pentru dezvoltarea afacerilor creative</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Features Grid */}

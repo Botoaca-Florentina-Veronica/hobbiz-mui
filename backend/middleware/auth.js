@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
   try {
@@ -13,6 +14,15 @@ module.exports = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId || decoded.id; // <-- Fix pentru Google OAuth
+    
+    // Actualizează lastSeen pentru utilizatorul autentificat
+    try {
+      await User.findByIdAndUpdate(req.userId, { lastSeen: new Date() });
+    } catch (updateError) {
+      console.log('Eroare la actualizarea lastSeen:', updateError);
+      // Nu oprește execuția pentru această eroare
+    }
+    
     next();
   } catch (error) {
     res.status(401).json({ error: 'Token invalid' });

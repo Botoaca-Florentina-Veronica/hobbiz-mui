@@ -10,14 +10,20 @@ import apiClient from '../api/api';
 import './NotificationsPage.css';
 
 // Helper pentru obținerea datelor userului
-const getUserName = async (userId) => {
+const getUserData = async (userId) => {
   try {
     const res = await apiClient.get(`/api/users/${userId}`);
     const user = res.data;
-    if (user.firstName) return `${user.firstName} ${user.lastName || ''}`;
-    return user.email || 'Expeditor necunoscut';
+    const name = user.firstName ? `${user.firstName} ${user.lastName || ''}` : (user.email || 'Expeditor necunoscut');
+    return {
+      name,
+      avatar: user.googleAvatar || user.avatar || null
+    };
   } catch {
-    return 'Expeditor necunoscut';
+    return {
+      name: 'Expeditor necunoscut',
+      avatar: null
+    };
   }
 };
 
@@ -26,12 +32,16 @@ const getLastMessagePreview = async (convId) => {
   try {
     const res = await apiClient.get(`/api/messages/conversation/${convId}`);
     const msgs = res.data;
-    if (!msgs.length) return { senderName: '', preview: '' };
+    if (!msgs.length) return { senderName: '', preview: '', senderAvatar: null };
     const lastMsg = msgs[msgs.length - 1];
-    const senderName = await getUserName(lastMsg.senderId);
-    return { senderName, preview: lastMsg.text };
+    const userData = await getUserData(lastMsg.senderId);
+    return { 
+      senderName: userData.name, 
+      preview: lastMsg.text,
+      senderAvatar: userData.avatar
+    };
   } catch {
-    return { senderName: '', preview: '' };
+    return { senderName: '', preview: '', senderAvatar: null };
   }
 };
 
@@ -118,11 +128,11 @@ export default function NotificationsPage() {
         const enriched = await Promise.all(data.map(async notif => {
           if (notif.link && notif.link.startsWith('/chat/')) {
             const convId = notif.link.split('/chat/')[1];
-            const { senderName, preview } = await getLastMessagePreview(convId);
-            return { ...notif, senderName, preview };
+            const { senderName, preview, senderAvatar } = await getLastMessagePreview(convId);
+            return { ...notif, senderName, preview, senderAvatar };
           }
           // Notificare non-chat
-          return { ...notif, senderName: '', preview: notif.message || '' };
+          return { ...notif, senderName: '', preview: notif.message || '', senderAvatar: null };
         }));
         setNotifications(enriched);
         setLoading(false);
@@ -161,7 +171,14 @@ export default function NotificationsPage() {
                           {n.senderName && (
                             <div className="notification-sender">{n.senderName}</div>
                           )}
-                          <div className="notification-message">{n.preview}</div>
+                          <div className="notification-message-container">
+                            <div className="notification-message">{n.preview}</div>
+                            {n.senderAvatar && n.link && n.link.startsWith('/chat/') && (
+                              <div className="notification-avatar">
+                                <img src={n.senderAvatar} alt={n.senderName} />
+                              </div>
+                            )}
+                          </div>
                           <div className="notification-date">
                             {n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}
                           </div>
