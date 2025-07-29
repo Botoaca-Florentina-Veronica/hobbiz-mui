@@ -1,86 +1,262 @@
-.announcement-details-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  background: #f5f7f8;
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  transition: box-shadow 0.2s, background 0.2s;
+/* Modern Announcement Details Styling */
+
+/* Smooth scrolling pentru navigare */
+html {
+  scroll-behavior: smooth;
 }
-.announcement-details-nav-btn:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.16);
-  background: #e9ecef;
+
+/* Container pentru pagina de detalii */
+.announcement-details-page {
+  background: linear-gradient(135deg, #f5f7f8 0%, #e8f2f4 100%);
+  min-height: 100vh;
 }
-.announcement-details-nav-btn.left {
-  left: 16px;
+
+/* Custom animations pentru componente */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.announcement-details-nav-btn.right {
-  right: 16px;
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
-.announcement-details-nav-btn svg {
-  width: 28px;
-  height: 28px;
-  stroke: #043136;
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
-/* Adaugă padding-top pentru a nu fi acoperit de headerul fix */
-.announcement-details-container {
-  max-width: 700px;
-  margin: 32px auto;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-  margin-top: 8rem;
+
+/* Animation pentru carduri */
+.MuiCard-root {
+  animation: slideInUp 0.6s ease-out;
 }
-.announcement-details-image-wrapper {
-  width: 100%;
-  background: #f5f5f5;
-  border-radius: 12px 12px 0 0;
+
+/* Hover effects pentru butoane */
+.MuiButton-root {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.MuiButton-root:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 20px rgba(53, 80, 112, 0.2) !important;
+}
+
+/* IconButton hover effects */
+.MuiIconButton-root {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.MuiIconButton-root:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Custom styles pentru imagini */
+.announcement-image-container {
+  position: relative;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-        min-height: 480px;
-        height: 480px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
-.announcement-details-image {
-  max-width: 95%;
-  max-height: 95%;
-  width: 95%;
-  height: 95%;
-  object-fit: contain;
-  border-radius: 12px 12px 0 0;
-  background: #f5f5f5;
-  display: block;
-  margin: auto;
-  opacity: 1;
-  transition: opacity 0.4s cubic-bezier(.4,0,.2,1);
-  will-change: opacity;
+
+.announcement-image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(53, 80, 112, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
 }
-.announcement-details-image-placeholder {
-  width: 100%;
-  height: 340px;
-  background: #eee;
-  border-radius: 12px 12px 0 0;
+
+/* Gradient overlay pentru hero section */
+.announcement-hero-overlay {
+  background: linear-gradient(135deg, rgba(53, 80, 112, 0.03) 0%, transparent 100%);
+  border-radius: 16px;
+  padding: 2rem;
 }
-.announcement-details-content {
-  padding: 32px 32px 0 32px;
+
+/* Custom chip styling */
+.MuiChip-root {
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
 }
-.announcement-details-title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 24px;
-  color: #355070;
+
+.MuiChip-root:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.15) !important;
 }
-.announcement-details-description {
-  font-size: 1.15rem;
-  color: #222;
-  white-space: pre-line;
+
+/* Contact paper styling */
+.contact-paper {
+  background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%) !important;
+  border: 1px solid rgba(53, 80, 112, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.contact-paper:hover {
+  border-color: rgba(53, 80, 112, 0.2) !important;
+  box-shadow: 0 4px 16px rgba(53, 80, 112, 0.1) !important;
+}
+
+/* Price highlight */
+.price-highlight {
+  background: linear-gradient(135deg, #e53e3e, #ff6b6b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Sidebar sticky positioning enhancement */
+.sidebar-sticky {
+  position: sticky;
+  top: 120px;
+  transition: all 0.3s ease;
+}
+
+/* Loading skeleton enhancements */
+.MuiSkeleton-root {
+  border-radius: 12px !important;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .sidebar-sticky {
+    position: static;
+    top: auto;
+  }
+  
+  .MuiContainer-root {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .announcement-hero-overlay {
+    padding: 1rem;
+  }
+}
+
+/* Focus states pentru accessibility */
+.MuiButton-root:focus-visible {
+  outline: 2px solid #355070;
+  outline-offset: 2px;
+}
+
+.MuiIconButton-root:focus-visible {
+  outline: 2px solid #355070;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar pentru description */
+.description-text {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.description-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.description-text::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.description-text::-webkit-scrollbar-thumb {
+  background: #355070;
+  border-radius: 3px;
+}
+
+.description-text::-webkit-scrollbar-thumb:hover {
+  background: #406b92;
+}
+
+/* Image carousel enhancements */
+.image-carousel-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.15);
+}
+
+.carousel-navigation-btn {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.carousel-navigation-btn:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Seller card enhancements */
+.seller-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
+  border: 1px solid rgba(53, 80, 112, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(53, 80, 112, 0.08);
+  transition: all 0.3s ease;
+}
+
+.seller-card:hover {
+  border-color: rgba(53, 80, 112, 0.15);
+  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.12);
+}
+
+/* Avatar enhancements */
+.MuiAvatar-root {
+  box-shadow: 0 4px 16px rgba(53, 80, 112, 0.2) !important;
+  border: 3px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Typography enhancements */
+.announcement-title {
+  background: linear-gradient(135deg, #355070, #406b92);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
+}
+
+/* Divider custom styling */
+.MuiDivider-root {
+  background: linear-gradient(90deg, transparent, rgba(53, 80, 112, 0.2), transparent) !important;
+  height: 1px !important;
+  border: none !important;
+  margin: 1.5rem 0 !important;
+}
+
+/* Back button styling */
+.back-button {
+  margin-bottom: 2rem !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.back-button:hover {
+  background: rgba(53, 80, 112, 0.08) !important;
+  transform: translateX(-4px) !important;
 }

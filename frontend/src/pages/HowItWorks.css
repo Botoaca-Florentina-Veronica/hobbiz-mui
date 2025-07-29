@@ -1,0 +1,406 @@
+/* Pagina How It Works - Design modern și interactiv */
+.how-it-works-page {
+  background: linear-gradient(135deg, #f5f7f8 0%, #e8f2f4 100%);
+  min-height: 100vh;
+  padding: 40px 0;
+  margin-top: 4rem;
+}
+
+.how-it-works-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.how-it-works-hero {
+  text-align: center;
+  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  color: white;
+  padding: 80px 40px;
+  border-radius: 24px;
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+}
+
+.how-it-works-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  transform: rotate(30deg);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-badge-icon {
+  font-size: 1.1rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-5px); }
+  60% { transform: translateY(-3px); }
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 24px 0;
+  letter-spacing: -2px;
+  position: relative;
+  z-index: 2;
+  line-height: 1.1;
+}
+
+.hero-title .highlight {
+  background: linear-gradient(45deg, #F8B195, #ffd89b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.hero-description {
+  font-size: 1.3rem;
+  opacity: 0.95;
+  max-width: 700px;
+  margin: 0 auto 48px auto;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+  font-weight: 400;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  position: relative;
+  z-index: 2;
+  margin-top: 40px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #F8B195;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Interactive Stepper Section */
+.interactive-stepper-section {
+  background: white;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive-stepper-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #355070, #F8B195);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #355070;
+  margin: 0 0 16px 0;
+  letter-spacing: -1px;
+}
+
+.section-header p {
+  font-size: 1.2rem;
+  color: #718096;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Features Showcase */
+.features-showcase {
+  background: white;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.features-showcase::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #F8B195, #355070);
+}
+
+.feature-card-mui {
+  transition: all 0.3s ease !important;
+  border: 1px solid #e8ecef !important;
+  border-radius: 16px !important;
+  height: 100%;
+}
+
+.feature-card-mui:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 12px 40px rgba(53, 80, 112, 0.15) !important;
+  border-color: #355070 !important;
+}
+
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
+  color: white;
+  padding: 60px 40px;
+  border-radius: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(248, 181, 149, 0.3);
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+.cta-section h2 {
+  font-size: 2.5rem;
+  margin: 0 0 16px 0;
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-section p {
+  font-size: 1.3rem;
+  margin: 0 0 40px 0;
+  opacity: 0.95;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 2;
+  line-height: 1.6;
+}
+
+.cta-buttons {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Animații pentru elementele interactive */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.interactive-stepper-section,
+.features-showcase {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Hover effects pentru carduri */
+.feature-card-mui::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #355070, #F8B195);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.feature-card-mui:hover::before {
+  transform: scaleX(1);
+}
+
+/* Responsivitate */
+@media (max-width: 768px) {
+  .how-it-works-page {
+    padding: 20px 0;
+    margin-top: 2rem;
+  }
+  
+  .how-it-works-container {
+    padding: 0 16px;
+  }
+  
+  .how-it-works-hero {
+    padding: 50px 20px;
+    margin-bottom: 40px;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+  }
+  
+  .hero-description {
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+  }
+  
+  .hero-stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .stat-divider {
+    width: 60px;
+    height: 1px;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+  }
+  
+  .stat-label {
+    font-size: 0.85rem;
+  }
+  
+  .interactive-stepper-section,
+  .features-showcase {
+    padding: 40px 20px;
+    margin-bottom: 40px;
+  }
+  
+  .section-header h2 {
+    font-size: 2rem;
+  }
+  
+  .section-header p {
+    font-size: 1.1rem;
+  }
+  
+  .cta-section {
+    padding: 40px 20px;
+  }
+  
+  .cta-section h2 {
+    font-size: 2rem;
+  }
+  
+  .cta-section p {
+    font-size: 1.1rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .cta-buttons .MuiButton-root {
+    margin: 8px 0 !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
+  
+  .section-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .cta-section h2 {
+    font-size: 1.8rem;
+  }
+  
+  .cta-section p {
+    font-size: 1rem;
+  }
+}
+
+/* Button animations */
+.MuiButton-root {
+  transition: all 0.3s ease !important;
+}
+
+.cta-buttons .MuiButton-root:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+}

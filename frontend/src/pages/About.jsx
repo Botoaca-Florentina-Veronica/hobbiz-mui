@@ -225,15 +225,6 @@ export default function About() {
             </div>
           </div>
 
-          {/* Call to Action */}
-          <div className="cta-section">
-            <h2>Gata să începi?</h2>
-            <p>Alătură-te comunității Hobbiz și descoperă un univers plin de creativitate și oportunități!</p>
-            <a href="/register" className="cta-button">
-              Înregistrează-te gratuit
-            </a>
-          </div>
-
           <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.9rem', marginTop: '30px' }}>
             Ultima actualizare: 19 iulie 2025
           </p>

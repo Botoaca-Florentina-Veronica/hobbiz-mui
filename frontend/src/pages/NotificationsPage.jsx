@@ -12,17 +12,22 @@ import './NotificationsPage.css';
 // Helper pentru obținerea datelor userului
 const getUserData = async (userId) => {
   try {
-    const res = await apiClient.get(`/api/users/${userId}`);
+    const res = await apiClient.get(`/api/users/profile/${userId}`);
     const user = res.data;
+    console.log('🔍 User data pentru userId:', userId, user);
     const name = user.firstName ? `${user.firstName} ${user.lastName || ''}` : (user.email || 'Expeditor necunoscut');
-    return {
+    const result = {
       name,
-      avatar: user.googleAvatar || user.avatar || null
+      // Pentru test, să adăugăm un avatar default dacă nu există unul
+      avatar: user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=355070&color=fff&size=128'
     };
-  } catch {
+    console.log('🖼️ Avatar găsit:', result.avatar);
+    return result;
+  } catch (error) {
+    console.error('Eroare la obținerea datelor utilizatorului:', error);
     return {
       name: 'Expeditor necunoscut',
-      avatar: null
+      avatar: 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128'
     };
   }
 };
@@ -34,13 +39,17 @@ const getLastMessagePreview = async (convId) => {
     const msgs = res.data;
     if (!msgs.length) return { senderName: '', preview: '', senderAvatar: null };
     const lastMsg = msgs[msgs.length - 1];
+    console.log('📩 Ultimul mesaj din conversația:', convId, lastMsg);
     const userData = await getUserData(lastMsg.senderId);
-    return { 
+    const result = { 
       senderName: userData.name, 
       preview: lastMsg.text,
       senderAvatar: userData.avatar
     };
-  } catch {
+    console.log('🔄 Preview final pentru notificare:', result);
+    return result;
+  } catch (error) {
+    console.error('Eroare la obținerea preview-ului mesajului:', error);
     return { senderName: '', preview: '', senderAvatar: null };
   }
 };
@@ -126,13 +135,18 @@ export default function NotificationsPage() {
       .then(async data => {
         // Enrich chat notifications cu preview și sender
         const enriched = await Promise.all(data.map(async notif => {
+          console.log('🔍 Processing notification:', notif);
           if (notif.link && notif.link.startsWith('/chat/')) {
             const convId = notif.link.split('/chat/')[1];
             const { senderName, preview, senderAvatar } = await getLastMessagePreview(convId);
-            return { ...notif, senderName, preview, senderAvatar };
+            const enrichedNotif = { ...notif, senderName, preview, senderAvatar };
+            console.log('✅ Enriched chat notification:', enrichedNotif);
+            return enrichedNotif;
           }
           // Notificare non-chat
-          return { ...notif, senderName: '', preview: notif.message || '', senderAvatar: null };
+          const nonChatNotif = { ...notif, senderName: '', preview: notif.message || '', senderAvatar: null };
+          console.log('📋 Non-chat notification:', nonChatNotif);
+          return nonChatNotif;
         }));
         setNotifications(enriched);
         setLoading(false);
@@ -172,12 +186,19 @@ export default function NotificationsPage() {
                             <div className="notification-sender">{n.senderName}</div>
                           )}
                           <div className="notification-message-container">
-                            <div className="notification-message">{n.preview}</div>
-                            {n.senderAvatar && n.link && n.link.startsWith('/chat/') && (
+                            {n.link && n.link.startsWith('/chat/') && (
                               <div className="notification-avatar">
-                                <img src={n.senderAvatar} alt={n.senderName} />
+                                <img 
+                                  src={n.senderAvatar} 
+                                  alt={n.senderName} 
+                                  onError={(e) => {
+                                    console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
+                                    e.target.src = 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128';
+                                  }} 
+                                />
                               </div>
                             )}
+                            <div className="notification-message">{n.preview}</div>
                           </div>
                           <div className="notification-date">
                             {n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}

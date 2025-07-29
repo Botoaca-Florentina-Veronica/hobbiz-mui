@@ -164,18 +164,9 @@
   margin-bottom: 6px;
 }
 
-.notification-message {
-  color: #183642;
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 8px;
-  font-weight: 500;
-  flex: 1;
-}
-
 .notification-message-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   margin-bottom: 8px;
 }
@@ -188,6 +179,7 @@
   flex-shrink: 0;
   border: 2px solid #355070;
   box-shadow: 0 2px 8px rgba(53, 80, 112, 0.2);
+  order: 1; /* Avatar primul în ordine */
 }
 
 .notification-avatar img {
@@ -195,6 +187,16 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.notification-message {
+  color: #183642;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+  font-weight: 500;
+  flex: 1;
+  order: 2; /* Mesajul al doilea în ordine */
 }
 
 .notification-date {

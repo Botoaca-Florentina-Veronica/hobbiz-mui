@@ -25,6 +25,7 @@ import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
 import AnnouncementDetails from './pages/AnnouncementDetails';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import About from './pages/About';
+import HowItWorks from './pages/HowItWorks';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import './App.css';
 import './mediaQueries.css';
@@ -85,6 +86,12 @@ function App() {
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <About />
+          </>
+        } />
+        <Route path="/cum-functioneaza" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <HowItWorks />
           </>
         } />
         <Route path="/confidentialitate" element={
