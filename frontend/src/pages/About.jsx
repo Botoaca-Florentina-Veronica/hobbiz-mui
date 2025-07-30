@@ -14,7 +14,7 @@ export default function About() {
   const faqData = [
     {
       question: "Este gratuit să folosesc Hobbiz?",
-      answer: "Da, înregistrarea și utilizarea de bază a platformei Hobbiz sunt complet gratuite. Poți publica anunțuri, răspunde la anunțuri și comunica cu alți utilizatori fără costuri."
+      answer: "Da, înregistrarea și utilizarea de bază a platformei Hobbiz sunt complet gratuite. Poți publica și răspunde la anunțuri și comunica cu alți utilizatori fără costuri."
     },
     {
       question: "Cum îmi protejez datele personale?",

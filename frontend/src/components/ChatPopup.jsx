@@ -5,7 +5,6 @@ import { Popover } from '@mui/material';
 import { sendMessage, getMessages, deleteMessage } from '../api/api';
 import './ChatPopup.css';
 
-// userId și userRole ar trebui să vină din contextul de autentificare sau ca prop
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
   const [hoveredMsgId, setHoveredMsgId] = useState(null);
   const [deleteHover, setDeleteHover] = useState(false);
@@ -15,26 +14,51 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
   const messagesEndRef = useRef(null);
 
-  // Creează un id unic pentru conversație (ex: anuntId + sellerId + cumparatorId)
-  // Fallback: folosește stringuri goale dacă nu există id-uri valide
-  const annId = announcement?.id || announcement?._id || "testAnnId";
-  const sellerId = seller?._id || "testSellerId";
-  const effectiveUserId = userId || localStorage.getItem('userId') || "testUserId";
-  // Nu mai blochez conversația dacă id-urile lipsesc
-  const conversationId = [annId, sellerId, effectiveUserId].join("-");
+  // Obține userId din localStorage dacă nu e pasat ca prop
+  const effectiveUserId = userId || localStorage.getItem('userId');
+  
+  // Creează conversationId mai simplu și consistent
+  const conversationId = React.useMemo(() => {
+    if (!announcement || !seller || !effectiveUserId) return null;
+    
+    const annId = announcement.id || announcement._id;
+    const sellerId = seller._id || seller.id;
+    
+    if (!annId || !sellerId) return null;
+    
+    // Sortăm ID-urile pentru a asigura consistența indiferent de ordinea parametrilor
+    const participants = [sellerId, effectiveUserId].sort();
+    return `${annId}-${participants.join('-')}`;
+  }, [announcement, seller, effectiveUserId]);
 
-  // Fetch messages când se deschide popup-ul sau se schimbă conversația
+  // Încarcă mesajele când se deschide popup-ul
   useEffect(() => {
-    if (open && conversationId) {
-      setLoading(true);
-      getMessages(conversationId)
-        .then(res => setMessages(res.data))
-        .catch(() => setMessages([]))
-        .finally(() => setLoading(false));
+    if (!open || !conversationId) {
+      setMessages([]);
+      return;
     }
+    
+    const fetchMessages = async () => {
+      setLoading(true);
+      try {
+        console.log('🔄 Încărcare mesaje pentru conversația:', conversationId);
+        const response = await getMessages(conversationId);
+        setMessages(response.data || []);
+        console.log('✅ Mesaje încărcate:', response.data?.length || 0);
+      } catch (error) {
+        console.error('❌ Eroare la încărcarea mesajelor:', error);
+        setMessages([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchMessages();
   }, [open, conversationId]);
 
   // Scroll la ultimul mesaj
@@ -46,68 +70,76 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
-    // Determină destinatarul: dacă userul logat e cumpărător, destinatarul e vânzătorul, altfel e userul logat
-    const destinatarId = userRole === 'cumparator' ? sellerId : effectiveUserId;
-    // Validarea și alertul au fost eliminate complet
-    const msg = {
+    
+    if (!input.trim() || sending || !conversationId) return;
+    
+    const messageText = input.trim();
+    setInput("");
+    setSending(true);
+    
+    // Determină destinatarul corect
+    const recipientId = effectiveUserId === seller._id ? 
+      // Dacă utilizatorul curent este vânzătorul, mesajul merge către cel care a inițiat conversația
+      // Pentru aceasta, avem nevoie să extragem celălalt participant din conversationId
+      conversationId.split('-').find(id => id !== seller._id && id !== (announcement.id || announcement._id)) :
+      // Altfel, mesajul merge către vânzător
+      seller._id;
+    
+    const messageData = {
       conversationId,
       senderId: effectiveUserId,
-      senderRole: userRole,
-      text: input.trim(),
-      destinatarId,
-      announcementId: annId,
+      text: messageText,
+      announcementId: announcement.id || announcement._id,
+      destinatarId: recipientId
     };
+    
     try {
-      // Adaugă mesajul local instant
-      setMessages(prev => [...prev, {
-        ...msg,
-        _id: Date.now().toString(), // id temporar
-        createdAt: new Date().toISOString()
-      }]);
-      setInput("");
-      const response = await sendMessage(msg);
-      // Dacă backend-ul returnează mesajul, sincronizează cu răspunsul
-      if (response && response.data) {
-        setMessages(prev => {
-          // Elimină mesajul temporar
-          const filtered = prev.filter(m => m._id !== msg._id);
-          return [...filtered, response.data];
-        });
+      console.log('📤 Trimitere mesaj:', messageData);
+      const response = await sendMessage(messageData);
+      
+      if (response.data) {
+        // Adaugă mesajul la lista existentă
+        setMessages(prev => [...prev, response.data]);
+        console.log('✅ Mesaj trimis cu succes:', response.data);
+        
+        // Notifică componenta părinte despre mesajul nou
+        if (onMessageSent) {
+          onMessageSent();
+        }
       }
-      if (typeof onMessageSent === 'function') {
-        onMessageSent(); // refetch notificări instant
-      }
-      // (opțional) Refă fetch la toate mesajele conversației pentru sincronizare corectă
-      setTimeout(async () => {
-        try {
-          const res = await getMessages(conversationId);
-          setMessages(res.data);
-        } catch {}
-      }, 500);
-    } catch (err) {
-      console.error('Eroare la trimiterea mesajului:', err);
-      // Nu mai afișăm alert pentru că este deranjant - mesajul local rămâne afișat
+    } catch (error) {
+      console.error('❌ Eroare la trimiterea mesajului:', error);
+      // Restaurează textul în input dacă trimiterea a eșuat
+      setInput(messageText);
+      alert('Eroare la trimiterea mesajului. Te rog încearcă din nou.');
+    } finally {
+      setSending(false);
     }
   };
 
   // Șterge mesaj
   const handleDeleteMessage = async (msgId) => {
+    if (!msgId) return;
+    
     try {
       await deleteMessage(msgId);
       setMessages(prev => prev.filter(m => m._id !== msgId));
-    } catch (err) {
-      // handle error
+      console.log('✅ Mesaj șters cu succes:', msgId);
+    } catch (error) {
+      console.error('❌ Eroare la ștergerea mesajului:', error);
+      alert('Eroare la ștergerea mesajului. Te rog încearcă din nou.');
     }
   };
 
   // Adaugă emoji la input
   const handleEmoji = (emoji) => {
-    setInput(input + emoji);
+    setInput(prev => prev + emoji);
     setEmojiAnchor(null);
   };
 
-  if (!open) return null;
+  // Verifică dacă componenta poate fi afișată
+  if (!open || !conversationId) return null;
+
   return (
     <div className="chat-popup-overlay">
       <div className="chat-popup-box">
@@ -134,63 +166,72 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         </div>
         <div className="chat-popup-messages">
           {loading ? (
-            <div style={{textAlign: 'center', color: '#888'}}>Se încarcă...</div>
+            <div style={{textAlign: 'center', color: '#888', padding: '20px'}}>
+              Se încarcă mesajele...
+            </div>
+          ) : messages.length === 0 ? (
+            <div style={{textAlign: 'center', color: '#888', padding: '20px'}}>
+              Nicio conversație încă. Scrie primul mesaj!
+            </div>
           ) : (
-            messages.length === 0 ? (
-              <div style={{textAlign: 'center', color: '#888'}}>Nicio conversație încă.</div>
-            ) : (
-              messages.map((msg, idx) => (
+            messages.map((msg, idx) => (
+              <div
+                key={msg._id || `msg-${idx}`}
+                className={
+                  "chat-popup-message-row " +
+                  (msg.senderId === effectiveUserId
+                    ? "chat-popup-message-own-row"
+                    : "chat-popup-message-other-row" 
+                  )
+                }
+              >
                 <div
-                  key={msg._id || idx}
                   className={
-                    "chat-popup-message-row " +
-                    (msg.senderId === userId
-                      ? "chat-popup-message-own-row"
-                      : "chat-popup-message-other-row" 
+                    "chat-popup-message " +
+                    (msg.senderId === effectiveUserId
+                      ? "chat-popup-message-own"
+                      : "chat-popup-message-other" 
                     )
                   }
+                  onMouseEnter={() => setHoveredMsgId(msg._id)}
+                  onMouseLeave={() => { setHoveredMsgId(null); setDeleteHover(false); }}
                 >
-                  <div
-                    className={
-                      "chat-popup-message " +
-                      (msg.senderId === userId
-                        ? "chat-popup-message-own"
-                        : "chat-popup-message-other" 
-                      )
-                    }
-                    onMouseEnter={() => setHoveredMsgId(msg._id)}
-                    onMouseLeave={() => { setHoveredMsgId(null); setDeleteHover(false); }}
-                  >
-                    {msg.senderId === userId && hoveredMsgId === msg._id && (
-                      <div
-                        className="chat-popup-message-delete"
+                  {msg.senderId === effectiveUserId && hoveredMsgId === msg._id && (
+                    <div className="chat-popup-message-delete">
+                      <button
+                        className="chat-popup-message-delete-btn"
+                        onMouseEnter={() => {
+                          setDeleteHover(msg._id);
+                          window.deleteTooltipTimeout = setTimeout(() => {
+                            setDeleteHover('show-' + msg._id);
+                          }, 1000);
+                        }}
+                        onMouseLeave={() => {
+                          setDeleteHover(false);
+                          clearTimeout(window.deleteTooltipTimeout);
+                        }}
+                        onClick={() => handleDeleteMessage(msg._id)}
+                        title="Șterge mesajul"
                       >
-                        <button
-                          className="chat-popup-message-delete-btn"
-                          onMouseEnter={() => {
-                            setDeleteHover(msg._id);
-                            window.deleteTooltipTimeout = setTimeout(() => {
-                              setDeleteHover('show-' + msg._id);
-                            }, 1000);
-                          }}
-                          onMouseLeave={() => {
-                            setDeleteHover(false);
-                            clearTimeout(window.deleteTooltipTimeout);
-                          }}
-                          onClick={() => handleDeleteMessage(msg._id)}
-                        >
-                          <DeleteIcon sx={{ color: '#222', fontSize: 18 }} />
-                        </button>
-                        {deleteHover === 'show-' + msg._id && (
-                          <span className="chat-popup-message-delete-tooltip">Șterge</span>
-                        )}
-                      </div>
-                    )}
-                    {msg.text}
-                  </div>
+                        <DeleteIcon sx={{ color: '#222', fontSize: 18 }} />
+                      </button>
+                      {deleteHover === 'show-' + msg._id && (
+                        <span className="chat-popup-message-delete-tooltip">Șterge</span>
+                      )}
+                    </div>
+                  )}
+                  <div className="chat-popup-message-text">{msg.text}</div>
+                  {msg.createdAt && (
+                    <div className="chat-popup-message-time">
+                      {new Date(msg.createdAt).toLocaleTimeString('ro-RO', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </div>
+                  )}
                 </div>
-              ))
-            )
+              </div>
+            ))
           )}
           <div ref={messagesEndRef} />
         </div>
@@ -260,19 +301,39 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
           <form onSubmit={handleSend} style={{display: 'flex', flex: 1, alignItems: 'center'}}>
             <input
               className="chat-popup-input"
-              placeholder="Scrie mesajul tău..."
+              placeholder={sending ? "Se trimite..." : "Scrie mesajul tău..."}
               value={input}
               onChange={e => setInput(e.target.value)}
+              disabled={sending}
               autoFocus
             />
             <button
               type="submit"
               className="chat-popup-icon-btn"
-              style={{marginLeft: 4, fontSize: 22, color: '#2ec4b6'}}
+              style={{
+                marginLeft: 4, 
+                fontSize: 22, 
+                color: sending ? '#ccc' : '#2ec4b6',
+                cursor: sending ? 'not-allowed' : 'pointer'
+              }}
               aria-label="Trimite mesaj"
-              disabled={!input.trim()}
+              disabled={!input.trim() || sending}
             >
-              <svg width="24" height="24" fill="none" stroke="#2ec4b6" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+              {sending ? (
+                <div style={{
+                  width: 20, 
+                  height: 20, 
+                  border: '2px solid #ccc', 
+                  borderTop: '2px solid #2ec4b6',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+              ) : (
+                <svg width="24" height="24" fill="none" stroke="#2ec4b6" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M22 2L11 13"/>
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                </svg>
+              )}
             </button>
           </form>
         </div>

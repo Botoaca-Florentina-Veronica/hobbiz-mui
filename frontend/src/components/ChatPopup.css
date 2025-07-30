@@ -363,3 +363,21 @@
     max-height: 100vh;
   }
 }
+
+/* Animație pentru loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Stiluri pentru mesajele cu timestamp */
+.chat-popup-message-text {
+  margin-bottom: 4px;
+}
+
+.chat-popup-message-time {
+  font-size: 11px;
+  opacity: 0.7;
+  text-align: right;
+  margin-top: 2px;
+}

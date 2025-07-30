@@ -2,7 +2,7 @@
 
 /* Pagina About modernă și dinamică */
 .about-page {
-  background: linear-gradient(135deg, #f5f7f8 0%, #e8f2f4 100%);
+  background-color: #f3f5f6;
   min-height: 100vh;
   padding: 40px 0;
   margin-top: 4rem;
@@ -645,7 +645,7 @@
 /* Secțiune FAQ */
 .faq-section {
   margin: 60px 0;
-  background: linear-gradient(135deg, #f8fafb 0%, #e8f2f4 100%);
+  background-color: white;
   padding: 50px 40px;
   border-radius: 20px;
 }

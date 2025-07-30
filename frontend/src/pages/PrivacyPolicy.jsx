@@ -38,7 +38,7 @@ const PrivacyPolicy = () => (
         <section>
           <h2>2. Categorii de date prelucrate</h2>
           
-          <h3>2.1 Date furnizate voluntar</h3>
+          <h3> Date furnizate voluntar</h3>
           <p>
             În procesul de creare a contului și utilizare a platformei, colectăm o serie de informații personale necesare pentru furnizarea serviciilor noastre. Acestea includ nume complet, adresă de email validă, număr de telefon verificat, date demografice opționale (vârstă, gen) și orice alte informații pe care le introduceți voluntar în profilul utilizatorului sau în conținutul generat (anunțuri, mesaje, recenzii).
           </p>
@@ -46,7 +46,7 @@ const PrivacyPolicy = () => (
             Pentru utilizatorii care optează pentru servicii premium, colectăm și procesăm date de plată necesare procesării tranzacțiilor financiare. Aceste informații sunt prelucrate exclusiv prin intermediul procesatorilor de plăți certificați PCI DSS, fără a fi stocate pe serverele noastre.
           </p>
           
-          <h3>2.2 Date colectate automat</h3>
+          <h3> Date colectate automat</h3>
           <p>
             Sistemul nostru înregistrează automat date tehnice despre dispozitivul și interacțiunile dumneavoastră cu platforma. Acestea includ adresa IP, identificatori unici de dispozitiv, tipul și versiunea browserului, sistemul de operare, date de utilizare (pagini accesate, timpul petrecut, acțiuni întreprinse) și date aproximative de localizare derivate din adresa IP sau setările dispozitivului.
           </p>
@@ -63,22 +63,22 @@ const PrivacyPolicy = () => (
             Prelucrăm datele dumneavoastră personale pe baza următoarelor fundamentări juridice și pentru următoarele scopuri specifice:
           </p>
           
-          <h3>3.1 Executarea contractului</h3>
+          <h3> Executarea contractului</h3>
           <p>
             Pentru a vă oferi acces la platformă și serviciile solicitate, inclusiv gestionarea contului, publicarea anunțurilor, facilitarea comunicării între utilizatori și procesarea tranzacțiilor financiare. Această prelucrare este esențială pentru îndeplinirea obligațiilor noastre contractuale față de dumneavoastră.
           </p>
           
-          <h3>3.2 Interese legitime</h3>
+          <h3> Interese legitime</h3>
           <p>
             Pentru îmbunătățirea continuă a platformei, prevenirea fraudelor și activităților abuzive, analiza modului de utilizare a serviciilor noastre, dezvoltarea de noi funcționalități și asigurarea securității sistemului. Implementăm măsuri adecvate pentru a vă proteja drepturile și libertățile în aceste procese.
           </p>
           
-          <h3>3.3 Consimțământ</h3>
+          <h3> Consimțământ</h3>
           <p>
             Pentru activități de marketing direct, anumite tipuri de analize de date și utilizarea anumitor cookie-uri. Puteți retrage consimțământul oricând, fără a afecta legalitatea prelucrării efectuate anterior retragerii.
           </p>
           
-          <h3>3.4 Conformitate legală</h3>
+          <h3> Conformitate legală</h3>
           <p>
             Pentru îndeplinirea obligațiilor legale, inclusiv în domeniul fiscal, al prevenirii spălării banilor și al altor reglementări aplicabile. Aceste prelucrări sunt efectuate numai în măsura cerută de legislația în vigoare.
           </p>

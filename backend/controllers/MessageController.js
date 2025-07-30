@@ -17,6 +17,10 @@ const { Types } = require('mongoose');
 // Creează un mesaj nou și notificare pentru destinatar
 exports.createMessage = async (req, res) => {
   try {
+    console.log('🚀🚀🚀 === APEL CREATEMESSAGE ===');
+    console.log('🚀 Timestamp:', new Date().toISOString());
+    console.log('🚀 Request body:', req.body);
+    console.log('🚀 Request ID (dacă există):', req.id || 'N/A');
     console.log('=== CREEAZĂ MESAJ - REQUEST BODY ===');
     console.log(JSON.stringify(req.body, null, 2));
     console.log('=== HEADERS ===');
@@ -52,17 +56,36 @@ exports.createMessage = async (req, res) => {
       console.error('Nu s-a putut identifica destinatarul pentru notificare!', notificationUserId);
       return res.status(400).json({ error: 'ID destinatar invalid pentru notificare.' });
     }
-    // Creează notificare
+    // Creează notificare doar dacă nu există deja una identică
     try {
-      const notif = await Notification.create({
+      console.log('🔔 Verificare notificare duplicată...');
+      console.log('🔔 User ID pentru notificare:', notificationUserId);
+      console.log('🔔 Link conversație:', `/chat/${conversationId}`);
+      console.log('🔔 Mesaj notificare:', `Ai primit un mesaj nou la anunțul #${announcementId || ''}`);
+      
+      // Verifică dacă există deja o notificare identică (fără condiție de timp)
+      const existingNotification = await Notification.findOne({
         userId: notificationUserId,
         message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
         link: `/chat/${conversationId}`,
+        read: false // doar notificările necitite
       });
-      console.log('Notificare salvată:', notif);
+      
+      if (existingNotification) {
+        console.log('⚠️ NOTIFICARE DUPLICATĂ găsită! Se sare peste crearea unei noi:', existingNotification._id);
+        console.log('⚠️ Notificare existentă:', existingNotification);
+      } else {
+        console.log('✅ Nu s-a găsit notificare duplicată, se creează una nouă...');
+        const notif = await Notification.create({
+          userId: notificationUserId,
+          message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
+          link: `/chat/${conversationId}`,
+        });
+        console.log('✅ Notificare nouă salvată:', notif);
+      }
     } catch (err) {
       console.error('EROARE LA SALVAREA NOTIFICĂRII:', err);
-      return res.status(500).json({ error: 'Eroare la salvarea notificării.' });
+      // Nu returnăm eroare aici pentru că mesajul s-a salvat cu succes
     }
 
     res.status(201).json(message);

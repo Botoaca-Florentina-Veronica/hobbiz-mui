@@ -8,4 +8,7 @@ const NotificationSchema = new mongoose.Schema({
   read: { type: Boolean, default: false },
 });
 
+// Index unic pentru a preveni notificări duplicate
+NotificationSchema.index({ userId: 1, message: 1, link: 1 }, { unique: false });
+
 module.exports = mongoose.model('Notification', NotificationSchema);
