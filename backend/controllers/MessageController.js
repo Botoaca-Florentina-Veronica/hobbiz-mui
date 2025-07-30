@@ -26,66 +26,55 @@ exports.createMessage = async (req, res) => {
     console.log('=== HEADERS ===');
     console.log(JSON.stringify(req.headers, null, 2));
     
-    const { conversationId, senderId, senderRole, text, destinatarId, announcementId, sellerId, userId } = req.body;
-    const message = new Message({ conversationId, senderId, senderRole, text });
+    const { conversationId, senderId, text, destinatarId, announcementId } = req.body;
+    
+    // Validare de bază
+    if (!conversationId || !senderId || !text || !destinatarId) {
+      console.error('❌ Date obligatorii lipsă:', { conversationId, senderId, text, destinatarId });
+      return res.status(400).json({ error: 'Date obligatorii lipsă pentru mesaj.' });
+    }
+    
+    const message = new Message({ 
+      conversationId, 
+      senderId, 
+      text,
+      createdAt: new Date()
+    });
+    
     await message.save();
+    console.log('✅ Mesaj salvat:', message);
 
-    // Identifică destinatarul robust
-    let notificationUserId = destinatarId;
-    if (!notificationUserId) {
-      // conversationId = [announcementId, sellerId, userId].sort().join('-')
-      // Preferă sellerId și userId din body dacă există
-      if (sellerId && userId) {
-        notificationUserId = senderId === sellerId ? userId : sellerId;
-      } else {
-        // Fallback: parsează din conversationId
-        const ids = conversationId.split('-');
-        notificationUserId = ids.find(id => id !== senderId && id !== announcementId);
-      }
-    }
-    // Validare și conversie ObjectId robustă
-    if (typeof notificationUserId === 'string' && /^[a-fA-F0-9]{24}$/.test(notificationUserId)) {
+    // Creează notificare pentru destinatar
+    const notificationUserId = destinatarId;
+    // Creează notificare pentru destinatar (doar dacă nu e același cu expeditorul)
+    if (notificationUserId !== senderId) {
       try {
-        notificationUserId = new Types.ObjectId(notificationUserId);
-      } catch (e) {
-        console.error('Eroare la conversia ObjectId:', e);
-        return res.status(400).json({ error: 'ID destinatar invalid pentru notificare.' });
-      }
-    }
-    if (!notificationUserId || !Types.ObjectId.isValid(notificationUserId)) {
-      console.error('Nu s-a putut identifica destinatarul pentru notificare!', notificationUserId);
-      return res.status(400).json({ error: 'ID destinatar invalid pentru notificare.' });
-    }
-    // Creează notificare doar dacă nu există deja una identică
-    try {
-      console.log('🔔 Verificare notificare duplicată...');
-      console.log('🔔 User ID pentru notificare:', notificationUserId);
-      console.log('🔔 Link conversație:', `/chat/${conversationId}`);
-      console.log('🔔 Mesaj notificare:', `Ai primit un mesaj nou la anunțul #${announcementId || ''}`);
-      
-      // Verifică dacă există deja o notificare identică (fără condiție de timp)
-      const existingNotification = await Notification.findOne({
-        userId: notificationUserId,
-        message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
-        link: `/chat/${conversationId}`,
-        read: false // doar notificările necitite
-      });
-      
-      if (existingNotification) {
-        console.log('⚠️ NOTIFICARE DUPLICATĂ găsită! Se sare peste crearea unei noi:', existingNotification._id);
-        console.log('⚠️ Notificare existentă:', existingNotification);
-      } else {
-        console.log('✅ Nu s-a găsit notificare duplicată, se creează una nouă...');
-        const notif = await Notification.create({
+        console.log('🔔 Verificare notificare duplicată...');
+        console.log('🔔 User ID pentru notificare:', notificationUserId);
+        console.log('🔔 Link conversație:', `/chat/${conversationId}`);
+        
+        // Verifică dacă există deja o notificare necitită pentru această conversație
+        const existingNotification = await Notification.findOne({
           userId: notificationUserId,
-          message: `Ai primit un mesaj nou la anunțul #${announcementId || ''}`,
           link: `/chat/${conversationId}`,
+          read: false
         });
-        console.log('✅ Notificare nouă salvată:', notif);
+        
+        if (existingNotification) {
+          console.log('⚠️ NOTIFICARE DUPLICATĂ găsită! Se sare peste crearea unei noi:', existingNotification._id);
+        } else {
+          console.log('✅ Nu s-a găsit notificare duplicată, se creează una nouă...');
+          const notif = await Notification.create({
+            userId: notificationUserId,
+            message: `Ai primit un mesaj nou${announcementId ? ` la anunțul #${announcementId}` : ''}`,
+            link: `/chat/${conversationId}`,
+          });
+          console.log('✅ Notificare nouă salvată:', notif);
+        }
+      } catch (err) {
+        console.error('EROARE LA SALVAREA NOTIFICĂRII:', err);
+        // Nu returnăm eroare aici pentru că mesajul s-a salvat cu succes
       }
-    } catch (err) {
-      console.error('EROARE LA SALVAREA NOTIFICĂRII:', err);
-      // Nu returnăm eroare aici pentru că mesajul s-a salvat cu succes
     }
 
     res.status(201).json(message);

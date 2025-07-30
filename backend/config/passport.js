@@ -55,8 +55,7 @@ passport.use(new FacebookStrategy({
 
 */
 
-// Google OAuth2.0 Strategy dezactivat temporar pentru dezvoltare locală
-/*
+// Google OAuth2.0 Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -103,7 +102,6 @@ passport.use(new GoogleStrategy({
     return done(err, null);
   }
 }));
-*/
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

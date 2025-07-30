@@ -52,6 +52,11 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         console.log('✅ Mesaje încărcate:', response.data?.length || 0);
       } catch (error) {
         console.error('❌ Eroare la încărcarea mesajelor:', error);
+        
+        if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+          console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează pe portul 5000.');
+        }
+        
         setMessages([]);
       } finally {
         setLoading(false);
@@ -77,13 +82,23 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     setInput("");
     setSending(true);
     
-    // Determină destinatarul corect
-    const recipientId = effectiveUserId === seller._id ? 
-      // Dacă utilizatorul curent este vânzătorul, mesajul merge către cel care a inițiat conversația
-      // Pentru aceasta, avem nevoie să extragem celălalt participant din conversationId
-      conversationId.split('-').find(id => id !== seller._id && id !== (announcement.id || announcement._id)) :
-      // Altfel, mesajul merge către vânzător
-      seller._id;
+    // Determină destinatarul corect - logic simplu
+    const recipientId = seller._id || seller.id;
+    
+    // Validare înainte de trimitere
+    if (!recipientId || !effectiveUserId || !conversationId) {
+      console.error('❌ Date lipsă pentru trimiterea mesajului:', {
+        recipientId,
+        effectiveUserId,
+        conversationId,
+        seller,
+        announcement
+      });
+      alert('Eroare: Date lipsă pentru trimiterea mesajului.');
+      setSending(false);
+      setInput(messageText);
+      return;
+    }
     
     const messageData = {
       conversationId,
@@ -109,9 +124,18 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       }
     } catch (error) {
       console.error('❌ Eroare la trimiterea mesajului:', error);
+      
+      // Verifică tipul de eroare și afișează mesaj relevant
+      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+        alert('Eroare de conectare la server. Te rog verifică dacă backend-ul rulează pe portul 5000.');
+      } else if (error.response?.status === 500) {
+        alert('Eroare de server la trimiterea mesajului. Verifică log-urile backend-ului.');
+      } else {
+        alert(`Eroare la trimiterea mesajului: ${error.message}`);
+      }
+      
       // Restaurează textul în input dacă trimiterea a eșuat
       setInput(messageText);
-      alert('Eroare la trimiterea mesajului. Te rog încearcă din nou.');
     } finally {
       setSending(false);
     }

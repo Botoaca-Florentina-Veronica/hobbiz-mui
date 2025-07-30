@@ -27,14 +27,22 @@ router.get('/google/callback',
       process.env.JWT_SECRET || 'jwt_secret',
       { expiresIn: '7d' }
     );    // Redirecționează către frontend cu tokenul în query string
-    res.redirect(`https://hobbiz.netlify.app/oauth-success?token=${token}`);
+    // Pentru dezvoltare locală
+    const frontendUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://hobbiz.netlify.app' 
+      : 'http://localhost:5173';
+    
+    res.redirect(`${frontendUrl}/oauth-success?token=${token}`);
   }
 );
 
 // Logout
 router.get('/logout', (req, res) => {
   req.logout(() => {
-    res.redirect('https://hobbiz.netlify.app');
+    const frontendUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://hobbiz.netlify.app' 
+      : 'http://localhost:5173';
+    res.redirect(frontendUrl);
   });
 });
 
