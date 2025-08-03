@@ -101,6 +101,8 @@
   backdrop-filter: blur(2px);
 }
 
+/* Styled Components MUI handle the dropdown styling now */
+/*
 .categories-dropdown {
   position: fixed;
   top: 70px;
@@ -115,121 +117,137 @@
   animation: fadeIn .2s;
 }
 
-.categories-dropdown::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 100%;
-  width: calc(100vw - 380px - 40px);
-  height: 100%;
-  background: white;
-  z-index: 9999;
-  opacity: 0;
-  transform: translateX(-20px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  pointer-events: none;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-}
-
-.categories-dropdown:hover::after {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.categories-dropdown ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  z-index: 10001;
-}
-
-.categories-dropdown li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.05rem;
-  padding: 12px 22px;
-  cursor: pointer;
-  transition: background 0.15s;
-  position: relative;
-}
-
-.categories-dropdown li:hover > ul {
-  display: block;
-  position: absolute;
-  left: 100%;
-  top: 0;
-  background: white;
-  min-width: 200px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-}
-
-.categories-dropdown li > ul {
-  display: none;
-}
-
-.categories-dropdown li svg {
-  margin-right: 10px;
-  font-size: 1.05rem;
-}
-
-.categories-dropdown li:hover {
-  background: #f8b19522;
-}
-
-.categories-dropdown .arrow {
-  font-size: 1.1em;
-  color: #b23a48;
-}
-
-@media (max-width: 600px) {
-  .categories-dropdown {
-    left: 0;
-    right: 0;
-    min-width: unset;
-    width: 95vw;
-    top: 10px;
-    border-radius: 12px;
-    padding: 6px 0;
-  }
-  .categories-dropdown li {
-    font-size: 0.98rem;
-    padding: 10px 12px;
-  }
-}
+... rest of old dropdown styles commented out ...
+*/
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes categorySlideIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(-20px) scale(0.95); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes detailsSlideIn {
+  0% { 
+    opacity: 0; 
+    transform: translateX(-16px) scale(0.96); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0) scale(1); 
+  }
+}
+
+/* Animații optimizate pentru categorii */
+@keyframes categorySlideIn {
+  0% { 
+    opacity: 0; 
+    transform: translate3d(-20px, 0, 0) scale(0.95); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translate3d(0, 0, 0) scale(1); 
+  }
+}
+
+/* Îmbunătățiri pentru overlay blur */
+.categories-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.4);
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  animation: overlayFadeIn 0.3s ease;
+}
+
+@keyframes overlayFadeIn {
+  from { 
+    opacity: 0; 
+    backdrop-filter: blur(0px);
+  }
+  to { 
+    opacity: 1; 
+    backdrop-filter: blur(8px);
+  }
+}
+
 .categories-button {
+  all: unset; /* Resetează toate stilurile default ale button-ului */
   display: inline-flex;
   align-items: center;
   gap: 12px;
   padding: 18px 36px;
-  background: #355070;
-  border: 6px solid #fff; /* contur alb, grosime mare */
-  border-radius: 12px;
+  background: linear-gradient(135deg, #355070 0%, #2c4a63 100%);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
   cursor: pointer;
   color: #fff;
   font-size: 1.45rem;
-  font-weight: bold;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(53, 80, 112, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  z-index: 1000; /* Z-index normal */
+}
+
+.categories-button.menu-open {
+  z-index: 9990; /* Z-index mai mic când meniul este deschis, pentru a fi sub overlay */
+}
+
+.categories-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.categories-button:hover::before {
+  left: 100%;
 }
 
 .categories-button:hover, .categories-button:focus {
-  background: #27405a;
+  background: linear-gradient(135deg, #2c4a63 0%, #1e3a52 100%);
   color: #fff;
-  border-color: #fff;
-  box-shadow: 0 6px 24px rgba(53,80,112,0.18);
+  border-color: rgba(248, 177, 149, 0.8);
+  box-shadow: 0 12px 32px rgba(53, 80, 112, 0.4), 0 6px 16px rgba(248, 177, 149, 0.2);
+  transform: translateY(-2px);
+}
+
+.categories-button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 20px rgba(53, 80, 112, 0.3);
 }
 
 .categories-button svg {
   font-size: 1.6em;
+  transition: transform 0.3s ease;
+}
+
+.categories-button:hover svg {
+  transform: rotate(90deg);
 }
 
 .top-bar {

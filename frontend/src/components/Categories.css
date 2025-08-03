@@ -4,7 +4,7 @@
   text-align: center;
   background-color: #355070;
   height: auto;
-  min-height: 102vh;
+  min-height: 120vh;
 }
 
 @media (max-width: 700px) {
@@ -109,4 +109,15 @@
 
 .dark-mode .category-description{
   color: #fe6585;
+}
+
+/* Stiluri pentru cardurile Material-UI */
+.MuiCard-root {
+  transition: all 0.3s ease !important;
+}
+
+/* Stiluri pentru imaginile din categorii */
+.MuiBox-root img {
+  margin: 0 auto !important;
+  text-align: center !important;
 }

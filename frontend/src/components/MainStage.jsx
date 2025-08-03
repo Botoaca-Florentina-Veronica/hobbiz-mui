@@ -1,17 +1,214 @@
 import { FaSearch, FaBars, FaMapMarkerAlt } from "react-icons/fa";
 import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
 import hobby from '../assets/images/hobby_img.jpg';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import { Paper, Card, CardContent, Chip, Box, IconButton } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import './MainStage.css';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 const judete = ["Toată țara", ...Object.keys(localitatiPeJudet)];
+
+// Styled MUI Components pentru categorii
+const CategoryDropdown = styled(Paper)(({ theme }) => ({
+  position: 'fixed',
+  top: '70px',
+  left: '40px',
+  background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+  borderRadius: '0px',
+  boxShadow: '0 20px 40px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1)',
+  zIndex: 10000,
+  width: '420px', // Mai mare de la 380px la 420px
+  height: '630px', // Mai mare de la 560px la 630px (14 * 45px)
+  overflowY: 'hidden', // Eliminăm scrollbar-ul vertical
+  overflowX: 'hidden', // Eliminăm scrollbar-ul orizontal
+  padding: '0px', // Eliminăm padding-ul pentru a câștiga spațiu
+  animation: 'categorySlideIn 0.25s ease-out',
+  willChange: 'opacity, transform',
+  border: '1px solid rgba(255,255,255,0.8)',
+  backdropFilter: 'blur(10px)',
+  display: 'flex',
+  flexDirection: 'column',
+  '@media (max-width: 600px)': {
+    left: '10px',
+    right: '10px',
+    minWidth: 'unset',
+    width: 'calc(100vw - 20px)',
+    top: '60px',
+    height: '400px',
+  }
+}));
+
+const CategoryItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '12px 18px', // Padding mai mare pentru mai mult spațiu
+  margin: '0px', // Fără margin
+  borderRadius: '0px',
+  cursor: 'pointer',
+  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  position: 'relative',
+  background: 'transparent',
+  flex: '1', // Fiecare item să ocupe spațiul disponibil uniform
+  height: '45px', // Înălțime mai mare pentru fiecare item (630px / 14 categorii = 45px)
+  maxWidth: '100%', // Previne overflow-ul orizontal
+  overflow: 'hidden', // Ascunde orice overflow
+  '&:hover': {
+    background: 'linear-gradient(135deg, rgba(248,177,149,0.15) 0%, rgba(53,80,112,0.08) 100%)',
+    transform: 'translateX(2px)', // Redus de la 4px la 2px pentru a preveni overflow-ul
+    boxShadow: '0 4px 12px rgba(248,177,149,0.2)',
+  },
+  '& .category-icon': {
+    fontSize: '1.1rem', // Puțin mai mare
+    marginRight: '14px',
+    color: '#355070',
+    transition: 'color 0.2s ease',
+    flexShrink: 0, // Previne comprimarea iconului
+  },
+  '& .category-text': {
+    flex: 1,
+    fontSize: '1rem', // Puțin mai mare
+    fontWeight: 500,
+    color: '#2c3e50',
+    whiteSpace: 'nowrap', // Previne wrap-ul textului
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  '& .category-arrow': {
+    color: '#F8B195',
+    transition: 'transform 0.2s ease, color 0.2s ease',
+    flexShrink: 0, // Previne comprimarea săgeții
+  },
+  '&:hover .category-arrow': {
+    transform: 'translateX(2px)', // Redus pentru consistență
+    color: '#355070',
+  },
+  '&:hover .category-icon': {
+    color: '#F8B195',
+  }
+}));
+
+const CategoryDetails = styled(Paper)(({ theme, isAnimatingOut }) => ({
+  position: 'fixed',
+  top: '70px',
+  left: '460px', // Ajustat pentru noua poziție (40px + 420px = 460px)
+  background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+  borderRadius: '0px', // Fără colțuri rotunjite
+  boxShadow: '0 15px 30px rgba(0,0,0,0.12), 0 5px 10px rgba(0,0,0,0.08)',
+  zIndex: 9999,
+  width: 'calc(100vw - 500px)', // Ajustat pentru noua poziție (460px + 40px margin)
+  minWidth: '450px', // Mai mare pentru mai mult conținut
+  maxWidth: '650px', // Mai mare pentru monitoare mari
+  height: '630px', // Exact aceeași înălțime ca dropdown-ul
+  overflowY: 'auto',
+  padding: '0px', // Eliminăm padding-ul pentru a avea aceeași înălțime totală
+  opacity: isAnimatingOut ? 0 : 1,
+  transform: isAnimatingOut ? 'translate3d(-5px, 0, 0) scale(0.98)' : 'translate3d(0, 0, 0) scale(1)',
+  transition: 'opacity 0.2s ease-out, transform 0.2s ease-out',
+  willChange: 'opacity, transform',
+  border: '1px solid rgba(248,177,149,0.2)',
+  borderLeft: 'none', // Eliminăm border-ul stâng pentru a fi lipit
+  '&::-webkit-scrollbar': {
+    width: '5px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'rgba(248,177,149,0.5)',
+    borderRadius: '2.5px',
+    '&:hover': {
+      background: 'rgba(248,177,149,0.7)',
+    }
+  },
+  '@media (max-width: 1200px)': {
+    width: 'calc(100vw - 480px)',
+    minWidth: '400px',
+  },
+  '@media (max-width: 900px)': {
+    width: 'calc(100vw - 460px)',
+    minWidth: '350px',
+  },
+  '@media (max-width: 768px)': {
+    display: 'none',
+  }
+}));
+
+const DetailColumn = styled(Box)(({ theme }) => ({
+  minWidth: '180px', // Mărit de la 120px
+  marginBottom: '20px',
+  height: 'fit-content',
+  padding: '16px', // Adăugat padding
+  borderRadius: '8px', // Adăugat border radius
+  background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(248,249,250,0.9) 100%)', // Adăugat gradient
+  border: '1px solid rgba(248,177,149,0.15)', // Adăugat border subtil
+  boxShadow: '0 2px 8px rgba(0,0,0,0.05)', // Adăugat umbră subtilă
+  transition: 'all 0.2s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 4px 16px rgba(248,177,149,0.15)',
+    background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,249,250,1) 100%)',
+  },
+  '& .detail-title': {
+    fontSize: '1rem', // Mărit de la 0.9rem
+    fontWeight: 600,
+    color: '#355070',
+    marginBottom: '12px', // Mărit de la 10px
+    display: 'flex',
+    alignItems: 'center',
+    lineHeight: '1.3',
+    '&::before': {
+      content: '""',
+      width: '4px', // Mărit de la 3px
+      height: '16px', // Mărit de la 14px
+      backgroundColor: '#F8B195',
+      borderRadius: '2px',
+      marginRight: '10px', // Mărit de la 8px
+      flexShrink: 0,
+    }
+  },
+  '& .detail-items': {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px', // Mărit de la 5px
+  }
+}));
+
+const DetailChip = styled(Chip)(({ theme }) => ({
+  fontSize: '0.9rem', // Mărit de la 0.8rem
+  height: '32px', // Mărit de la 26px
+  justifyContent: 'flex-start',
+  backgroundColor: 'rgba(248,177,149,0.12)', // Puțin mai intens
+  color: '#2c3e50',
+  border: '1px solid rgba(248,177,149,0.4)', // Puțin mai intens
+  transition: 'all 0.2s ease',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  width: '100%', // Ocupă toată lățimea disponibilă
+  maxWidth: '100%',
+  '&:hover': {
+    backgroundColor: 'rgba(248,177,149,0.25)', // Puțin mai intens
+    borderColor: '#F8B195',
+    transform: 'translateY(-1px) scale(1.02)', // Adăugat scaling
+    boxShadow: '0 4px 12px rgba(248,177,149,0.4)', // Umbră mai pronunțată
+  },
+  '& .MuiChip-label': {
+    paddingLeft: '12px', // Mărit de la 8px
+    paddingRight: '12px', // Mărit de la 8px
+    fontSize: 'inherit',
+    width: '100%',
+    textAlign: 'left',
+  }
+}));
 
 // Helper pentru a obține localitățile (orase + comune) sortate alfabetic pentru un județ
 function getLocalitatiForJudet(judet) {
@@ -178,7 +375,25 @@ export default function MainStage() {
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [categoryDetailsAnimating, setCategoryDetailsAnimating] = useState(false);
   const categoriesButtonRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+
+  const handleCategoryHover = (category) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setCategoryDetailsAnimating(false);
+    setHoveredCategory(category);
+  };
+
+  const handleCategoryLeave = () => {
+    setCategoryDetailsAnimating(true);
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredCategory(null);
+      setCategoryDetailsAnimating(false);
+    }, 200); // Redus de la 300ms la 200ms pentru mai multă responsivitate
+  };
 
   const handleInputClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -202,13 +417,30 @@ export default function MainStage() {
   };
 
   const handleCategoriesClick = (event) => {
+    event.preventDefault();
     event.stopPropagation();
+    console.log('Categories clicked!'); // Pentru debugging
     setCategoriesOpen(prev => !prev);
   };
 
   const handleCloseCategories = () => {
     setCategoriesOpen(false);
+    setCategoryDetailsAnimating(true);
+    setHoveredCategory(null);
+    setCategoryDetailsAnimating(false);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const open = Boolean(anchorEl);
   const id = open ? 'location-popover' : undefined;
@@ -218,56 +450,108 @@ export default function MainStage() {
       {categoriesOpen && (
         <>
           <div className="categories-overlay" onClick={handleCloseCategories}></div>
-          <div className="categories-dropdown">
-            <ul>
+          <CategoryDropdown elevation={0}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'stretch' }}>
               {categoriesList.map((cat) => (
-                <li
+                <CategoryItem
                   key={cat}
                   onClick={() => {
                     handleCloseCategories();
                     navigate(`/anunturi-categorie/${encodeURIComponent(cat)}`);
                   }}
-                  onMouseEnter={() => setHoveredCategory(cat)}
-                  onMouseLeave={() => setHoveredCategory(null)}
-                  style={{ position: 'relative' }}
+                  onMouseEnter={() => handleCategoryHover(cat)}
+                  onMouseLeave={handleCategoryLeave}
                 >
-                  {categoryIcons[cat]}
-                  <span>{cat}</span>
-                  <span className="arrow">&gt;</span>
-                </li>
+                  <Box className="category-icon">
+                    {categoryIcons[cat]}
+                  </Box>
+                  <Typography className="category-text">
+                    {cat}
+                  </Typography>
+                  <ArrowForwardIosIcon className="category-arrow" fontSize="small" />
+                </CategoryItem>
               ))}
-            </ul>
-            {hoveredCategory && categoriesDetails[hoveredCategory] && (
-              <div className="category-details-inline category-details-inline--top">
-                {categoriesDetails[hoveredCategory].columns.map((col, idx) => (
-                  <div key={idx} className="category-details-col-inline">
-                    <div className="category-details-title-inline">{col.title}</div>
-                    <ul>
-                      {col.items.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+            </Box>
+          </CategoryDropdown>
+          
+          {/* Detaliile categoriei apar separat, în dreapta dropdown-ului */}
+          {hoveredCategory && categoriesDetails[hoveredCategory] && (
+            <CategoryDetails
+              isAnimatingOut={categoryDetailsAnimating}
+              onMouseEnter={() => handleCategoryHover(hoveredCategory)}
+              onMouseLeave={handleCategoryLeave}
+            >
+              <CardContent sx={{ 
+                padding: '24px !important', 
+                height: '100%', 
+                boxSizing: 'border-box',
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(248,249,250,0.95) 100%)', // Adăugat gradient
+                borderRadius: '0 0 12px 12px', // Match cu border radius-ul Card-ului
+              }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    marginBottom: '20px', 
+                    color: '#355070', 
+                    fontWeight: 600,
+                    borderBottom: '2px solid #F8B195',
+                    paddingBottom: '10px',
+                    fontSize: '1.2rem',
+                    textAlign: 'center'
+                  }}
+                >
+                  {hoveredCategory}
+                </Typography>
+                <Box 
+                  sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: { 
+                      xs: '1fr', 
+                      sm: '1fr 1fr', 
+                      md: 'repeat(2, 1fr)',
+                      lg: 'repeat(2, 1fr)' // Schimbat de la 4 la 2 coloane pentru mai mult spațiu
+                    },
+                    gap: '24px', // Spațiu mai mare între coloane
+                    height: 'calc(100% - 60px)', // Ocupă înălțimea rămasă
+                    '@media (max-width: 1200px)': {
+                      gridTemplateColumns: '1fr 1fr',
+                    },
+                    '@media (max-width: 900px)': {
+                      gridTemplateColumns: '1fr',
+                    }
+                  }}
+                >
+                  {categoriesDetails[hoveredCategory].columns.map((col, idx) => (
+                    <DetailColumn key={idx}>
+                      <Typography className="detail-title">
+                        {col.title}
+                      </Typography>
+                      <Box className="detail-items">
+                        {col.items.map((item, i) => (
+                          <DetailChip
+                            key={i}
+                            label={item}
+                            variant="outlined"
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    </DetailColumn>
+                  ))}
+                </Box>
+              </CardContent>
+            </CategoryDetails>
+          )}
         </>
       )}
       <div className="top-bar">
-        <div 
-          className="categories-button"
+        <button 
+          className={`categories-button ${categoriesOpen ? 'menu-open' : ''}`}
           onClick={handleCategoriesClick}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              handleCategoriesClick(e);
-            }
-          }}>
+          type="button">
           <FaBars />
           <span>Categorii</span>
-        </div>
+        </button>
 
         {typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches ? null : (
           <div className="search-container mainstage-search-desktop">
