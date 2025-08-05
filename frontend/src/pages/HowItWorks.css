@@ -404,3 +404,106 @@
 .cta-buttons .MuiButton-root:hover {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
 }
+
+/* Dark Mode Styles */
+.dark-mode .how-it-works-page {
+  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+}
+
+.dark-mode .how-it-works-hero {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  color: #ffffff;
+}
+
+.dark-mode .how-it-works-hero::before {
+  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+}
+
+.dark-mode .hero-badge {
+  background: rgba(245, 24, 102, 0.2);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .hero-title {
+  color: #ffffff;
+}
+
+.dark-mode .hero-description {
+  color: #ffffff;
+}
+
+.dark-mode .hero-stats .stat-item {
+  color: #ffffff;
+}
+
+.dark-mode .stat-number {
+  color: #f51866;
+}
+
+.dark-mode .stat-label {
+  color: #ffffff;
+}
+
+.dark-mode .section-header h2 {
+  color: #ffffff;
+}
+
+.dark-mode .section-header p {
+  color: #ffffff;
+}
+
+.dark-mode .step-card {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .step-card:hover {
+  border-color: rgba(245, 24, 102, 0.5);
+  box-shadow: 0 12px 48px rgba(245, 24, 102, 0.2);
+}
+
+.dark-mode .step-number {
+  background: linear-gradient(135deg, #f51866, #fa4875);
+  color: #ffffff;
+}
+
+.dark-mode .step-title {
+  color: #ffffff;
+}
+
+.dark-mode .step-description {
+  color: #ffffff;
+}
+
+.dark-mode .cta-section {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .cta-section h2 {
+  color: #ffffff;
+}
+
+.dark-mode .cta-section p {
+  color: #ffffff;
+}
+
+.dark-mode .MuiButton-contained {
+  background-color: #f51866 !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .MuiButton-contained:hover {
+  background-color: #fa4875 !important;
+}
+
+.dark-mode .MuiButton-outlined {
+  border-color: #f51866 !important;
+  color: #f51866 !important;
+}
+
+.dark-mode .MuiButton-outlined:hover {
+  background-color: rgba(245, 24, 102, 0.1) !important;
+  border-color: #fa4875 !important;
+}

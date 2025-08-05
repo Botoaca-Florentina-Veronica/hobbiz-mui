@@ -561,6 +561,22 @@
 /* Secțiune Values */
 .values-section {
   margin: 60px 0;
+  background: white;
+  padding: 60px 40px;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.values-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #355070, #406b92, #F8B195);
 }
 
 .values-section h2 {
@@ -569,6 +585,8 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 50px;
+  position: relative;
+  z-index: 2;
 }
 
 .values-grid {
@@ -912,6 +930,8 @@
   /* Values responsive */
   .values-section {
     margin: 40px 0;
+    padding: 40px 20px;
+    border-radius: 16px;
   }
   
   .values-section h2 {
@@ -948,4 +968,500 @@
     padding: 20px;
     font-size: 0.95rem;
   }
+}
+
+/* Dark Mode Styles pentru About Page */
+.dark-mode .about-page {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .about-container {
+  color: #ffffff;
+}
+
+.dark-mode .about-hero {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .about-hero::before {
+  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+}
+
+.dark-mode .hero-badge {
+  background: rgba(254, 101, 133, 0.15);
+  border-color: rgba(254, 101, 133, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .hero-title {
+  color: #ffffff;
+}
+
+.dark-mode .hero-title .highlight {
+  background: linear-gradient(45deg, #f51866, #fe6585);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark-mode .hero-description {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+.dark-mode .stat-number {
+  color: #fe6585;
+}
+
+.dark-mode .stat-label {
+  color: #8b8b8b;
+}
+
+.dark-mode .stat-divider {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Mode pentru Mission Section */
+.dark-mode .mission-section {
+  background: #282828;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid #3f3f3f;
+}
+
+.dark-mode .mission-section::before {
+  background: linear-gradient(90deg, #f51866, #fe6585);
+}
+
+.dark-mode .mission-icon {
+  background: linear-gradient(135deg, #f51866, #fe6585);
+  box-shadow: 0 8px 24px rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .mission-title {
+  color: #ffffff;
+}
+
+.dark-mode .mission-subtitle {
+  color: #8b8b8b;
+}
+
+.dark-mode .mission-description {
+  color: #ffffff;
+}
+
+.dark-mode .mission-description strong {
+  color: #fe6585;
+}
+
+.dark-mode .pillar-item {
+  background: #3f3f3f;
+  border-color: transparent;
+}
+
+.dark-mode .pillar-item:hover {
+  background: #575757;
+  border-color: #fe6585;
+}
+
+.dark-mode .pillar-icon {
+  background: linear-gradient(135deg, #f51866, #fe6585);
+}
+
+.dark-mode .pillar-content h4 {
+  color: #ffffff;
+}
+
+.dark-mode .pillar-content p {
+  color: #8b8b8b;
+}
+
+/* Dark Mode pentru About Sections */
+.dark-mode .about-section {
+  background: #282828;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border-left-color: #fe6585;
+  border: 1px solid #3f3f3f;
+  border-left: 4px solid #fe6585;
+}
+
+.dark-mode .about-section:hover {
+  box-shadow: 0 8px 40px rgba(245, 24, 102, 0.2);
+}
+
+.dark-mode .about-section h2 {
+  color: #ffffff;
+}
+
+.dark-mode .about-section p {
+  color: #8b8b8b;
+}
+
+/* Dark Mode pentru Values Section */
+.dark-mode .values-section {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .values-section::before {
+  background: linear-gradient(90deg, #f51866, #fa4875, #fe6585);
+}
+
+.dark-mode .values-section h2 {
+  color: #ffffff;
+}
+
+.dark-mode .value-card {
+  background: #3f3f3f;
+  border: 1px solid #575757;
+}
+
+.dark-mode .value-card:hover {
+  background: #575757;
+  border-color: #fe6585;
+}
+
+.dark-mode .value-icon {
+  background: linear-gradient(135deg, #f51866, #fe6585);
+}
+
+.dark-mode .value-card h3 {
+  color: #ffffff;
+}
+
+.dark-mode .value-card p {
+  color: #8b8b8b;
+}
+
+/* Dark Mode pentru How It Works Section */
+.dark-mode .how-it-works-section {
+  background: #282828;
+  border: 1px solid #3f3f3f;
+}
+
+.dark-mode .how-it-works-section h2 {
+  color: #ffffff;
+}
+
+.dark-mode .step-card {
+  background: #3f3f3f;
+  border: 1px solid #575757;
+}
+
+.dark-mode .step-card:hover {
+  background: #575757;
+  border-color: #fe6585;
+}
+
+.dark-mode .step-number {
+  background: linear-gradient(135deg, #f51866, #fe6585);
+  color: #ffffff;
+}
+
+.dark-mode .step-title {
+  color: #ffffff;
+}
+
+.dark-mode .step-description {
+  color: #8b8b8b;
+}
+
+/* Dark Mode pentru FAQ Section */
+.dark-mode .faq-section {
+  background: #282828;
+  border: 1px solid #3f3f3f;
+}
+
+.dark-mode .faq-section h2 {
+  color: #ffffff;
+}
+
+.dark-mode .faq-item {
+  border-color: #3f3f3f;
+}
+
+.dark-mode .faq-question {
+  background: #3f3f3f;
+  color: #ffffff;
+}
+
+.dark-mode .faq-question:hover {
+  background: #575757;
+}
+
+.dark-mode .faq-answer {
+  background: #282828;
+  color: #8b8b8b;
+}
+
+/* Dark Mode pentru Call to Action */
+.dark-mode .about-cta {
+  background: linear-gradient(135deg, #f51866, #fe6585);
+  box-shadow: 0 12px 48px rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .cta-title {
+  color: #ffffff;
+}
+
+.dark-mode .cta-description {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+.dark-mode .cta-button {
+  background: #ffffff;
+  color: #f51866;
+}
+
+.dark-mode .cta-button:hover {
+  background: #8b8b8b;
+  color: #ffffff;
+}
+
+/* Dark Mode completări pentru componente lipsă */
+
+/* Dark Mode pentru How It Works (secțiunea din About) */
+.dark-mode .how-it-works {
+  background: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .how-it-works::before {
+  background: linear-gradient(135deg, rgba(245, 24, 102, 0.05) 0%, transparent 50%);
+}
+
+.dark-mode .how-it-works h2 {
+  color: #ffffff;
+}
+
+.dark-mode .how-it-works-subtitle {
+  color: #8b8b8b;
+}
+
+.dark-mode .timeline-line {
+  background: linear-gradient(90deg, #f51866, #fa4875, #fe6585);
+}
+
+.dark-mode .step-circle {
+  background: linear-gradient(135deg, #f51866, #fa4875);
+  box-shadow: 0 4px 15px rgba(245, 24, 102, 0.4);
+}
+
+.dark-mode .step-circle:hover {
+  box-shadow: 0 6px 20px rgba(245, 24, 102, 0.5);
+}
+
+.dark-mode .step-circle::before {
+  border: 2px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .step-title {
+  color: #ffffff;
+}
+
+.dark-mode .step-description {
+  color: #8b8b8b;
+}
+
+.dark-mode .step-icon {
+  background: #fe6585;
+}
+
+/* Dark Mode pentru Feature Cards */
+.dark-mode .feature-card {
+  background: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .feature-card::before {
+  background: linear-gradient(90deg, #f51866, #fa4875, #fe6585);
+}
+
+.dark-mode .feature-card:hover {
+  background: #3f3f3f;
+  border-color: #fe6585;
+  box-shadow: 0 8px 25px rgba(245, 24, 102, 0.2);
+}
+
+.dark-mode .feature-card h3 {
+  color: #ffffff;
+}
+
+.dark-mode .feature-list li {
+  color: #8b8b8b;
+}
+
+.dark-mode .feature-list li::before {
+  color: #fe6585;
+}
+
+/* Dark Mode pentru About Section Icon */
+.dark-mode .about-section-icon {
+  background: linear-gradient(135deg, #f51866, #fa4875);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dark Mode pentru CTA Section (diferit de about-cta) */
+.dark-mode .cta-section {
+  background: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  color: #ffffff;
+}
+
+.dark-mode .cta-section h2 {
+  color: #ffffff;
+}
+
+.dark-mode .cta-section p {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru About Features */
+.dark-mode .about-features {
+  background: transparent;
+}
+
+/* Dark Mode pentru About Content */
+.dark-mode .about-content {
+  background: transparent;
+}
+
+/* Dark Mode completări pentru FAQ din About */
+.dark-mode .faq-container {
+  background: transparent;
+}
+
+.dark-mode .faq-item {
+  background: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .faq-item:hover {
+  box-shadow: 0 4px 16px rgba(245, 24, 102, 0.2);
+  border-color: #575757;
+}
+
+.dark-mode .faq-question {
+  background: #f51866;
+  color: #ffffff;
+}
+
+.dark-mode .faq-question:hover {
+  background: #fa4875;
+}
+
+.dark-mode .faq-question::after {
+  color: #ffffff;
+}
+
+.dark-mode .faq-answer {
+  background: #282828;
+  color: #ffffff;
+  border-top: 1px solid #3f3f3f;
+}
+
+/* Dark Mode pentru About Hero completări */
+.dark-mode .about-hero h1 {
+  color: #ffffff;
+}
+
+.dark-mode .about-hero-subtitle {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* Dark Mode pentru Hero Badge Icon */
+.dark-mode .hero-badge-icon {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru Mission Content și Header */
+.dark-mode .mission-content {
+  color: #ffffff;
+}
+
+.dark-mode .mission-header {
+  color: #ffffff;
+}
+
+.dark-mode .mission-text {
+  color: #ffffff;
+}
+
+.dark-mode .mission-body {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru Value Icon Effects */
+.dark-mode .value-icon::before {
+  background: linear-gradient(135deg, rgba(245, 24, 102, 0.3), rgba(254, 101, 133, 0.3));
+}
+
+.dark-mode .value-card:hover .value-icon::before {
+  background: linear-gradient(135deg, rgba(245, 24, 102, 0.5), rgba(254, 101, 133, 0.5));
+}
+
+/* Dark Mode pentru Value Card Border Colors */
+.dark-mode .value-card:nth-child(1) {
+  border-top-color: #f51866;
+}
+
+.dark-mode .value-card:nth-child(2) {
+  border-top-color: #fa4875;
+}
+
+.dark-mode .value-card:nth-child(3) {
+  border-top-color: #fe6585;
+}
+
+/* Dark Mode pentru statistici și alte elemente */
+.dark-mode .stat-item {
+  color: #ffffff;
+}
+
+.dark-mode .hero-stats {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru CTA Button hover state îmbunătățit */
+.dark-mode .cta-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: #f51866;
+  transform: translateY(-2px);
+}
+
+/* Dark Mode pentru toate textele din hero */
+.dark-mode .about-hero * {
+  color: #ffffff;
+}
+
+.dark-mode .hero-badge * {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru toate link-urile și butoanele interactive */
+.dark-mode .feature-card:hover {
+  background: #575757;
+}
+
+.dark-mode .pillar-item:hover {
+  background: #575757;
+  transform: translateY(-2px);
+}
+
+.dark-mode .about-section:hover {
+  transform: translateY(-5px);
+}
+
+/* Dark Mode pentru separatori și decorații */
+.dark-mode .hero-stats .stat-divider {
+  background: rgba(245, 24, 102, 0.3);
 }

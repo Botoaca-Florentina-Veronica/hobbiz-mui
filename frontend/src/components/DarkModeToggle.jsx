@@ -10,16 +10,17 @@ export default function DarkModeToggle({ darkMode, toggleDarkMode }) {
         onClick={toggleDarkMode}
         color="inherit"
         sx={{
-          backgroundColor: darkMode ? '#3f1b0f' : '#503f25',
+          backgroundColor: darkMode ? '#282828' : '#575757',
+          border: darkMode ? '2px solid #3f3f3f' : '2px solid #8b8b8b',
           '&:hover': {
-            backgroundColor: darkMode ? '#503f25' : '#3f1b0f',
+            backgroundColor: darkMode ? '#3f3f3f' : '#717171',
           }
         }}
       >
         {darkMode ? (
-          <Brightness7Icon sx={{ color: '#e2e7eb' }} />
+          <Brightness7Icon sx={{ color: '#fe6585' }} />
         ) : (
-          <Brightness4Icon sx={{ color: '#e2e7eb' }} />
+          <Brightness4Icon sx={{ color: '#8b8b8b' }} />
         )}
       </IconButton>
     </div>

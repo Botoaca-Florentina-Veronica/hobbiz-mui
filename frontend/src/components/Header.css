@@ -228,17 +228,18 @@
 }
 
 .dark-mode .for-dropdown {
-  color: #ff7e95;
+  color: #fe6585;
 }
 
 .dark-mode .section-dropdown {
-  background-color: #222121;
-  box-shadow: 0 14px 35px 0 #282828;
+  background-color: #282828;
+  box-shadow: 0 14px 35px 0 #121212;
+  border: 1px solid #3f3f3f;
 }
 
 .dark-mode .section-dropdown a {
-  background-color: #222121 !important;
-  color: #fff !important;
+  background-color: #282828 !important;
+  color: #ffffff !important;
 }
 
 .dark-mode .section-dropdown a:hover {
@@ -247,7 +248,7 @@
 }
 
 .dark-mode .section-dropdown:after {
-  border-bottom-color: #222121;
+  border-bottom-color: #282828;
 }
 
 .avatar-img {

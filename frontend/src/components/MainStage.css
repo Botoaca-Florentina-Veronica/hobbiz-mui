@@ -88,6 +88,271 @@
   color: #f9faf8;
 }
 
+/* Dark Mode pentru Categories Button */
+.dark-mode .categories-button {
+  background: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(245, 24, 102, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .categories-button::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.dark-mode .categories-button:hover, 
+.dark-mode .categories-button:focus {
+  background: linear-gradient(135deg, #fa4875 0%, #fe6585 100%);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 32px rgba(245, 24, 102, 0.5), 0 6px 16px rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .categories-button:active {
+  box-shadow: 0 6px 20px rgba(245, 24, 102, 0.4);
+}
+
+.dark-mode .categories-button svg {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru Search Components */
+.dark-mode .search-input {
+  background-color: #3f3f3f;
+  color: #ffffff;
+  border: 1px solid #575757;
+}
+
+.dark-mode .search-input:focus {
+  border-color: #f51866;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #8b8b8b;
+}
+
+.dark-mode .location-section {
+  background: #3f3f3f;
+  border-top: 1px solid #575757;
+  border-bottom: 1px solid #575757;
+}
+
+.dark-mode .location-input {
+  background: transparent;
+  color: #ffffff;
+}
+
+.dark-mode .location-input::placeholder {
+  color: #8b8b8b;
+}
+
+.dark-mode .location-icon {
+  color: #8b8b8b;
+}
+
+.dark-mode .search-button {
+  background: #f51866;
+  color: #ffffff;
+}
+
+.dark-mode .search-button:hover {
+  background: #fa4875;
+}
+
+.dark-mode .sign-up-button {
+  background: #f51866;
+  color: #ffffff;
+}
+
+.dark-mode .sign-up-button:hover {
+  background: #fa4875;
+}
+
+/* Dark Mode pentru Category Details Panel */
+.dark-mode .category-details-panel {
+  background: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .category-details-col div {
+  color: #ffffff;
+}
+
+.dark-mode .category-details-col div:first-child {
+  color: #f51866;
+}
+
+.dark-mode .category-details-title-inline {
+  color: #f51866;
+}
+
+.dark-mode .category-details-col-inline div {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru Categories Overlay */
+.dark-mode .categories-overlay {
+  background: rgba(18, 18, 18, 0.9);
+}
+
+/* Dark Mode pentru Categories Dropdown Menu - Strongest Pink Only */
+
+/* CategoryDropdown Component (MUI Paper) */
+.dark-mode .css-1poimk-MuiPaper-root,
+.dark-mode [class*="CategoryDropdown"],
+.dark-mode .MuiPaper-root {
+  background: #121212 !important;
+  border: 1px solid #282828 !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 8px 16px rgba(245, 24, 102, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* CategoryItem Components */
+.dark-mode .css-*[class*="CategoryItem"],
+.dark-mode [class*="CategoryItem"] {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(40, 40, 40, 0.5) !important;
+}
+
+.dark-mode .css-*[class*="CategoryItem"]:hover,
+.dark-mode [class*="CategoryItem"]:hover {
+  background: rgba(245, 24, 102, 0.1) !important;
+  transform: translateX(2px) !important;
+  box-shadow: inset 3px 0 0 #f51866 !important;
+  border-bottom: 1px solid rgba(245, 24, 102, 0.4) !important;
+}
+
+/* Category Icons */
+.dark-mode .category-icon,
+.dark-mode [class*="category-icon"] {
+  color: #f51866 !important;
+  transition: color 0.2s ease !important;
+}
+
+.dark-mode .css-*[class*="CategoryItem"]:hover .category-icon,
+.dark-mode [class*="CategoryItem"]:hover .category-icon {
+  color: #f51866 !important;
+}
+
+/* Category Text */
+.dark-mode .category-text,
+.dark-mode [class*="category-text"],
+.dark-mode .MuiTypography-root {
+  color: #c8c8c8 !important;
+}
+
+.dark-mode .css-*[class*="CategoryItem"]:hover .category-text,
+.dark-mode [class*="CategoryItem"]:hover .category-text {
+  color: #ffffff !important;
+}
+
+/* Category Arrow */
+.dark-mode .category-arrow,
+.dark-mode [class*="category-arrow"] {
+  color: #f51866 !important;
+  transition: all 0.2s ease !important;
+}
+
+.dark-mode .css-*[class*="CategoryItem"]:hover .category-arrow,
+.dark-mode [class*="CategoryItem"]:hover .category-arrow {
+  color: #f51866 !important;
+  transform: translateX(3px) !important;
+}
+
+/* CategoryDetails Component (Right Panel) */
+.dark-mode .css-*[class*="CategoryDetails"],
+.dark-mode [class*="CategoryDetails"] {
+  background: #121212 !important;
+  border: 1px solid #282828 !important;
+  border-left: 2px solid #f51866 !important;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8), 0 5px 10px rgba(245, 24, 102, 0.2) !important;
+}
+
+/* Detail Columns */
+.dark-mode .css-*[class*="DetailColumn"],
+.dark-mode [class*="DetailColumn"] {
+  background: rgba(40, 40, 40, 0.6) !important;
+  border: 1px solid rgba(245, 24, 102, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark-mode .css-*[class*="DetailColumn"]:hover,
+.dark-mode [class*="DetailColumn"]:hover {
+  background: rgba(40, 40, 40, 0.9) !important;
+  border-color: rgba(245, 24, 102, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(245, 24, 102, 0.2) !important;
+}
+
+/* Detail Titles */
+.dark-mode .detail-title {
+  color: #f51866 !important;
+}
+
+.dark-mode .detail-title::before {
+  background-color: #f51866 !important;
+}
+
+/* Detail Chips */
+.dark-mode .css-*[class*="DetailChip"],
+.dark-mode [class*="DetailChip"],
+.dark-mode .MuiChip-root {
+  background-color: rgba(245, 24, 102, 0.15) !important;
+  color: #f51866 !important;
+  border: 1px solid rgba(245, 24, 102, 0.3) !important;
+}
+
+.dark-mode .css-*[class*="DetailChip"]:hover,
+.dark-mode [class*="DetailChip"]:hover,
+.dark-mode .MuiChip-root:hover {
+  background-color: rgba(245, 24, 102, 0.25) !important;
+  border-color: #f51866 !important;
+  color: #f51866 !important;
+}
+
+/* Card Content */
+.dark-mode .MuiCardContent-root {
+  background: #121212 !important;
+  color: #f51866 !important;
+}
+
+/* Typography in Details */
+.dark-mode .MuiTypography-h6 {
+  color: #f51866 !important;
+  border-bottom: 2px solid #f51866 !important;
+}
+
+/* Scrollbar pentru Category Details */
+.dark-mode .css-*[class*="CategoryDetails"]::-webkit-scrollbar-thumb,
+.dark-mode [class*="CategoryDetails"]::-webkit-scrollbar-thumb {
+  background: rgba(245, 24, 102, 0.6) !important;
+}
+
+.dark-mode .css-*[class*="CategoryDetails"]::-webkit-scrollbar-thumb:hover,
+.dark-mode [class*="CategoryDetails"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 24, 102, 0.8) !important;
+}
+
+/* General MUI Overrides pentru Dark Mode */
+.dark-mode .MuiBox-root {
+  color: #c8c8c8 !important;
+}
+
+.dark-mode .MuiTypography-root:not(.MuiTypography-h6) {
+  color: #c8c8c8 !important;
+}
+
+/* ArrowForwardIos Icon - doar pentru meniul de categorii */
+.dark-mode .MuiSvgIcon-root[data-testid="ArrowForwardIosIcon"] {
+  color: #f51866 !important;
+}
+
+/* Păstrează iconițele de dark mode toggle vizibile */
+.dark-mode .dark-mode-toggle svg,
+.dark-mode .MuiIconButton-root svg:not([data-testid="ArrowForwardIosIcon"]) {
+  color: inherit !important;
+}
+
 .categories-overlay {
   position: fixed;
   top: 0;

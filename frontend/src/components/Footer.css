@@ -36,8 +36,102 @@
 }
 
 .dark-mode .footer {
-  background: #4e3222;
-  color: #eceeef;
+  background: #121212;
+  color: #ffffff;
+}
+
+/* Dark Mode pentru Footer Mobile Buttons */
+.dark-mode .footer-mobile-buttons {
+  background: #282828;
+  border-top: 1px solid #3f3f3f;
+}
+
+.dark-mode .footer-mobile-buttons .footer-icon {
+  color: #ffffff;
+}
+
+.dark-mode .footer-mobile-buttons .footer-icon svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+.dark-mode .footer-mobile-buttons .footer-icon:hover {
+  color: #fe6585;
+}
+
+.dark-mode .footer-mobile-buttons .footer-icon:hover svg {
+  color: #fe6585;
+  stroke: #fe6585;
+}
+
+.dark-mode .footer-mobile-buttons .footer-icon span,
+.dark-mode .footer-mobile-buttons .footer-publish-label,
+.dark-mode .footer-mobile-buttons .footer-account-label,
+.dark-mode .footer-mobile-buttons .footer-explore-label {
+  color: #ffffff;
+}
+
+.dark-mode .footer-mobile-buttons .footer-icon:hover span,
+.dark-mode .footer-mobile-buttons .footer-icon:hover .footer-publish-label,
+.dark-mode .footer-mobile-buttons .footer-icon:hover .footer-account-label,
+.dark-mode .footer-mobile-buttons .footer-icon:hover .footer-explore-label {
+  color: #fe6585;
+}
+
+/* Dark Mode pentru Footer Publish Button */
+.dark-mode .footer-publish-btn {
+  background: #3f3f3f;
+  border: 2px solid #575757;
+}
+
+.dark-mode .footer-publish-btn:hover {
+  background: #f51866;
+  border-color: #f51866;
+}
+
+.dark-mode .footer-publish-btn svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+.dark-mode .footer-publish-btn:hover svg {
+  color: #121212;
+  stroke: #121212;
+}
+
+.dark-mode .footer-publish-btn .footer-publish-label {
+  color: #ffffff;
+}
+
+.dark-mode .footer-publish-btn:hover .footer-publish-label {
+  color: #fe6585;
+}
+
+/* Dark Mode pentru Footer Dropdown */
+.dark-mode .section-dropdown.footer-dropdown {
+  background-color: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: 0 14px 35px 0 rgba(0,0,0,0.6);
+}
+
+.dark-mode .section-dropdown.footer-dropdown a {
+  background-color: #282828 !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .section-dropdown.footer-dropdown a:hover {
+  color: #121212 !important;
+  background-color: #f51866 !important;
+}
+
+/* Dark Mode pentru Desktop Footer */
+.dark-mode .desktop-footer {
+  background: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .desktop-footer p {
+  color: #ffffff;
 }
 
 .footer-mobile-buttons {
@@ -203,4 +297,9 @@
   margin: 24px 0 24px 0;
   border: none;
   box-sizing: content-box;
+}
+
+/* Dark Mode pentru Footer Separator */
+.dark-mode .footer-separator {
+  background: #3f3f3f;
 }

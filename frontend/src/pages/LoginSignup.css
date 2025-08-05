@@ -56,3 +56,52 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+
+/* Dark Mode Styles */
+.dark-mode .login-container {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  box-shadow: 0 0 20px rgba(245, 24, 102, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .email-login input {
+  background-color: #575757;
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .email-login input:focus {
+  border-color: #f51866;
+  outline: none;
+}
+
+.dark-mode .email-login input::placeholder {
+  color: #8b8b8b;
+}
+
+.dark-mode .submit-btn {
+  background-color: #f51866;
+  color: #ffffff;
+}
+
+.dark-mode .submit-btn:hover {
+  background-color: #fa4875;
+}
+
+.dark-mode .submit-btn:disabled {
+  background-color: #575757;
+  color: #8b8b8b;
+}
+
+.dark-mode .login-links a {
+  color: #f51866;
+}
+
+.dark-mode .login-links a:hover {
+  color: #fa4875;
+}
+
+.dark-mode .error-message {
+  color: #ff6b6b;
+}

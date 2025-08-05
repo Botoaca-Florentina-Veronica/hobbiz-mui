@@ -84,3 +84,41 @@
     min-width: 0;
   }
 }
+
+/* Dark Mode Styles pentru Legal Section */
+.dark-mode .legal-section {
+  background: #121212;
+  border-top: 1px solid #3f3f3f;
+}
+
+.dark-mode .legal-section__brand {
+  color: #fe6585;
+}
+
+.dark-mode .legal-section__desc {
+  color: #ffffff;
+}
+
+.dark-mode .legal-section__column h4 {
+  color: #ffffff;
+}
+
+.dark-mode .legal-section__column ul li a {
+  color: #ffffff;
+}
+
+.dark-mode .legal-section__column ul li a:hover {
+  color: #fe6585;
+}
+
+.dark-mode .legal-section__icons a {
+  color: #ffffff;
+}
+
+.dark-mode .legal-section__icons a:hover {
+  color: #f51866;
+}
+
+.dark-mode .legal-section__icon {
+  color: #ff7e95;
+}

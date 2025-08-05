@@ -91,6 +91,17 @@ export default function AddAnnouncementPage() {
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  
+  // Adăugăm state-uri pentru validări specifice
+  const [titleError, setTitleError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+  const [locationError, setLocationError] = useState("");
+  const [contactPersonError, setContactPersonError] = useState("");
+  const [contactEmailError, setContactEmailError] = useState("");
+  const [contactPhoneError, setContactPhoneError] = useState("");
+  const [imageError, setImageError] = useState("");
+  
   const navigate = useNavigate();
   const location = useLocation();
   const [isEdit, setIsEdit] = useState(false);
@@ -213,13 +224,30 @@ export default function AddAnnouncementPage() {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+    
+    // Verifică dacă utilizatorul încearcă să adauge prea multe imagini
+    if (images.length + files.length > 10) {
+      setImageError('Poți adăuga maxim 10 imagini per anunț');
+      return;
+    }
+    
     // Acceptă doar imagini jpg/jpeg
     const validFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
     if (validFiles.length !== files.length) {
-      setError('Poți încărca doar imagini în format JPG');
+      setImageError('Poți încărca doar imagini în format JPG/JPEG');
       return;
     }
+
+    // Verifică dimensiunea fiecărui fișier (max 5MB)
+    const oversizedFiles = validFiles.filter(file => file.size > 5 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      setImageError('Fiecare imagine trebuie să fie mai mică de 5MB');
+      return;
+    }
+
+    setImageError("");
     setImages(prev => [...prev, ...validFiles]);
+    
     // Generează preview pentru fiecare imagine
     validFiles.forEach((file, idx) => {
       const reader = new FileReader();
@@ -233,8 +261,83 @@ export default function AddAnnouncementPage() {
   };
 
   const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-    setTitleChars(e.target.value.length);
+    const value = e.target.value;
+    setTitle(value);
+    setTitleChars(value.length);
+    
+    // Validare în timp real pentru titlu
+    if (value.length < 16) {
+      setTitleError("Titlul trebuie să aibă cel puțin 16 caractere");
+    } else if (value.length > 70) {
+      setTitleError("Titlul nu poate depăși 70 de caractere");
+    } else {
+      setTitleError("");
+    }
+  };
+
+  // Funcție pentru validarea email-ului
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Funcție pentru validarea telefonului
+  const validatePhone = (phone) => {
+    const phoneRegex = /^0[0-9]{9}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // Funcție pentru validarea descrierii
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setDescription(value);
+    setDescriptionChars(value.length);
+    
+    if (value.length < 40) {
+      setDescriptionError("Descrierea trebuie să aibă cel puțin 40 de caractere");
+    } else if (value.length > 9000) {
+      setDescriptionError("Descrierea nu poate depăși 9000 de caractere");
+    } else {
+      setDescriptionError("");
+    }
+  };
+
+  // Funcție pentru validarea persoanei de contact
+  const handleContactPersonChange = (e) => {
+    const value = e.target.value;
+    setContactPerson(value);
+    
+    if (value.trim().length < 2) {
+      setContactPersonError("Numele trebuie să aibă cel puțin 2 caractere");
+    } else if (value.trim().length > 50) {
+      setContactPersonError("Numele nu poate depăși 50 de caractere");
+    } else {
+      setContactPersonError("");
+    }
+  };
+
+  // Funcție pentru validarea email-ului de contact
+  const handleContactEmailChange = (e) => {
+    const value = e.target.value;
+    setContactEmail(value);
+    
+    if (value && !validateEmail(value)) {
+      setContactEmailError("Adresa de email nu este validă");
+    } else {
+      setContactEmailError("");
+    }
+  };
+
+  // Funcție pentru validarea telefonului de contact
+  const handleContactPhoneChange = (e) => {
+    const value = e.target.value;
+    setContactPhone(value);
+    
+    if (value && !validatePhone(value)) {
+      setContactPhoneError("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
+    } else {
+      setContactPhoneError("");
+    }
   };
 
   const handleSubmit = async () => {
@@ -248,14 +351,73 @@ export default function AddAnnouncementPage() {
       return;
     }
 
-    if (!title || title.length < 16 || !category || !description || description.length < 40 || !(selectedJudet || selectedLocalitate) || !contactPerson) {
-      setError("Te rugăm să completezi toate câmpurile obligatorii și să respecți limitele de caractere!");
+    // Validare completă înainte de submit
+    let hasErrors = false;
+
+    // Validare titlu
+    if (!title || title.length < 16) {
+      setTitleError("Titlul trebuie să aibă cel puțin 16 caractere");
+      hasErrors = true;
+    } else if (title.length > 70) {
+      setTitleError("Titlul nu poate depăși 70 de caractere");
+      hasErrors = true;
+    }
+
+    // Validare categorie
+    if (!category) {
+      setCategoryError("Trebuie să selectezi o categorie");
+      hasErrors = true;
+    } else {
+      setCategoryError("");
+    }
+
+    // Validare descriere
+    if (!description || description.length < 40) {
+      setDescriptionError("Descrierea trebuie să aibă cel puțin 40 de caractere");
+      hasErrors = true;
+    } else if (description.length > 9000) {
+      setDescriptionError("Descrierea nu poate depăși 9000 de caractere");
+      hasErrors = true;
+    }
+
+    // Validare locație
+    if (!selectedJudet && !selectedLocalitate) {
+      setLocationError("Trebuie să selectezi o locație");
+      hasErrors = true;
+    } else {
+      setLocationError("");
+    }
+
+    // Validare persoană de contact
+    if (!contactPerson || contactPerson.trim().length < 2) {
+      setContactPersonError("Numele persoanei de contact este obligatoriu");
+      hasErrors = true;
+    }
+
+    // Validare email (dacă este completat)
+    if (contactEmail && !validateEmail(contactEmail)) {
+      setContactEmailError("Adresa de email nu este validă");
+      hasErrors = true;
+    }
+
+    // Validare telefon (dacă este completat)
+    if (contactPhone && !validatePhone(contactPhone)) {
+      setContactPhoneError("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
+      hasErrors = true;
+    }
+
+    // Dacă nu există nici email nici telefon
+    if (!contactEmail && !contactPhone) {
+      setContactEmailError("Trebuie să completezi cel puțin email-ul sau telefonul");
+      setContactPhoneError("Trebuie să completezi cel puțin email-ul sau telefonul");
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setError("Te rugăm să corectezi erorile de mai sus înainte de a publica anunțul");
       return;
     }
-    if (contactPhone && !/^\d{10}$/.test(contactPhone)) {
-      setError("Numărul de telefon trebuie să conțină exact 10 cifre!");
-      return;
-    }
+
     try {
       const formData = new FormData();
       formData.append('title', title);
@@ -313,6 +475,7 @@ export default function AddAnnouncementPage() {
   const handleLocationSelect = (judet, localitate) => {
     setSelectedJudet(judet);
     setSelectedLocalitate(localitate);
+    setLocationError(""); // Resetează eroarea când se selectează o locație
     handleClose();
   };
 
@@ -326,6 +489,7 @@ export default function AddAnnouncementPage() {
 
   const handleCategorySelect = (selectedCategory) => {
     setCategory(selectedCategory);
+    setCategoryError(""); // Resetează eroarea când se selectează o categorie
     handleCategoryClose();
   };
 
@@ -362,6 +526,14 @@ export default function AddAnnouncementPage() {
           <div className="add-announcement-helper">Introdu cel puțin 16 caractere</div>
           <div className="add-announcement-charcount">{titleChars}/70</div>
         </div>
+        {titleError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {titleError}
+          </div>
+        )}
         <label className="add-announcement-label">Categoria*</label>
         <input
           className="add-announcement-category-select"
@@ -372,6 +544,14 @@ export default function AddAnnouncementPage() {
           onClick={handleCategoryClick}
           required
         />
+        {categoryError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {categoryError}
+          </div>
+        )}
         <Popover
           id={categoryId}
           open={categoryOpen}
@@ -422,13 +602,13 @@ export default function AddAnnouncementPage() {
         </Popover>
       </form>
       <div className="add-announcement-images-section">
-        {/* Mesaj de eroare DOAR pentru imagini JPG/JPEG */}
-        {error && error.includes('JPG') && (
+        {/* Mesaj de eroare pentru imagini */}
+        {imageError && (
           <div className="add-announcement-message add-announcement-error" style={{marginBottom: 16}}>
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
-            {error}
+            {imageError}
           </div>
         )}
         <h2 className="add-announcement-subtitle">Imagini</h2>
@@ -490,15 +670,20 @@ export default function AddAnnouncementPage() {
           maxLength={9000}
           required
           value={description}
-          onChange={e => {
-            setDescription(e.target.value);
-            setDescriptionChars(e.target.value.length);
-          }}
+          onChange={handleDescriptionChange}
         />
         <div className="add-announcement-char-helper-row">
           <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
           <div className="add-announcement-charcount">{descriptionChars}/9000</div>
         </div>
+        {descriptionError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {descriptionError}
+          </div>
+        )}
       </div>
       <div className="add-announcement-location-section">
         <label className="add-announcement-label">Localitate*</label>
@@ -583,6 +768,14 @@ export default function AddAnnouncementPage() {
             )}
           </Popover>
         </div>
+        {locationError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {locationError}
+          </div>
+        )}
       </div>
       <div className="add-announcement-contact-section">
         <h2 className="add-announcement-subtitle">Informații de contact</h2>
@@ -593,29 +786,53 @@ export default function AddAnnouncementPage() {
             type="text"
             placeholder="Nume și prenume"
             value={contactPerson || ''}
-            onChange={e => setContactPerson(e.target.value)}
+            onChange={handleContactPersonChange}
             required
           />
           {contactPerson && (
             <span className="add-announcement-location-check">✓</span>
           )}
         </div>
+        {contactPersonError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {contactPersonError}
+          </div>
+        )}
         <label className="add-announcement-label">Adresa de email</label>
         <input
           className="add-announcement-contact-input"
           type="email"
           placeholder="ex: exemplu@gmail.com"
           value={contactEmail || ''}
-          onChange={e => setContactEmail(e.target.value)}
+          onChange={handleContactEmailChange}
         />
+        {contactEmailError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {contactEmailError}
+          </div>
+        )}
         <label className="add-announcement-label">Numărul de telefon</label>
         <input
           className="add-announcement-contact-input"
           type="tel"
           placeholder="ex: 07xxxxxxxx"
           value={contactPhone || ''}
-          onChange={e => setContactPhone(e.target.value)}
+          onChange={handleContactPhoneChange}
         />
+        {contactPhoneError && (
+          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+            <div className="add-announcement-error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </div>
+            {contactPhoneError}
+          </div>
+        )}
       </div>
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>

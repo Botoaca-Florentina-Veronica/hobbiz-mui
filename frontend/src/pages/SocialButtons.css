@@ -44,3 +44,46 @@
 
 .divider::before { left: 0; }
 .divider::after { right: 0; }
+
+/* Dark Mode Styles */
+.dark-mode .social-btn {
+  color: #ffffff;
+}
+
+.dark-mode .google {
+  background: #3f3f3f;
+  color: #ffffff;
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .google:hover {
+  background: #575757;
+  border-color: rgba(245, 24, 102, 0.5);
+}
+
+.dark-mode .facebook {
+  background: linear-gradient(135deg, #1877F2, #4267B2);
+  color: #ffffff;
+}
+
+.dark-mode .facebook:hover {
+  background: linear-gradient(135deg, #4267B2, #1877F2);
+}
+
+.dark-mode .apple {
+  background: linear-gradient(135deg, #000, #333);
+  color: #ffffff;
+}
+
+.dark-mode .apple:hover {
+  background: linear-gradient(135deg, #333, #000);
+}
+
+.dark-mode .divider {
+  color: #ffffff;
+}
+
+.dark-mode .divider::before,
+.dark-mode .divider::after {
+  border-bottom: 1px solid rgba(245, 24, 102, 0.3);
+}

@@ -107,3 +107,39 @@
     height: 100px;
   }
 }
+
+/* Dark Mode Styles */
+.dark-mode .my-announcement-card {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .my-announcement-card:hover {
+  border-color: rgba(245, 24, 102, 0.5);
+  box-shadow: 0 4px 18px rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .my-announcement-title {
+  color: #ffffff;
+}
+
+.dark-mode .my-announcement-category {
+  color: #ffffff;
+}
+
+.dark-mode .my-announcement-location {
+  color: #ffffff;
+}
+
+.dark-mode .my-announcement-price {
+  color: #f51866;
+}
+
+.dark-mode .favorite-heart {
+  color: #f51866;
+}
+
+.dark-mode .favorite-heart:hover {
+  color: #fa4875;
+}

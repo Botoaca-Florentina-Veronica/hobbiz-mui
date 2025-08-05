@@ -420,3 +420,85 @@
   align-items: center;
   gap: 10px;
 }
+
+/* Dark Mode Styles pentru Add Announcement Page */
+.dark-mode .add-announcement-container {
+  background: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .add-announcement-title {
+  color: #f51866;
+}
+
+.dark-mode .add-announcement-form {
+  background: #282828;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  border: 1px solid #3f3f3f;
+}
+
+.dark-mode .add-announcement-subtitle {
+  color: #ffffff;
+}
+
+.dark-mode .add-announcement-label {
+  color: #ffffff;
+}
+
+.dark-mode .add-announcement-title-input,
+.dark-mode .add-announcement-category-select,
+.dark-mode .add-announcement-description-input {
+  background: #3f3f3f;
+  color: #ffffff;
+  border: 1px solid #575757;
+}
+
+.dark-mode .add-announcement-title-input:focus,
+.dark-mode .add-announcement-category-select:focus,
+.dark-mode .add-announcement-description-input:focus {
+  outline: 2px solid #fe6585;
+  background: #575757;
+}
+
+.dark-mode .add-announcement-charcount,
+.dark-mode .add-announcement-helper {
+  color: #8b8b8b;
+}
+
+.dark-mode .category-card-popover {
+  background: #3f3f3f;
+  border-color: #575757;
+  color: #ffffff;
+}
+
+.dark-mode .category-card-popover:hover {
+  background: #575757;
+  border-color: #fe6585;
+}
+
+.dark-mode .category-card-popover.selected {
+  background: #f51866;
+  border-color: #f51866;
+  color: #ffffff;
+}
+
+.dark-mode .category-title-popover,
+.dark-mode .category-description-popover {
+  color: #ffffff;
+}
+
+.dark-mode .add-announcement-image-upload-text {
+  color: #ffffff;
+}
+
+.dark-mode .add-announcement-error {
+  color: #ff7e95;
+  background: #3f3f3f;
+  border-color: #f51866;
+}
+
+.dark-mode .add-announcement-success {
+  color: #fe6585;
+  background: #282828;
+  border-color: #fe6585;
+}

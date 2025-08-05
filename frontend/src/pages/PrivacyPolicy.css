@@ -307,3 +307,71 @@
     font-size: 1rem;
   }
 }
+
+/* Dark Mode Styles */
+.dark-mode .privacy-policy {
+  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+}
+
+.dark-mode .privacy-policy__header {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy__header::before {
+  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+}
+
+.dark-mode .privacy-policy h1 {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy__subtitle {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy__intro {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .privacy-policy__intro-content strong {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy__intro-content p {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy__content {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .privacy-policy h2 {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy h3 {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy p {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy ul li {
+  color: #ffffff;
+}
+
+.dark-mode .privacy-policy strong {
+  color: #f51866;
+}
+
+.dark-mode .privacy-policy__icon {
+  color: #f51866;
+}
+
+.dark-mode .privacy-policy__intro-icon {
+  color: #f51866;
+}

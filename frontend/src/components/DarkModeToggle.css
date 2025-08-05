@@ -25,19 +25,19 @@
 /* --------- DARK MODE  --------- */
 body.dark-mode {
   background-color: #121212;
-  color: #c7c7c7;
+  color: #ffffff;
 }
 
 .dark-mode .header {
   background-color: #282828;
-  color: #c7c7c7;
+  color: #ffffff;
 }
 .dark-mode .main-stage,
 .dark-mode .content,
 .dark-mode .hole-action,
 .dark-mode .footer {
   background-color: #121212;
-  color: #c7c7c7;
+  color: #ffffff;
 }
 
 .dark-mode .header .logo {
@@ -45,19 +45,19 @@ body.dark-mode {
 }
 
 .dark-mode .header ul a {
-  color: #eceeef;
-  background-color: #342b2b;
+  color: #ffffff;
+  background-color: #282828;
 }
 
 .dark-mode .main-text {
   color: #F51866;
-  border-color: #f9f1ea;
+  border-color: #3f3f3f;
   background-color: #282828;
 }
 
 .dark-mode .favorite-btn, 
 .dark-mode .user-account-btn {
-  color: #ff7e95;
+  color: #fe6585;
 }
 
 .dark-mode .add-button {
@@ -67,7 +67,7 @@ body.dark-mode {
 
 .dark-mode .categories-button {
   background-color: #ffabb7;
-  color: #282828  ;
+  color: #282828;
 }
 
 .dark-mode .categories-container{
@@ -77,13 +77,13 @@ body.dark-mode {
 .dark-mode .search-input{
   background-color: #282828;
   border-color: #3f3f3f;
-  color: #eceeef;
+  color: #ffffff;
 }
 
 .dark-mode .location-section{
   background-color: #282828;
   border-color: #3f3f3f;
-  color: #eceeef;
+  color: #ffffff;
 }
 
 .dark-mode .search-button{
@@ -96,13 +96,13 @@ body.dark-mode {
 }
 
 .dark-mode .sign-up-button {
-  color: #3e271b;
-  background-color: #eceeef;
+  color: #282828;
+  background-color: #ffffff;
 }
 
 .dark-mode .sign-up-button:hover {
-  color: #eceeef;
-  background-color: #1a1a1a;
+  color: #ffffff;
+  background-color: #3f3f3f;
 }
 
 .dark-mode .second-button {
@@ -117,15 +117,15 @@ body.dark-mode {
 
 .dark-mode .content {
   background-color: #282828;
-  color: #eceeef;
+  color: #ffffff;
 }
 
 .dark-mode .content h2 {
-  color: #eceeef;
+  color: #ffffff;
 }
 
 .dark-mode .card img {
-  border-color: #2f2119;
+  border-color: #3f3f3f;
 }
 
 .dark-mode .categories-title{
@@ -137,28 +137,28 @@ body.dark-mode {
 }
 
 .dark-mode .call-to-action {
-  background-color: #5a3f2f;
-  color: #eceeef;
+  background-color: #282828;
+  color: #ffffff;
 }
 
 .dark-mode .second-button {
-  color: #362318;
-  background-color: #eceeef;
+  color: #282828;
+  background-color: #ffffff;
 }
 
 .dark-mode .second-button:hover {
-  color: #eceeef;
-  background-color: #301717;
+  color: #ffffff;
+  background-color: #3f3f3f;
 }
 
 .dark-mode .footer {
-  background: #4e3222;
-  color: #eceeef;
+  background: #121212;
+  color: #ffffff;
 }
 
 .dark-mode .dark-mode-toggle button{
   background-color: #f51866;
-  color: #e2e7eb;
+  color: #ffffff;
 }
 
 .sign-up-button {

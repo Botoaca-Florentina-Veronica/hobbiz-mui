@@ -333,3 +333,61 @@
     padding: 6px;
   }
 }
+
+/* Dark Mode Styles */
+.dark-mode .notifications-page {
+  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+}
+
+.dark-mode .notifications-title {
+  color: #ffffff;
+}
+
+.dark-mode .notifications-content {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .notification-item {
+  background: linear-gradient(135deg, #3f3f3f 0%, #575757 100%);
+  border: 1px solid rgba(245, 24, 102, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .notification-item.unread {
+  background: linear-gradient(135deg, rgba(245, 24, 102, 0.2) 0%, rgba(245, 24, 102, 0.1) 100%);
+  border-color: rgba(245, 24, 102, 0.4);
+}
+
+.dark-mode .notification-item:hover {
+  border-color: rgba(245, 24, 102, 0.5);
+  box-shadow: 0 8px 32px rgba(245, 24, 102, 0.2);
+}
+
+.dark-mode .notification-message {
+  color: #ffffff;
+}
+
+.dark-mode .notification-time {
+  color: #8b8b8b;
+}
+
+.dark-mode .notification-type {
+  background: rgba(245, 24, 102, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .notification-delete-btn {
+  background: rgba(245, 24, 102, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .notification-delete-btn:hover {
+  background: rgba(245, 24, 102, 0.4);
+}
+
+.dark-mode .notification-unread-indicator {
+  background: #f51866;
+}
