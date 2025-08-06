@@ -111,26 +111,26 @@ export default function FavoriteAnnouncements() {
             {announcements.map((a) => (
               <div
                 key={a._id}
-                className="my-announcement-card"
+                className="favorite-announcement-card"
                 onClick={e => {
                   if (e.target.closest('.favorite-heart')) return;
                   window.location.href = `/announcement/${a._id}`;
                 }}
               >
-              <div className="my-announcement-image">
+              <div className="favorite-announcement-image">
                 {a.images && a.images[0] ? (
                   <img
                     src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
                       ? a.images[0]
                       : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
                     alt="imagine principala"
-                    className="my-announcement-img"
+                    className="favorite-announcement-img"
                   />
                 ) : (
-                  <div className="my-announcement-img" style={{background: '#eee'}} />
+                  <div className="favorite-announcement-img" style={{background: '#eee'}} />
                 )}
               </div>
-              <div className="my-announcement-info">
+              <div className="favorite-announcement-info">
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
                   <span style={{color: '#355070', fontSize: 17}}>
                     {a.createdAt ? `Postat ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}` : ''}
@@ -147,9 +147,9 @@ export default function FavoriteAnnouncements() {
                     )}
                   </div>
                 </div>
-                <h2 className="my-announcement-title">{a.title}</h2>
-                <div className="my-announcement-category">{a.category}</div>
-                <div className="my-announcement-location">{a.location}</div>
+                <h2 className="favorite-announcement-title">{a.title}</h2>
+                <div className="favorite-announcement-category">{a.category}</div>
+                <div className="favorite-announcement-location">{a.location}</div>
                 {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#003b3b', marginTop: 12 }}>{a.price} €</div>}
               </div>
               </div>

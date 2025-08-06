@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import './MyAnnouncements.css';
+import './AnnouncementsByCategory.css';
 
 export default function AnnouncementsByCategory() {
   const { category } = useParams();
@@ -134,7 +135,7 @@ export default function AnnouncementsByCategory() {
   if (loading) return <div>Se încarcă anunțurile...</div>;
 
   return (
-    <div className="my-announcements-container">
+    <div className="my-announcements-container announcements-by-category">
       <Typography variant="h4" className="my-announcements-title" gutterBottom>
         {category}
       </Typography>

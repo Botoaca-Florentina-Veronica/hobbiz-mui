@@ -1,0 +1,72 @@
+/* Stiluri compacte pentru paginile de categorii */
+.announcements-by-category .favorite-announcements-list.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
+  width: 100%;
+  max-width: 100%;
+  flex-direction: column;
+  min-height: 260px;
+}
+
+.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
+  min-width: 100%;
+  max-width: 100%;
+  height: 140px;
+  margin-right: 0;
+}
+
+.announcements-by-category .my-announcement-info {
+  padding: 8px;
+}
+
+.announcements-by-category .my-announcement-title {
+  font-size: 14px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.announcements-by-category .my-announcement-category {
+  font-weight: 500;
+  color: #23484a;
+  margin-bottom: 3px;
+  font-size: 12px;
+}
+
+.announcements-by-category .my-announcement-location {
+  color: #23484a;
+  margin-bottom: 3px;
+  font-size: 12px;
+}
+
+/* Dark mode pentru paginile de categorii */
+.announcements-by-category.dark-mode .my-announcement-card {
+  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  border: 1px solid rgba(245, 24, 102, 0.3);
+  color: #ffffff;
+}
+
+.announcements-by-category.dark-mode .my-announcement-card:hover {
+  border-color: rgba(245, 24, 102, 0.5);
+  box-shadow: 0 4px 18px rgba(245, 24, 102, 0.3);
+}
+
+.announcements-by-category.dark-mode .my-announcement-title {
+  color: #ffffff;
+}
+
+.announcements-by-category.dark-mode .my-announcement-category {
+  color: #ffffff;
+}
+
+.announcements-by-category.dark-mode .my-announcement-location {
+  color: #ffffff;
+}
+
+.announcements-by-category.dark-mode .my-announcement-price {
+  color: #f51866;
+}
