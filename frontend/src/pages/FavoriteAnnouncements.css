@@ -6,8 +6,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   max-width: 1800px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
   padding: 0 16px;
 }
 
@@ -79,8 +78,9 @@
 @media (min-width: 1200px) {
   .favorite-announcements-list {
     gap: 20px;
-    padding: 0 24px;
+    padding: 0 32px;
     justify-content: flex-start;
+    max-width: 1200px;
   }
   .favorite-announcement-card {
     width: 280px;
@@ -97,9 +97,10 @@
 @media (max-width: 700px) {
   .favorite-announcements-list {
     gap: 16px;
-    padding: 0 12px;
+    padding: 0 16px;
     justify-content: flex-start;
     flex-direction: column;
+    max-width: 100%;
   }
   .favorite-announcement-card {
     width: 100%;

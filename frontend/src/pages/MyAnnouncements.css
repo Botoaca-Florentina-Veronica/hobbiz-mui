@@ -41,6 +41,114 @@
   color: #355070;
 }
 
+/* Stiluri pentru header-ul de căutare și filtrare - versiunea compactă */
+.my-announcements-search-header {
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(53, 80, 112, 0.06);
+  margin-bottom: 20px;
+  border: 1px solid rgba(53, 80, 112, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.my-announcements-search-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #355070 0%, #F8B195 100%);
+}
+
+.my-announcements-search-header .MuiTextField-root {
+  background: #fff;
+  border-radius: 6px;
+}
+
+.my-announcements-search-header .MuiOutlinedInput-root {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.my-announcements-search-header .MuiOutlinedInput-root:hover {
+  box-shadow: 0 1px 4px rgba(53, 80, 112, 0.08);
+}
+
+.my-announcements-search-header .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.12);
+}
+
+.my-announcements-search-header .MuiFormControl-root {
+  background: #fff;
+  border-radius: 6px;
+}
+
+.my-announcements-search-header .MuiSelect-root {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.my-announcements-search-header .MuiSelect-root:hover {
+  box-shadow: 0 1px 4px rgba(53, 80, 112, 0.08);
+}
+
+/* Stiluri pentru Chip-urile de filtre active - versiunea compactă */
+.my-announcements-search-header .MuiChip-root {
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  height: 28px;
+}
+
+.my-announcements-search-header .MuiChip-root:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.my-announcements-search-header .MuiChip-colorPrimary {
+  background: linear-gradient(135deg, #355070 0%, #4a6b8a 100%);
+  color: white;
+  border: none;
+}
+
+.my-announcements-search-header .MuiChip-colorSecondary {
+  background: linear-gradient(135deg, #F8B195 0%, #fcc2a6 100%);
+  color: #355070;
+  border: none;
+}
+
+/* Responsive design pentru versiunea compactă */
+@media (max-width: 900px) {
+  .my-announcements-search-header {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .my-announcements-search-header .MuiBox-root {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .my-announcements-search-header .MuiTextField-root,
+  .my-announcements-search-header .MuiFormControl-root {
+    min-width: 100% !important;
+    flex: none !important;
+  }
+  
+  .my-announcements-search-header .MuiStack-root {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+  
+  .my-announcements-search-header .MuiChip-root {
+    font-size: 0.7rem !important;
+    height: 26px !important;
+  }
+}
+
 /* Carduri îmbunătățite pentru desktop */
 .my-announcement-card {
   background: #fff;
@@ -513,6 +621,124 @@
 
 .dark-mode .my-announcements-title {
   color: #f51866;
+}
+
+/* Dark Mode pentru Search Header - versiune îmbunătățită */
+.dark-mode .my-announcements-search-header {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .my-announcements-search-header::before {
+  background: linear-gradient(90deg, #f51866 0%, #ff6b9d 100%);
+}
+
+/* Input Fields în Dark Mode */
+.dark-mode .my-announcements-search-header .MuiTextField-root {
+  background: rgba(42, 42, 42, 0.8);
+}
+
+.dark-mode .my-announcements-search-header .MuiOutlinedInput-root {
+  background: rgba(42, 42, 42, 0.8);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .my-announcements-search-header .MuiOutlinedInput-root:hover {
+  border-color: rgba(245, 24, 102, 0.4);
+  box-shadow: 0 2px 8px rgba(245, 24, 102, 0.1);
+}
+
+.dark-mode .my-announcements-search-header .MuiOutlinedInput-root.Mui-focused {
+  border-color: #f51866;
+  box-shadow: 0 4px 12px rgba(245, 24, 102, 0.2);
+}
+
+.dark-mode .my-announcements-search-header .MuiInputLabel-root {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark-mode .my-announcements-search-header .MuiInputLabel-root.Mui-focused {
+  color: #f51866;
+}
+
+/* Select Fields în Dark Mode */
+.dark-mode .my-announcements-search-header .MuiFormControl-root {
+  background: rgba(42, 42, 42, 0.8);
+}
+
+.dark-mode .my-announcements-search-header .MuiSelect-root {
+  color: #ffffff;
+}
+
+.dark-mode .my-announcements-search-header .MuiSelect-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Chip-uri în Dark Mode - design simplificat */
+.dark-mode .my-announcements-search-header .MuiChip-root {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-root:hover {
+  background: rgba(245, 24, 102, 0.2);
+  border-color: rgba(245, 24, 102, 0.4);
+  box-shadow: 0 2px 8px rgba(245, 24, 102, 0.1);
+  transform: translateY(-1px);
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-colorPrimary {
+  background: #f51866;
+  color: #ffffff;
+  border: none;
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-colorSecondary {
+  background: #ff6b9d;
+  color: #ffffff;
+  border: none;
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-colorDefault {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-deleteIcon {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-deleteIcon:hover {
+  color: #ffffff;
+}
+
+/* Dark Mode pentru Menu Dropdown - design simplificat */
+.dark-mode .MuiPaper-root.MuiMenu-paper {
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .MuiMenuItem-root {
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.dark-mode .MuiMenuItem-root:hover {
+  background: rgba(245, 24, 102, 0.15);
+  color: #f51866;
+}
+
+.dark-mode .MuiMenuItem-root .MuiSvgIcon-root {
+  color: #f51866;
+}
+
+.dark-mode .MuiMenuItem-root .MuiBox-root {
+  color: inherit;
 }
 
 .dark-mode .my-announcement-card {
