@@ -1,3 +1,6 @@
+/* Import Google font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
 html {
   zoom: 90%;
 }
@@ -28,6 +31,3 @@ body.login-page {
   margin: 0;
   min-height: 100vh;
 }
-
-/* Import Google font - Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');

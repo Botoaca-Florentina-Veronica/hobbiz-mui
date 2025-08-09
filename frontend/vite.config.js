@@ -22,10 +22,6 @@ export default defineConfig(({ mode }) => {
         },
         external: ['jwt-decode']
       }
-    },
-    // Definirea variabilelor de mediu pentru a fi accesibile în cod
-    define: {
-      'process.env': env // Permite accesul la toate variabilele cu prefixul VITE_
-    }
+  }
   };
 });
