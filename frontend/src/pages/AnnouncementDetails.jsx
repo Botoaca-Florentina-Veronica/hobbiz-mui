@@ -202,12 +202,24 @@ export default function AnnouncementDetails() {
       loggedUserId,
       isOwnAnnouncement,
       announcementUserId: announcement.user._id,
-      showChat
+      showChat,
+      localStorage_token: localStorage.getItem('token'),
+      localStorage_userId: localStorage.getItem('userId')
     });
     
-    if (!loggedUserId) {
-      // Redirectează către pagina de login dacă utilizatorul nu este autentificat
-      console.log('❌ User not logged in, redirecting to login');
+    // Verificăm mai atent autentificarea - check și pentru token
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    
+    if (!loggedUserId || !token || !userId) {
+      console.log('❌ User not properly authenticated:', {
+        loggedUserId,
+        token: token ? 'exists' : 'missing',
+        userId: userId ? 'exists' : 'missing'
+      });
+      
+      // În loc să redirectăm automat, să afișăm un mesaj de eroare
+      alert('Pentru a trimite mesaje, trebuie să fii conectat în cont. Te rog să te conectezi mai întâi.');
       navigate('/login');
       return;
     }

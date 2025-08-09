@@ -126,13 +126,18 @@ export default function NotificationsPage() {
     }
     setLoading(true);
     console.log('🔔 Frontend: Încarcă notificări pentru userId:', userId);
+    console.log('🔔 URL API pentru notificări:', `${apiClient.defaults.baseURL}/api/notifications/${userId}`);
+    console.log('🔔 Token în localStorage:', localStorage.getItem('token') ? 'exists' : 'missing');
     
     apiClient.get(`/api/notifications/${userId}`)
       .then(res => {
         console.log('🔔 Frontend: Răspuns primit:', res.data);
+        console.log('🔔 Status răspuns:', res.status);
+        console.log('🔔 Headers răspuns:', res.headers);
         return res.data;
       })
       .then(async data => {
+        console.log('🔔 Data primită:', data, 'lungime:', data?.length);
         // Enrich chat notifications cu preview și sender
         const enriched = await Promise.all(data.map(async notif => {
           console.log('🔍 Processing notification:', notif);
@@ -153,6 +158,20 @@ export default function NotificationsPage() {
       })
       .catch((err) => {
         console.error('❌ Frontend: Eroare la încărcarea notificărilor:', err);
+        console.error('❌ Detalii eroare notificări:', {
+          message: err.message,
+          status: err.response?.status,
+          statusText: err.response?.statusText,
+          data: err.response?.data,
+          config: err.config
+        });
+        
+        if (err.response?.status === 401) {
+          console.error('❌ Token invalid sau expirat pentru notificări');
+        } else if (err.response?.status === 404) {
+          console.error('❌ Endpoint notificări nu a fost găsit');
+        }
+        
         setNotifications([]);
         setLoading(false);
       });

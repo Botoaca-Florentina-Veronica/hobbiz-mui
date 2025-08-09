@@ -38,6 +38,30 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Interceptor pentru răspunsuri - nu redirecta automat la 401, doar loghează
+apiClient.interceptors.response.use(
+  (response) => {
+    // Răspuns de succes - returnează răspunsul tal care este
+    return response;
+  },
+  (error) => {
+    // Eroare de răspuns
+    console.error('❌ API Response Error:', {
+      message: error.message,
+      status: error.response?.status,
+      url: error.config?.url,
+      method: error.config?.method
+    });
+    
+    if (error.response?.status === 401) {
+      console.warn('⚠️ Token invalid sau expirat detectat pentru:', error.config?.url);
+      // Nu redirectăm automat - lăsăm componenta să decidă
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 // User-related requests
 export const login = (credentials) => apiClient.post('/api/users/login', credentials);
 export const getProfile = () => apiClient.get('/api/users/profile');
