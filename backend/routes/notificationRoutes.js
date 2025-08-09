@@ -3,8 +3,8 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const NotificationController = require('../controllers/NotificationController');
 
-// GET toate notificările pentru un user
-router.get('/:userId', NotificationController.getNotifications);
+// GET toate notificările pentru un user (necesită autentificare)
+router.get('/:userId', auth, NotificationController.getNotifications);
 
 // POST creează notificare nouă
 router.post('/', NotificationController.createNotification);

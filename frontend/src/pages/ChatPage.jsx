@@ -121,8 +121,12 @@ export default function ChatPage() {
         
         setConversations(uniqueConversations);
       } catch (error) {
-        console.error('Eroare la încărcarea conversațiilor:', error);
-        setConversations([]);
+        if (error?.response?.status === 401) {
+          setConversations([]);
+        } else {
+          console.error('Eroare la încărcarea conversațiilor:', error);
+          setConversations([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -165,8 +169,12 @@ export default function ChatPage() {
         console.log(`Primite ${response.data.length} mesaje din backend`);
         setMessages(response.data || []);
       } catch (error) {
-        console.error('Eroare la încărcarea mesajelor:', error);
-        setMessages([]);
+        if (error?.response?.status === 401) {
+          setMessages([]);
+        } else {
+          console.error('Eroare la încărcarea mesajelor:', error);
+          setMessages([]);
+        }
       } finally {
         setLoading(false);
       }

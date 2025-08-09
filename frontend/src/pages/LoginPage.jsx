@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Sau folosește fetch
+import apiClient from '../api/api';
 import '../pages/LoginSignup.css';
 
 export default function LoginPage() {
@@ -23,11 +23,8 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Trimite cererea la backend
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/users/login`, {
-        email,
-        password
-      });
+  // Trimite cererea la backend folosind apiClient (gestionează automat baseURL și token)
+  const response = await apiClient.post('/api/users/login', { email, password });
 
       // Salvează token-ul în localStorage/sessionStorage
       localStorage.setItem('token', response.data.token);

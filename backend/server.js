@@ -27,6 +27,9 @@ const app = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://hobbiz.netlify.app',
+  'https://hobbiz-mui.netlify.app',
+  'https://hobbiz-mui.netlify.app',
+  'https://hobbiz-mui.onrender.com',
   'http://localhost:5173'
 ].filter(Boolean);
 
@@ -48,6 +51,7 @@ const corsOptions = {
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 app.use(cors(corsOptions));

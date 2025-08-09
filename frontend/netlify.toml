@@ -8,6 +8,19 @@
 [build.environment]
   NODE_VERSION = "22"
 
+## API proxy către backend (ajută când folosiți rute relative)
+[[redirects]]
+  from = "/api/*"
+  to = "https://hobbiz-mui.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://hobbiz-mui.onrender.com/uploads/:splat"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

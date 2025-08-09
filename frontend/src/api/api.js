@@ -19,15 +19,27 @@ if (!API_URL) {
   if (isDev) {
     API_URL = 'http://localhost:5000';
   } else if (typeof window !== 'undefined') {
-    // fallback: același origin (utile pentru reverse proxy sau single-origin deploy)
-    API_URL = `${window.location.origin}`;
+    const host = window.location.hostname;
+    // Dacă suntem pe Netlify și nu avem VITE_API_URL, folosește backend-ul pe Render (configurat în CORS)
+    if (/\.netlify\.app$/.test(host)) {
+      API_URL = 'https://hobbiz-mui.onrender.com';
+    } else {
+      // fallback: același origin (utile pentru reverse proxy sau single-origin deploy)
+      API_URL = `${window.location.origin}`;
+    }
   }
 }
 
 // Configurare instanță Axios
 const apiClient = axios.create({
   baseURL: API_URL,
+  withCredentials: false,
 });
+
+// Debug baseURL once
+if (typeof window !== 'undefined') {
+  console.log('API baseURL:', API_URL);
+}
 
 // Adaugă token-ul JWT în header-ul Authorization pentru toate request-urile
 apiClient.interceptors.request.use((config) => {
@@ -38,26 +50,11 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor pentru răspunsuri - nu redirecta automat la 401, doar loghează
-apiClient.interceptors.response.use(
-  (response) => {
-    // Răspuns de succes - returnează răspunsul tal care este
-    return response;
-  },
+// Optional: Avoid global redirects on 401; let callers decide
+apiClient.interceptors.response?.use(
+  (resp) => resp,
   (error) => {
-    // Eroare de răspuns
-    console.error('❌ API Response Error:', {
-      message: error.message,
-      status: error.response?.status,
-      url: error.config?.url,
-      method: error.config?.method
-    });
-    
-    if (error.response?.status === 401) {
-      console.warn('⚠️ Token invalid sau expirat detectat pentru:', error.config?.url);
-      // Nu redirectăm automat - lăsăm componenta să decidă
-    }
-    
+    // Pass through 401 without redirecting
     return Promise.reject(error);
   }
 );

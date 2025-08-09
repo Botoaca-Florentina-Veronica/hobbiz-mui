@@ -195,6 +195,7 @@ export default function AnnouncementDetails() {
   };
 
   const loggedUserId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
   const isOwnAnnouncement = loggedUserId && announcement.user._id === loggedUserId;
 
   const handleChatClick = () => {
@@ -202,29 +203,10 @@ export default function AnnouncementDetails() {
       loggedUserId,
       isOwnAnnouncement,
       announcementUserId: announcement.user._id,
-      showChat,
-      localStorage_token: localStorage.getItem('token'),
-      localStorage_userId: localStorage.getItem('userId')
+      showChat
     });
-    
-    // Verificăm mai atent autentificarea - check și pentru token
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
-    
-    if (!loggedUserId || !token || !userId) {
-      console.log('❌ User not properly authenticated:', {
-        loggedUserId,
-        token: token ? 'exists' : 'missing',
-        userId: userId ? 'exists' : 'missing'
-      });
-      
-      // În loc să redirectăm automat, să afișăm un mesaj de eroare
-      alert('Pentru a trimite mesaje, trebuie să fii conectat în cont. Te rog să te conectezi mai întâi.');
-      navigate('/login');
-      return;
-    }
-    
-    console.log('✅ Opening chat popup');
+  // Deschide chat-ul fără a forța redirecționarea la login; componenta ChatPopup gestionează lipsa autentificării
+  console.log('✅ Opening chat popup');
     setShowChat(true);
   };
 
@@ -537,8 +519,8 @@ export default function AnnouncementDetails() {
         </Grid>
       </Container>
 
-      {/* Chat Popup */}
-      {showChat && loggedUserId && !isOwnAnnouncement && (
+  {/* Chat Popup */}
+  {showChat && !isOwnAnnouncement && (
         <ChatPopup
           open={showChat}
           onClose={() => {
@@ -561,9 +543,9 @@ export default function AnnouncementDetails() {
       {/* Debug info */}
       {console.log('🎯 ChatPopup render conditions:', {
         showChat,
-        loggedUserId: !!loggedUserId,
-        isOwnAnnouncement,
-        shouldRender: showChat && loggedUserId && !isOwnAnnouncement
+    loggedUserId: !!loggedUserId,
+    isOwnAnnouncement,
+  shouldRender: showChat && !isOwnAnnouncement
       })}
 
       <Footer />

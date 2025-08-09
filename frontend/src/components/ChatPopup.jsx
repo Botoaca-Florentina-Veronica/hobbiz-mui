@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
-import { sendMessage, getMessages, deleteMessage, getMessagesBetween } from '../api/api';
+import apiClient, { sendMessage, getMessages, deleteMessage, getMessagesBetween } from '../api/api';
 import './ChatPopup.css';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
@@ -19,8 +19,23 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
   const messagesEndRef = useRef(null);
 
-  // Obține userId din localStorage dacă nu e pasat ca prop
-  const effectiveUserId = userId || localStorage.getItem('userId');
+  // Obține userId din localStorage dacă nu e pasat ca prop; dacă lipsește dar avem token, încearcă să-l afli din profil
+  const [effectiveUserId, setEffectiveUserId] = useState(userId || localStorage.getItem('userId'));
+  useEffect(() => {
+    if (!effectiveUserId && localStorage.getItem('token')) {
+      (async () => {
+        try {
+          const res = await apiClient.get('/api/users/profile');
+          if (res.data?._id) {
+            localStorage.setItem('userId', res.data._id);
+            setEffectiveUserId(res.data._id);
+          }
+        } catch (e) {
+          console.warn('Nu s-a putut obține profilul pentru a determina userId:', e?.response?.status || e?.message);
+        }
+      })();
+    }
+  }, [effectiveUserId]);
   
   // Creează conversationId mai simplu și consistent - doar între utilizatori
   const conversationId = React.useMemo(() => {
@@ -46,35 +61,18 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       setLoading(true);
       try {
         console.log('🔄 Încărcare mesaje pentru conversația:', conversationId);
-        console.log('🔄 API URL folosit:', import.meta.env.VITE_API_URL || 'default');
-        console.log('🔄 Token din localStorage:', localStorage.getItem('token') ? 'exists' : 'missing');
         
         // Folosim endpoint-ul pentru mesaje între doi utilizatori
         const sellerId = seller._id || seller.id;
-        console.log('🔄 Solicitare mesaje între:', { effectiveUserId, sellerId });
-        
         const response = await getMessagesBetween(effectiveUserId, sellerId);
         
-        console.log('✅ Răspuns API:', response);
-        const messages = response.data || [];
-        setMessages(messages);
-        console.log('✅ Mesaje încărcate:', messages.length, messages);
+        setMessages(response.data || []);
+        console.log('✅ Mesaje încărcate:', response.data?.length || 0);
       } catch (error) {
         console.error('❌ Eroare la încărcarea mesajelor:', error);
-        console.error('❌ Detalii eroare:', {
-          message: error.message,
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          config: error.config
-        });
         
         if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-          console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează.');
-        } else if (error.response?.status === 401) {
-          console.error('❌ Token invalid sau expirat - încearcă să te reconectezi');
-        } else if (error.response?.status === 404) {
-          console.error('❌ Endpoint-ul nu a fost găsit');
+          console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează pe portul 5000.');
         }
         
         setMessages([]);
@@ -103,7 +101,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     setSending(true);
     
     // Determină destinatarul corect - logic simplu
-    const recipientId = seller._id || seller.id;
+  const recipientId = seller._id || seller.id;
     
     // Validare înainte de trimitere
     if (!recipientId || !effectiveUserId || !conversationId) {
@@ -130,12 +128,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     
     try {
       console.log('📤 Trimitere mesaj:', messageData);
-      console.log('📤 URL API:', import.meta.env.VITE_API_URL || 'default');
-      console.log('📤 Token:', localStorage.getItem('token') ? 'exists' : 'missing');
-      
-      const response = await sendMessage(messageData);
-      
-      console.log('✅ Răspuns trimitere mesaj:', response);
+  const response = await sendMessage(messageData);
       
       if (response.data) {
         // Adaugă mesajul la lista existentă
@@ -149,22 +142,12 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       }
     } catch (error) {
       console.error('❌ Eroare la trimiterea mesajului:', error);
-      console.error('❌ Detalii eroare trimitere:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        config: error.config
-      });
       
       // Nu mai afișăm popup-uri - doar logăm erorile în consolă
       if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-        console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează.');
+        console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează pe portul 5000.');
       } else if (error.response?.status === 500) {
         console.error('❌ Eroare de server la trimiterea mesajului. Verifică log-urile backend-ului.');
-      } else if (error.response?.status === 401) {
-        console.error('❌ Token invalid sau expirat - încearcă să te reconectezi');
-        // Poate înlocui token-ul sau redirecționa la login
       } else {
         console.error(`❌ Eroare la trimiterea mesajului: ${error.message}`);
       }

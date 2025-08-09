@@ -6,6 +6,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Set BACKEND_URL in site settings for API proxy, e.g. https://your-backend.onrender.com
 
 # SPA fallback
 [[redirects]]

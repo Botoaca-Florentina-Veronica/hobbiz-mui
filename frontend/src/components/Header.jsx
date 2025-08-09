@@ -33,6 +33,11 @@ export default function Header() {
       const unreadNotifications = notifications.filter(n => !n.read);
       setUnreadCount(unreadNotifications.length);
     } catch (error) {
+      if (error?.response?.status === 401) {
+        // token expirat – nu forțăm redirect aici; contorul rămâne 0 până la reautentificare
+        setUnreadCount(0);
+        return;
+      }
       console.error('Eroare la obținerea notificărilor necitite:', error);
       setUnreadCount(0);
     }
