@@ -7,8 +7,20 @@ const { Types } = require('mongoose');
 exports.deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Message.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ error: 'Mesajul nu a fost găsit.' });
+    const authenticatedUserId = req.userId;
+    
+    // Găsim mesajul pentru a verifica proprietatea
+    const message = await Message.findById(id);
+    if (!message) {
+      return res.status(404).json({ error: 'Mesajul nu a fost găsit.' });
+    }
+    
+    // Verificăm că utilizatorul poate șterge mesajul (doar propriile mesaje)
+    if (message.senderId !== authenticatedUserId) {
+      return res.status(403).json({ error: 'Nu poți șterge mesajele altui utilizator.' });
+    }
+    
+    await Message.findByIdAndDelete(id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Eroare la ștergerea mesajului.' });
@@ -18,18 +30,16 @@ exports.deleteMessage = async (req, res) => {
 // Creează un mesaj nou și (opțional) o notificare pentru destinatar
 exports.createMessage = async (req, res) => {
   try {
-    // Log de diagnostic minimal (nu logăm payload-uri mari în producție)
     console.log('➡️ POST /api/messages - createMessage');
-    // Afișăm starea conexiunii DB
-    try {
-      const mongoose = require('mongoose');
-      const rs = mongoose.connection?.readyState;
-      console.log('   • Mongo readyState:', rs, '(0=disconnected,1=connected,2=connecting,3=disconnecting)');
-    } catch {}
-
-    // Asigurăm body-ul ca obiect simplu
+    
+    // Verificăm utilizatorul autentificat din middleware
+    const authenticatedUserId = req.userId;
+    if (!authenticatedUserId) {
+      return res.status(401).json({ error: 'Utilizator neautentificat' });
+    }
+    
     const body = typeof req.body === 'object' && req.body !== null ? req.body : {};
-  let {
+    let {
       conversationId,
       senderId,
       senderRole,
@@ -39,39 +49,37 @@ exports.createMessage = async (req, res) => {
       image,
       imageFile,
     } = body;
-  console.log('   • Payload primit (chei):', Object.keys(body));
-
+    
+    console.log('   • Payload primit (chei):', Object.keys(body));
+    
+    // Validăm că senderId corespunde cu utilizatorul autentificat
+    if (senderId && senderId !== authenticatedUserId) {
+      return res.status(403).json({ error: 'Nu poți trimite mesaje în numele altui utilizator' });
+    }
+    
+    // Folosim utilizatorul autentificat ca sender
+    senderId = authenticatedUserId;
+    
     const isValidObjectId = (id) => typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id);
-
-    // Normalizează conversationId dacă e format din 2 ObjectId-uri despărțite cu '-'
-    if (typeof conversationId === 'string' && conversationId.includes('-')) {
-      const parts = conversationId.split('-').filter(Boolean);
-      if (parts.length === 2 && isValidObjectId(parts[0]) && isValidObjectId(parts[1])) {
-        // sort pentru consistență
-        conversationId = parts.sort().join('-');
-      }
-    }
-
-    // Deducem destinatarId dacă lipsește
-    if (!destinatarId && typeof conversationId === 'string') {
-      const parts = conversationId.split('-');
-      const candidate = parts.find((p) => p !== String(senderId));
-      if (isValidObjectId(candidate)) destinatarId = candidate;
-    }
-
-    // Validare de bază – trebuie text sau imagine, iar IDs valide
-    const missing = [];
-    if (!conversationId) missing.push('conversationId');
-    if (!senderId) missing.push('senderId');
-    if (!text && !image) missing.push('text|image');
-    if (!destinatarId) missing.push('destinatarId');
-  if (missing.length) {
+    
+    // Validare minimă - doar text este obligatoriu
+    if (!text || !text.trim()) {
       return res.status(400).json({
-        error: 'Date obligatorii lipsă pentru mesaj',
-        missing,
+        error: 'Mesajul nu poate fi gol',
       });
     }
-
+    
+    // Asigurăm că avem un destinatar
+    if (!destinatarId) {
+      return res.status(400).json({
+        error: 'Destinatarul este obligatoriu',
+      });
+    }
+    
+    // Generăm conversationId automat
+    const participants = [senderId, destinatarId].sort();
+    conversationId = participants.join('-');
+    
     const messageData = {
       conversationId,
       senderId,
@@ -79,18 +87,17 @@ exports.createMessage = async (req, res) => {
       destinatarId,
       createdAt: new Date(),
     };
-
+    
     if (text && String(text).trim()) messageData.text = String(text).trim();
     if (image) {
       messageData.image = image;
       if (imageFile) messageData.imageFile = imageFile;
     }
-
-    // Salvăm mesajul (cu validare Mongoose)
-  console.log('   • Salvăm mesajul în MongoDB...');
-  const message = await new Message(messageData).save();
+    
+    console.log('   • Salvăm mesajul în MongoDB...');
+    const message = await new Message(messageData).save();
     console.log('✅ Mesaj salvat:', message._id);
-
+    
     // Notificare – doar dacă avem un destinatar valid și diferit de expeditor
     if (isValidObjectId(destinatarId) && String(destinatarId) !== String(senderId)) {
       try {
@@ -100,7 +107,7 @@ exports.createMessage = async (req, res) => {
           link,
           read: false,
         });
-
+        
         if (!existingNotification) {
           await Notification.create({
             userId: destinatarId,
@@ -109,14 +116,12 @@ exports.createMessage = async (req, res) => {
           });
         }
       } catch (notifErr) {
-        // Logăm dar nu blocăm răspunsul
         console.warn('⚠️ Eroare la crearea notificării (non-fatal):', notifErr.message);
       }
     }
-
+    
     return res.status(201).json(message);
   } catch (err) {
-    // Trimitem detalii utile pentru debugging (message + câteva meta)
     console.error('❌ EROARE createMessage:', err);
     return res.status(500).json({
       error: err.message || 'Eroare internă la crearea mesajului',
@@ -130,45 +135,40 @@ exports.createMessage = async (req, res) => {
 exports.getConversations = async (req, res) => {
   try {
     const { userId } = req.params;
+    const authenticatedUserId = req.userId;
+    
+    // Verificăm că utilizatorul solicită propriile conversații
+    if (userId !== authenticatedUserId) {
+      return res.status(403).json({ error: 'Nu poți accesa conversațiile altui utilizator' });
+    }
     
     // Găsim toate mesajele în care utilizatorul este implicat
     const messages = await Message.find({
       $or: [
         { senderId: userId },
+        { destinatarId: userId },
         { conversationId: { $regex: userId } } // conversationId conține userId-ul
       ]
     }).sort({ createdAt: -1 });
     
     console.log(`Găsite ${messages.length} mesaje pentru utilizatorul ${userId}`);
     
-    // Grupăm mesajele pe utilizatori (nu pe conversații)
+    // Grupăm mesajele pe utilizatori
     const userConversationMap = new Map();
     
     for (const message of messages) {
-      // Identificăm celalalt participant mai robust
+      // Identificăm celalalt participant
       let otherParticipantId = null;
       
       if (message.senderId === userId) {
-        // Mesajul este trimis de utilizatorul curent, căutăm destinatarul în conversationId
-        const participants = message.conversationId.split('-').filter(id => 
-          id !== userId && 
-          id.length === 24 && // ObjectId length
-          /^[a-fA-F0-9]{24}$/.test(id) // Valid ObjectId
-        );
-        
-        // Găsim primul participant valid care nu este userId-ul curent
-        for (const participantId of participants) {
-          if (participantId !== userId) {
-            otherParticipantId = participantId;
-            break;
-          }
-        }
+        // Mesajul este trimis de utilizatorul curent
+        otherParticipantId = message.destinatarId;
       } else {
         // Mesajul este primit, expeditorul este celalalt participant
         otherParticipantId = message.senderId;
       }
       
-      // Validăm că am găsit un participant valid
+      // Verificăm dacă celalalt participant este valid și diferit
       if (!otherParticipantId || otherParticipantId === userId) {
         console.log(`Ignorăm mesajul ${message._id} - participant invalid:`, otherParticipantId);
         continue;
@@ -181,7 +181,7 @@ exports.getConversations = async (req, res) => {
           
           if (otherUser) {
             userConversationMap.set(otherParticipantId, {
-              conversationId: message.conversationId, // Folosim conversationId din ultimul mesaj
+              conversationId: message.conversationId,
               otherParticipant: {
                 id: otherParticipantId,
                 firstName: otherUser.firstName || 'Utilizator',
@@ -196,8 +196,6 @@ exports.getConversations = async (req, res) => {
               },
               unread: false // Aici poți implementa logica pentru mesaje necitite
             });
-          } else {
-            console.log(`Utilizatorul ${otherParticipantId} nu a fost găsit în baza de date`);
           }
         } catch (error) {
           console.error('Eroare la preluarea datelor utilizatorului:', error);
@@ -234,17 +232,21 @@ exports.getConversations = async (req, res) => {
 exports.getMessagesBetweenUsers = async (req, res) => {
   try {
     const { userId1, userId2 } = req.params;
+    const authenticatedUserId = req.userId;
+    
+    // Verificăm că utilizatorul autentificat este unul dintre participanți
+    if (authenticatedUserId !== userId1 && authenticatedUserId !== userId2) {
+      return res.status(403).json({ error: 'Nu poți accesa conversațiile altui utilizator' });
+    }
     
     console.log(`Căutăm mesaje între ${userId1} și ${userId2}`);
     
-    // Căutăm toate mesajele unde ambii utilizatori sunt implicați
-    // Fie unul trimite către celălalt, fie sunt în aceeași conversație
+    // Căutăm mesajele între cei doi utilizatori
     const messages = await Message.find({
       $or: [
-        // Mesaje directe între cei doi utilizatori
-        { senderId: userId1, conversationId: { $regex: userId2 } },
-        { senderId: userId2, conversationId: { $regex: userId1 } },
-        // Mesaje în conversații comune (să zicem că conversationId conține ambii)
+        { senderId: userId1, destinatarId: userId2 },
+        { senderId: userId2, destinatarId: userId1 },
+        // Căutăm și în conversationId pentru compatibilitate cu mesajele vechi
         {
           $and: [
             { conversationId: { $regex: userId1 } },
@@ -254,25 +256,11 @@ exports.getMessagesBetweenUsers = async (req, res) => {
       ]
     }).sort({ createdAt: 1 });
     
-    console.log(`Query găsit: ${messages.length} mesaje brute`);
-    
-    // Verificăm fiecare mesaj pentru a ne asigura că este relevant
-    const relevantMessages = [];
-    for (const message of messages) {
-      const convParticipants = message.conversationId.split('-');
-      const hasUser1 = convParticipants.includes(userId1);
-      const hasUser2 = convParticipants.includes(userId2);
-      
-      if (hasUser1 && hasUser2) {
-        relevantMessages.push(message);
-      }
-    }
-    
-    console.log(`Mesaje relevante după verificare: ${relevantMessages.length}`);
+    console.log(`Query găsit: ${messages.length} mesaje`);
     
     // Preluam informațiile utilizatorilor pentru fiecare mesaj
     const messagesWithUserData = await Promise.all(
-      relevantMessages.map(async (message) => {
+      messages.map(async (message) => {
         try {
           const sender = await User.findById(message.senderId).select('firstName lastName avatar');
           return {
@@ -305,6 +293,14 @@ exports.getMessagesBetweenUsers = async (req, res) => {
 exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
+    const authenticatedUserId = req.userId;
+    
+    // Verificăm că utilizatorul autentificat face parte din conversație
+    const participants = conversationId.split('-');
+    if (!participants.includes(authenticatedUserId)) {
+      return res.status(403).json({ error: 'Nu poți accesa această conversație' });
+    }
+    
     const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
     
     // Preluam informațiile utilizatorilor pentru fiecare mesaj

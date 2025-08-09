@@ -1043,3 +1043,122 @@
 .dark-mode .chat-message-image img {
   border-color: rgba(245, 24, 102, 0.3);
 }
+
+/* Bara de acțiuni pentru mesaje */
+.message-actions-bar {
+  position: absolute;
+  top: -45px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(5px);
+  animation: slideInActions 0.2s ease forwards;
+}
+
+@keyframes slideInActions {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.message-action-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+  transform: scale(1.1);
+}
+
+.message-action-btn.delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.message-action-btn .MuiSvgIcon-root {
+  font-size: 18px;
+}
+
+/* Pozitionare relativă pentru container-ul mesajului */
+.chat-message {
+  position: relative;
+}
+
+.chat-message.own {
+  position: relative;
+}
+
+/* Dark mode pentru bara de acțiuni */
+.dark-mode .message-actions-bar {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark-mode .message-action-btn {
+  color: #d1d5db;
+}
+
+.dark-mode .message-action-btn:hover {
+  background: #4b5563;
+  color: #f9fafb;
+}
+
+.dark-mode .message-action-btn.delete:hover {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+/* Separator de dată */
+.date-separator {
+  display: flex;
+  align-items: center;
+  margin: 24px 16px 16px 16px;
+  position: relative;
+}
+
+.date-separator-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5e7eb 20%, #e5e7eb 80%, transparent);
+}
+
+.date-separator-text {
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  background: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Dark mode pentru separator */
+.dark-mode .date-separator-line {
+  background: linear-gradient(90deg, transparent, #4b5563 20%, #4b5563 80%, transparent);
+}
+
+.dark-mode .date-separator-text {
+  color: #9ca3af;
+  background: #1f2937;
+}

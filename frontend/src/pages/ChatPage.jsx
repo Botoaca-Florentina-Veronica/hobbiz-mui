@@ -1,8 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import apiClient from '../api/api';
 import './ChatPage.css';
+// Import iconițe MUI
+import ReplyIcon from '@mui/icons-material/Reply';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function ChatPage() {
   const [activeTab, setActiveTab] = useState('buying'); // 'buying' sau 'selling'
@@ -14,6 +19,7 @@ export default function ChatPage() {
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const userId = localStorage.getItem('userId');
@@ -180,7 +186,7 @@ export default function ChatPage() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!userId) {
-      alert('Trebuie să fii autentificat pentru a trimite mesaje.');
+      console.error('Utilizator neautentificat pentru trimiterea mesajelor.');
       return;
     }
     if ((!newMessage.trim() && !selectedImage) || !selectedConversation) return;
@@ -245,7 +251,9 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Eroare la trimiterea mesajului:', error);
       const backendMsg = error?.response?.data?.error;
-      if (backendMsg) alert(`Eroare server: ${backendMsg}`);
+      if (backendMsg) {
+        console.error(`Eroare server: ${backendMsg}`);
+      }
       // Elimină mesajul temporar în caz de eroare (doar dacă a fost creat)
       if (tempMessage) {
         setMessages(prev => prev.filter(msg => msg._id !== tempMessage._id));
@@ -258,6 +266,37 @@ export default function ChatPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Funcție pentru formatarea datei separatorului
+  const formatDateSeparator = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // Resetăm orele pentru comparație corectă
+    today.setHours(0, 0, 0, 0);
+    yesterday.setHours(0, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
+    
+    if (date.getTime() === today.getTime()) {
+      return 'Astăzi';
+    } else if (date.getTime() === yesterday.getTime()) {
+      return 'Ieri';
+    } else {
+      return date.toLocaleDateString('ro-RO', {
+        day: 'numeric',
+        month: 'short'
+      }).toUpperCase();
+    }
+  };
+
+  // Funcție pentru a verifica dacă două mesaje sunt în zile diferite
+  const isDifferentDay = (date1, date2) => {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    return d1.toDateString() !== d2.toDateString();
   };
 
   const formatLastSeen = (lastSeenDate) => {
@@ -284,6 +323,34 @@ export default function ChatPage() {
         day: 'numeric',
         month: 'short'
       });
+    }
+  };
+
+  // Funcții pentru bara de acțiuni din mesaje
+  const handleReplyMessage = (message) => {
+    // Adaugă textul de reply în input
+    setNewMessage(`@${message.senderInfo?.firstName || 'Utilizator'}: "${message.text}" \n`);
+  };
+
+  const handleReactToMessage = (messageId, emoji) => {
+    // Aici poți implementa logica pentru reacții
+    console.log(`React cu ${emoji} la mesajul ${messageId}`);
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      // Elimină mesajul din lista locală
+      setMessages(prev => prev.filter(msg => msg._id !== messageId));
+      console.log('Mesaj șters:', messageId);
+    } catch (error) {
+      console.error('Eroare la ștergerea mesajului:', error);
+    }
+  };
+
+  const handleCopyMessage = (messageText) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(messageText);
+      console.log('Mesaj copiat în clipboard');
     }
   };
 
@@ -419,7 +486,11 @@ export default function ChatPage() {
                     Nicio conversație încă. Scrie primul mesaj!
                   </div>
                 ) : (
-                  messages.map((message) => {
+                  messages.map((message, index) => {
+                    // Verificăm dacă trebuie să afișăm un separator de dată
+                    const showDateSeparator = index === 0 || 
+                      (index > 0 && isDifferentDay(messages[index - 1].createdAt, message.createdAt));
+                    
                     // Determinăm avatarul pentru mesaj
                     let messageAvatar;
                     if (message.senderId === userId) {
@@ -433,35 +504,86 @@ export default function ChatPage() {
                     }
 
                     return (
-                      <div 
-                        key={message._id} 
-                        className={`chat-message ${message.senderId === userId ? 'own' : ''}`}
-                      >
-                        {/* Avatar eliminat la cerere */}
-                        <div className="chat-message-content-group">
-                          <div className="chat-bubble-row">
-                            <div className="chat-message-bubble">
-                              {message.image && (
-                                <div className="chat-message-image">
-                                  <img src={message.image} alt="Imagine trimisă" />
-                                </div>
-                              )}
-                              {message.text && (
-                                <p className="chat-message-text">{message.text}</p>
-                              )}
-                              {message.senderId === userId && (
-                                <span className="chat-message-ticks" aria-label="Livrat / citit">
-                                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path d="M2 9l2.5 2.5L8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M6 9l2.5 2.5L14 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                                  </svg>
-                                </span>
-                              )}
-                            </div>
+                      <React.Fragment key={message._id}>
+                        {/* Separator de dată */}
+                        {showDateSeparator && (
+                          <div className="date-separator">
+                            <div className="date-separator-line"></div>
+                            <span className="date-separator-text">
+                              {formatDateSeparator(message.createdAt)}
+                            </span>
+                            <div className="date-separator-line"></div>
                           </div>
-                          <div className="chat-message-time">{formatTime(message.createdAt)}</div>
+                        )}
+
+                        <div 
+                          className={`chat-message ${message.senderId === userId ? 'own' : ''}`}
+                          onMouseEnter={() => setHoveredMessageId(message._id)}
+                          onMouseLeave={() => setHoveredMessageId(null)}
+                        >
+                          {/* Bara de acțiuni - doar pentru mesajele proprii */}
+                          {message.senderId === userId && hoveredMessageId === message._id && (
+                            <div className="message-actions-bar">
+                              <button 
+                                className="message-action-btn"
+                                onClick={() => handleReplyMessage(message)}
+                                title="Răspunde"
+                              >
+                                <ReplyIcon fontSize="small" />
+                              </button>
+                              
+                              <button 
+                                className="message-action-btn"
+                                onClick={() => handleReactToMessage(message._id, '😊')}
+                                title="Reacționează"
+                              >
+                                <SentimentSatisfiedAltIcon fontSize="small" />
+                              </button>
+                              
+                              <button 
+                                className="message-action-btn"
+                                onClick={() => handleCopyMessage(message.text)}
+                                title="Copiază"
+                              >
+                                <ContentCopyIcon fontSize="small" />
+                              </button>
+                              
+                              <button 
+                                className="message-action-btn delete"
+                                onClick={() => handleDeleteMessage(message._id)}
+                                title="Șterge"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Avatar eliminat la cerere */}
+                          <div className="chat-message-content-group">
+                            <div className="chat-bubble-row">
+                              <div className="chat-message-bubble">
+                                {message.image && (
+                                  <div className="chat-message-image">
+                                    <img src={message.image} alt="Imagine trimisă" />
+                                  </div>
+                                )}
+                                {message.text && (
+                                  <p className="chat-message-text">{message.text}</p>
+                                )}
+                                {message.senderId === userId && (
+                                  <span className="chat-message-ticks" aria-label="Livrat / citit">
+                                    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                      <path d="M2 9l2.5 2.5L8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                                      <path d="M6 9l2.5 2.5L14 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="chat-message-time">{formatTime(message.createdAt)}</div>
+                          </div>
                         </div>
-                      </div>
+                      </React.Fragment>
                     );
                   })
                 )}

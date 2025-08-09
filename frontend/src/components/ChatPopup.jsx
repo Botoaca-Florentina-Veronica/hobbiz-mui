@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
-import { sendMessage, getMessages, deleteMessage } from '../api/api';
+import { sendMessage, getMessages, deleteMessage, getMessagesBetween } from '../api/api';
 import './ChatPopup.css';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
@@ -22,19 +22,18 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   // Obține userId din localStorage dacă nu e pasat ca prop
   const effectiveUserId = userId || localStorage.getItem('userId');
   
-  // Creează conversationId mai simplu și consistent
+  // Creează conversationId mai simplu și consistent - doar între utilizatori
   const conversationId = React.useMemo(() => {
-    if (!announcement || !seller || !effectiveUserId) return null;
+    if (!seller || !effectiveUserId) return null;
     
-    const annId = announcement.id || announcement._id;
     const sellerId = seller._id || seller.id;
     
-    if (!annId || !sellerId) return null;
+    if (!sellerId) return null;
     
     // Sortăm ID-urile pentru a asigura consistența indiferent de ordinea parametrilor
     const participants = [sellerId, effectiveUserId].sort();
-    return `${annId}-${participants.join('-')}`;
-  }, [announcement, seller, effectiveUserId]);
+    return participants.join('-');
+  }, [seller, effectiveUserId]);
 
   // Încarcă mesajele când se deschide popup-ul
   useEffect(() => {
@@ -47,7 +46,11 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       setLoading(true);
       try {
         console.log('🔄 Încărcare mesaje pentru conversația:', conversationId);
-        const response = await getMessages(conversationId);
+        
+        // Folosim endpoint-ul pentru mesaje între doi utilizatori
+        const sellerId = seller._id || seller.id;
+        const response = await getMessagesBetween(effectiveUserId, sellerId);
+        
         setMessages(response.data || []);
         console.log('✅ Mesaje încărcate:', response.data?.length || 0);
       } catch (error) {
@@ -94,7 +97,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         seller,
         announcement
       });
-      alert('Eroare: Date lipsă pentru trimiterea mesajului.');
+      // Nu mai afișăm alert - doar logăm eroarea
       setSending(false);
       setInput(messageText);
       return;
@@ -125,13 +128,13 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     } catch (error) {
       console.error('❌ Eroare la trimiterea mesajului:', error);
       
-      // Verifică tipul de eroare și afișează mesaj relevant
+      // Nu mai afișăm popup-uri - doar logăm erorile în consolă
       if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-        alert('Eroare de conectare la server. Te rog verifică dacă backend-ul rulează pe portul 5000.');
+        console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează pe portul 5000.');
       } else if (error.response?.status === 500) {
-        alert('Eroare de server la trimiterea mesajului. Verifică log-urile backend-ului.');
+        console.error('❌ Eroare de server la trimiterea mesajului. Verifică log-urile backend-ului.');
       } else {
-        alert(`Eroare la trimiterea mesajului: ${error.message}`);
+        console.error(`❌ Eroare la trimiterea mesajului: ${error.message}`);
       }
       
       // Restaurează textul în input dacă trimiterea a eșuat
@@ -151,7 +154,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       console.log('✅ Mesaj șters cu succes:', msgId);
     } catch (error) {
       console.error('❌ Eroare la ștergerea mesajului:', error);
-      alert('Eroare la ștergerea mesajului. Te rog încearcă din nou.');
+      // Nu mai afișăm popup - doar logăm eroarea
     }
   };
 
