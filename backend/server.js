@@ -23,10 +23,32 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const app = express();
 
 // Middleware
+// CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://hobbiz.netlify.app',
+  'http://localhost:5173'
+].filter(Boolean);
+
 const corsOptions = {
-  origin: ['https://hobbiz.netlify.app', 'http://localhost:5173'], // Domeniul frontend-ului și localhost pentru development
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Metodele permise
-  credentials: true, // Permite trimiterea cookie-urilor
+  origin: (origin, callback) => {
+    // Permite tool-uri server-to-server sau curl fără origin
+    if (!origin) return callback(null, true);
+    try {
+      const hostname = new URL(origin).hostname;
+      const isNetlify = /\.netlify\.app$/.test(hostname);
+      if (allowedOrigins.includes(origin) || isNetlify) {
+        return callback(null, true);
+      }
+      console.warn(`CORS blocat pentru origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'));
+    } catch (e) {
+      console.warn('CORS origin parse error:', e.message);
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 };
 app.use(cors(corsOptions));
 // Accept larger JSON bodies (for base64 images) and urlencoded payloads

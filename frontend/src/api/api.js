@@ -10,7 +10,19 @@ export const deleteAccount = () => apiClient.delete('/api/users/delete-account')
 // frontend/src/api/index.js
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Fallback pentru development
+// Determină baza API:
+// - În dev: folosește localhost dacă VITE_API_URL nu e setat
+// - În producție (Netlify): cere VITE_API_URL; fără ea, deduce din origin (același host) ca fallback sigur
+let API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) {
+  const isDev = import.meta.env.MODE === 'development';
+  if (isDev) {
+    API_URL = 'http://localhost:5000';
+  } else if (typeof window !== 'undefined') {
+    // fallback: același origin (utile pentru reverse proxy sau single-origin deploy)
+    API_URL = `${window.location.origin}`;
+  }
+}
 
 // Configurare instanță Axios
 const apiClient = axios.create({
