@@ -1,77 +1,17 @@
 /* =============== Dispozitive Mobile (până la 768px) =============== */
 @media (max-width: 768px) {
-  /* ----------------- Header ----------------- */
+  /* ----------------- Header Principal - Ascuns pe Mobile ----------------- */
   .header {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    height: auto;
-    padding: 1.2rem 1rem 1rem 1rem;
-    background: #355070;
-    position: relative;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  }
-
-  .header .logo {
-    display: none;
-  }
-
-  .header ul {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.7rem;
-    margin: 1rem 0 0 0;
-    padding: 0;
-    width: 100%;
-  }
-
-  /* Ascunde butoanele din header */
-  .add-button,
-  .favorite-btn,
-  .user-account-btn {
     display: none !important;
   }
 
-  /* ----------------- Search Bar ----------------- */
-  .search-container {
-    position: static;
-    width: 100%;
-    max-width: 100%;
-    margin: 0.7rem 0 0 0;
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    z-index: 110;
-    padding: 0.2rem 0.5rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    order: 2; /* asigură plasarea sub logo dacă header-ul folosește flex */
-  }
-
-  .search-input {
-    font-size: 1rem;
-    padding: 0.5rem 0.7rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .search-button {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    margin-left: 0.5rem;
-    border-radius: 6px;
-  }
+  /* Mobile Header este afișat prin componenta MobileHeader */
 
   /* ----------------- Main Content ----------------- */
   .main-stage {
-    padding: 1.2rem 0.5rem 0.5rem 0.5rem !important;
+    padding: 0 !important;
     margin-top: 0;
+    background: #f8f9fa;
   }
 
   .main-content {
@@ -79,87 +19,227 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 0.5rem 0;
+    padding: 1rem 1rem 2rem 1rem;
+    background: #fff;
+    margin-bottom: 1rem;
   }
 
   .main-text {
     margin: 0 0 1.5rem 0;
-    font-size: 1.1rem;
-    line-height: 1.5;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #333;
+    font-weight: 500;
   }
 
   .main-stage-image img {
     width: 100%;
-    max-width: 320px;
+    max-width: 280px;
     height: auto;
-    border-radius: 10px;
+    border-radius: 12px;
     margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   .call-to-action {
     margin-top: 1.5rem;
-    padding: 1rem 0.5rem;
+    padding: 1rem;
     font-size: 1.1rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
 
-  /* ----------------- Footer Fixat (Mobile Menu) ----------------- */
-  .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    background: #F67280;
-    z-index: 1000;
-    padding: 0.5rem 0;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+  /* ----------------- Categories Grid (inspirat din OLX) ----------------- */
+  .categories {
+    padding: 1rem;
+    background: #fff;
+    margin-bottom: 1rem;
   }
 
-  .footer-icons {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    gap: 1.5rem;
+  .categories h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 600;
   }
 
-  .footer-icon {
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .category-card {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0.8rem 0.5rem;
+    background: #fff;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s ease;
+    border: 1px solid #f0f0f0;
+    min-height: 100px;
+    justify-content: center;
+  }
+
+  .category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #1a5a87;
+  }
+
+  .image-container {
+    margin-bottom: 0.5rem;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .category-card img,
+  .category-card svg {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+  }
+
+  .category-card span {
+    font-size: 0.8rem;
+    text-align: center;
+    line-height: 1.2;
+    font-weight: 500;
+    color: #555;
+  }
+
+  /* ----------------- Footer Fixat (Mobile Menu inspirat din OLX) ----------------- */
+  .footer {
+    position: relative; /* Nu schimbăm structura footer-ului de desktop */
+  }
+
+  /* Footer mobile - doar pe mobile */
+  .footer-mobile-buttons {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    display: flex !important;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background: #fff;
+    z-index: 1000;
+    padding: 0.5rem 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .footer-mobile-buttons .footer-icons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 0;
+  }
+
+  .footer-mobile-buttons .footer-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    font-size: 0.75rem;
+    gap: 0.2rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 0.5rem;
+    min-width: 60px;
+    min-height: 55px;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .footer-mobile-buttons .footer-icon:hover,
+  .footer-mobile-buttons .footer-icon.active {
+    color: #1a5a87;
+  }
+
+  .footer-mobile-buttons .footer-icon svg {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .footer-mobile-buttons .footer-icon span {
+    font-weight: 500;
+    font-size: 0.7rem;
+  }
+
+  /* Butonul special de Vinde (inspirat din OLX) */
+  .footer-mobile-buttons .footer-publish {
+    position: relative;
+  }
+
+  .footer-mobile-buttons .footer-publish-icon {
+    background: #1a5a87;
     color: white;
-    font-size: 1.1rem;
-    gap: 0.1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.2rem;
+    box-shadow: 0 2px 8px rgba(26, 90, 135, 0.3);
   }
 
-  .footer-icon svg {
-    font-size: 1.4rem;
-    margin-bottom: 0.1rem;
+  .footer-mobile-buttons .footer-publish span {
+    color: #1a5a87;
+    font-weight: 600;
   }
 
-  .footer > *:not(.footer-icons) {
-    display: none;
+  .footer-mobile-buttons .footer-publish.active .footer-publish-icon {
+    background: #144a70;
+  }
+
+  /* Ascunde footer-ul de desktop pe mobile */
+  .desktop-footer {
+    display: none !important;
+  }
+
+  .legal-section {
+    display: none !important;
+  }
+
+  .footer-separator {
+    display: none !important;
   }
 
   /* ----------------- General Mobile Adjustments ----------------- */
   body {
     padding: 0;
     margin: 0;
-    padding-bottom: 65px;
+    padding-bottom: 70px;
     font-size: 1rem;
     background: #f8f9fa;
   }
 
   .content {
-    padding: 0.7rem 0.2rem;
+    padding: 0;
+    background: #f8f9fa;
+  }
+
+  .content > div {
+    margin: 0 0 1rem 0;
+    background: #fff;
+    border-radius: 0;
   }
 
   button, input, select, textarea {
     font-size: 1rem;
-    border-radius: 6px;
+    border-radius: 8px;
   }
 
   /* Touch-friendly tap targets */
@@ -168,31 +248,19 @@
     min-width: 44px;
   }
 
-  /* ----------------- Category Cards ----------------- */
-
-  .image-container {
-    margin-bottom: 0.1rem;
-    height: 85px;
-    width:85px;
-  }
-
-  .categories-grid {
-    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
-  }
-
-  .category-card img,
-  .category-card svg {
-    width: 80px;
-    height: 80px;
+  /* Search container - hidden on mobile since we use MobileHeader */
+  .search-container {
+    display: none !important;
   }
 }
 
 /* =============== Tabletă (769px - 1024px) =============== */
 @media (min-width: 769px) and (max-width: 1024px) {
-  /* (Păstrează codul existent pentru tabletă) */
+  /* Header rămâne vizibil pe tabletă dar adaptat */
   .header {
     flex-wrap: wrap;
     padding: 1rem;
+    background: #355070;
   }
 
   .header .logo img {
@@ -200,32 +268,70 @@
     padding-right: 2rem;
   }
 
+  /* MobileHeader ascuns pe tabletă */
+  .mobile-header {
+    display: none !important;
+  }
+
+  /* Search container pe tabletă */
   .search-container {
     width: 100%;
     margin: 1rem 0 0 0;
     order: 3;
+    display: flex !important;
   }
 
+  /* Categories grid pentru tabletă */
+  .categories-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
+  }
+
+  .category-card {
+    padding: 1rem;
+  }
+
+  .image-container {
+    height: 60px;
+    width: 60px;
+  }
+
+  .category-card img,
+  .category-card svg {
+    width: 55px;
+    height: 55px;
+  }
+
+  /* Footer pentru tabletă - păstrăm aspectul de desktop */
   .footer {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    position: fixed;
-    bottom: 0;
-    height: 70px;
-  }
-
-  .footer-icons {
+    position: relative;
+    height: auto;
+    background: #f3f5f6;
+    box-shadow: none;
+    border-top: none;
+    padding: 0;
     display: flex;
-    justify-content: space-evenly;
-    width: 100%;
+    flex-direction: column;
   }
 
-  .footer-icon {
-    font-size: 1rem;
+  .footer-mobile-buttons {
+    display: none !important;
   }
 
-  .footer-icon svg {
-    font-size: 1.8rem;
+  .desktop-footer {
+    display: block !important;
+  }
+
+  .legal-section {
+    display: grid !important;
+  }
+
+  .footer-separator {
+    display: block !important;
+  }
+
+  body {
+    padding-bottom: 0;
   }
 }
 

@@ -55,12 +55,13 @@ passport.use(new FacebookStrategy({
 
 */
 
-// Google OAuth2.0 Strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL,
-}, async (accessToken, refreshToken, profile, done) => {
+// Google OAuth2.0 Strategy (optional in local/dev)
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL) {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+  }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Try to find the user by googleId
     let user = await User.findOne({ googleId: profile.id });
@@ -101,7 +102,10 @@ passport.use(new GoogleStrategy({
   } catch (err) {
     return done(err, null);
   }
-}));
+  }));
+} else {
+  console.warn('⚠️ Google OAuth not configured: missing env vars. Skipping strategy setup.');
+}
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

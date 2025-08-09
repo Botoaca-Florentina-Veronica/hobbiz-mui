@@ -1,7 +1,10 @@
 // Chat messages
 export const sendMessage = (data) => apiClient.post('/api/messages', data);
-export const getMessages = (conversationId) => apiClient.get(`/api/messages/${conversationId}`);
+// Align with backend: GET /api/messages/conversation/:conversationId
+export const getMessages = (conversationId) => apiClient.get(`/api/messages/conversation/${conversationId}`);
 export const deleteMessage = (id) => apiClient.delete(`/api/messages/${id}`);
+// Fetch messages between two users
+export const getMessagesBetween = (userId1, userId2) => apiClient.get(`/api/messages/between/${userId1}/${userId2}`);
 // Șterge contul utilizatorului și toate anunțurile sale
 export const deleteAccount = () => apiClient.delete('/api/users/delete-account');
 // frontend/src/api/index.js

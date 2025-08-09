@@ -4,22 +4,45 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import './MobileHeader.css';
 
-export default function MobileHeader({ notificationCount = 0 }) {
+export default function MobileHeader({ notificationCount = 0, onSearchFocus, onNotificationClick }) {
   return (
     <div className="mobile-header">
-      <div className="mobile-search-bar">
-        <input
-          type="text"
-          className="mobile-search-input"
-          placeholder="Ce anume cauți?"
-        />
-        <button className="mobile-search-btn">
-          <SearchIcon />
-        </button>
+      <div className="mobile-search-container">
+        <div className="mobile-search-bar">
+          <input
+            type="text"
+            className="mobile-search-input"
+            placeholder="Ce anume cauți?"
+            onFocus={onSearchFocus}
+          />
+          <div className="mobile-search-btn">
+            <SearchIcon />
+          </div>
+        </div>
       </div>
-      <Badge badgeContent={notificationCount} color="warning" overlap="circular" className="mobile-notification-badge">
-        <NotificationsIcon className="mobile-notification-icon" />
-      </Badge>
+      <button 
+        className="mobile-notification-btn"
+        onClick={onNotificationClick}
+        aria-label="Notificări"
+      >
+        <Badge 
+          badgeContent={notificationCount} 
+          color="error" 
+          overlap="circular" 
+          className="mobile-notification-badge"
+          sx={{
+            '& .MuiBadge-badge': {
+              backgroundColor: '#ff4757',
+              color: 'white',
+              fontSize: '0.75rem',
+              minWidth: '16px',
+              height: '16px',
+            }
+          }}
+        >
+          <NotificationsIcon className="mobile-notification-icon" />
+        </Badge>
+      </button>
     </div>
   );
 }

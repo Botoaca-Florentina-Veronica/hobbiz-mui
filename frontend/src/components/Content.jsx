@@ -5,7 +5,6 @@ import './Content.css';
 
 // Importuri imagini
 import guitar from '../assets/images/guitar-lessons.jpg'
-import weheartitGif from '../assets/images/weheartit.gif';
 import crosetat from '../assets/images/crosetat.png';
 import fridge from '../assets/images/Fridge-Repair.jpg';
 import dancing from '../assets/images/dancing.jpg';
@@ -33,10 +32,6 @@ export default function Content() {
 
   return (
     <section className="content">
-      {/* GIF animat cu traiectorie orizontală */}
-      <div className="moving-gif-container">
-        <img src={weheartitGif} alt="We Heart It" className="moving-gif" />
-      </div>
       <h2>Anunțuri populare</h2>
       <Box sx={{ 
         maxWidth: '1100px',

@@ -22,7 +22,7 @@ export default function About() {
     },
     {
       question: "Pot vinde atât produse cât și servicii?",
-      answer: "Absolut! Hobbiz este conceput pentru ambele - poți oferi servicii creative, produse handmade, lecții, consultanță și multe altele."
+      answer: "Absolut! Chiar dacă Hobbiz este conceput mai mult pentru servicii, poți vinde și produse handmade, obiecte, vechituri, mașini, alimente și multe altele."
     },
     {
       question: "Cum funcționează sistemul de mesagerie?",

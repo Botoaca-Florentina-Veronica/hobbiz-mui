@@ -156,7 +156,11 @@ export default function Header() {
   return (
     <>
       {isMobile ? (
-        <MobileHeader notificationCount={5} />
+        <MobileHeader 
+          notificationCount={unreadCount} 
+          onSearchFocus={() => {/* handel search focus */}}
+          onNotificationClick={() => navigate('/notificari')}
+        />
       ) : (
         <>
           <div className="header fixed-header">

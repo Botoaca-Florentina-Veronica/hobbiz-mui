@@ -3,7 +3,7 @@
   display: flex;
   height: 85vh;
   background: white;
-  border-radius: 16px;
+  border-radius: 8px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   margin: 32px auto;
   max-width: 1300px;
@@ -32,7 +32,7 @@
   flex: 1;
   background: transparent;
   border: 2px solid #e8ecef;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 12px 16px;
   font-weight: 600;
   color: #6b7280;
@@ -106,7 +106,7 @@
   margin: 16px 24px;
   padding: 16px;
   background: linear-gradient(135deg, #f8fafb 0%, #f0f4f7 100%);
-  border-radius: 12px;
+  border-radius: 6px;
   border: 1px solid #e8ecef;
 }
 
@@ -146,7 +146,7 @@
   transition: all 0.3s ease;
   position: relative;
   margin: 0 8px;
-  border-radius: 8px;
+  border-radius: 4px;
   margin-bottom: 4px;
 }
 
@@ -288,73 +288,186 @@
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px; /* mai puțin spațiu între mesaje */
 }
 
 .chat-message {
   display: flex;
-  gap: 12px;
-  max-width: 80%;
+  max-width: 85%;
+  margin-bottom: 0; /* folosim doar gap-ul containerului */
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .chat-message.own {
   align-self: flex-end;
   flex-direction: row-reverse;
+  margin-left: 15%;
 }
 
-.chat-message-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
+/* fără avatar */
+
+.chat-message:not(.own) {
+  margin-right: 15%;
 }
+
+/* avatar eliminat */
+
+.chat-message-content-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-bubble-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px; /* spațiu între bulă și bife */
+}
+
+.chat-message.own .chat-bubble-row { justify-content: flex-end; }
+.chat-message:not(.own) .chat-bubble-row { justify-content: flex-start; }
 
 .chat-message-bubble {
-  background: white;
-  padding: 12px 16px;
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #ffffff;
+  padding: 10px 14px; /* compact, fără rezervă pentru bife absolute */
+  border-radius: 16px; /* ușor mai rotunjit */
+  box-shadow: 0 4px 18px rgba(0,0,0,0.10);
   position: relative;
   border: 1px solid #e8ecef;
+  max-width: 70ch;
+  word-wrap: break-word;
+  display: grid; /* text + bife în aceeași linie */
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+  align-items: center; /* bife centrate pe verticală față de text */
 }
 
 .chat-message.own .chat-message-bubble {
-  background: linear-gradient(135deg, #355070, #406b92);
-  color: white;
-  border-color: #355070;
+  background: #e2f0ff; /* păstrăm culoarea actuală */
+  color: #0a2540;
+  border: 1px solid #b9dbff;
+  border-radius: 16px 16px 6px 16px; /* TL TR BR BL - puțin mai rotunjit, dar BR mai mic */
 }
 
+/* Coada pentru mesajele utilizatorului */
+.chat-message.own .chat-message-bubble::before,
+.chat-message.own .chat-message-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-bottom: none;
+  border-right: none;
+}
+
+/* Eliminăm coada: nu mai afișăm triunghiuri */
+.chat-message.own .chat-message-bubble::before,
+.chat-message.own .chat-message-bubble::after,
+.chat-message:not(.own) .chat-message-bubble::before,
+.chat-message:not(.own) .chat-message-bubble::after { display:none; }
+
+/* Coada pentru mesajele primite */
+.chat-message:not(.own) .chat-message-bubble {
+  border-radius: 16px 16px 16px 6px; /* puțin mai rotunjit, BL mai mic */
+}
+
+/* coada dezactivată pentru stilul nou */
+
 .chat-message-text {
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 16px; /* mărit textul din bulă */
+  line-height: 1.4; /* ușor mai aerisit pentru dimensiunea nouă */
   margin: 0;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 .chat-message-time {
-  font-size: 11px;
+  font-size: 12px;
   color: #9ca3af;
+  opacity: 0.85;
   margin-top: 4px;
-  text-align: right;
+  align-self: flex-end; /* sub bulă, aliniat la dreapta */
 }
 
-.chat-message.own .chat-message-time {
-  color: rgba(255,255,255,0.8);
+/* Timpul la mesajele primite (destinatar) în stânga, sub mesaj */
+.chat-message:not(.own) .chat-message-time {
+  align-self: flex-start;
 }
+
+.chat-message.own .chat-message-time { color: #7a8aa0; }
+
+/* meta wrapper eliminat - bife sunt în rând cu bula, timpul sub bulă */
+
+/* Double check ticks inside bubble for own messages */
+.chat-message-ticks {
+  position: static; /* în flux, la dreapta textului */
+  color: #2d7bf6; /* bife albastre */
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  font-size: 20px; /* și mai mari */
+}
+
+/* bife la dimensiunea textului */
+.chat-message-ticks svg { width: 1em; height: 1em; }
+
+/* imagini din mesaj ocupă rând dedicat (deasupra text+bife) */
+.chat-message-image { grid-column: 1 / -1; margin-bottom: 4px; }
 
 .chat-input-container {
   background: white;
   border-top: 1px solid #e8ecef;
   padding: 20px 24px;
+  position: relative;
+}
+
+.chat-input-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+.chat-input-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input-button {
+  width: 40px;
+  height: 40px;
+  background: #f8fafb;
+  border: 1px solid #e8ecef;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.chat-input-button:hover {
+  background: #355070;
+  color: white;
+  border-color: #355070;
+}
+
 .chat-input {
   flex: 1;
   border: 2px solid #e8ecef;
-  border-radius: 24px;
+  border-radius: 8px;
   padding: 12px 20px;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -373,7 +486,7 @@
   height: 44px;
   background: linear-gradient(135deg, #355070, #406b92);
   border: none;
-  border-radius: 50%;
+  border-radius: 6px;
   color: white;
   cursor: pointer;
   display: flex;
@@ -432,7 +545,7 @@
     height: auto;
     min-width: unset;
     margin: 16px;
-    border-radius: 12px;
+    border-radius: 6px;
   }
   
   .chat-sidebar {
@@ -471,7 +584,7 @@
 @media (max-width: 600px) {
   .chat-page-container {
     margin: 8px;
-    border-radius: 8px;
+    border-radius: 6px;
     height: calc(100vh - 16px);
     margin-top: 6rem;
   }
@@ -548,11 +661,15 @@
   
   .chat-message-bubble {
     padding: 10px 14px;
-    border-radius: 16px;
+    border-radius: 6px;
   }
   
   .chat-message-text {
-    font-size: 13px;
+    font-size: 15px; /* text mai mare pe mobil */
+  }
+  
+  .chat-message-ticks {
+  font-size: 19px; /* și mai mari pe mobil */
   }
   
   .chat-input-container {
@@ -685,16 +802,40 @@
   color: #ffffff;
 }
 
-.dark-mode .chat-message.sent .chat-message-content {
+/* Dark mode styles pentru mesajele proprii */
+.dark-mode .chat-message.own .chat-message-bubble {
   background: linear-gradient(135deg, #f51866, #fa4875);
+  border: 1px solid rgba(250, 72, 117, 0.35);
   color: #ffffff;
 }
 
-.dark-mode .chat-message.received .chat-message-content {
-  background: #3f3f3f;
-  color: #ffffff;
-  border: 1px solid rgba(245, 24, 102, 0.2);
+/* fără coadă în stilul nou */
+
+/* Dark mode styles pentru mesajele primite */
+.dark-mode .chat-message:not(.own) .chat-message-bubble {
+  background: #3a3f46;
+  color: #eaeff5;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* fără coadă în stilul nou */
+
+/* Dark mode: own tail outline + fill */
+.dark-mode .chat-message.own .chat-message-bubble::before {
+  border-left-color: rgba(255,255,255,0.15);
+}
+
+/* Dark mode: received tail outline + fill */
+.dark-mode .chat-message:not(.own) .chat-message-bubble::before {
+  border-right-color: rgba(255,255,255,0.15);
+}
+
+.dark-mode .chat-message-ticks {
+  color: #9ec3ff;
+}
+
+.dark-mode .chat-message-time,
+.dark-mode .chat-message-meta { color: #a7b8c9; }
 
 .dark-mode .chat-message-time {
   color: #8b8b8b;
@@ -739,4 +880,166 @@
 
 .dark-mode .chat-empty-subtitle {
   color: #8b8b8b;
+}
+
+/* Stiluri pentru funcționalități noi */
+
+/* Preview imagine în input */
+.chat-image-preview {
+  position: relative;
+  margin-bottom: 12px;
+  max-width: 200px;
+}
+
+.chat-image-preview img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #e8ecef;
+}
+
+.chat-image-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: #f51866;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.chat-image-remove:hover {
+  background: #d91656;
+  transform: scale(1.1);
+}
+
+/* Emoji picker */
+.chat-emoji-picker {
+  position: absolute;
+  bottom: 100%;
+  left: 24px;
+  right: 24px;
+  background: white;
+  border: 1px solid #e8ecef;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 8px;
+  z-index: 1000;
+}
+
+.chat-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  padding: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.chat-emoji-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  line-height: 1;
+}
+
+.chat-emoji-button:hover {
+  background: #f0f4f7;
+}
+
+/* Imagini în mesaje */
+.chat-message-image {
+  margin-bottom: 8px;
+}
+
+.chat-message-image img {
+  max-width: 250px;
+  max-height: 200px;
+  border-radius: 6px;
+  border: 1px solid #e8ecef;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.chat-message-image img:hover {
+  transform: scale(1.02);
+}
+
+/* Responsive pentru noile funcționalități */
+@media (max-width: 600px) {
+  .chat-input-buttons {
+    gap: 4px;
+  }
+  
+  .chat-input-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .chat-input-button svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .chat-emoji-grid {
+    grid-template-columns: repeat(8, 1fr);
+    padding: 8px;
+  }
+  
+  .chat-emoji-button {
+    padding: 6px;
+    font-size: 18px;
+  }
+  
+  .chat-message-image img {
+    max-width: 200px;
+    max-height: 150px;
+  }
+  
+  .chat-image-preview {
+    max-width: 150px;
+  }
+}
+
+/* Dark mode pentru noile funcționalități */
+.dark-mode .chat-input-button {
+  background: #575757;
+  border-color: rgba(245, 24, 102, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .chat-input-button:hover {
+  background: linear-gradient(135deg, #f51866, #fa4875);
+  border-color: #f51866;
+}
+
+.dark-mode .chat-emoji-picker {
+  background: #3f3f3f;
+  border-color: rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .chat-emoji-button:hover {
+  background: #575757;
+}
+
+.dark-mode .chat-image-preview img {
+  border-color: rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .chat-message-image img {
+  border-color: rgba(245, 24, 102, 0.3);
 }

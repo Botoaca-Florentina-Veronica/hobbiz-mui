@@ -88,49 +88,90 @@ export default function Footer() {
       <footer className="desktop-footer">
         <p>©Copyright Hobbiz 2025. Toate drepturile rezervate</p>
       </footer>
+      
+      {/* Mobile Footer - doar pe mobile */}
       <div className="footer-mobile-buttons">
-        <div className="footer-icon footer-account" onClick={handleAccountClick} style={{ position: 'relative' }}>
-          {googleAvatar ? (
-            <img src={googleAvatar} alt="Google Avatar" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxSizing: 'border-box' }} />
-          ) : (
-            <HiOutlineUser size={26} />
-          )}
-          <span className="footer-account-label">Cont</span>
-          {showDropdown && isAuthenticated && (
-            <div className="section-dropdown footer-dropdown" style={{ position: 'absolute', bottom: '40px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000 }}>
-              <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); setShowDropdown(false); }}>Setări</a>
-              <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); setShowDropdown(false); }}>Anunțurile mele</a>
-              <a onClick={(e) => { e.preventDefault(); navigate('/profil'); setShowDropdown(false); }}>Profil</a>
-              <a onClick={(e) => { e.preventDefault(); navigate('/plati'); setShowDropdown(false); }}>Plăți</a>
-              <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); setShowDropdown(false); }}>Contul tău</a>
-              <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); navigate('/'); window.location.reload(); }}>Deconectează-te</a>
-            </div>
-          )}
-        </div>
-        <FooterPublishButton 
-          onClick={() => navigate('/add-announcement')}
-          active={location.pathname === '/add-announcement'}
-        />
-        <div 
-          className="footer-icon footer-favorite" 
-          onClick={() => {
-            if (!isAuthenticated) {
-              navigate('/login');
-            } else {
-              navigate('/favorite-announcements');
-            }
-          }}
-        >
-          <HiOutlineHeart />
-          <span className="footer-favorite-label" style={location.pathname === '/favorite-announcements' ? {opacity: 1, height: 'auto', pointerEvents: 'auto'} : {}}>
-            Favorite
-          </span>
-        </div>
-        <div className="footer-icon footer-explore" onClick={() => navigate("/explore")}> 
-          <FiCompass />
-          <span className="footer-explore-label" style={location.pathname === '/explore' ? {opacity: 1, height: 'auto', pointerEvents: 'auto'} : {}}>
-            Explorează
-          </span>
+        <div className="footer-icons">
+          <div 
+            className={`footer-icon ${location.pathname === '/' ? 'active' : ''}`}
+            onClick={() => navigate('/')}
+          >
+            <FiCompass />
+            <span>Explorează</span>
+          </div>
+          
+          <div 
+            className={`footer-icon ${location.pathname === '/favorite-announcements' ? 'active' : ''}`}
+            onClick={() => {
+              if (!isAuthenticated) {
+                navigate('/login');
+              } else {
+                navigate('/favorite-announcements');
+              }
+            }}
+          >
+            <HiOutlineHeart />
+            <span>Favorite</span>
+          </div>
+          
+          <FooterPublishButton 
+            onClick={() => {
+              if (!isAuthenticated) {
+                navigate('/login');
+              } else {
+                navigate('/add-announcement');
+              }
+            }}
+            active={location.pathname === '/add-announcement'}
+          />
+          
+          <div 
+            className={`footer-icon ${location.pathname === '/chat' ? 'active' : ''}`}
+            onClick={() => {
+              if (!isAuthenticated) {
+                navigate('/login');
+              } else {
+                navigate('/chat');
+              }
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"/>
+            </svg>
+            <span>Chat</span>
+          </div>
+          
+          <div 
+            className={`footer-icon footer-account ${location.pathname.includes('/profil') || location.pathname.includes('/setari-cont') ? 'active' : ''}`}
+            onClick={handleAccountClick}
+            style={{ position: 'relative' }}
+          >
+            {googleAvatar ? (
+              <img 
+                src={googleAvatar} 
+                alt="Avatar" 
+                style={{ 
+                  width: 24, 
+                  height: 24, 
+                  borderRadius: '50%', 
+                  objectFit: 'cover' 
+                }} 
+              />
+            ) : (
+              <HiOutlineUser />
+            )}
+            <span>Cont</span>
+            {showDropdown && isAuthenticated && (
+              <div className="section-dropdown footer-dropdown" style={{ position: 'absolute', bottom: '60px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000 }}>
+                <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); setShowDropdown(false); }}>Setări</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); setShowDropdown(false); }}>Anunțurile mele</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/profil'); setShowDropdown(false); }}>Profil</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/plati'); setShowDropdown(false); }}>Plăți</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); setShowDropdown(false); }}>Contul tău</a>
+                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); navigate('/'); window.location.reload(); }}>Deconectează-te</a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

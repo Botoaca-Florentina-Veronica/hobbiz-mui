@@ -7,7 +7,9 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('✅ Conectat la MongoDB:', uri);
+  const conn = mongoose.connection;
+  console.log('✅ Conectat la MongoDB:', uri);
+  console.log('   • DB name:', conn.name, '| readyState:', conn.readyState);
   } catch (err) {
     console.error('❌ Eroare de conexiune MongoDB:', err.message);
     process.exit(1); // Închide aplicația la eroare critică

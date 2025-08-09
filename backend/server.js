@@ -29,7 +29,9 @@ const corsOptions = {
   credentials: true, // Permite trimiterea cookie-urilor
 };
 app.use(cors(corsOptions));
-app.use(express.json());
+// Accept larger JSON bodies (for base64 images) and urlencoded payloads
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 app.use('/api/notifications', notificationRoutes);
 
 // Configure session middleware
@@ -60,6 +62,17 @@ app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uplo
 
 app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
+});
+
+// DB healthcheck endpoint
+app.get('/health/db', (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const rs = mongoose.connection?.readyState;
+    res.json({ readyState: rs, ok: rs === 1 });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
 
 app.post('/login', async (req, res) => {

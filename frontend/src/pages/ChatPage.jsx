@@ -12,9 +12,49 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
   const userId = localStorage.getItem('userId');
   const location = useLocation();
+
+  // Lista de emoji-uri populare
+  const popularEmojis = ['😀', '😍', '🥰', '😊', '😂', '😭', '😎', '🤔', '😴', '🎉', '❤️', '👍', '👎', '🔥', '💯', '🙌', '👏', '🤝', '💪', '🎯'];
+
+  // Toggle emoji picker
+  const toggleEmojiPicker = () => {
+    setShowEmojiPicker(!showEmojiPicker);
+  };
+
+  // Adaugă emoji în mesaj
+  const addEmoji = (emoji) => {
+    setNewMessage(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  // Gestionează selecția de imagini
+  const handleImageSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage({
+          file: file,
+          preview: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Elimină imaginea selectată
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   // Fetch current user avatar
   useEffect(() => {
@@ -139,8 +179,14 @@ export default function ChatPage() {
   // Trimite mesaj
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation) return;
+    if (!userId) {
+      alert('Trebuie să fii autentificat pentru a trimite mesaje.');
+      return;
+    }
+    if ((!newMessage.trim() && !selectedImage) || !selectedConversation) return;
 
+    let tempMessage;
+    
     try {
       // Generăm conversationId din IDs-urile participanților (sortate pentru consistență)
       const participantIds = [userId, selectedConversation.otherParticipant.id].sort();
@@ -150,12 +196,24 @@ export default function ChatPage() {
         conversationId: conversationId,
         senderId: userId,
         senderRole: 'cumparator', // sau determină rolul în funcție de context
-        text: newMessage.trim(),
         destinatarId: selectedConversation.otherParticipant.id
       };
 
+      // Adaugă text dacă există
+      if (newMessage.trim()) {
+        messageData.text = newMessage.trim();
+      }
+
+      // Dacă avem o imagine selectată, o includem
+      if (selectedImage) {
+        // Pentru demo, salvăm imaginea ca base64 în mesaj
+        // În producție, ar trebui să încărcăm imaginea pe server separat
+        messageData.image = selectedImage.preview;
+        messageData.imageFile = selectedImage.file.name;
+      }
+
       // Adaugă mesajul local
-      const tempMessage = {
+      tempMessage = {
         ...messageData,
         _id: Date.now().toString(),
         createdAt: new Date().toISOString(),
@@ -167,6 +225,10 @@ export default function ChatPage() {
       };
       setMessages(prev => [...prev, tempMessage]);
       setNewMessage('');
+      setSelectedImage(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
 
       // Trimite la server
       const response = await apiClient.post('/api/messages', messageData);
@@ -182,8 +244,12 @@ export default function ChatPage() {
       }
     } catch (error) {
       console.error('Eroare la trimiterea mesajului:', error);
-      // Elimină mesajul temporar în caz de eroare
-      setMessages(prev => prev.filter(msg => msg._id !== tempMessage._id));
+      const backendMsg = error?.response?.data?.error;
+      if (backendMsg) alert(`Eroare server: ${backendMsg}`);
+      // Elimină mesajul temporar în caz de eroare (doar dacă a fost creat)
+      if (tempMessage) {
+        setMessages(prev => prev.filter(msg => msg._id !== tempMessage._id));
+      }
     }
   };
 
@@ -371,19 +437,29 @@ export default function ChatPage() {
                         key={message._id} 
                         className={`chat-message ${message.senderId === userId ? 'own' : ''}`}
                       >
-                        <img 
-                          className="chat-message-avatar" 
-                          src={messageAvatar}
-                          alt="avatar"
-                          onError={(e) => {
-                            e.target.src = `https://ui-avatars.com/api/?name=${message.senderId === userId ? 'Tu' : 'U'}&background=355070&color=fff`;
-                          }}
-                        />
-                        <div className="chat-message-bubble">
-                          <p className="chat-message-text">{message.text}</p>
-                          <div className="chat-message-time">
-                            {formatTime(message.createdAt)}
+                        {/* Avatar eliminat la cerere */}
+                        <div className="chat-message-content-group">
+                          <div className="chat-bubble-row">
+                            <div className="chat-message-bubble">
+                              {message.image && (
+                                <div className="chat-message-image">
+                                  <img src={message.image} alt="Imagine trimisă" />
+                                </div>
+                              )}
+                              {message.text && (
+                                <p className="chat-message-text">{message.text}</p>
+                              )}
+                              {message.senderId === userId && (
+                                <span className="chat-message-ticks" aria-label="Livrat / citit">
+                                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M2 9l2.5 2.5L8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M6 9l2.5 2.5L14 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                                  </svg>
+                                </span>
+                              )}
+                            </div>
                           </div>
+                          <div className="chat-message-time">{formatTime(message.createdAt)}</div>
                         </div>
                       </div>
                     );
@@ -393,23 +469,93 @@ export default function ChatPage() {
               </div>
 
               <form className="chat-input-container" onSubmit={handleSendMessage}>
-                <input
-                  type="text"
-                  className="chat-input"
-                  placeholder="Scrie mesajul tău..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
+                {selectedImage && (
+                  <div className="chat-image-preview">
+                    <img src={selectedImage.preview} alt="Preview" />
+                    <button 
+                      type="button" 
+                      className="chat-image-remove" 
+                      onClick={removeSelectedImage}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+                
+                <div className="chat-input-wrapper">
+                  <div className="chat-input-buttons">
+                    <button 
+                      type="button" 
+                      className="chat-input-button"
+                      onClick={() => fileInputRef.current?.click()}
+                      title="Atașează imagine"
+                    >
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.64 16.2a2 2 0 01-2.83-2.83l8.49-8.49"/>
+                      </svg>
+                    </button>
+                    
+                    <button 
+                      type="button" 
+                      className="chat-input-button"
+                      onClick={toggleEmojiPicker}
+                      title="Adaugă emoji"
+                    >
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                        <line x1="9" y1="9" x2="9.01" y2="9"/>
+                        <line x1="15" y1="9" x2="15.01" y2="9"/>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <input
+                    type="text"
+                    className="chat-input"
+                    placeholder="Scrie mesajul tău..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                  />
+                  
+                  <button 
+                    type="submit" 
+                    className="chat-send-button"
+                    disabled={!newMessage.trim() && !selectedImage}
+                  >
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M22 2L11 13"/>
+                      <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Hidden file input */}
+                <input 
+                  type="file" 
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  style={{ display: 'none' }}
                 />
-                <button 
-                  type="submit" 
-                  className="chat-send-button"
-                  disabled={!newMessage.trim()}
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M22 2L11 13"/>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
-                  </svg>
-                </button>
+
+                {/* Emoji picker */}
+                {showEmojiPicker && (
+                  <div className="chat-emoji-picker">
+                    <div className="chat-emoji-grid">
+                      {popularEmojis.map((emoji, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="chat-emoji-button"
+                          onClick={() => addEmoji(emoji)}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </form>
             </>
           )}

@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Alert,
   CircularProgress,
-  Fade
+  Fade,
+  IconButton,
+  Box
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -13,12 +16,16 @@ import {
   Email as EmailIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
-  Visibility as VisibilityIcon
+  Visibility as VisibilityIcon,
+  CalendarMonth as CalendarMonthIcon,
+  ChevronLeft,
+  ChevronRight
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({ firstName: '', lastName: '', localitate: '', phone: '' });
@@ -28,6 +35,40 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState('');
   const fileInputRef = React.useRef(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [userAnnouncements, setUserAnnouncements] = useState([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const carouselRef = useRef(null);
+
+  // Detectează dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.body.classList.contains('dark-mode'));
+    };
+    
+    checkDarkMode();
+    
+    // Observer pentru schimbări de clasă pe body
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
+  }, []);
+
+  const handleScroll = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = 400;
+      carouselRef.current.scrollLeft += direction === 'left' ? -scrollAmount : scrollAmount;
+    }
+  };
+
+  const handleAnnouncementClick = (announcementId) => {
+    navigate(`/announcement/${announcementId}`);
+  };
+
+  // Culori în funcție de tema activă
+  const getPrimaryColor = () => isDarkMode ? '#f51866' : '#355070';
+  const getScrollbarColor = () => isDarkMode ? '#f51866' : '#355070';
 
   useEffect(() => {
     async function fetchProfile() {
@@ -50,6 +91,23 @@ export default function ProfilePage() {
       }
     }
     fetchProfile();
+  }, []);
+
+  // Încarcă anunțurile utilizatorului
+  useEffect(() => {
+    async function fetchUserAnnouncements() {
+      try {
+        setAnnouncementsLoading(true);
+        const res = await apiClient.get('/api/users/my-announcements');
+        setUserAnnouncements(res.data);
+      } catch (error) {
+        console.error('Eroare la încărcarea anunțurilor:', error);
+        setUserAnnouncements([]);
+      } finally {
+        setAnnouncementsLoading(false);
+      }
+    }
+    fetchUserAnnouncements();
   }, []);
 
   const handleEdit = () => {
@@ -256,6 +314,24 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
+
+              {/* Membru din (readonly) */}
+              <div className="profile-field-container">
+                <div className="profile-field-label">
+                  <CalendarMonthIcon className="profile-icon" />
+                  Membru din
+                </div>
+                <div className="profile-field-value">
+                  {profile?.createdAt 
+                    ? new Date(profile.createdAt).toLocaleDateString('ro-RO', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: '2-digit'
+                      })
+                    : 'Nespecificat'
+                  }
+                </div>
+              </div>
             </div>
 
             <div className="profile-form-column">
@@ -313,6 +389,176 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {/* Secțiunea Anunțurile mele */}
+          {!announcementsLoading && userAnnouncements.length > 0 && (
+            <>
+              <hr className="profile-divider" />
+              <div style={{ marginTop: '30px' }}>
+                <h3 style={{ 
+                  color: getPrimaryColor(),
+                  marginBottom: '20px',
+                  fontSize: '1.4rem',
+                  fontWeight: '600'
+                }}>
+                  Anunțurile mele ({userAnnouncements.length})
+                </h3>
+                <Box sx={{ 
+                  position: 'relative',
+                  maxWidth: '100%'
+                }}>
+                  {userAnnouncements.length > 3 && (
+                    <IconButton 
+                      onClick={() => handleScroll('left')}
+                      sx={{
+                        position: 'absolute',
+                        left: '-25px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 1,
+                        backgroundColor: getPrimaryColor(),
+                        color: 'white',
+                        width: '40px',
+                        height: '40px',
+                        '&:hover': {
+                          backgroundColor: '#2a4a65'
+                        }
+                      }}
+                    >
+                      <ChevronLeft />
+                    </IconButton>
+                  )}
+
+                  <Box
+                    ref={carouselRef}
+                    sx={{
+                      display: 'flex',
+                      gap: '15px',
+                      overflowX: userAnnouncements.length > 3 ? 'auto' : 'visible',
+                      scrollBehavior: 'smooth',
+                      padding: '10px 5px',
+                      '&::-webkit-scrollbar': {
+                        height: '6px',
+                        backgroundColor: '#f5f5f5'
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: getScrollbarColor(),
+                        borderRadius: '3px'
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: '3px'
+                      }
+                    }}
+                  >
+                    {userAnnouncements.map((announcement, index) => (
+                      <Box 
+                        key={announcement._id}
+                        onClick={() => handleAnnouncementClick(announcement._id)}
+                        sx={{ 
+                          minWidth: '280px',
+                          flexShrink: 0,
+                          position: 'relative',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            transition: 'transform 0.2s ease'
+                          }
+                        }}
+                      >
+                        <Box sx={{
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          backgroundColor: 'white',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                          border: '1px solid #e0e0e0'
+                        }}>
+                          {announcement.images && announcement.images.length > 0 ? (
+                            <img
+                              src={announcement.images[0]}
+                              alt={announcement.title}
+                              style={{
+                                width: '100%',
+                                height: '160px',
+                                objectFit: 'cover'
+                              }}
+                            />
+                          ) : (
+                            <Box sx={{
+                              width: '100%',
+                              height: '160px',
+                              backgroundColor: '#f5f5f5',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#999'
+                            }}>
+                              Fără imagine
+                            </Box>
+                          )}
+                          
+                          <Box sx={{ padding: '12px' }}>
+                            <h4 style={{
+                              margin: '0 0 8px 0',
+                              fontSize: '1rem',
+                              fontWeight: '600',
+                              color: '#333',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {announcement.title}
+                            </h4>
+                            
+                            {announcement.price && (
+                              <p style={{
+                                margin: '0 0 8px 0',
+                                fontSize: '0.9rem',
+                                color: '#666',
+                                fontWeight: '500'
+                              }}>
+                                {announcement.price} lei
+                              </p>
+                            )}
+                            
+                            <p style={{
+                              margin: '0',
+                              fontSize: '0.8rem',
+                              color: '#999'
+                            }}>
+                              {announcement.localitate}
+                            </p>
+                          </Box>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+
+                  {userAnnouncements.length > 3 && (
+                    <IconButton
+                      onClick={() => handleScroll('right')}
+                      sx={{
+                        position: 'absolute',
+                        right: '-25px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 1,
+                        backgroundColor: getPrimaryColor(),
+                        color: 'white',
+                        width: '40px',
+                        height: '40px',
+                        '&:hover': {
+                          backgroundColor: '#2a4a65'
+                        }
+                      }}
+                    >
+                      <ChevronRight />
+                    </IconButton>
+                  )}
+                </Box>
+              </div>
+            </>
+          )}
 
           {editMode && (
             <>

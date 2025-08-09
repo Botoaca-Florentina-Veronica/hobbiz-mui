@@ -1,3 +1,8 @@
+const Message = require('../models/Message');
+const Notification = require('../models/Notification');
+const User = require('../models/User');
+const { Types } = require('mongoose');
+
 // Șterge un mesaj după id
 exports.deleteMessage = async (req, res) => {
   try {
@@ -9,78 +14,115 @@ exports.deleteMessage = async (req, res) => {
     res.status(500).json({ error: 'Eroare la ștergerea mesajului.' });
   }
 };
-const Message = require('../models/Message');
-const Notification = require('../models/Notification');
-const User = require('../models/User');
-const { Types } = require('mongoose');
 
-// Creează un mesaj nou și notificare pentru destinatar
+// Creează un mesaj nou și (opțional) o notificare pentru destinatar
 exports.createMessage = async (req, res) => {
   try {
-    console.log('🚀🚀🚀 === APEL CREATEMESSAGE ===');
-    console.log('🚀 Timestamp:', new Date().toISOString());
-    console.log('🚀 Request body:', req.body);
-    console.log('🚀 Request ID (dacă există):', req.id || 'N/A');
-    console.log('=== CREEAZĂ MESAJ - REQUEST BODY ===');
-    console.log(JSON.stringify(req.body, null, 2));
-    console.log('=== HEADERS ===');
-    console.log(JSON.stringify(req.headers, null, 2));
-    
-    const { conversationId, senderId, text, destinatarId, announcementId } = req.body;
-    
-    // Validare de bază
-    if (!conversationId || !senderId || !text || !destinatarId) {
-      console.error('❌ Date obligatorii lipsă:', { conversationId, senderId, text, destinatarId });
-      return res.status(400).json({ error: 'Date obligatorii lipsă pentru mesaj.' });
-    }
-    
-    const message = new Message({ 
-      conversationId, 
-      senderId, 
-      text,
-      createdAt: new Date()
-    });
-    
-    await message.save();
-    console.log('✅ Mesaj salvat:', message);
+    // Log de diagnostic minimal (nu logăm payload-uri mari în producție)
+    console.log('➡️ POST /api/messages - createMessage');
+    // Afișăm starea conexiunii DB
+    try {
+      const mongoose = require('mongoose');
+      const rs = mongoose.connection?.readyState;
+      console.log('   • Mongo readyState:', rs, '(0=disconnected,1=connected,2=connecting,3=disconnecting)');
+    } catch {}
 
-    // Creează notificare pentru destinatar
-    const notificationUserId = destinatarId;
-    // Creează notificare pentru destinatar (doar dacă nu e același cu expeditorul)
-    if (notificationUserId !== senderId) {
-      try {
-        console.log('🔔 Verificare notificare duplicată...');
-        console.log('🔔 User ID pentru notificare:', notificationUserId);
-        console.log('🔔 Link conversație:', `/chat/${conversationId}`);
-        
-        // Verifică dacă există deja o notificare necitită pentru această conversație
-        const existingNotification = await Notification.findOne({
-          userId: notificationUserId,
-          link: `/chat/${conversationId}`,
-          read: false
-        });
-        
-        if (existingNotification) {
-          console.log('⚠️ NOTIFICARE DUPLICATĂ găsită! Se sare peste crearea unei noi:', existingNotification._id);
-        } else {
-          console.log('✅ Nu s-a găsit notificare duplicată, se creează una nouă...');
-          const notif = await Notification.create({
-            userId: notificationUserId,
-            message: `Ai primit un mesaj nou${announcementId ? ` la anunțul #${announcementId}` : ''}`,
-            link: `/chat/${conversationId}`,
-          });
-          console.log('✅ Notificare nouă salvată:', notif);
-        }
-      } catch (err) {
-        console.error('EROARE LA SALVAREA NOTIFICĂRII:', err);
-        // Nu returnăm eroare aici pentru că mesajul s-a salvat cu succes
+    // Asigurăm body-ul ca obiect simplu
+    const body = typeof req.body === 'object' && req.body !== null ? req.body : {};
+  let {
+      conversationId,
+      senderId,
+      senderRole,
+      text,
+      destinatarId,
+      announcementId,
+      image,
+      imageFile,
+    } = body;
+  console.log('   • Payload primit (chei):', Object.keys(body));
+
+    const isValidObjectId = (id) => typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id);
+
+    // Normalizează conversationId dacă e format din 2 ObjectId-uri despărțite cu '-'
+    if (typeof conversationId === 'string' && conversationId.includes('-')) {
+      const parts = conversationId.split('-').filter(Boolean);
+      if (parts.length === 2 && isValidObjectId(parts[0]) && isValidObjectId(parts[1])) {
+        // sort pentru consistență
+        conversationId = parts.sort().join('-');
       }
     }
 
-    res.status(201).json(message);
+    // Deducem destinatarId dacă lipsește
+    if (!destinatarId && typeof conversationId === 'string') {
+      const parts = conversationId.split('-');
+      const candidate = parts.find((p) => p !== String(senderId));
+      if (isValidObjectId(candidate)) destinatarId = candidate;
+    }
+
+    // Validare de bază – trebuie text sau imagine, iar IDs valide
+    const missing = [];
+    if (!conversationId) missing.push('conversationId');
+    if (!senderId) missing.push('senderId');
+    if (!text && !image) missing.push('text|image');
+    if (!destinatarId) missing.push('destinatarId');
+  if (missing.length) {
+      return res.status(400).json({
+        error: 'Date obligatorii lipsă pentru mesaj',
+        missing,
+      });
+    }
+
+    const messageData = {
+      conversationId,
+      senderId,
+      senderRole: senderRole || 'cumparator',
+      destinatarId,
+      createdAt: new Date(),
+    };
+
+    if (text && String(text).trim()) messageData.text = String(text).trim();
+    if (image) {
+      messageData.image = image;
+      if (imageFile) messageData.imageFile = imageFile;
+    }
+
+    // Salvăm mesajul (cu validare Mongoose)
+  console.log('   • Salvăm mesajul în MongoDB...');
+  const message = await new Message(messageData).save();
+    console.log('✅ Mesaj salvat:', message._id);
+
+    // Notificare – doar dacă avem un destinatar valid și diferit de expeditor
+    if (isValidObjectId(destinatarId) && String(destinatarId) !== String(senderId)) {
+      try {
+        const link = `/chat/${conversationId}`;
+        const existingNotification = await Notification.findOne({
+          userId: destinatarId,
+          link,
+          read: false,
+        });
+
+        if (!existingNotification) {
+          await Notification.create({
+            userId: destinatarId,
+            message: `Ai primit un mesaj nou${announcementId ? ` la anunțul #${announcementId}` : ''}`,
+            link,
+          });
+        }
+      } catch (notifErr) {
+        // Logăm dar nu blocăm răspunsul
+        console.warn('⚠️ Eroare la crearea notificării (non-fatal):', notifErr.message);
+      }
+    }
+
+    return res.status(201).json(message);
   } catch (err) {
-    console.error('EROARE LA CREARE MESAJ:', err);
-    res.status(500).json({ error: err.message });
+    // Trimitem detalii utile pentru debugging (message + câteva meta)
+    console.error('❌ EROARE createMessage:', err);
+    return res.status(500).json({
+      error: err.message || 'Eroare internă la crearea mesajului',
+      code: err.code,
+      name: err.name,
+    });
   }
 };
 
