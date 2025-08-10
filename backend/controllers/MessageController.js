@@ -3,6 +3,54 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const { Types } = require('mongoose');
 
+// Adaugă sau actualizează o reacție la un mesaj; repetarea aceleiași reacții o elimină (toggle)
+const reactToMessage = async (req, res) => {
+  try {
+    const { id } = req.params; // message id
+    const { emoji } = req.body;
+    const userId = req.userId;
+
+    if (!emoji || typeof emoji !== 'string') {
+      return res.status(400).json({ error: 'Emoji lipsă sau invalid' });
+    }
+
+    const message = await Message.findById(id);
+    if (!message) {
+      return res.status(404).json({ error: 'Mesajul nu a fost găsit' });
+    }
+
+    // Caută reacția utilizatorului curent
+    const existingIndex = (message.reactions || []).findIndex(r => String(r.userId) === String(userId));
+    if (existingIndex >= 0) {
+      // Dacă e aceeași reacție -> eliminăm (toggle off); altfel actualizăm emoji-ul
+      if (message.reactions[existingIndex].emoji === emoji) {
+        message.reactions.splice(existingIndex, 1);
+      } else {
+        message.reactions[existingIndex].emoji = emoji;
+        message.reactions[existingIndex].createdAt = new Date();
+      }
+    } else {
+      message.reactions = message.reactions || [];
+      message.reactions.push({ userId, emoji, createdAt: new Date() });
+    }
+
+    await message.save();
+    // Atașăm și senderInfo pentru consistență cu celelalte răspunsuri
+    let senderInfo = null;
+    try {
+      const sender = await User.findById(message.senderId).select('firstName lastName avatar');
+      if (sender) {
+        senderInfo = { firstName: sender.firstName, lastName: sender.lastName, avatar: sender.avatar };
+      }
+    } catch (_) {}
+
+    return res.json({ ...message.toObject(), senderInfo });
+  } catch (err) {
+    console.error('Eroare reactToMessage:', err);
+    return res.status(500).json({ error: 'Eroare la setarea reacției' });
+  }
+};
+
 // Șterge un mesaj după id
 const deleteMessage = async (req, res) => {
   try {
@@ -61,6 +109,7 @@ const createMessage = async (req, res) => {
       announcementId,
   image,
   imageFile,
+  replyTo,
     } = body;
     
     console.log('   • Payload primit (chei):', Object.keys(body));
@@ -94,7 +143,7 @@ const createMessage = async (req, res) => {
     const participants = [senderId, destinatarId].sort();
     conversationId = participants.join('-');
     
-    const messageData = {
+  const messageData = {
       conversationId,
       senderId,
       senderRole: senderRole || 'cumparator',
@@ -103,6 +152,23 @@ const createMessage = async (req, res) => {
     };
     
     if (hasText) messageData.text = String(text).trim();
+    // Reply info (safe subset)
+    // Acceptă și string (din multipart) și obiect nativ
+    if (typeof replyTo === 'string') {
+      try {
+        replyTo = JSON.parse(replyTo);
+      } catch (e) {
+        // Ignorăm parsing-ul eșuat
+      }
+    }
+    if (replyTo && typeof replyTo === 'object') {
+      messageData.replyTo = {
+        messageId: String(replyTo.messageId || ''),
+        senderId: String(replyTo.senderId || ''),
+        text: replyTo.text ? String(replyTo.text).slice(0, 300) : undefined,
+        image: replyTo.image ? String(replyTo.image) : undefined
+      };
+    }
     // Imagine încărcată prin Cloudinary (multer)
     if (req.file && req.file.path) {
       messageData.image = req.file.path; // URL-ul public Cloudinary
@@ -405,5 +471,6 @@ module.exports = {
   getConversations,
   getMessagesBetweenUsers,
   getMessages,
-  markMessagesAsRead
+  markMessagesAsRead,
+  reactToMessage
 };

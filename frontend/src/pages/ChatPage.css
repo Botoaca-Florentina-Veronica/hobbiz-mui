@@ -359,6 +359,61 @@
   align-items: center; /* bife centrate pe verticală față de text */
 }
 
+/* Reply preview în mesaj (stil quote WhatsApp) */
+.chat-reply-preview {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: stretch;
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.chat-reply-preview.own { background: #e8f3ff; border-color: #cfe6ff; }
+.chat-reply-bar {
+  width: 4px;
+  background: #355070;
+}
+.chat-reply-preview.own .chat-reply-bar { background: #1e73be; }
+.chat-reply-content {
+  padding: 6px 10px;
+}
+.chat-reply-author {
+  font-weight: 700;
+  font-size: 12px;
+  color: #355070;
+  margin-bottom: 2px;
+}
+.chat-reply-text {
+  font-size: 13px;
+  color: #334155;
+}
+
+/* Reply composer preview (deasupra inputului) */
+.chat-reply-composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin: 6px 24px 4px 24px;
+  position: relative;
+}
+.chat-reply-composer .chat-reply-bar { height: 100%; }
+.chat-reply-cancel {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.chat-reply-cancel:hover { color: #374151; }
+
 .chat-message.own .chat-message-bubble {
   background: #e2f0ff; /* păstrăm culoarea actuală */
   color: #0a2540;
@@ -1054,7 +1109,7 @@
 .message-actions-bar {
   position: absolute;
   top: -45px;
-  right: 8px;
+  right: 8px; /* default for own; overridden for received */
   display: flex;
   gap: 4px;
   background: #ffffff;
@@ -1066,6 +1121,17 @@
   opacity: 0;
   transform: translateY(5px);
   animation: slideInActions 0.2s ease forwards;
+}
+
+/* Aliniere corectă în funcție de direcția mesajului */
+.chat-message.own .message-actions-bar {
+  right: 8px;
+  left: auto;
+}
+
+.chat-message:not(.own) .message-actions-bar {
+  left: 8px;
+  right: auto;
 }
 
 @keyframes slideInActions {
@@ -1220,3 +1286,94 @@
   color: #9ca3af;
   background: #1f2937;
 }
+
+/* Reacții la mesaje */
+.reaction-picker {
+  position: absolute;
+  top: -56px;
+  display: flex;
+  gap: 8px;
+  background: #ffffff; /* aliniat cu celelalte bule hover */
+  color: #374151;
+  padding: 8px 10px;
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  z-index: 20;
+}
+.chat-message.own .reaction-picker { right: 8px; }
+.chat-message:not(.own) .reaction-picker { left: 8px; }
+.reaction-option {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: transform .1s ease;
+}
+.reaction-option:hover { transform: scale(1.15); }
+
+.message-reactions-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.message-reactions-row.own { justify-content: flex-end; }
+
+.reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 2px 8px;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.reaction-chip .emoji { font-size: 15px; }
+.reaction-chip .count { font-weight: 600; }
+.reaction-chip.mine { background: #eff6ff; border-color: #bfdbfe; }
+
+.dark-mode .reaction-picker { background: #374151; border-color: #4b5563; color: #e5e7eb; }
+.dark-mode .reaction-chip { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+.dark-mode .reaction-chip.mine { background: #0f172a; border-color: #334155; }
+
+/* Reacții fixate pe bulă */
+.message-reactions-bubble {
+  position: absolute;
+  bottom: -14px;
+  left: 8px;
+  display: inline-flex;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+.chat-message.own .message-reactions-bubble {
+  right: 8px;
+  left: auto;
+}
+.reaction-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #374151;
+}
+.reaction-item .emoji { font-size: 14px; }
+.reaction-item .count { font-size: 12px; font-weight: 600; }
+.reaction-item.mine { color: #1d4ed8; }
+
+.dark-mode .message-reactions-bubble { background: #1f2937; border-color: #374151; }
+.dark-mode .reaction-item { color: #e5e7eb; }
+.dark-mode .reaction-item.mine { color: #93c5fd; }

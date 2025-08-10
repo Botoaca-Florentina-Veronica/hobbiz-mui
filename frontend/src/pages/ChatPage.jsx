@@ -21,6 +21,8 @@ export default function ChatPage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const [copiedMessageId, setCopiedMessageId] = useState(null);
+  const [selectedReply, setSelectedReply] = useState(null);
+  const [reactionTargetId, setReactionTargetId] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const userId = localStorage.getItem('userId');
@@ -28,6 +30,8 @@ export default function ChatPage() {
 
   // Lista de emoji-uri populare
   const popularEmojis = ['😀', '😍', '🥰', '😊', '😂', '😭', '😎', '🤔', '😴', '🎉', '❤️', '👍', '👎', '🔥', '💯', '🙌', '👏', '🤝', '💪', '🎯'];
+  // Emoji-urile disponibile pentru reacții rapide (stil WhatsApp)
+  const reactionEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
   // Toggle emoji picker
   const toggleEmojiPicker = () => {
@@ -227,6 +231,14 @@ export default function ChatPage() {
         // câmpul se numește 'image' ca să corespundă upload.single('image')
         formData.append('image', selectedImage.file);
         formData.append('imageFile', selectedImage.file.name);
+        if (selectedReply) {
+          formData.append('replyTo', JSON.stringify({
+            messageId: selectedReply.messageId,
+            senderId: selectedReply.senderId,
+            text: selectedReply.text,
+            image: selectedReply.image
+          }));
+        }
         messageData = formData;
       } else {
         messageData = {
@@ -234,15 +246,33 @@ export default function ChatPage() {
           senderId: userId,
           senderRole: 'cumparator',
           destinatarId: selectedConversation.otherParticipant.id,
-          ...(newMessage.trim() ? { text: newMessage.trim() } : {})
+          ...(newMessage.trim() ? { text: newMessage.trim() } : {}),
+          ...(selectedReply ? { replyTo: {
+            messageId: selectedReply.messageId,
+            senderId: selectedReply.senderId,
+            text: selectedReply.text,
+            image: selectedReply.image
+          }} : {})
         };
       }
 
-      // Adaugă mesajul local
+      // Adaugă mesajul local (evităm spread pe FormData)
+      const nowIso = new Date().toISOString();
       tempMessage = {
-        ...messageData,
         _id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
+        conversationId,
+        senderId: userId,
+        senderRole: 'cumparator',
+        destinatarId: selectedConversation.otherParticipant.id,
+        text: newMessage.trim() || undefined,
+        image: selectedImage?.preview || undefined,
+        replyTo: selectedReply ? {
+          messageId: selectedReply.messageId,
+          senderId: selectedReply.senderId,
+          text: selectedReply.text,
+          image: selectedReply.image
+        } : undefined,
+        createdAt: nowIso,
         senderInfo: {
           firstName: 'Tu',
           lastName: '',
@@ -250,7 +280,8 @@ export default function ChatPage() {
         }
       };
       setMessages(prev => [...prev, tempMessage]);
-      setNewMessage('');
+  setNewMessage('');
+  setSelectedReply(null);
       setSelectedImage(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -266,6 +297,8 @@ export default function ChatPage() {
         setMessages(prev => prev.map(msg => 
           msg._id === tempMessage._id ? {
             ...response.data,
+            // Asigură că replyTo rămâne vizibil dacă backend-ul nu-l reflectă
+            replyTo: response.data.replyTo || tempMessage.replyTo,
             senderInfo: tempMessage.senderInfo
           } : msg
         ));
@@ -350,13 +383,31 @@ export default function ChatPage() {
 
   // Funcții pentru bara de acțiuni din mesaje
   const handleReplyMessage = (message) => {
-    // Adaugă textul de reply în input
-    setNewMessage(`@${message.senderInfo?.firstName || 'Utilizator'}: "${message.text}" \n`);
+    const senderName = message.senderId === userId ? 'Tu' : (message.senderInfo?.firstName || 'Utilizator');
+    setSelectedReply({
+      messageId: message._id,
+      senderId: message.senderId,
+      senderName,
+      text: message.text || '',
+      image: message.image || null,
+    });
   };
 
-  const handleReactToMessage = (messageId, emoji) => {
-    // Aici poți implementa logica pentru reacții
-    console.log(`React cu ${emoji} la mesajul ${messageId}`);
+  const handleReactToMessage = async (messageId, emoji) => {
+    try {
+      const res = await apiClient.post(`/api/messages/${messageId}/react`, { emoji });
+      const updated = res.data;
+      setMessages(prev => prev.map(m => m._id === messageId ? {
+        ...m,
+        ...updated,
+        // păstrează senderInfo existent dacă lipsește din răspuns
+        senderInfo: m.senderInfo || updated.senderInfo
+      } : m));
+    } catch (err) {
+      console.error('Eroare la setarea reacției:', err?.response?.data || err.message);
+    } finally {
+      setReactionTargetId(null);
+    }
   };
 
   const handleDeleteMessage = async (messageId) => {
@@ -590,7 +641,7 @@ export default function ChatPage() {
                           onMouseEnter={() => setHoveredMessageId(message._id)}
                           onMouseLeave={() => setHoveredMessageId(null)}
                         >
-                          {/* Bara de acțiuni - doar pentru mesajele proprii */}
+                          {/* Bara de acțiuni - mesajele proprii */}
                           {message.senderId === userId && hoveredMessageId === message._id && (
                             <div className="message-actions-bar">
                               <button 
@@ -603,7 +654,7 @@ export default function ChatPage() {
                               
                               <button 
                                 className="message-action-btn"
-                                onClick={() => handleReactToMessage(message._id, '😊')}
+                                onClick={() => setReactionTargetId(prev => prev === message._id ? null : message._id)}
                                 title="Reacționează"
                               >
                                 <SentimentSatisfiedAltIcon fontSize="small" />
@@ -631,10 +682,64 @@ export default function ChatPage() {
                             </div>
                           )}
 
+                          {/* Bara de acțiuni - mesajele primite (fără Șterge) */}
+                          {message.senderId !== userId && hoveredMessageId === message._id && (
+                            <div className="message-actions-bar">
+                              <button 
+                                className="message-action-btn"
+                                onClick={() => handleReplyMessage(message)}
+                                title="Răspunde"
+                              >
+                                <ReplyIcon fontSize="small" />
+                              </button>
+                              
+                              <button 
+                                className="message-action-btn"
+                                onClick={() => setReactionTargetId(prev => prev === message._id ? null : message._id)}
+                                title="Reacționează"
+                              >
+                                <SentimentSatisfiedAltIcon fontSize="small" />
+                              </button>
+                              
+                              <button 
+                                className="message-action-btn copy"
+                                onClick={() => handleCopyMessage(message._id, message.text)}
+                                disabled={!message.text}
+                                title="Copiază"
+                              >
+                                <ContentCopyIcon fontSize="small" />
+                                {copiedMessageId === message._id && (
+                                  <span className="message-copied">Copiat!</span>
+                                )}
+                              </button>
+                            </div>
+                          )}
+
                           {/* Avatar eliminat la cerere */}
                           <div className="chat-message-content-group">
                             <div className="chat-bubble-row">
                               <div className="chat-message-bubble">
+                                {/* Secțiune reply pentru mesaj */}
+                                {message.replyTo && (
+                                  <div className={`chat-reply-preview ${message.senderId === userId ? 'own' : ''}`}>
+                                    <div className="chat-reply-bar" />
+                                    <div className="chat-reply-content">
+                                      <div className="chat-reply-author">
+                                        {message.replyTo.senderId === userId
+                                          ? 'Tu'
+                                          : (message.replyTo.senderId === selectedConversation.otherParticipant.id
+                                              ? selectedConversation.name
+                                              : (message.senderInfo?.firstName || 'Utilizator'))}
+                                      </div>
+                                      {message.replyTo.text && (
+                                        <div className="chat-reply-text">{message.replyTo.text}</div>
+                                      )}
+                                      {!message.replyTo.text && message.replyTo.image && (
+                                        <div className="chat-reply-text">Imagine</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                                 {message.image && (
                                   <div className="chat-message-image">
                                     <img src={message.image} alt="Imagine trimisă" />
@@ -661,6 +766,49 @@ export default function ChatPage() {
                             </div>
                             <div className="chat-message-time">{formatTime(message.createdAt)}</div>
                           </div>
+                          {/* Reacții fixate pe bulă (colț) */}
+                          {Array.isArray(message.reactions) && message.reactions.length > 0 && (
+                            <div className={`message-reactions-bubble ${message.senderId === userId ? 'own' : ''}`}>
+                              {Object.entries(
+                                message.reactions.reduce((acc, r) => {
+                                  acc[r.emoji] = (acc[r.emoji] || 0) + 1;
+                                  return acc;
+                                }, {})
+                              ).map(([emoji, count]) => {
+                                const mine = message.reactions.some(r => r.userId === userId && r.emoji === emoji);
+                                return (
+                                  <button
+                                    key={emoji}
+                                    type="button"
+                                    className={`reaction-item ${mine ? 'mine' : ''}`}
+                                    onClick={() => handleReactToMessage(message._id, emoji)}
+                                    title={mine ? 'Elimină reacția' : 'Reacționează'}
+                                  >
+                                    <span className="emoji">{emoji}</span>
+                                    <span className="count">{count}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                          
+                          
+                          
+                          {/* Picker reacții, ancorat deasupra mesajului */}
+                          {hoveredMessageId === message._id && reactionTargetId === message._id && (
+                            <div className={`reaction-picker ${message.senderId === userId ? 'own' : ''}`}>
+                              {reactionEmojis.map((emo) => (
+                                <button
+                                  key={emo}
+                                  type="button"
+                                  className="reaction-option"
+                                  onClick={() => handleReactToMessage(message._id, emo)}
+                                >
+                                  {emo}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </React.Fragment>
                     );
@@ -670,6 +818,20 @@ export default function ChatPage() {
               </div>
 
               <form className="chat-input-container" onSubmit={handleSendMessage}>
+                {selectedReply && (
+                  <div className="chat-reply-composer">
+                    <div className="chat-reply-bar" />
+                    <div className="chat-reply-content">
+                      <div className="chat-reply-author">Răspuns către {selectedReply.senderName}</div>
+                      {selectedReply.text ? (
+                        <div className="chat-reply-text">{selectedReply.text}</div>
+                      ) : (
+                        <div className="chat-reply-text">Imagine</div>
+                      )}
+                    </div>
+                    <button type="button" className="chat-reply-cancel" onClick={() => setSelectedReply(null)} aria-label="Anulează răspunsul">×</button>
+                  </div>
+                )}
                 {selectedImage && (
                   <div className="chat-image-preview">
                     <img src={selectedImage.preview} alt="Preview" />

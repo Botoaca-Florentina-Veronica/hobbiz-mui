@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createMessage, deleteMessage, getConversations, getMessagesBetweenUsers, getMessages, markMessagesAsRead } = require('../controllers/MessageController');
+const { createMessage, deleteMessage, getConversations, getMessagesBetweenUsers, getMessages, markMessagesAsRead, reactToMessage } = require('../controllers/MessageController');
 const auth = require('../middleware/auth');
 const upload = require('../config/cloudinaryMulter');
 
@@ -9,6 +9,9 @@ router.post('/', auth, upload.single('image'), createMessage);
 
 // Șterge un mesaj după id
 router.delete('/:id', auth, deleteMessage);
+
+// Reacționează la un mesaj (toggle/update)
+router.post('/:id/react', auth, reactToMessage);
 
 // Obține conversațiile pentru un utilizator
 router.get('/conversations/:userId', auth, getConversations);
