@@ -8,7 +8,7 @@ const upload = require('../config/cloudinaryMulter');
 router.post('/', auth, upload.single('image'), MessageController.createMessage);
 
 // Obține conversațiile pentru un utilizator
-router.get('/conversations/:userId', auth, MessageController.getConversationsList);
+router.get('/conversations/:userId', auth, MessageController.getConversations);
 
 // Obține mesajele între doi utilizatori
 router.get('/between/:userId1/:userId2', auth, MessageController.getMessagesBetweenUsers);

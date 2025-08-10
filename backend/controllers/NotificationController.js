@@ -2,7 +2,7 @@
 const Notification = require('../models/Notification');
 
 // Obține toate notificările pentru un user
-exports.getNotifications = async (req, res) => {
+const getNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
     console.log(`🔔 GET /api/notifications/${userId} - cerere primită`);
@@ -19,7 +19,7 @@ exports.getNotifications = async (req, res) => {
 };
 
 // Creează o notificare nouă
-exports.createNotification = async (req, res) => {
+const createNotification = async (req, res) => {
   try {
     const { userId, message, link } = req.body;
     const notif = await Notification.create({ userId, message, link });
@@ -30,7 +30,7 @@ exports.createNotification = async (req, res) => {
 };
 
 // Marchează o notificare ca citită
-exports.markAsRead = async (req, res) => {
+const markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
     const notif = await Notification.findByIdAndUpdate(id, { read: true }, { new: true });
@@ -41,7 +41,7 @@ exports.markAsRead = async (req, res) => {
 };
 
 // Șterge o notificare
-exports.deleteNotification = async (req, res) => {
+const deleteNotification = async (req, res) => {
   try {
     const { id } = req.params;
     console.log(`🗑️ DELETE /api/notifications/${id} - cerere primită`);
@@ -60,4 +60,11 @@ exports.deleteNotification = async (req, res) => {
     console.error('❌ Eroare la ștergerea notificării:', err);
     res.status(500).json({ error: err.message });
   }
+};
+
+module.exports = {
+  getNotifications,
+  createNotification,
+  markAsRead,
+  deleteNotification
 };

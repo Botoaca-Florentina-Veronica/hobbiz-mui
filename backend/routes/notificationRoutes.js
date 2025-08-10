@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const NotificationController = require('../controllers/NotificationController');
+const { getNotifications, createNotification, markAsRead, deleteNotification } = require('../controllers/NotificationController');
 
 // GET toate notificările pentru un user (necesită autentificare)
-router.get('/:userId', auth, NotificationController.getNotifications);
+router.get('/:userId', auth, getNotifications);
 
 // POST creează notificare nouă
-router.post('/', NotificationController.createNotification);
+router.post('/', createNotification);
 
 // PATCH marchează ca citită
-router.patch('/:id/read', NotificationController.markAsRead);
+router.patch('/:id/read', markAsRead);
 
 // DELETE șterge notificare (cu autentificare)
-router.delete('/:id', auth, NotificationController.deleteNotification);
+router.delete('/:id', auth, deleteNotification);
 
 module.exports = router;

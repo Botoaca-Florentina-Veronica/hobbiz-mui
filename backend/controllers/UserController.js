@@ -9,7 +9,7 @@ const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
 
 // Șterge utilizatorul și toate anunțurile sale
-exports.deleteAccount = async (req, res) => {
+const deleteAccount = async (req, res) => {
   try {
     const userId = req.userId;
     // Șterge toate anunțurile utilizatorului
@@ -24,7 +24,7 @@ exports.deleteAccount = async (req, res) => {
 };
 
 // Înregistrare utilizator
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   try { 
     const { firstName, lastName, email, password, phone } = req.body;
 
@@ -70,7 +70,7 @@ exports.register = async (req, res) => {
 };
 
 // Autentificare utilizator
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -137,7 +137,7 @@ exports.login = async (req, res) => {
 };
 
 // Obține profil utilizator
-exports.getProfile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
     // Verificăm dacă există userId în parametri (profil public) sau folosim userId din auth (profil propriu)
     const targetUserId = req.params.userId || req.userId;
@@ -154,7 +154,7 @@ exports.getProfile = async (req, res) => {
 };
 
 // Actualizează email utilizator
-exports.updateEmail = async (req, res) => {
+const updateEmail = async (req, res) => {
   try {
     const userId = req.userId; // Obținut din middleware-ul de autentificare
     const { newEmail } = req.body;
@@ -194,7 +194,7 @@ exports.updateEmail = async (req, res) => {
 };
 
 // Actualizează parola utilizator
-exports.updatePassword = async (req, res) => {
+const updatePassword = async (req, res) => {
   try {
     const userId = req.userId; // Obținut din middleware-ul de autentificare
     const { currentPassword, newPassword } = req.body;
@@ -227,7 +227,7 @@ exports.updatePassword = async (req, res) => {
 };
 
 // Adaugă un anunț nou pentru utilizatorul autentificat
-exports.addAnnouncement = async (req, res) => {
+const addAnnouncement = async (req, res) => {
   try {
     console.log('--- [addAnnouncement] req.body:', req.body);
     console.log('--- [addAnnouncement] req.file:', req.file);
@@ -262,7 +262,7 @@ exports.addAnnouncement = async (req, res) => {
 };
 
 // Returnează toate anunțurile utilizatorului autentificat
-exports.getMyAnnouncements = async (req, res) => {
+const getMyAnnouncements = async (req, res) => {
   try {
     const userId = req.userId;
     const announcements = await Announcement.find({ user: userId }).sort({ createdAt: -1 });
@@ -274,7 +274,7 @@ exports.getMyAnnouncements = async (req, res) => {
 };
 
 // Șterge un anunț după id
-exports.deleteAnnouncement = async (req, res) => {
+const deleteAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
     const announcementId = req.params.id;
@@ -292,7 +292,7 @@ exports.deleteAnnouncement = async (req, res) => {
 };
 
 // Actualizează un anunț existent
-exports.updateAnnouncement = async (req, res) => {
+const updateAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
     const { id } = req.params;
@@ -323,7 +323,7 @@ exports.updateAnnouncement = async (req, res) => {
 };
 
 // Actualizează profilul utilizatorului (nume, prenume, localitate, telefon)
-exports.updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const userId = req.userId;
     const { firstName, lastName, localitate, phone } = req.body;
@@ -341,4 +341,18 @@ exports.updateProfile = async (req, res) => {
     console.error('Eroare la actualizarea profilului:', error);
     res.status(500).json({ error: 'Eroare server la actualizarea profilului' });
   }
+};
+
+module.exports = {
+  deleteAccount,
+  register,
+  login,
+  getProfile,
+  updateEmail,
+  updatePassword,
+  addAnnouncement,
+  getMyAnnouncements,
+  deleteAnnouncement,
+  updateAnnouncement,
+  updateProfile
 };
