@@ -4,7 +4,7 @@ const User = require('../models/User');
 const { Types } = require('mongoose');
 
 // Șterge un mesaj după id
-exports.deleteMessage = async (req, res) => {
+const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;
     const authenticatedUserId = req.userId;
@@ -28,7 +28,7 @@ exports.deleteMessage = async (req, res) => {
 };
 
 // Creează un mesaj nou și (opțional) o notificare pentru destinatar
-exports.createMessage = async (req, res) => {
+const createMessage = async (req, res) => {
   try {
     console.log('➡️ POST /api/messages - createMessage');
     
@@ -139,7 +139,7 @@ exports.createMessage = async (req, res) => {
 };
 
 // Obține toate conversațiile pentru un utilizator
-exports.getConversations = async (req, res) => {
+const getConversations = async (req, res) => {
   try {
     const { userId } = req.params;
     const authenticatedUserId = req.userId;
@@ -236,7 +236,7 @@ exports.getConversations = async (req, res) => {
 };
 
 // Obține toate mesajele între doi utilizatori
-exports.getMessagesBetweenUsers = async (req, res) => {
+const getMessagesBetweenUsers = async (req, res) => {
   try {
     const { userId1, userId2 } = req.params;
     const authenticatedUserId = req.userId;
@@ -297,7 +297,7 @@ exports.getMessagesBetweenUsers = async (req, res) => {
 };
 
 // Obține toate mesajele pentru o conversație cu datele utilizatorilor
-exports.getMessages = async (req, res) => {
+const getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const authenticatedUserId = req.userId;
@@ -376,7 +376,9 @@ const markMessagesAsRead = async (req, res) => {
 
 module.exports = {
   createMessage,
-  getConversationsList,
+  deleteMessage,
+  getConversations,
   getMessagesBetweenUsers,
+  getMessages,
   markMessagesAsRead
 };
