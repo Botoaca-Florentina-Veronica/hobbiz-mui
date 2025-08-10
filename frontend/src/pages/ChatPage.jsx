@@ -20,6 +20,7 @@ export default function ChatPage() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const userId = localStorage.getItem('userId');
@@ -168,6 +169,13 @@ export default function ChatPage() {
         
         console.log(`Primite ${response.data.length} mesaje din backend`);
         setMessages(response.data || []);
+        
+        // Marchează mesajele ca citite când se deschide conversația
+        try {
+          await apiClient.put(`/api/messages/mark-read/${userId}/${selectedConversation.otherParticipant.id}`);
+        } catch (error) {
+          console.error('Eroare la marcarea mesajelor ca citite:', error);
+        }
       } catch (error) {
         if (error?.response?.status === 401) {
           setMessages([]);
@@ -206,24 +214,28 @@ export default function ChatPage() {
       const participantIds = [userId, selectedConversation.otherParticipant.id].sort();
       const conversationId = participantIds.join('-');
       
-      const messageData = {
-        conversationId: conversationId,
-        senderId: userId,
-        senderRole: 'cumparator', // sau determină rolul în funcție de context
-        destinatarId: selectedConversation.otherParticipant.id
-      };
-
-      // Adaugă text dacă există
-      if (newMessage.trim()) {
-        messageData.text = newMessage.trim();
-      }
-
-      // Dacă avem o imagine selectată, o includem
-      if (selectedImage) {
-        // Pentru demo, salvăm imaginea ca base64 în mesaj
-        // În producție, ar trebui să încărcăm imaginea pe server separat
-        messageData.image = selectedImage.preview;
-        messageData.imageFile = selectedImage.file.name;
+      // Construim payload: dacă avem imagine, folosim FormData (multipart)
+      const useMultipart = !!selectedImage?.file;
+      let messageData;
+      if (useMultipart) {
+        const formData = new FormData();
+        formData.append('conversationId', conversationId);
+        formData.append('senderId', userId);
+        formData.append('senderRole', 'cumparator');
+        formData.append('destinatarId', selectedConversation.otherParticipant.id);
+        if (newMessage.trim()) formData.append('text', newMessage.trim());
+        // câmpul se numește 'image' ca să corespundă upload.single('image')
+        formData.append('image', selectedImage.file);
+        formData.append('imageFile', selectedImage.file.name);
+        messageData = formData;
+      } else {
+        messageData = {
+          conversationId: conversationId,
+          senderId: userId,
+          senderRole: 'cumparator',
+          destinatarId: selectedConversation.otherParticipant.id,
+          ...(newMessage.trim() ? { text: newMessage.trim() } : {})
+        };
       }
 
       // Adaugă mesajul local
@@ -245,7 +257,9 @@ export default function ChatPage() {
       }
 
       // Trimite la server
-      const response = await apiClient.post('/api/messages', messageData);
+      const response = await apiClient.post('/api/messages', messageData, useMultipart ? {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      } : undefined);
       
       // Înlocuiește mesajul temporar cu cel de pe server
       if (response.data) {
@@ -355,10 +369,33 @@ export default function ChatPage() {
     }
   };
 
-  const handleCopyMessage = (messageText) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(messageText);
-      console.log('Mesaj copiat în clipboard');
+  const handleCopyMessage = async (messageId, messageText) => {
+    if (!messageText) return; // nimic de copiat
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(messageText);
+      } else {
+        // Fallback pentru contexte nesecurizate
+        const textArea = document.createElement('textarea');
+        textArea.value = messageText;
+        // Evită scroll pe iOS
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+        } finally {
+          document.body.removeChild(textArea);
+        }
+      }
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 1500);
+    } catch (err) {
+      console.error('Nu s-a putut copia mesajul:', err);
     }
   };
 
@@ -549,11 +586,15 @@ export default function ChatPage() {
                               </button>
                               
                               <button 
-                                className="message-action-btn"
-                                onClick={() => handleCopyMessage(message.text)}
+                                className="message-action-btn copy"
+                                onClick={() => handleCopyMessage(message._id, message.text)}
+                                disabled={!message.text}
                                 title="Copiază"
                               >
                                 <ContentCopyIcon fontSize="small" />
+                                {copiedMessageId === message._id && (
+                                  <span className="message-copied">Copiat!</span>
+                                )}
                               </button>
                               
                               <button 
@@ -579,7 +620,13 @@ export default function ChatPage() {
                                   <p className="chat-message-text">{message.text}</p>
                                 )}
                                 {message.senderId === userId && (
-                                  <span className="chat-message-ticks" aria-label="Livrat / citit">
+                                  <span 
+                                    className="chat-message-ticks" 
+                                    aria-label="Livrat / citit"
+                                    style={{ 
+                                      color: message.isRead ? '#4fc3f7' : '#9e9e9e' // Albastru dacă citit, gri dacă nu
+                                    }}
+                                  >
                                     <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                       <path d="M2 9l2.5 2.5L8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                                       <path d="M6 9l2.5 2.5L14 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>

@@ -6,15 +6,15 @@
   justify-content: flex-start;
   align-items: stretch;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto 32px auto;
-  padding: 0 20px;
+  /* Remove max-width to match search bar width exactly */
+  margin: 0 0 32px 0; /* Remove auto centering */
+  padding: 0; /* Remove padding to align with search bar */
 }
 
 @media (max-width: 900px) {
   .my-announcements-list {
     gap: 16px;
-    padding: 0 16px;
+    padding: 0; /* Remove padding to align with search bar */
   }
 }
 /* Permite mai multe carduri pe un rând */
@@ -24,6 +24,9 @@
   padding: 24px;
   margin-top: 4rem;
   margin-bottom: 16rem;
+  /* Add same padding as categories page for consistency */
+  padding-left: 80px !important;
+  padding-right: 80px !important;
 }
 
 @media (max-width: 900px) {
@@ -31,6 +34,17 @@
     padding: 12px;
     margin-top: 2rem;
     margin-bottom: 8rem;
+    /* Responsive padding for tablets */
+    padding-left: 40px !important;
+    padding-right: 40px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-announcements-container {
+    /* Normal padding on mobile */
+    padding-left: 24px !important;
+    padding-right: 24px !important;
   }
 }
 
@@ -457,6 +471,8 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   width: 100%;
+  padding: 0; /* Remove padding to align with search bar */
+  margin: 0; /* Remove margin to align with search bar */
 }
 
 .favorite-announcements-list.list-view {
@@ -464,11 +480,13 @@
   flex-direction: column;
   gap: 15px;
   width: 100%;
+  padding: 0; /* Remove padding to align with search bar */
+  margin: 0; /* Remove margin to align with search bar */
 }
 
 .favorite-announcements-list.list-view .my-announcement-card {
   width: 100%;
-  max-width: 1300px; /* Limităm lățimea maximă */
+  /* Remove max-width limitation to match search bar width exactly */
   flex-direction: row;
   min-height: 180px; /* Mărim puțin înălțimea */
   padding: 0;
@@ -571,12 +589,14 @@
 @media (max-width: 768px) {
   .favorite-announcements-list.grid-view {
     grid-template-columns: 1fr;
+    padding: 0; /* Ensure no padding on tablet */
   }
   
   .favorite-announcements-list.grid-view .my-announcement-card,
   .favorite-announcements-list.list-view .my-announcement-card {
     flex-direction: column;
     min-height: unset;
+    margin: 0; /* Remove margin to align with search bar */
   }
   
   .favorite-announcements-list.grid-view .my-announcement-image,

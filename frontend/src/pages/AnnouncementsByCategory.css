@@ -1,9 +1,38 @@
 /* Stiluri compacte pentru paginile de categorii */
+.announcements-by-category .favorite-announcements-list {
+  padding: 0; /* Remove any padding that could cause misalignment */
+  margin: 0; /* Remove any margin that could cause misalignment */
+  width: 100%;
+}
+
 .announcements-by-category .favorite-announcements-list.grid-view {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
   width: 100%;
+  padding: 0; /* Ensure no padding on the grid itself */
+}
+
+/* Ensure the search/filter Paper component and grid are properly aligned */
+.announcements-by-category .MuiPaper-root {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Override any inherited margins/padding from my-announcements container */
+.announcements-by-category .favorite-announcements-list,
+.announcements-by-category .favorite-announcements-list.grid-view,
+.announcements-by-category .favorite-announcements-list.list-view {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Add more padding to the main container to push content more to the right */
+.announcements-by-category.my-announcements-container {
+  padding-left: 80px !important;
+  padding-right: 80px !important;
 }
 
 .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
@@ -69,4 +98,37 @@
 
 .announcements-by-category.dark-mode .my-announcement-price {
   color: #f51866;
+}
+
+/* Mobile responsive fixes for alignment */
+@media (max-width: 768px) {
+  .announcements-by-category .favorite-announcements-list.grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+  }
+  
+  .announcements-by-category .MuiPaper-root {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 16px !important;
+  }
+  
+  /* Reduce padding on tablets */
+  .announcements-by-category.my-announcements-container {
+    padding-left: 40px !important;
+    padding-right: 40px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .announcements-by-category .favorite-announcements-list.grid-view {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  /* Use normal padding on mobile */
+  .announcements-by-category.my-announcements-container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
 }

@@ -38,7 +38,7 @@ exports.createMessage = async (req, res) => {
       return res.status(401).json({ error: 'Utilizator neautentificat' });
     }
     
-    const body = typeof req.body === 'object' && req.body !== null ? req.body : {};
+  const body = typeof req.body === 'object' && req.body !== null ? req.body : {};
     let {
       conversationId,
       senderId,
@@ -46,8 +46,8 @@ exports.createMessage = async (req, res) => {
       text,
       destinatarId,
       announcementId,
-      image,
-      imageFile,
+  image,
+  imageFile,
     } = body;
     
     console.log('   • Payload primit (chei):', Object.keys(body));
@@ -62,11 +62,12 @@ exports.createMessage = async (req, res) => {
     
     const isValidObjectId = (id) => typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id);
     
-    // Validare minimă - doar text este obligatoriu
-    if (!text || !text.trim()) {
-      return res.status(400).json({
-        error: 'Mesajul nu poate fi gol',
-      });
+    // Acceptăm mesaje cu text SAU imagine (una dintre ele e necesară)
+    const hasText = !!(text && String(text).trim());
+    const hasUploadedFile = !!req.file; // din multer
+    const hasInlineImage = !!image; // fallback (ex: base64) - nu recomandat
+    if (!hasText && !hasUploadedFile && !hasInlineImage) {
+      return res.status(400).json({ error: 'Mesajul trebuie să conțină text sau imagine' });
     }
     
     // Asigurăm că avem un destinatar
@@ -88,8 +89,14 @@ exports.createMessage = async (req, res) => {
       createdAt: new Date(),
     };
     
-    if (text && String(text).trim()) messageData.text = String(text).trim();
-    if (image) {
+    if (hasText) messageData.text = String(text).trim();
+    // Imagine încărcată prin Cloudinary (multer)
+    if (req.file && req.file.path) {
+      messageData.image = req.file.path; // URL-ul public Cloudinary
+      // req.file.originalname nu e disponibil cu CloudinaryStorage; folosim filename dacă e disponibil
+      messageData.imageFile = req.file.originalname || req.file.filename || messageData.imageFile;
+    } else if (image) {
+      // fallback pentru compatibilitate (ex. base64) – recomandat să migrezi către upload multipart
       messageData.image = image;
       if (imageFile) messageData.imageFile = imageFile;
     }
@@ -330,4 +337,46 @@ exports.getMessages = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+// Marchează mesajele ca citite
+const markMessagesAsRead = async (req, res) => {
+  try {
+    const { userId, otherUserId } = req.params;
+    
+    if (!userId || !otherUserId) {
+      return res.status(400).json({ error: 'userId și otherUserId sunt necesare' });
+    }
+    
+    // Găsește conversația între cei doi utilizatori
+    const participants = [userId, otherUserId].sort();
+    const conversationId = participants.join('-');
+    
+    // Marchează toate mesajele necitite din această conversație care NU sunt ale utilizatorului curent ca fiind citite
+    const result = await Message.updateMany(
+      { 
+        conversationId: conversationId,
+        senderId: { $ne: userId }, // Mesajele care NU sunt ale utilizatorului curent
+        isRead: false // Doar mesajele necitite
+      },
+      { 
+        isRead: true,
+        readAt: new Date()
+      }
+    );
+    
+    res.json({ 
+      message: 'Mesajele au fost marcate ca citite',
+      modifiedCount: result.modifiedCount 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  createMessage,
+  getConversationsList,
+  getMessagesBetweenUsers,
+  markMessagesAsRead
 };

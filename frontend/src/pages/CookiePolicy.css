@@ -1,0 +1,486 @@
+/* Cookie Policy Page - stil consistent cu About.css */
+.cookie-policy-page {
+  background-color: #f3f5f6;
+  min-height: 100vh;
+  padding: 40px 0;
+  margin-top: 4rem;
+}
+
+.cookie-policy-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.cookie-policy-hero {
+  text-align: center;
+  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  color: white;
+  padding: 80px 40px;
+  border-radius: 24px;
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+}
+
+.cookie-policy-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  transform: rotate(30deg);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-badge-icon {
+  font-size: 1.1rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 24px 0;
+  letter-spacing: -2px;
+  position: relative;
+  z-index: 2;
+  line-height: 1.1;
+}
+
+.hero-title .highlight {
+  background: linear-gradient(45deg, #F8B195, #ffd89b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.hero-description {
+  font-size: 1.3rem;
+  opacity: 0.95;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+  font-weight: 400;
+}
+
+/* Content Sections */
+.cookie-policy-content {
+  background: white;
+  border-radius: 20px;
+  padding: 60px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
+}
+
+.policy-section {
+  margin-bottom: 50px;
+}
+
+.policy-section:last-child {
+  margin-bottom: 0;
+}
+
+.policy-section h2 {
+  color: #355070;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.policy-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #F8B195, #ffd89b);
+  border-radius: 2px;
+}
+
+.policy-section h3 {
+  color: #355070;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  margin-top: 32px;
+}
+
+.policy-section h4 {
+  color: #355070;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.policy-section p {
+  color: #4a5568;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.policy-section ul {
+  color: #4a5568;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-left: 20px;
+  margin-bottom: 16px;
+}
+
+.policy-section ul li {
+  margin-bottom: 8px;
+}
+
+/* Cookie Types */
+.cookie-type {
+  background: #f8fafb;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.cookie-type:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(53, 80, 112, 0.1);
+}
+
+.cookie-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.cookie-tag {
+  background: linear-gradient(135deg, #355070, #406b92);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Reasons Grid */
+.reasons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.reason-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.reason-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #F8B195, #ffd89b);
+}
+
+.reason-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(53, 80, 112, 0.15);
+}
+
+.reason-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.reason-card h4 {
+  color: #355070;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.reason-card p {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Browser Guides */
+.browser-guides {
+  background: #f8fafb;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.browser-guides h4 {
+  color: #355070;
+  margin-bottom: 16px;
+}
+
+.browser-guides ul {
+  margin-left: 0;
+  list-style: none;
+}
+
+.browser-guides ul li {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  transition: background 0.2s ease;
+}
+
+.browser-guides ul li:hover {
+  background: #f1f5f9;
+}
+
+/* Important Note */
+.important-note {
+  background: linear-gradient(135deg, #fef3cd, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.important-note h4 {
+  color: #92400e;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.important-note p {
+  color: #92400e;
+  margin: 0;
+}
+
+/* Contact Section */
+.contact-section {
+  background: linear-gradient(135deg, #f8fafb 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 40px;
+}
+
+.contact-info {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.contact-info p {
+  margin-bottom: 12px;
+  color: #4a5568;
+}
+
+.last-updated {
+  font-style: italic;
+  color: #6b7280;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cookie-policy-page {
+    padding: 20px 0;
+    margin-top: 3rem;
+  }
+  
+  .cookie-policy-container {
+    padding: 0 16px;
+  }
+  
+  .cookie-policy-hero {
+    padding: 60px 24px;
+    border-radius: 16px;
+    margin-bottom: 40px;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+  }
+  
+  .hero-description {
+    font-size: 1.1rem;
+  }
+  
+  .cookie-policy-content {
+    padding: 40px 24px;
+    border-radius: 16px;
+  }
+  
+  .policy-section h2 {
+    font-size: 1.8rem;
+  }
+  
+  .cookie-type {
+    padding: 24px 20px;
+  }
+  
+  .reasons-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .reason-card {
+    padding: 24px 20px;
+  }
+  
+  .browser-guides {
+    padding: 20px;
+  }
+  
+  .contact-section {
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
+  
+  .cookie-policy-content {
+    padding: 32px 20px;
+  }
+  
+  .policy-section h2 {
+    font-size: 1.6rem;
+  }
+  
+  .cookie-examples {
+    justify-content: center;
+  }
+  
+  .cookie-tag {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+  }
+}
+
+/* Dark Mode Support */
+.dark-mode .cookie-policy-page {
+  background-color: #1a202c;
+}
+
+.dark-mode .cookie-policy-hero {
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+}
+
+.dark-mode .cookie-policy-content {
+  background: #2d3748;
+  color: #e2e8f0;
+}
+
+.dark-mode .policy-section h2,
+.dark-mode .policy-section h3,
+.dark-mode .policy-section h4 {
+  color: #f7fafc;
+}
+
+.dark-mode .policy-section p,
+.dark-mode .policy-section ul {
+  color: #cbd5e0;
+}
+
+.dark-mode .cookie-type {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .reason-card {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .reason-card h4 {
+  color: #f7fafc;
+}
+
+.dark-mode .reason-card p {
+  color: #a0aec0;
+}
+
+.dark-mode .browser-guides {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .browser-guides ul li {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .browser-guides ul li:hover {
+  background: #4a5568;
+}
+
+.dark-mode .contact-section {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .contact-info {
+  background: #2d3748;
+  border: 1px solid #4a5568;
+}
+
+.dark-mode .contact-info p {
+  color: #cbd5e0;
+}

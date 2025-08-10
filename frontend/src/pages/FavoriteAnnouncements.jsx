@@ -44,8 +44,44 @@ export default function FavoriteAnnouncements() {
   // Cheie unică pentru favorite per utilizator
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+  
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    const stored = localStorage.getItem(FAVORITES_KEY);
+    if (!stored) return [];
+    
+    try {
+      const parsed = JSON.parse(stored);
+      // Verifică dacă e în formatul vechi (array de string-uri) sau nou (array de obiecte)
+      if (parsed.length > 0 && typeof parsed[0] === 'string') {
+        // Convertește din formatul vechi în cel nou
+        const converted = parsed.map(id => ({ id, addedAt: Date.now() }));
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(converted));
+        return parsed; // returnează ID-urile pentru compatibilitate
+      } else {
+        // Format nou - returnează doar ID-urile pentru compatibilitate
+        return parsed.map(item => item.id);
+      }
+    } catch {
+      return [];
+    }
+  });
+  
+  const [favoriteObjects, setFavoriteObjects] = useState(() => {
+    const stored = localStorage.getItem(FAVORITES_KEY);
+    if (!stored) return [];
+    
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed.length > 0 && typeof parsed[0] === 'string') {
+        // Format vechi - convertește
+        return parsed.map(id => ({ id, addedAt: Date.now() }));
+      } else {
+        // Format nou
+        return parsed;
+      }
+    } catch {
+      return [];
+    }
   });
   const [showToast, setShowToast] = useState(false);
 
@@ -56,22 +92,47 @@ export default function FavoriteAnnouncements() {
     }
     apiClient.get(`/api/announcements`)
       .then(res => {
-        setAnnouncements(res.data.filter(a => favoriteIds.includes(a._id)));
+        const filtered = res.data.filter(a => favoriteIds.includes(a._id));
+        
+        // Sortează anunțurile în ordinea în care au fost adăugate în favorite (cel mai recent primul)
+        const sorted = filtered.sort((a, b) => {
+          const aFavorite = favoriteObjects.find(fav => fav.id === a._id);
+          const bFavorite = favoriteObjects.find(fav => fav.id === b._id);
+          
+          if (!aFavorite || !bFavorite) return 0;
+          return bFavorite.addedAt - aFavorite.addedAt; // Cel mai recent primul
+        });
+        
+        setAnnouncements(sorted);
       })
       .catch(() => setAnnouncements([]));
-  }, [favoriteIds, FAVORITES_KEY]);
+  }, [favoriteIds, favoriteObjects, FAVORITES_KEY]);
 
   const handleToggleFavorite = (id) => {
-    setFavoriteIds((prev) => {
+    setFavoriteObjects((prev) => {
       let updated;
-      if (prev.includes(id)) {
-        updated = prev.filter((fid) => fid !== id);
+      const exists = prev.find(item => item.id === id);
+      
+      if (exists) {
+        // Elimină din favorite
+        updated = prev.filter((item) => item.id !== id);
         setShowToast(true);
       } else {
-        updated = [...prev, id];
+        // Adaugă în favorite cu timestamp-ul curent
+        updated = [...prev, { id, addedAt: Date.now() }];
       }
+      
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       return updated;
+    });
+    
+    // Actualizează și array-ul simplu de ID-uri pentru compatibilitate
+    setFavoriteIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((fid) => fid !== id);
+      } else {
+        return [...prev, id];
+      }
     });
   };
 

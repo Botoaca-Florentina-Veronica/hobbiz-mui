@@ -43,8 +43,23 @@ export default function AnnouncementsByCategory() {
   
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+  
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    const stored = localStorage.getItem(FAVORITES_KEY);
+    if (!stored) return [];
+    
+    try {
+      const parsed = JSON.parse(stored);
+      // Verifică dacă e în formatul vechi (array de string-uri) sau nou (array de obiecte)
+      if (parsed.length > 0 && typeof parsed[0] === 'string') {
+        return parsed; // returnează ID-urile pentru compatibilitate
+      } else {
+        // Format nou - returnează doar ID-urile pentru compatibilitate
+        return parsed.map(item => item.id);
+      }
+    } catch {
+      return [];
+    }
   });
 
   // Get unique locations from announcements
@@ -318,39 +333,6 @@ export default function AnnouncementsByCategory() {
                 ) : (
                   <div className="my-announcement-img" style={{background: '#eee'}} />
                 )}
-                {/* Iconiță inimă pentru favorite */}
-                <div
-                  className="favorite-heart"
-                  style={{
-                    position: 'absolute',
-                    right: 16,
-                    bottom: 16,
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    zIndex: 2
-                  }}
-                  onClick={ev => {
-                    ev.stopPropagation();
-                    setFavoriteIds((prev) => {
-                      let updated;
-                      if (prev.includes(a._id)) {
-                        updated = prev.filter((id) => id !== a._id);
-                      } else {
-                        updated = [...prev, a._id];
-                      }
-                      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-                      return updated;
-                    });
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  {favoriteIds.includes(a._id) ? (
-                    <FavoriteIcon sx={{ color: 'red', fontSize: 32 }} />
-                  ) : (
-                    <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 32 }} />
-                  )}
-                </div>
               </div>
               <div className="my-announcement-info">
                 <div className="my-announcement-header">
@@ -374,6 +356,64 @@ export default function AnnouncementsByCategory() {
                   </div>
                 </div>
                 {/* Fără butoane de acțiune */}
+              </div>
+              {/* Iconiță inimă pentru favorite - mutată în colțul din dreapta jos al cardului */}
+              <div
+                className="favorite-heart"
+                style={{
+                  position: 'absolute',
+                  right: 16,
+                  bottom: 16,
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  zIndex: 2
+                }}
+                onClick={ev => {
+                  ev.stopPropagation();
+                  
+                  // Actualizează localStorage cu noul format
+                  const stored = localStorage.getItem(FAVORITES_KEY);
+                  let favoriteObjects = [];
+                  
+                  try {
+                    const parsed = JSON.parse(stored || '[]');
+                    if (parsed.length > 0 && typeof parsed[0] === 'string') {
+                      // Convertește din formatul vechi
+                      favoriteObjects = parsed.map(id => ({ id, addedAt: Date.now() }));
+                    } else {
+                      favoriteObjects = parsed;
+                    }
+                  } catch {
+                    favoriteObjects = [];
+                  }
+                  
+                  const exists = favoriteObjects.find(item => item.id === a._id);
+                  let updatedObjects;
+                  
+                  if (exists) {
+                    updatedObjects = favoriteObjects.filter(item => item.id !== a._id);
+                  } else {
+                    updatedObjects = [...favoriteObjects, { id: a._id, addedAt: Date.now() }];
+                  }
+                  
+                  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
+                  
+                  setFavoriteIds((prev) => {
+                    if (prev.includes(a._id)) {
+                      return prev.filter((id) => id !== a._id);
+                    } else {
+                      return [...prev, a._id];
+                    }
+                  });
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                {favoriteIds.includes(a._id) ? (
+                  <FavoriteIcon sx={{ color: 'red', fontSize: 28 }} />
+                ) : (
+                  <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 28 }} />
+                )}
               </div>
             </div>
           ))}

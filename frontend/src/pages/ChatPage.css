@@ -1090,6 +1090,12 @@
   transform: scale(1.1);
 }
 
+.message-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .message-action-btn.delete:hover {
   background: #fef2f2;
   color: #dc2626;
@@ -1126,6 +1132,52 @@
 .dark-mode .message-action-btn.delete:hover {
   background: #7f1d1d;
   color: #fca5a5;
+}
+
+/* Tooltip mic pentru confirmarea copierii */
+/* Tooltip "Copiat!" poziționat deasupra butonului de copiere */
+.message-action-btn.copy {
+  position: relative;
+}
+
+.message-action-btn.copy .message-copied {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #10b981; /* verde confirmare */
+  border: 1px solid #d1fae5;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  z-index: 20;
+}
+
+.message-action-btn.copy .message-copied::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #ffffff;
+}
+
+.dark-mode .message-action-btn.copy .message-copied {
+  background: #1f2937;
+  color: #34d399;
+  border-color: #065f46;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.dark-mode .message-action-btn.copy .message-copied::after {
+  border-top-color: #1f2937;
 }
 
 /* Separator de dată */

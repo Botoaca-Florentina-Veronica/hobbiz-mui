@@ -170,188 +170,135 @@ export default function MyAnnouncements() {
         
         {/* Header de căutare și filtrare */}
         {announcements.length > 0 && (
-          <Card elevation={2} sx={{ mb: 3, borderRadius: 3, overflow: 'visible' }}>
-            <CardContent sx={{ p: 1.5 }}>
-              {/* Căutare și controale într-o singură linie */}
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 1.5 }}>
-                {/* Căutare */}
-                <TextField
-                  placeholder="Caută după titlu, ID sau locație"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon sx={{ color: '#355070', fontSize: 20 }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="outlined"
-                  size="small"
-                  sx={{ 
-                    flex: 2,
-                    minWidth: 280,
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#f8f9fa',
-                      '&:hover': { backgroundColor: '#fff' },
-                      '&.Mui-focused': { backgroundColor: '#fff' }
-                    }
-                  }}
-                />
-                
-                {/* Filtru categorie */}
-                <FormControl size="small" sx={{ minWidth: 160, flex: 1 }}>
-                  <InputLabel>Categorie</InputLabel>
-                  <Select
-                    value={categoryFilter}
-                    label="Categorie"
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    sx={{ 
-                      borderRadius: 2,
-                      backgroundColor: '#f8f9fa',
-                      '&:hover': { backgroundColor: '#fff' },
-                    }}
-                  >
-                    <MenuItem value="Orice categorie">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CategoryIcon sx={{ fontSize: 16, color: '#666' }} />
-                        Toate
-                      </Box>
-                    </MenuItem>
-                    {uniqueCategories.map(category => (
-                      <MenuItem key={category} value={category}>
+          <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+            <Stack spacing={2}>
+              {/* Search Bar - styled like categories page */}
+              <TextField
+                fullWidth
+                placeholder="Caută după titlu, ID sau locație..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="outlined"
+                size="medium"
+              />
+              
+              {/* Filter and View Controls */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  {/* Filtru categorie */}
+                  <FormControl size="small" sx={{ minWidth: 160 }}>
+                    <InputLabel>Categorie</InputLabel>
+                    <Select
+                      value={categoryFilter}
+                      label="Categorie"
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                    >
+                      <MenuItem value="Orice categorie">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
-                          {category.length > 20 ? `${category.substring(0, 20)}...` : category}
+                          <CategoryIcon sx={{ fontSize: 16, color: '#666' }} />
+                          Toate
                         </Box>
                       </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                      {uniqueCategories.map(category => (
+                        <MenuItem key={category} value={category}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
+                            {category.length > 20 ? `${category.substring(0, 20)}...` : category}
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  
+                  {/* Filtru sortare */}
+                  <FormControl size="small" sx={{ minWidth: 180 }}>
+                    <InputLabel>Sortare</InputLabel>
+                    <Select
+                      value={dateFilter}
+                      label="Sortare"
+                      onChange={(e) => setDateFilter(e.target.value)}
+                    >
+                      <MenuItem value="cea mai recenta">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ScheduleIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          Cele mai recente
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value="cea mai veche">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ScheduleIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          Cele mai vechi
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value="titlu_a_z">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          Titlu A-Z
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value="titlu_z_a">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          Titlu Z-A
+                        </Box>
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
                 
-                {/* Filtru sortare */}
-                <FormControl size="small" sx={{ minWidth: 180, flex: 1 }}>
-                  <InputLabel>Sortare</InputLabel>
-                  <Select
-                    value={dateFilter}
-                    label="Sortare"
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    sx={{ 
-                      borderRadius: 2,
-                      backgroundColor: '#f8f9fa',
-                      '&:hover': { backgroundColor: '#fff' },
-                    }}
-                  >
-                    <MenuItem value="cea mai recenta">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ScheduleIcon sx={{ fontSize: 16, color: '#355070' }} />
-                        Data publicării: cea mai recentă
-                      </Box>
-                    </MenuItem>
-                    <MenuItem value="cea mai veche">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ScheduleIcon sx={{ fontSize: 16, color: '#666' }} />
-                        Data publicării: cea mai veche
-                      </Box>
-                    </MenuItem>
-                    <MenuItem value="titlu_a_z">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ScheduleIcon sx={{ fontSize: 16, color: '#355070' }} />
-                        Titlu: A-Z
-                      </Box>
-                    </MenuItem>
-                    <MenuItem value="titlu_z_a">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ScheduleIcon sx={{ fontSize: 16, color: '#666' }} />
-                        Titlu: Z-A
-                      </Box>
-                    </MenuItem>
-                  </Select>
-                </FormControl>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {filteredAndSortedAnnouncements.length} rezultate
+                  </Typography>
+                </Box>
               </Box>
               
-              {/* Numărul de anunțuri și sortarea pe aceeași linie */}
-              <Box sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Chip 
-                  label={`${filteredAndSortedAnnouncements.length} ${filteredAndSortedAnnouncements.length === 1 ? 'anunț găsit' : 'anunțuri găsite'}`}
-                  size="medium"
-                  color="primary"
-                  variant="outlined"
-                  sx={{ 
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    height: 32
-                  }}
-                />
-                {/* Butonul de sortare în dreapta */}
-                {dateFilter !== 'cea mai recenta' && (
-                  <Chip
-                    label={
-                      dateFilter === 'cea mai veche' ? 'Sortare: Vechi' :
-                      dateFilter === 'titlu_a_z' ? 'Sortare: A-Z' :
-                      dateFilter === 'titlu_z_a' ? 'Sortare: Z-A' : 'Sortare'
-                    }
-                    onDelete={() => setDateFilter('cea mai recenta')}
-                    size="medium"
-                    color="default"
-                    variant="outlined"
-                    sx={{ fontSize: '0.8rem', height: 32 }}
-                  />
-                )}
-              </Box>
-              
-              {/* Filtre active - doar căutare și categorie */}
+              {/* Filtre active */}
               {(searchTerm || categoryFilter !== 'Orice categorie') && (
-                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {searchTerm && (
                     <Chip
-                      label={`"${searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"`}
+                      label={`Căutare: "${searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"`}
                       onDelete={() => setSearchTerm('')}
                       size="small"
-                      color="primary"
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem', height: 28 }}
                     />
                   )}
                   {categoryFilter !== 'Orice categorie' && (
                     <Chip
-                      label={categoryFilter.length > 15 ? categoryFilter.substring(0, 15) + '...' : categoryFilter}
+                      label={`Categorie: ${categoryFilter.length > 15 ? categoryFilter.substring(0, 15) + '...' : categoryFilter}`}
                       onDelete={() => setCategoryFilter('Orice categorie')}
                       size="small"
-                      color="secondary"
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem', height: 28 }}
                     />
                   )}
-                </Stack>
+                </Box>
               )}
-            </CardContent>
-          </Card>
+            </Stack>
+          </Paper>
         )}
-        
-        <ConfirmDialog
-          open={confirmOpen}
-          onClose={() => setConfirmOpen(false)}
-          onConfirm={handleConfirmDelete}
-        />
-        {filteredAndSortedAnnouncements.length === 0 ? (
-          <Card elevation={1} sx={{ p: 4, textAlign: 'center', borderRadius: 3 }}>
-            <Typography variant="h6" sx={{ color: '#666', mb: 2 }}>
-              {announcements.length === 0 
-                ? "🎯 Nu ai publicat niciun anunț încă" 
-                : "🔍 Nu s-au găsit anunțuri care să corespundă filtrelor"}
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <CircularProgress />
+          </div>
+        ) : filteredAndSortedAnnouncements.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <Typography variant="h6" color="text.secondary">
+              {searchTerm || categoryFilter !== 'Orice categorie' 
+                ? 'Nu au fost găsite anunțuri cu criteriile selectate'
+                : 'Nu ai încă niciun anunț publicat'}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#888' }}>
-              {announcements.length === 0 
-                ? "Începe să-ți publici primul anunț pentru a-ți prezenta serviciile!" 
-                : "Încearcă să modifici criteriile de căutare sau să resetezi filtrele."}
-            </Typography>
-          </Card>
+          </div>
         ) : (
           <div className="my-announcements-list">
             {filteredAndSortedAnnouncements.map((a) => {
-              const images = a.images || [];
+              const images = Array.isArray(a.images) ? a.images : [];
               const getImageSrc = (img) =>
                 img.startsWith('http') || img.startsWith('/uploads')
                   ? img

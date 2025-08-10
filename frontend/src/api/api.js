@@ -1,5 +1,7 @@
 // Chat messages
 export const sendMessage = (data) => apiClient.post('/api/messages', data);
+export const sendMessageMultipart = (formData) =>
+  apiClient.post('/api/messages', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 // Align with backend: GET /api/messages/conversation/:conversationId
 export const getMessages = (conversationId) => apiClient.get(`/api/messages/conversation/${conversationId}`);
 export const deleteMessage = (id) => apiClient.delete(`/api/messages/${id}`);

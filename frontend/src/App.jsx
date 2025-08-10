@@ -26,6 +26,7 @@ import AnnouncementDetails from './pages/AnnouncementDetails';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import About from './pages/About';
 import HowItWorks from './pages/HowItWorks';
+import CookiePolicy from './pages/CookiePolicy';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import './App.css';
 import './mediaQueries.css';
@@ -101,6 +102,12 @@ function App() {
             <PrivacyPolicy />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
+          </>
+        } />
+        <Route path="/cookie" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <CookiePolicy />
           </>
         } />
         <Route path="/*" element={
