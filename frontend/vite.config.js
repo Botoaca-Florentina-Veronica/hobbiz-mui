@@ -19,9 +19,8 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           assetFileNames: 'assets/[name].[hash].[ext]'
-        },
-        external: ['jwt-decode']
+        }
       }
-  }
+    }
   };
 });

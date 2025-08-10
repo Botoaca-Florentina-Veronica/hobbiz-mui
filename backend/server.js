@@ -90,6 +90,16 @@ app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
 });
 
+// Health check endpoint pentru Render
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // DB healthcheck endpoint
 app.get('/health/db', (req, res) => {
   try {
