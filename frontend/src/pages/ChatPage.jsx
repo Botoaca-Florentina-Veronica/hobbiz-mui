@@ -361,11 +361,25 @@ export default function ChatPage() {
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      // Elimină mesajul din lista locală
+      // Șterge mesajul din baza de date
+      const response = await fetch(`/api/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Eroare la ștergerea mesajului din baza de date');
+      }
+
+      // Elimină mesajul din lista locală doar dacă ștergerea din BD a fost cu succes
       setMessages(prev => prev.filter(msg => msg._id !== messageId));
-      console.log('Mesaj șters:', messageId);
+      console.log('Mesaj șters cu succes:', messageId);
     } catch (error) {
       console.error('Eroare la ștergerea mesajului:', error);
+      // Poți adăuga aici o notificare pentru utilizator
     }
   };
 
