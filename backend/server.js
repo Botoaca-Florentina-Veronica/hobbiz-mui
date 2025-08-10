@@ -1,9 +1,18 @@
 // backend/server.js
 require('dotenv').config();
+
+// Error handling pentru uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('💥 UNCAUGHT EXCEPTION! Shutting down...');
+  console.error(err.name, err.message);
+  process.exit(1);
+});
+
 console.log('🔍 DEBUG ENV VARS:');
-console.log('JWT_SECRET:', process.env.JWT_SECRET);
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? '***SET***' : 'NOT SET');
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? '***SET***' : 'NOT SET');
 console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT || 5000);
 
 const express = require('express');
 const cors = require('cors');
@@ -144,14 +153,33 @@ app.post('/login', async (req, res) => {
 
 // Pornire server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🔥 Server pe http://localhost:${PORT}`);
+});
+
+// Error handling pentru server
+server.on('error', (err) => {
+  console.error('💥 Server Error:', err);
+  process.exit(1);
 });
 
 // Gestionare închidere grațioasă (opțional)
 const mongoose = require('mongoose');
 process.on('SIGINT', async () => {
+  console.log('🔄 Shutting down gracefully...');
   await mongoose.connection.close();
   console.log('⏹️ Conexiune MongoDB închisă grațios');
-  process.exit(0);
+  server.close(() => {
+    console.log('⏹️ Server closed');
+    process.exit(0);
+  });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('💥 UNHANDLED REJECTION! Shutting down...');
+  console.error(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });

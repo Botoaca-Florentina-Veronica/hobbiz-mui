@@ -4,23 +4,26 @@ services:
     name: hobbiz-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    rootDir: ./backend
+    buildCommand: npm install
+    startCommand: npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: MONGODB_URI
-        fromDatabase:
-          name: hobbiz-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: FRONTEND_URL
         sync: false
 
   # Frontend (static site)
@@ -28,13 +31,10 @@ services:
     name: hobbiz-frontend
     env: static
     plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
+    rootDir: ./frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-
-databases:
-  - name: hobbiz-db
-    plan: free
