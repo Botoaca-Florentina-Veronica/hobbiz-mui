@@ -222,6 +222,12 @@
   white-space: nowrap;
 }
 
+/* Preview bold pentru conversațiile necitite */
+.chat-conversation-item:not(.read) .chat-conversation-message {
+  font-weight: 700;
+  color: #1f2937; /* puțin mai închis pentru contrast */
+}
+
 .chat-conversation-time {
   color: #9ca3af;
   font-size: 12px;

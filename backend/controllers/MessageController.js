@@ -9,20 +9,33 @@ const deleteMessage = async (req, res) => {
     const { id } = req.params;
     const authenticatedUserId = req.userId;
     
+    console.log('🗑️ DELETE /api/messages/:id - deleteMessage');
+    console.log('   • ID mesaj:', id);
+    console.log('   • UserId autentificat:', authenticatedUserId);
+    
     // Găsim mesajul pentru a verifica proprietatea
     const message = await Message.findById(id);
     if (!message) {
+      console.log('❌ Mesaj nu a fost găsit cu ID:', id);
       return res.status(404).json({ error: 'Mesajul nu a fost găsit.' });
     }
     
+    console.log('   • Mesaj găsit - senderId:', message.senderId);
+    console.log('   • Tip senderId:', typeof message.senderId);
+    console.log('   • Tip authenticatedUserId:', typeof authenticatedUserId);
+    console.log('   • Sunt egale?:', message.senderId === authenticatedUserId);
+    
     // Verificăm că utilizatorul poate șterge mesajul (doar propriile mesaje)
     if (message.senderId !== authenticatedUserId) {
+      console.log('❌ Utilizatorul nu poate șterge mesajul altui utilizator');
       return res.status(403).json({ error: 'Nu poți șterge mesajele altui utilizator.' });
     }
     
     await Message.findByIdAndDelete(id);
+    console.log('✅ Mesaj șters cu succes:', id);
     res.json({ success: true });
   } catch (err) {
+    console.error('❌ Eroare la ștergerea mesajului:', err);
     res.status(500).json({ error: 'Eroare la ștergerea mesajului.' });
   }
 };
@@ -160,7 +173,7 @@ const getConversations = async (req, res) => {
     
     console.log(`Găsite ${messages.length} mesaje pentru utilizatorul ${userId}`);
     
-    // Grupăm mesajele pe utilizatori
+  // Grupăm mesajele pe utilizatori
     const userConversationMap = new Map();
     
     for (const message of messages) {
@@ -181,6 +194,13 @@ const getConversations = async (req, res) => {
         continue;
       }
       
+      // Determinăm dacă acest mesaj contribuie la starea "necitit"
+      const contributesUnread = (
+        message.senderId === otherParticipantId && // mesaj venit de la celălalt
+        message.destinatarId === userId &&         // către utilizatorul curent
+        message.isRead === false                   // încă necitit
+      );
+
       // Dacă nu avem deja acest utilizator în map, îl adăugăm
       if (!userConversationMap.has(otherParticipantId)) {
         try {
@@ -201,7 +221,8 @@ const getConversations = async (req, res) => {
                 senderId: message.senderId,
                 createdAt: message.createdAt
               },
-              unread: false // Aici poți implementa logica pentru mesaje necitite
+              // Marcat necitit dacă există cel puțin un mesaj necitit de la celălalt participant
+              unread: !!contributesUnread
             });
           }
         } catch (error) {
@@ -217,6 +238,10 @@ const getConversations = async (req, res) => {
             createdAt: message.createdAt
           };
           existingConversation.conversationId = message.conversationId;
+        }
+        // O conversatie rămâne necitită dacă ORICE mesaj necitit de la celălalt participant există
+        if (contributesUnread) {
+          existingConversation.unread = true;
         }
       }
     }

@@ -163,12 +163,16 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const handleDeleteMessage = async (msgId) => {
     if (!msgId) return;
     
+    console.log('🗑️ Încercăm să ștergem mesajul cu ID:', msgId);
+    
     try {
-      await deleteMessage(msgId);
+      const response = await deleteMessage(msgId);
+      console.log('✅ Răspuns de la API:', response);
       setMessages(prev => prev.filter(m => m._id !== msgId));
       console.log('✅ Mesaj șters cu succes:', msgId);
     } catch (error) {
       console.error('❌ Eroare la ștergerea mesajului:', error);
+      console.error('❌ Detalii eroare:', error.response?.data);
       // Nu mai afișăm popup - doar logăm eroarea
     }
   };

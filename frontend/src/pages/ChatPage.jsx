@@ -360,26 +360,21 @@ export default function ChatPage() {
   };
 
   const handleDeleteMessage = async (messageId) => {
+    console.log('🗑️ ChatPage: Încercăm să ștergem mesajul cu ID:', messageId);
     try {
-      // Șterge mesajul din baza de date
-      const response = await fetch(`/api/messages/${messageId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Eroare la ștergerea mesajului din baza de date');
-      }
+      // Folosim apiClient care atașează automat token-ul JWT în Authorization
+      const { status, data } = await apiClient.delete(`/api/messages/${messageId}`);
+      console.log('📡 Răspuns HTTP status:', status);
+      console.log('✅ Rezultat backend:', data);
 
       // Elimină mesajul din lista locală doar dacă ștergerea din BD a fost cu succes
       setMessages(prev => prev.filter(msg => msg._id !== messageId));
-      console.log('Mesaj șters cu succes:', messageId);
+      console.log('✅ ChatPage: Mesaj șters cu succes:', messageId);
     } catch (error) {
-      console.error('Eroare la ștergerea mesajului:', error);
-      // Poți adăuga aici o notificare pentru utilizator
+      // Log detaliat
+      console.error('❌ ChatPage: Eroare la ștergerea mesajului:', error);
+      console.error('❌ Detalii backend:', error.response?.data);
+      // TODO: opțional - afișează un toast/alert pentru utilizator
     }
   };
 
@@ -444,7 +439,22 @@ export default function ChatPage() {
                   <div 
                     key={conversation.id}
                     className={`chat-conversation-item ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedConversation(conversation)}
+                    onClick={async () => {
+                      // Selectează conversația
+                      setSelectedConversation(conversation);
+                      // Marcăm local conversația ca citită ca să o mutăm din secțiunea NECITITE imediat în UI
+                      setConversations(prev => prev.map(c =>
+                        c.otherParticipant.id === conversation.otherParticipant.id
+                          ? { ...c, unread: false }
+                          : c
+                      ));
+                      // Backend: marchează mesajele ca citite (deja se face și în useEffect, dar dăm un semnal imediat)
+                      try {
+                        await apiClient.put(`/api/messages/mark-read/${userId}/${conversation.otherParticipant.id}`);
+                      } catch (e) {
+                        // Non-blocking
+                      }
+                    }}
                   >
                     <img 
                       className="chat-avatar" 
