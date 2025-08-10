@@ -1347,31 +1347,33 @@
 /* Reacții fixate pe bulă */
 .message-reactions-bubble {
   position: absolute;
-  bottom: -14px;
-  left: 8px;
+  bottom: -12px;
+  right: 8px;
   display: inline-flex;
-  gap: 6px;
+  gap: 2px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 2px 6px;
+  border-radius: 8px;
+  padding: 1px 3px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  min-width: unset;
+  max-width: 80px;
 }
 .chat-message.own .message-reactions-bubble {
-  right: 8px;
-  left: auto;
+  left: 8px; /* pentru mesajele proprii: colțul din stânga jos */
+  right: auto;
 }
 .reaction-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   border: none;
   background: transparent;
   cursor: pointer;
   color: #374151;
 }
 .reaction-item .emoji { font-size: 14px; }
-.reaction-item .count { font-size: 12px; font-weight: 600; }
+.reaction-item .count { font-size: 12px; font-weight: 600; margin-left: 2px; }
 .reaction-item.mine { color: #1d4ed8; }
 
 .dark-mode .message-reactions-bubble { background: #1f2937; border-color: #374151; }

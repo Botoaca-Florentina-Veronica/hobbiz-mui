@@ -101,30 +101,41 @@ export default function ChatPage() {
         console.log(`Primite ${conversationsData.length} conversații din backend`);
         
         // Formatează datele pentru UI
-        const formattedConversations = conversationsData.map(conv => ({
-          id: conv.otherParticipant.id,
-          conversationId: conv.conversationId,
-          name: `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`,
-          lastMessage: conv.lastMessage.text,
-          time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
-            hour: '2-digit',
-            minute: '2-digit'
-          }),
-          avatar: conv.otherParticipant.avatar || 
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.otherParticipant.firstName[0] + conv.otherParticipant.lastName[0])}&background=355070&color=fff`,
-          unread: conv.unread,
-          otherParticipant: conv.otherParticipant,
-          lastSeen: conv.otherParticipant.lastSeen
-        }));
-        
-        // Eliminăm duplicatele pe baza ID-ului participantului (extra verificare)
-        const uniqueConversations = formattedConversations.filter((conv, index, arr) => 
-          arr.findIndex(c => c.otherParticipant.id === conv.otherParticipant.id) === index
-        );
-        
-        console.log(`Conversații originale: ${formattedConversations.length}, unice: ${uniqueConversations.length}`);
-        
-        setConversations(uniqueConversations);
+          const formattedConversations = conversationsData.map(conv => ({
+            id: conv.otherParticipant.id,
+            conversationId: conv.conversationId,
+            name: `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`,
+            lastMessage: conv.lastMessage.text,
+            time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            avatar: conv.announcementImage || conv.otherParticipant.avatar || 
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.otherParticipant.firstName[0] + conv.otherParticipant.lastName[0])}&background=355070&color=fff`,
+            unread: conv.unread,
+            otherParticipant: conv.otherParticipant,
+            lastSeen: conv.otherParticipant.lastSeen,
+            announcementOwnerId: conv.announcementOwnerId // nou, pentru split
+          }));
+
+          // Split conversations by role
+          const sellingConversations = formattedConversations.filter(conv => conv.announcementOwnerId === userId);
+          const buyingConversations = formattedConversations.filter(conv => conv.announcementOwnerId !== userId);
+
+          // Eliminăm duplicatele pe baza ID-ului participantului (extra verificare)
+          const uniqueSelling = sellingConversations.filter((conv, index, arr) => 
+            arr.findIndex(c => c.otherParticipant.id === conv.otherParticipant.id) === index
+          );
+          const uniqueBuying = buyingConversations.filter((conv, index, arr) => 
+            arr.findIndex(c => c.otherParticipant.id === conv.otherParticipant.id) === index
+          );
+
+          // Set conversations by tab
+          if (activeTab === 'selling') {
+            setConversations(uniqueSelling);
+          } else {
+            setConversations(uniqueBuying);
+          }
       } catch (error) {
         if (error?.response?.status === 401) {
           setConversations([]);
@@ -638,87 +649,89 @@ export default function ChatPage() {
 
                         <div 
                           className={`chat-message ${message.senderId === userId ? 'own' : ''}`}
-                          onMouseEnter={() => setHoveredMessageId(message._id)}
-                          onMouseLeave={() => setHoveredMessageId(null)}
                         >
-                          {/* Bara de acțiuni - mesajele proprii */}
-                          {message.senderId === userId && hoveredMessageId === message._id && (
-                            <div className="message-actions-bar">
-                              <button 
-                                className="message-action-btn"
-                                onClick={() => handleReplyMessage(message)}
-                                title="Răspunde"
-                              >
-                                <ReplyIcon fontSize="small" />
-                              </button>
-                              
-                              <button 
-                                className="message-action-btn"
-                                onClick={() => setReactionTargetId(prev => prev === message._id ? null : message._id)}
-                                title="Reacționează"
-                              >
-                                <SentimentSatisfiedAltIcon fontSize="small" />
-                              </button>
-                              
-                              <button 
-                                className="message-action-btn copy"
-                                onClick={() => handleCopyMessage(message._id, message.text)}
-                                disabled={!message.text}
-                                title="Copiază"
-                              >
-                                <ContentCopyIcon fontSize="small" />
-                                {copiedMessageId === message._id && (
-                                  <span className="message-copied">Copiat!</span>
-                                )}
-                              </button>
-                              
-                              <button 
-                                className="message-action-btn delete"
-                                onClick={() => handleDeleteMessage(message._id)}
-                                title="Șterge"
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </button>
-                            </div>
-                          )}
-
-                          {/* Bara de acțiuni - mesajele primite (fără Șterge) */}
-                          {message.senderId !== userId && hoveredMessageId === message._id && (
-                            <div className="message-actions-bar">
-                              <button 
-                                className="message-action-btn"
-                                onClick={() => handleReplyMessage(message)}
-                                title="Răspunde"
-                              >
-                                <ReplyIcon fontSize="small" />
-                              </button>
-                              
-                              <button 
-                                className="message-action-btn"
-                                onClick={() => setReactionTargetId(prev => prev === message._id ? null : message._id)}
-                                title="Reacționează"
-                              >
-                                <SentimentSatisfiedAltIcon fontSize="small" />
-                              </button>
-                              
-                              <button 
-                                className="message-action-btn copy"
-                                onClick={() => handleCopyMessage(message._id, message.text)}
-                                disabled={!message.text}
-                                title="Copiază"
-                              >
-                                <ContentCopyIcon fontSize="small" />
-                                {copiedMessageId === message._id && (
-                                  <span className="message-copied">Copiat!</span>
-                                )}
-                              </button>
-                            </div>
-                          )}
+                          {/* ...existing code... */}
 
                           {/* Avatar eliminat la cerere */}
                           <div className="chat-message-content-group">
                             <div className="chat-bubble-row">
-                              <div className="chat-message-bubble">
+                              <div 
+                                className="chat-message-bubble"
+                                onMouseEnter={() => setHoveredMessageId(message._id)}
+                                onMouseLeave={() => setHoveredMessageId(null)}
+                              >
+                                {/* Bara de acțiuni - mesajele proprii */}
+                                {message.senderId === userId && hoveredMessageId === message._id && (
+                                  <div className="message-actions-bar">
+                                    <button 
+                                      className="message-action-btn"
+                                      onClick={() => handleReplyMessage(message)}
+                                      title="Răspunde"
+                                    >
+                                      <ReplyIcon fontSize="small" />
+                                    </button>
+                                    
+                                    <button 
+                                      className="message-action-btn"
+                                      onClick={() => setReactionTargetId(prev => prev === message._id ? null : message._id)}
+                                      title="Reacționează"
+                                    >
+                                      <SentimentSatisfiedAltIcon fontSize="small" />
+                                    </button>
+                                    
+                                    <button 
+                                      className="message-action-btn copy"
+                                      onClick={() => handleCopyMessage(message._id, message.text)}
+                                      disabled={!message.text}
+                                      title="Copiază"
+                                    >
+                                      <ContentCopyIcon fontSize="small" />
+                                      {copiedMessageId === message._id && (
+                                        <span className="message-copied">Copiat!</span>
+                                      )}
+                                    </button>
+                                    
+                                    <button 
+                                      className="message-action-btn delete"
+                                      onClick={() => handleDeleteMessage(message._id)}
+                                      title="Șterge"
+                                    >
+                                      <DeleteIcon fontSize="small" />
+                                    </button>
+                                  </div>
+                                )}
+                                {/* Bara de acțiuni - mesajele primite (fără Șterge) */}
+                                {message.senderId !== userId && hoveredMessageId === message._id && (
+                                  <div className="message-actions-bar">
+                                    <button 
+                                      className="message-action-btn"
+                                      onClick={() => handleReplyMessage(message)}
+                                      title="Răspunde"
+                                    >
+                                      <ReplyIcon fontSize="small" />
+                                    </button>
+                                    
+                                    <button 
+                                      className="message-action-btn"
+                                      onClick={() => setReactionTargetId(prev => prev === message._id ? null : message._id)}
+                                      title="Reacționează"
+                                    >
+                                      <SentimentSatisfiedAltIcon fontSize="small" />
+                                    </button>
+                                    
+                                    <button 
+                                      className="message-action-btn copy"
+                                      onClick={() => handleCopyMessage(message._id, message.text)}
+                                      disabled={!message.text}
+                                      title="Copiază"
+                                    >
+                                      <ContentCopyIcon fontSize="small" />
+                                      {copiedMessageId === message._id && (
+                                        <span className="message-copied">Copiat!</span>
+                                      )}
+                                    </button>
+                                  </div>
+                                )}
                                 {/* Secțiune reply pentru mesaj */}
                                 {message.replyTo && (
                                   <div className={`chat-reply-preview ${message.senderId === userId ? 'own' : ''}`}>
@@ -762,35 +775,35 @@ export default function ChatPage() {
                                     </svg>
                                   </span>
                                 )}
+                                {/* Reacții fixate pe bulă (colț interior) */}
+                                {Array.isArray(message.reactions) && message.reactions.length > 0 && (
+                                  <div className={`message-reactions-bubble ${message.senderId === userId ? 'own' : ''}`}>
+                                    {Object.entries(
+                                      message.reactions.reduce((acc, r) => {
+                                        acc[r.emoji] = (acc[r.emoji] || 0) + 1;
+                                        return acc;
+                                      }, {})
+                                    ).map(([emoji, count]) => {
+                                      const mine = message.reactions.some(r => r.userId === userId && r.emoji === emoji);
+                                      return (
+                                        <button
+                                          key={emoji}
+                                          type="button"
+                                          className={`reaction-item ${mine ? 'mine' : ''}`}
+                                          onClick={() => handleReactToMessage(message._id, emoji)}
+                                          title={mine ? 'Elimină reacția' : 'Reacționează'}
+                                        >
+                                          <span className="emoji">{emoji}</span>
+                                          {count > 1 && (<span className="count">{count}</span>)}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                )}
                               </div>
                             </div>
                             <div className="chat-message-time">{formatTime(message.createdAt)}</div>
                           </div>
-                          {/* Reacții fixate pe bulă (colț) */}
-                          {Array.isArray(message.reactions) && message.reactions.length > 0 && (
-                            <div className={`message-reactions-bubble ${message.senderId === userId ? 'own' : ''}`}>
-                              {Object.entries(
-                                message.reactions.reduce((acc, r) => {
-                                  acc[r.emoji] = (acc[r.emoji] || 0) + 1;
-                                  return acc;
-                                }, {})
-                              ).map(([emoji, count]) => {
-                                const mine = message.reactions.some(r => r.userId === userId && r.emoji === emoji);
-                                return (
-                                  <button
-                                    key={emoji}
-                                    type="button"
-                                    className={`reaction-item ${mine ? 'mine' : ''}`}
-                                    onClick={() => handleReactToMessage(message._id, emoji)}
-                                    title={mine ? 'Elimină reacția' : 'Reacționează'}
-                                  >
-                                    <span className="emoji">{emoji}</span>
-                                    <span className="count">{count}</span>
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          )}
                           
                           
                           

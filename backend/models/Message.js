@@ -9,6 +9,7 @@ const MessageSchema = new mongoose.Schema({
   image: { type: String, required: false }, // URL sau base64 pentru imagine
   imageFile: { type: String, required: false }, // Numele fișierului original
   // Informații opționale pentru răspuns (reply)
+    announcementId: { type: String, required: false }, // Referință la anunțul asociat conversației (opțional)
   replyTo: {
     messageId: { type: String, required: false },
     senderId: { type: String, required: false },

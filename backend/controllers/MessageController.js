@@ -272,6 +272,23 @@ const getConversations = async (req, res) => {
         try {
           const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar lastSeen');
           
+          let announcementImage = null;
+          let announcementId = message.announcementId;
+          let announcementOwnerId = null;
+          if (announcementId) {
+            try {
+              const Announcement = require('../models/Announcement');
+              const ann = await Announcement.findById(announcementId).select('images user');
+              if (ann) {
+                if (Array.isArray(ann.images) && ann.images.length > 0) {
+                  announcementImage = ann.images[0];
+                }
+                if (ann.user) {
+                  announcementOwnerId = String(ann.user);
+                }
+              }
+            } catch (e) {}
+          }
           if (otherUser) {
             userConversationMap.set(otherParticipantId, {
               conversationId: message.conversationId,
@@ -287,7 +304,9 @@ const getConversations = async (req, res) => {
                 senderId: message.senderId,
                 createdAt: message.createdAt
               },
-              // Marcat necitit dacă există cel puțin un mesaj necitit de la celălalt participant
+              announcementId,
+              announcementImage,
+              announcementOwnerId,
               unread: !!contributesUnread
             });
           }
