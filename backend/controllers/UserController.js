@@ -373,6 +373,6 @@ module.exports = {
   getMyAnnouncements,
   deleteAnnouncement,
   updateAnnouncement,
-  updateProfile
+  updateProfile,
   uploadAvatar
 };
