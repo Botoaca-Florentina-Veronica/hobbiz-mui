@@ -110,8 +110,7 @@ export default function ChatPage() {
               hour: '2-digit',
               minute: '2-digit'
             }),
-            avatar: conv.announcementImage || conv.otherParticipant.avatar || 
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.otherParticipant.firstName[0] + conv.otherParticipant.lastName[0])}&background=355070&color=fff`,
+            avatar: conv.announcementImage || '',
             unread: conv.unread,
             otherParticipant: conv.otherParticipant,
             lastSeen: conv.otherParticipant.lastSeen,
@@ -122,19 +121,11 @@ export default function ChatPage() {
           const sellingConversations = formattedConversations.filter(conv => conv.announcementOwnerId === userId);
           const buyingConversations = formattedConversations.filter(conv => conv.announcementOwnerId !== userId);
 
-          // Eliminăm duplicatele pe baza ID-ului participantului (extra verificare)
-          const uniqueSelling = sellingConversations.filter((conv, index, arr) => 
-            arr.findIndex(c => c.otherParticipant.id === conv.otherParticipant.id) === index
-          );
-          const uniqueBuying = buyingConversations.filter((conv, index, arr) => 
-            arr.findIndex(c => c.otherParticipant.id === conv.otherParticipant.id) === index
-          );
-
-          // Set conversations by tab
+          // Nu mai eliminăm duplicatele pe baza ID-ului participantului, păstrăm fiecare conversație per anunț
           if (activeTab === 'selling') {
-            setConversations(uniqueSelling);
+            setConversations(sellingConversations);
           } else {
-            setConversations(uniqueBuying);
+            setConversations(buyingConversations);
           }
       } catch (error) {
         if (error?.response?.status === 401) {
