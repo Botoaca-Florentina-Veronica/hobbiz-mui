@@ -110,7 +110,11 @@ export default function ChatPage() {
               hour: '2-digit',
               minute: '2-digit'
             }),
-            avatar: conv.announcementImage || '',
+            avatar: conv.announcementImage
+              ? (conv.announcementImage.startsWith('http') || conv.announcementImage.startsWith('/uploads')
+                  ? conv.announcementImage
+                  : `/uploads/${conv.announcementImage.replace(/^.*[\\/]/, '')}`)
+              : '',
             unread: conv.unread,
             otherParticipant: conv.otherParticipant,
             lastSeen: conv.otherParticipant.lastSeen,
