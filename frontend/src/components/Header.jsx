@@ -19,7 +19,7 @@ export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [googleAvatar, setGoogleAvatar] = useState(null); // Nou: avatar Google
+  const [avatar, setAvatar] = useState(null); // Avatar personal sau Google
   const [unreadCount, setUnreadCount] = useState(0); // Nou: numărul de notificări necitite
 
   // Funcție pentru a obține numărul de notificări necitite
@@ -73,10 +73,12 @@ export default function Header() {
       try {
         const response = await apiClient.get('/api/users/auth/check');
         setIsAuthenticated(response.data.isAuthenticated);
-        if (response.data.googleAvatar) {
-          setGoogleAvatar(response.data.googleAvatar);
+        if (response.data.avatar) {
+          setAvatar(response.data.avatar);
+        } else if (response.data.googleAvatar) {
+          setAvatar(response.data.googleAvatar);
         } else {
-          setGoogleAvatar(null);
+          setAvatar(null);
         }
         
         // Dacă utilizatorul este autentificat, obține numărul de notificări necitite
@@ -216,8 +218,8 @@ export default function Header() {
                   className="for-dropdown" 
                   onClick={handleAccountClick}
                 >
-                  {googleAvatar ? (
-                    <img src={googleAvatar} alt="Google Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }} />
+                  {avatar ? (
+                    <img src={avatar} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }} />
                   ) : (
                     <HiOutlineUser size={24} />
                   )}

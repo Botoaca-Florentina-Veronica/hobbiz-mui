@@ -1,3 +1,14 @@
+.announcements-by-category .favorite-announcements-list.list-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: stretch;
+}
+.announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 /* Stiluri compacte pentru paginile de categorii */
 .announcements-by-category .favorite-announcements-list {
   padding: 0; /* Remove any padding that could cause misalignment */

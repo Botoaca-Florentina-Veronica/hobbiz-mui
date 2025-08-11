@@ -27,9 +27,9 @@ router.get('/auth/check', auth, async (req, res) => {
   try {
     const user = await require('../models/User').findById(req.userId);
     if (!user) return res.json({ isAuthenticated: false });
-    // Trimite avatarul doar dacă utilizatorul are googleId (autentificat cu Google)
     res.json({
       isAuthenticated: true,
+      avatar: user.avatar || null,
       googleAvatar: user.googleId ? user.avatar : null
     });
   } catch (e) {
