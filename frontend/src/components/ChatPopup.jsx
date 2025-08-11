@@ -37,18 +37,15 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     }
   }, [effectiveUserId]);
   
-  // Creează conversationId mai simplu și consistent - doar între utilizatori
+  // Creează conversationId unic pentru fiecare anunț
   const conversationId = React.useMemo(() => {
-    if (!seller || !effectiveUserId) return null;
-    
+    if (!seller || !effectiveUserId || !announcement) return null;
     const sellerId = seller._id || seller.id;
-    
-    if (!sellerId) return null;
-    
-    // Sortăm ID-urile pentru a asigura consistența indiferent de ordinea parametrilor
-    const participants = [sellerId, effectiveUserId].sort();
-    return participants.join('-');
-  }, [seller, effectiveUserId]);
+    const announcementId = announcement.id || announcement._id;
+    if (!sellerId || !announcementId) return null;
+    // Nu sortăm, ordinea e: sellerId, userId, announcementId
+    return [sellerId, effectiveUserId, announcementId].join('-');
+  }, [seller, effectiveUserId, announcement]);
 
   // Încarcă mesajele când se deschide popup-ul
   useEffect(() => {

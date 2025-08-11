@@ -239,106 +239,87 @@ const getConversations = async (req, res) => {
     
     console.log(`Găsite ${messages.length} mesaje pentru utilizatorul ${userId}`);
     
-  // Grupăm mesajele pe utilizatori
-    const userConversationMap = new Map();
-    
-    for (const message of messages) {
-      // Identificăm celalalt participant
-      let otherParticipantId = null;
-      
-      if (message.senderId === userId) {
-        // Mesajul este trimis de utilizatorul curent
-        otherParticipantId = message.destinatarId;
-      } else {
-        // Mesajul este primit, expeditorul este celalalt participant
-        otherParticipantId = message.senderId;
-      }
-      
-      // Verificăm dacă celalalt participant este valid și diferit
-      if (!otherParticipantId || otherParticipantId === userId) {
-        console.log(`Ignorăm mesajul ${message._id} - participant invalid:`, otherParticipantId);
-        continue;
-      }
-      
-      // Determinăm dacă acest mesaj contribuie la starea "necitit"
-      const contributesUnread = (
-        message.senderId === otherParticipantId && // mesaj venit de la celălalt
-        message.destinatarId === userId &&         // către utilizatorul curent
-        message.isRead === false                   // încă necitit
-      );
+  // Grupăm mesajele pe (otherParticipantId, announcementId)
+  const conversationMap = new Map();
 
-      // Dacă nu avem deja acest utilizator în map, îl adăugăm
-      if (!userConversationMap.has(otherParticipantId)) {
-        try {
-          const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar lastSeen');
-          
-          let announcementImage = null;
-          let announcementId = message.announcementId;
-          let announcementOwnerId = null;
-          if (announcementId) {
-            try {
-              const Announcement = require('../models/Announcement');
-              const ann = await Announcement.findById(announcementId).select('images user');
-              if (ann) {
-                if (Array.isArray(ann.images) && ann.images.length > 0) {
-                  announcementImage = ann.images[0];
-                }
-                if (ann.user) {
-                  announcementOwnerId = String(ann.user);
-                }
+  for (const message of messages) {
+    let otherParticipantId = message.senderId === userId ? message.destinatarId : message.senderId;
+    if (!otherParticipantId || otherParticipantId === userId) continue;
+    const announcementId = message.announcementId || '';
+    const key = `${otherParticipantId}_${announcementId}`;
+
+    const contributesUnread = (
+      message.senderId === otherParticipantId &&
+      message.destinatarId === userId &&
+      message.isRead === false
+    );
+
+    if (!conversationMap.has(key)) {
+      try {
+        const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar lastSeen');
+        let announcementImage = null;
+        let announcementOwnerId = null;
+        if (announcementId) {
+          try {
+            const Announcement = require('../models/Announcement');
+            const ann = await Announcement.findById(announcementId).select('images user');
+            if (ann) {
+              if (Array.isArray(ann.images) && ann.images.length > 0) {
+                announcementImage = ann.images[0];
               }
-            } catch (e) {}
-          }
-          if (otherUser) {
-            userConversationMap.set(otherParticipantId, {
-              conversationId: message.conversationId,
-              otherParticipant: {
-                id: otherParticipantId,
-                firstName: otherUser.firstName || 'Utilizator',
-                lastName: otherUser.lastName || 'Necunoscut',
-                avatar: otherUser.avatar || null,
-                lastSeen: otherUser.lastSeen
-              },
-              lastMessage: {
-                text: message.text,
-                senderId: message.senderId,
-                createdAt: message.createdAt
-              },
-              announcementId,
-              announcementImage,
-              announcementOwnerId,
-              unread: !!contributesUnread
-            });
-          }
-        } catch (error) {
-          console.error('Eroare la preluarea datelor utilizatorului:', error);
+              if (ann.user) {
+                announcementOwnerId = String(ann.user);
+              }
+            }
+          } catch (e) {}
         }
-      } else {
-        // Actualizăm ultimul mesaj dacă mesajul curent este mai recent
-        const existingConversation = userConversationMap.get(otherParticipantId);
-        if (new Date(message.createdAt) > new Date(existingConversation.lastMessage.createdAt)) {
-          existingConversation.lastMessage = {
-            text: message.text,
-            senderId: message.senderId,
-            createdAt: message.createdAt
-          };
-          existingConversation.conversationId = message.conversationId;
+        if (otherUser) {
+          conversationMap.set(key, {
+            conversationId: message.conversationId,
+            otherParticipant: {
+              id: otherParticipantId,
+              firstName: otherUser.firstName || 'Utilizator',
+              lastName: otherUser.lastName || 'Necunoscut',
+              avatar: otherUser.avatar || null,
+              lastSeen: otherUser.lastSeen
+            },
+            lastMessage: {
+              text: message.text,
+              senderId: message.senderId,
+              createdAt: message.createdAt
+            },
+            announcementId,
+            announcementImage,
+            announcementOwnerId,
+            unread: !!contributesUnread
+          });
         }
-        // O conversatie rămâne necitită dacă ORICE mesaj necitit de la celălalt participant există
-        if (contributesUnread) {
-          existingConversation.unread = true;
-        }
+      } catch (error) {
+        console.error('Eroare la preluarea datelor utilizatorului:', error);
+      }
+    } else {
+      const existingConversation = conversationMap.get(key);
+      if (new Date(message.createdAt) > new Date(existingConversation.lastMessage.createdAt)) {
+        existingConversation.lastMessage = {
+          text: message.text,
+          senderId: message.senderId,
+          createdAt: message.createdAt
+        };
+        existingConversation.conversationId = message.conversationId;
+      }
+      if (contributesUnread) {
+        existingConversation.unread = true;
       }
     }
-    
-    // Convertim Map-ul în array și sortăm după data ultimului mesaj
-    const conversations = Array.from(userConversationMap.values()).sort((a, b) => 
-      new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
-    );
-    
-    console.log(`Găsite ${conversations.length} conversații unice pentru utilizatorul ${userId}`);
-    
-    res.json(conversations);
+  }
+
+  const conversations = Array.from(conversationMap.values()).sort((a, b) =>
+    new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
+  );
+
+  console.log(`Găsite ${conversations.length} conversații unice pentru utilizatorul ${userId}`);
+
+  res.json(conversations);
   } catch (err) {
     console.error('Eroare la preluarea conversațiilor:', err);
     res.status(500).json({ error: err.message });

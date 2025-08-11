@@ -1,3 +1,22 @@
+// Upload avatar utilizator
+const uploadAvatar = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ error: 'Nicio imagine încărcată.' });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+    user.avatar = req.file.path;
+    await user.save();
+    res.json({ message: 'Avatar actualizat cu succes!', avatar: user.avatar });
+  } catch (error) {
+    console.error('Eroare la upload avatar:', error);
+    res.status(500).json({ error: 'Eroare server la upload avatar.' });
+  }
+};
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -355,4 +374,5 @@ module.exports = {
   deleteAnnouncement,
   updateAnnouncement,
   updateProfile
+  uploadAvatar
 };
