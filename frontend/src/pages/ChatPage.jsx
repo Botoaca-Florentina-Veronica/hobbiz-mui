@@ -1,3 +1,11 @@
+  // Helper: normalize avatar/announcement image URLs
+  const resolveAvatarUrl = (src) => {
+    if (!src) return '';
+    if (src.startsWith('http') || src.startsWith('data:')) return src;
+    // Normalize already-uploaded relative paths like 'uploads/...' or '/uploads/...'
+    const cleaned = src.replace(/^\.\//, '').replace(/^\//, '');
+    return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\/]/, '')}`;
+  };
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
@@ -101,25 +109,26 @@ export default function ChatPage() {
         console.log(`Primite ${conversationsData.length} conversații din backend`);
         
         // Formatează datele pentru UI
-          const formattedConversations = conversationsData.map(conv => ({
-            id: conv.otherParticipant.id,
-            conversationId: conv.conversationId,
-            name: `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`,
-            lastMessage: conv.lastMessage.text,
-            time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
-            avatar: conv.announcementImage
-              ? (conv.announcementImage.startsWith('http') || conv.announcementImage.startsWith('/uploads')
-                  ? conv.announcementImage
-                  : `/uploads/${conv.announcementImage.replace(/^.*[\\/]/, '')}`)
-              : '',
-            unread: conv.unread,
-            otherParticipant: conv.otherParticipant,
-            lastSeen: conv.otherParticipant.lastSeen,
-            announcementOwnerId: conv.announcementOwnerId // nou, pentru split
-          }));
+          const formattedConversations = conversationsData.map(conv => {
+            const participantAvatar = resolveAvatarUrl(conv.otherParticipant?.avatar);
+            const announcementImg = resolveAvatarUrl(conv.announcementImage);
+            return {
+              id: conv.otherParticipant.id,
+              conversationId: conv.conversationId,
+              name: `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`.trim(),
+              lastMessage: conv.lastMessage.text,
+              time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
+                hour: '2-digit',
+                minute: '2-digit'
+              }),
+              // Prefer avatarul utilizatorului; dacă lipsește, folosim imaginea anunțului ca fallback
+              avatar: participantAvatar || announcementImg || '',
+              unread: conv.unread,
+              otherParticipant: conv.otherParticipant,
+              lastSeen: conv.otherParticipant.lastSeen,
+              announcementOwnerId: conv.announcementOwnerId // nou, pentru split
+            };
+          });
 
           // Split conversations by role
           const sellingConversations = formattedConversations.filter(conv => conv.announcementOwnerId === userId);

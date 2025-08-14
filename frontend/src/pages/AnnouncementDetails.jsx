@@ -35,8 +35,7 @@ import {
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import './AnnouncementDetails.css';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+// Header and Footer are provided by the App.jsx route layout
 import ChatPopup from '../components/ChatPopup';
 
 export default function AnnouncementDetails() {
@@ -131,7 +130,6 @@ export default function AnnouncementDetails() {
   if (loading) {
     return (
       <>
-        <Header />
         <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
           <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
@@ -145,7 +143,6 @@ export default function AnnouncementDetails() {
             </Grid>
           </Grid>
         </Container>
-        <Footer />
       </>
     );
   }
@@ -153,7 +150,6 @@ export default function AnnouncementDetails() {
   if (!announcement) {
     return (
       <>
-        <Header />
         <Container maxWidth="lg" sx={{ mt: 12, mb: 4, textAlign: 'center' }}>
           <Typography variant="h4" color="error" gutterBottom>
             Anunțul nu a fost găsit
@@ -167,7 +163,6 @@ export default function AnnouncementDetails() {
             Înapoi la pagina principală
           </Button>
         </Container>
-        <Footer />
       </>
     );
   }
@@ -227,7 +222,6 @@ export default function AnnouncementDetails() {
 
   return (
     <>
-      <Header />
       <Container maxWidth="lg" sx={{ mt: 10, mb: 4 }}>
         {/* Back Button */}
         <Button
@@ -573,8 +567,7 @@ export default function AnnouncementDetails() {
     isOwnAnnouncement,
   shouldRender: showChat && !isOwnAnnouncement
       })}
-
-      <Footer />
+      
     </>
   );
 }

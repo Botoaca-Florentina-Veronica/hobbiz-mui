@@ -566,6 +566,9 @@ export default function AddAnnouncementPage() {
               minHeight: 600,
               maxHeight: 'calc(100vh - 100px)',
               overflowY: 'auto',
+              backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
+              color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
+              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
               '& .categories-grid-popover': {
                 padding: '2rem'
               }
@@ -628,7 +631,7 @@ export default function AddAnnouncementPage() {
             onClick={() => imageInputRef.current.click()}
           >
             <span className="add-announcement-image-upload-icon">
-              <FaCamera size={38} color="#46626a" />
+              <FaCamera size={38} />
             </span>
           </button>
           <input
@@ -711,7 +714,17 @@ export default function AddAnnouncementPage() {
             onClose={() => setAnchorEl(null)}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
+            PaperProps={{
+              sx: {
+                minWidth: 260,
+                maxHeight: 400,
+                marginLeft: '60px',
+                marginTop: '15px',
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
+                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
+                border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb'
+              }
+            }}
           >
             {!selectedJudet ? (
               <>
@@ -744,7 +757,7 @@ export default function AddAnnouncementPage() {
                 {/* Mutăm butonul Înapoi la județe deasupra listei */}
                 <List sx={{ maxHeight: 320, overflow: 'auto' }}>
                   <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                    <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
+                    <ListItemText primary={<span style={{ color: '#f51866' }}>Înapoi la județe</span>} />
                   </ListItemButton>
                   {/* Orase + Comune sortate alfabetic */}
                   {(() => {

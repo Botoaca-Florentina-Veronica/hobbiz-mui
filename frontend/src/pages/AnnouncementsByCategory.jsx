@@ -180,6 +180,20 @@ export default function AnnouncementsByCategory() {
                   startIcon={<FilterIcon />}
                   onClick={() => setShowFilters(!showFilters)}
                   size="small"
+                  sx={
+                    showFilters
+                      ? {
+                          backgroundColor: '#f51866',
+                          color: '#ffffff',
+                          borderColor: '#f51866',
+                          '&:hover': { backgroundColor: '#d71558', borderColor: '#d71558' },
+                        }
+                      : {
+                          color: '#f51866',
+                          borderColor: '#f51866',
+                          '&:hover': { backgroundColor: 'rgba(245,24,102,0.08)', borderColor: '#f51866' },
+                        }
+                  }
                 >
                   Filtre
                 </Button>
@@ -203,14 +217,22 @@ export default function AnnouncementsByCategory() {
                 </Typography>
                 <ButtonGroup size="small">
                   <IconButton
-                    color={viewMode === 'grid' ? 'primary' : 'default'}
                     onClick={() => setViewMode('grid')}
+                    sx={{
+                      color: viewMode === 'grid' ? '#f51866' : 'text.secondary',
+                      '&:hover': { color: '#f51866' },
+                    }}
+                    aria-pressed={viewMode === 'grid'}
                   >
                     <GridViewIcon />
                   </IconButton>
                   <IconButton
-                    color={viewMode === 'list' ? 'primary' : 'default'}
                     onClick={() => setViewMode('list')}
+                    sx={{
+                      color: viewMode === 'list' ? '#f51866' : 'text.secondary',
+                      '&:hover': { color: '#f51866' },
+                    }}
+                    aria-pressed={viewMode === 'list'}
                   >
                     <ListViewIcon />
                   </IconButton>

@@ -665,6 +665,23 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Ensure the actual input text and caret are visible in dark mode */
+.dark-mode .my-announcements-search-header .MuiInputBase-input {
+  color: #ffffff !important;
+  caret-color: #ffffff;
+}
+
+/* Placeholder color in dark mode */
+.dark-mode .my-announcements-search-header .MuiInputBase-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 1; /* for Firefox */
+}
+
+/* Start adornment/search icon color */
+.dark-mode .my-announcements-search-header .MuiInputAdornment-root .MuiSvgIcon-root {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .dark-mode .my-announcements-search-header .MuiOutlinedInput-root:hover {
   border-color: rgba(245, 24, 102, 0.4);
   box-shadow: 0 2px 8px rgba(245, 24, 102, 0.1);

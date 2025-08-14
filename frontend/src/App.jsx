@@ -162,7 +162,14 @@ function App() {
             <Footer />
           </>
         } />
-        <Route path="/announcement/:id" element={<AnnouncementDetails />} />
+        <Route path="/announcement/:id" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AnnouncementDetails />
+            <Footer />
+          </>
+        } />
       </Routes>
     </div>
   );

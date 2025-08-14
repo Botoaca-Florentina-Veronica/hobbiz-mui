@@ -28,7 +28,7 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [rotation, setRotation] = useState(0); // degrees: 0, 90, 180, 270
 
-  const handleZoomIn = () => setZoom(z => Math.min(z + 0.25, 4));
+  const handleZoomIn = () => setZoom(z => (z >= 4 ? 1 : Math.min(z + 0.25, 4)));
   const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
   const handleResetZoom = () => { setZoom(1); setRotation(0); };
   const handleWheel = e => {
@@ -108,6 +108,7 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
                   src={images[index]}
                   alt={`Imagine ${index + 1} din ${images.length}`}
                   style={{ maxWidth: '100%', maxHeight: '100%', transform: `rotate(${rotation}deg) scale(${zoom})`, transition: 'transform 0.25s ease', cursor: zoom > 1 ? 'grab' : 'zoom-in', objectFit: 'contain' }}
+                  onClick={handleZoomIn}
                   onWheel={handleWheel}
                   draggable={false}
                 />
@@ -135,7 +136,7 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
                 <IconButton onClick={handleRotate} sx={{ color: 'white', width: 36, height: 36, border: '1px solid rgba(255,255,255,0.3)', borderRadius: 1 }}>
                   <RotateRightIcon />
                 </IconButton>
-                <IconButton onClick={handleZoomIn} disabled={zoom >= 4} sx={{ color: 'white', width: 36, height: 36, border: '1px solid rgba(255,255,255,0.3)', borderRadius: 1 }}>
+                <IconButton onClick={handleZoomIn} sx={{ color: 'white', width: 36, height: 36, border: '1px solid rgba(255,255,255,0.3)', borderRadius: 1 }}>
                   <ZoomInIcon />
                 </IconButton>
                 {images.length > 1 && (

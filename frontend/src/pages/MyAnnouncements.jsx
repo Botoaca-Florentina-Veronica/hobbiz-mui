@@ -170,7 +170,7 @@ export default function MyAnnouncements() {
         
         {/* Header de căutare și filtrare */}
         {announcements.length > 0 && (
-          <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+          <Paper elevation={1} className="my-announcements-search-header" sx={{ p: 2, mb: 3 }}>
             <Stack spacing={2}>
               {/* Search Bar - styled like categories page */}
               <TextField

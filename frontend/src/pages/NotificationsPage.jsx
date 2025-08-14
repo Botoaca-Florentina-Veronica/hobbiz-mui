@@ -9,17 +9,26 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../api/api';
 import './NotificationsPage.css';
 
+// Normalize avatar/announcement relative URLs to work with /uploads
+const resolveAvatarUrl = (src) => {
+  if (!src) return '';
+  if (typeof src !== 'string') return '';
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+  const cleaned = src.replace(/^\.\//, '').replace(/^\//, '');
+  return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\/]/, '')}`;
+};
+
 // Helper pentru obținerea datelor userului
 const getUserData = async (userId) => {
   try {
     const res = await apiClient.get(`/api/users/profile/${userId}`);
     const user = res.data;
     console.log('🔍 User data pentru userId:', userId, user);
-    const name = user.firstName ? `${user.firstName} ${user.lastName || ''}` : (user.email || 'Expeditor necunoscut');
+    const name = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : (user.email || 'Expeditor necunoscut');
+    const resolved = resolveAvatarUrl(user.avatar);
     const result = {
       name,
-      // Pentru test, să adăugăm un avatar default dacă nu există unul
-      avatar: user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=355070&color=fff&size=128'
+      avatar: resolved || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=355070&color=fff&size=128')
     };
     console.log('🖼️ Avatar găsit:', result.avatar);
     return result;
@@ -189,11 +198,12 @@ export default function NotificationsPage() {
                             {n.link && n.link.startsWith('/chat/') && (
                               <div className="notification-avatar">
                                 <img 
-                                  src={n.senderAvatar} 
+                                  src={resolveAvatarUrl(n.senderAvatar)} 
                                   alt={n.senderName} 
                                   onError={(e) => {
                                     console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
-                                    e.target.src = 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128';
+                                    const fallbackName = n.senderName || 'User';
+                                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName) + '&background=355070&color=fff&size=128';
                                   }} 
                                 />
                               </div>
