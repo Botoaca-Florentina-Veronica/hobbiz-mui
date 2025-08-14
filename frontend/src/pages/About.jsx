@@ -77,7 +77,7 @@ export default function About() {
                     <div className="pillar-icon">🤝</div>
                     <div className="pillar-content">
                       <h4>Comunitate</h4>
-                      <p>Creăm legături puternice între creatori și pasionați</p>
+                      <p>Creăm legături puternice între pasionați și utilizatori</p>
                     </div>
                   </div>
                   

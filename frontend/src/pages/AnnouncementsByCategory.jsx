@@ -154,271 +154,249 @@ export default function AnnouncementsByCategory() {
       <Typography variant="h4" className="my-announcements-title" gutterBottom>
         {category}
       </Typography>
-      
-      {/* Search and Filter Controls */}
-      <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
-        <Stack spacing={2}>
-          {/* Search Bar */}
-          <TextField
-            fullWidth
-            placeholder="Caută anunturi..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            variant="outlined"
-            size="medium"
-          />
-          
-          {/* Filter and View Controls */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-              <Button
-                variant={showFilters ? "contained" : "outlined"}
-                startIcon={<FilterIcon />}
-                onClick={() => setShowFilters(!showFilters)}
-                size="small"
-              >
-                Filtre
-              </Button>
-              
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Sortează după</InputLabel>
-                <Select
-                  value={sortBy}
-                  label="Sortează după"
-                  onChange={(e) => setSortBy(e.target.value)}
-                >
-                  <MenuItem value="recent">Cele mai recente</MenuItem>
-                  <MenuItem value="price-asc">Preț crescător</MenuItem>
-                  <MenuItem value="price-desc">Preț descrescător</MenuItem>
-                  <MenuItem value="title">Nume (A-Z)</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-            
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {filteredAndSortedAnnouncements.length} rezultate
-              </Typography>
-              <ButtonGroup size="small">
-                <IconButton
-                  color={viewMode === 'grid' ? 'primary' : 'default'}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <GridViewIcon />
-                </IconButton>
-                <IconButton
-                  color={viewMode === 'list' ? 'primary' : 'default'}
-                  onClick={() => setViewMode('list')}
-                >
-                  <ListViewIcon />
-                </IconButton>
-              </ButtonGroup>
-            </Box>
-          </Box>
-          
-          {/* Expandable Filters */}
-          {showFilters && (
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel>Preț</InputLabel>
-                <Select
-                  value={priceFilter}
-                  label="Preț"
-                  onChange={(e) => setPriceFilter(e.target.value)}
-                >
-                  <MenuItem value="all">Toate prețurile</MenuItem>
-                  <MenuItem value="free">Gratuit</MenuItem>
-                  <MenuItem value="under50">Sub 50 RON</MenuItem>
-                  <MenuItem value="under100">50-100 RON</MenuItem>
-                  <MenuItem value="over100">Peste 100 RON</MenuItem>
-                </Select>
-              </FormControl>
-              
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel>Locație</InputLabel>
-                <Select
-                  value={locationFilter}
-                  label="Locație"
-                  onChange={(e) => setLocationFilter(e.target.value)}
-                >
-                  <MenuItem value="all">Toate locațiile</MenuItem>
-                  {uniqueLocations.map(location => (
-                    <MenuItem key={location} value={location}>{location}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              
-              {(searchTerm || priceFilter !== 'all' || locationFilter !== 'all') && (
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setPriceFilter('all');
-                    setLocationFilter('all');
-                  }}
-                >
-                  Resetează filtrele
-                </Button>
-              )}
-            </Box>
-          )}
-          
-          {/* Active Filters Display */}
-          {(searchTerm || priceFilter !== 'all' || locationFilter !== 'all') && (
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {searchTerm && (
-                <Chip
-                  label={`Căutare: "${searchTerm}"`}
-                  onDelete={() => setSearchTerm('')}
-                  size="small"
-                />
-              )}
-              {priceFilter !== 'all' && (
-                <Chip
-                  label={`Preț: ${priceFilter === 'free' ? 'Gratuit' : 
-                    priceFilter === 'under50' ? 'Sub 50 RON' : 
-                    priceFilter === 'under100' ? '50-100 RON' : 'Peste 100 RON'}`}
-                  onDelete={() => setPriceFilter('all')}
-                  size="small"
-                />
-              )}
-              {locationFilter !== 'all' && (
-                <Chip
-                  label={`Locație: ${locationFilter}`}
-                  onDelete={() => setLocationFilter('all')}
-                  size="small"
-                />
-              )}
-            </Box>
-          )}
-        </Stack>
-      </Paper>
-
-      {/* Results */}
-      {filteredAndSortedAnnouncements.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography variant="h6" color="text.secondary">
-            {announcements.length === 0 
-              ? "Nu există anunțuri pentru această categorie." 
-              : "Nu s-au găsit anunțuri care să corespundă filtrelor."}
-          </Typography>
-        </Box>
-      ) : (
-        <div className={`favorite-announcements-list ${viewMode === 'list' ? 'list-view' : 'grid-view'}`}>
-          {filteredAndSortedAnnouncements.map((a) => (
-            <div key={a._id} className="my-announcement-card" style={{ position: 'relative', cursor: 'pointer' }}
-              onClick={e => {
-                // Nu declanșa navigarea dacă s-a dat click pe inimă
-                if (e.target.closest('.favorite-heart')) return;
-                window.location.href = `/announcement/${a._id}`;
+      <div className="abc-align-container">
+        {/* Searchbar și filtre */}
+        <div className="abc-searchbar">
+          <Stack spacing={2} sx={{ width: '100%' }}>
+            <TextField
+              fullWidth
+              placeholder="Caută anunturi..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
               }}
-            >
-              <div className="my-announcement-image">
-                {a.images && a.images[0] ? (
-                  <img
-                    src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
-                      ? a.images[0]
-                      : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
-                    alt="imagine principala"
-                    className="my-announcement-img"
-                  />
-                ) : (
-                  <div className="my-announcement-img" style={{background: '#eee'}} />
+              variant="outlined"
+              size="medium"
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                <Button
+                  variant={showFilters ? "contained" : "outlined"}
+                  startIcon={<FilterIcon />}
+                  onClick={() => setShowFilters(!showFilters)}
+                  size="small"
+                >
+                  Filtre
+                </Button>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Sortează după</InputLabel>
+                  <Select
+                    value={sortBy}
+                    label="Sortează după"
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <MenuItem value="recent">Cele mai recente</MenuItem>
+                    <MenuItem value="price-asc">Preț crescător</MenuItem>
+                    <MenuItem value="price-desc">Preț descrescător</MenuItem>
+                    <MenuItem value="title">Nume (A-Z)</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {filteredAndSortedAnnouncements.length} rezultate
+                </Typography>
+                <ButtonGroup size="small">
+                  <IconButton
+                    color={viewMode === 'grid' ? 'primary' : 'default'}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <GridViewIcon />
+                  </IconButton>
+                  <IconButton
+                    color={viewMode === 'list' ? 'primary' : 'default'}
+                    onClick={() => setViewMode('list')}
+                  >
+                    <ListViewIcon />
+                  </IconButton>
+                </ButtonGroup>
+              </Box>
+            </Box>
+            {showFilters && (
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <InputLabel>Preț</InputLabel>
+                  <Select
+                    value={priceFilter}
+                    label="Preț"
+                    onChange={(e) => setPriceFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">Toate prețurile</MenuItem>
+                    <MenuItem value="free">Gratuit</MenuItem>
+                    <MenuItem value="under50">Sub 50 RON</MenuItem>
+                    <MenuItem value="under100">50-100 RON</MenuItem>
+                    <MenuItem value="over100">Peste 100 RON</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <InputLabel>Locație</InputLabel>
+                  <Select
+                    value={locationFilter}
+                    label="Locație"
+                    onChange={(e) => setLocationFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">Toate locațiile</MenuItem>
+                    {uniqueLocations.map(location => (
+                      <MenuItem key={location} value={location}>{location}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {(searchTerm || priceFilter !== 'all' || locationFilter !== 'all') && (
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setPriceFilter('all');
+                      setLocationFilter('all');
+                    }}
+                  >
+                    Resetează filtrele
+                  </Button>
                 )}
-              </div>
-              <div className="my-announcement-info">
-                <div className="my-announcement-header">
-                  <div>
-                    <h2 className="my-announcement-title">{a.title}</h2>
-                    <div className="my-announcement-category">{a.category}</div>
-                    <div className="my-announcement-location">{a.location}</div>
-                    {a.price && (
-                      <div className="my-announcement-price" style={{
-                        color: '#f51866',
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        marginTop: '8px'
-                      }}>
-                        {parseFloat(a.price) === 0 ? 'Gratuit' : `${a.price} RON`}
-                      </div>
-                    )}
-                  </div>
-                  <div className="my-announcement-id">
-                    ID: {a._id?.slice(-9) || ''}
+              </Box>
+            )}
+            {(searchTerm || priceFilter !== 'all' || locationFilter !== 'all') && (
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {searchTerm && (
+                  <Chip
+                    label={`Căutare: "${searchTerm}"`}
+                    onDelete={() => setSearchTerm('')}
+                    size="small"
+                  />
+                )}
+                {priceFilter !== 'all' && (
+                  <Chip
+                    label={`Preț: ${priceFilter === 'free' ? 'Gratuit' : 
+                      priceFilter === 'under50' ? 'Sub 50 RON' : 
+                      priceFilter === 'under100' ? '50-100 RON' : 'Peste 100 RON'}`}
+                    onDelete={() => setPriceFilter('all')}
+                    size="small"
+                  />
+                )}
+                {locationFilter !== 'all' && (
+                  <Chip
+                    label={`Locație: ${locationFilter}`}
+                    onDelete={() => setLocationFilter('all')}
+                    size="small"
+                  />
+                )}
+              </Box>
+            )}
+          </Stack>
+        </div>
+        {/* Rezultate */}
+        {filteredAndSortedAnnouncements.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Typography variant="h6" color="text.secondary">
+              {announcements.length === 0 
+                ? "Nu există anunțuri pentru această categorie." 
+                : "Nu s-au găsit anunțuri care să corespundă filtrelor."}
+            </Typography>
+          </Box>
+        ) : (
+          <div className={`favorite-announcements-list ${viewMode === 'list' ? 'list-view' : 'grid-view'}`}>
+            {filteredAndSortedAnnouncements.map((a) => (
+              <div key={a._id} className="abc-announcement-card my-announcement-card" style={{ position: 'relative', cursor: 'pointer' }}
+                onClick={e => {
+                  if (e.target.closest('.favorite-heart')) return;
+                  window.location.href = `/announcement/${a._id}`;
+                }}
+              >
+                <div className="my-announcement-image">
+                  {a.images && a.images[0] ? (
+                    <img
+                      src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
+                        ? a.images[0]
+                        : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
+                      alt="imagine principala"
+                      className="my-announcement-img"
+                    />
+                  ) : (
+                    <div className="my-announcement-img" style={{background: '#eee'}} />
+                  )}
+                </div>
+                <div className="my-announcement-info">
+                  <div className="my-announcement-header">
+                    <div>
+                      <h2 className="my-announcement-title">{a.title}</h2>
+                      <div className="my-announcement-category">{a.category}</div>
+                      <div className="my-announcement-location">{a.location}</div>
+                      {a.price && (
+                        <div className="my-announcement-price" style={{
+                          color: '#f51866',
+                          fontWeight: 'bold',
+                          fontSize: '1.1rem',
+                          marginTop: '8px'
+                        }}>
+                          {parseFloat(a.price) === 0 ? 'Gratuit' : `${a.price} RON`}
+                        </div>
+                      )}
+                    </div>
+                    <div className="my-announcement-id">
+                      ID: {a._id?.slice(-9) || ''}
+                    </div>
                   </div>
                 </div>
-                {/* Fără butoane de acțiune */}
-              </div>
-              {/* Iconiță inimă pentru favorite - mutată în colțul din dreapta jos al cardului */}
-              <div
-                className="favorite-heart"
-                style={{
-                  position: 'absolute',
-                  right: 16,
-                  bottom: 16,
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  zIndex: 2
-                }}
-                onClick={ev => {
-                  ev.stopPropagation();
-                  
-                  // Actualizează localStorage cu noul format
-                  const stored = localStorage.getItem(FAVORITES_KEY);
-                  let favoriteObjects = [];
-                  
-                  try {
-                    const parsed = JSON.parse(stored || '[]');
-                    if (parsed.length > 0 && typeof parsed[0] === 'string') {
-                      // Convertește din formatul vechi
-                      favoriteObjects = parsed.map(id => ({ id, addedAt: Date.now() }));
-                    } else {
-                      favoriteObjects = parsed;
+                <div
+                  className="favorite-heart"
+                  style={{
+                    position: 'absolute',
+                    right: 16,
+                    bottom: 16,
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    zIndex: 2
+                  }}
+                  onClick={ev => {
+                    ev.stopPropagation();
+                    const stored = localStorage.getItem(FAVORITES_KEY);
+                    let favoriteObjects = [];
+                    try {
+                      const parsed = JSON.parse(stored || '[]');
+                      if (parsed.length > 0 && typeof parsed[0] === 'string') {
+                        favoriteObjects = parsed.map(id => ({ id, addedAt: Date.now() }));
+                      } else {
+                        favoriteObjects = parsed;
+                      }
+                    } catch {
+                      favoriteObjects = [];
                     }
-                  } catch {
-                    favoriteObjects = [];
-                  }
-                  
-                  const exists = favoriteObjects.find(item => item.id === a._id);
-                  let updatedObjects;
-                  
-                  if (exists) {
-                    updatedObjects = favoriteObjects.filter(item => item.id !== a._id);
-                  } else {
-                    updatedObjects = [...favoriteObjects, { id: a._id, addedAt: Date.now() }];
-                  }
-                  
-                  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
-                  
-                  setFavoriteIds((prev) => {
-                    if (prev.includes(a._id)) {
-                      return prev.filter((id) => id !== a._id);
+                    const exists = favoriteObjects.find(item => item.id === a._id);
+                    let updatedObjects;
+                    if (exists) {
+                      updatedObjects = favoriteObjects.filter(item => item.id !== a._id);
                     } else {
-                      return [...prev, a._id];
+                      updatedObjects = [...favoriteObjects, { id: a._id, addedAt: Date.now() }];
                     }
-                  });
-                }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                {favoriteIds.includes(a._id) ? (
-                  <FavoriteIcon sx={{ color: 'red', fontSize: 28 }} />
-                ) : (
-                  <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 28 }} />
-                )}
+                    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
+                    setFavoriteIds((prev) => {
+                      if (prev.includes(a._id)) {
+                        return prev.filter((id) => id !== a._id);
+                      } else {
+                        return [...prev, a._id];
+                      }
+                    });
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  {favoriteIds.includes(a._id) ? (
+                    <FavoriteIcon sx={{ color: 'red', fontSize: 28 }} />
+                  ) : (
+                    <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 28 }} />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

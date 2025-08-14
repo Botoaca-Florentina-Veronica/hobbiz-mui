@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import ImageZoomModal from '../components/ImageZoomModal';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -53,6 +54,10 @@ export default function AnnouncementDetails() {
   const [imgIndex, setImgIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const timeoutRef = useRef();
+
+  // Modal zoom logic
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const [zoomIndex, setZoomIndex] = useState(0);
   
   // Chat and contact logic
   const [showChat, setShowChat] = useState(false);
@@ -174,6 +179,16 @@ export default function AnnouncementDetails() {
       ? img
       : `/uploads/${img.replace(/^.*[\\/]/, '')}`;
 
+  // Pentru modal zoom
+  const imagesSrc = images.map(getImageSrc);
+  const handleOpenZoom = (idx) => {
+    setZoomIndex(idx);
+    setZoomOpen(true);
+  };
+  const handleCloseZoom = () => setZoomOpen(false);
+  const handlePrevZoom = () => setZoomIndex(i => i > 0 ? i - 1 : imagesSrc.length - 1);
+  const handleNextZoom = () => setZoomIndex(i => i < imagesSrc.length - 1 ? i + 1 : 0);
+
   const handlePrev = (e) => {
     e.stopPropagation();
     setFade(false);
@@ -244,8 +259,10 @@ export default function AnnouncementDetails() {
                         objectFit: 'contain',
                         bgcolor: '#f5f5f5',
                         opacity: fade ? 1 : 0,
-                        transition: 'opacity 0.4s cubic-bezier(.4,0,.2,1)'
+                        transition: 'opacity 0.4s cubic-bezier(.4,0,.2,1)',
+                        cursor: 'pointer'
                       }}
+                      onClick={() => handleOpenZoom(imgIndex)}
                     />
                     {showArrows && (
                       <>
@@ -307,6 +324,15 @@ export default function AnnouncementDetails() {
                 )}
               </Box>
             </Card>
+            {/* Modal zoom imagine */}
+            <ImageZoomModal
+              open={zoomOpen}
+              images={imagesSrc}
+              index={zoomIndex}
+              onClose={handleCloseZoom}
+              onPrev={handlePrevZoom}
+              onNext={handleNextZoom}
+            />
 
             {/* Announcement Details */}
             <Card elevation={2} sx={{ borderRadius: 3 }}>
