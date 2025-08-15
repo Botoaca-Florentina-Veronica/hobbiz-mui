@@ -134,6 +134,92 @@
   color: #ffffff;
 }
 
+.legal-section {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 24px 16px 8px;
+  box-sizing: border-box;
+}
+
+.legal-section__column {
+  flex: 1 1 240px;
+  min-width: 220px;
+}
+
+.legal-section__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.legal-section__brand {
+  font-weight: 700;
+}
+
+.legal-section__desc {
+  margin: 0;
+  max-width: 560px;
+}
+
+.legal-section__column h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #355070;
+}
+
+.legal-section__column ul {
+  list-style: disc inside;
+  margin: 0;
+  padding: 0;
+}
+
+.legal-section__column a {
+  color: #355070;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.legal-section__column a:hover {
+  color: #406b92;
+  text-decoration: underline;
+}
+
+.legal-section__socials .legal-section__icons {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .legal-section {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+  .legal-section__column {
+    min-width: 0;
+  }
+}
+
+/* Dark mode colors for desktop legal section */
+.dark-mode .legal-section__column h4 {
+  color: #ffffff;
+}
+
+.dark-mode .legal-section__column a {
+  color: #ffffff;
+}
+
+.dark-mode .legal-section__column a:hover {
+  color: #fa4875;
+}
+
 .footer-mobile-buttons {
   display: none;
 }
@@ -230,8 +316,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 0; /* evită aliniere pe baseline care poate muta vertical */
     margin-bottom: 0.2rem;
     box-shadow: 0 2px 8px rgba(26, 90, 135, 0.3);
+  }
+
+  /* Iconița MUI pentru Vinde - centrare și dimensiune calibrată */
+  .footer-publish .footer-publish-svg {
+    display: block;
+    line-height: 0;
+    font-size: 22px; /* 32px container => 22px vizual echilibrat */
+    margin: 0;
   }
 
   .footer-mobile-buttons .footer-publish span {

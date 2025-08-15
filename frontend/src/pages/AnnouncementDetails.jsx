@@ -260,7 +260,15 @@ export default function AnnouncementDetails() {
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ mt: 10, mb: 4 }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          mt: 10,
+          mb: 4,
+          minHeight: '100vh',
+          pb: { xs: 'calc(96px + env(safe-area-inset-bottom))', md: 0 }
+        }}
+      >
         {/* Back Button */}
         <Button
           startIcon={<ArrowBackIcon />}
@@ -276,18 +284,20 @@ export default function AnnouncementDetails() {
 
         <Grid container spacing={4}>
           {/* Main Content */}
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={8} order={{ xs: 2, md: 1 }}>
             {/* Image Carousel */}
             <Card elevation={3} sx={{ mb: 3, borderRadius: 3, overflow: 'hidden' }}>
-              <Box sx={{ position: 'relative', height: 500 }}>
+              <Box sx={{ position: 'relative', height: { xs: '58vw', sm: '60vw', md: 500 } }}>
                 {images.length > 0 ? (
                   <>
                     <CardMedia
                       component="img"
-                      height="500"
+                      height={undefined}
                       image={getImageSrc(images[imgIndex])}
                       alt={`Imagine ${imgIndex + 1}`}
                       sx={{
+                        width: '100%',
+                        height: '100%',
                         objectFit: 'contain',
                         bgcolor: '#f5f5f5',
                         opacity: fade ? 1 : 0,
@@ -360,7 +370,7 @@ export default function AnnouncementDetails() {
             {/* Details card */}
 
             <Card elevation={2} sx={{ borderRadius: 3, bgcolor: getIsDarkMode() ? '#282828' : '#f5f5f5' }}>
-              <CardContent sx={{ p: 4 }}>
+              <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
                 {/* Header with actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                   <Box sx={{ flex: 1 }}>
@@ -370,7 +380,7 @@ export default function AnnouncementDetails() {
                         Postat {formatDate(announcement.createdAt)}
                       </Typography>
                     </Box>
-                    <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2 }}>
+                    <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>
                       {announcement.title}
                     </Typography>
                     {announcement.category && (
@@ -434,7 +444,7 @@ export default function AnnouncementDetails() {
                     color: getIsDarkMode() ? '#f5f5f5' : '#2d3748',
                     lineHeight: 1.7,
                     whiteSpace: 'pre-line',
-                    fontSize: '1.1rem'
+                    fontSize: { xs: '1rem', md: '1.1rem' }
                   }}
                 >
                   {announcement.description}
@@ -456,9 +466,9 @@ export default function AnnouncementDetails() {
           </Grid>
 
           {/* Seller Information Sidebar */}
-          <Grid item xs={12} md={4}>
-            <Card elevation={2} sx={{ borderRadius: 3, position: 'sticky', top: 120 }}>
-              <CardContent sx={{ p: 3 }}>
+          <Grid item xs={12} md={4} order={{ xs: 1, md: 2 }}>
+            <Card elevation={2} sx={{ borderRadius: 3, position: { md: 'sticky' }, top: { md: 120 } }}>
+              <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>
                   Informații vânzător
                 </Typography>

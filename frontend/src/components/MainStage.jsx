@@ -639,6 +639,92 @@ export default function MainStage() {
           </button>
           </div>
         )}
+
+        {typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches && (
+          <div className="mainstage-search-mobile">
+            <div className="search-mobile-row">
+              <input
+                type="text"
+                placeholder="Caută servicii..."
+                className="search-input-mobile"
+                aria-label="Căutare"
+              />
+              <button className="search-button-mobile" type="button" aria-label="Căutare">
+                <FaSearch />
+              </button>
+            </div>
+            <button
+              className="location-button-mobile"
+              onClick={handleInputClick}
+              type="button"
+              aria-haspopup="dialog"
+            >
+              <FaMapMarkerAlt className="location-icon" />
+              <span>{selectedLocalitate || selectedJudet || "Toată țara"}</span>
+            </button>
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              PaperProps={{ sx: { minWidth: 280, maxHeight: 360, marginTop: '8px' } }}
+            >
+              {!selectedJudet ? (
+                <>
+                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
+                  <List sx={{ maxHeight: 280, overflow: 'auto' }}>
+                    {judete.map((judet) => (
+                      <ListItemButton
+                        key={judet}
+                        onClick={() => {
+                          if (judet === "Toată țara") {
+                            setSelectedJudet(null);
+                            setSelectedLocalitate("");
+                            setAnchorEl(null);
+                          } else {
+                            setSelectedJudet(judet);
+                          }
+                        }}
+                        divider
+                      >
+                        <ListItemText
+                          primary={judet === "Toată țara" ? <span style={{ fontWeight: 'bold' }}>Toată țara</span> : judet}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </>
+              ) : (
+                <>
+                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
+                  <List sx={{ maxHeight: 280, overflow: 'auto' }}>
+                    <ListItemButton onClick={() => setSelectedJudet(null)} divider>
+                      <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
+                    </ListItemButton>
+                    {getLocalitatiForJudet(selectedJudet).map((localitate) => (
+                      <ListItemText
+                        key={localitate}
+                        primary={localitate}
+                        sx={{ px: 2, py: 1.25, cursor: 'pointer' }}
+                        onClick={() => {
+                          handleLocalitateClick(localitate);
+                        }}
+                      />
+                    ))}
+                  </List>
+                </>
+              )}
+            </Popover>
+          </div>
+        )}
       </div>
 
       <div className="main-content">

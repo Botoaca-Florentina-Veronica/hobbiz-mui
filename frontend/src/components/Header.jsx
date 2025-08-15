@@ -1,9 +1,9 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import { HiOutlineUser, HiOutlineHeart, HiOutlineBell, HiOutlineChat } from "react-icons/hi";
 import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
 import puzzleLogo from '../assets/images/puzzle.png';
+import puzzle2 from '../assets/images/puzzle2.png';
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
@@ -173,7 +173,7 @@ export default function Header() {
           <div className="header fixed-header">
             <ul className="logo" onClick={() => navigate("/")} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <li style={{display: 'flex', alignItems: 'center'}}>
-                <img src={puzzleLogo} alt="Puzzle Logo" className="puzzle-logo" />
+                <img src={isDarkMode ? puzzle2 : puzzleLogo} alt="Puzzle Logo" className="puzzle-logo" />
                 <img src={isDarkMode ? logoDark : logoLight} alt="Logo" className="main-logo" />
               </li>
             </ul>

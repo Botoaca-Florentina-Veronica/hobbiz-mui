@@ -1,5 +1,5 @@
 import React from 'react';
-import AddIcon from '@mui/icons-material/Add';
+import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 
 export default function FooterPublishButton({ onClick, active }) {
   return (
@@ -9,7 +9,7 @@ export default function FooterPublishButton({ onClick, active }) {
       aria-label="Publică un anunț"
     >
       <div className="footer-publish-icon">
-        <AddIcon style={{ fontSize: 20, strokeWidth: 3 }} />
+        <SellOutlinedIcon className="footer-publish-svg" />
       </div>
       <span>Vinde</span>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import apiClient from '../api/api';
 import './ChatPage.css';
@@ -9,6 +9,8 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 
 // Helper: normalize avatar/announcement image URLs
 const resolveAvatarUrl = (src) => {
@@ -20,6 +22,7 @@ const resolveAvatarUrl = (src) => {
 };
 
 export default function ChatPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('buying'); // 'buying' sau 'selling'
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -531,6 +534,15 @@ export default function ChatPage() {
       <div className={`chat-page-container ${isChattingOnMobile ? 'mobile-chatting' : ''}`}>
         {!isChattingOnMobile && (
         <aside className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+          {/* Mobile-only back button above title */}
+          <div className="chat-mobile-backtop">
+            <button type="button" className="chat-back-btn" onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }} aria-label="Înapoi">
+              <ArrowBackIosNewIcon fontSize="small" />
+              <span>Înapoi</span>
+            </button>
+          </div>
+          {/* Mobile-only page title */}
+          <div className="chat-mobile-title">Chat</div>
           <div className="chat-tabs">
             <button 
               className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`}
@@ -646,7 +658,7 @@ export default function ChatPage() {
           {!selectedConversation ? (
             <div className="chat-empty-main">
               <div className="chat-empty-icon">
-                <ForumOutlinedIcon sx={{ fontSize: 96, color: getAccentCss() }} />
+                <ForumOutlinedIcon sx={{ fontSize: 96 }} />
               </div>
               <div className="chat-empty-text">Selectează o conversație pentru a o citi</div>
               <div className="chat-empty-subtitle">
@@ -823,16 +835,10 @@ export default function ChatPage() {
                                 )}
                                 {message.senderId === userId && (
                                   <span 
-                                    className="chat-message-ticks" 
+                                    className={`chat-message-ticks ${message.isRead ? 'read' : 'unread'}`}
                                     aria-label="Livrat / citit"
-                                    style={{ 
-                                      color: message.isRead ? getAccentCss() : '#9ca3af' // accent dacă citit, gri dacă nu
-                                    }}
                                   >
-                                    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                      <path d="M2 9l2.5 2.5L8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                                      <path d="M6 9l2.5 2.5L14 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
+                                    <DoneAllIcon className="ticks-icon" aria-hidden="true" />
                                   </span>
                                 )}
                                 {/* Reacții fixate pe bulă (colț interior) */}

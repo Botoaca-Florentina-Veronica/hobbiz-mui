@@ -9,7 +9,7 @@
 
 @media (max-width: 900px) {
   .main-stage {
-    padding: 30px 10px 60px 10px;
+    padding: 20px 12px calc(88px + env(safe-area-inset-bottom)) 12px; /* mai compact + safe-area */
   }
 }
 
@@ -519,7 +519,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .search-container {
@@ -710,5 +710,106 @@
 @media (max-width: 900px) {
   .mainstage-search-desktop {
     display: none !important;
+  }
+}
+
+/* Mobile search block */
+@media (max-width: 900px) {
+  .mainstage-search-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .search-mobile-row {
+    display: grid;
+    grid-template-columns: 1fr 48px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .search-input-mobile {
+    width: 100%;
+    height: 44px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.12);
+    font-size: 16px;
+    outline: none;
+  }
+
+  .search-button-mobile {
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #355070;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .location-button-mobile {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: #fff;
+    color: #333;
+    width: fit-content;
+  }
+}
+
+/* Dark mode for mobile search */
+@media (max-width: 900px) {
+  .dark-mode .search-input-mobile {
+    background: #3f3f3f;
+    color: #fff;
+    border-color: #575757;
+  }
+
+  .dark-mode .search-button-mobile {
+    background: #f51866;
+    color: #fff;
+  }
+
+  .dark-mode .location-button-mobile {
+    background: #3f3f3f;
+    color: #fff;
+    border-color: #575757;
+  }
+}
+
+/* Refine main hero on mobile */
+@media (max-width: 900px) {
+  .main-text {
+    background: rgba(255,255,255,0.92);
+    border-radius: 16px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    padding: 20px;
+  }
+
+  #main-title {
+    line-height: 1.25;
+  }
+
+  .main-stage-image img {
+    max-width: 360px;
+  }
+}
+
+/* Safe area padding */
+@media (max-width: 900px) {
+  .mainstage-search-mobile {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .main-text {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

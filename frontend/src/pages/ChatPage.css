@@ -12,6 +12,17 @@
   overflow: hidden; /* va fi suprascris pe mobil */
 }
 
+/* Dark mode tweaks for mobile pills */
+@media (max-width: 600px) {
+  .dark-mode .chat-mobile-title { color: var(--dm-text); }
+  .dark-mode .chat-tab { background: #3a3a3a; color: var(--dm-text); }
+  .dark-mode .chat-tab.active,
+  .dark-mode .chat-tab:hover { background: var(--dm-pink); color: #fff; }
+  .dark-mode .chat-section-label { color: var(--dm-text); border-bottom: 1px solid var(--dm-border); }
+  .dark-mode .chat-conversation-item { border-bottom: 1px solid var(--dm-border); }
+  .dark-mode .chat-back-btn { background: #3a3a3a; color: var(--dm-text); }
+}
+
 .chat-sidebar {
   width: 380px;
   background: white;
@@ -485,8 +496,19 @@
   display: inline-flex;
   align-items: center;
   line-height: 1;
-  font-size: 20px; /* și mai mari */
+  font-size: 1em; /* egala cu mărimea textului din bulă */
+  margin-left: 0px; /* fără spațiu între text și bife */
 }
+
+/* Dimensiunea iconiței MUI pentru bife (raportată la text) */
+.chat-message-ticks .ticks-icon {
+  font-size: 1.2em; /* puțin mai mare decât textul */
+  line-height: 1;
+}
+
+/* Stări pentru bife: necitit vs. citit (light mode) */
+.chat-message-ticks.unread { color: #9ca3af; }
+.chat-message-ticks.read { color: #4da3ff; /* albastru mai deschis pentru seen */ }
 
 /* bife la dimensiunea textului */
 .chat-message-ticks svg { width: 1em; height: 1em; }
@@ -593,6 +615,20 @@
   opacity: 0.8;
 }
 
+/* Hidden by default, shown on mobile */
+.chat-mobile-title { display: none; }
+/* Back button container hidden by default */
+.chat-mobile-backtop { display: none; }
+
+/* Empty state icon color by theme */
+.chat-empty-icon .MuiSvgIcon-root {
+  color: #355070; /* light mode */
+}
+
+.dark-mode .chat-empty-icon .MuiSvgIcon-root {
+  color: var(--dm-pink); /* dark mode */
+}
+
 .chat-empty-text {
   color: #333333;
   font-size: 18px;
@@ -611,12 +647,16 @@
 
 /* Responsive Design */
 @media (max-width: 900px) {
+  html, body { background: #ffffff !important; }
   .chat-page-container {
     flex-direction: column;
     height: auto;
     min-width: unset;
     margin: 16px;
     border-radius: 6px;
+    /* Fundal uniform și fără umbre pe mobil/tabletă */
+    background: #ffffff !important;
+    box-shadow: none !important;
   }
   
   .chat-sidebar {
@@ -628,6 +668,7 @@
   
   .chat-main {
     min-height: 50vh;
+    background: #ffffff !important;
   }
   
   .chat-tabs {
@@ -645,6 +686,7 @@
   
   .chat-messages-container {
     padding: 16px 20px;
+    background: #ffffff !important;
   }
   
   .chat-input-container {
@@ -653,7 +695,7 @@
 }
 
 @media (max-width: 600px) {
-  html, body { overflow-x: hidden; }
+  html, body { overflow-x: hidden; background: #ffffff !important; }
   .chat-page-container {
     margin: 0; /* eliminăm marginile care taie spațiu util pe mobil */
     border-radius: 0;
@@ -702,19 +744,51 @@
     box-sizing: border-box;
   }
 
+  /* Fundal uniform pe mobil pentru zona de conversație (înlocuiește gradientul desktop) */
+  .chat-main { background: #ffffff !important; }
+  .chat-messages-container { background: #ffffff !important; }
+
   /* Overlay pentru când drawer-ul este deschis */
   .chat-overlay { display: none !important; }
 
   /* FAB mobil pentru deschiderea rapidă a conversațiilor */
   .chat-mobile-fab { display: none !important; }
 
-  /* Ascunde empty state din zona principală pe mobil */
-  .chat-empty-state { display: none !important; }
+  /* Afișăm empty state pentru secțiunea NECITITE pe mobil */
+  .chat-empty-state { display: flex !important; }
   .chat-empty-main { display: none !important; }
 
+  /* Titlu mare ca în mock */
+  /* Back button area */
+  .chat-mobile-backtop {
+    display: flex;
+    align-items: center;
+    padding: 8px 8px 0 8px;
+  }
+  .chat-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 9999px;
+    background: #f1f5f5;
+    color: #0f3d3e;
+    border: none;
+  }
+  .chat-back-btn:active { transform: translateY(0); }
+
+  .chat-mobile-title {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    padding: 16px 16px 8px 16px;
+    color: #0f3d3e;
+  }
+
+  /* Tab-uri tip pills */
   .chat-tabs {
-    padding: 12px 12px 0 12px; /* păstrăm 12px egali pe ambele părți */
-    gap: 2px;
+    padding: 8px 12px 0 12px;
+    gap: 8px;
     overflow-x: auto;
     max-width: 100%;
     box-sizing: border-box;
@@ -730,14 +804,29 @@
   .chat-conversation-list { padding: 0; }
   
   .chat-tab {
-    padding: 10px 12px;
+    padding: 8px 14px;
     font-size: 13px;
     flex: 0 0 auto; /* lățime naturală pentru scroll orizontal */
+    border: none;
+    background: #f1f5f5;
+    border-radius: 9999px;
+    color: #0f3d3e;
+  }
+  .chat-tab.active,
+  .chat-tab:hover {
+    background: #20c997;
+    color: #ffffff;
+    border: none;
+    box-shadow: none;
+    transform: none;
   }
   
   .chat-section-label {
     margin: 16px 16px 8px 16px;
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #0f3d3e;
+    border-bottom: 1px solid #e5e7eb;
   }
   
   .chat-empty-state {
@@ -747,10 +836,13 @@
   }
   
   .chat-conversation-item {
-    margin: 0 2px;
-    padding: 10px 12px;
+    margin: 0 0;
+    padding: 12px 16px;
     gap: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 0;
   }
+  .chat-conversation-item:hover { background: #fff; transform: none; box-shadow: none; }
   
   .chat-avatar {
     width: 40px;
@@ -782,7 +874,7 @@
     padding: 12px 12px;
     gap: 12px;
     min-height: 0;
-    padding-bottom: 88px; /* rezervă pentru bara de input fixă */
+    padding-bottom: 108px; /* rezervă pentru bara de input fixă + safe area */
   }
   
   .chat-message {
@@ -799,9 +891,8 @@
     font-size: 15px; /* text mai mare pe mobil */
   }
   
-  .chat-message-ticks {
-  font-size: 19px; /* și mai mari pe mobil */
-  }
+  .chat-message-ticks { font-size: 1.2em; }
+  .chat-message-ticks .ticks-icon { font-size: 1.35em; }
   
   /* Creștem specificitatea și folosim !important pentru a evita suprascrieri din MUI */
   .chat-page-container .chat-input-container {
@@ -811,10 +902,10 @@
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important; /* ancorată la baza ecranului */
-    z-index: 999 !important;
+    z-index: 10000 !important;
     padding-bottom: max(env(safe-area-inset-bottom), 12px) !important;
     background: #ffffff !important; /* suprascrie eventuale transparențe */
-    border-top: 2px solid #00aaff !important; /* DEBUG: marker vizibil pentru bară input */
+    border-top: 1px solid #e8ecef !important;
   }
   
   .chat-input {
@@ -865,7 +956,8 @@
 .dark-mode .chat-conversation-item:hover .chat-avatar { border-color: var(--dm-pink); }
 .dark-mode .chat-main-avatar { border-color: var(--dm-pink); }
 .dark-mode .chat-reply-bar { background: var(--dm-pink); }
-.dark-mode .chat-message-ticks { color: var(--dm-pink); }
+.dark-mode .chat-message-ticks.unread { color: var(--dm-muted); }
+.dark-mode .chat-message-ticks.read { color: var(--dm-pink); }
 .dark-mode .chat-image-remove { background: var(--dm-pink); }
 
 .dark-mode .chat-sidebar {
@@ -942,6 +1034,14 @@
   background: var(--dm-bg);
 }
 
+/* Dark mode: și containerul de mesaje pe mobil are același fundal */
+@media (max-width: 600px) {
+  .dark-mode html, .dark-mode body { background: var(--dm-bg) !important; }
+  .dark-mode .chat-messages-container {
+    background: var(--dm-bg) !important;
+  }
+}
+
 .dark-mode .chat-header {
   background: var(--dm-bg-elev);
   border-bottom: 1px solid var(--dm-border);
@@ -1004,9 +1104,8 @@
   border-right-color: rgba(255,255,255,0.15);
 }
 
-.dark-mode .chat-message-ticks {
-  color: var(--dm-pink);
-}
+.dark-mode .chat-message-ticks.unread { color: var(--dm-muted); }
+.dark-mode .chat-message-ticks.read { color: var(--dm-pink); }
 
 .dark-mode .chat-message-time,
 .dark-mode .chat-message-meta { 
