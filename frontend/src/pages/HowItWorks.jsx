@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import {
   Typography,
   Button,
@@ -17,16 +15,15 @@ import {
   Paper
 } from '@mui/material';
 import {
-  ExpandMore as ExpandMoreIcon,
   Search as SearchIcon,
   Chat as ChatIcon,
-  Handshake as HandshakeIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
-  Support as SupportIcon,
-  Verified as VerifiedIcon,
-  TrendingUp as TrendingUpIcon,
-  Groups as GroupsIcon,
+  Favorite as FavoriteIcon,
+  Notifications as NotificationsIcon,
+  Shield as ShieldIcon,
+  Nightlight as NightlightIcon,
+  Publish as PublishIcon,
+  Category as CategoryIcon,
+  Person as PersonIcon,
   Assignment as AssignmentIcon,
   CheckCircle as CheckCircleIcon,
   ArrowForward as ArrowForwardIcon
@@ -36,65 +33,65 @@ import './HowItWorks.css';
 const steps = [
   {
     label: 'Creează-ți contul',
-    description: 'Înregistrează-te rapid și ușor cu email-ul sau prin rețelele sociale',
+    description: 'Înregistrează-te rapid cu emailul sau intră ca invitat și personalizează-ți profilul.',
     icon: <AssignmentIcon />,
-    details: 'Procesul de înregistrare durează doar câteva minute. Completezi informațiile de bază și îți validezi adresa de email pentru a începe să folosești platforma.'
+    details: 'Completezi informațiile de bază și, opțional, adaugi avatar și o scurtă descriere. Poți porni în modul invitat și să îți creezi contul mai târziu.'
   },
   {
-    label: 'Explorează categoriile',
-    description: 'Navighează prin categoriile diverse de hobby-uri și găsește ce te pasionează',
-    icon: <SearchIcon />,
-    details: 'Avem peste 50 de categorii diferite, de la arte și meserii până la sport și tehnologie. Folosește filtrele pentru a găsi exact ceea ce cauți.'
+    label: 'Publică sau caută anunțuri',
+    description: 'Publică ușor un anunț sau explorează categoriile și filtrele pentru a găsi ce te interesează.',
+    icon: <PublishIcon />,
+    details: 'Folosește filtre (preț, locație, dată, popularitate) și sortări, sau adaugă rapid un anunț cu imagini, categorie și detalii clare.'
   },
   {
-    label: 'Conectează-te cu pasionații',
-    description: 'Trimite mesaje și stabilește întâlniri cu persoane cu aceleași interese',
+    label: 'Salvează în Favorite și revino',
+    description: 'Apasă inimioara pentru a salva anunțurile preferate și a le accesa ulterior.',
+    icon: <FavoriteIcon />,
+    details: 'Favoritele se salvează pe dispozitiv, separate pe utilizator sau invitat, și pot fi regăsite în pagina „Favorite”.'
+  },
+  {
+    label: 'Discută și primește notificări',
+    description: 'Deschide chatul cu autorul anunțului și urmărește actualizările în „Notificări”.',
     icon: <ChatIcon />,
-    details: 'Sistemul nostru de chat securizat îți permite să comunici în siguranță cu alți membri. Planifică întâlniri și schimbă experiențe valoroase.'
-  },
-  {
-    label: 'Participă la activități',
-    description: 'Alătură-te grupurilor și evenimentelor organizate de comunitate',
-    icon: <GroupsIcon />,
-    details: 'Participă la workshop-uri, cursuri și evenimente speciale. Învață lucruri noi și dezvoltă-ți pasiunile alături de alți entuziaști.'
+    details: 'Chat integrat pentru întrebări rapide. Primești notificări despre mesaje noi sau activitate pe anunțurile tale.'
   }
 ];
 
 const features = [
   {
-    icon: <SecurityIcon />,
-    title: 'Siguritate maximă',
-    description: 'Toate datele tale sunt protejate cu criptare de nivel bancar și autentificare în doi pași.',
+    icon: <CategoryIcon />,
+    title: 'Categorii și filtre puternice',
+    description: 'Navigare pe categorii, căutare după cuvinte cheie, sortări și filtre pentru rezultate relevante.',
     color: '#355070'
   },
   {
-    icon: <SpeedIcon />,
-    title: 'Găsire rapidă',
-    description: 'Algoritmii noștri avansați îți recomandă persoane și activități potrivite în secunde.',
+    icon: <FavoriteIcon />,
+    title: 'Favorite sincronizate local',
+    description: 'Salvează ce-ți place și revino oricând. Stocare pe dispozitiv și separare pe utilizator/guest.',
     color: '#406b92'
   },
   {
-    icon: <SupportIcon />,
-    title: 'Suport 24/7',
-    description: 'Echipa noastră de support este disponibilă non-stop pentru a te ajuta cu orice întrebare.',
+    icon: <ChatIcon />,
+    title: 'Chat integrat',
+    description: 'Comunică rapid cu autorii anunțurilor. Avatare normalizate și fallback cu inițiale.',
     color: '#F8B195'
   },
   {
-    icon: <VerifiedIcon />,
-    title: 'Membri verificați',
-    description: 'Toți membrii trec prin procesul nostru de verificare pentru o experiență sigură.',
+    icon: <NotificationsIcon />,
+    title: 'Notificări clare',
+    description: 'Vezi noutățile importante, cu avatare, linkuri către anunțuri și evidențiere pentru elementele necitite.',
     color: '#355070'
   },
   {
-    icon: <TrendingUpIcon />,
-    title: 'Progres urmărit',
-    description: 'Monitorizează-ți progresul în hobby-uri și vezi cum evoluezi în timp.',
+    icon: <NightlightIcon />,
+    title: 'Dark mode elegant',
+    description: 'Paletă dark rafinată și accente roz, cu contrast și lizibilitate optimizate pe toate paginile.',
     color: '#406b92'
   },
   {
-    icon: <CheckCircleIcon />,
-    title: 'Calitate garantată',
-    description: 'Toate activitățile și cursurile sunt evaluate de comunitate pentru calitate maximă.',
+    icon: <ShieldIcon />,
+    title: 'Siguranță și încredere',
+    description: 'Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.',
     color: '#F8B195'
   }
 ];
@@ -117,7 +114,6 @@ export default function HowItWorks() {
 
   return (
     <>
-      <Header />
       <div className="how-it-works-page">
         <div className="how-it-works-container">
           
@@ -128,7 +124,7 @@ export default function HowItWorks() {
               Simplu și eficient
             </div>
             <h1 className="hero-title">
-              Cum funcționează <span className="highlight">HobbizMUI</span>?
+              Cum funcționează <span className="highlight">Hobbiz</span>?
             </h1>
             <p className="hero-description">
               Descoperă cum poți să-ți găsești rapid persoane cu aceleași pasiuni și să participi 
@@ -141,8 +137,8 @@ export default function HowItWorks() {
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
-                <span className="stat-number">500+</span>
-                <span className="stat-label">Evenimente lunare</span>
+                <span className="stat-number">2K+</span>
+                <span className="stat-label">Conversații lunare</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
@@ -248,7 +244,7 @@ export default function HowItWorks() {
           {/* Features Grid */}
           <div className="features-showcase">
             <div className="section-header">
-              <h2>De ce să alegi HobbizMUI?</h2>
+              <h2>De ce să alegi Hobbiz?</h2>
               <p>Funcționalități care fac diferența pentru experiența ta</p>
             </div>
             
@@ -330,7 +326,6 @@ export default function HowItWorks() {
 
         </div>
       </div>
-      <Footer />
     </>
   );
 }

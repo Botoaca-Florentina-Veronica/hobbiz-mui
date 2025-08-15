@@ -18,8 +18,8 @@ function Toast({ message, onClose }) {
       top: 100,
       left: '50%',
       transform: 'translateX(-50%)',
-      background: '#043136',
-      color: '#fff',
+      background: '#282828',
+      color: '#ffffff',
       padding: '18px 32px',
       borderRadius: 12,
       fontSize: 24,
@@ -28,7 +28,8 @@ function Toast({ message, onClose }) {
       display: 'flex',
       alignItems: 'center',
       gap: 12,
-      boxShadow: '0 2px 16px rgba(0,0,0,0.12)'
+      boxShadow: '0 2px 16px rgba(63,63,63,0.18)',
+      border: '1px solid #f51866'
     }}>
       <span style={{fontSize: 28, display: 'flex', alignItems: 'center'}}>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2l4-4"/></svg>
@@ -150,7 +151,7 @@ export default function FavoriteAnnouncements() {
             border: 'none',
             display: 'flex',
             alignItems: 'center',
-            color: '#073b4c',
+            color: '#f51866',
             fontSize: 22,
             fontWeight: 500,
             marginBottom: 8,
@@ -183,35 +184,35 @@ export default function FavoriteAnnouncements() {
                   <img
                     src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
                       ? a.images[0]
-                      : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
+                      : `/uploads/${a.images[0].replace(/^.*[\\\/]/, '')}`}
                     alt="imagine principala"
                     className="favorite-announcement-img"
                   />
                 ) : (
-                  <div className="favorite-announcement-img" style={{background: '#eee'}} />
+                  <div className="favorite-announcement-img" style={{background: '#ffebf0'}} />
                 )}
               </div>
               <div className="favorite-announcement-info">
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
-                  <span style={{color: '#355070', fontSize: 17}}>
+                  <span style={{color: '#717171', fontSize: 17}}>
                     {a.createdAt ? `Postat ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}` : ''}
                   </span>
-                  <div className="favorite-heart"
+                  <div className={`favorite-heart ${favoriteIds.includes(a._id) ? 'filled' : ''}`}
                     onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
                     onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
                     onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                   >
                     {favoriteIds.includes(a._id) ? (
-                      <FavoriteIcon sx={{ color: 'red', fontSize: 32 }} />
+                      <FavoriteIcon sx={{ fontSize: 32 }} />
                     ) : (
-                      <FavoriteBorderIcon sx={{ color: '#355070', fontSize: 32 }} />
+                      <FavoriteBorderIcon sx={{ fontSize: 32 }} />
                     )}
                   </div>
                 </div>
                 <h2 className="favorite-announcement-title">{a.title}</h2>
                 <div className="favorite-announcement-category">{a.category}</div>
                 <div className="favorite-announcement-location">{a.location}</div>
-                {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#003b3b', marginTop: 12 }}>{a.price} €</div>}
+                {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#3f3f3f', marginTop: 12 }}>{a.price} €</div>}
               </div>
               </div>
             ))}

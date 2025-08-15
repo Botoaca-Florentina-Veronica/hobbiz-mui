@@ -1,11 +1,3 @@
-  // Helper: normalize avatar/announcement image URLs
-  const resolveAvatarUrl = (src) => {
-    if (!src) return '';
-    if (src.startsWith('http') || src.startsWith('data:')) return src;
-    // Normalize already-uploaded relative paths like 'uploads/...' or '/uploads/...'
-    const cleaned = src.replace(/^\.\//, '').replace(/^\//, '');
-    return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\/]/, '')}`;
-  };
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
@@ -16,6 +8,16 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+
+// Helper: normalize avatar/announcement image URLs
+const resolveAvatarUrl = (src) => {
+  if (!src) return '';
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+  // Normalize already-uploaded relative paths like 'uploads/...' or '/uploads/...'
+  const cleaned = src.replace(/^\.\//, '').replace(/^\//, '');
+  return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\\/]/, '')}`;
+};
 
 export default function ChatPage() {
   const [activeTab, setActiveTab] = useState('buying'); // 'buying' sau 'selling'
@@ -31,10 +33,42 @@ export default function ChatPage() {
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const [selectedReply, setSelectedReply] = useState(null);
   const [reactionTargetId, setReactionTargetId] = useState(null);
+  // Drawer mobil pentru lista de conversații (deschis implicit pe mobil)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 600;
+    }
+    return false;
+  });
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  // refs inutile eliminate
   const userId = localStorage.getItem('userId');
   const location = useLocation();
+
+  // Detectează mobil pentru a ascunde lista când este selectată o conversație
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') return window.innerWidth <= 600;
+    return false;
+  });
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const isChattingOnMobile = isMobile && !!selectedConversation;
+
+  // Accent color helpers: blue in light mode, pink in dark mode
+  const getIsDarkMode = () => {
+    if (typeof document === 'undefined') return false;
+    const b = document.body;
+    const de = document.documentElement;
+    return (b && b.classList.contains('dark-mode')) || (de && de.classList.contains('dark-mode'));
+  };
+  const getAccentHex = () => (getIsDarkMode() ? 'f51866' : '355070');
+  const getAccentCss = () => `#${getAccentHex()}`;
 
   // Lista de emoji-uri populare
   const popularEmojis = ['😀', '😍', '🥰', '😊', '😂', '😭', '😎', '🤔', '😴', '🎉', '❤️', '👍', '👎', '🔥', '💯', '🙌', '👏', '🤝', '💪', '🎯'];
@@ -77,6 +111,10 @@ export default function ChatPage() {
 
   // Fetch current user avatar
   useEffect(() => {
+    // asigură-te că pe mobil e deschis la montare
+    if (typeof window !== 'undefined' && window.innerWidth <= 600) {
+      setIsSidebarOpen(true);
+    }
     if (!userId) return;
     
     const fetchCurrentUser = async () => {
@@ -480,8 +518,19 @@ export default function ChatPage() {
   return (
     <>
       <Header />
-      <div className="chat-page-container">
-        <aside className="chat-sidebar">
+      {/* Top bar mobil cu buton pentru conversații */}
+      <div className="chat-mobile-topbar">
+        <button
+          type="button"
+          className="chat-mobile-toggle"
+          onClick={() => setIsSidebarOpen(true)}
+        >
+          ☰ Conversații{unreadConversations.length > 0 ? ` (${unreadConversations.length})` : ''}
+        </button>
+      </div>
+      <div className={`chat-page-container ${isChattingOnMobile ? 'mobile-chatting' : ''}`}>
+        {!isChattingOnMobile && (
+        <aside className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <div className="chat-tabs">
             <button 
               className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`}
@@ -508,6 +557,8 @@ export default function ChatPage() {
                     onClick={async () => {
                       // Selectează conversația
                       setSelectedConversation(conversation);
+                      // Închide drawer-ul pe mobil după selectare
+                      setIsSidebarOpen(false);
                       // Marcăm local conversația ca citită ca să o mutăm din secțiunea NECITITE imediat în UI
                       setConversations(prev => prev.map(c =>
                         c.otherParticipant.id === conversation.otherParticipant.id
@@ -527,7 +578,7 @@ export default function ChatPage() {
                       src={conversation.avatar} 
                       alt={conversation.name}
                       onError={(e) => {
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=355070&color=fff`;
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=${getAccentHex()}&color=fff`;
                       }}
                     />
                     <div className="chat-conversation-info">
@@ -558,14 +609,17 @@ export default function ChatPage() {
                   <div 
                     key={conversation.id}
                     className={`chat-conversation-item read ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedConversation(conversation)}
+                    onClick={() => {
+                      setSelectedConversation(conversation);
+                      setIsSidebarOpen(false);
+                    }}
                   >
                     <img 
                       className="chat-avatar" 
                       src={conversation.avatar} 
                       alt={conversation.name}
                       onError={(e) => {
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=355070&color=fff`;
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=${getAccentHex()}&color=fff`;
                       }}
                     />
                     <div className="chat-conversation-info">
@@ -579,18 +633,20 @@ export default function ChatPage() {
             </>
           )}
         </aside>
+        )}
 
         <main className="chat-main">
+          {isChattingOnMobile && (
+            <div className="chat-main-header" style={{display:'flex', alignItems:'center', gap:8}}>
+              <button type="button" onClick={() => setSelectedConversation(null)} className="chat-mobile-back" aria-label="Înapoi la conversații" style={{border:'none',background:'transparent',padding:8}}>
+                ← Înapoi
+              </button>
+            </div>
+          )}
           {!selectedConversation ? (
             <div className="chat-empty-main">
               <div className="chat-empty-icon">
-                <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-                  <circle cx="60" cy="60" r="60" fill="#E3EDFF"/>
-                  <circle cx="85" cy="85" r="40" fill="#355070"/>
-                  <path d="M60 80c11.046 0 20-8.954 20-20s-8.954-20-20-20-20 8.954-20 20 8.954 20 20 20z" fill="#D6E4FF"/>
-                  <circle cx="60" cy="60" r="10" fill="#00394C"/>
-                  <path d="M65 65c-2.5 2.5-7.5 2.5-10 0" stroke="#00394C" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
+                <ForumOutlinedIcon sx={{ fontSize: 96, color: getAccentCss() }} />
               </div>
               <div className="chat-empty-text">Selectează o conversație pentru a o citi</div>
               <div className="chat-empty-subtitle">
@@ -631,11 +687,11 @@ export default function ChatPage() {
                     if (message.senderId === userId) {
                       // Mesaj trimis de utilizatorul curent
                       messageAvatar = currentUserAvatar || 
-                                    `https://ui-avatars.com/api/?name=Tu&background=355070&color=fff`;
+                                    `https://ui-avatars.com/api/?name=Tu&background=${getAccentHex()}&color=fff`;
                     } else {
                       // Mesaj primit - folosim avatarul din senderInfo
                       messageAvatar = message.senderInfo?.avatar || 
-                                    `https://ui-avatars.com/api/?name=${encodeURIComponent((message.senderInfo?.firstName?.[0] || '') + (message.senderInfo?.lastName?.[0] || ''))}&background=355070&color=fff`;
+                                    `https://ui-avatars.com/api/?name=${encodeURIComponent((message.senderInfo?.firstName?.[0] || '') + (message.senderInfo?.lastName?.[0] || ''))}&background=${getAccentHex()}&color=fff`;
                     }
 
                     return (
@@ -770,7 +826,7 @@ export default function ChatPage() {
                                     className="chat-message-ticks" 
                                     aria-label="Livrat / citit"
                                     style={{ 
-                                      color: message.isRead ? '#4fc3f7' : '#9e9e9e' // Albastru dacă citit, gri dacă nu
+                                      color: message.isRead ? getAccentCss() : '#9ca3af' // accent dacă citit, gri dacă nu
                                     }}
                                   >
                                     <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

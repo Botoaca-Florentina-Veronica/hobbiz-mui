@@ -263,7 +263,8 @@ html {
 
 /* Dark Mode Styles */
 .dark-mode .announcement-details-page {
-  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+  /* Surface colors only: #121212 -> #282828 */
+  background: linear-gradient(135deg, #121212 0%, #282828 100%);
 }
 
 .dark-mode .announcement-hero-overlay {
@@ -307,13 +308,15 @@ html {
 }
 
 .dark-mode .carousel-navigation-btn {
-  background: rgba(40, 40, 40, 0.95) !important;
+  /* Use surface palette: #282828 */
+  background: #282828 !important;
   color: #ffffff !important;
   border: 1px solid rgba(245, 24, 102, 0.3) !important;
 }
 
 .dark-mode .carousel-navigation-btn:hover {
-  background: rgba(63, 63, 63, 1) !important;
+  /* Use surface palette: #3f3f3f */
+  background: #3f3f3f !important;
   box-shadow: 0 4px 16px rgba(245, 24, 102, 0.3) !important;
 }
 

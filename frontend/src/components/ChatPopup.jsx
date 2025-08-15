@@ -209,11 +209,11 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         </div>
         <div className="chat-popup-messages">
           {loading ? (
-            <div style={{textAlign: 'center', color: '#888', padding: '20px'}}>
+            <div className="chat-popup-status">
               Se încarcă mesajele...
             </div>
           ) : messages.length === 0 ? (
-            <div style={{textAlign: 'center', color: '#888', padding: '20px'}}>
+            <div className="chat-popup-status">
               Nicio conversație încă. Scrie primul mesaj!
             </div>
           ) : (
@@ -256,7 +256,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                         onClick={() => handleDeleteMessage(msg._id)}
                         title="Șterge mesajul"
                       >
-                        <DeleteIcon sx={{ color: '#222', fontSize: 18 }} />
+                        <DeleteIcon sx={{ fontSize: 18 }} />
                       </button>
                       {deleteHover === 'show-' + msg._id && (
                         <span className="chat-popup-message-delete-tooltip">Șterge</span>
@@ -287,7 +287,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               type="button"
             >
               {/* Paperclip icon */}
-              <svg width="24" height="24" fill="none" stroke="#13344b" strokeWidth="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-8.49 8.49a5 5 0 0 1-7.07-7.07l9.19-9.19a3 3 0 0 1 4.24 4.24l-9.19 9.19a1 1 0 0 1-1.41-1.41l8.49-8.49"/></svg>
+              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-8.49 8.49a5 5 0 0 1-7.07-7.07l9.19-9.19a3 3 0 0 1 4.24 4.24l-9.19 9.19a1 1 0 0 1-1.41-1.41l8.49-8.49"/></svg>
             </button>
             {attachHover && (
               <div className="chat-popup-attach-tooltip">
@@ -304,7 +304,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               onClick={e => setEmojiAnchor(e.currentTarget)}
               type="button"
             >
-              <InsertEmoticonIcon style={{ fontSize: 24, color: '#13344b' }} />
+              <InsertEmoticonIcon style={{ fontSize: 24 }} />
             </button>
             {emojiHover && (
               <div className="chat-popup-attach-tooltip">
@@ -352,27 +352,14 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
             />
             <button
               type="submit"
-              className="chat-popup-icon-btn"
-              style={{
-                marginLeft: 4, 
-                fontSize: 22, 
-                color: sending ? '#ccc' : '#2ec4b6',
-                cursor: sending ? 'not-allowed' : 'pointer'
-              }}
+              className="chat-popup-icon-btn chat-popup-send-btn"
               aria-label="Trimite mesaj"
               disabled={!input.trim() || sending}
             >
               {sending ? (
-                <div style={{
-                  width: 20, 
-                  height: 20, 
-                  border: '2px solid #ccc', 
-                  borderTop: '2px solid #2ec4b6',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite'
-                }} />
+                <div className="chat-popup-spinner" />
               ) : (
-                <svg width="24" height="24" fill="none" stroke="#2ec4b6" strokeWidth="2" viewBox="0 0 24 24">
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M22 2L11 13"/>
                   <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
                 </svg>

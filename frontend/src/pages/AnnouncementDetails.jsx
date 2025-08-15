@@ -62,6 +62,16 @@ export default function AnnouncementDetails() {
   const [showChat, setShowChat] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
 
+  // Dark mode helpers and accent palette
+  const getIsDarkMode = () => {
+    if (typeof document === 'undefined') return false;
+    const b = document.body;
+    const de = document.documentElement;
+    return (b && b.classList.contains('dark-mode')) || (de && de.classList.contains('dark-mode'));
+  };
+  const getAccentCss = () => (getIsDarkMode() ? '#f51866' : '#355070');
+  const getAccentHover = () => (getIsDarkMode() ? '#fa4875' : '#406b92');
+
   useEffect(() => {
     async function fetchAnnouncement() {
       setLoading(true);
@@ -79,20 +89,48 @@ export default function AnnouncementDetails() {
 
   useEffect(() => {
     if (!announcement?._id) return;
-    const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-    setIsFavorite(favs.includes(announcement._id));
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    let isFav = false;
+    try {
+      const parsed = JSON.parse(raw || '[]');
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+        // Format vechi: ["id1","id2",...]
+        isFav = parsed.includes(announcement._id);
+      } else if (Array.isArray(parsed)) {
+        // Format nou: [{id, addedAt}]
+        isFav = parsed.some(item => item.id === announcement._id);
+      }
+    } catch {
+      isFav = false;
+    }
+    setIsFavorite(isFav);
   }, [announcement, FAVORITES_KEY]);
 
   const handleToggleFavorite = () => {
-    const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-    let updated;
-    if (favs.includes(announcement._id)) {
-      updated = favs.filter(fid => fid !== announcement._id);
-    } else {
-      updated = [...favs, announcement._id];
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    let list = [];
+    try {
+      const parsed = JSON.parse(raw || '[]');
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+        // Convert format vechi la obiecte
+        list = parsed.map(id => ({ id, addedAt: Date.now() }));
+      } else if (Array.isArray(parsed)) {
+        list = parsed;
+      }
+    } catch {
+      list = [];
     }
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-    setIsFavorite(updated.includes(announcement._id));
+
+    const exists = list.some(item => item.id === announcement._id);
+    let updatedObjects;
+    if (exists) {
+      updatedObjects = list.filter(item => item.id !== announcement._id);
+    } else {
+      updatedObjects = [...list, { id: announcement._id, addedAt: Date.now() }];
+    }
+
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
+    setIsFavorite(!exists);
   };
 
   const handleShare = async () => {
@@ -229,8 +267,8 @@ export default function AnnouncementDetails() {
           onClick={() => navigate(-1)}
           sx={{ 
             mb: 3, 
-            color: '#355070',
-            '&:hover': { bgcolor: 'rgba(53, 80, 112, 0.04)' }
+            color: getAccentCss(),
+            '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)' }
           }}
         >
           Înapoi
@@ -267,8 +305,8 @@ export default function AnnouncementDetails() {
                             left: 16,
                             top: '50%',
                             transform: 'translateY(-50%)',
-                            bgcolor: 'rgba(255,255,255,0.9)',
-                            '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
+                            bgcolor: getIsDarkMode() ? '#282828' : 'rgba(255,255,255,0.9)',
+                            '&:hover': { bgcolor: getIsDarkMode() ? '#3f3f3f' : 'rgba(255,255,255,1)' },
                             boxShadow: 2
                           }}
                         >
@@ -281,8 +319,8 @@ export default function AnnouncementDetails() {
                             right: 16,
                             top: '50%',
                             transform: 'translateY(-50%)',
-                            bgcolor: 'rgba(255,255,255,0.9)',
-                            '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
+                            bgcolor: getIsDarkMode() ? '#282828' : 'rgba(255,255,255,0.9)',
+                            '&:hover': { bgcolor: getIsDarkMode() ? '#3f3f3f' : 'rgba(255,255,255,1)' },
                             boxShadow: 2
                           }}
                         >
@@ -306,11 +344,11 @@ export default function AnnouncementDetails() {
                   <Box
                     sx={{
                       height: 500,
-                      bgcolor: '#f5f5f5',
+                      bgcolor: getIsDarkMode() ? '#282828' : '#f5f5f5',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#999'
+                      color: getIsDarkMode() ? '#f5f5f5' : '#999'
                     }}
                   >
                     <Typography variant="h6">Nu există imagini disponibile</Typography>
@@ -318,29 +356,21 @@ export default function AnnouncementDetails() {
                 )}
               </Box>
             </Card>
-            {/* Modal zoom imagine */}
-            <ImageZoomModal
-              open={zoomOpen}
-              images={imagesSrc}
-              index={zoomIndex}
-              onClose={handleCloseZoom}
-              onPrev={handlePrevZoom}
-              onNext={handleNextZoom}
-            />
 
-            {/* Announcement Details */}
-            <Card elevation={2} sx={{ borderRadius: 3 }}>
+            {/* Details card */}
+
+            <Card elevation={2} sx={{ borderRadius: 3, bgcolor: getIsDarkMode() ? '#282828' : '#f5f5f5' }}>
               <CardContent sx={{ p: 4 }}>
                 {/* Header with actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                   <Box sx={{ flex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                      <AccessTimeIcon sx={{ color: '#355070', fontSize: 20 }} />
+                      <AccessTimeIcon sx={{ color: getAccentCss(), fontSize: 20 }} />
                       <Typography variant="body2" color="text.secondary">
                         Postat {formatDate(announcement.createdAt)}
                       </Typography>
                     </Box>
-                    <Typography variant="h4" component="h1" sx={{ color: '#355070', fontWeight: 700, mb: 2 }}>
+                    <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2 }}>
                       {announcement.title}
                     </Typography>
                     {announcement.category && (
@@ -348,8 +378,8 @@ export default function AnnouncementDetails() {
                         label={announcement.category}
                         variant="outlined"
                         sx={{
-                          borderColor: '#355070',
-                          color: '#355070',
+                          borderColor: getAccentCss(),
+                          color: getAccentCss(),
                           mb: 2
                         }}
                       />
@@ -361,9 +391,11 @@ export default function AnnouncementDetails() {
                       <IconButton
                         onClick={handleToggleFavorite}
                         sx={{
-                          color: isFavorite ? '#e53e3e' : '#355070',
+                          color: isFavorite ? (getIsDarkMode() ? '#f51866' : '#e53e3e') : getAccentCss(),
                           '&:hover': {
-                            bgcolor: isFavorite ? 'rgba(229, 62, 62, 0.04)' : 'rgba(53, 80, 112, 0.04)',
+                            bgcolor: isFavorite 
+                              ? (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(229, 62, 62, 0.08)')
+                              : (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)'),
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s'
@@ -376,9 +408,9 @@ export default function AnnouncementDetails() {
                       <IconButton
                         onClick={handleShare}
                         sx={{
-                          color: '#355070',
+                          color: getAccentCss(),
                           '&:hover': {
-                            bgcolor: 'rgba(53, 80, 112, 0.04)',
+                            bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)',
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s'
@@ -393,13 +425,13 @@ export default function AnnouncementDetails() {
                 <Divider sx={{ mb: 3 }} />
 
                 {/* Description */}
-                <Typography variant="h6" sx={{ color: '#355070', mb: 2, fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ color: getAccentCss(), mb: 2, fontWeight: 600 }}>
                   Descriere
                 </Typography>
                 <Typography
                   variant="body1"
                   sx={{
-                    color: '#2d3748',
+                    color: getIsDarkMode() ? '#f5f5f5' : '#2d3748',
                     lineHeight: 1.7,
                     whiteSpace: 'pre-line',
                     fontSize: '1.1rem'
@@ -411,7 +443,7 @@ export default function AnnouncementDetails() {
                 {announcement.price && (
                   <>
                     <Divider sx={{ my: 3 }} />
-                    <Typography variant="h6" sx={{ color: '#355070', mb: 1, fontWeight: 600 }}>
+                    <Typography variant="h6" sx={{ color: getAccentCss(), mb: 1, fontWeight: 600 }}>
                       Preț
                     </Typography>
                     <Typography variant="h5" sx={{ color: '#e53e3e', fontWeight: 700 }}>
@@ -427,7 +459,7 @@ export default function AnnouncementDetails() {
           <Grid item xs={12} md={4}>
             <Card elevation={2} sx={{ borderRadius: 3, position: 'sticky', top: 120 }}>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ color: '#355070', mb: 3, fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>
                   Informații vânzător
                 </Typography>
 
@@ -439,7 +471,7 @@ export default function AnnouncementDetails() {
                       width: 60,
                       height: 60,
                       mr: 2,
-                      bgcolor: '#355070',
+                      bgcolor: getAccentCss(),
                       fontSize: '1.2rem',
                       fontWeight: 600
                     }}
@@ -447,7 +479,7 @@ export default function AnnouncementDetails() {
                     {!announcement.user.avatar && getInitials(announcement.user)}
                   </Avatar>
                   <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#2d3748' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: getIsDarkMode() ? '#f5f5f5' : '#2d3748' }}>
                       {announcement.user.firstName} {announcement.user.lastName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -479,8 +511,8 @@ export default function AnnouncementDetails() {
                       onClick={handleChatClick}
                       fullWidth
                       sx={{
-                        bgcolor: '#355070',
-                        '&:hover': { bgcolor: '#406b92' },
+                        bgcolor: getAccentCss(),
+                        '&:hover': { bgcolor: getAccentHover() },
                         borderRadius: 2,
                         py: 1.5
                       }}
@@ -492,7 +524,7 @@ export default function AnnouncementDetails() {
                     <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <PhoneIcon sx={{ color: '#355070', fontSize: 20 }} />
+                          <PhoneIcon sx={{ color: getAccentCss(), fontSize: 20 }} />
                           <Typography variant="body1">
                             {showPhone 
                               ? (announcement.contactPhone || announcement.user.phone || 'N/A')
@@ -504,7 +536,7 @@ export default function AnnouncementDetails() {
                           <Button
                             size="small"
                             onClick={() => setShowPhone(true)}
-                            sx={{ color: '#355070' }}
+                            sx={{ color: getAccentCss() }}
                           >
                             Arată
                           </Button>
@@ -516,7 +548,7 @@ export default function AnnouncementDetails() {
                     {announcement.contactEmail && (
                       <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <EmailIcon sx={{ color: '#355070', fontSize: 20 }} />
+                          <EmailIcon sx={{ color: getAccentCss(), fontSize: 20 }} />
                           <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
                             {announcement.contactEmail}
                           </Typography>

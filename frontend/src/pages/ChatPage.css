@@ -9,7 +9,7 @@
   max-width: 1300px;
   min-width: 320px;
   margin-top: 8rem;
-  overflow: hidden;
+  overflow: hidden; /* va fi suprascris pe mobil */
 }
 
 .chat-sidebar {
@@ -27,6 +27,12 @@
   padding: 24px 24px 0 24px;
   background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
 }
+
+/* Ascunde permanent controlul FAB mobil pe desktop/laptop */
+.chat-mobile-fab { display: none; }
+
+/* Ascunde topbar-ul mobil pe desktop/tabletă; va fi afișat în media query-ul <600px */
+.chat-mobile-topbar { display: none; }
 
 .chat-tab {
   flex: 1;
@@ -50,7 +56,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #355070, #406b92);
+  background: #355070;
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 1;
@@ -76,7 +82,7 @@
 
 .chat-section-label {
   font-weight: 700;
-  color: #355070;
+  color: #333333;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -93,7 +99,7 @@
   left: 0;
   width: 30px;
   height: 2px;
-  background: linear-gradient(90deg, #355070, #406b92);
+  background: #355070;
 }
 
 .chat-empty-state {
@@ -177,7 +183,7 @@
 }
 
 .chat-conversation-item.selected {
-  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  background: #355070;
   color: white;
 }
 
@@ -208,7 +214,7 @@
 
 .chat-conversation-name {
   font-weight: 600;
-  color: #355070;
+  color: #333333;
   font-size: 15px;
   margin-bottom: 4px;
 }
@@ -277,7 +283,7 @@
 
 .chat-main-user-info h3 {
   margin: 0;
-  color: #355070;
+  color: #333333;
   font-size: 16px;
   font-weight: 600;
 }
@@ -295,6 +301,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px; /* mai puțin spațiu între mesaje */
+  min-height: 0; /* permite containerului să se micșoreze corect în layout-uri flex */
 }
 
 .chat-message {
@@ -364,30 +371,30 @@
   grid-column: 1 / -1;
   display: flex;
   align-items: stretch;
-  background: #f1f5f9;
+  background: #f5f5f5;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   margin-bottom: 8px;
   overflow: hidden;
 }
-.chat-reply-preview.own { background: #e8f3ff; border-color: #cfe6ff; }
+.chat-reply-preview.own { background: #ffabb7; border-color: #ff96a6; }
 .chat-reply-bar {
   width: 4px;
   background: #355070;
 }
-.chat-reply-preview.own .chat-reply-bar { background: #1e73be; }
+.chat-reply-preview.own .chat-reply-bar { background: #355070; }
 .chat-reply-content {
   padding: 6px 10px;
 }
 .chat-reply-author {
   font-weight: 700;
   font-size: 12px;
-  color: #355070;
+  color: #333333;
   margin-bottom: 2px;
 }
 .chat-reply-text {
   font-size: 13px;
-  color: #334155;
+  color: #4b5563;
 }
 
 /* Reply composer preview (deasupra inputului) */
@@ -415,9 +422,9 @@
 .chat-reply-cancel:hover { color: #374151; }
 
 .chat-message.own .chat-message-bubble {
-  background: #e2f0ff; /* păstrăm culoarea actuală */
-  color: #0a2540;
-  border: 1px solid #b9dbff;
+  background: #355070;
+  color: #ffffff;
+  border: 1px solid #355070;
   border-radius: 16px 16px 6px 16px; /* TL TR BR BL - puțin mai rotunjit, dar BR mai mic */
 }
 
@@ -467,14 +474,14 @@
   align-self: flex-start;
 }
 
-.chat-message.own .chat-message-time { color: #7a8aa0; }
+.chat-message.own .chat-message-time { color: #9ca3af; }
 
 /* meta wrapper eliminat - bife sunt în rând cu bula, timpul sub bulă */
 
 /* Double check ticks inside bubble for own messages */
 .chat-message-ticks {
   position: static; /* în flux, la dreapta textului */
-  color: #2d7bf6; /* bife albastre */
+  color: #355070;
   display: inline-flex;
   align-items: center;
   line-height: 1;
@@ -491,7 +498,10 @@
   background: white;
   border-top: 1px solid #e8ecef;
   padding: 20px 24px;
-  position: relative;
+  position: sticky; /* rămâne vizibilă pe mobil la scroll */
+  bottom: 0;
+  z-index: 5;
+  padding-bottom: max(env(safe-area-inset-bottom), 20px); /* suport iOS safe area */
 }
 
 .chat-input-wrapper {
@@ -539,13 +549,13 @@
   outline: none;
   border-color: #355070;
   background: white;
-  box-shadow: 0 0 0 3px rgba(53, 80, 112, 0.1);
+  box-shadow: 0 0 0 3px rgba(53, 80, 112, 0.15);
 }
 
 .chat-send-button {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #355070, #406b92);
+  background: #355070;
   border: none;
   border-radius: 6px;
   color: white;
@@ -584,7 +594,7 @@
 }
 
 .chat-empty-text {
-  color: #355070;
+  color: #333333;
   font-size: 18px;
   font-weight: 500;
   text-align: center;
@@ -625,7 +635,7 @@
   }
   
   .chat-conversation-item {
-    margin: 0 4px;
+    margin: 0; /* elimină marginea dreapta care crea spațiu inutil */
     padding: 12px 16px;
   }
   
@@ -643,29 +653,86 @@
 }
 
 @media (max-width: 600px) {
+  html, body { overflow-x: hidden; }
   .chat-page-container {
-    margin: 8px;
+    margin: 0; /* eliminăm marginile care taie spațiu util pe mobil */
+    border-radius: 0;
+    height: auto; /* permite footer-ului să rămână vizibil */
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden; /* previne scroll-ul orizontal accidental, dar nu blochează sticky */
+    /* DEBUG border eliminat după verificare */
+    padding: 0 0 90px 0; /* fără padding lateral; spațiu jos pt footer */
+    box-sizing: border-box;
+    width: 100% !important;
+  }
+
+  /* Topbar mobil pentru deschiderea drawer-ului de conversații */
+  .chat-mobile-topbar { display: none !important; }
+  .chat-mobile-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 12px;
     border-radius: 6px;
-    height: calc(100vh - 16px);
-    margin-top: 6rem;
+    border: 2px solid #e8ecef;
+    background: #fff;
+    color: #333;
   }
-  
+
   .chat-sidebar {
-    max-height: 35vh;
+    /* Pe mobil afișăm lista normal, fără poziționare fixă, ca să rămână vizibil footer-ul */
+    position: static;
+    width: 100% !important;
+    max-height: none;
+    background: #ffffff;
+    z-index: auto;
+    transform: none;
+    transition: none;
+    overflow: visible;
+    padding: 0; /* evită spațiu lateral care creează gutter */
   }
-  
+  .chat-sidebar.open { transform: none; }
+
   .chat-main {
     min-height: 60vh;
+    width: 100% !important;
+    box-sizing: border-box;
   }
-  
+
+  /* Overlay pentru când drawer-ul este deschis */
+  .chat-overlay { display: none !important; }
+
+  /* FAB mobil pentru deschiderea rapidă a conversațiilor */
+  .chat-mobile-fab { display: none !important; }
+
+  /* Ascunde empty state din zona principală pe mobil */
+  .chat-empty-state { display: none !important; }
+  .chat-empty-main { display: none !important; }
+
   .chat-tabs {
-    padding: 12px 12px 0 12px;
+    padding: 12px 12px 0 12px; /* păstrăm 12px egali pe ambele părți */
     gap: 2px;
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
   }
+
+  .chat-page-container.mobile-chatting .chat-sidebar { display: none !important; }
+  .chat-page-container.mobile-chatting .chat-main {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .chat-conversation-list { padding: 0; }
   
   .chat-tab {
     padding: 10px 12px;
     font-size: 13px;
+    flex: 0 0 auto; /* lățime naturală pentru scroll orizontal */
   }
   
   .chat-section-label {
@@ -712,17 +779,20 @@
   }
   
   .chat-messages-container {
-    padding: 12px 16px;
+    padding: 12px 12px;
     gap: 12px;
+    min-height: 0;
+    padding-bottom: 88px; /* rezervă pentru bara de input fixă */
   }
   
   .chat-message {
-    max-width: 90%;
+    max-width: 96%;
   }
   
   .chat-message-bubble {
-    padding: 10px 14px;
-    border-radius: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    word-break: break-word; /* previne overflow pe cuvinte lungi/URL-uri */
   }
   
   .chat-message-text {
@@ -733,9 +803,18 @@
   font-size: 19px; /* și mai mari pe mobil */
   }
   
-  .chat-input-container {
-    padding: 12px 16px;
-    gap: 8px;
+  /* Creștem specificitatea și folosim !important pentru a evita suprascrieri din MUI */
+  .chat-page-container .chat-input-container {
+    padding: 12px 12px !important;
+    gap: 8px !important;
+    position: fixed !important; /* garantat vizibilă pe mobil peste tastatură */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important; /* ancorată la baza ecranului */
+    z-index: 999 !important;
+    padding-bottom: max(env(safe-area-inset-bottom), 12px) !important;
+    background: #ffffff !important; /* suprascrie eventuale transparențe */
+    border-top: 2px solid #00aaff !important; /* DEBUG: marker vizibil pentru bară input */
   }
   
   .chat-input {
@@ -762,124 +841,158 @@
 }
 
 /* Dark Mode Styles */
+.dark-mode {
+  /* Strict palette variables */
+  --dm-bg: #1e1e1e;
+  --dm-bg-elev: #232323;
+  --dm-bg-soft: #2a2a2a;
+  --dm-border: #333333;
+  --dm-text: #f5f5f5;
+  --dm-muted: #9ca3af;
+  --dm-pink: #f51866;
+  --dm-pink-soft: #fa4875;
+}
+
 .dark-mode .chat-page-container {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  background: var(--dm-bg-elev);
   box-shadow: 0 4px 24px rgba(245, 24, 102, 0.2);
 }
 
+/* Accente specifice pentru dark mode (roz) pentru elementele schimbate în light la albastru) */
+.dark-mode .chat-section-label::after { background: var(--dm-pink); }
+.dark-mode .chat-conversation-item::before { background: var(--dm-pink); }
+.dark-mode .chat-conversation-item.selected { background: var(--dm-pink); color: #ffffff; }
+.dark-mode .chat-conversation-item:hover .chat-avatar { border-color: var(--dm-pink); }
+.dark-mode .chat-main-avatar { border-color: var(--dm-pink); }
+.dark-mode .chat-reply-bar { background: var(--dm-pink); }
+.dark-mode .chat-message-ticks { color: var(--dm-pink); }
+.dark-mode .chat-image-remove { background: var(--dm-pink); }
+
 .dark-mode .chat-sidebar {
-  background: #282828;
-  border-right: 1px solid rgba(245, 24, 102, 0.3);
+  background: var(--dm-bg);
+  border-right: 1px solid var(--dm-border);
 }
 
 .dark-mode .chat-tabs {
-  background: linear-gradient(135deg, #3f3f3f 0%, #575757 100%);
+  background: var(--dm-bg-elev);
 }
 
 .dark-mode .chat-tab {
-  border: 2px solid rgba(245, 24, 102, 0.3);
-  color: #ffffff;
+  border: 2px solid var(--dm-border);
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-tab::before {
-  background: linear-gradient(135deg, #f51866, #fa4875);
+  background: var(--dm-pink);
 }
 
 .dark-mode .chat-tab.active,
 .dark-mode .chat-tab:hover {
-  border-color: #f51866;
-  color: #ffffff;
+  border-color: var(--dm-pink);
+  color: var(--dm-text);
   box-shadow: 0 4px 12px rgba(245, 24, 102, 0.3);
 }
 
 .dark-mode .chat-section-label {
-  color: #ffffff;
-  border-bottom: 2px solid rgba(245, 24, 102, 0.3);
+  color: var(--dm-text);
+  border-bottom: 2px solid var(--dm-border);
 }
 
 .dark-mode .chat-section-label::after {
-  background: linear-gradient(90deg, #f51866, #fa4875);
+  background: var(--dm-pink);
 }
 
 .dark-mode .chat-empty-state {
-  color: #ffffff;
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-conversations {
-  background: #282828;
+  background: var(--dm-bg);
 }
 
 .dark-mode .chat-conversation-item {
-  background: #3f3f3f;
-  border: 1px solid rgba(245, 24, 102, 0.2);
-  color: #ffffff;
+  background: var(--dm-bg-soft);
+  border: 1px solid var(--dm-border);
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-conversation-item:hover {
-  background: #575757;
-  border-color: rgba(245, 24, 102, 0.4);
+  background: var(--dm-bg-soft);
+  border-color: var(--dm-pink);
 }
 
 .dark-mode .chat-conversation-item.active {
-  background: rgba(245, 24, 102, 0.2);
-  border-color: #f51866;
+  background: var(--dm-bg-soft);
+  border-color: var(--dm-pink);
 }
 
 .dark-mode .chat-conversation-name {
-  color: #ffffff;
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-conversation-preview {
-  color: #8b8b8b;
+  color: var(--dm-muted);
 }
 
 .dark-mode .chat-conversation-time {
-  color: #8b8b8b;
+  color: var(--dm-muted);
 }
 
 .dark-mode .chat-main {
-  background: #282828;
+  background: var(--dm-bg);
 }
 
 .dark-mode .chat-header {
-  background: linear-gradient(135deg, #3f3f3f 0%, #575757 100%);
-  border-bottom: 1px solid rgba(245, 24, 102, 0.3);
-  color: #ffffff;
+  background: var(--dm-bg-elev);
+  border-bottom: 1px solid var(--dm-border);
+  color: var(--dm-text);
+}
+
+/* Dark mode: header din zona de mesaje (nu cel global) */
+.dark-mode .chat-main-header {
+  background: var(--dm-bg-elev);
+  border-bottom: 1px solid var(--dm-border);
+  color: var(--dm-text);
+  box-shadow: none; /* evită efectul luminos pe dark */
+}
+
+.dark-mode .chat-main-user-info h3 {
+  color: var(--dm-text);
+}
+
+.dark-mode .chat-main-user-info p {
+  color: var(--dm-muted);
 }
 
 .dark-mode .chat-partner-name {
-  color: #ffffff;
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-partner-status {
-  color: #8b8b8b;
+  color: var(--dm-muted);
 }
 
 .dark-mode .chat-messages {
-  background: #282828;
+  background: var(--dm-bg);
 }
 
 .dark-mode .chat-message {
-  color: #ffffff;
+  color: var(--dm-text);
 }
 
 /* Dark mode styles pentru mesajele proprii */
 .dark-mode .chat-message.own .chat-message-bubble {
-  background: linear-gradient(135deg, #f51866, #fa4875);
-  border: 1px solid rgba(250, 72, 117, 0.35);
+  background: var(--dm-pink);
+  border: 1px solid var(--dm-pink);
   color: #ffffff;
 }
 
-/* fără coadă în stilul nou */
-
 /* Dark mode styles pentru mesajele primite */
 .dark-mode .chat-message:not(.own) .chat-message-bubble {
-  background: #3a3f46;
-  color: #eaeff5;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--dm-bg-soft);
+  color: var(--dm-text);
+  border: 1px solid var(--dm-border);
 }
-
-/* fără coadă în stilul nou */
 
 /* Dark mode: own tail outline + fill */
 .dark-mode .chat-message.own .chat-message-bubble::before {
@@ -892,55 +1005,54 @@
 }
 
 .dark-mode .chat-message-ticks {
-  color: #9ec3ff;
+  color: var(--dm-pink);
 }
 
 .dark-mode .chat-message-time,
-.dark-mode .chat-message-meta { color: #a7b8c9; }
-
-.dark-mode .chat-message-time {
-  color: #8b8b8b;
+.dark-mode .chat-message-meta { 
+  color: var(--dm-muted);
 }
 
 .dark-mode .chat-input-container {
-  background: #3f3f3f;
-  border-top: 1px solid rgba(245, 24, 102, 0.3);
+  background: var(--dm-bg-elev);
+  border-top: 1px solid var(--dm-border);
 }
 
 .dark-mode .chat-input {
-  background: #575757;
-  border: 1px solid rgba(245, 24, 102, 0.3);
-  color: #ffffff;
+  background: var(--dm-bg-soft);
+  border: 1px solid var(--dm-border);
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-input:focus {
-  border-color: #f51866;
+  border-color: var(--dm-pink);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(245, 24, 102, 0.25);
 }
 
 .dark-mode .chat-input::placeholder {
-  color: #8b8b8b;
+  color: var(--dm-muted);
 }
 
 .dark-mode .chat-send-button {
-  background: linear-gradient(135deg, #f51866, #fa4875);
+  background: var(--dm-pink);
   color: #ffffff;
 }
 
 .dark-mode .chat-send-button:hover {
-  background: linear-gradient(135deg, #fa4875, #fe6585);
+  background: var(--dm-pink-soft);
 }
 
 .dark-mode .chat-empty-main {
-  color: #ffffff;
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-empty-text {
-  color: #ffffff;
+  color: var(--dm-text);
 }
 
 .dark-mode .chat-empty-subtitle {
-  color: #8b8b8b;
+  color: var(--dm-muted);
 }
 
 /* Stiluri pentru funcționalități noi */
@@ -965,7 +1077,7 @@
   right: -8px;
   width: 24px;
   height: 24px;
-  background: #f51866;
+  background: #355070;
   color: white;
   border: none;
   border-radius: 50%;
@@ -1169,8 +1281,8 @@
 }
 
 .message-action-btn.delete:hover {
-  background: #fef2f2;
-  color: #dc2626;
+  background: #fff0f4;
+  color: #355070;
 }
 
 .message-action-btn .MuiSvgIcon-root {
@@ -1188,22 +1300,22 @@
 
 /* Dark mode pentru bara de acțiuni */
 .dark-mode .message-actions-bar {
-  background: #374151;
-  border-color: #4b5563;
+  background: var(--dm-bg-elev);
+  border-color: var(--dm-border);
 }
 
 .dark-mode .message-action-btn {
-  color: #d1d5db;
+  color: var(--dm-text);
 }
 
 .dark-mode .message-action-btn:hover {
-  background: #4b5563;
-  color: #f9fafb;
+  background: var(--dm-bg-soft);
+  color: var(--dm-text);
 }
 
 .dark-mode .message-action-btn.delete:hover {
-  background: #7f1d1d;
-  color: #fca5a5;
+  background: rgba(245, 24, 102, 0.15);
+  color: #ff96a6;
 }
 
 /* Tooltip mic pentru confirmarea copierii */
@@ -1218,8 +1330,8 @@
   left: 50%;
   transform: translateX(-50%);
   background: #ffffff;
-  color: #10b981; /* verde confirmare */
-  border: 1px solid #d1fae5;
+  color: #f51866; /* confirmare roz */
+  border: 1px solid #ffabb7;
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
@@ -1242,14 +1354,14 @@
 }
 
 .dark-mode .message-action-btn.copy .message-copied {
-  background: #1f2937;
-  color: #34d399;
-  border-color: #065f46;
+  background: var(--dm-bg-elev);
+  color: #ff96a6;
+  border-color: rgba(245, 24, 102, 0.4);
   box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
 .dark-mode .message-action-btn.copy .message-copied::after {
-  border-top-color: #1f2937;
+  border-top-color: var(--dm-bg-elev);
 }
 
 /* Separator de dată */
@@ -1279,12 +1391,12 @@
 
 /* Dark mode pentru separator */
 .dark-mode .date-separator-line {
-  background: linear-gradient(90deg, transparent, #4b5563 20%, #4b5563 80%, transparent);
+  background: linear-gradient(90deg, transparent, var(--dm-border) 20%, var(--dm-border) 80%, transparent);
 }
 
 .dark-mode .date-separator-text {
-  color: #9ca3af;
-  background: #1f2937;
+  color: var(--dm-muted);
+  background: var(--dm-bg-elev);
 }
 
 /* Reacții la mesaje */
@@ -1339,10 +1451,11 @@
 .reaction-chip .emoji { font-size: 15px; }
 .reaction-chip .count { font-weight: 600; }
 .reaction-chip.mine { background: #eff6ff; border-color: #bfdbfe; }
+.reaction-chip.mine { background: #fff1f5; border-color: #ffabb7; }
 
-.dark-mode .reaction-picker { background: #374151; border-color: #4b5563; color: #e5e7eb; }
-.dark-mode .reaction-chip { background: #1f2937; border-color: #374151; color: #e5e7eb; }
-.dark-mode .reaction-chip.mine { background: #0f172a; border-color: #334155; }
+.dark-mode .reaction-picker { background: var(--dm-bg-elev); border-color: var(--dm-border); color: var(--dm-text); }
+.dark-mode .reaction-chip { background: var(--dm-bg-elev); border-color: var(--dm-border); color: var(--dm-text); }
+.dark-mode .reaction-chip.mine { background: rgba(245, 24, 102, 0.15); border-color: var(--dm-pink); }
 
 /* Reacții fixate pe bulă */
 .message-reactions-bubble {
@@ -1374,8 +1487,12 @@
 }
 .reaction-item .emoji { font-size: 14px; }
 .reaction-item .count { font-size: 12px; font-weight: 600; margin-left: 2px; }
-.reaction-item.mine { color: #1d4ed8; }
+.reaction-item.mine { color: #355070; }
 
-.dark-mode .message-reactions-bubble { background: #1f2937; border-color: #374151; }
-.dark-mode .reaction-item { color: #e5e7eb; }
-.dark-mode .reaction-item.mine { color: #93c5fd; }
+.dark-mode .message-reactions-bubble { background: var(--dm-bg-elev); border-color: var(--dm-border); }
+.dark-mode .reaction-item { color: var(--dm-text); }
+.dark-mode .reaction-item.mine { color: #ff96a6; }
+
+/* (șters blocul gol @media 768px care putea crea confuzii) */
+
+/* Reacții fixate pe bulă */

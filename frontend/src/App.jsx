@@ -66,7 +66,14 @@ function App() {
             <Footer />
           </>
         } />
-        <Route path="/notificari" element={<NotificationsPage />} />
+        <Route path="/notificari" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <NotificationsPage />
+            <Footer />
+          </>
+        } />
         <Route path="/favorite-announcements" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -92,7 +99,9 @@ function App() {
         <Route path="/cum-functioneaza" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
             <HowItWorks />
+            <Footer />
           </>
         } />
         <Route path="/confidentialitate" element={

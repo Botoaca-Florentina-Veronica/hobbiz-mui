@@ -1,6 +1,6 @@
 /* Cookie Policy Page - stil consistent cu About.css */
 .cookie-policy-page {
-  background-color: #f3f5f6;
+  background-color: #ffffff;
   min-height: 100vh;
   padding: 40px 0;
   margin-top: 4rem;
@@ -14,14 +14,14 @@
 
 .cookie-policy-hero {
   text-align: center;
-  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
-  color: white;
+  background: linear-gradient(135deg, #ffabb7 0%, #ff96a6 100%);
+  color: #121212;
   padding: 80px 40px;
   border-radius: 24px;
   margin-bottom: 60px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+  box-shadow: 0 12px 48px rgba(63, 63, 63, 0.2);
 }
 
 .cookie-policy-hero::before {
@@ -31,7 +31,7 @@
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
   transform: rotate(30deg);
   pointer-events: none;
 }
@@ -40,9 +40,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(245, 24, 102, 0.08);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(245, 24, 102, 0.25);
   padding: 12px 24px;
   border-radius: 50px;
   font-size: 0.9rem;
@@ -57,11 +57,6 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
 .hero-title {
   font-size: 3.5rem;
   font-weight: 800;
@@ -73,7 +68,7 @@
 }
 
 .hero-title .highlight {
-  background: linear-gradient(45deg, #F8B195, #ffd89b);
+  background: linear-gradient(45deg, #f51866, #fa4875);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -96,7 +91,7 @@
   background: white;
   border-radius: 20px;
   padding: 60px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(63, 63, 63, 0.12);
   margin-bottom: 40px;
 }
 
@@ -109,7 +104,7 @@
 }
 
 .policy-section h2 {
-  color: #355070;
+  color: #3f3f3f;
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 24px;
@@ -124,12 +119,12 @@
   left: 0;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #F8B195, #ffd89b);
+  background: linear-gradient(90deg, #f51866, #fa4875);
   border-radius: 2px;
 }
 
 .policy-section h3 {
-  color: #355070;
+  color: #3f3f3f;
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 16px;
@@ -137,21 +132,21 @@
 }
 
 .policy-section h4 {
-  color: #355070;
+  color: #3f3f3f;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
 .policy-section p {
-  color: #4a5568;
+  color: #575757;
   font-size: 1.1rem;
   line-height: 1.7;
   margin-bottom: 16px;
 }
 
 .policy-section ul {
-  color: #4a5568;
+  color: #575757;
   font-size: 1.1rem;
   line-height: 1.7;
   margin-left: 20px;
@@ -164,8 +159,8 @@
 
 /* Cookie Types */
 .cookie-type {
-  background: #f8fafb;
-  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #8b8b8b;
   border-radius: 16px;
   padding: 32px;
   margin-bottom: 24px;
@@ -174,7 +169,7 @@
 
 .cookie-type:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(53, 80, 112, 0.1);
+  box-shadow: 0 8px 25px rgba(63, 63, 63, 0.12);
 }
 
 .cookie-examples {
@@ -185,8 +180,8 @@
 }
 
 .cookie-tag {
-  background: linear-gradient(135deg, #355070, #406b92);
-  color: white;
+  background: linear-gradient(135deg, #f51866, #fa4875);
+  color: #ffffff;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -203,7 +198,7 @@
 
 .reason-card {
   background: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #8b8b8b;
   border-radius: 16px;
   padding: 32px 24px;
   text-align: center;
@@ -219,12 +214,12 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #F8B195, #ffd89b);
+  background: linear-gradient(90deg, #f51866, #fa4875);
 }
 
 .reason-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(53, 80, 112, 0.15);
+  box-shadow: 0 12px 40px rgba(63, 63, 63, 0.15);
 }
 
 .reason-icon {
@@ -234,14 +229,14 @@
 }
 
 .reason-card h4 {
-  color: #355070;
+  color: #3f3f3f;
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
 .reason-card p {
-  color: #6b7280;
+  color: #717171;
   font-size: 1rem;
   line-height: 1.6;
   margin: 0;
@@ -249,15 +244,15 @@
 
 /* Browser Guides */
 .browser-guides {
-  background: #f8fafb;
-  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #8b8b8b;
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
 }
 
 .browser-guides h4 {
-  color: #355070;
+  color: #3f3f3f;
   margin-bottom: 16px;
 }
 
@@ -267,8 +262,8 @@
 }
 
 .browser-guides ul li {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #8b8b8b;
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 8px;
@@ -276,20 +271,20 @@
 }
 
 .browser-guides ul li:hover {
-  background: #f1f5f9;
+  background: #ffebf0; /* subtle very light from pink family */
 }
 
 /* Important Note */
 .important-note {
-  background: linear-gradient(135deg, #fef3cd, #fde68a);
-  border: 1px solid #f59e0b;
+  background: linear-gradient(135deg, #ffabb7, #ff96a6);
+  border: 1px solid #fa4875;
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
 }
 
 .important-note h4 {
-  color: #92400e;
+  color: #121212;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -297,14 +292,14 @@
 }
 
 .important-note p {
-  color: #92400e;
+  color: #121212;
   margin: 0;
 }
 
 /* Contact Section */
 .contact-section {
-  background: linear-gradient(135deg, #f8fafb 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+  border: 1px solid #8b8b8b;
   border-radius: 16px;
   padding: 40px;
 }
@@ -318,13 +313,13 @@
 
 .contact-info p {
   margin-bottom: 12px;
-  color: #4a5568;
+  color: #575757;
 }
 
 .last-updated {
   font-style: italic;
-  color: #6b7280;
-  border-top: 1px solid #e2e8f0;
+  color: #717171;
+  border-top: 1px solid #8b8b8b;
   padding-top: 16px;
   margin-top: 24px;
 }
@@ -413,74 +408,113 @@
   }
 }
 
-/* Dark Mode Support */
+/* Dark Mode Support (STRICT palette) */
 .dark-mode .cookie-policy-page {
-  background-color: #1a202c;
+  background-color: #121212 !important;
 }
 
 .dark-mode .cookie-policy-hero {
-  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  background: #282828 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark-mode .cookie-policy-hero::before {
+  background: radial-gradient(circle, rgba(245, 24, 102, 0.18) 0%, transparent 70%) !important;
+}
+
+.dark-mode .hero-badge {
+  background: rgba(245, 24, 102, 0.15) !important;
+  border: 1px solid rgba(245, 24, 102, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .hero-title,
+.dark-mode .hero-description {
+  color: #ffffff !important;
 }
 
 .dark-mode .cookie-policy-content {
-  background: #2d3748;
-  color: #e2e8f0;
+  background: #1b1b1b !important;
+  color: #d6d6d6 !important;
+  border: 1px solid #282828 !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35) !important;
 }
 
 .dark-mode .policy-section h2,
 .dark-mode .policy-section h3,
 .dark-mode .policy-section h4 {
-  color: #f7fafc;
+  color: #ffffff !important;
+}
+
+.dark-mode .policy-section h2::after {
+  background: linear-gradient(90deg, #f51866, #fa4875) !important;
 }
 
 .dark-mode .policy-section p,
-.dark-mode .policy-section ul {
-  color: #cbd5e0;
+.dark-mode .policy-section ul,
+.dark-mode .policy-section ul li {
+  color: #d6d6d6 !important;
 }
 
 .dark-mode .cookie-type {
-  background: #1a202c;
-  border-color: #4a5568;
+  background: #1f1f1f !important;
+  border: 1px solid #3f3f3f !important;
+  box-shadow: none !important;
 }
 
-.dark-mode .reason-card {
-  background: #1a202c;
-  border-color: #4a5568;
+.dark-mode .cookie-type:hover {
+  box-shadow: 0 8px 28px rgba(245, 24, 102, 0.12) !important;
 }
 
-.dark-mode .reason-card h4 {
-  color: #f7fafc;
+.dark-mode .cookie-tag {
+  background: linear-gradient(135deg, #f51866, #fa4875) !important;
+  color: #ffffff !important;
 }
 
-.dark-mode .reason-card p {
-  color: #a0aec0;
+.dark-mode .reasons-grid .reason-card {
+  background: #1f1f1f !important;
+  border: 1px solid #3f3f3f !important;
 }
+
+.dark-mode .reason-card::before {
+  background: linear-gradient(90deg, #f51866, #fa4875) !important;
+}
+
+.dark-mode .reason-card h4 { color: #ffffff !important; }
+.dark-mode .reason-card p { color: #c9c9c9 !important; }
 
 .dark-mode .browser-guides {
-  background: #1a202c;
-  border-color: #4a5568;
+  background: #1b1b1b !important;
+  border: 1px solid #3f3f3f !important;
 }
-
+.dark-mode .browser-guides h4 { color: #ffffff !important; }
 .dark-mode .browser-guides ul li {
-  background: #2d3748;
-  border-color: #4a5568;
-  color: #e2e8f0;
+  background: #232323 !important;
+  border: 1px solid #3f3f3f !important;
+  color: #d6d6d6 !important;
 }
+.dark-mode .browser-guides ul li:hover { background: #282828 !important; }
 
-.dark-mode .browser-guides ul li:hover {
-  background: #4a5568;
+.dark-mode .important-note {
+  background: linear-gradient(135deg, rgba(255, 123, 167, 0.18), rgba(250, 72, 117, 0.18)) !important;
+  border: 1px solid rgba(245, 24, 102, 0.35) !important;
 }
+.dark-mode .important-note h4,
+.dark-mode .important-note p { color: #ffd7e3 !important; }
 
 .dark-mode .contact-section {
-  background: #1a202c;
-  border-color: #4a5568;
+  background: #181818 !important;
+  border: 1px solid #3f3f3f !important;
 }
 
-.dark-mode .contact-info {
-  background: #2d3748;
-  border: 1px solid #4a5568;
+.dark-mode .contact-info { background: #1f1f1f !important; }
+.dark-mode .contact-info p { color: #d6d6d6 !important; }
+
+.dark-mode .last-updated {
+  color: #8b8b8b !important;
+  border-top: 1px solid #3f3f3f !important;
 }
 
-.dark-mode .contact-info p {
-  color: #cbd5e0;
-}
+.dark-mode .cookie-policy-content a { color: #ff96a6 !important; }
+.dark-mode .cookie-policy-content a:hover { color: #ff7e95 !important; }

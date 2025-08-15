@@ -3,8 +3,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../api/api';
 import './NotificationsPage.css';
@@ -142,7 +140,7 @@ export default function NotificationsPage() {
         return res.data;
       })
       .then(async data => {
-        // Enrich chat notifications cu preview și sender
+        // Enrich chat și non-chat notifications cu sender (dacă există id disponibil)
         const enriched = await Promise.all(data.map(async notif => {
           console.log('🔍 Processing notification:', notif);
           if (notif.link && notif.link.startsWith('/chat/')) {
@@ -152,9 +150,25 @@ export default function NotificationsPage() {
             console.log('✅ Enriched chat notification:', enrichedNotif);
             return enrichedNotif;
           }
-          // Notificare non-chat
+          // Non-chat: încercăm să deducem un posibil sender id
+          const possibleSenderId = notif.senderId || notif.fromUserId || notif.userId || null;
+          if (possibleSenderId) {
+            try {
+              const userData = await getUserData(possibleSenderId);
+              const enrichedNonChat = {
+                ...notif,
+                senderName: userData.name || '',
+                preview: notif.message || '',
+                senderAvatar: userData.avatar || null
+              };
+              console.log('✅ Enriched non-chat notification with sender:', enrichedNonChat);
+              return enrichedNonChat;
+            } catch (e) {
+              // fallback silențios
+            }
+          }
           const nonChatNotif = { ...notif, senderName: '', preview: notif.message || '', senderAvatar: null };
-          console.log('📋 Non-chat notification:', nonChatNotif);
+          console.log('📋 Non-chat notification (no sender id):', nonChatNotif);
           return nonChatNotif;
         }));
         setNotifications(enriched);
@@ -169,7 +183,6 @@ export default function NotificationsPage() {
 
   return (
     <>
-      <Header />
       <div className="notifications-page">
         <div className="notifications-container">
           <h1 className="notifications-title">Notificări</h1>
@@ -195,19 +208,17 @@ export default function NotificationsPage() {
                             <div className="notification-sender">{n.senderName}</div>
                           )}
                           <div className="notification-message-container">
-                            {n.link && n.link.startsWith('/chat/') && (
-                              <div className="notification-avatar">
-                                <img 
-                                  src={resolveAvatarUrl(n.senderAvatar)} 
-                                  alt={n.senderName} 
-                                  onError={(e) => {
-                                    console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
-                                    const fallbackName = n.senderName || 'User';
-                                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName) + '&background=355070&color=fff&size=128';
-                                  }} 
-                                />
-                              </div>
-                            )}
+                            <div className="notification-avatar">
+                              <img 
+                                src={n.senderAvatar ? resolveAvatarUrl(n.senderAvatar) : ('https://ui-avatars.com/api/?name=' + encodeURIComponent(n.senderName || 'User') + '&background=355070&color=fff&size=128')}
+                                alt={n.senderName || 'User'} 
+                                onError={(e) => {
+                                  console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
+                                  const fallbackName = n.senderName || 'User';
+                                  e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName) + '&background=355070&color=fff&size=128';
+                                }} 
+                              />
+                            </div>
                             <div className="notification-message">{n.preview}</div>
                           </div>
                           <div className="notification-date">
@@ -238,7 +249,6 @@ export default function NotificationsPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }
