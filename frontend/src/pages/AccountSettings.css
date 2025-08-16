@@ -221,3 +221,64 @@
   color: #ff7e95;
   border: 1px solid #f51866;
 }
+
+/* ==== Mobile optimizations ==== */
+@media (max-width: 900px) {
+  .account-settings-container {
+    padding: clamp(36px, 7vh, 72px) 12px 16px; /* și mai mult spațiu sus, dar adaptiv la înălțimea ecranului */
+    margin-top: 0; /* fără header pe mobil pe ruta setări */
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom)); /* spațiu pentru footer-ul mobil fix */
+    min-height: 100dvh; /* adaptează înălțimea la viewport-ul efectiv pe mobil */
+  }
+
+  .settings-title {
+    font-size: 1.8rem;
+    margin: 0 0 12px 0;
+    padding: 0 4px;
+    letter-spacing: -0.5px;
+  }
+
+  .settings-menu {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    gap: 16px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    margin-bottom: 12px; /* spațiu suplimentar sub card pe mobil */
+  }
+
+  .settings-item {
+    padding: 14px 16px;
+    font-size: 1rem;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .email-change-section {
+    padding: 14px;
+    gap: 12px;
+    margin-top: -8px;
+  }
+
+  .email-change-section label {
+    font-size: 1rem;
+  }
+
+  .email-change-section input[type="email"],
+  .email-change-section input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+
+  .email-change-section button {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+
+  .message {
+    font-size: 0.95rem;
+  }
+}

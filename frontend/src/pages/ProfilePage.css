@@ -453,6 +453,73 @@
   }
 }
 
+/* Optimizare pentru ecrane mici (telefon) */
+@media (max-width: 600px) {
+  html, body { background: #ffffff !important; }
+
+  .profile-page-container {
+    /* Elimină spațiile mari verticale și adaptează la footer */
+    margin-top: 0; /* pe mobil header-ul mobil deja ocupă spațiu sus */
+    margin-bottom: 0;
+    padding: 0 12px;
+    /* fallback pentru browsere fără svh */
+    min-height: calc(100dvh - var(--footer-height, 0px));
+    /* Folosește svh pentru a evita tăierea conținutului din cauza barelor browserului */
+    min-height: calc(100svh - var(--footer-height, 0px));
+    /* fallback suplimentar pentru iOS Safari */
+    min-height: -webkit-fill-available;
+    height: auto;
+    max-height: none;
+    /* spațiu sus pentru notch / status bar pe unele device-uri */
+    padding-top: calc(8px + env(safe-area-inset-top));
+    padding-bottom: calc(var(--footer-height, 0px) + 8px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .profile-header-card {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .profile-main-title { font-size: 1.5rem; }
+  .profile-view-button { font-size: 0.85rem; }
+
+  .profile-avatar-main {
+    width: 96px;
+    height: 96px;
+    border-width: 3px;
+  }
+  .profile-person-icon { font-size: 44px; }
+  .profile-camera-button { width: 32px; height: 32px; }
+
+  .profile-info-main-card { border-radius: 10px; }
+  .profile-info-content { padding: 16px; }
+
+  .profile-info-header-section { margin-bottom: 12px; }
+  .profile-info-main-title { font-size: 1.1rem; }
+  .profile-edit-button { padding: 6px 10px; font-size: 0.85rem; }
+
+  .profile-divider, .profile-actions-divider { margin-bottom: 12px; }
+
+  .profile-form-grid { gap: 12px; }
+  .profile-form-column { gap: 12px; }
+
+  .profile-field-label { font-size: 0.9rem; margin-bottom: 6px; }
+  .profile-field-value { font-size: 0.95rem; }
+  .profile-field-input { padding: 10px; font-size: 0.95rem; }
+
+  /* Butoanele devin full width și compacte */
+  .profile-actions-container { gap: 10px; }
+  .profile-action-button {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+}
+
 /* Dark Mode Styles pentru Profile Page */
 .dark-mode .profile-container {
   background: #282828;

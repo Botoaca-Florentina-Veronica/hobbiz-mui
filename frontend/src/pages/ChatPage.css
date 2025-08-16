@@ -388,7 +388,7 @@
   margin-bottom: 8px;
   overflow: hidden;
 }
-.chat-reply-preview.own { background: #ffabb7; border-color: #ff96a6; }
+.chat-reply-preview.own { background: #f3f4f6; border-color: #e5e7eb; }
 .chat-reply-bar {
   width: 4px;
   background: #355070;
@@ -700,13 +700,16 @@
     margin: 0; /* eliminăm marginile care taie spațiu util pe mobil */
     border-radius: 0;
     height: auto; /* permite footer-ului să rămână vizibil */
+    min-height: calc(100dvh - var(--footer-height, 0px)); /* evită spații moarte, ține cont de footer */
     min-width: 0;
     max-width: 100%;
     overflow-x: hidden; /* previne scroll-ul orizontal accidental, dar nu blochează sticky */
     /* DEBUG border eliminat după verificare */
-    padding: 0 0 90px 0; /* fără padding lateral; spațiu jos pt footer */
+    padding: 0; /* fără padding lateral; spațiu jos va fi gestionat de containerul de mesaje */
     box-sizing: border-box;
     width: 100% !important;
+    /* definește înălțimea barei de input pe mobil pentru spațiere adaptivă */
+    --input-bar-height: 56px;
   }
 
   /* Topbar mobil pentru deschiderea drawer-ului de conversații */
@@ -739,7 +742,7 @@
   .chat-sidebar.open { transform: none; }
 
   .chat-main {
-    min-height: 60vh;
+    min-height: auto; /* lasă conținutul să dicteze înălțimea, evită golurile mari */
     width: 100% !important;
     box-sizing: border-box;
   }
@@ -871,10 +874,10 @@
   }
   
   .chat-messages-container {
-    padding: 12px 12px;
+    padding: 8px 12px; /* mai compact pe mobil */
     gap: 12px;
     min-height: 0;
-    padding-bottom: 108px; /* rezervă pentru bara de input fixă + safe area */
+    padding-bottom: calc(var(--input-bar-height, 56px) + var(--footer-height, 0px) + env(safe-area-inset-bottom)); /* rezervă pentru bara de input + footer (dacă e vizibil) */
   }
   
   .chat-message {
@@ -901,12 +904,19 @@
     position: fixed !important; /* garantat vizibilă pe mobil peste tastatură */
     left: 0 !important;
     right: 0 !important;
-    bottom: 0 !important; /* ancorată la baza ecranului */
+    bottom: var(--footer-height, 0px) !important; /* stă deasupra footer-ului mobil dacă e prezent */
     z-index: 10000 !important;
     padding-bottom: max(env(safe-area-inset-bottom), 12px) !important;
     background: #ffffff !important; /* suprascrie eventuale transparențe */
     border-top: 1px solid #e8ecef !important;
+    /* aliniează înălțimea declarată la spațiul rezervat mai sus */
+    min-height: var(--input-bar-height, 56px);
   }
+
+  /* Când suntem în modul de chat activ pe mobil, ascundem elementele secundare pentru mai mult spațiu util */
+  .chat-page-container.mobile-chatting .chat-tabs,
+  .chat-page-container.mobile-chatting .chat-section-label,
+  .chat-page-container.mobile-chatting .chat-empty-state { display: none !important; }
   
   .chat-input {
     padding: 10px 16px;

@@ -284,11 +284,29 @@
   border-color: rgba(245, 24, 102, 0.45);
 }
 
-/* Mobile responsive fixes for alignment */
+/* Mobile responsive optimizations */
 @media (max-width: 768px) {
+  .announcements-by-category .abc-align-container {
+    padding: 0 12px;
+  }
+  
+  .announcements-by-category .abc-searchbar {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+  }
+  
   .announcements-by-category .favorite-announcements-list.grid-view {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 12px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
+    min-height: 300px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
+    height: 160px;
   }
   
   .announcements-by-category .MuiPaper-root {
@@ -302,17 +320,106 @@
     padding-left: 40px !important;
     padding-right: 40px !important;
   }
+  
+  /* List view optimizations for tablet */
+  .announcements-by-category .favorite-announcements-list.list-view .abc-announcement-card {
+    margin-bottom: 12px;
+    border-radius: 12px;
+  }
+  
+  .announcements-by-category .my-announcement-info {
+    padding: 10px;
+  }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+  .announcements-by-category .abc-align-container {
+    padding: 0 8px;
+  }
+  
+  .announcements-by-category .abc-searchbar {
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+  }
+  
   .announcements-by-category .favorite-announcements-list.grid-view {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
+    min-height: 280px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
+    height: 140px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-title {
+    max-width: 100%;
+    padding-right: 0;
+    font-size: 0.95rem;
+  }
+  
+  /* List view becomes more compact on mobile */
+  .announcements-by-category .favorite-announcements-list.list-view .abc-announcement-card {
+    flex-direction: column;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+  
+  .announcements-by-category .my-announcement-info {
+    padding: 8px;
+  }
+  
+  .announcements-by-category .my-announcement-category,
+  .announcements-by-category .my-announcement-location {
+    font-size: 11px;
   }
   
   /* Use normal padding on mobile */
   .announcements-by-category.my-announcements-container {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .announcements-by-category .abc-align-container {
+    padding: 0 6px;
+  }
+  
+  .announcements-by-category .abc-searchbar {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
+    min-height: 260px;
+  }
+  
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
+    height: 120px;
+  }
+  
+  .announcements-by-category .my-announcement-info {
+    padding: 6px;
+  }
+  
+  .announcements-by-category .my-announcement-title {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+  
+  .announcements-by-category .my-announcement-category,
+  .announcements-by-category .my-announcement-location {
+    font-size: 10px;
+  }
+  
+  /* Very compact on small phones */
+  .announcements-by-category.my-announcements-container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 }

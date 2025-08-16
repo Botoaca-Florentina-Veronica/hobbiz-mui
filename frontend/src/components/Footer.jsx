@@ -14,6 +14,7 @@ export default function Footer() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [googleAvatar, setGoogleAvatar] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -33,9 +34,42 @@ export default function Footer() {
     checkAuth();
   }, []);
 
+  // Sync dark mode with body + localStorage
+  useEffect(() => {
+    const body = document.body;
+    // Apply saved preference
+    const saved = localStorage.getItem('darkMode');
+    if (saved === 'true') {
+      body.classList.add('dark-mode');
+    } else if (saved === 'false') {
+      body.classList.remove('dark-mode');
+    }
+    setIsDarkMode(body.classList.contains('dark-mode'));
+
+    // Observe external changes
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(body.classList.contains('dark-mode'));
+    });
+    observer.observe(body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const toggleDarkMode = () => {
+    const body = document.body;
+    const next = !body.classList.contains('dark-mode');
+    body.classList.toggle('dark-mode', next);
+    localStorage.setItem('darkMode', next ? 'true' : 'false');
+    setIsDarkMode(next);
+  };
+
   const handleAccountClick = () => {
     if (!isAuthenticated) {
       navigate('/login');
+      return;
+    }
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
+    if (isMobile) {
+      navigate('/cont');
     } else {
       setShowDropdown(!showDropdown);
     }
@@ -171,6 +205,9 @@ export default function Footer() {
                 <a onClick={(e) => { e.preventDefault(); navigate('/profil'); setShowDropdown(false); }}>Profil</a>
                 <a onClick={(e) => { e.preventDefault(); navigate('/plati'); setShowDropdown(false); }}>Plăți</a>
                 <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); setShowDropdown(false); }}>Contul tău</a>
+                <a onClick={(e) => { e.preventDefault(); toggleDarkMode(); }}>
+                  {isDarkMode ? 'Luminos' : 'Mod Întunecat'}
+                </a>
                 <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); navigate('/'); window.location.reload(); }}>Deconectează-te</a>
               </div>
             )}

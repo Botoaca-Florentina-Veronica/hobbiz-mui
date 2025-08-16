@@ -163,11 +163,13 @@ export default function Header() {
   return (
     <>
       {isMobile ? (
-        <MobileHeader 
-          notificationCount={unreadCount} 
-          onSearchFocus={() => {/* handel search focus */}}
-          onNotificationClick={() => navigate('/notificari')}
-        />
+        (location.pathname === '/setari-cont' || location.pathname === '/profil') ? null : (
+          <MobileHeader 
+            notificationCount={unreadCount} 
+            onSearchFocus={() => {/* handel search focus */}}
+            onNotificationClick={() => navigate('/notificari')}
+          />
+        )
       ) : (
         <>
           <div className="header fixed-header">

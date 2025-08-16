@@ -581,8 +581,8 @@ export default function AnnouncementDetails() {
         </Grid>
       </Container>
 
-  {/* Chat Popup */}
-  {showChat && !isOwnAnnouncement && (
+      {/* Chat Popup */}
+      {showChat && !isOwnAnnouncement && (
         <ChatPopup
           open={showChat}
           onClose={() => {
@@ -602,12 +602,23 @@ export default function AnnouncementDetails() {
         />
       )}
 
+      {/* Image Zoom Modal */}
+      {zoomOpen && (
+        <ImageZoomModal
+          open={zoomOpen}
+          images={imagesSrc}
+          index={zoomIndex}
+          onClose={handleCloseZoom}
+          onPrev={handlePrevZoom}
+          onNext={handleNextZoom}
+        />
+      )}
+
       {/* Debug info */}
       {console.log('🎯 ChatPopup render conditions:', {
         showChat,
-    loggedUserId: !!loggedUserId,
-    isOwnAnnouncement,
-  shouldRender: showChat && !isOwnAnnouncement
+        loggedUserId: !!loggedUserId,
+        isOwnAnnouncement,
       })}
       
     </>

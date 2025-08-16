@@ -28,6 +28,7 @@ import About from './pages/About';
 import HowItWorks from './pages/HowItWorks';
 import CookiePolicy from './pages/CookiePolicy';
 import NotificationsPage from './pages/NotificationsPage.jsx';
+import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import './App.css';
 import './mediaQueries.css';
 
@@ -71,6 +72,15 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <NotificationsPage />
+            <Footer />
+          </>
+        } />
+        {/* Pagină dedicată pentru meniul de cont pe mobil */}
+        <Route path="/cont" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AccountMenuMobile />
             <Footer />
           </>
         } />
