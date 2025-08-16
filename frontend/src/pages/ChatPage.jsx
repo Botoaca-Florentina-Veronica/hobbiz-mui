@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import TypingIndicator from '../components/TypingIndicator';
+import useSocket from '../hooks/useSocket';
 import apiClient from '../api/api';
 import './ChatPage.css';
 // Import iconițe MUI
@@ -36,6 +38,8 @@ export default function ChatPage() {
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const [selectedReply, setSelectedReply] = useState(null);
   const [reactionTargetId, setReactionTargetId] = useState(null);
+  const [typingUsers, setTypingUsers] = useState(new Set());
+  const [typingTimeout, setTypingTimeout] = useState(null);
   // Drawer mobil pentru lista de conversații (deschis implicit pe mobil)
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -49,6 +53,9 @@ export default function ChatPage() {
   // refs inutile eliminate
   const userId = localStorage.getItem('userId');
   const location = useLocation();
+  
+  // Socket.IO hook for real-time messaging
+  const { emitTyping, on, off } = useSocket(userId);
 
   // Detectează mobil pentru a ascunde lista când este selectată o conversație
   const [isMobile, setIsMobile] = useState(() => {
@@ -251,6 +258,52 @@ export default function ChatPage() {
     fetchMessages();
   }, [selectedConversation, userId]);
 
+  // Socket.IO event listeners
+  useEffect(() => {
+    if (!userId) return;
+    
+    // Listen for new messages
+    const handleNewMessage = (message) => {
+      // Only add message if it's for the current conversation
+      if (selectedConversation && 
+          ((message.senderId === selectedConversation.otherParticipant.id && message.destinatarId === userId) ||
+           (message.senderId === userId && message.destinatarId === selectedConversation.otherParticipant.id))) {
+        setMessages(prev => {
+          // Avoid duplicates
+          const exists = prev.some(msg => msg._id === message._id);
+          if (exists) return prev;
+          return [...prev, message];
+        });
+      }
+    };
+    
+    // Listen for typing indicators
+    const handleUserTyping = ({ conversationId, userId: typingUserId, isTyping }) => {
+      if (selectedConversation) {
+        const currentConversationId = [userId, selectedConversation.otherParticipant.id].sort().join('-');
+        if (conversationId === currentConversationId && typingUserId === selectedConversation.otherParticipant.id) {
+          setTypingUsers(prev => {
+            const newSet = new Set(prev);
+            if (isTyping) {
+              newSet.add(typingUserId);
+            } else {
+              newSet.delete(typingUserId);
+            }
+            return newSet;
+          });
+        }
+      }
+    };
+    
+    on('newMessage', handleNewMessage);
+    on('userTyping', handleUserTyping);
+    
+    return () => {
+      off('newMessage', handleNewMessage);
+      off('userTyping', handleUserTyping);
+    };
+  }, [userId, selectedConversation, on, off]);
+  
   // Scroll la ultimul mesaj
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -689,7 +742,8 @@ export default function ChatPage() {
                     Nicio conversație încă. Scrie primul mesaj!
                   </div>
                 ) : (
-                  messages.map((message, index) => {
+                  <>
+                    {messages.map((message, index) => {
                     // Verificăm dacă trebuie să afișăm un separator de dată
                     const showDateSeparator = index === 0 || 
                       (index > 0 && isDifferentDay(messages[index - 1].createdAt, message.createdAt));
@@ -891,7 +945,15 @@ export default function ChatPage() {
                         </div>
                       </React.Fragment>
                     );
-                  })
+                    })}
+                    
+                    {/* Typing indicator */}
+                    {typingUsers.size > 0 && selectedConversation && (
+                      <TypingIndicator 
+                        userName={selectedConversation.name} 
+                      />
+                    )}
+                  </>
                 )}
                 <div ref={messagesEndRef} />
               </div>
@@ -957,7 +1019,37 @@ export default function ChatPage() {
                     className="chat-input"
                     placeholder="Scrie mesajul tău..."
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => {
+                      setNewMessage(e.target.value);
+                      
+                      // Handle typing indicator
+                      if (selectedConversation) {
+                        const conversationId = [userId, selectedConversation.otherParticipant.id].sort().join('-');
+                        
+                        // Clear existing timeout
+                        if (typingTimeout) {
+                          clearTimeout(typingTimeout);
+                        }
+                        
+                        // Emit typing start
+                        emitTyping(conversationId, true);
+                        
+                        // Set timeout to stop typing after 2 seconds of inactivity
+                        const timeout = setTimeout(() => {
+                          emitTyping(conversationId, false);
+                        }, 2000);
+                        
+                        setTypingTimeout(timeout);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Stop typing when input loses focus
+                      if (selectedConversation && typingTimeout) {
+                        clearTimeout(typingTimeout);
+                        const conversationId = [userId, selectedConversation.otherParticipant.id].sort().join('-');
+                        emitTyping(conversationId, false);
+                      }
+                    }}
                   />
                   
                   <button 

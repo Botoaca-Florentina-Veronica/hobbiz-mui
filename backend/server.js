@@ -16,6 +16,8 @@ console.log('PORT:', process.env.PORT || 5000);
 
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const socketIo = require('socket.io');
 const connectDB = require('./config/db'); // Importă conexiunea
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes'); // Importă rutele de autentificare
@@ -30,6 +32,116 @@ const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
+const server = http.createServer(app);
+
+// Configure Socket.IO with CORS
+const io = socketIo(server, {
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      try {
+        const hostname = new URL(origin).hostname;
+        const isNetlify = /\.netlify\.app$/.test(hostname);
+        const allowedOrigins = [
+          process.env.FRONTEND_URL,
+          'https://hobbiz.netlify.app',
+          'https://hobbiz-mui.netlify.app',
+          'https://hobbiz-mui.onrender.com',
+          'http://localhost:5173',
+          'http://localhost:5174'
+        ].filter(Boolean);
+        if (allowedOrigins.includes(origin) || isNetlify) {
+          return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
+      } catch (e) {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// Store active users and their typing status
+const activeUsers = new Map(); // userId -> socketId
+const typingUsers = new Map(); // conversationId -> Set of userIds
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('🔌 User connected:', socket.id);
+
+  // User joins with their ID
+  socket.on('join', (userId) => {
+    activeUsers.set(userId, socket.id);
+    socket.userId = userId;
+    console.log(`👤 User ${userId} joined with socket ${socket.id}`);
+  });
+
+  // Handle typing events
+  socket.on('typing', ({ conversationId, isTyping }) => {
+    if (!socket.userId) return;
+    
+    if (!typingUsers.has(conversationId)) {
+      typingUsers.set(conversationId, new Set());
+    }
+    
+    const typingSet = typingUsers.get(conversationId);
+    
+    if (isTyping) {
+      typingSet.add(socket.userId);
+    } else {
+      typingSet.delete(socket.userId);
+    }
+    
+    // Broadcast typing status to other users in the conversation
+    const participantIds = conversationId.split('-');
+    participantIds.forEach(participantId => {
+      if (participantId !== socket.userId) {
+        const participantSocketId = activeUsers.get(participantId);
+        if (participantSocketId) {
+          io.to(participantSocketId).emit('userTyping', {
+            conversationId,
+            userId: socket.userId,
+            isTyping
+          });
+        }
+      }
+    });
+  });
+
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    if (socket.userId) {
+      activeUsers.delete(socket.userId);
+      // Remove from all typing conversations
+      typingUsers.forEach((typingSet, conversationId) => {
+        if (typingSet.has(socket.userId)) {
+          typingSet.delete(socket.userId);
+          // Notify others that user stopped typing
+          const participantIds = conversationId.split('-');
+          participantIds.forEach(participantId => {
+            if (participantId !== socket.userId) {
+              const participantSocketId = activeUsers.get(participantId);
+              if (participantSocketId) {
+                io.to(participantSocketId).emit('userTyping', {
+                  conversationId,
+                  userId: socket.userId,
+                  isTyping: false
+                });
+              }
+            }
+          });
+        }
+      });
+      console.log(`👤 User ${socket.userId} disconnected`);
+    }
+  });
+});
+
+// Make io available to routes
+app.set('io', io);
+app.set('activeUsers', activeUsers);
 
 // Middleware
 // CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify
@@ -39,7 +151,8 @@ const allowedOrigins = [
   'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.onrender.com',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'http://localhost:5174'
 ].filter(Boolean);
 
 const corsOptions = {
@@ -153,8 +266,9 @@ app.post('/login', async (req, res) => {
 
 // Pornire server
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🔥 Server pe http://localhost:${PORT}`);
+  console.log(`🔌 Socket.IO enabled for real-time chat`);
 });
 
 // Error handling pentru server

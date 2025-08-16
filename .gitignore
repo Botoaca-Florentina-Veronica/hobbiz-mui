@@ -29,3 +29,34 @@ secret.txt
 *.njsproj
 *.sln
 *.sw?
+
+# Build caches and tooling
+**/.vite/
+**/.cache/
+**/.turbo/
+**/.parcel-cache/
+**/.eslintcache
+
+# Test and coverage output
+**/coverage/
+**/.nyc_output/
+
+# Local environment files (for all packages)
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.env.development
+**/.env.test
+**/.env.production
+
+# Uploads and generated media
+frontend/public/uploads/
+backend/uploads/
+**/uploads/
+
+# OS-specific
+Thumbs.db
+
+# Project-specific binaries
+backend/mitm-detector.exe

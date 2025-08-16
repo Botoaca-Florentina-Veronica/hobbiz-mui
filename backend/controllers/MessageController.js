@@ -184,6 +184,37 @@ const createMessage = async (req, res) => {
     const message = await new Message(messageData).save();
     console.log('✅ Mesaj salvat:', message._id);
     
+    // Real-time message delivery via Socket.IO
+    const io = req.app.get('io');
+    const activeUsers = req.app.get('activeUsers');
+    
+    if (io && activeUsers && isValidObjectId(destinatarId) && String(destinatarId) !== String(senderId)) {
+      const recipientSocketId = activeUsers.get(destinatarId);
+      if (recipientSocketId) {
+        // Get sender info for real-time message
+        let senderInfo = null;
+        try {
+          const sender = await User.findById(senderId).select('firstName lastName avatar');
+          if (sender) {
+            senderInfo = { 
+              firstName: sender.firstName, 
+              lastName: sender.lastName, 
+              avatar: sender.avatar 
+            };
+          }
+        } catch (e) {
+          console.warn('Could not fetch sender info for real-time message:', e.message);
+        }
+        
+        // Emit the new message to the recipient
+        io.to(recipientSocketId).emit('newMessage', {
+          ...message.toObject(),
+          senderInfo
+        });
+        console.log(`📨 Real-time message sent to user ${destinatarId}`);
+      }
+    }
+    
     // Notificare – doar dacă avem un destinatar valid și diferit de expeditor
     if (isValidObjectId(destinatarId) && String(destinatarId) !== String(senderId)) {
       try {
