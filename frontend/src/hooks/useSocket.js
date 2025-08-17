@@ -3,6 +3,8 @@ import { io } from 'socket.io-client';
 
 const useSocket = (userId) => {
   const socketRef = useRef(null);
+  const pendingSubsRef = useRef([]); // [{ event, callback }]
+  const pendingEmitsRef = useRef([]); // [{ event, payload }]
 
   useEffect(() => {
     if (!userId) return;
@@ -20,8 +22,22 @@ const useSocket = (userId) => {
       transports: ['websocket', 'polling']
     });
 
-    // Join with user ID
-    socketRef.current.emit('join', userId);
+    // On connect: join and flush pending subscriptions
+    socketRef.current.on('connect', () => {
+      socketRef.current.emit('join', userId);
+      if (pendingSubsRef.current.length) {
+        pendingSubsRef.current.forEach(({ event, callback }) => {
+          socketRef.current.on(event, callback);
+        });
+        pendingSubsRef.current = [];
+      }
+      if (pendingEmitsRef.current.length) {
+        pendingEmitsRef.current.forEach(({ event, payload }) => {
+          socketRef.current.emit(event, payload);
+        });
+        pendingEmitsRef.current = [];
+      }
+    });
 
     // Cleanup on unmount
     return () => {
@@ -34,8 +50,11 @@ const useSocket = (userId) => {
 
   // Emit typing status
   const emitTyping = (conversationId, isTyping) => {
-    if (socketRef.current) {
-      socketRef.current.emit('typing', { conversationId, isTyping });
+    const payload = { conversationId, isTyping };
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit('typing', payload);
+    } else {
+      pendingEmitsRef.current.push({ event: 'typing', payload });
     }
   };
 
@@ -43,12 +62,20 @@ const useSocket = (userId) => {
   const on = (event, callback) => {
     if (socketRef.current) {
       socketRef.current.on(event, callback);
+    } else {
+      // Queue until socket connects
+      pendingSubsRef.current.push({ event, callback });
     }
   };
 
   const off = (event, callback) => {
     if (socketRef.current) {
       socketRef.current.off(event, callback);
+    } else {
+      // Remove from pending queue if not yet attached
+      pendingSubsRef.current = pendingSubsRef.current.filter(
+        (s) => !(s.event === event && s.callback === callback)
+      );
     }
   };
 

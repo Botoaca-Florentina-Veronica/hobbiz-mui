@@ -1,6 +1,6 @@
 import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import Badge from '@mui/material/Badge';
 import './MobileHeader.css';
 
@@ -40,7 +40,7 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
             }
           }}
         >
-          <NotificationsIcon className="mobile-notification-icon" />
+          <NotificationsNoneOutlinedIcon className="mobile-notification-icon" />
         </Badge>
       </button>
     </div>

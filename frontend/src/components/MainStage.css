@@ -715,54 +715,86 @@
 
 /* Mobile search block */
 @media (max-width: 900px) {
+  .categories-button {
+    display: none;
+  }
+
   .mainstage-search-mobile {
     display: flex;
     flex-direction: column;
     gap: 10px;
     width: 100%;
-    padding: 20px;
+    padding: 0 12px;
+  }
+
+  .search-bell-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* spațiu între search și clopoțel */
+    width: 100%;
   }
 
   .search-mobile-row {
     display: grid;
-    grid-template-columns: 1fr 48px;
-    gap: 8px;
+    grid-template-columns: 1fr 52px; /* buton un pic mai lat */
+    gap: 0; /* fără spațiu între input și buton */
     align-items: center;
+    background: #fff;
+    border: 1px solid #e7ecef;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 
   .search-input-mobile {
     width: 100%;
     height: 44px;
     padding: 10px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 10px 0 0 10px; /* rotunjit doar stânga */
+    border: none; /* border pe container */
     font-size: 16px;
     outline: none;
+    color: #26414a;
+    background: transparent;
+  }
+
+  .search-input-mobile::placeholder {
+    color: #4f6d73;
   }
 
   .search-button-mobile {
     height: 44px;
-    border-radius: 12px;
+    border-radius: 0 10px 10px 0; /* rotunjit doar dreapta */
     border: none;
-    background: #355070;
+    background: #063439; /* teal închis */
     color: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
   }
 
-  .location-button-mobile {
+  .search-button-mobile:hover {
+    background: #072f33;
+  }
+
+  .notif-button-mobile {
+    background: none;
+    border: none;
+    color: #063439;
+    width: 44px;
+    height: 44px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    height: 40px;
-    padding: 0 12px;
-    border-radius: 12px;
-    border: 1px solid rgba(0,0,0,0.12);
-    background: #fff;
-    color: #333;
-    width: fit-content;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .notif-button-mobile svg {
+    width: 22px;
+    height: 22px;
   }
 }
 

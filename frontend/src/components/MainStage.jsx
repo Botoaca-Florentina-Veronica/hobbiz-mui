@@ -1,4 +1,5 @@
 import { FaSearch, FaBars, FaMapMarkerAlt } from "react-icons/fa";
+import { HiOutlineBell } from 'react-icons/hi';
 import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
 import hobby from '../assets/images/hobby_img.jpg';
 import { useState, useRef, useEffect } from "react";
@@ -642,26 +643,27 @@ export default function MainStage() {
 
         {typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches && (
           <div className="mainstage-search-mobile">
-            <div className="search-mobile-row">
-              <input
-                type="text"
-                placeholder="Caută servicii..."
-                className="search-input-mobile"
-                aria-label="Căutare"
-              />
-              <button className="search-button-mobile" type="button" aria-label="Căutare">
-                <FaSearch />
+            <div className="search-bell-wrapper">
+              <div className="search-mobile-row">
+                <input
+                  type="text"
+                  placeholder="Ce anume cauți?"
+                  className="search-input-mobile"
+                  aria-label="Căutare"
+                />
+                <button className="search-button-mobile" type="button" aria-label="Căutare">
+                  <FaSearch />
+                </button>
+              </div>
+              <button
+                className="notif-button-mobile"
+                type="button"
+                aria-label="Notificări"
+                onClick={() => navigate('/notificari')}
+              >
+                <HiOutlineBell />
               </button>
             </div>
-            <button
-              className="location-button-mobile"
-              onClick={handleInputClick}
-              type="button"
-              aria-haspopup="dialog"
-            >
-              <FaMapMarkerAlt className="location-icon" />
-              <span>{selectedLocalitate || selectedJudet || "Toată țara"}</span>
-            </button>
             <Popover
               id={id}
               open={open}

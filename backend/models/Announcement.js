@@ -10,6 +10,7 @@ const announcementSchema = new mongoose.Schema({
   contactEmail: { type: String },
   contactPhone: { type: String },
   images: [String],
+  favoritesCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -115,12 +115,16 @@ export default function FavoriteAnnouncements() {
       const exists = prev.find(item => item.id === id);
       
       if (exists) {
-        // Elimină din favorite
+        // Elimină din favorite (optimistic)
         updated = prev.filter((item) => item.id !== id);
         setShowToast(true);
+        // Backend: decrement favoritesCount
+        apiClient.delete(`/api/announcements/${id}/favorite`).catch(() => {});
       } else {
-        // Adaugă în favorite cu timestamp-ul curent
+        // Adaugă în favorite cu timestamp-ul curent (optimistic)
         updated = [...prev, { id, addedAt: Date.now() }];
+        // Backend: increment favoritesCount
+        apiClient.post(`/api/announcements/${id}/favorite`).catch(() => {});
       }
       
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));

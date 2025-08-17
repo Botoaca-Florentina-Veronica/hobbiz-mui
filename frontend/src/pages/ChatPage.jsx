@@ -279,6 +279,7 @@ export default function ChatPage() {
     
     // Listen for typing indicators
     const handleUserTyping = ({ conversationId, userId: typingUserId, isTyping }) => {
+      console.debug('[typing] event received', { conversationId, typingUserId, isTyping, selectedWith: selectedConversation?.otherParticipant?.id, me: userId });
       if (selectedConversation) {
         const currentConversationId = [userId, selectedConversation.otherParticipant.id].sort().join('-');
         if (conversationId === currentConversationId && typingUserId === selectedConversation.otherParticipant.id) {
@@ -303,6 +304,11 @@ export default function ChatPage() {
       off('userTyping', handleUserTyping);
     };
   }, [userId, selectedConversation, on, off]);
+
+  // Clear typing users when switching conversation
+  useEffect(() => {
+    setTypingUsers(new Set());
+  }, [selectedConversation]);
   
   // Scroll la ultimul mesaj
   useEffect(() => {
@@ -1032,10 +1038,12 @@ export default function ChatPage() {
                         }
                         
                         // Emit typing start
+                        console.debug('[typing] emit start', { conversationId, me: userId, other: selectedConversation.otherParticipant.id });
                         emitTyping(conversationId, true);
                         
                         // Set timeout to stop typing after 2 seconds of inactivity
                         const timeout = setTimeout(() => {
+                          console.debug('[typing] emit stop (timeout)', { conversationId });
                           emitTyping(conversationId, false);
                         }, 2000);
                         
@@ -1047,6 +1055,7 @@ export default function ChatPage() {
                       if (selectedConversation && typingTimeout) {
                         clearTimeout(typingTimeout);
                         const conversationId = [userId, selectedConversation.otherParticipant.id].sort().join('-');
+                        console.debug('[typing] emit stop (blur)', { conversationId });
                         emitTyping(conversationId, false);
                       }
                     }}

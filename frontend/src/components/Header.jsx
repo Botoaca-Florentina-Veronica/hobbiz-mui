@@ -64,7 +64,7 @@ export default function Header() {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsAuthenticated(false);
-      setGoogleAvatar(null);
+      setAvatar(null);
       setUnreadCount(0);
       return;
     }
@@ -87,7 +87,7 @@ export default function Header() {
         }
       } catch (error) {
         setIsAuthenticated(false);
-        setGoogleAvatar(null);
+        setAvatar(null);
         setUnreadCount(0);
       }
     };
@@ -111,6 +111,32 @@ export default function Header() {
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);
+
+  // Detectează mobilul în mod reactiv (la resize / schimbare media query)
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 900px)');
+    const handler = (e) => setIsMobile(e.matches);
+    // compat: event listener on MQ
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+    } else {
+      // Safari
+      mq.addListener(handler);
+    }
+    // inițial, sincronizează
+    setIsMobile(mq.matches);
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handler);
+      } else {
+        mq.removeListener(handler);
+      }
+    };
+  }, []);
 
   const handleMouseEnter = () => {
     if (isAuthenticated) {
@@ -159,7 +185,6 @@ export default function Header() {
     }
   };
 
-  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
   return (
     <>
       {isMobile ? (

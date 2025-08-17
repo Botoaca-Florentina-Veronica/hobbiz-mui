@@ -1,18 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { IconButton, Box } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import './Content.css';
-
-// Importuri imagini
-import guitar from '../assets/images/guitar-lessons.jpg'
-import crosetat from '../assets/images/crosetat.png';
-import fridge from '../assets/images/Fridge-Repair.jpg';
-import dancing from '../assets/images/dancing.jpg';
-import cooking from '../assets/images/cooking.png';
-import pregatire from '../assets/images/pregatire.png';
+import apiClient from '../api/api';
 
 export default function Content() {
   const carouselRef = useRef(null);
+  const [popular, setPopular] = useState([]);
 
   const handleScroll = (direction) => {
     if (carouselRef.current) {
@@ -21,14 +15,16 @@ export default function Content() {
     }
   };
 
-  const images = [
-    { src: dancing, alt: "Dans" },
-    { src: crosetat, alt: "Croșetare" },
-    { src: guitar, alt: "Lecții de chitară" },
-    { src: fridge, alt: "Reparații frigidere" },
-    { src: pregatire, alt: "Pregătire pentru examen" },
-    { src: cooking, alt: "Gătind prăjituri" }
-  ];
+  useEffect(() => {
+    let mounted = true;
+    apiClient.get('/api/announcements/popular?limit=10')
+      .then(res => {
+        if (!mounted) return;
+        setPopular(res.data || []);
+      })
+      .catch(() => setPopular([]));
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <section className="content">
@@ -79,7 +75,7 @@ export default function Content() {
             }
           }}
         >
-          {images.map((img, index) => (
+          {popular.map((a, index) => (
             <Box 
               key={index}
               sx={{ 
@@ -88,17 +84,23 @@ export default function Content() {
                 position: 'relative'
               }}
             >
-              <img
-                src={img.src}
-                alt={img.alt}
-                style={{
-                  width: '100%',
-                  height: '300px',
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-                }}
-              />
+              {a?.images && a.images[0] ? (
+                <img
+                  src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
+                    ? a.images[0]
+                    : `/uploads/${a.images[0].replace(/^.*[\\\/]/, '')}`}
+                  alt={a.title || 'anunț popular'}
+                  style={{
+                    width: '100%',
+                    height: '300px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                  }}
+                />
+              ) : (
+                <div style={{width:'100%', height:300, borderRadius:8, background:'#ffebf0'}} />
+              )}
             </Box>
           ))}
         </Box>

@@ -345,28 +345,74 @@
   
   .announcements-by-category .favorite-announcements-list.grid-view {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 8px;
   }
   
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 280px;
+    min-height: 140px;
+    border-radius: 8px;
   }
   
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 140px;
+    height: 80px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  /* Ensure image covers smaller height cleanly */
+  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-title {
     max-width: 100%;
     padding-right: 0;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  /* Compact meta */
+  .announcements-by-category .my-announcement-info {
+    padding: 4px 6px;
+    row-gap: 4px;
+  }
+
+  .announcements-by-category .my-announcement-category,
+  .announcements-by-category .my-announcement-location {
+    font-size: 9.5px;
+  }
+
+  /* Hide ID badge to save vertical space */
+  .announcements-by-category .my-announcement-id {
+    display: none !important;
   }
   
   /* List view becomes more compact on mobile */
   .announcements-by-category .favorite-announcements-list.list-view .abc-announcement-card {
-    flex-direction: column;
-    margin-bottom: 10px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
     border-radius: 10px;
+  }
+  /* Small square thumbnail to reduce vertical height */
+  .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
+    width: 84px;
+    min-width: 84px;
+    height: 84px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .announcements-by-category .favorite-announcements-list.list-view .my-announcement-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .announcements-by-category .my-announcement-info {
@@ -387,34 +433,53 @@
 
 @media (max-width: 480px) {
   .announcements-by-category .abc-align-container {
-    padding: 0 6px;
+    padding: 0 4px;
   }
   
   .announcements-by-category .abc-searchbar {
-    padding: 10px;
-    margin-bottom: 12px;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 8px;
   }
   
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 260px;
+    min-height: 120px;
+    border-radius: 8px;
   }
   
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 120px;
+    height: 64px;
+    border-radius: 8px 8px 0 0;
   }
   
   .announcements-by-category .my-announcement-info {
-    padding: 6px;
+    padding: 4px;
   }
   
   .announcements-by-category .my-announcement-title {
-    font-size: 0.9rem;
-    line-height: 1.3;
+    font-size: 0.8rem;
+    line-height: 1.15;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 2px;
   }
   
   .announcements-by-category .my-announcement-category,
   .announcements-by-category .my-announcement-location {
-    font-size: 10px;
+    font-size: 9px;
+  }
+
+  /* Hide category chip entirely to save height */
+  .announcements-by-category .my-announcement-category {
+    display: none !important;
+  }
+
+  /* Optionally hide location to save height on very small screens */
+  .announcements-by-category .my-announcement-location {
+    display: none;
   }
   
   /* Very compact on small phones */
