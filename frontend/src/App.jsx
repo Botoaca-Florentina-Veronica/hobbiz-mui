@@ -72,7 +72,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <NotificationsPage />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         {/* Pagină dedicată pentru meniul de cont pe mobil */}
@@ -81,7 +81,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AccountMenuMobile />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/favorite-announcements" element={
@@ -89,7 +89,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <FavoriteAnnouncements />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/chat" element={
@@ -97,7 +97,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <ChatPage />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/despre" element={
@@ -146,7 +146,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AccountSettings />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/add-announcement" element={
@@ -154,7 +154,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AddAnnouncementPage />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/edit-announcement" element={
@@ -162,7 +162,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <EditAnnouncementPage />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/profil" element={
@@ -170,7 +170,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <ProfilePage />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/anunturile-mele" element={
@@ -178,7 +178,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <MyAnnouncements />
-            <Footer />
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/announcement/:id" element={

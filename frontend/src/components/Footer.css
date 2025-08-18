@@ -230,11 +230,9 @@
     display: block !important;
     width: 100%;
     text-align: center;
-    margin-top: 2px; /* foarte redus */
-    padding: 1px 1px; /* padding minimal */
-    font-size: 0.8rem; /* text mai mic */
+    margin-top: 8px;
     /* lasă spațiu deasupra barei fixate cu butoane mobile */
-    margin-bottom: calc(var(--footer-height, 25px) + env(safe-area-inset-bottom));
+    margin-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
   }
   
   /* Footer-ul mobile cu stiluri OLX-inspired */
@@ -346,54 +344,103 @@
     background: #144a70;
   }
 
-  /* ===== Legal section: layout foarte compact pe mobil ===== */
+  /* Compact legal section on mobile only */
   .legal-section {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    margin-bottom: -10rem;
-    padding: 6px 16px 2px; /* foarte redus padding */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px; /* minimal gap */
+    padding: 10px 12px 6px !important;
+    gap: 6px !important;
   }
-
+  .desktop-footer {
+    padding: 6px 0 !important;
+  }
+  .desktop-footer p,
+  .desktop-footer small,
+  .desktop-footer span {
+    /* keep original font-size; only tighten line-height and margins */
+    line-height: 1.2 !important;
+    margin: 4px 0 !important;
+  }
   .legal-section__column {
-    width: 100%;
+    flex: 1 1 auto;
+    padding-bottom: 4px !important;
   }
-
   .legal-section__column h4 {
-    font-size: 1rem; /* mai mic */
-    font-weight: 600;
-    margin: 2px 0 2px 0; /* margini minime */
+    margin: 2px 0 4px 0 !important;
+    line-height: 1.2;
   }
-
   .legal-section__column ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important; /* fără bullets pe mobil */
   }
-
   .legal-section__column ul li {
-    margin: 2px 0; /* spațiu minimal */
+    margin: 0 !important; /* lipite între ele */
   }
-
   .legal-section__column a {
-    display: inline-block;
-    line-height: 1.3;
-    font-size: 0.9rem; /* mai mic */
+    display: block;
+    line-height: 1.05;
+    margin: 0 !important;
+    padding: 0 !important; /* fără spațiu suplimentar */
   }
-
+  .legal-section__desc {
+    line-height: 1.2;
+  }
   .legal-section__socials .legal-section__icons {
-    gap: 1px;
-    margin-top: 2px;
+    gap: 8px !important;
   }
-
-  /* Separator minimal */
+  .legal-section__socials .legal-section__icons svg,
+  .legal-section__socials .legal-section__icons img {
+    width: 20px;
+    height: 20px;
+  }
   .footer-separator {
-    height: 1px;
-    margin: 1px 0; /* margini foarte mici */
+    margin: 8px 0 !important;
+  }
+}
+
+/* Make desktop footer compact up to 900px without changing text sizes */
+@media (max-width: 900px) {
+  .desktop-footer {
+    padding: 6px 0 !important;
+    margin-top: 6px !important;
+  }
+  .legal-section {
+    padding: 10px 12px 6px !important;
+    gap: 6px !important;
+  }
+  .legal-section__column {
+    padding-bottom: 4px !important;
+  }
+  .legal-section__column h4 {
+    margin: 2px 0 4px 0 !important;
+    line-height: 1.2 !important;
+  }
+  .legal-section__column ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+  .legal-section__column ul li {
+    margin: 0 !important;
+  }
+  .legal-section__column a {
+    display: block;
+    line-height: 1.05 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .legal-section__desc {
+    line-height: 1.2 !important;
+  }
+  .legal-section__socials .legal-section__icons {
+    gap: 8px !important;
+  }
+  .legal-section__socials .legal-section__icons svg,
+  .legal-section__socials .legal-section__icons img {
+    width: 20px;
+    height: 20px;
+  }
+  .footer-separator {
+    margin: 8px 0 !important;
   }
 }
 
@@ -478,4 +525,13 @@
 /* Dark Mode pentru Footer Separator */
 .dark-mode .footer-separator {
   background: #3f3f3f;
+}
+
+/* Hide desktop footer parts on pages that opt-in via hide-on-mobile (mobile only) */
+@media (max-width: 900px) {
+  .footer.hide-on-mobile .legal-section,
+  .footer.hide-on-mobile .footer-separator,
+  .footer.hide-on-mobile .desktop-footer {
+    display: none !important;
+  }
 }

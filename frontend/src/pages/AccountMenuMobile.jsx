@@ -97,9 +97,9 @@ export default function AccountMenuMobile() {
     <Box sx={{ 
       maxWidth: 720, 
       margin: '0 auto', 
-      px: 2,
-      pt: 2,
-      pb: 'calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 24px)',
+      px: 1.5,
+      pt: 1.5,
+      pb: 'calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 12px)',
       minHeight: '100vh',
       backgroundColor: '#f8fafc',
       overflowY: 'auto'
@@ -108,9 +108,9 @@ export default function AccountMenuMobile() {
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        gap: 2, 
-        mb: 3,
-        pt: 1
+        gap: 1.5, 
+        mb: 2,
+        pt: 0.5
       }}>
         <IconButton 
           onClick={() => navigate(-1)}
@@ -130,14 +130,14 @@ export default function AccountMenuMobile() {
       </Box>
 
       {/* Menu Items */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, mb: 2 }}>
         {menuItems.map((item, index) => (
           <Card
             key={index}
             onClick={() => navigate(item.path)}
             sx={{
               cursor: 'pointer',
-              borderRadius: 3,
+              borderRadius: 2,
               boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
               transition: 'all 0.2s ease',
               '&:hover': {
@@ -149,9 +149,10 @@ export default function AccountMenuMobile() {
             <CardContent sx={{ 
               display: 'flex', 
               alignItems: 'center', 
-              gap: 2,
-              py: 2.5,
-              '&:last-child': { pb: 2.5 }
+              gap: 1.5,
+              py: 1.25,
+              minHeight: 30,
+              '&:last-child': { pb: 1.25 }
             }}>
               <Box sx={{ 
                 color: '#f51866',
@@ -160,7 +161,7 @@ export default function AccountMenuMobile() {
               }}>
                 {item.icon}
               </Box>
-              <Typography variant="body1" sx={{ fontWeight: 500, color: '#1a1a1a' }}>
+              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: '#1a1a1a' }}>
                 {item.label}
               </Typography>
             </CardContent>
@@ -169,15 +170,16 @@ export default function AccountMenuMobile() {
 
         {/* Dark Mode Toggle */}
         <Card sx={{
-          borderRadius: 3,
+          borderRadius: 2,
           boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
         }}>
           <CardContent sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between',
-            py: 2.5,
-            '&:last-child': { pb: 2.5 }
+            py: 1.25,
+            minHeight: 48,
+            '&:last-child': { pb: 1.25 }
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ 
@@ -187,7 +189,7 @@ export default function AccountMenuMobile() {
               }}>
                 {isDarkMode ? <LightMode /> : <DarkMode />}
               </Box>
-              <Typography variant="body1" sx={{ fontWeight: 500, color: '#1a1a1a' }}>
+              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: '#1a1a1a' }}>
                 {isDarkMode ? 'Mod luminos' : 'Mod întunecat'}
               </Typography>
             </Box>
@@ -213,9 +215,9 @@ export default function AccountMenuMobile() {
       <Card
         onClick={handleLogout}
         sx={{
-          mt: 1.5,
+          mt: 1,
           cursor: 'pointer',
-          borderRadius: 3,
+          borderRadius: 2,
           boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
           transition: 'all 0.2s ease',
           '&:hover': {
@@ -228,9 +230,10 @@ export default function AccountMenuMobile() {
         <CardContent sx={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: 2,
-          py: 2.5,
-          '&:last-child': { pb: 2.5 }
+          gap: 1.5,
+          py: 1.25,
+          minHeight: 48,
+          '&:last-child': { pb: 1.25 }
         }}>
           <Box sx={{ 
             color: '#ef4444',
@@ -239,7 +242,7 @@ export default function AccountMenuMobile() {
           }}>
             <Logout />
           </Box>
-          <Typography variant="body1" sx={{ fontWeight: 600, color: '#ef4444' }}>
+          <Typography variant="body1" noWrap sx={{ fontWeight: 600, color: '#ef4444' }}>
             Deconectează-te
           </Typography>
         </CardContent>

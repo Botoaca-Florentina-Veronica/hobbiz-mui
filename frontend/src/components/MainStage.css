@@ -43,6 +43,11 @@
     padding: 24px 10px;
     margin-right: 0;
     font-size: 1.1rem;
+    /* Narrower container on phones for better readability */
+    width: 80vw;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -758,8 +763,8 @@
 
   .search-input-mobile {
     width: 100%;
-    height: 44px;
-    padding: 10px 14px;
+    height: 50px;
+    padding: 12px 14px;
     border-radius: 10px 0 0 10px; /* rotunjit doar stânga */
     border: none; /* border pe container */
     font-size: 16px;
@@ -773,7 +778,7 @@
   }
 
   .search-button-mobile {
-    height: 44px;
+    height: 50px;
     border-radius: 0 10px 10px 0; /* rotunjit doar dreapta */
     border: none;
     background: #063439; /* teal închis */

@@ -21,19 +21,35 @@
 @media (max-width: 800px) {
   .call-to-action {
     flex-direction: column;
-    width: 98%;
-    padding: 24px 8px;
-    font-size: 1.1rem;
-    gap: 18px;
-    margin: 40px auto 40px auto;
+    width: min(96%, 640px);
+    padding: 20px 16px;
+    font-size: 1rem;
+    gap: 14px;
+    margin: 28px auto;
+    text-align: center;
+    border-radius: 18px;
   }
   .call-to-action h3 {
-    font-size: 1.3rem;
+    font-size: clamp(1.2rem, 5.5vw, 1.6rem);
+    line-height: 1.25;
   }
   .call-to-action p {
-    font-size: 1rem;
-    margin: 0 0 10px 0;
+    font-size: clamp(0.95rem, 4.2vw, 1.05rem);
+    margin: 4px 0 8px 0;
     padding: 0;
+    line-height: 1.45;
+    margin-left: 0; /* override desktop offsets */
+    margin-right: 0; /* override desktop offsets */
+  }
+  .second-button.sign-up-button {
+    width: 100%;
+    max-width: 340px;
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    margin: 6px auto 0 auto;
   }
 }
 

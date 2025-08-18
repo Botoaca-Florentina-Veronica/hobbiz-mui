@@ -8,7 +8,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
-export default function Footer() {
+export default function Footer({ hideOnMobile = false }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,7 +76,7 @@ export default function Footer() {
   };
 
   return (
-    <div className="footer">
+    <div className={`footer ${hideOnMobile ? 'hide-on-mobile' : ''}`}>
 
 
       {/* Separator deasupra legal-section */}

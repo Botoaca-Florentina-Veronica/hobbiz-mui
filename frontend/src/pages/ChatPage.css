@@ -696,6 +696,7 @@
 
 @media (max-width: 600px) {
   html, body { overflow-x: hidden; background: #ffffff !important; }
+  
   .chat-page-container {
     margin: 0; /* eliminăm marginile care taie spațiu util pe mobil */
     border-radius: 0;
