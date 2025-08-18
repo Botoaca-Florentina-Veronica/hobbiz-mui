@@ -9,7 +9,8 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Paper, Card, CardContent, Chip, Box, IconButton } from '@mui/material';
+import { Paper, Card, CardContent, Chip, Box, IconButton, InputBase, Stack, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import './MainStage.css';
@@ -379,6 +380,8 @@ export default function MainStage() {
   const [categoryDetailsAnimating, setCategoryDetailsAnimating] = useState(false);
   const categoriesButtonRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleCategoryHover = (category) => {
     if (hoverTimeoutRef.current) {
@@ -546,187 +549,125 @@ export default function MainStage() {
         </>
       )}
       <div className="top-bar">
-        <button 
-          className={`categories-button ${categoriesOpen ? 'menu-open' : ''}`}
-          onClick={handleCategoriesClick}
-          type="button">
-          <FaBars />
-          <span>Categorii</span>
-        </button>
+        {!isMobile && (
+          <button 
+            className={`categories-button ${categoriesOpen ? 'menu-open' : ''}`}
+            onClick={handleCategoriesClick}
+            type="button">
+            <FaBars />
+            <span>Categorii</span>
+          </button>
+        )}
 
-        {typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches ? null : (
+        {!isMobile ? (
           <div className="search-container mainstage-search-desktop">
-          <input 
-            type="text" 
-            placeholder="Ce anume cauți?" 
-            className="search-input"
-          />
-          <div className="location-section">
-            <FaMapMarkerAlt className="location-icon" />
             <input 
               type="text" 
-              placeholder="Toată țara" 
-              className="location-input"
-              value={selectedLocalitate || selectedJudet || "Toată țara"}
-              readOnly
-              onClick={handleInputClick}
-              style={{ cursor: 'pointer' }}
+              placeholder="Ce anume cauți?" 
+              className="search-input"
             />
-            <Popover
-              id={id}
-              open={open}
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              PaperProps={{ sx: { minWidth: 260, maxHeight: 400, marginLeft: '60px', marginTop: '15px' } }}
-            >
-              {!selectedJudet ? (
-                <>
-                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
-                  <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                    {judete.map((judet) => (
-                      <ListItemButton
-                        key={judet}
-                        onClick={() => {
-                          if (judet === "Toată țara") {
-                            setSelectedJudet(null);
-                            setSelectedLocalitate("");
-                            setAnchorEl(null);
-                          } else {
-                            setSelectedJudet(judet);
-                          }
-                        }}
-                        divider
-                      >
-                        <ListItemText
-                          primary={judet === "Toată țara" ? <span style={{ fontWeight: 'bold' }}>Toată țara</span> : judet}
-                        />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </>
-              ) : (
-                <>
-                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
-                  <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                    <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                      <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
-                    </ListItemButton>
-                    {getLocalitatiForJudet(selectedJudet).map((localitate) => (
-                      <ListItemText
-                        key={localitate}
-                        primary={localitate}
-                        sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
-                        onClick={() => {
-                          handleLocalitateClick(localitate);
-                        }}
-                      />
-                    ))}
-                  </List>
-                </>
-              )}
-            </Popover>
+            <div className="location-section">
+              <FaMapMarkerAlt className="location-icon" />
+              <input 
+                type="text" 
+                placeholder="Toată țara" 
+                className="location-input"
+                value={selectedLocalitate || selectedJudet || "Toată țara"}
+                readOnly
+                onClick={handleInputClick}
+                style={{ cursor: 'pointer' }}
+              />
+            </div>
+            <button className="search-button">
+              <span>Căutare</span>
+              <FaSearch className="search-icon" />
+            </button>
           </div>
-          <button className="search-button">
-            <span>Căutare</span>
-            <FaSearch className="search-icon" />
-          </button>
-          </div>
+        ) : (
+          <Box className="mainstage-search-mobile" sx={{ width: '100%' }}>
+            <Stack direction="row" alignItems="center" spacing={1} className="search-bell-wrapper">
+              <Paper elevation={3} sx={{ flex: 1, display: 'flex', alignItems: 'center', borderRadius: 2, px: 1 }}>
+                <IconButton size="small" aria-label="Alege locația" onClick={(e) => { setAnchorEl(e.currentTarget); setSelectedJudet(null); setSelectedLocalitate(""); }}>
+                  <FaMapMarkerAlt />
+                </IconButton>
+                <InputBase
+                  sx={{ ml: 1, flex: 1, fontSize: 16 }}
+                  placeholder="Ce anume cauți?"
+                  inputProps={{ 'aria-label': 'Căutare' }}
+                />
+                <IconButton color="primary" aria-label="Căutare">
+                  <FaSearch />
+                </IconButton>
+              </Paper>
+              <IconButton className="notif-button-mobile" aria-label="Notificări" onClick={() => navigate('/notificari')}>
+                <HiOutlineBell />
+              </IconButton>
+            </Stack>
+          </Box>
         )}
 
-        {typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches && (
-          <div className="mainstage-search-mobile">
-            <div className="search-bell-wrapper">
-              <div className="search-mobile-row">
-                <input
-                  type="text"
-                  placeholder="Ce anume cauți?"
-                  className="search-input-mobile"
-                  aria-label="Căutare"
-                />
-                <button className="search-button-mobile" type="button" aria-label="Căutare">
-                  <FaSearch />
-                </button>
-              </div>
-              <button
-                className="notif-button-mobile"
-                type="button"
-                aria-label="Notificări"
-                onClick={() => navigate('/notificari')}
-              >
-                <HiOutlineBell />
-              </button>
-            </div>
-            <Popover
-              id={id}
-              open={open}
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              PaperProps={{ sx: { minWidth: 280, maxHeight: 360, marginTop: '8px' } }}
-            >
-              {!selectedJudet ? (
-                <>
-                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
-                  <List sx={{ maxHeight: 280, overflow: 'auto' }}>
-                    {judete.map((judet) => (
-                      <ListItemButton
-                        key={judet}
-                        onClick={() => {
-                          if (judet === "Toată țara") {
-                            setSelectedJudet(null);
-                            setSelectedLocalitate("");
-                            setAnchorEl(null);
-                          } else {
-                            setSelectedJudet(judet);
-                          }
-                        }}
-                        divider
-                      >
-                        <ListItemText
-                          primary={judet === "Toată țara" ? <span style={{ fontWeight: 'bold' }}>Toată țara</span> : judet}
-                        />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </>
-              ) : (
-                <>
-                  <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
-                  <List sx={{ maxHeight: 280, overflow: 'auto' }}>
-                    <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                      <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
-                    </ListItemButton>
-                    {getLocalitatiForJudet(selectedJudet).map((localitate) => (
-                      <ListItemText
-                        key={localitate}
-                        primary={localitate}
-                        sx={{ px: 2, py: 1.25, cursor: 'pointer' }}
-                        onClick={() => {
-                          handleLocalitateClick(localitate);
-                        }}
-                      />
-                    ))}
-                  </List>
-                </>
-              )}
-            </Popover>
-          </div>
-        )}
+        {/* Shared Popover for location selection (desktop + mobile) */}
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          PaperProps={{ sx: { minWidth: isMobile ? 280 : 260, maxHeight: isMobile ? 360 : 400, mt: isMobile ? 1 : 2 } }}
+        >
+          {!selectedJudet ? (
+            <>
+              <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
+              <List sx={{ maxHeight: isMobile ? 280 : 320, overflow: 'auto' }}>
+                {judete.map((judet) => (
+                  <ListItemButton
+                    key={judet}
+                    onClick={() => {
+                      if (judet === "Toată țara") {
+                        setSelectedJudet(null);
+                        setSelectedLocalitate("");
+                        setAnchorEl(null);
+                      } else {
+                        setSelectedJudet(judet);
+                      }
+                    }}
+                    divider
+                  >
+                    <ListItemText
+                      primary={judet === "Toată țara" ? <span style={{ fontWeight: 'bold' }}>Toată țara</span> : judet}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            </>
+          ) : (
+            <>
+              <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
+              <List sx={{ maxHeight: isMobile ? 280 : 320, overflow: 'auto' }}>
+                <ListItemButton onClick={() => setSelectedJudet(null)} divider>
+                  <ListItemText primary={<span style={{ color: '#1976d2' }}>Înapoi la județe</span>} />
+                </ListItemButton>
+                {getLocalitatiForJudet(selectedJudet).map((localitate) => (
+                  <ListItemText
+                    key={localitate}
+                    primary={localitate}
+                    sx={{ px: 2, py: isMobile ? 1.25 : 1.5, cursor: 'pointer' }}
+                    onClick={() => {
+                      handleLocalitateClick(localitate);
+                    }}
+                  />
+                ))}
+              </List>
+            </>
+          )}
+        </Popover>
       </div>
 
       <div className="main-content">

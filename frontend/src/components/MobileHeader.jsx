@@ -6,7 +6,9 @@ import './MobileHeader.css';
 
 export default function MobileHeader({ notificationCount = 0, onSearchFocus, onNotificationClick }) {
   return (
-    <div className="mobile-header">
+    <>
+      <div className="mobile-header-spacer" aria-hidden="true" />
+      <div className="mobile-header">
       <div className="mobile-search-container">
         <div className="mobile-search-bar">
           <input
@@ -43,6 +45,7 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
           <NotificationsNoneOutlinedIcon className="mobile-notification-icon" />
         </Badge>
       </button>
-    </div>
+      </div>
+    </>
   );
 }

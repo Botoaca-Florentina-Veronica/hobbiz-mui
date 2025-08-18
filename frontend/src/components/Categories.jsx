@@ -48,37 +48,42 @@ export default function Categories() {
       <Container maxWidth="lg">
         <h2 className="categories-title">Explorează categorii</h2>
         
-        {/* Categories Grid */}
-        <Grid container spacing={3} justifyContent="center">
+        {/* Categories Grid - compact on mobile */}
+        <Grid 
+          container 
+          spacing={{ xs: 1.5, sm: 2, md: 3 }} 
+          justifyContent="center"
+        >
           {categories.map((category, index) => (
-            <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
+            <Grid item xs={3} sm={4} md={3} lg={2} key={index}>
               <Card
                 onClick={() => navigate(`/anunturi-categorie/${encodeURIComponent(category.description)}`)}
                 sx={{
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  borderRadius: '16px',
+                  borderRadius: { xs: '10px', sm: '12px', md: '16px' },
                   overflow: 'hidden',
                   position: 'relative',
                   '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                    transform: { sm: 'translateY(-6px)', md: 'translateY(-8px)' },
+                    boxShadow: { sm: '0 6px 18px rgba(0,0,0,0.12)', md: '0 8px 25px rgba(0,0,0,0.15)' },
                   },
                   background: `linear-gradient(135deg, ${category.color}20, ${category.color}10)`,
-                  border: `2px solid ${category.color}40`,
+                  border: `1px solid ${category.color}40`,
                 }}
               >
                 <Box sx={{ 
-                  height: 120, 
+                  height: { xs: 72, sm: 96, md: 120 },
                   backgroundColor: 'white', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  p: 2
+                  p: { xs: 1, sm: 1.5, md: 2 }
                 }}>
                   <img
                     src={category.image}
                     alt={category.description}
+                    loading="lazy"
                     style={{
                       maxWidth: '100%',
                       maxHeight: '100%',
@@ -87,15 +92,16 @@ export default function Categories() {
                     }}
                   />
                 </Box>
-                <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <CardContent sx={{ p: { xs: 1, sm: 1.5, md: 2 }, textAlign: 'center' }}>
                   <Typography 
-                    variant="h6" 
+                    variant="subtitle2" 
                     component="h3"
                     sx={{ 
                       color: 'white',
-                      fontWeight: 'bold',
-                      fontSize: { xs: '0.9rem', sm: '1rem' },
-                      mb: 1
+                      fontWeight: 700,
+                      fontSize: { xs: '0.8rem', sm: '0.95rem' },
+                      lineHeight: 1.2,
+                      mb: 0
                     }}
                   >
                     {category.description}
@@ -105,6 +111,7 @@ export default function Categories() {
             </Grid>
           ))}
         </Grid>
+
       </Container>
     </div>
   );

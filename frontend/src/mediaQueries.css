@@ -204,17 +204,18 @@
     background: #144a70;
   }
 
-  /* Ascunde footer-ul de desktop pe mobile */
+  /* Afișează și pe mobile footer-ul de desktop și zona legală */
   .desktop-footer {
-    display: none !important;
+    display: block !important;
+    margin-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
   }
 
   .legal-section {
-    display: none !important;
+    display: flex !important;
   }
 
   .footer-separator {
-    display: none !important;
+    display: block !important;
   }
 
   /* ----------------- General Mobile Adjustments ----------------- */

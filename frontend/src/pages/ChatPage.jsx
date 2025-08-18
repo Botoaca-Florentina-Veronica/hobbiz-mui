@@ -11,8 +11,9 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowBack from '@mui/icons-material/ArrowBack';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import { Box, IconButton, Typography } from '@mui/material';
 
 // Helper: normalize avatar/announcement image URLs
 const resolveAvatarUrl = (src) => {
@@ -593,15 +594,28 @@ export default function ChatPage() {
       <div className={`chat-page-container ${isChattingOnMobile ? 'mobile-chatting' : ''}`}>
         {!isChattingOnMobile && (
         <aside className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-          {/* Mobile-only back button above title */}
-          <div className="chat-mobile-backtop">
-            <button type="button" className="chat-back-btn" onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }} aria-label="Înapoi">
-              <ArrowBackIosNewIcon fontSize="small" />
-              <span>Înapoi</span>
-            </button>
-          </div>
-          {/* Mobile-only page title */}
-          <div className="chat-mobile-title">Chat</div>
+          {/* Mobile header: back + title, consistent MUI styling */}
+          <Box sx={{ 
+            display: { xs: 'flex', md: 'none' }, 
+            alignItems: 'center', 
+            gap: 2, 
+            mb: 2, 
+            pt: 'clamp(36px, 7vh, 72px)', 
+            px: 1 
+          }}>
+            <IconButton
+              onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+              sx={{
+                backgroundColor: 'white',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                '&:hover': { backgroundColor: '#f8fafc' }
+              }}
+              aria-label="Înapoi"
+            >
+              <ArrowBack />
+            </IconButton>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>Chat</Typography>
+          </Box>
           <div className="chat-tabs">
             <button 
               className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`}
@@ -708,11 +722,29 @@ export default function ChatPage() {
 
         <main className="chat-main">
           {isChattingOnMobile && (
-            <div className="chat-main-header" style={{display:'flex', alignItems:'center', gap:8}}>
-              <button type="button" onClick={() => setSelectedConversation(null)} className="chat-mobile-back" aria-label="Înapoi la conversații" style={{border:'none',background:'transparent',padding:8}}>
-                ← Înapoi
-              </button>
-            </div>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 2, 
+              mb: 1, 
+              pt: { xs: 'clamp(36px, 7vh, 72px)', md: 1 },
+              px: { xs: 1, md: 0 }
+            }} className="chat-main-header">
+              <IconButton
+                onClick={() => setSelectedConversation(null)}
+                sx={{
+                  backgroundColor: 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  '&:hover': { backgroundColor: '#f8fafc' }
+                }}
+                aria-label="Înapoi la conversații"
+              >
+                <ArrowBack />
+              </IconButton>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+                {selectedConversation?.name || 'Chat'}
+              </Typography>
+            </Box>
           )}
           {!selectedConversation ? (
             <div className="chat-empty-main">
