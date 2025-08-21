@@ -1,6 +1,6 @@
 /* Cookie Policy Page - stil consistent cu About.css */
 .cookie-policy-page {
-  background-color: #ffffff;
+  background-color: #f3f5f6; /* align with footer background */
   min-height: 100vh;
   padding: 40px 0;
   margin-top: 4rem;

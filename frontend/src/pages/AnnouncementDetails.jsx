@@ -63,14 +63,47 @@ export default function AnnouncementDetails() {
   const [showPhone, setShowPhone] = useState(false);
 
   // Dark mode helpers and accent palette
-  const getIsDarkMode = () => {
-    if (typeof document === 'undefined') return false;
-    const b = document.body;
-    const de = document.documentElement;
-    return (b && b.classList.contains('dark-mode')) || (de && de.classList.contains('dark-mode'));
-  };
-  const getAccentCss = () => (getIsDarkMode() ? '#f51866' : '#355070');
-  const getAccentHover = () => (getIsDarkMode() ? '#fa4875' : '#406b92');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const getIsDarkMode = () => isDarkMode;
+  const getAccentCss = () => (isDarkMode ? '#f51866' : '#355070');
+  const getAccentHover = () => (isDarkMode ? '#fa4875' : '#406b92');
+
+  // Tooltip styling helper (bule de hover deasupra butoanelor)
+  const getTooltipProps = () => ({
+    placement: 'top',
+    arrow: true,
+    TransitionComponent: Fade,
+    enterDelay: 200,
+    enterTouchDelay: 100,
+    leaveTouchDelay: 3000,
+    componentsProps: {
+      tooltip: {
+        sx: {
+          bgcolor: getIsDarkMode() ? '#282828' : '#355070',
+          color: '#ffffff',
+          border: `1px solid ${getIsDarkMode() ? '#3f3f3f' : '#4a6b8a'}`,
+          fontSize: '0.8rem',
+          boxShadow: 'none'
+        }
+      },
+      arrow: {
+        sx: {
+          color: getIsDarkMode() ? '#282828' : '#355070'
+        }
+      }
+    }
+  });
+
+  // Keep component in sync with global dark-mode class toggles
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const body = document.body;
+    const update = () => setIsDarkMode(body.classList.contains('dark-mode'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     async function fetchAnnouncement() {
@@ -261,6 +294,7 @@ export default function AnnouncementDetails() {
   return (
     <>
       <Container
+        className="announcement-details-page"
         maxWidth="lg"
         sx={{
           mt: 10,
@@ -397,7 +431,7 @@ export default function AnnouncementDetails() {
                   </Box>
                   
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Tooltip title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}>
+                    <Tooltip {...getTooltipProps()} title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}>
                       <IconButton
                         onClick={handleToggleFavorite}
                         sx={{
@@ -414,7 +448,7 @@ export default function AnnouncementDetails() {
                         {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Partajează">
+                    <Tooltip {...getTooltipProps()} title="Partajează">
                       <IconButton
                         onClick={handleShare}
                         sx={{

@@ -202,14 +202,14 @@ export default function MyAnnouncements() {
                     >
                       <MenuItem value="Orice categorie">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CategoryIcon sx={{ fontSize: 16, color: '#666' }} />
+                          <CategoryIcon sx={{ fontSize: 16 }} />
                           Toate
                         </Box>
                       </MenuItem>
                       {uniqueCategories.map(category => (
                         <MenuItem key={category} value={category}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
+                            <CategoryIcon sx={{ fontSize: 16 }} />
                             {category.length > 20 ? `${category.substring(0, 20)}...` : category}
                           </Box>
                         </MenuItem>
@@ -227,25 +227,25 @@ export default function MyAnnouncements() {
                     >
                       <MenuItem value="cea mai recenta">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <ScheduleIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          <ScheduleIcon sx={{ fontSize: 16 }} />
                           Cele mai recente
                         </Box>
                       </MenuItem>
                       <MenuItem value="cea mai veche">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <ScheduleIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          <ScheduleIcon sx={{ fontSize: 16 }} />
                           Cele mai vechi
                         </Box>
                       </MenuItem>
                       <MenuItem value="titlu_a_z">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          <CategoryIcon sx={{ fontSize: 16 }} />
                           Titlu A-Z
                         </Box>
                       </MenuItem>
                       <MenuItem value="titlu_z_a">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CategoryIcon sx={{ fontSize: 16, color: '#355070' }} />
+                          <CategoryIcon sx={{ fontSize: 16 }} />
                           Titlu Z-A
                         </Box>
                       </MenuItem>
@@ -327,7 +327,7 @@ export default function MyAnnouncements() {
                         <h2 className="my-announcement-title">{a.title}</h2>
                         <div className="my-announcement-category">{a.category}</div>
                         <div className="my-announcement-location">
-                          <LocationOnIcon sx={{ fontSize: 26, color: '#355070', marginRight: 1 }} />
+                          <LocationOnIcon sx={{ fontSize: 26, marginRight: 1 }} />
                           {a.location}
                         </div>
                         {/* Descrierea a fost eliminată pentru un aspect mai curat al listei de anunțuri */}

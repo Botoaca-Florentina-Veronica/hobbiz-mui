@@ -1,5 +1,5 @@
 .privacy-policy {
-  background: linear-gradient(135deg, #f5f7f8 0%, #e8f2f4 100%);
+  background: #f3f5f6;
   min-height: 100vh;
   padding: 40px 0;
   margin-top: 4rem;
@@ -13,7 +13,7 @@
 
 .privacy-policy__header {
   text-align: center;
-  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  background: #355070;
   color: white;
   padding: 60px 40px;
   border-radius: 24px;
@@ -310,11 +310,11 @@
 
 /* Dark Mode Styles */
 .dark-mode .privacy-policy {
-  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+  background: #121212;
 }
 
 .dark-mode .privacy-policy__header {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  background: #282828;
   color: #ffffff;
 }
 

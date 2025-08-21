@@ -498,6 +498,7 @@ export default function AddAnnouncementPage() {
 
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 600;
 
   return (
     <div className="add-announcement-container">
@@ -557,51 +558,75 @@ export default function AddAnnouncementPage() {
           open={categoryOpen}
           anchorEl={categoryAnchorEl}
           onClose={handleCategoryClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: isMobile ? 'center' : 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'left' }}
           PaperProps={{ 
-            sx: { 
-              minWidth: 800,
-              maxWidth: 1000,
-              minHeight: 600,
-              maxHeight: 'calc(100vh - 100px)',
+            sx: {
+              minWidth: isMobile ? '94vw' : 800,
+              maxWidth: isMobile ? '94vw' : 1000,
+              minHeight: isMobile ? '55vh' : 600,
+              maxHeight: isMobile ? '80vh' : 'calc(100vh - 100px)',
               overflowY: 'auto',
+              borderRadius: isMobile ? 16 : 8,
+              p: isMobile ? 0 : 0,
+              zIndex: (theme) => theme.zIndex.modal + 1,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
               color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
               border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
               '& .categories-grid-popover': {
-                padding: '2rem'
+                padding: isMobile ? '0' : '2rem'
               }
-            } 
+            }
           }}
         >
-          <div className="categories-grid-popover">
-            {categories.map((cat, index) => (
-              <div
-                key={index}
-                className="category-card-popover"
-                onClick={() => handleCategorySelect(cat.description)}
-              >
-                <div className="image-container-popover">
-                  {cat.image ? (
-                    <img
-                      src={cat.image}
-                      alt={cat.description}
-                      className="category-image-popover"
-                      style={{ display: 'block' }}
-                    />
-                  ) : (
-                    <div className="image-placeholder-popover">Fără imagine</div>
-                  )}
-                </div>
-                <span className="category-title-popover">
-                  {cat.description || 'Fără titlu'}
-                </span>
-                <p className="category-description-popover">{cat.description}</p>
-                <p className="category-hint-popover">{getCategoryHint(cat.description)}</p>
-              </div>
-            ))}
+          <div className="categories-popover-header-mobile">
+            <span className="categories-popover-title">Alege categoria</span>
+            <button type="button" className="categories-popover-close" onClick={handleCategoryClose} aria-label="Închide">✕</button>
           </div>
+          {isMobile ? (
+            <List className="categories-list-mobile">
+              {categories.map((cat, index) => (
+                <ListItemButton
+                  key={index}
+                  className="category-row-mobile"
+                  onClick={() => handleCategorySelect(cat.description)}
+                >
+                  {cat.image && (
+                    <img src={cat.image} alt="" className="category-row-icon" />
+                  )}
+                  <ListItemText
+                    primary={cat.title || cat.description}
+                    primaryTypographyProps={{ noWrap: true }}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          ) : (
+            <div className="categories-grid-popover">
+              {categories.map((cat, index) => (
+                <div
+                  key={index}
+                  className="category-card-popover"
+                  onClick={() => handleCategorySelect(cat.description)}
+                >
+                  <div className="image-container-popover">
+                    {cat.image ? (
+                      <img
+                        src={cat.image}
+                        alt={cat.description}
+                        className="category-image-popover"
+                      />
+                    ) : (
+                      <div className="image-placeholder" />
+                    )}
+                  </div>
+                  <div className="category-title-popover">{cat.title || cat.description}</div>
+                  <div className="category-description-popover">{cat.description}</div>
+                  <p className="category-hint-popover">{getCategoryHint(cat.description)}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </Popover>
       </form>
       <div className="add-announcement-images-section">

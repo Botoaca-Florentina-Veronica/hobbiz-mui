@@ -645,24 +645,24 @@
 
 /* Dark Mode pentru Search Header - versiune îmbunătățită */
 .dark-mode .my-announcements-search-header {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: none;
 }
 
 .dark-mode .my-announcements-search-header::before {
-  background: linear-gradient(90deg, #f51866 0%, #ff6b9d 100%);
+  background: #f51866;
 }
 
 /* Input Fields în Dark Mode */
 .dark-mode .my-announcements-search-header .MuiTextField-root {
-  background: rgba(42, 42, 42, 0.8);
+  background: #3f3f3f;
 }
 
 .dark-mode .my-announcements-search-header .MuiOutlinedInput-root {
-  background: rgba(42, 42, 42, 0.8);
+  background: #3f3f3f;
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: #575757;
 }
 
 /* Ensure the actual input text and caret are visible in dark mode */
@@ -673,27 +673,27 @@
 
 /* Placeholder color in dark mode */
 .dark-mode .my-announcements-search-header .MuiInputBase-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #8b8b8b;
   opacity: 1; /* for Firefox */
 }
 
 /* Start adornment/search icon color */
 .dark-mode .my-announcements-search-header .MuiInputAdornment-root .MuiSvgIcon-root {
-  color: rgba(255, 255, 255, 0.8);
+  color: #8b8b8b;
 }
 
 .dark-mode .my-announcements-search-header .MuiOutlinedInput-root:hover {
-  border-color: rgba(245, 24, 102, 0.4);
-  box-shadow: 0 2px 8px rgba(245, 24, 102, 0.1);
+  border-color: #fe6585;
+  box-shadow: none;
 }
 
 .dark-mode .my-announcements-search-header .MuiOutlinedInput-root.Mui-focused {
   border-color: #f51866;
-  box-shadow: 0 4px 12px rgba(245, 24, 102, 0.2);
+  box-shadow: none;
 }
 
 .dark-mode .my-announcements-search-header .MuiInputLabel-root {
-  color: rgba(255, 255, 255, 0.7);
+  color: #8b8b8b;
 }
 
 .dark-mode .my-announcements-search-header .MuiInputLabel-root.Mui-focused {
@@ -702,7 +702,7 @@
 
 /* Select Fields în Dark Mode */
 .dark-mode .my-announcements-search-header .MuiFormControl-root {
-  background: rgba(42, 42, 42, 0.8);
+  background: #3f3f3f;
 }
 
 .dark-mode .my-announcements-search-header .MuiSelect-root {
@@ -710,20 +710,25 @@
 }
 
 .dark-mode .my-announcements-search-header .MuiSelect-icon {
-  color: rgba(255, 255, 255, 0.7);
+  color: #8b8b8b;
+}
+
+/* Icons rendered inside the closed Select's current value (e.g., clock) */
+.dark-mode .my-announcements-search-header .MuiSelect-select .MuiSvgIcon-root {
+  color: #8b8b8b;
 }
 
 /* Chip-uri în Dark Mode - design simplificat */
 .dark-mode .my-announcements-search-header .MuiChip-root {
-  background: rgba(255, 255, 255, 0.1);
+  background: #575757;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #717171;
 }
 
 .dark-mode .my-announcements-search-header .MuiChip-root:hover {
-  background: rgba(245, 24, 102, 0.2);
-  border-color: rgba(245, 24, 102, 0.4);
-  box-shadow: 0 2px 8px rgba(245, 24, 102, 0.1);
+  background: #ff7e95;
+  border-color: #fe6585;
+  box-shadow: none;
   transform: translateY(-1px);
 }
 
@@ -734,19 +739,19 @@
 }
 
 .dark-mode .my-announcements-search-header .MuiChip-colorSecondary {
-  background: #ff6b9d;
+  background: #fe6585;
   color: #ffffff;
   border: none;
 }
 
 .dark-mode .my-announcements-search-header .MuiChip-colorDefault {
-  background: rgba(255, 255, 255, 0.15);
+  background: #575757;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #717171;
 }
 
 .dark-mode .my-announcements-search-header .MuiChip-deleteIcon {
-  color: rgba(255, 255, 255, 0.8);
+  color: #8b8b8b;
 }
 
 .dark-mode .my-announcements-search-header .MuiChip-deleteIcon:hover {
@@ -755,9 +760,9 @@
 
 /* Dark Mode pentru Menu Dropdown - design simplificat */
 .dark-mode .MuiPaper-root.MuiMenu-paper {
-  background: #2a2a2a;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: #282828;
+  border: 1px solid #3f3f3f;
+  box-shadow: none;
 }
 
 .dark-mode .MuiMenuItem-root {
@@ -766,8 +771,8 @@
 }
 
 .dark-mode .MuiMenuItem-root:hover {
-  background: rgba(245, 24, 102, 0.15);
-  color: #f51866;
+  background: #ff7e95;
+  color: #121212;
 }
 
 .dark-mode .MuiMenuItem-root .MuiSvgIcon-root {
@@ -779,24 +784,23 @@
 }
 
 .dark-mode .my-announcement-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  border: 1px solid rgba(245, 24, 102, 0.3);
+  background: #282828;
+  box-shadow: none;
+  border: 1px solid #3f3f3f;
 }
 
 .dark-mode .my-announcement-card:hover {
-  box-shadow: 0 12px 40px rgba(245, 24, 102, 0.4);
-  border-color: rgba(245, 24, 102, 0.5);
+  border-color: #fe6585;
   transform: translateY(-3px);
 }
 
 .dark-mode .my-announcement-info {
-  background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+  background: #282828;
   height: 200px;
 }
 
 .dark-mode .my-announcement-image {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3f3f3f 100%);
+  background: #3f3f3f;
   height: 200px;
 }
 
@@ -805,79 +809,83 @@
 }
 
 .dark-mode .my-announcement-category {
-  color: #1a1a1a;
-  background: rgba(254, 101, 133, 0.9);
+  color: #ffabb7;
+  background: #3f3f3f;
 }
 
 .dark-mode .my-announcement-location {
-  color: #c8c8c8;
+  color: #8b8b8b;
+}
+
+/* Ensure the location pin icon matches surface gray, not blue */
+.dark-mode .my-announcement-location .MuiSvgIcon-root {
+  color: #8b8b8b;
 }
 
 .dark-mode .my-announcement-description {
-  color: #a8a8a8;
+  color: #8b8b8b;
 }
 
 .dark-mode .my-announcement-price {
   color: #fe6585;
-  text-shadow: 0 1px 3px rgba(254, 101, 133, 0.3);
+  text-shadow: none;
 }
 
 .dark-mode .my-announcement-id {
   color: #8b8b8b;
-  background: rgba(139, 139, 139, 0.2);
+  background: #3f3f3f;
 }
 
 .dark-mode .my-announcement-btn {
   border-color: #fe6585;
-  background: rgba(26, 26, 26, 0.9);
+  background: #121212;
   color: #fe6585;
-  backdrop-filter: blur(10px);
 }
 
 .dark-mode .my-announcement-btn:hover {
   background: #fe6585;
-  color: #1a1a1a;
+  color: #121212;
   border-color: #fe6585;
-  box-shadow: 0 8px 25px rgba(254, 101, 133, 0.4);
+  box-shadow: none;
 }
 
 .dark-mode .my-announcement-btn.primary {
-  border-color: #fe6585;
-  background: #fe6585;
-  color: #1a1a1a;
+  border-color: #f51866;
+  background: #f51866;
+  color: #ffffff;
 }
 
 .dark-mode .my-announcement-btn.primary:hover {
-  background: #f51866;
-  border-color: #f51866;
-  color: #ffffff;
-  box-shadow: 0 8px 25px rgba(245, 24, 102, 0.5);
+  background: #fa4875;
+  border-color: #fa4875;
+  color: #121212;
+  box-shadow: none;
 }
 
 .dark-mode .my-announcement-btn.danger {
-  border-color: #ff6b6b;
-  background: rgba(26, 26, 26, 0.9);
-  color: #ff6b6b;
+  border-color: #f51866;
+  background: #121212;
+  color: #f51866;
 }
 
 .dark-mode .my-announcement-btn.danger:hover {
-  background: #ff6b6b;
-  color: #1a1a1a;
-  border-color: #ff6b6b;
-  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+  background: #f51866;
+  color: #121212;
+  border-color: #f51866;
+  box-shadow: none;
 }
 
 .dark-mode .my-announcement-btn.secondary {
   border-color: #8b8b8b;
-  background: rgba(26, 26, 26, 0.9);
+  background: #121212;
   color: #8b8b8b;
 }
 
 .dark-mode .my-announcement-btn.secondary:hover {
   background: #8b8b8b;
-  color: #1a1a1a;
+  color: #121212;
   border-color: #8b8b8b;
-  box-shadow: 0 8px 25px rgba(139, 139, 139, 0.3);
+  box-shadow: none;
 }
 
 /* Dark Mode pentru Grid și List View */
