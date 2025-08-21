@@ -15,6 +15,12 @@ body {
   font-family: Roboto, 'Open sans', 'Helvetica Neue', sans-serif;
 }
 
+/* Mobile: avoid sub-pixel rounding and horizontal overflow */
+@media (max-width: 600px) {
+  html { zoom: 100%; }
+  body, #root { overflow-x: hidden; }
+}
+
 .flex-container {
   display: flex;
 }

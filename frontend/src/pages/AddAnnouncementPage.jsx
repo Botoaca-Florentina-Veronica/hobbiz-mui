@@ -562,8 +562,8 @@ export default function AddAnnouncementPage() {
           transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'left' }}
           PaperProps={{ 
             sx: {
-              minWidth: isMobile ? '94vw' : 800,
-              maxWidth: isMobile ? '94vw' : 1000,
+              minWidth: isMobile ? 'calc(100vw - 32px)' : 800,
+              maxWidth: isMobile ? 'calc(100vw - 32px)' : 1000,
               minHeight: isMobile ? '55vh' : 600,
               maxHeight: isMobile ? '80vh' : 'calc(100vh - 100px)',
               overflowY: 'auto',
