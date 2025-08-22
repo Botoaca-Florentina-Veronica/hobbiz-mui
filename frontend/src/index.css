@@ -1,13 +1,54 @@
 /* Import Google font - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
+/* Global theme tokens */
+:root {
+  /* Surfaces & backgrounds */
+  --app-bg: #f3f5f6;
+  --app-surface: #ffffff;
+  --app-elev: #ffffff;
+  --app-border: #e0e0e0;
+
+  /* Text */
+  --app-text: #1f2937;
+  --app-muted: #666666;
+  --app-placeholder: #aaa;
+
+  /* Brand */
+  --primary: #355070;
+  --primary-contrast: #ffffff;
+  --primary-hover: #2a4059;
+
+  /* Special sections */
+  --hero-bg: #F8B195;
+}
+
+.dark-mode {
+  /* Dark palette mapping */
+  --app-bg: #121212;
+  --app-surface: #282828;
+  --app-elev: #2e2e2e;
+  --app-border: #3f3f3f;
+
+  --app-text: #eceeef;
+  --app-muted: #8b8b8b;
+  --app-placeholder: #8b8b8b;
+
+  /* Brand in dark mode (pink accent already used across app) */
+  --primary: #f51866;
+  --primary-contrast: #ffffff;
+  --primary-hover: #fa4875;
+
+  --hero-bg: #121212;
+}
+
 html {
   zoom: 90%;
 }
 
 body {
   display: flex;
-  background-color:#f3f5f6;
+  background-color: var(--app-bg);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -33,7 +74,7 @@ a, .btn {
 
 /* login page */
 body.login-page {
-  background-color: #ffffff !important;
+  background-color: var(--app-surface) !important;
   margin: 0;
   min-height: 100vh;
 }

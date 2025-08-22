@@ -18,7 +18,7 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
             onFocus={onSearchFocus}
           />
           <div className="mobile-search-btn">
-            <SearchIcon />
+            <SearchIcon htmlColor="currentColor" />
           </div>
         </div>
       </div>
@@ -34,15 +34,15 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
           className="mobile-notification-badge"
           sx={{
             '& .MuiBadge-badge': {
-              backgroundColor: '#ff4757',
-              color: 'white',
+              backgroundColor: 'var(--primary)',
+              color: 'var(--primary-contrast)',
               fontSize: '0.75rem',
               minWidth: '16px',
               height: '16px',
             }
           }}
         >
-          <NotificationsNoneOutlinedIcon className="mobile-notification-icon" />
+          <NotificationsNoneOutlinedIcon className="mobile-notification-icon" htmlColor="currentColor" />
         </Badge>
       </button>
       </div>

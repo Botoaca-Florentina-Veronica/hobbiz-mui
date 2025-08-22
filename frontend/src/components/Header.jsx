@@ -11,6 +11,7 @@ import apiClient from '../api/api';
 import './Header.css';
 import MobileHeader from './MobileHeader';
 import './MobileHeader.css';
+import './Header.mediaQueries.css';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -114,11 +115,11 @@ export default function Header() {
 
   // Detectează mobilul în mod reactiv (la resize / schimbare media query)
   const [isMobile, setIsMobile] = useState(
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches
   );
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(max-width: 900px)');
+    const mq = window.matchMedia('(max-width: 1024px)');
     const handler = (e) => setIsMobile(e.matches);
     // compat: event listener on MQ
     if (mq.addEventListener) {
@@ -188,13 +189,13 @@ export default function Header() {
   return (
     <>
       {isMobile ? (
-        (location.pathname === '/setari-cont' || location.pathname === '/profil') ? null : (
+        ((location.pathname.startsWith('/chat') || location.pathname.startsWith('/favorite-announcements') || location.pathname.startsWith('/cont')) ? null : (
           <MobileHeader 
             notificationCount={unreadCount} 
             onSearchFocus={() => {/* handel search focus */}}
             onNotificationClick={() => navigate('/notificari')}
           />
-        )
+        ))
       ) : (
         <>
           <div className="header fixed-header">

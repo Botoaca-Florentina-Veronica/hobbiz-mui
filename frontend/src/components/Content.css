@@ -30,10 +30,10 @@
 /* Stiluri pentru Content */
 .content {
   padding: 150px 0px 150px 0px;
-  color: black;
+  color: var(--app-text);
   font-size: 40px;
   font-weight: bold;
-  background-color: #f3f5f6;
+  background-color: var(--app-bg);
   height: 80vh;
 }
 
@@ -52,7 +52,7 @@
 
 .content h2 {
   text-align: center;
-  color: #1f2937;
+  color: var(--app-text);
   font-size: 3.5rem;
   font-weight: bolder;
   padding: 50px 70px 70px 50px;
@@ -60,10 +60,10 @@
 }
 
 .dark-mode .content {
-  background-color: #282828;
-  color: #eceeef;
+  background-color: var(--app-surface);
+  color: var(--app-text);
 }
 
 .dark-mode .content h2 {
-  color: #eceeef;
+  color: var(--app-text);
 }

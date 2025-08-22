@@ -1,3 +1,28 @@
+/* Color tokens for Account page (light + dark via CSS vars) */
+:root {
+  --acc-bg: #f8fafc;
+  --acc-card: #ffffff;
+  --acc-border: #e5e7eb;
+  --acc-text: #1a1a1a;
+  --acc-title: #1a1a1a;
+  --acc-primary: #f51866; /* Primary a0 */
+  --acc-primary-alt: #fa4875; /* Primary a10 */
+  --acc-divider: #e5e7eb;
+  --acc-hover: #f8fafc;
+}
+
+.dark-mode {
+  --acc-bg: #121212;      /* Surface a0 */
+  --acc-card: #282828;    /* Surface a10 */
+  --acc-border: #3f3f3f;  /* Surface a20 */
+  --acc-text: #8b8b8b;    /* Surface a50 as readable text */
+  --acc-title: #ffabb7;   /* Primary a50 for headings */
+  --acc-primary: #f51866; /* Primary a0 */
+  --acc-primary-alt: #fa4875; /* Primary a10 */
+  --acc-divider: #575757; /* Surface a30 */
+  --acc-hover: #3f3f3f;   /* Surface a20 */
+}
+
 .mobile-account-menu {
   max-width: 720px;
   margin: 0 auto;

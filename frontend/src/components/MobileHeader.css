@@ -22,10 +22,10 @@
 
 .mobile-search-bar {
   display: flex;
-  background: #ffffff;
+  background: var(--app-surface);
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid #e7ecef;
+  border: 1px solid var(--app-border);
   min-height: 44px;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -38,17 +38,17 @@
   font-size: 1rem;
   flex: 1;
   background: transparent;
-  color: #26414a;
+  color: var(--app-text);
 }
 
 .mobile-search-input::placeholder {
-  color: #4f6d73; /* slightly teal-grey like mock */
+  color: var(--app-muted); /* slightly teal-grey like mock */
   font-size: 1rem;
 }
 
 .mobile-search-btn {
-  background: #063439; /* dark teal like in mock */
-  color: #fff;
+  background: var(--primary); /* dark teal like in mock */
+  color: var(--primary-contrast);
   border: none;
   padding: 0 16px;
   display: flex;
@@ -63,7 +63,14 @@
 }
 
 .mobile-search-btn:hover {
-  background: #072f33;
+  background: var(--primary-hover);
+}
+
+/* Ensure the icon inherits the button color */
+.mobile-search-btn svg,
+.mobile-search-btn .MuiSvgIcon-root {
+  color: currentColor !important;
+  fill: currentColor !important;
 }
 
 .mobile-notification-btn {
@@ -92,10 +99,38 @@
 
 .mobile-notification-icon {
   font-size: 1.6rem;
-  color: #063439; /* outlined bell color */
+  color: var(--app-text) !important; /* default bell color for contrast */
 }
 
-@media (min-width: 901px) {
+/* Dark mode specific refinements for better contrast */
+.dark-mode .mobile-search-bar {
+  background: var(--app-elev);
+  border-color: var(--app-border);
+  /* subtle inner outline to improve contrast on very dark bg */
+  box-shadow: 0 2px 16px rgba(0,0,0,0.55), 0 0 0 1px var(--app-border) inset;
+}
+
+.dark-mode .mobile-search-input::placeholder {
+  color: var(--app-placeholder);
+}
+
+.dark-mode .mobile-notification-btn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.dark-mode .mobile-notification-icon {
+  color: var(--app-text) !important;
+}
+
+.dark-mode .mobile-notification-btn:hover .mobile-notification-icon {
+  color: var(--primary) !important;
+}
+
+/* Make sure the search button itself uses brand with proper contrast */
+.mobile-search-btn { color: var(--primary-contrast); }
+.mobile-search-btn:hover { color: var(--primary-contrast); }
+
+@media (min-width: 1025px) {
   .mobile-header {
     display: none !important;
   }

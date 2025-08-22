@@ -606,15 +606,17 @@ export default function ChatPage() {
             <IconButton
               onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
               sx={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--chat-elev)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                '&:hover': { backgroundColor: '#f8fafc' }
+                '&:hover': { backgroundColor: 'var(--chat-surface)' }
               }}
+              disableRipple
+              disableFocusRipple
               aria-label="Înapoi"
             >
               <ArrowBack />
             </IconButton>
-            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>Chat</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>Chat</Typography>
           </Box>
           <div className="chat-tabs">
             <button 
@@ -733,15 +735,17 @@ export default function ChatPage() {
               <IconButton
                 onClick={() => setSelectedConversation(null)}
                 sx={{
-                  backgroundColor: 'white',
+                  backgroundColor: 'var(--chat-elev)',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  '&:hover': { backgroundColor: '#f8fafc' }
+                  '&:hover': { backgroundColor: 'var(--chat-surface)' }
                 }}
+                disableRipple
+                disableFocusRipple
                 aria-label="Înapoi la conversații"
               >
                 <ArrowBack />
               </IconButton>
-              <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>
                 {selectedConversation?.name || 'Chat'}
               </Typography>
             </Box>
@@ -772,11 +776,11 @@ export default function ChatPage() {
 
               <div className="chat-messages-container">
                 {loading ? (
-                  <div style={{textAlign: 'center', color: '#6b7280', padding: '20px'}}>
+                  <div style={{textAlign: 'center', color: 'var(--chat-muted)', padding: '20px'}}>
                     Se încarcă mesajele...
                   </div>
                 ) : messages.length === 0 ? (
-                  <div style={{textAlign: 'center', color: '#6b7280', padding: '20px'}}>
+                  <div style={{textAlign: 'center', color: 'var(--chat-muted)', padding: '20px'}}>
                     Nicio conversație încă. Scrie primul mesaj!
                   </div>
                 ) : (

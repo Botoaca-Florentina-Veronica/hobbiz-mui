@@ -2,7 +2,7 @@
 .main-stage {
   display: flex;
   flex-direction: column;
-  background-color: #F8B195;
+  background-color: var(--hero-bg);
   padding: 40px 100px 100px;
   align-items: center;
 }
@@ -31,7 +31,7 @@
 .main-text {
   flex: 1;
   padding: 40px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--app-elev);
   border-radius: 20px;
   box-shadow: 0 15px 15px rgba(0, 0, 0, 0.1);
   margin-right: 50px;
@@ -52,7 +52,7 @@
 }
 
 #main-title {
-  color: #355070;
+  color: var(--primary);
   font-size: 2.8rem;
   margin-bottom: 20px;
 }
@@ -80,17 +80,17 @@
 }
 
 .dark-mode .main-stage {
-  background-color: #121212;
+  background-color: var(--hero-bg);
 }
 
 .dark-mode .main-text {
-  color: #F51866;
-  border-color: #f9f1ea;
-  background-color: #282828;
+  color: var(--app-text);
+  border-color: var(--app-border);
+  background-color: var(--app-surface);
 }
 
 .dark-mode .main-text #main-title {
-  color: #f9faf8;
+  color: var(--app-text);
 }
 
 /* Dark Mode pentru Categories Button */
@@ -552,14 +552,14 @@
 .location-section {
   display: flex;
   align-items: center;
-  background: white;
+  background: var(--app-surface);
   padding: 0 15px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  border-top: 1px solid var(--app-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .location-icon {
-  color: #666;
+  color: var(--app-muted);
   margin-right: 8px;
 }
 
@@ -576,8 +576,8 @@
   align-items: center;
   justify-content: center;
   padding: 0 25px;
-  background: #355070;
-  color: white;
+  background: var(--primary);
+  color: var(--primary-contrast);
   border: none;
   border-radius: 0 25px 25px 0;
   cursor: pointer;
@@ -586,7 +586,7 @@
 }
 
 .search-button:hover {
-  background: #2a4059;
+  background: var(--primary-hover);
 }
 
 .search-icon {
@@ -595,8 +595,8 @@
 
 .sign-up-button {
   padding: 12px 30px;
-  background: #355070;
-  color: white;
+  background: var(--primary);
+  color: var(--primary-contrast);
   border: none;
   border-radius: 25px;
   cursor: pointer;
@@ -606,7 +606,7 @@
 }
 
 .sign-up-button:hover {
-  background: #2a4059;
+  background: var(--primary-hover);
 }
 
 /* Detalii categorie pe hover */
@@ -616,7 +616,7 @@
   top: 0;
   min-width: 520px;
   max-width: 900px;
-  background: #fff;
+  background: var(--app-surface);
   border-radius: 0 12px 12px 0;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   padding: 28px 36px 28px 32px;
@@ -641,12 +641,12 @@
 .category-details-col div {
   font-size: 1.04rem;
   margin-bottom: 4px;
-  color: #222;
+  color: var(--app-text);
 }
 
 .category-details-col div:first-child {
   font-weight: bold;
-  color: #355070;
+  color: var(--primary);
   margin-bottom: 8px;
 }
 
@@ -686,7 +686,7 @@
 
 .category-details-title-inline {
   font-weight: bold;
-  color: #355070;
+  color: var(--primary);
   margin-bottom: 8px;
   font-size: 1.05rem;
 }
@@ -694,7 +694,7 @@
 .category-details-col-inline div {
   font-size: 1.01rem;
   margin-bottom: 4px;
-  color: #222;
+  color: var(--app-text);
 }
 
 @media (max-width: 900px) {
@@ -720,6 +720,15 @@
 
 @media (max-width: 900px) {
   .mainstage-search-desktop {
+    display: none !important;
+  }
+}
+
+/* Ensure only the new MobileHeader is used on mobile/tablet */
+@media (max-width: 1024px) {
+  .mainstage-search-mobile,
+  .search-bell-wrapper,
+  .search-mobile-row {
     display: none !important;
   }
 }
@@ -755,8 +764,8 @@
     grid-template-columns: 1fr 52px; /* buton un pic mai lat */
     gap: 0; /* fără spațiu între input și buton */
     align-items: center;
-    background: #fff;
-    border: 1px solid #e7ecef;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
@@ -769,20 +778,20 @@
     border: none; /* border pe container */
     font-size: 16px;
     outline: none;
-    color: #26414a;
+    color: var(--app-text);
     background: transparent;
   }
 
   .search-input-mobile::placeholder {
-    color: #4f6d73;
+    color: var(--app-muted);
   }
 
   .search-button-mobile {
     height: 50px;
     border-radius: 0 10px 10px 0; /* rotunjit doar dreapta */
     border: none;
-    background: #063439; /* teal închis */
-    color: #fff;
+    background: var(--primary); /* teal închis */
+    color: var(--primary-contrast);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -792,13 +801,13 @@
   }
 
   .search-button-mobile:hover {
-    background: #072f33;
+    background: var(--primary-hover);
   }
 
   .notif-button-mobile {
     background: none;
     border: none;
-    color: #063439;
+    color: var(--primary);
     width: 44px;
     height: 44px;
     display: inline-flex;
@@ -837,7 +846,7 @@
 /* Refine main hero on mobile */
 @media (max-width: 900px) {
   .main-text {
-    background: rgba(255,255,255,0.92);
+    background: var(--app-elev);
     border-radius: 16px;
     box-shadow: 0 8px 18px rgba(0,0,0,0.08);
     padding: 20px;

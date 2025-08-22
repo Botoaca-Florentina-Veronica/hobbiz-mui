@@ -6,8 +6,12 @@
   .add-announcement-container * {
     box-sizing: border-box;
   }
-  header, .header, .mobile-header, .main-header {
+  /* Do not hide MobileHeader on this page; keep only legacy headers hidden */
+  header, .header, .main-header {
     display: none !important;
+  }
+  .mobile-header {
+    display: flex !important;
   }
   .add-announcement-container {
     background: #f5f7f8;

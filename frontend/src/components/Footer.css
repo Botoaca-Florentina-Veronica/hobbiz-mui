@@ -19,8 +19,8 @@
 /* Stiluri pentru Footer */
 .footer {
   font-size: 20px;
-  background: #f3f5f6;
-  color: #355070;
+  background: var(--app-bg);
+  color: var(--app-text);
   display: flex;
   flex-direction: column; /* asigura aranjarea pe verticala */
   justify-content: center;
@@ -36,102 +36,102 @@
 }
 
 .dark-mode .footer {
-  background: #121212;
-  color: #ffffff;
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
 /* Dark Mode pentru Footer Mobile Buttons */
 .dark-mode .footer-mobile-buttons {
-  background: #282828;
-  border-top: 1px solid #3f3f3f;
+  background: var(--app-surface);
+  border-top: 1px solid var(--app-border);
 }
 
 .dark-mode .footer-mobile-buttons .footer-icon {
-  color: #ffffff;
+  color: var(--app-text);
 }
 
 .dark-mode .footer-mobile-buttons .footer-icon svg {
-  color: #ffffff;
-  stroke: #ffffff;
+  color: var(--app-text);
+  stroke: var(--app-text);
 }
 
 .dark-mode .footer-mobile-buttons .footer-icon:hover {
-  color: #fe6585;
+  color: var(--primary-hover);
 }
 
 .dark-mode .footer-mobile-buttons .footer-icon:hover svg {
-  color: #fe6585;
-  stroke: #fe6585;
+  color: var(--primary-hover);
+  stroke: var(--primary-hover);
 }
 
 .dark-mode .footer-mobile-buttons .footer-icon span,
 .dark-mode .footer-mobile-buttons .footer-publish-label,
 .dark-mode .footer-mobile-buttons .footer-account-label,
 .dark-mode .footer-mobile-buttons .footer-explore-label {
-  color: #ffffff;
+  color: var(--app-text);
 }
 
 .dark-mode .footer-mobile-buttons .footer-icon:hover span,
 .dark-mode .footer-mobile-buttons .footer-icon:hover .footer-publish-label,
 .dark-mode .footer-mobile-buttons .footer-icon:hover .footer-account-label,
 .dark-mode .footer-mobile-buttons .footer-icon:hover .footer-explore-label {
-  color: #fe6585;
+  color: var(--primary-hover);
 }
 
 /* Dark Mode pentru Footer Publish Button */
 .dark-mode .footer-publish-btn {
-  background: #3f3f3f;
-  border: 2px solid #575757;
+  background: var(--app-border);
+  border: 2px solid var(--app-border);
 }
 
 .dark-mode .footer-publish-btn:hover {
-  background: #f51866;
-  border-color: #f51866;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .dark-mode .footer-publish-btn svg {
-  color: #ffffff;
-  stroke: #ffffff;
+  color: var(--primary-contrast);
+  stroke: var(--primary-contrast);
 }
 
 .dark-mode .footer-publish-btn:hover svg {
-  color: #121212;
-  stroke: #121212;
+  color: var(--app-surface);
+  stroke: var(--app-surface);
 }
 
 .dark-mode .footer-publish-btn .footer-publish-label {
-  color: #ffffff;
+  color: var(--primary-contrast);
 }
 
 .dark-mode .footer-publish-btn:hover .footer-publish-label {
-  color: #fe6585;
+  color: var(--primary-hover);
 }
 
 /* Dark Mode pentru Footer Dropdown */
 .dark-mode .section-dropdown.footer-dropdown {
-  background-color: #282828;
-  border: 1px solid #3f3f3f;
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
   box-shadow: 0 14px 35px 0 rgba(0,0,0,0.6);
 }
 
 .dark-mode .section-dropdown.footer-dropdown a {
-  background-color: #282828 !important;
-  color: #ffffff !important;
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
 }
 
 .dark-mode .section-dropdown.footer-dropdown a:hover {
-  color: #121212 !important;
-  background-color: #f51866 !important;
+  color: var(--app-surface) !important;
+  background-color: var(--primary) !important;
 }
 
 /* Dark Mode pentru Desktop Footer */
 .dark-mode .desktop-footer {
-  background: #121212;
-  color: #ffffff;
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
 .dark-mode .desktop-footer p {
-  color: #ffffff;
+  color: var(--app-text);
 }
 
 .legal-section {
@@ -171,7 +171,7 @@
   margin: 0 0 8px 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #355070;
+  color: var(--primary);
 }
 
 .legal-section__column ul {
@@ -181,13 +181,13 @@
 }
 
 .legal-section__column a {
-  color: #355070;
+  color: var(--primary);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .legal-section__column a:hover {
-  color: #406b92;
+  color: var(--primary-hover);
   text-decoration: underline;
 }
 
@@ -209,15 +209,15 @@
 
 /* Dark mode colors for desktop legal section */
 .dark-mode .legal-section__column h4 {
-  color: #ffffff;
+  color: var(--app-text);
 }
 
 .dark-mode .legal-section__column a {
-  color: #ffffff;
+  color: var(--app-text);
 }
 
 .dark-mode .legal-section__column a:hover {
-  color: #fa4875;
+  color: var(--primary-hover);
 }
 
 .footer-mobile-buttons {
@@ -247,8 +247,8 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    background: #fff;
-    border-top: 1px solid #e0e0e0;
+    background: var(--app-surface);
+    border-top: 1px solid var(--app-border);
     box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
     z-index: 1000;
     padding: 0;
@@ -271,7 +271,7 @@
     justify-content: center;
     height: 100%;
     cursor: pointer;
-    color: #666;
+    color: var(--app-muted);
     font-size: 0.7rem;
     gap: 0.2rem;
     transition: color 0.2s ease;
@@ -283,7 +283,7 @@
 
   .footer-mobile-buttons .footer-icon:hover,
   .footer-mobile-buttons .footer-icon.active {
-    color: #1a5a87;
+    color: var(--primary);
   }
   
   .footer-mobile-buttons .footer-icon svg {
@@ -314,8 +314,8 @@
   }
 
   .footer-mobile-buttons .footer-publish-icon {
-    background: #1a5a87;
-    color: white;
+    background: var(--primary);
+    color: var(--primary-contrast);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -336,12 +336,12 @@
   }
 
   .footer-mobile-buttons .footer-publish span {
-    color: #1a5a87;
+    color: var(--primary);
     font-weight: 600;
   }
 
   .footer-mobile-buttons .footer-publish.active .footer-publish-icon {
-    background: #144a70;
+    background: var(--primary-hover);
   }
 
   /* Compact legal section on mobile only */
@@ -454,7 +454,7 @@
 .footer-separator {
   width: 100%;
   height: 1px;
-  background: #183642;
+  background: var(--app-border);
   margin: 24px 0 24px 0;
   border: none;
   box-sizing: content-box;
@@ -462,7 +462,7 @@
 
 /* Dark Mode pentru Footer Separator */
 .dark-mode .footer-separator {
-  background: #3f3f3f;
+  background: var(--app-border);
 }
 
 /* Hide desktop footer parts on pages that opt-in via hide-on-mobile (mobile only) */

@@ -46,22 +46,13 @@ export default function AccountMenuMobile() {
     checkAuth();
   }, [navigate]);
 
-  // Sync dark mode with body + localStorage (listen and apply)
+  // Initialize dark mode once from localStorage/body
   useEffect(() => {
     const body = document.body;
     const saved = localStorage.getItem('darkMode');
-    if (saved === 'true') {
-      body.classList.add('dark-mode');
-    } else if (saved === 'false') {
-      body.classList.remove('dark-mode');
-    }
-    setIsDarkMode(body.classList.contains('dark-mode'));
-
-    const observer = new MutationObserver(() => {
-      setIsDarkMode(body.classList.contains('dark-mode'));
-    });
-    observer.observe(body, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    const initial = saved === 'true' ? true : saved === 'false' ? false : body.classList.contains('dark-mode');
+    body.classList.toggle('dark-mode', initial);
+    setIsDarkMode(initial);
   }, []);
 
   const toggleDarkMode = () => {
@@ -100,9 +91,11 @@ export default function AccountMenuMobile() {
       px: 1.5,
       pt: 1.5,
       pb: 'calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 12px)',
-      minHeight: '100vh',
-      backgroundColor: '#f8fafc',
-      overflowY: 'auto'
+      minHeight: '100dvh',
+      backgroundColor: 'var(--acc-bg)',
+      overflowY: 'auto',
+      transition: 'background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out',
+      willChange: 'background-color, color, border-color'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -115,16 +108,18 @@ export default function AccountMenuMobile() {
         <IconButton 
           onClick={() => navigate(-1)}
           sx={{
-            backgroundColor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            backgroundColor: 'var(--acc-card)',
+            border: '1px solid var(--acc-border)',
+            boxShadow: 'none',
             '&:hover': {
-              backgroundColor: '#f8fafc'
+              backgroundColor: 'var(--acc-hover)'
             }
           }}
+          disableRipple
         >
           <ArrowBack />
         </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--acc-title)' }}>
           Contul tău
         </Typography>
       </Box>
@@ -138,11 +133,14 @@ export default function AccountMenuMobile() {
             sx={{
               cursor: 'pointer',
               borderRadius: 2,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-              transition: 'all 0.2s ease',
+              backgroundColor: 'var(--acc-card)',
+              border: '1px solid var(--acc-border)',
+              boxShadow: 'none',
+              transition: 'background-color 140ms ease-out, transform 140ms ease-out',
+              willChange: 'background-color, transform',
               '&:hover': {
                 transform: 'translateY(-2px)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.12)'
+                backgroundColor: 'var(--acc-hover)'
               }
             }}
           >
@@ -155,13 +153,13 @@ export default function AccountMenuMobile() {
               '&:last-child': { pb: 1.25 }
             }}>
               <Box sx={{ 
-                color: '#f51866',
+                color: 'var(--acc-primary)',
                 display: 'flex',
                 alignItems: 'center'
               }}>
                 {item.icon}
               </Box>
-              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: '#1a1a1a' }}>
+              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: 'var(--acc-text)' }}>
                 {item.label}
               </Typography>
             </CardContent>
@@ -171,7 +169,9 @@ export default function AccountMenuMobile() {
         {/* Dark Mode Toggle */}
         <Card sx={{
           borderRadius: 2,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+          backgroundColor: 'var(--acc-card)',
+          border: '1px solid var(--acc-border)',
+          boxShadow: 'none'
         }}>
           <CardContent sx={{ 
             display: 'flex', 
@@ -183,13 +183,13 @@ export default function AccountMenuMobile() {
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ 
-                color: '#f51866',
+                color: 'var(--acc-primary)',
                 display: 'flex',
                 alignItems: 'center'
               }}>
                 {isDarkMode ? <LightMode /> : <DarkMode />}
               </Box>
-              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: '#1a1a1a' }}>
+              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: 'var(--acc-text)' }}>
                 {isDarkMode ? 'Mod luminos' : 'Mod întunecat'}
               </Typography>
             </Box>
@@ -198,18 +198,19 @@ export default function AccountMenuMobile() {
               onChange={toggleDarkMode}
               sx={{
                 '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#f51866'
+                  color: 'var(--acc-primary)'
                 },
                 '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#f51866'
+                  backgroundColor: 'var(--acc-primary)'
                 }
               }}
+              disableRipple
             />
           </CardContent>
         </Card>
       </Box>
 
-      <Divider sx={{ my: 3 }} />
+      <Divider sx={{ my: 3, borderColor: 'var(--acc-divider)' }} />
 
       {/* Logout Item - styled like the other menu cards */}
       <Card
@@ -218,11 +219,13 @@ export default function AccountMenuMobile() {
           mt: 1,
           cursor: 'pointer',
           borderRadius: 2,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+          backgroundColor: 'var(--acc-card)',
+          border: '1px solid var(--acc-border)',
+          boxShadow: 'none',
           transition: 'all 0.2s ease',
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.12)'
+            backgroundColor: 'var(--acc-hover)'
           }
         }}
         aria-label="Deconectează-te"
@@ -236,13 +239,13 @@ export default function AccountMenuMobile() {
           '&:last-child': { pb: 1.25 }
         }}>
           <Box sx={{ 
-            color: '#ef4444',
+            color: 'var(--acc-primary-alt)',
             display: 'flex',
             alignItems: 'center'
           }}>
             <Logout />
           </Box>
-          <Typography variant="body1" noWrap sx={{ fontWeight: 600, color: '#ef4444' }}>
+          <Typography variant="body1" noWrap sx={{ fontWeight: 600, color: 'var(--acc-primary-alt)' }}>
             Deconectează-te
           </Typography>
         </CardContent>
