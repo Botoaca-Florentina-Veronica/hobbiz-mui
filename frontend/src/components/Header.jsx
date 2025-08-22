@@ -189,7 +189,21 @@ export default function Header() {
   return (
     <>
       {isMobile ? (
-        ((location.pathname.startsWith('/chat') || location.pathname.startsWith('/favorite-announcements') || location.pathname.startsWith('/cont')) ? null : (
+        ((
+          location.pathname.startsWith('/chat') ||
+          location.pathname.startsWith('/favorite-announcements') ||
+          location.pathname.startsWith('/cont') ||
+          location.pathname.startsWith('/setari-cont') ||
+          location.pathname.startsWith('/add-announcement') ||
+          location.pathname.startsWith('/anunturile-mele') ||
+          location.pathname.startsWith('/profil') ||
+          location.pathname.startsWith('/cookie') ||
+          location.pathname.startsWith('/confidentialitate') ||
+          location.pathname.startsWith('/despre') ||
+          location.pathname.startsWith('/cum-functioneaza') ||
+          // Hide MobileHeader on announcement details pages on mobile
+          location.pathname.startsWith('/announcement/')
+        ) ? null : (
           <MobileHeader 
             notificationCount={unreadCount} 
             onSearchFocus={() => {/* handel search focus */}}
@@ -202,7 +216,7 @@ export default function Header() {
             <ul className="logo" onClick={() => navigate("/")} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <li style={{display: 'flex', alignItems: 'center'}}>
                 <img src={isDarkMode ? puzzle2 : puzzleLogo} alt="Puzzle Logo" className="puzzle-logo" />
-                <img src={isDarkMode ? logoDark : logoLight} alt="Logo" className="main-logo" />
+                <img src={logoDark} alt="Logo" className="main-logo" />
               </li>
             </ul>
             <ul className="nav-right">

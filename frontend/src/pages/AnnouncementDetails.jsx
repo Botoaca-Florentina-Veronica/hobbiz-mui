@@ -297,7 +297,9 @@ export default function AnnouncementDetails() {
         className="announcement-details-page"
         maxWidth="lg"
         sx={{
-          mt: 10,
+          // Use padding for top spacing on mobile to avoid two-tone background bands
+          pt: { xs: 'calc(env(safe-area-inset-top, 0px) + 24px)', md: 10 },
+          mt: 0,
           mb: 4,
           minHeight: '100vh',
           pb: { xs: 'calc(96px + env(safe-area-inset-bottom))', md: 0 }

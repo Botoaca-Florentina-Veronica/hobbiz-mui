@@ -2,10 +2,12 @@
 
 /* Pagina About modernă și dinamică */
 .about-page {
-  background-color: #f3f5f6;
+  /* Use app-level background to keep a unified color */
+  background: var(--app-bg);
   min-height: 100vh;
   padding: 40px 0;
-  margin-top: 4rem;
+  /* Avoid two-tone band at the very top by using safe-area-aware padding instead of margin */
+  padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
 }
 
 .about-container {
@@ -781,7 +783,8 @@
 @media (max-width: 768px) {
   .about-page {
     padding: 20px 0;
-    margin-top: 2rem;
+    /* Replace top margin with safe-area-aware padding on mobile */
+    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   }
   
   .about-container {

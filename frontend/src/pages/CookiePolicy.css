@@ -1,9 +1,17 @@
 /* Cookie Policy Page - stil consistent cu About.css */
 .cookie-policy-page {
-  background-color: #f3f5f6; /* align with footer background */
+  background-color: var(--app-bg); /* align with desktop footer background */
   min-height: 100vh;
   padding: 40px 0;
   margin-top: 4rem;
+}
+
+/* Tablet & small laptops up to 1024px: păstrăm același fundal și fără offset sus */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cookie-policy-page {
+    margin-top: 0 !important;
+    background-color: var(--app-bg) !important;
+  }
 }
 
 .cookie-policy-container {
@@ -328,7 +336,10 @@
 @media (max-width: 768px) {
   .cookie-policy-page {
     padding: 20px 0;
-    margin-top: 3rem;
+    /* pe mobil nu avem header fix, deci nu e nevoie de offset sus */
+    margin-top: 0;
+    /* Align mobile page background with desktop footer background */
+    background-color: var(--app-bg) !important;
   }
   
   .cookie-policy-container {

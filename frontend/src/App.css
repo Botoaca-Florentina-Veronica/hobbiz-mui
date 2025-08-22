@@ -1,5 +1,10 @@
 /* App.css - stiluri globale si layout general. Stilurile pentru componente sunt mutate in fisiere dedicate. */
 
+/* Asigură același fundal pentru wrapper-ul aplicației */
+.app {
+  background: var(--app-bg);
+}
+
 /* Spațiu pentru conținutul de sub header */
 .main-stage, 
 .content, 

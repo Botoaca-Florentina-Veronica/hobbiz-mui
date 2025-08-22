@@ -14,12 +14,12 @@
     display: flex !important;
   }
   .add-announcement-container {
-    background: #f5f7f8;
+    background: var(--app-bg);
     min-height: 210vh;
     /* Respect notches and rounded corners on iOS/Android while keeping 16px base gutters */
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
-    padding-top: 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
     padding-bottom: 0;
     margin-top: 0;
     width: 100%;
@@ -35,11 +35,11 @@
     margin-bottom: 18px;
     margin-left: 0 !important;
     padding: 0 16px !important; /* align with container gutters */
-    margin-top: 2.2rem;
+    margin-top: 0;
     margin-bottom: 3rem;
   }
   .add-announcement-form {
-    background: #fff;
+    background: var(--app-surface);
     border-radius: 0;
     max-width: 100%;
     margin: 0;
@@ -108,7 +108,7 @@
     max-width: 100%;
     margin: 0;
     box-sizing: border-box;
-    background: #fff;
+    background: var(--app-surface);
     align-items: center;
     justify-content: flex-start;
   }
@@ -124,13 +124,13 @@
     border-radius: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     border: 1px solid #e5e7eb;
-    background: #fff;
+    background: var(--app-surface);
     font-size: 1rem;
     transition: background 0.2s;
     gap: 1.1rem;
   }
   .category-card-popover:hover {
-    background: #f3f5f6;
+    background: var(--app-bg);
   }
   .category-description-popover,
   .category-hint-popover {
@@ -166,7 +166,7 @@
   .add-announcement-contact-section,
   .add-announcement-description-section,
   .add-announcement-images-section {
-    background: #fff;
+    background: var(--app-surface);
     border-radius: 12px;
     max-width: 100%;
     margin: 0 0 0.9rem 0;
@@ -189,7 +189,7 @@
     max-width: 100%;
   }
   .add-announcement-actions-section {
-    background: #fff;
+    background: var(--app-surface);
     border-radius: 12px;
     max-width: 100%;
     margin: 0 0 0.9rem 0;
@@ -204,7 +204,7 @@
 
   /* Treat the initial form block (subtitle, title, category) as a container on mobile */
   .add-announcement-form {
-    background: #fff;
+    background: var(--app-surface);
     border-radius: 12px;
     padding: 0.5rem 16px;
     margin-bottom: 0.9rem !important; /* override inline */
@@ -354,11 +354,12 @@
   .add-announcement-container {
     width: 100%;
     max-width: 100vw;
-    margin-top: 4rem;
+    margin-top: 0;
     margin-bottom: 6rem;
     min-height: 180vh;
     margin-left: 0;
     margin-right: 0;
+    background: var(--app-bg);
   }
 }
 
@@ -366,11 +367,12 @@
     .add-announcement-container {
     width: 100%;
     max-width: 100vw;
-    margin-top: 4rem;
+    margin-top: 0;
     margin-bottom: 1rem;
     min-height: 180vh;
     margin-left: 0;
     margin-right: 0;
+    background: var(--app-bg);
   }
 
 }
@@ -380,11 +382,12 @@
   .add-announcement-container {
     width: 100%;
     max-width: 100vw;
-    margin-top: 4rem;
+    margin-top: 0;
     margin-bottom: 1rem;
     min-height: 180vh;
     margin-left: 0;
     margin-right: 0;
+    background: var(--app-bg);
   }
 
   .add-announcement-contact-input[type="email"],
@@ -418,7 +421,7 @@
   .dark-mode .add-announcement-container {
     background: #121212 !important; /* page background */
     min-height: 100vh !important;
-    padding-top: 0 !important;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 24px) !important;
     margin-top: 0 !important;
   }
   
@@ -538,8 +541,8 @@
     padding: 12px 16px !important;
     background: inherit !important;
     border-bottom: 1px solid #e5e7eb !important;
-    border-top-left-radius: 16px !important;
-    border-top-right-radius: 16px !important;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
   }
   .dark-mode .categories-popover-header-mobile {
     border-bottom: 1px solid #575757 !important;
@@ -584,9 +587,9 @@
   .category-row-mobile.MuiListItemButton-root {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 16px !important;
-    min-height: 52px !important;
+    gap: 10px !important;
+    padding: 10px 14px !important;
+    min-height: 48px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     border-bottom: 1px solid #e5e7eb !important;
@@ -599,7 +602,9 @@
     border-bottom: 1px solid #575757 !important;
   }
   .category-row-mobile .MuiListItemText-primary {
-    font-size: 1rem !important;
+    font-size: 1.06rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
   }
   .category-row-mobile:hover {
     background: rgba(0,0,0,0.03) !important;
@@ -608,8 +613,8 @@
     background: rgba(255,255,255,0.06) !important;
   }
   .category-row-icon {
-    width: 24px !important;
-    height: 24px !important;
+    width: 20px !important;
+    height: 20px !important;
     object-fit: contain !important;
     flex: 0 0 auto !important;
   }

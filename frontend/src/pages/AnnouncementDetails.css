@@ -8,6 +8,8 @@ html {
 /* Container pentru pagina de detalii - in light mode, mosteneste fundalul global */
 .announcement-details-page {
   min-height: 100vh;
+  /* Ensure unified background with the app theme to avoid two-tone bands */
+  background: var(--app-bg);
 }
 
 /* Custom animations pentru componente */
@@ -261,9 +263,10 @@ html {
 }
 
 /* Dark Mode Styles */
-/* In dark mode, pagina de detalii mosteneste fundalul global */
-/* .dark-mode .announcement-details-page { }
-*/
+/* Ensure the background matches dark app background */
+.dark-mode .announcement-details-page {
+  background-color: #121212;
+}
 
 .dark-mode .announcement-hero-overlay {
   background: linear-gradient(135deg, rgba(245, 24, 102, 0.1) 0%, transparent 100%);

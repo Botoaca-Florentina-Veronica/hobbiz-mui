@@ -1,9 +1,11 @@
 /* Pagina How It Works - Design modern și interactiv */
 .how-it-works-page {
-  background: #f3f5f6; /* align with footer background */
+  /* Use app-level background to keep a unified color */
+  background: var(--app-bg);
   min-height: 100vh;
   padding: 40px 0;
-  margin-top: 4rem;
+  /* Avoid top two-tone band by using safe-area-aware padding instead of margin */
+  padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
 }
 
 .how-it-works-container {
@@ -297,7 +299,8 @@
 @media (max-width: 768px) {
   .how-it-works-page {
     padding: 20px 0;
-    margin-top: 2rem;
+    /* Replace top margin with safe-area-aware padding on mobile */
+    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   }
   
   .how-it-works-container {

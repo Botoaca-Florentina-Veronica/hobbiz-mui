@@ -562,12 +562,14 @@ export default function AddAnnouncementPage() {
           transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'left' }}
           PaperProps={{ 
             sx: {
-              minWidth: isMobile ? 'calc(100vw - 32px)' : 800,
-              maxWidth: isMobile ? 'calc(100vw - 32px)' : 1000,
-              minHeight: isMobile ? '55vh' : 600,
-              maxHeight: isMobile ? '80vh' : 'calc(100vh - 100px)',
+              // Mobile: responsive width using clamp(min, preferred, max)
+              width: isMobile ? 'clamp(280px, calc(100vw - 64px), 420px)' : undefined,
+              minWidth: isMobile ? undefined : 800,
+              maxWidth: isMobile ? undefined : 1000,
+              minHeight: isMobile ? '50vh' : 600,
+              maxHeight: isMobile ? '78vh' : 'calc(100vh - 100px)',
               overflowY: 'auto',
-              borderRadius: isMobile ? 16 : 8,
+              borderRadius: isMobile ? 10 : 8,
               p: isMobile ? 0 : 0,
               zIndex: (theme) => theme.zIndex.modal + 1,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
