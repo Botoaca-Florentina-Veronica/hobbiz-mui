@@ -5,7 +5,7 @@
   min-height: 100vh;
   padding: 40px 0;
   /* Avoid top two-tone band by using safe-area-aware padding instead of margin */
-  padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 100px);
 }
 
 .how-it-works-container {

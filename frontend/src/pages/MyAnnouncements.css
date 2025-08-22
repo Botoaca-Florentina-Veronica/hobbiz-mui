@@ -48,8 +48,15 @@
 @media (max-width: 480px) {
   .my-announcements-container {
     /* Normal padding on mobile */
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .my-announcements-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 }
 
@@ -141,14 +148,29 @@
 /* Responsive design pentru versiunea compactă */
 @media (max-width: 900px) {
   .my-announcements-search-header {
-    padding: 10px;
+    padding: 8px;
     border-radius: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
-  
-  .my-announcements-search-header .MuiBox-root {
+  /* Make filter row stack compactly */
+  .my-announcements-search-header .search-filters-wrap {
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+  /* Two-column compact selects */
+  .my-announcements-search-header .search-filters-left {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .my-announcements-search-header .search-filters-left .MuiFormControl-root {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .my-announcements-search-header .search-results-count {
+    align-self: flex-end !important;
   }
   
   .my-announcements-search-header .MuiTextField-root,
@@ -165,6 +187,17 @@
   .my-announcements-search-header .MuiChip-root {
     font-size: 0.7rem !important;
     height: 26px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Reduce input vertical size visually */
+  .my-announcements-search-header .MuiOutlinedInput-input {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+  .my-announcements-title {
+    margin-bottom: 16px;
   }
 }
 

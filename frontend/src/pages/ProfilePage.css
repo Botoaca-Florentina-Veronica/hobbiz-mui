@@ -453,46 +453,61 @@
   }
 }
 
+/* Elimină spațiul rezidual la final pe mobil */
+@media (max-width: 600px) {
+  .profile-page-container > *:last-child {
+    margin-bottom: 0 !important;
+  }
+  .profile-info-main-card {
+    margin-bottom: 0 !important;
+  }
+}
+
 /* Optimizare pentru ecrane mici (telefon) */
 @media (max-width: 600px) {
   html, body { background: #ffffff !important; }
 
   .profile-page-container {
-    /* Elimină spațiile mari verticale și adaptează la footer */
-    margin-top: 0; /* pe mobil header-ul mobil deja ocupă spațiu sus */
+    /* Fără margine sus; folosim doar padding pentru a nu mări înălțimea totală */
+    margin-top: 0;
     margin-bottom: 0;
     padding: 0 12px;
-    /* fallback pentru browsere fără svh */
-    min-height: calc(100dvh - var(--footer-height, 0px));
-    /* Folosește svh pentru a evita tăierea conținutului din cauza barelor browserului */
-    min-height: calc(100svh - var(--footer-height, 0px));
-    /* fallback suplimentar pentru iOS Safari */
-    min-height: -webkit-fill-available;
+    /* Înălțime adaptabilă strict la conținut pe mobil */
+    min-height: auto;
     height: auto;
     max-height: none;
     /* spațiu sus pentru notch / status bar pe unele device-uri */
     padding-top: calc(8px + env(safe-area-inset-top));
-    padding-bottom: calc(var(--footer-height, 0px) + 8px + env(safe-area-inset-bottom));
+    /* spațiu jos minim + safe area */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
     box-sizing: border-box;
     overflow-x: hidden;
-    overflow-y: auto;
+    /* lăsăm overflow-y implicit pentru a respecta înălțimea conținutului */
+    overflow-y: initial;
+  }
+
+  /* Spacer jos ca să nu fie acoperit ultimul element de footer-ul fix */
+  .profile-page-container::after {
+    content: "";
+    display: block;
+    height: calc(var(--footer-height, 56px) + 8px + env(safe-area-inset-bottom));
   }
 
   .profile-header-card {
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
   }
 
-  .profile-main-title { font-size: 1.5rem; }
-  .profile-view-button { font-size: 0.85rem; }
+  .profile-main-title { font-size: 1.4rem; line-height: 1.25; }
+  .profile-view-button { font-size: 0.85rem; padding: 0; }
 
-  .profile-avatar-main {
-    width: 96px;
-    height: 96px;
-    border-width: 3px;
-  }
+  .profile-avatar-main { width: 92px; height: 92px; border-width: 3px; }
   .profile-person-icon { font-size: 44px; }
-  .profile-camera-button { width: 32px; height: 32px; }
+  .profile-camera-button { width: 30px; height: 30px; }
+
+  .profile-header-grid { gap: 12px; }
+  .profile-private-chip { font-size: 0.7rem; padding: 2px 8px; }
 
   .profile-info-main-card { border-radius: 10px; }
   .profile-info-content { padding: 16px; }
@@ -518,6 +533,32 @@
     padding: 10px 12px;
     font-size: 0.95rem;
   }
+}
+
+/* Extra compact for very small phones */
+@media (max-width: 480px) {
+  /* Use a compact two-column header to reduce vertical space */
+  .profile-header-grid {
+    grid-template-columns: auto 1fr;
+    text-align: left;
+    align-items: center;
+    gap: 10px;
+  }
+  .profile-header-info { gap: 8px; }
+  .profile-main-title { font-size: 1.3rem; }
+  .profile-private-chip { font-size: 0.68rem; padding: 2px 8px; }
+  .profile-view-button { font-size: 0.82rem; gap: 6px; }
+  .profile-avatar-main { width: 84px; height: 84px; }
+  .profile-camera-button { width: 28px; height: 28px; }
+}
+
+@media (max-width: 360px) {
+  .profile-page-container { padding: 0 8px; }
+  .profile-header-card { padding: 10px; }
+  .profile-header-grid { gap: 8px; }
+  .profile-main-title { font-size: 1.2rem; }
+  .profile-avatar-main { width: 72px; height: 72px; }
+  .profile-camera-button { width: 26px; height: 26px; }
 }
 
 /* Dark Mode Styles pentru Profile Page */

@@ -190,8 +190,8 @@ export default function MyAnnouncements() {
               />
               
               {/* Filter and View Controls */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              <Box className="search-filters-wrap" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                <Box className="search-filters-left" sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                   {/* Filtru categorie */}
                   <FormControl size="small" sx={{ minWidth: 160 }}>
                     <InputLabel>Categorie</InputLabel>
@@ -253,7 +253,7 @@ export default function MyAnnouncements() {
                   </FormControl>
                 </Box>
                 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box className="search-results-count" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     {filteredAndSortedAnnouncements.length} rezultate
                   </Typography>

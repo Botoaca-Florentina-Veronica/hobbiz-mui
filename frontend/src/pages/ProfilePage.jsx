@@ -391,18 +391,27 @@ export default function ProfilePage() {
           </div>
 
           {/* Secțiunea Anunțurile mele */}
-          {!announcementsLoading && userAnnouncements.length > 0 && (
-            <>
-              <hr className="profile-divider" />
-              <div style={{ marginTop: '30px' }}>
-                <h3 style={{ 
-                  color: getPrimaryColor(),
-                  marginBottom: '20px',
-                  fontSize: '1.4rem',
-                  fontWeight: '600'
-                }}>
-                  Anunțurile mele ({userAnnouncements.length})
-                </h3>
+          <>
+            <hr className="profile-divider" />
+            <div style={{ marginTop: '24px' }}>
+              <h3 style={{ 
+                color: getPrimaryColor(),
+                marginBottom: '12px',
+                fontSize: 'clamp(1.1rem, 4.5vw, 1.4rem)',
+                fontWeight: '600'
+              }}>
+                Anunțurile mele ({userAnnouncements.length})
+              </h3>
+              {announcementsLoading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 2px' }}>
+                  <CircularProgress size={20} />
+                  <span style={{ color: '#777', fontSize: '0.95rem' }}>Se încarcă...</span>
+                </Box>
+              ) : userAnnouncements.length === 0 ? (
+                <Box sx={{ padding: '8px 2px', color: '#777', fontSize: '0.95rem' }}>
+                  Nu ai încă anunțuri.
+                </Box>
+              ) : (
                 <Box sx={{ 
                   position: 'relative',
                   maxWidth: '100%'
@@ -412,7 +421,7 @@ export default function ProfilePage() {
                       onClick={() => handleScroll('left')}
                       sx={{
                         position: 'absolute',
-                        left: '-25px',
+                        left: { xs: '0', sm: '-25px' },
                         top: '50%',
                         transform: 'translateY(-50%)',
                         zIndex: 1,
@@ -420,6 +429,7 @@ export default function ProfilePage() {
                         color: 'white',
                         width: '40px',
                         height: '40px',
+                        display: { xs: 'none', sm: 'inline-flex' },
                         '&:hover': {
                           backgroundColor: '#2a4a65'
                         }
@@ -433,10 +443,10 @@ export default function ProfilePage() {
                     ref={carouselRef}
                     sx={{
                       display: 'flex',
-                      gap: '15px',
-                      overflowX: userAnnouncements.length > 3 ? 'auto' : 'visible',
+                      gap: { xs: '8px', sm: '15px' },
+                      overflowX: 'auto',
                       scrollBehavior: 'smooth',
-                      padding: '10px 5px',
+                      padding: { xs: '4px 0', sm: '10px 5px' },
                       '&::-webkit-scrollbar': {
                         height: '6px',
                         backgroundColor: '#f5f5f5'
@@ -456,7 +466,7 @@ export default function ProfilePage() {
                         key={announcement._id}
                         onClick={() => handleAnnouncementClick(announcement._id)}
                         sx={{ 
-                          minWidth: '280px',
+                          minWidth: { xs: '200px', sm: '240px', md: '280px' },
                           flexShrink: 0,
                           position: 'relative',
                           cursor: 'pointer',
@@ -479,14 +489,14 @@ export default function ProfilePage() {
                               alt={announcement.title}
                               style={{
                                 width: '100%',
-                                height: '160px',
+                                height: 'clamp(120px, 38vw, 160px)',
                                 objectFit: 'cover'
                               }}
                             />
                           ) : (
                             <Box sx={{
                               width: '100%',
-                              height: '160px',
+                              height: 'clamp(120px, 38vw, 160px)',
                               backgroundColor: '#f5f5f5',
                               display: 'flex',
                               alignItems: 'center',
@@ -497,7 +507,7 @@ export default function ProfilePage() {
                             </Box>
                           )}
                           
-                          <Box sx={{ padding: '12px' }}>
+                          <Box sx={{ padding: { xs: '10px', sm: '12px' } }}>
                             <h4 style={{
                               margin: '0 0 8px 0',
                               fontSize: '1rem',
@@ -539,7 +549,7 @@ export default function ProfilePage() {
                       onClick={() => handleScroll('right')}
                       sx={{
                         position: 'absolute',
-                        right: '-25px',
+                        right: { xs: '0', sm: '-25px' },
                         top: '50%',
                         transform: 'translateY(-50%)',
                         zIndex: 1,
@@ -547,6 +557,7 @@ export default function ProfilePage() {
                         color: 'white',
                         width: '40px',
                         height: '40px',
+                        display: { xs: 'none', sm: 'inline-flex' },
                         '&:hover': {
                           backgroundColor: '#2a4a65'
                         }
@@ -556,9 +567,9 @@ export default function ProfilePage() {
                     </IconButton>
                   )}
                 </Box>
-              </div>
-            </>
-          )}
+              )}
+            </div>
+          </>
 
           {editMode && (
             <>

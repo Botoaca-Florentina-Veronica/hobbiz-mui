@@ -354,3 +354,10 @@
 /* Filled state for heart icon */
 .favorite-heart.filled { color: #f51866; }
 .dark-mode .favorite-heart.filled { color: #f51866 !important; }
+
+/* Desktop-only spacing for the main page title */
+@media (min-width: 1024px) {
+  .my-announcements-title {
+    margin-top: 80px;
+  }
+}
