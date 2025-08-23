@@ -38,6 +38,10 @@
     margin-top: 0;
     margin-bottom: 3rem;
   }
+  /* Hide desktop page H1 on mobile; mobile header now provides title */
+  .add-announcement-title {
+    display: none !important;
+  }
   .add-announcement-form {
     background: var(--app-surface);
     border-radius: 0;

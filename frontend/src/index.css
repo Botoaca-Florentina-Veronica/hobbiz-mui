@@ -21,6 +21,16 @@
 
   /* Special sections */
   --hero-bg: #F8B195;
+
+  /* Chat theme tokens (global) */
+  --chat-bg: #ffffff;
+  --chat-elev: #ffffff;
+  --chat-surface: #f8fafb;
+  --chat-border: #e8ecef;
+  --chat-text: #1a1a1a;
+  --chat-muted: #6b7280;
+  --chat-accent: #355070;
+  --chat-accent-contrast: #ffffff;
 }
 
 .dark-mode {
@@ -40,6 +50,16 @@
   --primary-hover: #fa4875;
 
   --hero-bg: #121212;
+
+  /* Map chat tokens to dark mode tokens for automatic theming */
+  --chat-bg: var(--app-bg);
+  --chat-elev: var(--app-elev);
+  --chat-surface: #2a2a2a; /* soft bg */
+  --chat-border: var(--app-border);
+  --chat-text: var(--app-text);
+  --chat-muted: var(--app-muted);
+  --chat-accent: #f51866;
+  --chat-accent-contrast: #ffffff;
 }
 
 html {
@@ -74,7 +94,7 @@ a, .btn {
 
 /* login page */
 body.login-page {
-  background-color: var(--app-surface) !important;
+  background-color: var(--app-bg) !important; /* use the darkest background tone */
   margin: 0;
   min-height: 100vh;
 }

@@ -79,8 +79,32 @@ const deleteMessage = async (req, res) => {
       return res.status(403).json({ error: 'Nu poți șterge mesajele altui utilizator.' });
     }
     
+    const conversationId = message.conversationId;
+    const otherParticipantId = String(message.senderId) === String(authenticatedUserId)
+      ? message.destinatarId
+      : message.senderId;
+
     await Message.findByIdAndDelete(id);
     console.log('✅ Mesaj șters cu succes:', id);
+
+    // Dacă nu mai există mesaje în conversație, emitem un eveniment realtime pentru ambii participanți
+    const remainingCount = await Message.countDocuments({ conversationId });
+    if (remainingCount === 0) {
+      try {
+        const io = req.app.get('io');
+        const activeUsers = req.app.get('activeUsers');
+        if (io && activeUsers) {
+          const notifyUsers = [String(authenticatedUserId), String(otherParticipantId)].filter(Boolean);
+          for (const uid of notifyUsers) {
+            const sid = activeUsers.get(String(uid));
+            if (sid) {
+              io.to(sid).emit('conversationEmpty', { conversationId });
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Eroare la ștergerea mesajului:', err);

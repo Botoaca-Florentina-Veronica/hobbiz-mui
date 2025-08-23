@@ -6,6 +6,8 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import { Box, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
 
@@ -502,6 +504,30 @@ export default function AddAnnouncementPage() {
 
   return (
     <div className="add-announcement-container">
+      {/* Mobile header: back + title (same style as Chat/Favorites) */}
+      <Box sx={{
+        display: { xs: 'flex', md: 'none' },
+        alignItems: 'center',
+        gap: 2,
+        mb: { xs: 1, md: 2 },
+        pt: 'clamp(8px, 3vh, 24px)',
+        px: 1
+      }}>
+        <IconButton
+          onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+          sx={{
+            backgroundColor: 'var(--chat-elev)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            '&:hover': { backgroundColor: 'var(--chat-surface)' }
+          }}
+          disableRipple
+          disableFocusRipple
+          aria-label="Înapoi"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>Publică un anunț</Typography>
+      </Box>
       <h1 className="add-announcement-title">Publică un anunț </h1>
       <form className="add-announcement-form" onSubmit={e => e.preventDefault()} style={{marginBottom: 0}}>
         {success && (

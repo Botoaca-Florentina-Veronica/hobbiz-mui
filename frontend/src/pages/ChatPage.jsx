@@ -264,44 +264,41 @@ export default function ChatPage() {
     
     // Listen for new messages
     const handleNewMessage = (message) => {
-      // Only add message if it's for the current conversation
-      if (selectedConversation && 
-          ((message.senderId === selectedConversation.otherParticipant.id && message.destinatarId === userId) ||
-           (message.senderId === userId && message.destinatarId === selectedConversation.otherParticipant.id))) {
-        setMessages(prev => {
-          // Avoid duplicates
-          const exists = prev.some(msg => msg._id === message._id);
-          if (exists) return prev;
-          return [...prev, message];
-        });
+      // Only add message if it's for the current conversation (match by conversationId)
+      if (!selectedConversation || message.conversationId !== selectedConversation.conversationId) return;
+      setMessages(prev => {
+        // Avoid duplicates
+        const exists = prev.some(msg => msg._id === message._id);
+        if (exists) return prev;
+        return [...prev, message];
+      });
+    };
+
+    const handleUserTyping = ({ conversationId, senderId }) => {
+      if (!selectedConversation || conversationId !== selectedConversation.conversationId || senderId === userId) return;
+      setTypingUsers(prev => new Set([...prev, senderId]));
+      if (typingTimeout) clearTimeout(typingTimeout);
+      const timeout = setTimeout(() => setTypingUsers(new Set()), 1500);
+      setTypingTimeout(timeout);
+    };
+
+    const handleConversationEmpty = ({ conversationId }) => {
+      // Elimină conversația din listă și deselectează dacă este cea curentă
+      setConversations(prev => prev.filter(c => c.conversationId !== conversationId));
+      if (selectedConversation && selectedConversation.conversationId === conversationId) {
+        setSelectedConversation(null);
+        setMessages([]);
       }
     };
-    
-    // Listen for typing indicators
-    const handleUserTyping = ({ conversationId, userId: typingUserId, isTyping }) => {
-      console.debug('[typing] event received', { conversationId, typingUserId, isTyping, selectedWith: selectedConversation?.otherParticipant?.id, me: userId });
-      if (selectedConversation) {
-        const currentConversationId = selectedConversation.conversationId || [userId, selectedConversation.otherParticipant.id].sort().join('-');
-        if (conversationId === currentConversationId && typingUserId === selectedConversation.otherParticipant.id) {
-          setTypingUsers(prev => {
-            const newSet = new Set(prev);
-            if (isTyping) {
-              newSet.add(typingUserId);
-            } else {
-              newSet.delete(typingUserId);
-            }
-            return newSet;
-          });
-        }
-      }
-    };
-    
+
     on('newMessage', handleNewMessage);
     on('userTyping', handleUserTyping);
+    on('conversationEmpty', handleConversationEmpty);
     
     return () => {
       off('newMessage', handleNewMessage);
       off('userTyping', handleUserTyping);
+      off('conversationEmpty', handleConversationEmpty);
     };
   }, [userId, selectedConversation, on, off]);
 
@@ -534,7 +531,15 @@ export default function ChatPage() {
       console.log('✅ Rezultat backend:', data);
 
       // Elimină mesajul din lista locală doar dacă ștergerea din BD a fost cu succes
-      setMessages(prev => prev.filter(msg => msg._id !== messageId));
+      setMessages(prev => {
+        const next = prev.filter(msg => msg._id !== messageId);
+        // Dacă nu mai există mesaje în conversația curentă, eliminăm conversația din sidebar și deselectăm
+        if (next.length === 0 && selectedConversation) {
+          setConversations(cv => cv.filter(c => c.conversationId !== selectedConversation.conversationId));
+          setSelectedConversation(null);
+        }
+        return next;
+      });
       console.log('✅ ChatPage: Mesaj șters cu succes:', messageId);
     } catch (error) {
       // Log detaliat

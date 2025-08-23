@@ -59,7 +59,7 @@
 
 /* Dark Mode Styles */
 .dark-mode .login-container {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  background: #282828; /* solid, the darker color from the previous gradient */
   border: 1px solid rgba(245, 24, 102, 0.3);
   box-shadow: 0 0 20px rgba(245, 24, 102, 0.2);
   color: #ffffff;
