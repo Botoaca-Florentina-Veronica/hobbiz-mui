@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createMessage, deleteMessage, getConversations, getMessagesBetweenUsers, getMessages, markMessagesAsRead, reactToMessage } = require('../controllers/MessageController');
+const { createMessage, deleteMessage, getConversations, getMessagesBetweenUsers, getMessages, markMessagesAsRead, markMessagesAsReadByConversation, reactToMessage } = require('../controllers/MessageController');
 const auth = require('../middleware/auth');
 const upload = require('../config/cloudinaryMulter');
 
@@ -19,7 +19,13 @@ router.get('/conversations/:userId', auth, getConversations);
 // Obține mesajele între doi utilizatori
 router.get('/between/:userId1/:userId2', auth, getMessagesBetweenUsers);
 
+// Obține toate mesajele pentru o conversație (scoped by conversationId)
+router.get('/conversation/:conversationId', auth, getMessages);
+
 // Marchează mesajele ca citite
 router.put('/mark-read/:userId/:otherUserId', auth, markMessagesAsRead);
+
+// Marchează mesajele ca citite pentru o conversație specifică (scoped)
+router.put('/conversation/:conversationId/mark-read', auth, markMessagesAsReadByConversation);
 
 module.exports = router;

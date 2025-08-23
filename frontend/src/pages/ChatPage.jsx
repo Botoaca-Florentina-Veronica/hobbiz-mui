@@ -170,12 +170,13 @@ export default function ChatPage() {
                 hour: '2-digit',
                 minute: '2-digit'
               }),
-              // Prefer avatarul utilizatorului; dacă lipsește, folosim imaginea anunțului ca fallback
-              avatar: participantAvatar || announcementImg || '',
+              // Afișăm imaginea principală a anunțului pentru a distinge discuțiile per anunț
+              avatar: announcementImg || participantAvatar || '',
               unread: conv.unread,
               otherParticipant: conv.otherParticipant,
               lastSeen: conv.otherParticipant.lastSeen,
-              announcementOwnerId: conv.announcementOwnerId // nou, pentru split
+              announcementOwnerId: conv.announcementOwnerId,
+              announcementId: conv.announcementId,
             };
           });
 
@@ -214,7 +215,7 @@ export default function ChatPage() {
       
       if (otherParticipantId) {
         const targetConversation = conversations.find(conv => 
-          conv.otherParticipant.id === otherParticipantId
+          conv.conversationId === conversationId
         );
         if (targetConversation) {
           setSelectedConversation(targetConversation);
@@ -230,11 +231,9 @@ export default function ChatPage() {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        console.log(`Încărcăm mesaje între ${userId} și ${selectedConversation.otherParticipant.id}`);
-        
-        // Folosim noul endpoint pentru mesajele între doi utilizatori
-        const response = await apiClient.get(`/api/messages/between/${userId}/${selectedConversation.otherParticipant.id}`);
-        
+        console.log(`Încărcăm mesaje pentru conversația ${selectedConversation.conversationId}`);
+        // Folosim endpoint-ul conversation-based (scoped by announcement)
+        const response = await apiClient.get(`/api/messages/conversation/${selectedConversation.conversationId}`);
         console.log(`Primite ${response.data.length} mesaje din backend`);
         setMessages(response.data || []);
         
@@ -282,7 +281,7 @@ export default function ChatPage() {
     const handleUserTyping = ({ conversationId, userId: typingUserId, isTyping }) => {
       console.debug('[typing] event received', { conversationId, typingUserId, isTyping, selectedWith: selectedConversation?.otherParticipant?.id, me: userId });
       if (selectedConversation) {
-        const currentConversationId = [userId, selectedConversation.otherParticipant.id].sort().join('-');
+        const currentConversationId = selectedConversation.conversationId || [userId, selectedConversation.otherParticipant.id].sort().join('-');
         if (conversationId === currentConversationId && typingUserId === selectedConversation.otherParticipant.id) {
           setTypingUsers(prev => {
             const newSet = new Set(prev);
@@ -330,9 +329,8 @@ export default function ChatPage() {
     let tempMessage;
     
     try {
-      // Generăm conversationId din IDs-urile participanților (sortate pentru consistență)
-      const participantIds = [userId, selectedConversation.otherParticipant.id].sort();
-      const conversationId = participantIds.join('-');
+      // Folosim conversationId existent, care este scoped by announcement
+      const conversationId = selectedConversation.conversationId;
       
       // Construim payload: dacă avem imagine, folosim FormData (multipart)
       const useMultipart = !!selectedImage?.file;
@@ -344,6 +342,7 @@ export default function ChatPage() {
         formData.append('senderRole', 'cumparator');
         formData.append('destinatarId', selectedConversation.otherParticipant.id);
         if (newMessage.trim()) formData.append('text', newMessage.trim());
+        if (selectedConversation.announcementId) formData.append('announcementId', selectedConversation.announcementId);
         // câmpul se numește 'image' ca să corespundă upload.single('image')
         formData.append('image', selectedImage.file);
         formData.append('imageFile', selectedImage.file.name);
@@ -363,6 +362,7 @@ export default function ChatPage() {
           senderRole: 'cumparator',
           destinatarId: selectedConversation.otherParticipant.id,
           ...(newMessage.trim() ? { text: newMessage.trim() } : {}),
+          ...(selectedConversation.announcementId ? { announcementId: selectedConversation.announcementId } : {}),
           ...(selectedReply ? { replyTo: {
             messageId: selectedReply.messageId,
             senderId: selectedReply.senderId,
@@ -372,7 +372,6 @@ export default function ChatPage() {
         };
       }
 
-      // Adaugă mesajul local (evităm spread pe FormData)
       const nowIso = new Date().toISOString();
       tempMessage = {
         _id: Date.now().toString(),
@@ -396,8 +395,8 @@ export default function ChatPage() {
         }
       };
       setMessages(prev => [...prev, tempMessage]);
-  setNewMessage('');
-  setSelectedReply(null);
+      setNewMessage('');
+      setSelectedReply(null);
       setSelectedImage(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -639,8 +638,8 @@ export default function ChatPage() {
               <div className="chat-conversation-list">
                 {unreadConversations.map((conversation) => (
                   <div 
-                    key={conversation.id}
-                    className={`chat-conversation-item ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
+                    key={conversation.conversationId}
+                    className={`chat-conversation-item ${selectedConversation?.conversationId === conversation.conversationId ? 'selected' : ''}`}
                     onClick={async () => {
                       // Selectează conversația
                       setSelectedConversation(conversation);
@@ -648,7 +647,7 @@ export default function ChatPage() {
                       setIsSidebarOpen(false);
                       // Marcăm local conversația ca citită ca să o mutăm din secțiunea NECITITE imediat în UI
                       setConversations(prev => prev.map(c =>
-                        c.otherParticipant.id === conversation.otherParticipant.id
+                        c.conversationId === conversation.conversationId
                           ? { ...c, unread: false }
                           : c
                       ));
@@ -694,8 +693,8 @@ export default function ChatPage() {
               <div className="chat-conversation-list">
                 {readConversations.map((conversation) => (
                   <div 
-                    key={conversation.id}
-                    className={`chat-conversation-item read ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
+                    key={conversation.conversationId}
+                    className={`chat-conversation-item read ${selectedConversation?.conversationId === conversation.conversationId ? 'selected' : ''}`}
                     onClick={() => {
                       setSelectedConversation(conversation);
                       setIsSidebarOpen(false);

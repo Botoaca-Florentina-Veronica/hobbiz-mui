@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
-import apiClient, { sendMessage, getMessages, deleteMessage, getMessagesBetween } from '../api/api';
+import apiClient, { sendMessage, getMessages, deleteMessage } from '../api/api';
 import './ChatPopup.css';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
@@ -58,20 +58,15 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       setLoading(true);
       try {
         console.log('🔄 Încărcare mesaje pentru conversația:', conversationId);
-        
-        // Folosim endpoint-ul pentru mesaje între doi utilizatori
-        const sellerId = seller._id || seller.id;
-        const response = await getMessagesBetween(effectiveUserId, sellerId);
-        
+        // Folosim endpoint-ul conversation-scoped
+        const response = await getMessages(conversationId);
         setMessages(response.data || []);
         console.log('✅ Mesaje încărcate:', response.data?.length || 0);
       } catch (error) {
         console.error('❌ Eroare la încărcarea mesajelor:', error);
-        
         if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
           console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează pe portul 5000.');
         }
-        
         setMessages([]);
       } finally {
         setLoading(false);

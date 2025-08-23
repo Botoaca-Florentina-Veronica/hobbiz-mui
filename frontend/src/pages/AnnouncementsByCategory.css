@@ -140,6 +140,13 @@
   padding-right: 80px !important;
 }
 
+/* Desktop-only: increase top margin for category pages */
+@media (min-width: 901px) {
+  .announcements-by-category.my-announcements-container {
+    margin-top: 80px;
+  }
+}
+
 .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
   width: 100%;
   max-width: 100%;

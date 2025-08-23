@@ -107,9 +107,9 @@ const createMessage = async (req, res) => {
       text,
       destinatarId,
       announcementId,
-  image,
-  imageFile,
-  replyTo,
+      image,
+      imageFile,
+      replyTo,
     } = body;
     
     console.log('   • Payload primit (chei):', Object.keys(body));
@@ -139,11 +139,27 @@ const createMessage = async (req, res) => {
       });
     }
     
-    // Generăm conversationId automat
-    const participants = [senderId, destinatarId].sort();
-    conversationId = participants.join('-');
+    // Generăm conversationId automat, scoped by announcement dacă este disponibil
+    // Format propus (deterministic): `${ownerId}-${otherUserId}-${announcementId}`
+    if (announcementId) {
+      try {
+        const Announcement = require('../models/Announcement');
+        const ann = await Announcement.findById(announcementId).select('user');
+        if (ann && ann.user) {
+          const ownerId = String(ann.user);
+          const otherId = String(ownerId) === String(senderId) ? String(destinatarId) : String(senderId);
+          conversationId = [ownerId, otherId, announcementId].join('-');
+        }
+      } catch (_) {
+        // dacă nu reușim să citim anunțul, cădem pe varianta clasică în doi
+      }
+    }
+    if (!conversationId) {
+      const participants = [senderId, destinatarId].sort();
+      conversationId = participants.join('-');
+    }
     
-  const messageData = {
+    const messageData = {
       conversationId,
       senderId,
       senderRole: senderRole || 'cumparator',
@@ -169,6 +185,11 @@ const createMessage = async (req, res) => {
         image: replyTo.image ? String(replyTo.image) : undefined
       };
     }
+    // Persistăm announcementId dacă este furnizat (pentru conversii/afișare)
+    if (announcementId) {
+      messageData.announcementId = String(announcementId);
+    }
+
     // Imagine încărcată prin Cloudinary (multer)
     if (req.file && req.file.path) {
       messageData.image = req.file.path; // URL-ul public Cloudinary
@@ -430,7 +451,16 @@ const getMessages = async (req, res) => {
       return res.status(403).json({ error: 'Nu poți accesa această conversație' });
     }
     
-    const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
+    let messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
+    // Backward-compat: dacă e un id cu 3 părți (userA-userB-annId) și nu găsim nimic,
+    // mai încercăm să încărcăm mesajele vechi pe formatul 2-parti participanți sortați
+    if ((!messages || messages.length === 0) && participants.length === 3) {
+      const legacyTwoPart = [participants[0], participants[1]].sort().join('-');
+      const legacy = await Message.find({ conversationId: legacyTwoPart }).sort({ createdAt: 1 });
+      if (legacy && legacy.length > 0) {
+        messages = legacy;
+      }
+    }
     
     // Preluam informațiile utilizatorilor pentru fiecare mesaj
     const messagesWithUserData = await Promise.all(
@@ -456,6 +486,36 @@ const getMessages = async (req, res) => {
     );
     
     res.json(messagesWithUserData);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Marchează mesajele ca citite pentru o conversație specifică (scoped by conversationId)
+const markMessagesAsReadByConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const authenticatedUserId = req.userId;
+    if (!conversationId) {
+      return res.status(400).json({ error: 'conversationId este necesar' });
+    }
+    // Asigură că utilizatorul autentificat este parte a conversației
+    const parts = String(conversationId).split('-');
+    if (!parts.includes(String(authenticatedUserId))) {
+      return res.status(403).json({ error: 'Nu poți marca drept citite o conversație a altora' });
+    }
+    const result = await Message.updateMany(
+      {
+        conversationId,
+        senderId: { $ne: authenticatedUserId },
+        isRead: false,
+      },
+      {
+        isRead: true,
+        readAt: new Date(),
+      }
+    );
+    res.json({ message: 'Mesajele au fost marcate ca citite pentru conversație', modifiedCount: result.modifiedCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -503,5 +563,6 @@ module.exports = {
   getMessagesBetweenUsers,
   getMessages,
   markMessagesAsRead,
+  markMessagesAsReadByConversation,
   reactToMessage
 };
