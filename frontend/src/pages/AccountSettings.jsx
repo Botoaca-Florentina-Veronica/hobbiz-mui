@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './AccountSettings.css';
 import { updateEmail, updatePassword, detectMitm, deleteAccount, logout } from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { IconButton, Typography } from '@mui/material';
 import ConfirmDialog from './ConfirmDialog';
 
 export default function AccountSettings() {
@@ -103,6 +105,19 @@ export default function AccountSettings() {
 
   return (
     <div className="account-settings-container">
+      {/* Mobile header: back + title */}
+      <div className="mobile-header">
+        <IconButton
+          onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+          className="mobile-back-btn"
+          disableRipple
+          disableFocusRipple
+          aria-label="Înapoi"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" className="mobile-header-title">Setări</Typography>
+      </div>
       <h1 className="settings-title">Setări</h1>
       <div className="settings-menu">
         <div className="settings-item" onClick={handlePasswordChangeClick}>Schimbă parola</div>
@@ -148,7 +163,6 @@ export default function AccountSettings() {
           </div>
         )}
         <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>Anunțuri</div>
-        <div className="settings-item">Profil</div>
         <div className="settings-item">Setează notificările</div>
         <div className="settings-item">Date de facturare</div>
         <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>

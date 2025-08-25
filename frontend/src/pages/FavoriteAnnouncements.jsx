@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, IconButton, Typography } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import './FavoriteAnnouncements.css';
-import Footer from '../components/Footer';
 
 function Toast({ message, onClose }) {
   useEffect(() => {
@@ -14,25 +13,8 @@ function Toast({ message, onClose }) {
     return () => clearTimeout(timer);
   }, [onClose]);
   return (
-    <div style={{
-      position: 'fixed',
-      top: 100,
-      left: '50%',
-      transform: 'translateX(-50%)',
-      background: '#282828',
-      color: '#ffffff',
-      padding: '18px 32px',
-      borderRadius: 12,
-      fontSize: 24,
-      fontWeight: 500,
-      zIndex: 9999,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      boxShadow: '0 2px 16px rgba(63,63,63,0.18)',
-      border: '1px solid #f51866'
-    }}>
-      <span style={{fontSize: 28, display: 'flex', alignItems: 'center'}}>
+    <div className="toast">
+      <span className="toast-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2l4-4"/></svg>
       </span>
       Șters din favorite
@@ -146,34 +128,21 @@ export default function FavoriteAnnouncements() {
     <>
       <div className="my-announcements-container">
         {showToast && <Toast message="Șters din favorite" onClose={() => setShowToast(false)} />}
-        {/* Mobile header: back + title, consistent MUI styling with ChatPage */}
-        <Box sx={{
-          display: { xs: 'flex', md: 'none' },
-          alignItems: 'center',
-          gap: 2,
-          mb: { xs: 1, md: 2 },
-          pt: 'clamp(8px, 3vh, 24px)',
-          px: 1
-        }}>
+        {/* Mobile header: back + title */}
+        <div className="mobile-header">
           <IconButton
             onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
-            sx={{
-              backgroundColor: 'var(--chat-elev)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              '&:hover': { backgroundColor: 'var(--chat-surface)' }
-            }}
+            className="mobile-back-btn"
             disableRipple
             disableFocusRipple
             aria-label="Înapoi"
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>Favorite</Typography>
-        </Box>
+          <Typography variant="h5" className="mobile-header-title">Favorite</Typography>
+        </div>
         <h1 className="my-announcements-title">Anunturile tale favorite</h1>
-        <Box sx={{ textAlign: 'center', fontWeight: 600, fontSize: 22, mt: { xs: 0.5, md: 4 }, mb: { xs: 0.5, md: 3 } }}>
-          Anunțuri favorite ({announcements.length}/150)
-        </Box>
+        <div className="favorite-count">Anunțuri favorite ({announcements.length}/150)</div>
         {announcements.length === 0 ? (
           <div>Nu ai anunțuri favorite salvate.</div>
         ) : (
@@ -192,35 +161,33 @@ export default function FavoriteAnnouncements() {
                   <img
                     src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
                       ? a.images[0]
-                      : `/uploads/${a.images[0].replace(/^.*[\\\/]/, '')}`}
+                      : `/uploads/${a.images[0].replace(/^.*[\\\\/]/, '')}`}
                     alt="imagine principala"
                     className="favorite-announcement-img"
                   />
                 ) : (
-                  <div className="favorite-announcement-img" style={{background: '#ffebf0'}} />
+                  <div className="favorite-announcement-img placeholder" />
                 )}
               </div>
               <div className="favorite-announcement-info">
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
-                  <span style={{color: '#717171', fontSize: 17}}>
+                <div className="favorite-info-top">
+                  <span className="favorite-date">
                     {a.createdAt ? `Postat ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}` : ''}
                   </span>
                   <div className={`favorite-heart ${favoriteIds.includes(a._id) ? 'filled' : ''}`}
                     onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                   >
                     {favoriteIds.includes(a._id) ? (
-                      <FavoriteIcon sx={{ fontSize: 32 }} />
+                      <FavoriteIcon />
                     ) : (
-                      <FavoriteBorderIcon sx={{ fontSize: 32 }} />
+                      <FavoriteBorderIcon />
                     )}
                   </div>
                 </div>
                 <h2 className="favorite-announcement-title">{a.title}</h2>
                 <div className="favorite-announcement-category">{a.category}</div>
                 <div className="favorite-announcement-location">{a.location}</div>
-                {a.price && <div style={{ fontWeight: 700, fontSize: 22, color: '#3f3f3f', marginTop: 12 }}>{a.price} €</div>}
+                {a.price && <div className="favorite-price">{a.price} €</div>}
               </div>
               </div>
             ))}

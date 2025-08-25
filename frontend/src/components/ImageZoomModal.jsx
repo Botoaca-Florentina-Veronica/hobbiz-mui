@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './ImageZoomModal.css';
 import { 
   Modal, 
@@ -27,14 +27,23 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [rotation, setRotation] = useState(0); // degrees: 0, 90, 180, 270
+  // Panning state (desktop only)
+  const [isPanning, setIsPanning] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 }); // current translate offset
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const startOffsetRef = useRef({ x: 0, y: 0 });
+  const containerRef = useRef(null);
 
-  const handleZoomIn = () => setZoom(z => (z >= 4 ? 1 : Math.min(z + 0.25, 4)));
-  const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
-  const handleResetZoom = () => { setZoom(1); setRotation(0); };
-  const handleWheel = e => {
-    e.preventDefault();
-    if (e.deltaY < 0) handleZoomIn();
-    else handleZoomOut();
+  const handleZoomIn = () => {
+    setZoom(z => Math.min(z + 0.25, 4));
+  };
+  const handleZoomOut = () => {
+    setZoom(z => Math.max(z - 0.25, 0.5));
+  };
+  const handleResetZoom = () => {
+    setZoom(1);
+    setRotation(0);
+    setOffset({ x: 0, y: 0 });
   };
 
   const toggleFullscreen = () => {
@@ -43,7 +52,58 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
 
   const handleRotate = () => setRotation(r => (r + 90) % 360);
 
-  // Keyboard controls
+  // When zoom changes, clamp offset to bounds and reset when not zoomed in
+  useEffect(() => {
+    if (zoom <= 1) {
+      setOffset({ x: 0, y: 0 });
+    } else {
+      // Clamp to bounds
+      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+      const container = containerRef.current;
+      if (!container) return;
+      const isRotated = rotation % 180 !== 0;
+      const cw = isRotated ? container.clientHeight : container.clientWidth;
+      const ch = isRotated ? container.clientWidth : container.clientHeight;
+      const scaledW = cw * zoom;
+      const scaledH = ch * zoom;
+      const maxX = Math.max(0, (scaledW - cw) / 2);
+      const maxY = Math.max(0, (scaledH - ch) / 2);
+      setOffset(prev => ({ x: clamp(prev.x, -maxX, maxX), y: clamp(prev.y, -maxY, maxY) }));
+    }
+  }, [zoom, rotation]);
+
+  // Mouse handlers for dragging
+  const onMouseDown = useCallback((e) => {
+    if (zoom <= 1) return;
+    e.preventDefault();
+    setIsPanning(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    startOffsetRef.current = { ...offset };
+  }, [zoom, offset]);
+
+  const onMouseMove = useCallback((e) => {
+    if (!isPanning || !containerRef.current) return;
+    const container = containerRef.current;
+    const isRotated = rotation % 180 !== 0;
+    const cw = isRotated ? container.clientHeight : container.clientWidth;
+    const ch = isRotated ? container.clientWidth : container.clientHeight;
+    const scaledW = cw * zoom;
+    const scaledH = ch * zoom;
+    const maxX = Math.max(0, (scaledW - cw) / 2);
+    const maxY = Math.max(0, (scaledH - ch) / 2);
+
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+    setOffset({
+      x: clamp(startOffsetRef.current.x + dx, -maxX, maxX),
+      y: clamp(startOffsetRef.current.y + dy, -maxY, maxY)
+    });
+  }, [isPanning, zoom]);
+
+  const endPan = useCallback(() => setIsPanning(false), []);
+
+  // Keyboard controls (zoom only via toolbar or keyboard; image does not zoom)
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
@@ -103,13 +163,26 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
                   <ChevronRight />
                 </IconButton>
               )}
-              <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#fff', position: 'relative', zIndex: 1 }}>
+              <Box
+                ref={containerRef}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={endPan}
+                onMouseLeave={endPan}
+                sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#fff', position: 'relative', zIndex: 1, cursor: zoom > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default' }}
+              >
                 <img
                   src={images[index]}
                   alt={`Imagine ${index + 1} din ${images.length}`}
-                  style={{ maxWidth: '100%', maxHeight: '100%', transform: `rotate(${rotation}deg) scale(${zoom})`, transition: 'transform 0.25s ease', cursor: zoom > 1 ? 'grab' : 'zoom-in', objectFit: 'contain' }}
-                  onClick={handleZoomIn}
-                  onWheel={handleWheel}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    transform: `rotate(${rotation}deg) scale(${zoom}) translate(${offset.x}px, ${offset.y}px)`,
+                    transition: isPanning ? 'none' : 'transform 0.25s ease',
+                    objectFit: 'contain',
+                    userSelect: 'none',
+                    pointerEvents: 'auto'
+                  }}
                   draggable={false}
                 />
               </Box>

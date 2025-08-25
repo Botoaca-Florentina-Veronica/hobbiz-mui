@@ -205,6 +205,38 @@
   .legal-section__column {
     min-width: 0;
   }
+
+  /* Organize legal section as grouped cards on small phones */
+  .legal-section {
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .legal-section__column {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+  .legal-section__column h4 {
+    font-size: 1rem !important;
+    margin: 0 0 8px 0 !important;
+  }
+  .legal-section__column ul {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    column-gap: 12px;
+    row-gap: 0;
+  }
+  .legal-section__column a {
+    padding: 0 !important;
+    line-height: 1.1 !important;
+  }
+  .legal-section__desc {
+    margin-top: 4px !important;
+  }
+  .legal-section__socials .legal-section__icons {
+    justify-content: flex-start;
+  }
 }
 
 /* Dark mode colors for desktop legal section */
@@ -397,6 +429,23 @@
   }
 }
 
+/* Very small screens: stack sections and use single-column lists */
+@media (max-width: 480px) {
+  .legal-section {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "brand"
+      "links"
+      "legal"
+      "socials" !important;
+    gap: 10px !important;
+  }
+  .legal-section__column ul {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Make desktop footer compact up to 900px without changing text sizes */
 @media (max-width: 900px) {
   .desktop-footer {
@@ -404,35 +453,56 @@
     margin-top: 6px !important;
   }
   .legal-section {
-    padding: 10px 12px 6px !important;
-    gap: 6px !important;
+    padding: 12px 12px 8px !important;
+    gap: 10px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "brand brand"
+      "links legal"
+      "socials socials";
   }
   .legal-section__column {
-    padding-bottom: 4px !important;
+    padding-bottom: 6px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
   }
+  /* Map existing columns to grid areas */
+  .legal-section__column:nth-child(1) { grid-area: brand; }
+  .legal-section__column:nth-child(2) { grid-area: links; }
+  .legal-section__column:nth-child(3) { grid-area: legal; }
+  .legal-section__column:nth-child(4) { grid-area: socials; }
   .legal-section__column h4 {
-    margin: 2px 0 4px 0 !important;
-    line-height: 1.2 !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.25 !important;
   }
   .legal-section__column ul {
     margin: 0 !important;
     padding: 0 !important;
     list-style: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    column-gap: 12px;
+    row-gap: 0;
   }
   .legal-section__column ul li {
     margin: 0 !important;
   }
   .legal-section__column a {
     display: block;
-    line-height: 1.05 !important;
+    line-height: 1.1 !important;
     margin: 0 !important;
     padding: 0 !important;
   }
   .legal-section__desc {
-    line-height: 1.2 !important;
+    line-height: 1.25 !important;
+    margin-top: 4px !important;
   }
   .legal-section__socials .legal-section__icons {
-    gap: 8px !important;
+    gap: 10px !important;
+    justify-content: flex-start;
   }
   .legal-section__socials .legal-section__icons svg,
   .legal-section__socials .legal-section__icons img {

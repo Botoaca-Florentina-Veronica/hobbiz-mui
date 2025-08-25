@@ -1,3 +1,11 @@
+/* ==============================
+ * FavoriteAnnouncements Styles
+ * Structure:
+ * - Layout & Card
+ * - Media queries (desktop/tablet/mobile/very small)
+ * - Dark mode
+ * - Utilities (toast, mobile header, counters)
+ * ============================== */
 
 .favorite-announcements-list {
   display: flex;
@@ -42,6 +50,10 @@
   border-radius: 8px;
 }
 
+.favorite-announcement-img.placeholder {
+  background: #ffebf0;
+}
+
 .favorite-heart {
   position: absolute;
   right: 16px;
@@ -52,11 +64,24 @@
   color: #575757; /* icon color when not filled */
 }
 
+.favorite-heart:hover { transform: scale(1.2); }
+
+/* Default icon size inside heart */
+.favorite-heart .MuiSvgIcon-root { font-size: 32px; }
+
 .favorite-announcement-info {
   padding: 10px;
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+/* Top row: date + heart */
+.favorite-info-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .favorite-announcement-title {
@@ -78,7 +103,38 @@
   font-size: 12px;
 }
 
+.favorite-date {
+  color: #717171;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-right: 10px;
+  display: block;
+  text-align: left;
+}
 
+.favorite-price {
+  font-weight: 700;
+  font-size: 22px;
+  color: #3f3f3f;
+  margin-top: 12px;
+}
+
+.favorite-count {
+  text-align: center;
+  font-weight: 600;
+  font-size: 22px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+@media (min-width: 900px) {
+  .favorite-count {
+    margin-top: 32px;
+    margin-bottom: 24px;
+  }
+}
 
 @media (min-width: 1200px) {
   .favorite-announcements-list {
@@ -97,7 +153,6 @@
   }
 }
 
-/* Tablet styles - pentru o tranziție mai bună */
 @media (max-width: 768px) and (min-width: 701px) {
   .favorite-announcements-list {
     gap: 18px;
@@ -110,7 +165,6 @@
   }
 }
 
-/* Very small phones */
 @media (max-width: 480px) {
   .favorite-announcements-list {
     padding: 0 8px !important;
@@ -163,9 +217,7 @@
   }
 }
 
-
-
-@media (max-width: 700px) {
+@media (max-width: 899.98px) {
   /* Hide desktop H1 title on mobile (mobile header already shows the page title) */
   .my-announcements-title {
     display: none !important;
@@ -236,6 +288,7 @@
   }
   
   /* Span cu data */
+  .favorite-date,
   .favorite-announcement-info > div:first-child > span {
     color: #717171 !important;
     font-size: 11px !important;
@@ -302,6 +355,7 @@
   }
   
   /* Preț - ultimul div cu inline styles */
+  .favorite-price,
   .favorite-announcement-info > div:last-child {
     font-weight: 700 !important;
     font-size: 16px !important;
@@ -310,6 +364,53 @@
     margin-bottom: 0 !important;
     display: block !important;
     width: 100% !important;
+  }
+
+  /* Mobile header visible only on small and tablet screens */
+  .mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important; /* ensure items stick together on the left */
+    gap: 8px !important; /* reduced distance between back button and title */
+    margin-bottom: 8px !important; /* matches old mb:1 */
+    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    color: var(--chat-text) !important;
+  }
+
+  /* Force IconButton dimensions and visuals on mobile */
+  .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--chat-elev) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  }
+  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+
+  /* Match icon and title styling exactly */
+  .mobile-header .MuiSvgIcon-root {
+    font-size: 24px !important;
+    color: var(--chat-text) !important;
+  }
+  .mobile-header-title {
+    font-weight: 600 !important;
+    color: var(--chat-text) !important;
+    font-size: 24px !important; /* MUI h5 on mobile */
+    line-height: 1.334 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important; /* prevent stretching to the right */
+    margin-left: 4px !important; /* nudge closer to the back button */
+  }
+
+  .favorite-count {
+    margin-top: 4px !important;  /* xs: 0.5 spacing -> 4px */
+    margin-bottom: 4px !important; /* xs: 0.5 spacing -> 4px */
   }
 }
 
@@ -337,10 +438,12 @@
   color: #cccccc !important;
 }
 
+.dark-mode .favorite-date,
 .dark-mode .favorite-announcement-info > div:first-child > span {
   color: #d6d6d6 !important;
 }
 
+.dark-mode .favorite-price,
 .dark-mode .favorite-announcement-info > div:last-child {
   color: #f51866 !important;
 }

@@ -1,8 +1,7 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../api/api';
 import './NotificationsPage.css';
@@ -185,6 +184,19 @@ export default function NotificationsPage() {
     <>
       <div className="notifications-page">
         <div className="notifications-container">
+          {/* Mobile header: back + title (mirror Favorites page) */}
+          <div className="mobile-header">
+            <IconButton
+              onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+              className="mobile-back-btn"
+              disableRipple
+              disableFocusRipple
+              aria-label="Înapoi"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h5" className="mobile-header-title">Notificări</Typography>
+          </div>
           <h1 className="notifications-title">Notificări</h1>
           <div className="notifications-content">
             {loading ? (

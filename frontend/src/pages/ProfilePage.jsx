@@ -5,7 +5,8 @@ import {
   CircularProgress,
   Fade,
   IconButton,
-  Box
+  Box,
+  Typography
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -21,6 +22,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import apiClient from '../api/api';
 import './ProfilePage.css';
 
@@ -193,6 +195,19 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page-container">
+      {/* Mobile header: back + title */}
+      <div className="mobile-header">
+        <IconButton
+          onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+          className="mobile-back-btn"
+          disableRipple
+          disableFocusRipple
+          aria-label="Înapoi"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" className="mobile-header-title">Profil</Typography>
+      </div>
       {/* Alerts */}
       {error && (
         <Fade in={!!error}>

@@ -18,13 +18,15 @@ import {
   Divider,
   Card,
   CardContent,
-  CircularProgress
+  CircularProgress,
+  IconButton
 } from '@mui/material';
 import { 
   Search as SearchIcon,
   FilterList as FilterListIcon,
   Category as CategoryIcon,
-  Schedule as ScheduleIcon
+  Schedule as ScheduleIcon,
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import './MyAnnouncements.css';
 
@@ -166,6 +168,19 @@ export default function MyAnnouncements() {
   return (
     <>
       <div className="my-announcements-container">
+        {/* Mobile header: back + title */}
+        <div className="mobile-header">
+          <IconButton
+            onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+            className="mobile-back-btn"
+            disableRipple
+            disableFocusRipple
+            aria-label="Înapoi"
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h5" className="mobile-header-title">Anunțurile mele</Typography>
+        </div>
         <h1 className="my-announcements-title">Anunțurile mele</h1>
         
         {/* Header de căutare și filtrare */}

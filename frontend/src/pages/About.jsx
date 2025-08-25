@@ -1,11 +1,15 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconButton, Typography } from '@mui/material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './About.css';
 
 export default function About() {
   const [openFAQ, setOpenFAQ] = useState(null);
+  const navigate = useNavigate();
 
   const toggleFAQ = (index) => {
     setOpenFAQ(openFAQ === index ? null : index);
@@ -34,6 +38,19 @@ export default function About() {
       <Header />
       <div className="about-page">
         <div className="about-container">
+          {/* Mobile header: back + title for Despre noi */}
+          <div className="mobile-header">
+            <IconButton
+              onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+              className="mobile-back-btn"
+              disableRipple
+              disableFocusRipple
+              aria-label="Înapoi"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h5" className="mobile-header-title">Despre noi</Typography>
+          </div>
           {/* Hero Section */}
           <div className="about-hero">
             <div className="hero-badge">

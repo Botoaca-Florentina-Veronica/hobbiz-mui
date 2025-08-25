@@ -2,8 +2,9 @@
 .notifications-page {
   background: #f5f7f8;
   min-height: 100vh;
+  /* Use padding-top instead of margin-top to prevent margin collapse revealing body bg */
   padding: 40px 0;
-  margin-top: 4rem;
+  padding-top: calc(40px + 4rem);
 }
 
 .notifications-container {
@@ -284,11 +285,60 @@
   opacity: 0.5;
 }
 
+/* Mobile header styles (match Favorites) */
+@media (max-width: 899.98px) {
+  /* Hide desktop H1 on mobile because mobile header shows title */
+  .notifications-title {
+    display: none !important;
+  }
+
+  .mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    color: var(--chat-text) !important;
+  }
+
+  .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--chat-elev) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  }
+  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+
+  .mobile-header .MuiSvgIcon-root {
+    font-size: 24px !important;
+    color: var(--chat-text) !important;
+  }
+
+  .mobile-header-title {
+    font-weight: 600 !important;
+    color: var(--chat-text) !important;
+    font-size: 24px !important; /* MUI h5 on mobile */
+    line-height: 1.334 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    margin-left: 4px !important;
+  }
+}
+
 /* Responsivitate */
 @media (max-width: 768px) {
   .notifications-page {
+    /* On mobile we hide MobileHeader, so remove extra offset and avoid margin to keep bg continuous */
     padding: 20px 0;
-    margin-top: 2rem;
+    padding-top: 20px;
   }
   
   .notifications-container {

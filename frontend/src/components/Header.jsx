@@ -201,6 +201,8 @@ export default function Header() {
           location.pathname.startsWith('/confidentialitate') ||
           location.pathname.startsWith('/despre') ||
           location.pathname.startsWith('/cum-functioneaza') ||
+          // Hide MobileHeader on notifications page as well
+          location.pathname.startsWith('/notificari') ||
           // Hide MobileHeader on announcement details and category pages on mobile
           location.pathname.startsWith('/announcement/') ||
           location.pathname.startsWith('/anunturi-categorie')

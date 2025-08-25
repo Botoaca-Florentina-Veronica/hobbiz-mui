@@ -225,7 +225,7 @@
 /* ==== Mobile optimizations ==== */
 @media (max-width: 900px) {
   .account-settings-container {
-    padding: clamp(36px, 7vh, 72px) 12px 16px; /* și mai mult spațiu sus, dar adaptiv la înălțimea ecranului */
+    padding: clamp(24px, 5vh, 48px) 12px 16px; /* ușor mai mic sus, având header mobil local */
     margin-top: 0; /* fără header pe mobil pe ruta setări */
     padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom)); /* spațiu pentru footer-ul mobil fix */
     min-height: 100dvh; /* adaptează înălțimea la viewport-ul efectiv pe mobil */
@@ -280,5 +280,54 @@
 
   .message {
     font-size: 0.95rem;
+  }
+}
+
+/* Mobile header styles (match Favorites/Notifications) */
+@media (max-width: 899.98px) {
+  /* Hide desktop title on mobile */
+  .settings-title {
+    display: none !important;
+  }
+
+  .mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    color: var(--chat-text) !important;
+  }
+
+  .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--chat-elev) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  }
+
+  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+
+  .mobile-header .MuiSvgIcon-root {
+    font-size: 24px !important;
+    color: var(--chat-text) !important;
+  }
+
+  .mobile-header-title {
+    font-weight: 600 !important;
+    color: var(--chat-text) !important;
+    font-size: 24px !important; /* MUI h5 on mobile */
+    line-height: 1.334 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    margin-left: 4px !important;
   }
 }

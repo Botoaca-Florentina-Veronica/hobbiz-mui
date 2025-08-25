@@ -1,9 +1,27 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconButton, Typography } from '@mui/material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import './PrivacyPolicy.css';
 
-const PrivacyPolicy = () => (
+const PrivacyPolicy = () => {
+  const navigate = useNavigate();
+  return (
   <div className="privacy-policy">
     <div className="privacy-policy__container">
+      {/* Mobile header: back + title */}
+      <div className="mobile-header">
+        <IconButton
+          onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+          className="mobile-back-btn"
+          disableRipple
+          disableFocusRipple
+          aria-label="Înapoi"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" className="mobile-header-title">Politica de confidențialitate</Typography>
+      </div>
       <div className="privacy-policy__header">
         <span className="privacy-policy__icon" role="img" aria-label="shield">🛡️</span>
         <h1>Politica de confidențialitate</h1>
@@ -243,6 +261,7 @@ const PrivacyPolicy = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default PrivacyPolicy;

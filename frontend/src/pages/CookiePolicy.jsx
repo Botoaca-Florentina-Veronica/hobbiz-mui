@@ -1,14 +1,31 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconButton, Typography } from '@mui/material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './CookiePolicy.css';
 
 export default function CookiePolicy() {
+  const navigate = useNavigate();
   return (
     <>
       <Header />
       <div className="cookie-policy-page">
         <div className="cookie-policy-container">
+          {/* Mobile header: back + title for Cookie Policy */}
+          <div className="mobile-header">
+            <IconButton
+              onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+              className="mobile-back-btn"
+              disableRipple
+              disableFocusRipple
+              aria-label="Înapoi"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h5" className="mobile-header-title">Politica cookie-urilor</Typography>
+          </div>
           {/* Hero Section */}
           <div className="cookie-policy-hero">
             <div className="hero-badge">
