@@ -1,3 +1,12 @@
+/* ==============================
+ * NotificationsPage Styles
+ * Structure:
+ * - Layout & List Items
+ * - Mobile header (align with Favorites)
+ * - Responsiveness
+ * - Dark mode
+ * - Utilities (spinner/empty state)
+ * ============================== */
 /* Pagina de notificări modernă și atractivă */
 .notifications-page {
   background: #f5f7f8;
@@ -148,6 +157,11 @@
   flex-shrink: 0;
 }
 
+/* Match icon sizing via CSS (no inline props) */
+.notification-delete-icon {
+  font-size: 20px; /* comparable to Favorites icon handling */
+}
+
 .notification-delete-btn:hover {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
@@ -247,9 +261,11 @@
   transform: translateX(2px);
 }
 
+/* ==============================
+ * Utilities: Empty & Loading
+ * ============================== */
 /* Stări pentru loading și fără notificări */
-.notifications-empty,
-.notifications-loading {
+.notifications-empty {
   text-align: center;
   padding: 60px 20px;
   color: #6b7280;
@@ -285,7 +301,9 @@
   opacity: 0.5;
 }
 
-/* Mobile header styles (match Favorites) */
+/* ==============================
+ * Mobile header (match Favorites)
+ * ============================== */
 @media (max-width: 899.98px) {
   /* Hide desktop H1 on mobile because mobile header shows title */
   .notifications-title {
@@ -333,7 +351,9 @@
   }
 }
 
-/* Responsivitate */
+/* ==============================
+ * Responsivitate
+ * ============================== */
 @media (max-width: 768px) {
   .notifications-page {
     /* On mobile we hide MobileHeader, so remove extra offset and avoid margin to keep bg continuous */
@@ -384,7 +404,9 @@
   }
 }
 
-/* Dark Mode Styles */
+/* ==============================
+ * Dark Mode Styles
+ * ============================== */
 .dark-mode .notifications-page {
   background: #121214;
 }

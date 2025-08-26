@@ -237,9 +237,13 @@ export default function ChatPage() {
         console.log(`Primite ${response.data.length} mesaje din backend`);
         setMessages(response.data || []);
         
-        // Marchează mesajele ca citite când se deschide conversația
+        // Marchează mesajele ca citite când se deschide conversația (scoped by conversationId)
         try {
-          await apiClient.put(`/api/messages/mark-read/${userId}/${selectedConversation.otherParticipant.id}`);
+          await apiClient.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
+          // notifica header-ul să actualizeze badge-urile imediat
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('chat:counts-updated'));
+          }
         } catch (error) {
           console.error('Eroare la marcarea mesajelor ca citite:', error);
         }
@@ -656,9 +660,12 @@ export default function ChatPage() {
                           ? { ...c, unread: false }
                           : c
                       ));
-                      // Backend: marchează mesajele ca citite (deja se face și în useEffect, dar dăm un semnal imediat)
+                      // Backend: marchează mesajele ca citite (scoped by conversationId) și notifică header-ul
                       try {
-                        await apiClient.put(`/api/messages/mark-read/${userId}/${conversation.otherParticipant.id}`);
+                        await apiClient.put(`/api/messages/conversation/${conversation.conversationId}/mark-read`);
+                        if (typeof window !== 'undefined') {
+                          window.dispatchEvent(new Event('chat:counts-updated'));
+                        }
                       } catch (e) {
                         // Non-blocking
                       }

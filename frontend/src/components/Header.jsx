@@ -21,7 +21,8 @@ export default function Header() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [avatar, setAvatar] = useState(null); // Avatar personal sau Google
-  const [unreadCount, setUnreadCount] = useState(0); // Nou: numărul de notificări necitite
+  const [unreadCount, setUnreadCount] = useState(0); // Număr notificări necitite
+  const [chatUnreadCount, setChatUnreadCount] = useState(0); // Număr mesaje chat necitite
 
   // Funcție pentru a obține numărul de notificări necitite
   const fetchUnreadCount = async () => {
@@ -41,6 +42,26 @@ export default function Header() {
       }
       console.error('Eroare la obținerea notificărilor necitite:', error);
       setUnreadCount(0);
+    }
+  };
+
+  // Funcție pentru a obține numărul de mesaje necitite în chat
+  const fetchChatUnreadCount = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+
+      const response = await apiClient.get(`/api/messages/conversations/${userId}`);
+      const conversations = response.data || [];
+      const unread = conversations.filter(c => c.unread).length;
+      setChatUnreadCount(unread);
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setChatUnreadCount(0);
+        return;
+      }
+      console.error('Eroare la obținerea numărului de mesaje necitite:', error);
+      setChatUnreadCount(0);
     }
   };
 
@@ -67,6 +88,7 @@ export default function Header() {
       setIsAuthenticated(false);
       setAvatar(null);
       setUnreadCount(0);
+      setChatUnreadCount(0);
       return;
     }
     // Dacă există token, verifică și cu backendul (pentru sesiuni Google etc)
@@ -82,35 +104,56 @@ export default function Header() {
           setAvatar(null);
         }
         
-        // Dacă utilizatorul este autentificat, obține numărul de notificări necitite
+        // Dacă utilizatorul este autentificat, obține numărul de notificări și chat necitite
         if (response.data.isAuthenticated) {
           fetchUnreadCount();
+          fetchChatUnreadCount();
         }
       } catch (error) {
         setIsAuthenticated(false);
         setAvatar(null);
         setUnreadCount(0);
+        setChatUnreadCount(0);
       }
     };
     checkAuth();
   }, []);
 
-  // Actualizează contorul când se schimbă pagina (pentru a reflecta citirea notificărilor)
+  // Actualizează contoarele când se schimbă pagina (pentru a reflecta citirea notificărilor/chat)
   useEffect(() => {
     if (isAuthenticated) {
       fetchUnreadCount();
+      fetchChatUnreadCount();
     }
   }, [location.pathname, isAuthenticated]);
 
-  // Polling pentru actualizarea în timp real a contorului (la fiecare 30 de secunde)
+  // Polling pentru actualizarea în timp real a contoarelor (la fiecare 30 de secunde)
   useEffect(() => {
     if (!isAuthenticated) return;
 
     const interval = setInterval(() => {
       fetchUnreadCount();
+      fetchChatUnreadCount();
     }, 30000); // 30 secunde
 
     return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  // Ascultă evenimentul global emis din ChatPage pentru a actualiza instant badge-ul
+  useEffect(() => {
+    const handler = () => {
+      if (isAuthenticated) {
+        fetchChatUnreadCount();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('chat:counts-updated', handler);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('chat:counts-updated', handler);
+      }
+    };
   }, [isAuthenticated]);
 
   // Detectează mobilul în mod reactiv (la resize / schimbare media query)
@@ -244,6 +287,11 @@ export default function Header() {
               <li>
                 <button className="favorite-btn" style={{marginLeft: 0}} onClick={() => navigate('/chat')}>
                   <HiOutlineChat />
+                  {chatUnreadCount > 0 && (
+                    <span className={`notification-badge ${chatUnreadCount > 99 ? 'notification-badge-large' : ''}`}>
+                      {chatUnreadCount > 99 ? '99+' : chatUnreadCount}
+                    </span>
+                  )}
                 </button>
               </li>
               <li

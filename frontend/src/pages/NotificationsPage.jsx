@@ -250,7 +250,7 @@ export default function NotificationsPage() {
                           onClick={() => deleteNotification(n._id)}
                           title="Șterge notificarea"
                         >
-                          <DeleteIcon fontSize="small" />
+                          <DeleteIcon className="notification-delete-icon" />
                         </button>
                       </div>
                     </div>

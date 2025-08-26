@@ -527,6 +527,13 @@
 /* bife la dimensiunea textului */
 .chat-message-ticks svg { width: 1em; height: 1em; }
 
+/* Ensure read ticks stay visibly blue on own bubble background */
+.chat-message.own .chat-message-ticks.read {
+  color: var(--chat-accent) !important;
+  /* subtle contrast so blue ticks remain visible on blue bubble */
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.25));
+}
+
 /* imagini din mesaj ocupă rând dedicat (deasupra text+bife) */
 .chat-message-image { grid-column: 1 / -1; margin-bottom: 4px; }
 
