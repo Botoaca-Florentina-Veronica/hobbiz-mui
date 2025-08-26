@@ -41,6 +41,8 @@ export default function ChatPage() {
   const [reactionTargetId, setReactionTargetId] = useState(null);
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [typingTimeout, setTypingTimeout] = useState(null);
+  // Long-press timer for mobile to open reactions
+  const longPressTimerRef = useRef(null);
   // Drawer mobil pentru lista de conversații (deschis implicit pe mobil)
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -96,6 +98,30 @@ export default function ChatPage() {
     setNewMessage(prev => prev + emoji);
     setShowEmojiPicker(false);
   };
+
+  // Close reaction picker on outside click or ESC
+  useEffect(() => {
+    const handleDocClick = (e) => {
+      // If clicking inside a reaction picker or reaction toggle button, ignore
+      const target = e.target;
+      if (!target) return;
+      const inPicker = target.closest && target.closest('.reaction-picker');
+      const isToggle = target.closest && target.closest('.message-action-btn');
+      if (inPicker || isToggle) return;
+      if (reactionTargetId) setReactionTargetId(null);
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && reactionTargetId) setReactionTargetId(null);
+    };
+    document.addEventListener('mousedown', handleDocClick);
+    document.addEventListener('touchstart', handleDocClick, { passive: true });
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleDocClick);
+      document.removeEventListener('touchstart', handleDocClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [reactionTargetId]);
 
   // Gestionează selecția de imagini
   const handleImageSelect = (event) => {
@@ -156,22 +182,63 @@ export default function ChatPage() {
         const conversationsData = response.data;
         
         console.log(`Primite ${conversationsData.length} conversații din backend`);
+        if (Array.isArray(conversationsData) && conversationsData.length > 0) {
+          // Debug temporar: verificăm câmpurile legate de anunț
+          const sample = conversationsData.slice(0, 3).map(c => ({
+            conversationId: c.conversationId,
+            announcementId: c.announcementId,
+            announcementTitle: c.announcementTitle,
+            hasImage: !!c.announcementImage,
+            otherParticipant: c.otherParticipant?.id
+          }));
+          console.log('Sample conv data (debug):', sample);
+        }
         
         // Formatează datele pentru UI
           const formattedConversations = conversationsData.map(conv => {
             const participantAvatar = resolveAvatarUrl(conv.otherParticipant?.avatar);
             const announcementImg = resolveAvatarUrl(conv.announcementImage);
+            const participantName = `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`.trim();
+            // Titlul anunțului din mai multe surse posibile (dependență de backend)
+            const resolvedAnnouncementTitle = (
+              conv.announcementTitle ||
+              conv.name ||
+              (conv.announcement && (conv.announcement.title || conv.announcement.name || conv.announcement.announcementTitle)) ||
+              conv.title ||
+              conv.announcementName ||
+              '(fără titlu)'
+            );
+            // Fallback din localStorage scris de ChatPopup
+            let titleFromLocal = '';
+            let imageFromLocal = '';
+            try {
+              if (conv.conversationId && typeof window !== 'undefined') {
+                const key = `chat_meta_${conv.conversationId}`;
+                const raw = localStorage.getItem(key);
+                if (raw) {
+                  const meta = JSON.parse(raw);
+                  titleFromLocal = meta?.title || '';
+                  imageFromLocal = meta?.image || '';
+                }
+              }
+            } catch (_) {}
+            const announcementOwnerName = conv.announcementOwnerName || participantName;
             return {
               id: conv.otherParticipant.id,
               conversationId: conv.conversationId,
-              name: `${conv.otherParticipant.firstName} ${conv.otherParticipant.lastName}`.trim(),
+              // În lista de conversații: afișăm titlul anunțului + poza anunțului
+              name: resolvedAnnouncementTitle || titleFromLocal,
+              avatar: (announcementImg || imageFromLocal) || participantAvatar || '',
+              // În header: afișăm numele și avatarul utilizatorului
+              participantName,
+              participantAvatar,
+              announcementTitle: resolvedAnnouncementTitle || titleFromLocal,
+              announcementOwnerName,
               lastMessage: conv.lastMessage.text,
               time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
                 hour: '2-digit',
                 minute: '2-digit'
               }),
-              // Afișăm imaginea principală a anunțului pentru a distinge discuțiile per anunț
-              avatar: announcementImg || participantAvatar || '',
               unread: conv.unread,
               otherParticipant: conv.otherParticipant,
               lastSeen: conv.otherParticipant.lastSeen,
@@ -674,13 +741,15 @@ export default function ChatPage() {
                     <img 
                       className="chat-avatar" 
                       src={conversation.avatar} 
-                      alt={conversation.name}
+                      alt={conversation.announcementTitle || conversation.name}
                       onError={(e) => {
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=${getAccentHex()}&color=fff`;
+                        const fallbackText = (conversation.announcementTitle || conversation.name || 'U').slice(0,1);
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackText)}&background=${getAccentHex()}&color=fff`;
                       }}
                     />
                     <div className="chat-conversation-info">
-                      <div className="chat-conversation-name">{conversation.name}</div>
+                      <div className="chat-conversation-owner">{conversation.announcementOwnerName}</div>
+                      <div className="chat-conversation-title">{conversation.announcementTitle}</div>
                       <div className="chat-conversation-message">{conversation.lastMessage}</div>
                     </div>
                     <div className="chat-conversation-time">{conversation.time}</div>
@@ -715,13 +784,15 @@ export default function ChatPage() {
                     <img 
                       className="chat-avatar" 
                       src={conversation.avatar} 
-                      alt={conversation.name}
+                      alt={conversation.announcementTitle || conversation.name}
                       onError={(e) => {
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.name[0] || 'U')}&background=${getAccentHex()}&color=fff`;
+                        const fallbackText = (conversation.announcementTitle || conversation.name || 'U').slice(0,1);
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackText)}&background=${getAccentHex()}&color=fff`;
                       }}
                     />
                     <div className="chat-conversation-info">
-                      <div className="chat-conversation-name">{conversation.name}</div>
+                      <div className="chat-conversation-owner">{conversation.announcementOwnerName}</div>
+                      <div className="chat-conversation-title">{conversation.announcementTitle}</div>
                       <div className="chat-conversation-message">{conversation.lastMessage}</div>
                     </div>
                     <div className="chat-conversation-time">{conversation.time}</div>
@@ -757,7 +828,7 @@ export default function ChatPage() {
                 <ArrowBack />
               </IconButton>
               <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>
-                {selectedConversation?.name || 'Chat'}
+                {selectedConversation?.participantName || 'Chat'}
               </Typography>
             </Box>
           )}
@@ -776,11 +847,11 @@ export default function ChatPage() {
               <div className="chat-main-header">
                 <img 
                   className="chat-main-avatar" 
-                  src={selectedConversation.avatar} 
-                  alt={selectedConversation.name}
+                  src={selectedConversation.participantAvatar || selectedConversation.avatar}
+                  alt={selectedConversation.participantName || selectedConversation.name}
                 />
                 <div className="chat-main-user-info">
-                  <h3>{selectedConversation.name}</h3>
+                  <h3>{selectedConversation.participantName || selectedConversation.name}</h3>
                   <p>{formatLastSeen(selectedConversation.lastSeen)}</p>
                 </div>
               </div>
@@ -838,9 +909,27 @@ export default function ChatPage() {
                                 className="chat-message-bubble"
                                 onMouseEnter={() => setHoveredMessageId(message._id)}
                                 onMouseLeave={() => setHoveredMessageId(null)}
+                                onTouchStart={() => {
+                                  if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+                                  longPressTimerRef.current = setTimeout(() => {
+                                    setReactionTargetId(message._id);
+                                  }, 350);
+                                }}
+                                onTouchEnd={() => {
+                                  if (longPressTimerRef.current) {
+                                    clearTimeout(longPressTimerRef.current);
+                                    longPressTimerRef.current = null;
+                                  }
+                                }}
+                                onTouchCancel={() => {
+                                  if (longPressTimerRef.current) {
+                                    clearTimeout(longPressTimerRef.current);
+                                    longPressTimerRef.current = null;
+                                  }
+                                }}
                               >
                                 {/* Bara de acțiuni - mesajele proprii */}
-                                {message.senderId === userId && hoveredMessageId === message._id && (
+                                {message.senderId === userId && hoveredMessageId === message._id && reactionTargetId !== message._id && (
                                   <div className="message-actions-bar">
                                     <button 
                                       className="message-action-btn"
@@ -880,7 +969,7 @@ export default function ChatPage() {
                                   </div>
                                 )}
                                 {/* Bara de acțiuni - mesajele primite (fără Șterge) */}
-                                {message.senderId !== userId && hoveredMessageId === message._id && (
+                                {message.senderId !== userId && hoveredMessageId === message._id && reactionTargetId !== message._id && (
                                   <div className="message-actions-bar">
                                     <button 
                                       className="message-action-btn"
@@ -981,7 +1070,7 @@ export default function ChatPage() {
                           
                           
                           {/* Picker reacții, ancorat deasupra mesajului */}
-                          {hoveredMessageId === message._id && reactionTargetId === message._id && (
+                          {reactionTargetId === message._id && (
                             <div className={`reaction-picker ${message.senderId === userId ? 'own' : ''}`}>
                               {reactionEmojis.map((emo) => (
                                 <button

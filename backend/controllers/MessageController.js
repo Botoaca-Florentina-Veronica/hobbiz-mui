@@ -321,7 +321,17 @@ const getConversations = async (req, res) => {
   for (const message of messages) {
     let otherParticipantId = message.senderId === userId ? message.destinatarId : message.senderId;
     if (!otherParticipantId || otherParticipantId === userId) continue;
-    const announcementId = message.announcementId || '';
+    // Determină announcementId și pentru mesaje legacy: dacă lipsește pe mesaj, încearcă să-l extragi din conversationId (format cu 3 părți)
+    let announcementId = message.announcementId || '';
+    if (!announcementId && message.conversationId) {
+      const parts = String(message.conversationId).split('-');
+      if (parts.length === 3) {
+        const candidate = parts[2];
+        if (/^[a-fA-F0-9]{24}$/.test(candidate)) {
+          announcementId = candidate;
+        }
+      }
+    }
     const key = `${otherParticipantId}_${announcementId}`;
 
     const contributesUnread = (
@@ -335,16 +345,27 @@ const getConversations = async (req, res) => {
         const otherUser = await User.findById(otherParticipantId).select('firstName lastName avatar lastSeen');
         let announcementImage = null;
         let announcementOwnerId = null;
+        let announcementTitle = null;
+        let announcementOwnerName = null;
         if (announcementId) {
           try {
             const Announcement = require('../models/Announcement');
-            const ann = await Announcement.findById(announcementId).select('images user');
+            const ann = await Announcement.findById(announcementId).select('images user title');
             if (ann) {
               if (Array.isArray(ann.images) && ann.images.length > 0) {
                 announcementImage = ann.images[0];
               }
               if (ann.user) {
                 announcementOwnerId = String(ann.user);
+                try {
+                  const owner = await User.findById(ann.user).select('firstName lastName');
+                  if (owner) {
+                    announcementOwnerName = `${owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Utilizator';
+                  }
+                } catch (_) {}
+              }
+              if (ann.title) {
+                announcementTitle = ann.title;
               }
             }
           } catch (e) {}
@@ -367,6 +388,8 @@ const getConversations = async (req, res) => {
             announcementId,
             announcementImage,
             announcementOwnerId,
+            announcementTitle,
+            announcementOwnerName,
             unread: !!contributesUnread
           });
         }

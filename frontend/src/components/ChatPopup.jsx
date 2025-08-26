@@ -47,6 +47,20 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     return [sellerId, effectiveUserId, announcementId].join('-');
   }, [seller, effectiveUserId, announcement]);
 
+  // Persist lightweight chat metadata locally for conversation list fallbacks
+  useEffect(() => {
+    try {
+      if (!conversationId) return;
+      const title = announcement?.title || announcement?.name || '';
+      const image = (announcement?.images && announcement.images[0]) || '';
+      if (title || image) {
+        const key = `chat_meta_${conversationId}`;
+        const payload = { title, image };
+        localStorage.setItem(key, JSON.stringify(payload));
+      }
+    } catch (_) {}
+  }, [conversationId, announcement]);
+
   // Încarcă mesajele când se deschide popup-ul
   useEffect(() => {
     if (!open || !conversationId) {
