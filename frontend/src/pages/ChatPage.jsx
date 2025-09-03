@@ -53,6 +53,12 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  // Sidebar resizing (desktop-only) - default width matches existing CSS
+  const [sidebarWidth, setSidebarWidth] = useState(380);
+  const separatorRef = useRef(null);
+  const draggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(sidebarWidth);
   // refs inutile eliminate
   const userId = localStorage.getItem('userId');
   const location = useLocation();
@@ -72,6 +78,32 @@ export default function ChatPage() {
   }, []);
 
   const isChattingOnMobile = isMobile && !!selectedConversation;
+  const isDesktop = !isMobile;
+
+  // Drag handlers: listen on window to support smooth dragging
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!draggingRef.current) return;
+      const dx = e.clientX - startXRef.current;
+      const newWidth = Math.max(240, Math.min(720, startWidthRef.current + dx));
+      setSidebarWidth(newWidth);
+    };
+
+    const onUp = () => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      document.body.style.userSelect = '';
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('mouseleave', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('mouseleave', onUp);
+    };
+  }, []);
 
   // Accent color helpers: blue in light mode, pink in dark mode
   const getIsDarkMode = () => {
@@ -668,7 +700,10 @@ export default function ChatPage() {
       </div>
       <div className={`chat-page-container ${isChattingOnMobile ? 'mobile-chatting' : ''}`}>
         {!isChattingOnMobile && (
-        <aside className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <aside
+          className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`}
+          style={isDesktop ? { width: sidebarWidth } : undefined}
+        >
           {/* Mobile header: back + title, consistent MUI styling */}
           <Box sx={{ 
             display: { xs: 'flex', md: 'none' }, 
@@ -802,6 +837,24 @@ export default function ChatPage() {
             </>
           )}
         </aside>
+        )}
+
+        {/* Desktop-only separator between sidebar and main; hoverable and draggable */}
+        {isDesktop && !isChattingOnMobile && (
+          <div
+            ref={separatorRef}
+            className="chat-separator"
+            role="separator"
+            aria-orientation="vertical"
+            onMouseDown={(e) => {
+              // start dragging
+              draggingRef.current = true;
+              startXRef.current = e.clientX;
+              startWidthRef.current = sidebarWidth;
+              // prevent selecting text while dragging
+              document.body.style.userSelect = 'none';
+            }}
+          />
         )}
 
         <main className="chat-main">

@@ -214,6 +214,10 @@ export default function Footer({ hideOnMobile = false }) {
           </div>
         </div>
       </div>
+      {/* Mobile legal block to show copyright text without desktop footer */}
+      <div className="footer-mobile-legal" aria-hidden={false}>
+        <small>Copyright © Hobbiz 2025. Toate drepturile rezervate.</small>
+      </div>
     </div>
   );
 }

@@ -151,6 +151,15 @@ export default function AnnouncementsByCategory() {
 
   return (
     <div className="my-announcements-container announcements-by-category">
+      <div className="mobile-back-container" onClick={() => window.history.back()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && window.history.back()}>
+        <button className="mobile-back-btn" aria-label="Înapoi">
+          {/* left arrow svg */}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" stroke="#23484a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <span className="mobile-back-label">Înapoi</span>
+      </div>
       <Typography variant="h4" className="my-announcements-title" gutterBottom>
         {category}
       </Typography>
@@ -359,9 +368,11 @@ export default function AnnouncementsByCategory() {
                           {parseFloat(a.price) === 0 ? 'Gratuit' : `${a.price} RON`}
                         </div>
                       )}
-                    </div>
-                    <div className="my-announcement-id">
-                      ID: {a._id?.slice(-9) || ''}
+
+                      {/* Keep ID inside the left column to avoid overlap with absolute-positioned rules */}
+                      <div className="my-announcement-id">
+                        ID: {a._id?.slice(-9) || ''}
+                      </div>
                     </div>
                   </div>
                 </div>

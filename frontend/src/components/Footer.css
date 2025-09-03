@@ -256,15 +256,15 @@
   display: none;
 }
 
+/* Mobile legal block hidden by default; shown inside media query */
+.footer-mobile-legal {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  /* Afișează footer-ul de desktop și pe mobile */
+  /* Hide desktop footer on small screens to avoid overlap with fixed mobile bar */
   .desktop-footer {
-    display: block !important;
-    width: 100%;
-    text-align: center;
-    margin-top: 8px;
-    /* lasă spațiu deasupra barei fixate cu butoane mobile */
-    margin-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
+    display: none !important;
   }
   
   /* Footer-ul mobile cu stiluri OLX-inspired */
@@ -377,19 +377,26 @@
   }
 
   /* Compact legal section on mobile only */
+  /* Compact legal section on mobile is handled inside mobile footer; ensure spacing for content above fixed bar */
   .legal-section {
-    padding: 10px 12px 6px !important;
+    padding: 10px 12px 80px !important; /* extra bottom padding to ensure content not hidden behind fixed footer */
     gap: 6px !important;
   }
-  .desktop-footer {
-    padding: 6px 0 !important;
+  .footer-mobile-legal {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px 12px;
+    box-sizing: border-box;
   }
-  .desktop-footer p,
-  .desktop-footer small,
-  .desktop-footer span {
-    /* keep original font-size; only tighten line-height and margins */
-    line-height: 1.2 !important;
-    margin: 4px 0 !important;
+  .footer-mobile-legal p,
+  .footer-mobile-legal small,
+  .footer-mobile-legal span {
+    line-height: 1.25 !important;
+    margin: 2px 0 !important;
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    word-break: break-word;
   }
   .legal-section__column {
     flex: 1 1 auto;

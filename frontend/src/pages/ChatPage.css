@@ -309,6 +309,36 @@
   position: relative;
 }
 
+/* Separator between sidebar and main - desktop only */
+.chat-separator {
+  /* thinner default separator */
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.12s ease, width 0.12s ease, box-shadow 0.12s ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.chat-separator:hover {
+  /* Stronger, less transparent hover so the blue is clearly visible */
+  background: linear-gradient(180deg, rgba(58,119,255,0.36), rgba(58,119,255,0.20));
+  box-shadow: 0 0 8px rgba(58,119,255,0.22);
+  width: 6px;
+}
+
+/* Positioning: place separator between aside and main by making it a flex item in the container
+   The container already uses display:flex; ensure separator doesn't shrink */
+.chat-page-container > .chat-separator {
+  flex: 0 0 auto;
+  height: 100%;
+}
+
+/* Hide separator on small screens (mobile) */
+@media (max-width: 600px) {
+  .chat-separator { display: none; }
+}
+
 .chat-main-header {
   background: var(--chat-elev);
   border-bottom: 1px solid #e8ecef;
