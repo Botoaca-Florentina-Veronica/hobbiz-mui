@@ -11,7 +11,6 @@ import apiClient from '../api/api';
 import './Header.css';
 import MobileHeader from './MobileHeader';
 import './MobileHeader.css';
-import './Header.mediaQueries.css';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -23,6 +22,7 @@ export default function Header() {
   const [avatar, setAvatar] = useState(null); // Avatar personal sau Google
   const [unreadCount, setUnreadCount] = useState(0); // Număr notificări necitite
   const [chatUnreadCount, setChatUnreadCount] = useState(0); // Număr mesaje chat necitite
+  const [favoriteCount, setFavoriteCount] = useState(0); // Număr anunțuri favorite
 
   // Funcție pentru a obține numărul de notificări necitite
   const fetchUnreadCount = async () => {
@@ -89,6 +89,16 @@ export default function Header() {
       setAvatar(null);
       setUnreadCount(0);
       setChatUnreadCount(0);
+      // calculează favorite guest
+      const guestKey = 'favoriteAnnouncements_guest';
+      try {
+        const raw = localStorage.getItem(guestKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const len = Array.isArray(parsed) ? (typeof parsed[0] === 'string' ? parsed.length : parsed.length) : 0;
+          setFavoriteCount(len);
+        } else setFavoriteCount(0);
+      } catch { setFavoriteCount(0); }
       return;
     }
     // Dacă există token, verifică și cu backendul (pentru sesiuni Google etc)
@@ -108,12 +118,14 @@ export default function Header() {
         if (response.data.isAuthenticated) {
           fetchUnreadCount();
           fetchChatUnreadCount();
+          updateFavoriteCount();
         }
       } catch (error) {
         setIsAuthenticated(false);
         setAvatar(null);
         setUnreadCount(0);
         setChatUnreadCount(0);
+        updateFavoriteCount();
       }
     };
     checkAuth();
@@ -124,6 +136,7 @@ export default function Header() {
     if (isAuthenticated) {
       fetchUnreadCount();
       fetchChatUnreadCount();
+  updateFavoriteCount();
     }
   }, [location.pathname, isAuthenticated]);
 
@@ -134,10 +147,49 @@ export default function Header() {
     const interval = setInterval(() => {
       fetchUnreadCount();
       fetchChatUnreadCount();
+  updateFavoriteCount();
     }, 30000); // 30 secunde
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);
+
+  // Funcție pentru a actualiza numărul de favorite din localStorage
+  const updateFavoriteCount = () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const key = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+      const raw = localStorage.getItem(key);
+      if (!raw) { setFavoriteCount(0); return; }
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        if (parsed.length > 0 && typeof parsed[0] === 'string') {
+          setFavoriteCount(parsed.length);
+        } else {
+          setFavoriteCount(parsed.length);
+        }
+      } else {
+        setFavoriteCount(0);
+      }
+    } catch {
+      setFavoriteCount(0);
+    }
+  };
+
+  // Ascultă modificările favorite (eveniment custom + storage cross-tab)
+  useEffect(() => {
+    const handler = () => updateFavoriteCount();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('favorites:updated', handler);
+      window.addEventListener('storage', handler);
+    }
+    updateFavoriteCount();
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('favorites:updated', handler);
+        window.removeEventListener('storage', handler);
+      }
+    };
+  }, []);
 
   // Ascultă evenimentul global emis din ChatPage pentru a actualiza instant badge-ul
   useEffect(() => {
@@ -156,22 +208,24 @@ export default function Header() {
     };
   }, [isAuthenticated]);
 
-  // Detectează mobilul în mod reactiv (la resize / schimbare media query)
+  // Detectare mobil + width pentru regula specială doar pe homepage
   const [isMobile, setIsMobile] = useState(
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 1200px)').matches
+  );
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1920
   );
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(max-width: 1024px)');
+    const mq = window.matchMedia('(max-width: 1200px)');
     const handler = (e) => setIsMobile(e.matches);
-    // compat: event listener on MQ
     if (mq.addEventListener) {
       mq.addEventListener('change', handler);
     } else {
-      // Safari
       mq.addListener(handler);
     }
-    // inițial, sincronizează
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
     setIsMobile(mq.matches);
     return () => {
       if (mq.removeEventListener) {
@@ -179,8 +233,19 @@ export default function Header() {
       } else {
         mq.removeListener(handler);
       }
+      window.removeEventListener('resize', onResize);
     };
   }, []);
+  const isHomepage = location.pathname === '/' || location.pathname === '';
+  const showMobileHeader = isHomepage ? windowWidth < 1200 : isMobile;
+
+  // Asigură că pe pagina de chat, când trecem în layout-ul "desktop" al chat-ului ( > 870px ),
+  // afișăm întotdeauna header-ul de desktop chiar dacă încă suntem sub 1200px (interval 871-1199px).
+  const CHAT_DESKTOP_BREAKPOINT = 870; // folosit și în ChatPage.jsx
+  const isChatRoute = location.pathname.startsWith('/chat');
+  const effectiveShowMobileHeader = (isChatRoute && windowWidth > CHAT_DESKTOP_BREAKPOINT)
+    ? false
+    : showMobileHeader;
 
   const handleMouseEnter = () => {
     if (isAuthenticated) {
@@ -231,7 +296,7 @@ export default function Header() {
 
   return (
     <>
-      {isMobile ? (
+  {effectiveShowMobileHeader ? (
         ((
           location.pathname.startsWith('/chat') ||
           location.pathname.startsWith('/favorite-announcements') ||
@@ -244,6 +309,7 @@ export default function Header() {
           location.pathname.startsWith('/confidentialitate') ||
           location.pathname.startsWith('/despre') ||
           location.pathname.startsWith('/cum-functioneaza') ||
+          location.pathname.startsWith('/termeni') ||
           // Hide MobileHeader on notifications page as well
           location.pathname.startsWith('/notificari') ||
           // Hide MobileHeader on announcement details and category pages on mobile
@@ -270,8 +336,13 @@ export default function Header() {
                 <button className="add-button" onClick={handleAddAnnouncement}>Adaugă un anunț</button>
               </li>
               <li>
-                <button className="favorite-btn" onClick={() => navigate('/favorite-announcements')}>
+                <button className="favorite-btn notification-btn" onClick={() => navigate('/favorite-announcements')}>
                   <HiOutlineHeart />
+                  {favoriteCount > 0 && (
+                    <span className={`notification-badge ${favoriteCount > 99 ? 'notification-badge-large' : ''}`}>
+                      {favoriteCount > 99 ? '99+' : favoriteCount}
+                    </span>
+                  )}
                 </button>
               </li>
               <li>

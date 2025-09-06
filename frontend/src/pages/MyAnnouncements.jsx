@@ -28,6 +28,7 @@ import {
   Schedule as ScheduleIcon,
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
+// Consolidated stylesheet (includes responsive rules)
 import './MyAnnouncements.css';
 
 

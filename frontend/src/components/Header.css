@@ -1,5 +1,24 @@
-/* Stiluri pentru Header */
+/* ================================
+ * HEADER CSS - ORGANIZED STRUCTURE
+ * ================================
+ * 
+ * TABLE OF CONTENTS:
+ * 1. Base Styles & Variables
+ * 2. Layout & Structure
+ * 3. Logo & Branding
+ * 4. Navigation Elements
+ * 5. Buttons & Interactive Elements
+ * 6. Notification System
+ * 7. User Account Dropdown
+ * 8. Dark Mode Styles
+ * 9. Media Queries (Mobile First)
+ * ================================ */
+
+/* ================================
+ * 1. BASE STYLES & VARIABLES
+ * ================================ */
 .header {
+  /* Core Layout */
   font-size: 18px;
   height: 72px;
   background-color: var(--primary);
@@ -9,9 +28,16 @@
   align-items: center;
   padding: 0 1rem;
   box-sizing: border-box;
+  
+  /* Reset */
+  margin: 0;
+  border: none;
+  outline: none;
 }
 
-/* Header fixat */
+/* ================================
+ * 2. LAYOUT & STRUCTURE
+ * ================================ */
 .fixed-header {
   position: fixed;
   top: 0;
@@ -21,38 +47,6 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Implicit ascundem ambele headere */
-.header-desktop,
-.header-mobile {
-  display: none;
-}
-
-/* Sub 1200px → doar header-ul mobile */
-@media screen and (max-width: 1200px) {
-  .header-desktop {
-    display: none !important;
-  }
-  .header-mobile {
-    display: flex !important;
-    width: 100%;
-    justify-content: space-between;
-    padding: 0 1rem;
-  }
-}
-
-/* Peste 1200px → doar header-ul desktop */
-@media screen and (min-width: 1201px) {
-  .header-desktop {
-    display: flex !important;
-    width: 100%;
-    justify-content: space-between;
-  }
-  .header-mobile {
-    display: none !important;
-  }
-}
-
-/* Navigația din header */
 .header ul {
   list-style-type: none;
   padding: 0;
@@ -64,11 +58,32 @@
   margin-left: 150px;
 }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* ================================
+ * 3. LOGO & BRANDING
+ * ================================ */
+.logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+  opacity: 0.9;
+}
+
 .puzzle-logo {
   height: 45px;
   width: auto;
   margin-right: 2px;
   margin-left: -4rem;
+  transition: transform 0.2s ease;
 }
 
 .main-logo {
@@ -77,8 +92,25 @@
   padding-right: 24px;
   margin-left: 0;
   margin-top: 1rem;
+  transition: transform 0.2s ease;
 }
 
+/* ================================
+ * 4. NAVIGATION ELEMENTS
+ * ================================ */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.nav-right li {
+  list-style: none;
+}
+
+/* ================================
+ * 5. BUTTONS & INTERACTIVE ELEMENTS
+ * ================================ */
 .add-button {
   background-color: var(--app-surface);
   color: var(--primary);
@@ -89,7 +121,19 @@
   font-size: 1rem;
   font-weight: bold;
   margin-right: 40px;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-button:hover {
+  background-color: var(--app-elev);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .favorite-btn {
@@ -101,9 +145,21 @@
   transition: all 0.3s ease;
   color: var(--primary-contrast);
   position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Buton notificări + badge */
+.favorite-btn:hover {
+  transform: scale(1.1);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+/* ================================
+ * 6. NOTIFICATION SYSTEM
+ * ================================ */
 .notification-btn {
   position: relative;
 }
@@ -124,8 +180,13 @@
   font-weight: bold;
   border: 2px solid var(--primary);
   min-width: 18px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.notification-badge:hover {
+  transform: scale(1.1);
 }
 
 /* Badge pentru numere cu două cifre */
@@ -158,6 +219,14 @@
   font-size: 0.65rem;
 }
 
+/* ================================
+ * 7. USER ACCOUNT DROPDOWN
+ * ================================ */
+.user-account-container {
+  position: relative;
+  margin-right: 6rem;
+}
+
 .user-account-btn {
   display: flex;
   align-items: center;
@@ -170,25 +239,13 @@
   color: inherit;
   transition: all 0.2s ease;
   margin-right: 6rem;
+  border-radius: 4px;
 }
 
 .user-account-btn:hover {
   opacity: 0.8;
   background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.favorite-btn:hover,
-.user-account-btn:hover {
-  transform: scale(1.1);
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.user-account-container {
-  position: relative;
-  margin-right: 6rem;
+  transform: scale(1.05);
 }
 
 .dropdown {
@@ -263,9 +320,62 @@
   border-color: transparent transparent var(--app-surface) transparent;
 }
 
-/* Dark Mode */
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+  vertical-align: middle;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.avatar-img:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+/* ================================
+ * 8. DARK MODE STYLES
+ * ================================ */
+.dark-mode .header {
+  background-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .add-button {
+  background-color: var(--app-surface);
+  color: var(--primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .add-button:hover {
+  background-color: var(--app-elev);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .favorite-btn {
+  color: var(--primary-contrast);
+}
+
+.dark-mode .favorite-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark-mode .notification-badge {
+  background: #fbbf24;
+  color: #1f1f1f;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
 .dark-mode .for-dropdown {
   color: var(--primary-hover);
+}
+
+.dark-mode .for-dropdown:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .dark-mode .section-dropdown {
@@ -288,11 +398,384 @@
   border-bottom-color: var(--app-surface);
 }
 
-.avatar-img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 8px;
-  vertical-align: middle;
+.dark-mode .avatar-img {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .avatar-img:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ================================
+ * 9. MEDIA QUERIES (MOBILE FIRST)
+ * ================================ */
+
+/* --------------------------------
+ * Mobile Phones (320px - 480px)
+ * -------------------------------- */
+@media screen and (max-width: 480px) {
+  .header {
+    padding: 0 0.5rem;
+    height: 60px;
+    font-size: 16px;
+  }
+  
+  .header ul {
+    margin-left: 0;
+    gap: 8px;
+  }
+  
+  .puzzle-logo {
+    height: 32px;
+    margin-left: -1rem;
+  }
+  
+  .main-logo {
+    height: 120px;
+    width: 120px;
+    padding-right: 8px;
+    margin-top: 0.5rem;
+  }
+  
+  .add-button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    margin-right: 8px;
+  }
+  
+  .favorite-btn {
+    font-size: 1.4rem;
+    margin-right: 8px;
+    padding: 6px;
+  }
+  
+  .user-account-container {
+    margin-right: 0.5rem;
+  }
+  
+  .user-account-btn {
+    margin-right: 0;
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .section-dropdown {
+    width: 180px;
+    right: -10px;
+  }
+  
+  .avatar-img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* --------------------------------
+ * Large Mobile/Small Tablet (481px - 768px)
+ * -------------------------------- */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .header {
+    padding: 0 0.75rem;
+    height: 64px;
+  }
+  
+  .header ul {
+    margin-left: 50px;
+    gap: 12px;
+  }
+  
+  .puzzle-logo {
+    height: 38px;
+    margin-left: -2rem;
+  }
+  
+  .main-logo {
+    height: 160px;
+    width: 160px;
+    padding-right: 16px;
+    margin-top: 0.75rem;
+  }
+  
+  .add-button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    margin-right: 16px;
+  }
+  
+  .favorite-btn {
+    font-size: 1.6rem;
+    margin-right: 12px;
+  }
+  
+  .user-account-container {
+    margin-right: 2rem;
+  }
+  
+  .section-dropdown {
+    width: 200px;
+  }
+  
+  .avatar-img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* --------------------------------
+ * Tablet (769px - 1024px)
+ * -------------------------------- */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .header {
+    padding: 0 1rem;
+    height: 68px;
+  }
+  
+  .header ul {
+    margin-left: 100px;
+  }
+  
+  .puzzle-logo {
+    height: 42px;
+    margin-left: -3rem;
+  }
+  
+  .main-logo {
+    height: 200px;
+    width: 200px;
+    padding-right: 20px;
+    margin-top: 0.875rem;
+  }
+  
+  .add-button {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    margin-right: 24px;
+  }
+  
+  .favorite-btn {
+    font-size: 1.8rem;
+    margin-right: 16px;
+  }
+  
+  .user-account-container {
+    margin-right: 3rem;
+  }
+  
+  .user-account-btn {
+    margin-right: 3rem;
+    font-size: 1.1rem;
+  }
+  
+  .avatar-img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* --------------------------------
+ * Small Desktop (1025px - 1200px)
+ * -------------------------------- */
+@media screen and (min-width: 1025px) and (max-width: 1200px) {
+  .header {
+    height: 70px;
+  }
+  
+  .header ul {
+    margin-left: 120px;
+  }
+  
+  .puzzle-logo {
+    height: 44px;
+    margin-left: -3.5rem;
+  }
+  
+  .main-logo {
+    height: 210px;
+    width: 210px;
+    padding-right: 22px;
+  }
+  
+  .add-button {
+    margin-right: 32px;
+  }
+  
+  .favorite-btn {
+    margin-right: 18px;
+  }
+  
+  .user-account-container {
+    margin-right: 4rem;
+  }
+  
+  .user-account-btn {
+    margin-right: 4rem;
+  }
+}
+
+/* --------------------------------
+ * Large Desktop (1201px+)
+ * -------------------------------- */
+@media screen and (min-width: 1201px) {
+  .header {
+    height: 72px;
+  }
+  
+  .header ul {
+    margin-left: 150px;
+  }
+  
+  .puzzle-logo {
+    height: 45px;
+    margin-left: -4rem;
+  }
+  
+  .main-logo {
+    height: 220px;
+    width: 220px;
+    padding-right: 24px;
+    margin-top: 1rem;
+  }
+  
+  .add-button {
+    margin-right: 40px;
+  }
+  
+  .favorite-btn {
+    margin-right: 20px;
+  }
+  
+  .user-account-container {
+    margin-right: 6rem;
+  }
+  
+  .user-account-btn {
+    margin-right: 6rem;
+  }
+}
+
+/* --------------------------------
+ * Ultra Wide Desktop (1441px+)
+ * -------------------------------- */
+@media screen and (min-width: 1441px) {
+  .header {
+    padding: 0 2rem;
+  }
+  
+  .header ul {
+    margin-left: 200px;
+  }
+  
+  .add-button {
+    padding: 16px 28px;
+    font-size: 1.1rem;
+    margin-right: 50px;
+  }
+  
+  .favorite-btn {
+    font-size: 2.2rem;
+    margin-right: 24px;
+  }
+  
+  .user-account-container {
+    margin-right: 8rem;
+  }
+  
+  .user-account-btn {
+    margin-right: 8rem;
+    font-size: 1.3rem;
+  }
+  
+  .section-dropdown {
+    width: 240px;
+  }
+}
+
+/* --------------------------------
+ * 4K+ Screens (2561px+)
+ * -------------------------------- */
+@media screen and (min-width: 2561px) {
+  .header {
+    height: 80px;
+    padding: 0 3rem;
+    font-size: 20px;
+  }
+  
+  .header ul {
+    margin-left: 250px;
+  }
+  
+  .puzzle-logo {
+    height: 50px;
+  }
+  
+  .main-logo {
+    height: 240px;
+    width: 240px;
+  }
+  
+  .add-button {
+    padding: 18px 32px;
+    font-size: 1.2rem;
+    margin-right: 60px;
+  }
+  
+  .favorite-btn {
+    font-size: 2.4rem;
+    margin-right: 28px;
+  }
+  
+  .user-account-btn {
+    font-size: 1.4rem;
+  }
+  
+  .section-dropdown {
+    width: 260px;
+  }
+  
+  .avatar-img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ================================
+ * 10. HOMEPAGE SPECIFIC RULES
+ * ================================ */
+
+/* Reguli specifice pentru pagina principală (/) */
+/* Pe homepage: sub 1200px = DOAR mobile header, peste 1200px = DOAR desktop header */
+
+/* Desktop header - ascuns pe homepage sub 1200px */
+@media screen and (max-width: 1199px) {
+  .homepage .header,
+  .homepage .fixed-header {
+    display: none !important;
+  }
+}
+
+/* Mobile header - ascuns pe homepage peste 1200px */
+@media screen and (min-width: 1200px) {
+  .homepage .mobile-header,
+  .homepage .mobile-header-spacer {
+    display: none !important;
+  }
+}
+
+/* Asigurăm că pe homepage mobile header-ul este vizibil sub 1200px */
+@media screen and (max-width: 1199px) {
+  .homepage .mobile-header {
+    display: flex !important;
+  }
+  
+  .homepage .mobile-header-spacer {
+    display: block !important;
+  }
+}
+
+/* Asigurăm că pe homepage desktop header-ul este vizibil peste 1200px */
+@media screen and (min-width: 1200px) {
+  .homepage .header,
+  .homepage .fixed-header {
+    display: flex !important;
+  }
 }

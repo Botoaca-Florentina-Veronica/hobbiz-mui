@@ -111,15 +111,23 @@ export default function FavoriteAnnouncements() {
       }
       
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+      // Notifică restul aplicației că favoritele s-au schimbat
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('favorites:updated'));
+      }
       return updated;
     });
     
     // Actualizează și array-ul simplu de ID-uri pentru compatibilitate
     setFavoriteIds((prev) => {
       if (prev.includes(id)) {
-        return prev.filter((fid) => fid !== id);
+  const next = prev.filter((fid) => fid !== id);
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
+  return next;
       } else {
-        return [...prev, id];
+  const next = [...prev, id];
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
+  return next;
       }
     });
   };

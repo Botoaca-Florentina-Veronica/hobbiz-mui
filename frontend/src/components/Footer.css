@@ -550,3 +550,12 @@
     display: none !important;
   }
 }
+
+/* Ascunde legal + desktop footer pe paginile care cer acest lucru (ex: detalii anunț) până la 1200px */
+@media (max-width: 1200px) {
+  .footer.hide-legal-upto-1200 .legal-section,
+  .footer.hide-legal-upto-1200 .footer-separator,
+  .footer.hide-legal-upto-1200 .desktop-footer {
+    display: none !important;
+  }
+}

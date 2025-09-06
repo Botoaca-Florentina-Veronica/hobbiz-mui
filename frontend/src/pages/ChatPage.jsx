@@ -44,9 +44,10 @@ export default function ChatPage() {
   // Long-press timer for mobile to open reactions
   const longPressTimerRef = useRef(null);
   // Drawer mobil pentru lista de conversații (deschis implicit pe mobil)
+  const MOBILE_BREAKPOINT = 870; // extins pentru optimizare între 600-870px
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth <= 600;
+      return window.innerWidth <= MOBILE_BREAKPOINT;
     }
     return false;
   });
@@ -68,11 +69,11 @@ export default function ChatPage() {
 
   // Detectează mobil pentru a ascunde lista când este selectată o conversație
   const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') return window.innerWidth <= 600;
+    if (typeof window !== 'undefined') return window.innerWidth <= MOBILE_BREAKPOINT;
     return false;
   });
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 600);
+    const onResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -181,7 +182,7 @@ export default function ChatPage() {
   // Fetch current user avatar
   useEffect(() => {
     // asigură-te că pe mobil e deschis la montare
-    if (typeof window !== 'undefined' && window.innerWidth <= 600) {
+  if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT) {
       setIsSidebarOpen(true);
     }
     if (!userId) return;
@@ -339,6 +340,10 @@ export default function ChatPage() {
         // Marchează mesajele ca citite când se deschide conversația (scoped by conversationId)
         try {
           await apiClient.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
+          // Clear unread badge in sidebar for this conversation
+          setConversations(prev => prev.map(c =>
+            c.conversationId === selectedConversation.conversationId ? { ...c, unread: false } : c
+          ));
           // notifica header-ul să actualizeze badge-urile imediat
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new Event('chat:counts-updated'));
@@ -375,6 +380,28 @@ export default function ChatPage() {
         if (exists) return prev;
         return [...prev, message];
       });
+      // Mark as read immediately since this conversation is open
+      (async () => {
+        try {
+          await apiClient.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('chat:counts-updated'));
+          }
+        } catch (_) {}
+      })();
+    };
+
+    // Read receipts: mark my sent messages as read when peer opens the conversation
+  const handleMessagesRead = ({ conversationId, readerId, messageIds, readAt }) => {
+      // Only process for the currently selected conversation
+      if (!selectedConversation || conversationId !== selectedConversation.conversationId) return;
+      // If someone else (the other participant) read messages
+      if (!selectedConversation.otherParticipant || readerId === userId) return;
+      if (readerId !== selectedConversation.otherParticipant.id) return;
+      if (!Array.isArray(messageIds) || messageIds.length === 0) return;
+      setMessages(prev => prev.map(m => (
+    m.senderId === userId && messageIds.includes(m._id) ? { ...m, isRead: true, readAt: m.readAt || readAt || new Date().toISOString() } : m
+      )));
     };
 
     const handleUserTyping = ({ conversationId, senderId }) => {
@@ -395,12 +422,14 @@ export default function ChatPage() {
     };
 
     on('newMessage', handleNewMessage);
-    on('userTyping', handleUserTyping);
+  on('userTyping', handleUserTyping);
+  on('messagesRead', handleMessagesRead);
     on('conversationEmpty', handleConversationEmpty);
     
     return () => {
       off('newMessage', handleNewMessage);
-      off('userTyping', handleUserTyping);
+  off('userTyping', handleUserTyping);
+  off('messagesRead', handleMessagesRead);
       off('conversationEmpty', handleConversationEmpty);
     };
   }, [userId, selectedConversation, on, off]);

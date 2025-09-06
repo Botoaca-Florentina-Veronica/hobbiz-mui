@@ -29,7 +29,7 @@
 }
 
 /* Dark mode tweaks for mobile pills */
-@media (max-width: 600px) {
+@media (max-width: 870px) {
   .dark-mode .chat-mobile-title { color: var(--dm-text); }
   .dark-mode .chat-tab { background: #3a3a3a; color: var(--dm-text); }
   .dark-mode .chat-tab.active,
@@ -258,6 +258,15 @@
   white-space: nowrap;
 }
 
+/* Desktop: show full title without ellipsis by allowing wrapping */
+@media (min-width: 871px) {
+  .chat-conversation-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+}
+
 .chat-conversation-name {
   font-weight: 600;
   color: var(--chat-text);
@@ -335,7 +344,7 @@
 }
 
 /* Hide separator on small screens (mobile) */
-@media (max-width: 600px) {
+@media (max-width: 870px) {
   .chat-separator { display: none; }
 }
 
@@ -766,7 +775,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 870px) {
   html, body { overflow-x: hidden; background: var(--chat-bg) !important; }
   
   .chat-page-container {
@@ -1127,7 +1136,7 @@
 }
 
 /* Dark mode: și containerul de mesaje pe mobil are același fundal */
-@media (max-width: 600px) {
+@media (max-width: 870px) {
   .dark-mode html, .dark-mode body { background: var(--dm-bg) !important; }
   .dark-mode .chat-messages-container {
     background: var(--dm-bg) !important;
@@ -1184,6 +1193,26 @@
   background: var(--dm-bg-soft);
   color: var(--dm-text);
   border: 1px solid var(--dm-border);
+}
+
+/* =============================
+   INTERMEDIATE LAYOUT 871px - 1199px
+   Optimizare pentru tablete landscape / small desktop
+   ============================= */
+@media (min-width: 871px) and (max-width: 1199px) {
+  .chat-page-container {
+    height: 80vh;
+    margin-top: 6rem;
+    max-width: 1100px;
+  }
+  .chat-sidebar { width: 300px; }
+  .chat-conversation-item { padding: 12px 16px; }
+  .chat-main-header { padding: 16px 20px; }
+  .chat-messages-container { padding: 16px 20px; }
+  .chat-input-container { padding: 16px 20px; }
+  /* Afișăm mereu sidebar-ul în această zonă pentru context mai bun */
+  .chat-page-container.mobile-chatting .chat-sidebar { display: flex !important; }
+  .chat-page-container.mobile-chatting .chat-main { width: auto !important; }
 }
 
 /* Dark mode: own tail outline + fill */
@@ -1344,7 +1373,7 @@
 }
 
 /* Responsive pentru noile funcționalități */
-@media (max-width: 600px) {
+@media (max-width: 870px) {
   .chat-input-buttons {
     gap: 4px;
   }

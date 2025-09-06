@@ -304,6 +304,11 @@
 /* ==============================
  * Mobile header (match Favorites)
  * ============================== */
+/* Hide mobile header on desktop - should only show on mobile */
+.mobile-header {
+  display: none !important;
+}
+
 @media (max-width: 899.98px) {
   /* Hide desktop H1 on mobile because mobile header shows title */
   .notifications-title {

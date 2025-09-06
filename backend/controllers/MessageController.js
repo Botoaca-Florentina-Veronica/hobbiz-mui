@@ -551,6 +551,18 @@ const markMessagesAsReadByConversation = async (req, res) => {
     if (!parts.includes(String(authenticatedUserId))) {
       return res.status(403).json({ error: 'Nu poți marca drept citite o conversație a altora' });
     }
+    // Găsește mesajele necitite ce urmează a fi marcate ca citite pentru a extrage ID-urile și expeditorii
+    const unreadMessages = await Message.find({
+      conversationId,
+      senderId: { $ne: authenticatedUserId },
+      isRead: false,
+    }).select('_id senderId');
+
+    if (!unreadMessages || unreadMessages.length === 0) {
+      return res.json({ message: 'Nu sunt mesaje necitite', modifiedCount: 0 });
+    }
+
+    const now = new Date();
     const result = await Message.updateMany(
       {
         conversationId,
@@ -559,9 +571,31 @@ const markMessagesAsReadByConversation = async (req, res) => {
       },
       {
         isRead: true,
-        readAt: new Date(),
+        readAt: now,
       }
     );
+
+    // Emite eveniment realtime către ceilalți participanți din conversație (expeditorii mesajelor marcate)
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const notifyUserIds = Array.from(new Set(unreadMessages.map(m => String(m.senderId))));
+        const messageIds = unreadMessages.map(m => String(m._id));
+        for (const uid of notifyUserIds) {
+          const sid = activeUsers.get(uid);
+          if (sid) {
+            io.to(sid).emit('messagesRead', {
+              conversationId,
+              readerId: String(authenticatedUserId),
+              messageIds,
+              readAt: now.toISOString(),
+            });
+          }
+        }
+      }
+    } catch (_) { /* noop */ }
+
     res.json({ message: 'Mesajele au fost marcate ca citite pentru conversație', modifiedCount: result.modifiedCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -582,6 +616,18 @@ const markMessagesAsRead = async (req, res) => {
     const conversationId = participants.join('-');
     
     // Marchează toate mesajele necitite din această conversație care NU sunt ale utilizatorului curent ca fiind citite
+    // Identificăm mesajele necitite pentru a obține ID-urile
+    const unreadMessages = await Message.find({
+      conversationId: conversationId,
+      senderId: { $ne: userId },
+      isRead: false,
+    }).select('_id senderId');
+
+    if (!unreadMessages || unreadMessages.length === 0) {
+      return res.json({ message: 'Nu sunt mesaje necitite', modifiedCount: 0 });
+    }
+
+    const now = new Date();
     const result = await Message.updateMany(
       { 
         conversationId: conversationId,
@@ -590,9 +636,26 @@ const markMessagesAsRead = async (req, res) => {
       },
       { 
         isRead: true,
-        readAt: new Date()
+        readAt: now
       }
     );
+
+    // Emitere realtime către celălalt participant (otherUserId)
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(otherUserId));
+        if (sid) {
+          io.to(sid).emit('messagesRead', {
+            conversationId,
+            readerId: String(userId),
+            messageIds: unreadMessages.map(m => String(m._id)),
+            readAt: now.toISOString(),
+          });
+        }
+      }
+    } catch (_) { /* noop */ }
     
     res.json({ 
       message: 'Mesajele au fost marcate ca citite',

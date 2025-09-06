@@ -8,7 +8,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
-export default function Footer({ hideOnMobile = false }) {
+export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,7 +76,7 @@ export default function Footer({ hideOnMobile = false }) {
   };
 
   return (
-    <div className={`footer ${hideOnMobile ? 'hide-on-mobile' : ''}`}>
+    <div className={`footer ${hideOnMobile ? 'hide-on-mobile' : ''} ${hideLegalUpTo1200 ? 'hide-legal-upto-1200' : ''}`}>
 
 
       {/* Separator deasupra legal-section */}

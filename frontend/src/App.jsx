@@ -27,6 +27,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import About from './pages/About';
 import HowItWorks from './pages/HowItWorks';
 import CookiePolicy from './pages/CookiePolicy';
+import TermsConditions from './pages/TermsConditions';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import './App.css';
@@ -129,8 +130,26 @@ function App() {
             <CookiePolicy />
           </>
         } />
-        <Route path="/*" element={
+        <Route path="/termeni" element={
           <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <TermsConditions />
+          </>
+        } />
+        <Route path="/" element={
+          <div className="homepage">
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <MainStage />
+            <Content />
+            <Categories />
+            <CallToAction />
+            <Footer />
+          </div>
+        } />
+        <Route path="/*" element={
+          <div className="homepage">
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <MainStage />
@@ -139,7 +158,7 @@ function App() {
             <CallToAction />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
-          </>
+          </div>
         } />
         <Route path="/setari-cont" element={
           <>
@@ -186,7 +205,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AnnouncementDetails />
-            <Footer />
+            <Footer hideLegalUpTo1200 />
           </>
         } />
       </Routes>

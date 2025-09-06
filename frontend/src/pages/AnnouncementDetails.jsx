@@ -320,7 +320,7 @@ export default function AnnouncementDetails() {
 
         <Grid container spacing={4}>
           {/* Main Content */}
-          <Grid item xs={12} md={8} order={{ xs: 2, md: 1 }}>
+          <Grid item xs={12} md={8} order={{ xs: 1, md: 1 }}>
             {/* Image Carousel */}
             <Card elevation={3} sx={{ mb: 3, borderRadius: 3, overflow: 'hidden' }}>
               <Box sx={{ position: 'relative', height: { xs: '58vw', sm: '60vw', md: 500 } }}>
@@ -502,7 +502,7 @@ export default function AnnouncementDetails() {
           </Grid>
 
           {/* Seller Information Sidebar */}
-          <Grid item xs={12} md={4} order={{ xs: 1, md: 2 }}>
+          <Grid item xs={12} md={4} order={{ xs: 2, md: 2 }}>
             <Card elevation={2} sx={{ borderRadius: 3, position: { md: 'sticky' }, top: { md: 120 } }}>
               <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>

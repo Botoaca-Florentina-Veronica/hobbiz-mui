@@ -132,8 +132,3 @@
 .mobile-search-btn { color: var(--primary-contrast); }
 .mobile-search-btn:hover { color: var(--primary-contrast); }
 
-@media (min-width: 1025px) {
-  .mobile-header {
-    display: none !important;
-  }
-}
