@@ -1,4 +1,21 @@
-/* ChatPage.css - Design modern și elegant */
+/*
+====================================================
+ ChatPage.css — stiluri pentru pagina de Chat
+====================================================
+TOC (sumar rapid):
+  1) Theme tokens (light) — :root
+  2) Layout container — .chat-page-container
+  3) Sidebar & tabs — .chat-sidebar, .chat-tabs, .chat-tab
+  4) Conversation list — .chat-conversation-*
+  5) Main area — .chat-main, header, messages container
+  6) Message bubble, ticks, images — .chat-message-*
+  7) Composer (input, butoane, emoji) — .chat-input-*
+  8) Separator (desktop resize) — .chat-separator
+  9) Responsive: mobile (<870px), intermediate (871–1199px)
+ 10) Dark mode overrides — .dark-mode ...
+====================================================
+*/
+/* 1) Theme tokens (light) */
 .chat-theme,
 :root {
   /* Light mode theme tokens for Chat (palette-based) */
@@ -14,7 +31,7 @@
   --chat-seen-blue: #34B7F1;
 }
 
-/* ChatPage.css - Design modern și elegant */
+/* 2) Layout container */
 .chat-page-container {
   display: flex;
   height: 85vh;
@@ -28,7 +45,7 @@
   overflow: hidden; /* va fi suprascris pe mobil */
 }
 
-/* Dark mode tweaks for mobile pills */
+/* Mobile-only tweaks for dark mode pills */
 @media (max-width: 870px) {
   .dark-mode .chat-mobile-title { color: var(--dm-text); }
   .dark-mode .chat-tab { background: #3a3a3a; color: var(--dm-text); }
@@ -39,6 +56,7 @@
   .dark-mode .chat-back-btn { background: #3a3a3a; color: var(--dm-text); }
 }
 
+/* 3) Sidebar & tabs */
 .chat-sidebar {
   width: 380px;
   background: var(--chat-bg);
@@ -55,10 +73,10 @@
   background: linear-gradient(135deg, var(--chat-surface) 0%, var(--chat-elev) 100%);
 }
 
-/* Ascunde permanent controlul FAB mobil pe desktop/laptop */
+/* Hide FAB on desktop/laptop */
 .chat-mobile-fab { display: none; }
 
-/* Ascunde topbar-ul mobil pe desktop/tabletă; va fi afișat în media query-ul <600px */
+/* Hide mobile topbar on desktop/tablet */
 .chat-mobile-topbar { display: none; }
 
 .chat-tab {
@@ -143,6 +161,7 @@
   border: 1px solid var(--chat-border);
 }
 
+/* 4) Conversation list */
 .chat-conversation-list {
   flex: 1;
   overflow-y: auto;
@@ -214,6 +233,7 @@
   color: var(--chat-accent-contrast);
 }
 
+/* Conversation item selected state */
 .chat-conversation-item.selected .chat-conversation-name,
 .chat-conversation-item.selected .chat-conversation-owner,
 .chat-conversation-item.selected .chat-conversation-title,
@@ -310,6 +330,7 @@
   transform: scale(1.1);
 }
 
+/* 5) Main area */
 .chat-main {
   flex: 1;
   background: linear-gradient(135deg, var(--chat-surface) 0%, var(--chat-elev) 100%);
@@ -318,7 +339,7 @@
   position: relative;
 }
 
-/* Separator between sidebar and main - desktop only */
+/* 8) Separator between sidebar and main - desktop only */
 .chat-separator {
   /* thinner default separator */
   width: 4px;
@@ -379,6 +400,7 @@
   font-size: 13px;
 }
 
+/* 6) Message list & bubbles */
 .chat-messages-container {
   flex: 1;
   overflow-y: auto;
@@ -580,7 +602,7 @@
   line-height: 1;
 }
 
-/* Stări pentru bife: necitit vs. citit (light mode) */
+/* 6.1) Ticks — read/unread colors (light mode) */
 .chat-message-ticks.unread { color: var(--chat-muted); }
 .chat-message-ticks.read { color: var(--chat-seen-blue); }
 
@@ -594,7 +616,7 @@
   filter: drop-shadow(0 0 1.25px rgba(0,0,0,0.35));
 }
 
-/* imagini din mesaj ocupă rând dedicat (deasupra text+bife) */
+/* 6.2) Image in message bubble */
 .chat-message-image { grid-column: 1 / -1; margin-bottom: 4px; }
 
 .chat-input-container {
@@ -1057,8 +1079,6 @@
 .dark-mode .chat-conversation-item:hover .chat-avatar { border-color: var(--dm-pink); }
 .dark-mode .chat-main-avatar { border-color: var(--dm-pink); }
 .dark-mode .chat-reply-bar { background: var(--dm-pink); }
-.dark-mode .chat-message-ticks.unread { color: var(--dm-muted); }
-.dark-mode .chat-message-ticks.read { color: var(--dm-pink); }
 .dark-mode .chat-image-remove { background: var(--dm-pink); }
 
 .dark-mode .chat-sidebar {
@@ -1225,6 +1245,7 @@
   border-right-color: rgba(255,255,255,0.15);
 }
 
+/* Tick colors (dark mode) */
 .dark-mode .chat-message-ticks.unread { color: var(--dm-muted); }
 .dark-mode .chat-message-ticks.read { color: var(--dm-pink); }
 

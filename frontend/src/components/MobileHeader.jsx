@@ -32,15 +32,6 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
           color="error" 
           overlap="circular" 
           className="mobile-notification-badge"
-          sx={{
-            '& .MuiBadge-badge': {
-              backgroundColor: 'var(--primary)',
-              color: 'var(--primary-contrast)',
-              fontSize: '0.75rem',
-              minWidth: '16px',
-              height: '16px',
-            }
-          }}
         >
           <NotificationsNoneOutlinedIcon className="mobile-notification-icon" htmlColor="currentColor" />
         </Badge>

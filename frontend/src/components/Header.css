@@ -351,8 +351,17 @@
 }
 
 .dark-mode .add-button:hover {
-  background-color: var(--app-elev);
+  /* Stronger contrast on hover so text remains clearly visible */
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  border: 1px solid var(--primary);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Keyboard focus visibility for accessibility in dark mode */
+.dark-mode .add-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .dark-mode .favorite-btn {

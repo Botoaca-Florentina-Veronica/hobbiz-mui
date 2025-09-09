@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import apiClient from '../api/api';
 import FooterPublishButton from './FooterPublishButton';
 import './Footer.css';
+import LegalSection from './LegalSection';
+import MobileLegal from './MobileLegal';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
@@ -79,48 +81,21 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
     <div className={`footer ${hideOnMobile ? 'hide-on-mobile' : ''} ${hideLegalUpTo1200 ? 'hide-legal-upto-1200' : ''}`}>
 
 
-      {/* Separator deasupra legal-section */}
-      <div className="footer-separator" />
-      {/* LegalSection combinat aici */}
-      <div className="legal-section">
-        <div className="legal-section__column">
-          <div className="legal-section__logo">
-            <span role="img" aria-label="chip" className="legal-section__icon">🧩</span>
-            <span className="legal-section__brand">Hobbiz</span>
-          </div>
-          <p className="legal-section__desc">Descoperă, vinde și cumpără servicii sau produse de la pasionați ca tine.</p>
-        </div>
-        <div className="legal-section__column">
-          <h4>Linkuri utile</h4>
-          <ul>
-            <li><a href="/despre">Despre noi</a></li>
-            <li><a href="/contact">Contact</a></li>
-            <li><a href="/cum-functioneaza">Cum funcționează</a></li>
-          </ul>
-        </div>
-        <div className="legal-section__column">
-          <h4>Legal</h4>
-          <ul>
-            <li><a href="/termeni">Termeni și condiții</a></li>
-            <li><a href="/confidentialitate">Politică de Confidențialitate</a></li>
-            <li><a href="/cookie">Cookie Policy</a></li>
-          </ul>
-        </div>
-        <div className="legal-section__column legal-section__socials">
-          <h4>Urmărește-ne</h4>
-          <div className="legal-section__icons">
-            <a href="#" aria-label="Facebook"><i className="fa-brands fa-facebook-f"></i></a>
-            <a href="#" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
-            <a href="#" aria-label="Discord"><i className="fa-brands fa-discord"></i></a>
-          </div>
-        </div>
+  {/* Separator deasupra legal-section */}
+  <div className="footer-separator desktop-only" />
+      {/* LegalSection desktop/tablet (component dedicat). Pe mobil folosim MobileLegal. */}
+      <div className="desktop-only">
+        <LegalSection />
       </div>
 
+  {/* Versiunea compactă pentru mobil */}
+  <MobileLegal />
+
       {/* Separator între legal-section și footer propriu-zis */}
-      <div className="footer-separator" />
+  <div className="footer-separator desktop-only" />
 
       {/* Footer propriu-zis: copyright și bara mobilă */}
-      <footer className="desktop-footer">
+  <footer className="desktop-footer desktop-only">
         <p>Copyright Hobbiz 2025. Toate drepturile rezervate</p>
       </footer>
       
@@ -214,10 +189,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
           </div>
         </div>
       </div>
-      {/* Mobile legal block to show copyright text without desktop footer */}
-      <div className="footer-mobile-legal" aria-hidden={false}>
-        <small>Copyright © Hobbiz 2025. Toate drepturile rezervate.</small>
-      </div>
+  {/* MobileLegal include și copyright-ul pe mobil */}
     </div>
   );
 }

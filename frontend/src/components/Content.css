@@ -67,3 +67,22 @@
 .dark-mode .content h2 {
   color: var(--app-text);
 }
+
+/* Dark mode: visible outline for cards in "Anunțuri populare" (desktop + mobile) */
+.dark-mode .content .MuiCard-root {
+  background: #141414 !important; /* surface a0/a10 area */
+  border: 1px solid #575757 !important; /* surface a30 */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+}
+
+.dark-mode .content .MuiCard-root:hover,
+.dark-mode .content .MuiCard-root:focus-visible {
+  border-color: #717171 !important; /* surface a40 */
+  box-shadow: 0 10px 28px rgba(0,0,0,0.45) !important;
+  outline: none;
+}
+
+/* Ensure card titles remain readable in dark mode */
+.dark-mode .content .MuiCard-root .MuiTypography-root {
+  color: var(--app-text) !important;
+}

@@ -6,13 +6,33 @@ import './TermsConditions.css';
 
 const TermsConditions = () => {
   const navigate = useNavigate();
+  const handleBack = () => {
+    try {
+      // Prefer history back when available inside SPA navigation
+      if (window.history && window.history.length > 1) {
+        navigate(-1);
+        return;
+      }
+      // Fallback: same-origin referrer path (handles full reload entry)
+      const ref = document.referrer;
+      if (ref) {
+        const refUrl = new URL(ref, window.location.href);
+        if (refUrl.origin === window.location.origin) {
+          navigate(refUrl.pathname + refUrl.search + refUrl.hash);
+          return;
+        }
+      }
+    } catch (_) {}
+    // Default fallback: go home
+    navigate('/');
+  };
   return (
   <div className="terms-conditions">
     <div className="terms-conditions__container">
       {/* Mobile header: back + title */}
       <div className="mobile-header">
         <IconButton
-          onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+          onClick={handleBack}
           className="mobile-back-btn"
           disableRipple
           disableFocusRipple

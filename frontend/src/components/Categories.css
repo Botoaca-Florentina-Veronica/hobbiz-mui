@@ -128,8 +128,17 @@
   /* Card întunecat (fără gradient colorat) */
   .dark-mode .categories-container .MuiCard-root {
     background: #141414 !important;
-    border: none !important;
+    /* Add visible outline on desktop dark mode */
+    border: 1px solid #575757 !important; /* surface a30 */
     box-shadow: 0 8px 20px rgba(0,0,0,0.35) !important;
+  }
+
+  /* Stronger outline on hover/focus for better affordance */
+  .dark-mode .categories-container .MuiCard-root:hover,
+  .dark-mode .categories-container .MuiCard-root:focus-visible {
+    border-color: #717171 !important; /* surface a40 */
+    box-shadow: 0 10px 24px rgba(0,0,0,0.45) !important;
+    outline: none;
   }
 
   /* Separator roz în partea de jos a etichetei */

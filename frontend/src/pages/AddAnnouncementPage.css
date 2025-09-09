@@ -9,6 +9,15 @@
   }
 }
 
+/* Desktop: hide mobile drawer header elements for "Alege categoria" popover */
+@media (min-width: 769px) {
+  .categories-popover-header-mobile,
+  .categories-popover-close,
+  .categories-popover-title {
+    display: none !important;
+  }
+}
+
 /* Base Styles */
 .add-announcement-container {
   background: var(--app-bg);

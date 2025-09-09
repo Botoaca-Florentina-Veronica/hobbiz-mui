@@ -1,4 +1,10 @@
 .mobile-header {
+  /* Tokens (light mode defaults) */
+  --mh-search-height: 44px;
+  --mh-radius: 10px;
+  --mh-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --mh-hover-bg: rgba(0,0,0,0.05);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,12 +31,12 @@
 .mobile-search-bar {
   display: flex;
   background: var(--app-surface);
-  border-radius: 10px;
+  border-radius: var(--mh-radius);
   overflow: hidden;
   border: 1px solid var(--app-border);
-  min-height: 44px;
+  min-height: var(--mh-search-height);
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: var(--mh-shadow);
 }
 
 .mobile-search-input {
@@ -58,8 +64,8 @@
   justify-content: center;
   cursor: pointer;
   font-size: 1.2rem;
-  border-radius: 0 10px 10px 0; /* only outer-right corner rounded */
-  height: 44px;
+  border-radius: 0 var(--mh-radius) var(--mh-radius) 0; /* only outer-right corner rounded */
+  height: var(--mh-search-height);
   min-width: 50px;
   transition: background-color 0.2s ease;
 }
@@ -85,18 +91,23 @@
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s ease;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--mh-search-height);
+  min-height: var(--mh-search-height);
 }
 
-.mobile-notification-btn:hover {
-  background: rgba(0,0,0,0.05);
-}
+.mobile-notification-btn:hover { background: var(--mh-hover-bg); }
 
 .mobile-notification-badge {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.mobile-notification-badge .MuiBadge-badge {
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  font-size: 0.75rem;
+  min-width: 16px;
+  height: 16px;
 }
 
 .mobile-notification-icon {

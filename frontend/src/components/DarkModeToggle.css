@@ -1,25 +1,19 @@
-/* Stiluri pentru DarkModeToggle */
-.dark-mode-toggle {
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  z-index: 9999;
-}
+/* Container poziționare (desktop). Poți muta în header și face position:static dacă vrei aliniere în meniu. */
+.dark-mode-toggle { position: fixed; top: 14px; right: 20px; z-index: 1200; }
 
-.dark-mode-toggle button {
-  background-color: #eaac8bd7;
-  color: #e2e7eb;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
-}
+/* Ajustări minore accesibilitate pentru switch (fallback dacă styled override nu se aplică) */
+.dark-mode-toggle .MuiSwitch-root { cursor: pointer; }
+.dark-mode-toggle .MuiSwitch-track { box-shadow: 0 0 0 1px rgba(0,0,0,0.06); }
+.dark-mode-toggle .MuiSwitch-thumb { outline: none; }
 
-.dark-mode-toggle button:hover {
-  background-color: #503f25;
-  cursor: pointer;
-}
+/* Wrapper & iconițe clar vizibile */
+.theme-switch-wrapper { position: relative; display: inline-flex; align-items: center; }
+/* Icon activ unic (sun sau moon) aliniază cu thumb-ul */
+.theme-switch-wrapper .single-mode-icon { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: left .35s cubic-bezier(.34,1.56,.64,1), color .4s ease, filter .4s ease; }
+.theme-switch-wrapper .single-mode-icon.light .MuiSvgIcon-root { color: #ff9d00; filter: drop-shadow(0 0 5px rgba(255,157,0,.6)); }
+.theme-switch-wrapper .single-mode-icon.dark .MuiSvgIcon-root { color: #f5f8fb; filter: drop-shadow(0 0 5px rgba(245,248,251,.55)); }
+body.dark-mode .theme-switch-wrapper .single-mode-icon.light .MuiSvgIcon-root { color: #ffb43b; }
+body.dark-mode .theme-switch-wrapper .single-mode-icon.dark .MuiSvgIcon-root { color: #ffffff; filter: drop-shadow(0 0 6px rgba(255,255,255,.55)); }
 
 
 /* --------- DARK MODE  --------- */
@@ -156,10 +150,6 @@ body.dark-mode {
   color: #ffffff;
 }
 
-.dark-mode .dark-mode-toggle button{
-  background-color: #f51866;
-  color: #ffffff;
-}
 
 .sign-up-button {
   margin-top: 20px;

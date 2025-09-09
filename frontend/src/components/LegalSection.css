@@ -122,3 +122,104 @@
 .dark-mode .legal-section__icon {
   color: #ff7e95;
 }
+
+/* App Store Buttons */
+.app-store-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.app-store-button {
+  display: inline-block;
+  transition: transform 0.25s ease, filter 0.25s ease;
+  border-radius: 12px;
+  /* overflow hidden scotea tooltip-ul; îl facem vizibil în afara butonului */
+  overflow: visible;
+  position: relative;
+}
+
+.app-store-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.08);
+}
+
+/* Overlay text on hover */
+.app-store-button::after {
+  content: 'Coming Soon';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translate(-50%, -10px);
+  background: rgba(30,30,30,0.92);
+  padding: 8px 16px 9px;
+  border-radius: 22px;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1.2;
+  min-width: 100px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  z-index: 5;
+}
+
+.app-store-button::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translate(-50%, -4px);
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgba(30,30,30,0.92);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.app-store-button:hover::after, .app-store-button:focus-visible::after,
+.app-store-button:hover::before, .app-store-button:focus-visible::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+.app-store-button:hover::after, .app-store-button:focus-visible::after {
+  transform: translate(-50%, -14px);
+}
+
+.app-store-button:hover::before, .app-store-button:focus-visible::before {
+  transform: translate(-50%, -8px);
+}
+
+.app-store-button img {
+  width: 180px;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+@media (max-width: 900px) {
+  .app-store-buttons {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .app-store-button img { width: 140px; }
+}
+
+/* Dark mode adjustments for app store buttons */
+.dark-mode .app-store-button:hover {
+  filter: brightness(1.15) contrast(1.05);
+}

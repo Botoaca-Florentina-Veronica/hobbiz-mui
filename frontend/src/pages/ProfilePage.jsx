@@ -409,28 +409,20 @@ export default function ProfilePage() {
           <>
             <hr className="profile-divider" />
             <div style={{ marginTop: '24px' }}>
-              <h3 style={{ 
-                color: getPrimaryColor(),
-                marginBottom: '12px',
-                fontSize: 'clamp(1.1rem, 4.5vw, 1.4rem)',
-                fontWeight: '600'
-              }}>
+              <h3 className="profile-section-title">
                 Anunțurile mele ({userAnnouncements.length})
               </h3>
               {announcementsLoading ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 2px' }}>
+                <Box className="profile-announcements-loading">
                   <CircularProgress size={20} />
-                  <span style={{ color: '#777', fontSize: '0.95rem' }}>Se încarcă...</span>
+                  <span className="profile-loading-inline-text">Se încarcă...</span>
                 </Box>
               ) : userAnnouncements.length === 0 ? (
-                <Box sx={{ padding: '8px 2px', color: '#777', fontSize: '0.95rem' }}>
+                <Box className="profile-empty-state">
                   Nu ai încă anunțuri.
                 </Box>
               ) : (
-                <Box sx={{ 
-                  position: 'relative',
-                  maxWidth: '100%'
-                }}>
+                <Box className="profile-announcements-container">
                   {userAnnouncements.length > 3 && (
                     <IconButton 
                       onClick={() => handleScroll('left')}
@@ -454,103 +446,34 @@ export default function ProfilePage() {
                     </IconButton>
                   )}
 
-                  <Box
-                    ref={carouselRef}
-                    sx={{
-                      display: 'flex',
-                      gap: { xs: '8px', sm: '15px' },
-                      overflowX: 'auto',
-                      scrollBehavior: 'smooth',
-                      padding: { xs: '4px 0', sm: '10px 5px' },
-                      '&::-webkit-scrollbar': {
-                        height: '6px',
-                        backgroundColor: '#f5f5f5'
-                      },
-                      '&::-webkit-scrollbar-thumb': {
-                        backgroundColor: getScrollbarColor(),
-                        borderRadius: '3px'
-                      },
-                      '&::-webkit-scrollbar-track': {
-                        backgroundColor: '#f5f5f5',
-                        borderRadius: '3px'
-                      }
-                    }}
-                  >
+                  <Box ref={carouselRef} className="profile-carousel">
                     {userAnnouncements.map((announcement, index) => (
                       <Box 
                         key={announcement._id}
                         onClick={() => handleAnnouncementClick(announcement._id)}
-                        sx={{ 
-                          minWidth: { xs: '200px', sm: '240px', md: '280px' },
-                          flexShrink: 0,
-                          position: 'relative',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
-                            transition: 'transform 0.2s ease'
-                          }
-                        }}
+                        className="profile-card-wrapper"
                       >
-                        <Box sx={{
-                          borderRadius: '8px',
-                          overflow: 'hidden',
-                          backgroundColor: 'white',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                          border: '1px solid #e0e0e0'
-                        }}>
+                        <Box className="announcement-card">
                           {announcement.images && announcement.images.length > 0 ? (
-                            <img
-                              src={announcement.images[0]}
-                              alt={announcement.title}
-                              style={{
-                                width: '100%',
-                                height: 'clamp(120px, 38vw, 160px)',
-                                objectFit: 'cover'
-                              }}
-                            />
+                            <img src={announcement.images[0]} alt={announcement.title} className="announcement-image" />
                           ) : (
-                            <Box sx={{
-                              width: '100%',
-                              height: 'clamp(120px, 38vw, 160px)',
-                              backgroundColor: '#f5f5f5',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#999'
-                            }}>
+                            <Box className="announcement-image-placeholder">
                               Fără imagine
                             </Box>
                           )}
                           
-                          <Box sx={{ padding: { xs: '10px', sm: '12px' } }}>
-                            <h4 style={{
-                              margin: '0 0 8px 0',
-                              fontSize: '1rem',
-                              fontWeight: '600',
-                              color: '#333',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}>
+                          <Box className="announcement-card-body">
+                            <h4 className="announcement-title">
                               {announcement.title}
                             </h4>
                             
                             {announcement.price && (
-                              <p style={{
-                                margin: '0 0 8px 0',
-                                fontSize: '0.9rem',
-                                color: '#666',
-                                fontWeight: '500'
-                              }}>
+                              <p className="announcement-price">
                                 {announcement.price} lei
                               </p>
                             )}
                             
-                            <p style={{
-                              margin: '0',
-                              fontSize: '0.8rem',
-                              color: '#999'
-                            }}>
+                            <p className="announcement-location">
                               {announcement.localitate}
                             </p>
                           </Box>

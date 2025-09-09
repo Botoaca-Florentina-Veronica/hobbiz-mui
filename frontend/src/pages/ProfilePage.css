@@ -1,117 +1,27 @@
-.profile-container {
-  max-width: 850px;
-  margin: 40px auto;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-  padding: 32px 24px;
-  margin-top: 12rem;
-}
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  margin-bottom: 32px;
-}
-.profile-avatar {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  background: #b2f5ea;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.profile-private {
-  background: #b2f5ea;
-  color: #006666;
-  font-size: 0.9rem;
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  display: inline-block;
-}
-.profile-title {
-  margin: 0 0 8px 0;
-  font-size: 2rem;
-  font-weight: 700;
-}
-.profile-view-link {
-  color: #006666;
-  text-decoration: none;
-  font-size: 1rem;
-}
-.profile-info-card {
-  background: #f7fafc;
-  border-radius: 12px;
-  padding: 24px;
-  height: 15rem;
-}
-.profile-info-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 18px;
-}
-.profile-edit-link {
-  color: #006666;
-  cursor: pointer;
-  border-bottom: 2px solid #006666;
-}
-.profile-info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.profile-info-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.1rem;
-}
-.profile-info-label {
-  color: #888;
-}
-.profile-info-value {
-  font-weight: 500;
-}
-.profile-input {
-  padding: 10px 12px;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  width: 60%;
-  background: #fff;
-  margin-left: 12px;
-}
-.profile-cancel-btn, .profile-save-btn {
-  font-size: 1.4rem;
-  font-weight: 700;
-  padding: 12px 36px;
-  border-radius: 8px;
-  border: 2px solid #00363a;
-  background: #fff;
-  color: #00363a;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.profile-save-btn {
-  background: #00363a;
-  color: #fff;
-  border: 2px solid #00363a;
-}
-.profile-cancel-btn:hover {
-  background: #e6f2f3;
-}
-.profile-save-btn:hover {
-  background: #00555a;
-  color: #fff;
-}
+/*
+  Profile Page styles
+  - Cleaned and organized
+  - Introduces CSS variables for easy theming and tweaks
+  - Removes unused legacy selectors
+*/
 
 /* Material-UI converted styles */
+/* Tokens (light theme defaults). Scoped to the page container so they don't leak globally. */
 .profile-page-container {
+  /* Colors */
+  --pf-primary: #355070;
+  --pf-primary-hover: #1e3a4e;
+  --pf-text: #333;
+  --pf-text-muted: #777;
+  --pf-divider: #e0e0e0;
+
+  /* Surfaces */
+  --pf-card-radius: 12px;
+  --pf-card-shadow: 0 3px 10px rgba(0,0,0,0.1);
+
+  /* Spacing */
+  --pf-gap: 1.5rem;
+
   margin-top: 6rem;
   margin-bottom: 2rem;
   max-width: 850px;
@@ -136,11 +46,80 @@
   margin-bottom: 1.5rem;
 }
 
+/* Announcements section */
+.profile-section-title {
+  color: var(--pf-primary);
+  margin-bottom: 12px;
+  font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+  font-weight: 600;
+}
+
+.profile-announcements-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 2px;
+}
+.profile-loading-inline-text { color: var(--pf-text-muted); font-size: 0.95rem; }
+.profile-empty-state { padding: 8px 2px; color: var(--pf-text-muted); font-size: 0.95rem; }
+
+.profile-announcements-container { position: relative; max-width: 100%; }
+.profile-carousel {
+  display: flex;
+  gap: 15px; /* small-screen value handled below */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 5px;
+}
+/* Scrollbar styling */
+.profile-carousel::-webkit-scrollbar { height: 6px; background-color: #f5f5f5; }
+.profile-carousel::-webkit-scrollbar-thumb { background-color: var(--pf-primary); border-radius: 3px; }
+.profile-carousel::-webkit-scrollbar-track { background-color: #f5f5f5; border-radius: 3px; }
+
+.profile-card-wrapper {
+  min-width: 280px; /* md default */
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.profile-card-wrapper:hover { transform: translateY(-2px); }
+
+.announcement-card {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+}
+.announcement-image { width: 100%; height: clamp(120px, 38vw, 160px); object-fit: cover; }
+.announcement-image-placeholder {
+  width: 100%;
+  height: clamp(120px, 38vw, 160px);
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+.announcement-card-body { padding: 12px; }
+.announcement-title {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.announcement-price { margin: 0 0 8px 0; font-size: 0.9rem; color: #666; font-weight: 500; }
+.announcement-location { margin: 0; font-size: 0.8rem; color: #999; }
+
 .profile-header-card {
   padding: 2rem;
   margin-bottom: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  border-radius: var(--pf-card-radius);
+  box-shadow: var(--pf-card-shadow);
 }
 
 .profile-header-grid {
@@ -158,7 +137,7 @@
   width: 120px;
   height: 120px;
   cursor: pointer;
-  border: 4px solid #355070;
+  border: 4px solid var(--pf-primary);
   border-radius: 50%;
   transition: all 0.3s ease;
   display: flex;
@@ -187,7 +166,7 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  background-color: #355070;
+  background-color: var(--pf-primary);
   color: white;
   width: 36px;
   height: 36px;
@@ -200,9 +179,7 @@
   transition: background-color 0.2s;
 }
 
-.profile-camera-button:hover {
-  background-color: #1e3a4e;
-}
+.profile-camera-button:hover { background-color: var(--pf-primary-hover); }
 
 .profile-camera-button:disabled {
   opacity: 0.6;
@@ -217,8 +194,8 @@
 
 .profile-private-chip {
   background-color: #e8f5e8;
-  color: #355070;
-  border: 1px solid #355070;
+  color: var(--pf-primary);
+  border: 1px solid var(--pf-primary);
   padding: 0.25rem 0.75rem;
   border-radius: 16px;
   font-size: 0.75rem;
@@ -230,14 +207,14 @@
 .profile-main-title {
   font-size: 2rem;
   font-weight: bold;
-  color: #355070;
+  color: var(--pf-primary);
   margin: 0;
 }
 
 .profile-view-button {
   background: none;
   border: none;
-  color: #355070;
+  color: var(--pf-primary);
   cursor: pointer;
   align-self: flex-start;
   display: flex;
@@ -253,8 +230,8 @@
 }
 
 .profile-info-main-card {
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  border-radius: var(--pf-card-radius);
+  box-shadow: var(--pf-card-shadow);
 }
 
 .profile-info-content {
@@ -271,14 +248,14 @@
 .profile-info-main-title {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #333;
+  color: var(--pf-text);
   margin: 0;
 }
 
 .profile-edit-button {
   background: none;
-  border: 2px solid #355070;
-  color: #355070;
+  border: 2px solid var(--pf-primary);
+  color: var(--pf-primary);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -295,7 +272,7 @@
 
 .profile-divider {
   border: none;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--pf-divider);
   margin-bottom: 1.5rem;
 }
 
@@ -318,7 +295,7 @@
 
 .profile-field-label {
   font-weight: 600;
-  color: #355070;
+  color: var(--pf-primary);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -328,7 +305,7 @@
 
 .profile-field-value {
   font-weight: 500;
-  color: #333;
+  color: var(--pf-text);
   font-size: 1rem;
 }
 
@@ -344,13 +321,11 @@
   transition: border-color 0.2s;
 }
 
-.profile-field-input:hover {
-  border-color: #355070;
-}
+.profile-field-input:hover { border-color: var(--pf-primary); }
 
 .profile-field-input:focus {
   outline: none;
-  border-color: #355070;
+  border-color: var(--pf-primary);
   box-shadow: 0 0 0 2px rgba(53, 80, 112, 0.1);
 }
 
@@ -377,26 +352,16 @@
   min-width: 120px;
   justify-content: center;
   transition: all 0.2s;
-  border: 2px solid #355070;
+  border: 2px solid var(--pf-primary);
 }
 
-.profile-action-button.cancel {
-  background: white;
-  color: #355070;
-}
+.profile-action-button.cancel { background: white; color: var(--pf-primary); }
 
-.profile-action-button.cancel:hover {
-  background-color: #f0f7ff;
-}
+.profile-action-button.cancel:hover { background-color: #f0f7ff; }
 
-.profile-action-button.save {
-  background: #355070;
-  color: white;
-}
+.profile-action-button.save { background: var(--pf-primary); color: white; }
 
-.profile-action-button.save:hover {
-  background: #1e3a4e;
-}
+.profile-action-button.save:hover { background: var(--pf-primary-hover); }
 
 .profile-action-button:disabled {
   opacity: 0.6;
@@ -451,16 +416,10 @@
   .profile-action-button {
     width: 100%;
   }
-}
 
-/* Elimină spațiul rezidual la final pe mobil */
-@media (max-width: 600px) {
-  .profile-page-container > *:last-child {
-    margin-bottom: 0 !important;
-  }
-  .profile-info-main-card {
-    margin-bottom: 0 !important;
-  }
+  /* Announcements responsiveness */
+  .profile-carousel { gap: 8px; padding: 4px 0; }
+  .profile-card-wrapper { min-width: 240px; }
 }
 
 /* Optimizare pentru ecrane mici (telefon) */
@@ -533,6 +492,10 @@
     padding: 10px 12px;
     font-size: 0.95rem;
   }
+
+  /* Elimină spațiul rezidual la final pe mobil */
+  .profile-page-container > *:last-child { margin-bottom: 0 !important; }
+  .profile-info-main-card { margin-bottom: 0 !important; }
 }
 
 /* Extra compact for very small phones */
@@ -550,6 +513,9 @@
   .profile-view-button { font-size: 0.82rem; gap: 6px; }
   .profile-avatar-main { width: 84px; height: 84px; }
   .profile-camera-button { width: 28px; height: 28px; }
+
+  /* Announcements compact on very small phones */
+  .profile-card-wrapper { min-width: 200px; }
 }
 
 @media (max-width: 360px) {
@@ -561,82 +527,53 @@
   .profile-camera-button { width: 26px; height: 26px; }
 }
 
-/* Dark Mode Styles pentru Profile Page */
-.dark-mode .profile-container {
+/* Dark Mode – override tokens for easy theming */
+body.dark-mode .profile-page-container {
+  --pf-primary: #f51866;
+  --pf-primary-hover: #fe6585;
+  --pf-text: #ffffff;
+  --pf-text-muted: #8b8b8b;
+  --pf-divider: #575757;
+  --pf-card-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+/* Preserve dark backgrounds and borders for cards (as before) */
+body.dark-mode .profile-page-container .profile-header-card,
+body.dark-mode .profile-page-container .profile-info-main-card {
   background: #282828;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
   border: 1px solid #3f3f3f;
 }
 
-.dark-mode .profile-avatar {
-  background: #3f3f3f;
+/* Avatar surface in dark mode */
+body.dark-mode .profile-page-container .profile-avatar-main {
+  background-color: #3f3f3f;
 }
 
-.dark-mode .profile-private {
-  background: #3f3f3f;
-  color: #fe6585;
-  border: 1px solid #fe6585;
-}
-
-.dark-mode .profile-title {
-  color: #ffffff;
-}
-
-.dark-mode .profile-view-link {
-  color: #fe6585;
-}
-
-.dark-mode .profile-info-card {
-  background: #3f3f3f;
-  border: 1px solid #575757;
-}
-
-.dark-mode .profile-info-header {
-  color: #ffffff;
-}
-
-.dark-mode .profile-edit-link {
-  color: #fe6585;
-  border-bottom-color: #fe6585;
-}
-
-.dark-mode .profile-info-label {
-  color: #8b8b8b;
-}
-
-.dark-mode .profile-info-value {
-  color: #ffffff;
-}
-
-.dark-mode .profile-input {
+/* Inputs in dark mode */
+body.dark-mode .profile-page-container .profile-field-input {
   background: #282828;
   border-color: #575757;
   color: #ffffff;
 }
-
-.dark-mode .profile-input:focus {
+body.dark-mode .profile-page-container .profile-field-input:hover,
+body.dark-mode .profile-page-container .profile-field-input:focus {
   border-color: #fe6585;
 }
-
-.dark-mode .profile-cancel-btn,
-.dark-mode .profile-save-btn {
-  background: #282828;
-  color: #fe6585;
-  border-color: #fe6585;
+body.dark-mode .profile-page-container .profile-field-input:focus {
+  box-shadow: 0 0 0 2px rgba(254, 101, 133, 0.2);
 }
 
-.dark-mode .profile-save-btn {
-  background: #f51866;
+/* Title color matched to old dark-mode */
+body.dark-mode .profile-page-container .profile-main-title {
   color: #ffffff;
-  border-color: #f51866;
 }
 
-.dark-mode .profile-cancel-btn:hover {
-  background: #3f3f3f;
+/* Dark hover states */
+body.dark-mode .profile-page-container .profile-edit-button:hover {
+  background-color: #3f3f3f;
 }
-
-.dark-mode .profile-save-btn:hover {
-  background: #fe6585;
+body.dark-mode .profile-page-container .profile-action-button.cancel:hover {
+  background-color: #3f3f3f;
 }
 
 /* Dark Mode pentru Material-UI styles */

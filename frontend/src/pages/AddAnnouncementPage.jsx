@@ -594,7 +594,16 @@ export default function AddAnnouncementPage() {
               maxWidth: isMobile ? undefined : 1000,
               minHeight: isMobile ? '50vh' : 600,
               maxHeight: isMobile ? '78vh' : 'calc(100vh - 100px)',
+              // Keep scroll on mobile, hide scrollbar on desktop
               overflowY: 'auto',
+              ...(isMobile ? {} : {
+                scrollbarWidth: 'none',          // Firefox
+                msOverflowStyle: 'none',          // IE/Edge
+                '&::-webkit-scrollbar': {         // WebKit
+                  width: 0,
+                  height: 0
+                }
+              }),
               borderRadius: isMobile ? 10 : 8,
               p: isMobile ? 0 : 0,
               zIndex: (theme) => theme.zIndex.modal + 1,

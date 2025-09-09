@@ -135,6 +135,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <TermsConditions />
+            <Footer />
           </>
         } />
         <Route path="/" element={

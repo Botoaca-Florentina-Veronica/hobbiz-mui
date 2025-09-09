@@ -1,5 +1,7 @@
 import React from 'react';
 import './LegalSection.css';
+import appStoreImg from '../assets/images/appStore.png';
+import googlePlayImg from '../assets/images/googlePlay.png';
 
 const LegalSection = () => (
   <div className="legal-section">
@@ -9,6 +11,14 @@ const LegalSection = () => (
         <span className="legal-section__brand">Hobbiz</span>
       </div>
       <p className="legal-section__desc">Descoperă, vinde și cumpără servicii sau produse de la pasionați ca tine.</p>
+      <div className="app-store-buttons">
+        <a href="#" className="app-store-button" aria-label="Download on the App Store">
+          <img src={appStoreImg} alt="Download on the App Store" />
+        </a>
+        <a href="#" className="app-store-button" aria-label="Get it on Google Play">
+          <img src={googlePlayImg} alt="Get it on Google Play" />
+        </a>
+      </div>
     </div>
     <div className="legal-section__column">
       <h4>Linkuri utile</h4>

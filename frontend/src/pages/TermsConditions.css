@@ -322,6 +322,11 @@ body.dark-mode .mobile-header-title {
   .terms-conditions__content p {
     text-align: left;
   }
+
+  /* Reserve space for fixed mobile footer so the last lines aren't hidden */
+  .terms-conditions {
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
+  }
 }
 
 /* Smooth animations */

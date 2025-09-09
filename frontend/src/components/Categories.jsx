@@ -56,7 +56,7 @@ export default function Categories() {
         >
           {categories.map((category, index) => (
             <Grid item xs={3} sm={4} md={3} lg={2} key={index}>
-              <Card
+        <Card
                 onClick={() => navigate(`/anunturi-categorie/${encodeURIComponent(category.description)}`)}
                 sx={{
                   cursor: 'pointer',
@@ -68,8 +68,9 @@ export default function Categories() {
                     transform: { sm: 'translateY(-6px)', md: 'translateY(-8px)' },
                     boxShadow: { sm: '0 6px 18px rgba(0,0,0,0.12)', md: '0 8px 25px rgba(0,0,0,0.15)' },
                   },
-                  background: `linear-gradient(135deg, ${category.color}20, ${category.color}10)`,
-                  border: `1px solid ${category.color}40`,
+          background: `linear-gradient(135deg, ${category.color}20, ${category.color}10)`,
+          // In dark mode (desktop), we add borders via CSS. Avoid overriding them here.
+          border: (theme) => theme.palette.mode === 'dark' ? '1px solid transparent' : `1px solid ${category.color}40`,
                 }}
               >
                 <Box sx={{ 

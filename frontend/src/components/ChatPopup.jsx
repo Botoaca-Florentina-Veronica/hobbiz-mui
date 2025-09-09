@@ -313,7 +313,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               onClick={e => setEmojiAnchor(e.currentTarget)}
               type="button"
             >
-              <InsertEmoticonIcon style={{ fontSize: 24 }} />
+              <InsertEmoticonIcon />
             </button>
             {emojiHover && (
               <div className="chat-popup-attach-tooltip">
@@ -331,12 +331,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               PaperProps={{
                 className: 'chat-popup-emoji-popover',
               }}
-              sx={{
-                zIndex: 99999,
-                '& .MuiPaper-root': {
-                  zIndex: 99999,
-                }
-              }}
+              sx={{ '& .MuiPaper-root': { zIndex: 99999 } }}
             >
               {emojiList.map(emoji => (
                 <button
@@ -350,7 +345,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               ))}
             </Popover>
           </div>
-          <form onSubmit={handleSend} style={{display: 'flex', flex: 1, alignItems: 'center'}}>
+          <form onSubmit={handleSend} className="chat-popup-form">
             <input
               className="chat-popup-input"
               placeholder={sending ? "Se trimite..." : "Scrie mesajul tău..."}
