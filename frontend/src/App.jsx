@@ -32,6 +32,7 @@ import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import './App.css';
 import './mediaQueries.css';
+import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -52,7 +53,7 @@ function App() {
   };
 
   return (
-    <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
+  <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
       <Routes>
         {/* Rute de autentificare - fără Header/Footer */}
         <Route path="/login" element={<LoginPage />} />
@@ -210,6 +211,7 @@ function App() {
           </>
         } />
       </Routes>
+  <SyncFavoritesModal />
     </div>
   );
 }

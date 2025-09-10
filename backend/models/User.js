@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String },
   createdAt: { type: Date, default: Date.now },
   localitate: { type: String }, // Adăugat câmpul localitate
-  lastSeen: { type: Date, default: Date.now } // Adăugat câmpul pentru ultima activitate
+  lastSeen: { type: Date, default: Date.now }, // Adăugat câmpul pentru ultima activitate
+  // Persistență pentru anunțurile favorite ale utilizatorului (cross-device)
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Announcement' }]
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

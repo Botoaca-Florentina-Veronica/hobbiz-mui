@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
@@ -15,6 +15,16 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  // File attachment state
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
+  // Resize (desktop) state
+  const [boxWidth, setBoxWidth] = useState(440);
+  const [boxHeight, setBoxHeight] = useState(450);
+  const [isResizable, setIsResizable] = useState(false);
+  const resizingRef = useRef(false);
+  const resizeDirRef = useRef(null);
+  const startSizeRef = useRef({ w: 440, h: 450, x: 0, y: 0 });
   
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
   const messagesEndRef = useRef(null);
@@ -96,6 +106,79 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  // Enable/disable resizable mode based on viewport width
+  useEffect(() => {
+    const check = () => {
+      const enable = window.innerWidth >= 1200;
+      setIsResizable(enable);
+      if (enable) {
+        // Ensure box fits viewport height
+        const maxH = Math.min(window.innerHeight * 0.85, 800);
+        setBoxHeight(h => Math.min(h, maxH));
+        const maxW = Math.min(720, window.innerWidth - 64); // leave margins
+        setBoxWidth(w => Math.min(w, maxW));
+      }
+    };
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const startResize = useCallback((e, dir) => {
+    if (!isResizable) return;
+    e.preventDefault();
+    e.stopPropagation();
+    resizingRef.current = true;
+    resizeDirRef.current = dir;
+    startSizeRef.current = {
+      w: boxWidth,
+      h: boxHeight,
+      x: e.clientX,
+      y: e.clientY
+    };
+    document.body.classList.add('chat-resizing');
+  }, [isResizable, boxWidth, boxHeight]);
+
+  const doResize = useCallback((e) => {
+    if (!resizingRef.current) return;
+    const { w, h, x, y } = startSizeRef.current;
+    const dx = e.clientX - x;
+    const dy = e.clientY - y;
+    let newW = w;
+    let newH = h;
+    const dir = resizeDirRef.current;
+    // Anchored to bottom-right (overlay right/bottom). Adjust width/height only.
+    if (dir.includes('right')) newW = w + dx;
+    if (dir.includes('left')) newW = w - dx; // dragging left edge (dx negative when moving left => grow)
+    if (dir.includes('bottom')) newH = h + dy;
+    if (dir.includes('top')) newH = h - dy;
+    // Constraints
+    const maxW = Math.min(900, window.innerWidth - 64);
+    const maxH = Math.min(window.innerHeight - 80, 900);
+    newW = Math.max(320, Math.min(newW, maxW));
+    newH = Math.max(360, Math.min(newH, maxH));
+    setBoxWidth(newW);
+    setBoxHeight(newH);
+  }, []);
+
+  const stopResize = useCallback(() => {
+    if (!resizingRef.current) return;
+    resizingRef.current = false;
+    resizeDirRef.current = null;
+    document.body.classList.remove('chat-resizing');
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('pointermove', doResize);
+    window.addEventListener('pointerup', stopResize);
+    window.addEventListener('pointercancel', stopResize);
+    return () => {
+      window.removeEventListener('pointermove', doResize);
+      window.removeEventListener('pointerup', stopResize);
+      window.removeEventListener('pointercancel', stopResize);
+    };
+  }, [doResize, stopResize]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -189,12 +272,79 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     setEmojiAnchor(null);
   };
 
+  // Handle file selection
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Fișierul este prea mare. Mărimea maximă permisă este 10MB.');
+        return;
+      }
+      
+      // Check file type (images, documents, etc.)
+      const allowedTypes = [
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+        'application/pdf', 'text/plain', 'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      
+      if (!allowedTypes.includes(file.type)) {
+        alert('Tipul de fișier nu este suportat. Poți încărca imagini, PDF-uri sau documente Word.');
+        return;
+      }
+      
+      setSelectedFile(file);
+      console.log('📎 Fișier selectat:', file.name, file.size, 'bytes');
+    }
+  };
+
+  // Handle file attachment click
+  const handleAttachClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Send file message (placeholder - extend as needed for your backend)
+  const handleSendFile = async () => {
+    if (!selectedFile || !conversationId) return;
+    
+    console.log('📤 Trimitere fișier:', selectedFile.name);
+    // Here you would typically upload to your backend
+    // For now, just simulate by adding a text message
+    const fileMessage = `📎 Fișier: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)}KB)`;
+    setInput(fileMessage);
+    setSelectedFile(null);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Verifică dacă componenta poate fi afișată
   if (!open || !conversationId) return null;
 
   return (
     <div className="chat-popup-overlay">
-      <div className="chat-popup-box">
+      <div
+        className={"chat-popup-box" + (isResizable ? " resizable" : "")}
+        style={isResizable ? { width: boxWidth + 'px', height: boxHeight + 'px' } : undefined}
+      >
+        {isResizable && (
+          <>
+            {/* Corners */}
+            <div className="chat-resize-handle corner tl" onPointerDown={(e)=>startResize(e,'top-left')} />
+            <div className="chat-resize-handle corner tr" onPointerDown={(e)=>startResize(e,'top-right')} />
+            <div className="chat-resize-handle corner bl" onPointerDown={(e)=>startResize(e,'bottom-left')} />
+            <div className="chat-resize-handle corner br" onPointerDown={(e)=>startResize(e,'bottom-right')} />
+            {/* Edges */}
+            <div className="chat-resize-handle edge top" onPointerDown={(e)=>startResize(e,'top')} />
+            <div className="chat-resize-handle edge right" onPointerDown={(e)=>startResize(e,'right')} />
+            <div className="chat-resize-handle edge bottom" onPointerDown={(e)=>startResize(e,'bottom')} />
+            <div className="chat-resize-handle edge left" onPointerDown={(e)=>startResize(e,'left')} />
+          </>
+        )}
         <div className="chat-popup-header">
           <div className="chat-popup-user">
             <div className="chat-popup-avatar">
@@ -288,11 +438,21 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
           <div ref={messagesEndRef} />
         </div>
         <div className="chat-popup-input-row">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+            accept="image/*,.pdf,.doc,.docx,.txt"
+          />
+          
           <div className="chat-popup-attach-wrapper">
             <button
               className="chat-popup-icon-btn chat-popup-attach-btn"
               onMouseEnter={() => setAttachHover(true)}
               onMouseLeave={() => setAttachHover(false)}
+              onClick={handleAttachClick}
               type="button"
             >
               {/* Paperclip icon */}
@@ -330,8 +490,10 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
               PaperProps={{
                 className: 'chat-popup-emoji-popover',
+                style: { zIndex: 99999 }
               }}
-              sx={{ '& .MuiPaper-root': { zIndex: 99999 } }}
+              sx={{ zIndex: 99999 }}
+              style={{ zIndex: 99999 }}
             >
               {emojiList.map(emoji => (
                 <button
@@ -346,9 +508,31 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
             </Popover>
           </div>
           <form onSubmit={handleSend} className="chat-popup-form">
+            {selectedFile && (
+              <div className="chat-popup-file-preview">
+                <span className="chat-popup-file-name">📎 {selectedFile.name}</span>
+                <button
+                  type="button"
+                  className="chat-popup-file-remove"
+                  onClick={() => {
+                    setSelectedFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }}
+                >
+                  ✕
+                </button>
+                <button
+                  type="button"
+                  className="chat-popup-file-send"
+                  onClick={handleSendFile}
+                >
+                  Trimite
+                </button>
+              </div>
+            )}
             <input
               className="chat-popup-input"
-              placeholder={sending ? "Se trimite..." : "Scrie mesajul tău..."}
+              placeholder={sending ? "Se trimite..." : selectedFile ? "Sau scrie un mesaj..." : "Scrie mesajul tău..."}
               value={input}
               onChange={e => setInput(e.target.value)}
               disabled={sending}

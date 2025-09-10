@@ -5,6 +5,7 @@ import logoDark from '../assets/images/logo-dark-mode.png';
 import puzzleLogo from '../assets/images/puzzle.png';
 import puzzle2 from '../assets/images/puzzle2.png';
 import { useEffect, useState } from "react";
+import { useAuth } from '../context/AuthContext.jsx';
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
 import apiClient from '../api/api';
@@ -23,6 +24,7 @@ export default function Header() {
   const [unreadCount, setUnreadCount] = useState(0); // Număr notificări necitite
   const [chatUnreadCount, setChatUnreadCount] = useState(0); // Număr mesaje chat necitite
   const [favoriteCount, setFavoriteCount] = useState(0); // Număr anunțuri favorite
+  const auth = useAuth();
 
   // Funcție pentru a obține numărul de notificări necitite
   const fetchUnreadCount = async () => {
@@ -155,24 +157,23 @@ export default function Header() {
 
   // Funcție pentru a actualiza numărul de favorite din localStorage
   const updateFavoriteCount = () => {
+    // Dacă avem context și user autentificat, folosim lista din context
+    if (auth?.user) {
+      setFavoriteCount(auth.favorites?.length || 0);
+      return;
+    }
+    // Guest fallback (localStorage legacy)
     try {
-      const userId = localStorage.getItem('userId');
-      const key = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+      const key = 'favoriteAnnouncements_guest';
       const raw = localStorage.getItem(key);
       if (!raw) { setFavoriteCount(0); return; }
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        if (parsed.length > 0 && typeof parsed[0] === 'string') {
-          setFavoriteCount(parsed.length);
-        } else {
-          setFavoriteCount(parsed.length);
-        }
+        setFavoriteCount(parsed.length);
       } else {
         setFavoriteCount(0);
       }
-    } catch {
-      setFavoriteCount(0);
-    }
+    } catch { setFavoriteCount(0); }
   };
 
   // Ascultă modificările favorite (eveniment custom + storage cross-tab)
@@ -189,7 +190,7 @@ export default function Header() {
         window.removeEventListener('storage', handler);
       }
     };
-  }, []);
+  }, [auth?.favorites, auth?.user]);
 
   // Ascultă evenimentul global emis din ChatPage pentru a actualiza instant badge-ul
   useEffect(() => {

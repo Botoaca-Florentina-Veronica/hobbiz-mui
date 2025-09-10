@@ -6,14 +6,25 @@
   color: #fff;
   padding: 2.5rem 2rem 1.5rem 2rem;
   border-radius: 12px 12px 0 0;
-  /* Eliminăm margin-bottom pentru a lipi de footer */
   margin-bottom: 0;
-  gap: 2rem;
+  gap: 1rem; /* Reduced gap for more compact layout */
 }
 .legal-section__column {
   flex: 1 1 180px;
   min-width: 180px;
   margin-bottom: 1rem;
+}
+
+/* Give the first column (with logo and app buttons) more space */
+.legal-section__column:first-child {
+  flex: 1.5 1 280px; /* Grow more, have a larger base width */
+  min-width: 280px;
+}
+/* Shift the second column (Linkuri utile) slightly right on wide screens */
+@media (min-width: 901px) {
+  .legal-section__column:nth-child(2) {
+    margin-left: 1.5rem; /* adjust spacing to move it right */
+  }
 }
 .legal-section__logo {
   display: flex;
@@ -126,18 +137,20 @@
 /* App Store Buttons */
 .app-store-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  flex-direction: row; /* Changed from column to row */
+  gap: 0.5rem; /* Reduced gap for tighter spacing */
+  margin-top: 1rem; /* Reduced top margin */
+  align-items: center; /* Vertically align buttons */
 }
 
 .app-store-button {
   display: inline-block;
   transition: transform 0.25s ease, filter 0.25s ease;
   border-radius: 12px;
-  /* overflow hidden scotea tooltip-ul; îl facem vizibil în afara butonului */
   overflow: visible;
   position: relative;
+  /* Ensure precise hover detection only on the image */
+  width: fit-content;
 }
 
 .app-store-button:hover {
@@ -147,7 +160,7 @@
 
 /* Overlay text on hover */
 .app-store-button::after {
-  content: 'Coming Soon';
+  content: 'COMING SOON';
   position: absolute;
   left: 50%;
   bottom: 100%;
@@ -206,6 +219,8 @@
   height: auto;
   display: block;
   border-radius: 12px;
+  /* Make image the exact hover target */
+  pointer-events: all;
 }
 
 @media (max-width: 900px) {

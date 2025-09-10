@@ -25,6 +25,7 @@ const session = require('express-session'); // Import express-session
 const passport = require('passport'); // Import passport
 const mitmRoutes = require('./routes/mitmRoutes'); // Importă rutele pentru mitm
 const announcementRoutes = require('./routes/announcementRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
 const { execFile } = require('child_process');
 const Alert = require('./models/Alert');
 const path = require('path');
@@ -203,6 +204,7 @@ app.use('/auth', authRoutes); // Adaugă rutele de autentificare
 app.use('/api/mitm', mitmRoutes); // Adaugă rutele pentru mitm
 
 app.use('/api/announcements', announcementRoutes); // Rute pentru anunturi publice
+app.use('/api/favorites', favoriteRoutes); // Rute pentru favorite persistente
 app.use('/api/messages', messageRoutes); // Rute pentru mesaje chat
 
 // Servire imagini uploadate din frontend/public/uploads

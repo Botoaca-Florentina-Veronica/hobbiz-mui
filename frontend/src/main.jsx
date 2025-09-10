@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom"; // Adaugă această linie
 import axios from 'axios';
 import App from "./App";
+import { AuthProvider } from './context/AuthContext.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import "./index.css";
 
@@ -22,8 +23,10 @@ axios.interceptors.request.use((config) => {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter> {/* Înfășoară aplicația aici */}
-      <App />
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

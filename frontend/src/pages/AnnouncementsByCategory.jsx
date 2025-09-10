@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+// TODO: Refactor favorites logic to use AuthContext (persisted) similar to AnnouncementDetails.
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useParams } from 'react-router-dom';

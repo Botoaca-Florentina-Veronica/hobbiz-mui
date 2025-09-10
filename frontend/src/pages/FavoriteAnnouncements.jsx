@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+// TODO: Migrare către AuthContext (favorites persistente). Pagină păstrată temporar pentru compatibilitate.
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

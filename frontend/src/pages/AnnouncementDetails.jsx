@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useAuth } from '../context/AuthContext.jsx';
 import ImageZoomModal from '../components/ImageZoomModal';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -44,10 +45,9 @@ export default function AnnouncementDetails() {
   const [announcement, setAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Favorite logic
-  const userId = localStorage.getItem('userId');
-  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
-  const [isFavorite, setIsFavorite] = useState(false);
+  // Favorite logic (migrated to AuthContext). Fallback to localStorage for guest.
+  const { favorites, toggleFavorite, user } = useAuth() || {};
+  const [isFavorite, setIsFavorite] = useState(false); // local UI state
   
   // Carousel logic
   const [imgIndex, setImgIndex] = useState(0);
@@ -76,6 +76,7 @@ export default function AnnouncementDetails() {
     enterDelay: 200,
     enterTouchDelay: 100,
     leaveTouchDelay: 3000,
+    disableInteractive: true, // Prevents tooltip from interfering with positioning
     componentsProps: {
       tooltip: {
         sx: {
@@ -83,12 +84,20 @@ export default function AnnouncementDetails() {
           color: '#ffffff',
           border: `1px solid ${getIsDarkMode() ? '#3f3f3f' : '#4a6b8a'}`,
           fontSize: '0.8rem',
-          boxShadow: 'none'
+          boxShadow: 'none',
+          position: 'relative' // Ensure proper positioning
         }
       },
       arrow: {
         sx: {
           color: getIsDarkMode() ? '#282828' : '#355070'
+        }
+      },
+      popper: {
+        sx: {
+          '& .MuiTooltip-tooltip': {
+            margin: '0px !important' // Remove default margins that might offset positioning
+          }
         }
       }
     }
@@ -120,50 +129,53 @@ export default function AnnouncementDetails() {
     fetchAnnouncement();
   }, [id]);
 
+  // Sync local isFavorite with context when data changes
   useEffect(() => {
     if (!announcement?._id) return;
-    const raw = localStorage.getItem(FAVORITES_KEY);
-    let isFav = false;
-    try {
-      const parsed = JSON.parse(raw || '[]');
-      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
-        // Format vechi: ["id1","id2",...]
-        isFav = parsed.includes(announcement._id);
-      } else if (Array.isArray(parsed)) {
-        // Format nou: [{id, addedAt}]
-        isFav = parsed.some(item => item.id === announcement._id);
-      }
-    } catch {
-      isFav = false;
+    if (user) {
+      setIsFavorite(favorites?.includes(announcement._id));
+    } else {
+      // guest fallback: still read localStorage legacy key
+      const userId = localStorage.getItem('userId');
+      const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      let isFav = false;
+      try {
+        const parsed = JSON.parse(raw || '[]');
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+          isFav = parsed.includes(announcement._id);
+        } else if (Array.isArray(parsed)) {
+          isFav = parsed.some(item => item.id === announcement._id);
+        }
+      } catch { /* ignore */ }
+      setIsFavorite(isFav);
     }
-    setIsFavorite(isFav);
-  }, [announcement, FAVORITES_KEY]);
+  }, [announcement?._id, favorites, user]);
 
   const handleToggleFavorite = () => {
-    const raw = localStorage.getItem(FAVORITES_KEY);
-    let list = [];
-    try {
-      const parsed = JSON.parse(raw || '[]');
-      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
-        // Convert format vechi la obiecte
-        list = parsed.map(id => ({ id, addedAt: Date.now() }));
-      } else if (Array.isArray(parsed)) {
-        list = parsed;
-      }
-    } catch {
-      list = [];
-    }
-
-    const exists = list.some(item => item.id === announcement._id);
-    let updatedObjects;
-    if (exists) {
-      updatedObjects = list.filter(item => item.id !== announcement._id);
+    if (!announcement?._id) return;
+    if (user) {
+      toggleFavorite?.(announcement._id);
+      setIsFavorite(prev => !prev);
     } else {
-      updatedObjects = [...list, { id: announcement._id, addedAt: Date.now() }];
+      // guest localStorage handling unchanged for now
+      const userId = localStorage.getItem('userId');
+      const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      let list = [];
+      try {
+        const parsed = JSON.parse(raw || '[]');
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+          list = parsed.map(id => ({ id, addedAt: Date.now() }));
+        } else if (Array.isArray(parsed)) {
+          list = parsed;
+        }
+      } catch { list = []; }
+      const exists = list.some(item => item.id === announcement._id);
+      const updated = exists ? list.filter(i => i.id !== announcement._id) : [...list, { id: announcement._id, addedAt: Date.now() }];
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+      setIsFavorite(!exists);
     }
-
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
-    setIsFavorite(!exists);
   };
 
   const handleShare = async () => {
@@ -433,7 +445,12 @@ export default function AnnouncementDetails() {
                   </Box>
                   
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Tooltip {...getTooltipProps()} title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}>
+                    <Tooltip 
+                      {...getTooltipProps()} 
+                      title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
+                      placement="top"
+                      arrow
+                    >
                       <IconButton
                         onClick={handleToggleFavorite}
                         sx={{
@@ -450,7 +467,12 @@ export default function AnnouncementDetails() {
                         {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                       </IconButton>
                     </Tooltip>
-                    <Tooltip {...getTooltipProps()} title="Partajează">
+                    <Tooltip 
+                      {...getTooltipProps()} 
+                      title="Partajează"
+                      placement="top"
+                      arrow
+                    >
                       <IconButton
                         onClick={handleShare}
                         sx={{

@@ -167,20 +167,49 @@
 }
 
 .chat-popup-box {
-  width: 440px;
-  height: 450px;
+  /* Fluid sizing: keep desktop size but adapt to small screens */
+  width: min(440px, 100vw - 24px);
+  height: clamp(420px, 70vh, 640px);
+  /* Use dynamic viewport height where supported to avoid keyboard/address bar overlap */
+  height: clamp(420px, 70dvh, 640px);
   background: var(--cp-elev-bg);
   border-radius: 16px;
   box-shadow: var(--cp-shadow);
-  overflow: visible;
+  overflow: visible; /* allow tooltips / emoji popover to extend outside */
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 420px;
-  max-height: 80vh;
-  /* Make all corners rounded */
+  max-height: 100vh;
   border-radius: 16px !important;
+  box-sizing: border-box;
 }
+
+/* Desktop resizable mode */
+@media (min-width: 1200px) {
+  .chat-popup-box.resizable { transition: none; }
+  .chat-popup-box.resizable .chat-resize-handle { display: block; }
+}
+
+/* Base hidden handles */
+.chat-resize-handle { position: absolute; z-index: 10000; display: none; }
+
+/* Edges */
+.chat-resize-handle.edge.top { top: -3px; left: 0; right: 0; height: 6px; cursor: ns-resize; }
+.chat-resize-handle.edge.bottom { bottom: -3px; left: 0; right: 0; height: 10px; cursor: ns-resize; }
+.chat-resize-handle.edge.left { left: -3px; top: 0; bottom: 0; width: 6px; cursor: ew-resize; }
+.chat-resize-handle.edge.right { right: -3px; top: 0; bottom: 0; width: 6px; cursor: ew-resize; }
+
+/* Corners */
+.chat-resize-handle.corner { width: 14px; height: 14px; }
+.chat-resize-handle.corner.tl { top: -4px; left: -4px; cursor: nwse-resize; }
+.chat-resize-handle.corner.tr { top: -4px; right: -4px; cursor: nesw-resize; }
+.chat-resize-handle.corner.bl { bottom: -4px; left: -4px; cursor: nesw-resize; }
+.chat-resize-handle.corner.br { bottom: -4px; right: -4px; cursor: nwse-resize; }
+
+/* Visual subtle hit-area (invisible but we could add outline on hover if needed) */
+.chat-resize-handle::after { content: ""; position: absolute; inset: 0; }
+
+body.chat-resizing { cursor: nwse-resize; user-select: none; }
 
 .chat-popup-header {
   /* Remove border-radius override if present */
@@ -294,7 +323,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 18px 14px 18px;
+  padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0)) 18px; /* safe-area for iOS */
   border-top: 1px solid var(--cp-border);
   background: var(--cp-elev-bg);
   border-radius: 0 0 16px 16px;
@@ -308,6 +337,7 @@
   padding: 10px 14px;
   font-size: 16px;
   color: var(--cp-text);
+  min-width: 0; /* allow shrinking on narrow screens */
   outline: none;
 }
 
@@ -328,9 +358,9 @@
 }
 
 .chat-popup-emoji-popover {
-  /* Poziționare exact deasupra butonului de emoji */
+  /* Poziționare mai aproape de butonul de emoji */
   position: absolute;
-  bottom: 44px; /* ajustează dacă e nevoie */
+  bottom: 36px; /* mai aproape de buton */
   left: 50%;
   transform: translateX(-50%);
   border-radius: 12px !important;
@@ -340,12 +370,69 @@
   gap: 6px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.13) !important;
   min-width: 220px;
-  background: var(--cp-bg-soft) !important;
+  background: #ffffff !important; /* solid white requested */
   z-index: 99999 !important; /* keep explicit to override MUI */
   max-width: 320px;
   max-height: 208px !important;
   overflow-y: auto !important;
   justify-content: flex-start;
+  /* Ensure all corners are uniformly rounded */
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+/* File preview styles */
+.chat-popup-file-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--cp-bg-soft);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--cp-border);
+  font-size: 14px;
+}
+
+.chat-popup-file-name {
+  flex: 1;
+  color: var(--cp-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.chat-popup-file-remove {
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.chat-popup-file-remove:hover {
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.chat-popup-file-send {
+  background: var(--cp-primary);
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-popup-file-send:hover {
+  background: var(--cp-primary-hover);
 }
 
 .chat-popup-emoji-option {
@@ -365,17 +452,64 @@
   background: #e0e0e0;
 }
 
+/* Tablet & small landscape */
+@media (max-width: 900px) {
+  .chat-popup-box { width: min(440px, 100vw - 12px); }
+}
+
+/* Phones: full screen for best fit */
 @media (max-width: 600px) {
   .chat-popup-overlay {
-    right: 0;
-    bottom: 0;
+    right: 0; left: 0; bottom: 0;
+    display: flex; justify-content: center;
   }
   .chat-popup-box {
-    width: 100vw;
-    min-width: 0;
+  width: 100vw; height: 100dvh; max-height: 100dvh; min-height: 100dvh; /* dynamic viewport for mobile browsers */
     border-radius: 0;
-    max-height: 100vh;
   }
+  .chat-popup-messages { padding: 14px 18px; }
+}
+
+/* Very narrow devices (<=400px) e.g., 360px width */
+@media (max-width: 400px) {
+  .chat-popup-header, .chat-popup-announcement, .chat-popup-messages, .chat-popup-input-row { padding-left: 16px; padding-right: 16px; }
+  .chat-popup-announcement { gap: 12px; }
+  .chat-popup-announcement-img { width: 56px; height: 44px; }
+  .chat-popup-username { font-size: 18px; }
+  .chat-popup-announcement-title { font-size: 16px; }
+  .chat-popup-input-row { gap: 6px; padding-left: 12px; padding-right: 12px; }
+  .chat-popup-icon-btn { padding: 0 2px; }
+  .chat-popup-icon-btn svg, .chat-popup-icon-btn .MuiSvgIcon-root { width: 22px; height: 22px; font-size: 22px; }
+  .chat-popup-input { font-size: 15px; padding: 9px 12px; }
+}
+
+/* Extra small phones (<=360px) */
+@media (max-width: 360px) {
+  .chat-popup-box { width: 100vw; }
+  .chat-popup-header, .chat-popup-announcement, .chat-popup-messages, .chat-popup-input-row { padding-left: 12px; padding-right: 12px; }
+  .chat-popup-header { padding-top: 14px; padding-bottom: 6px; }
+  .chat-popup-avatar { width: 40px; height: 40px; }
+  .chat-popup-username { font-size: 16px; }
+  .chat-popup-announcement { gap: 10px; padding-top: 10px; padding-bottom: 8px; }
+  .chat-popup-announcement-img { width: 50px; height: 40px; }
+  .chat-popup-announcement-title { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .chat-popup-announcement-price { font-size: 14px; }
+  .chat-popup-announcement-id { font-size: 12px; }
+  .chat-popup-input-row { gap: 4px; padding: 10px 10px calc(10px + env(safe-area-inset-bottom,0)) 10px; }
+  .chat-popup-icon-btn { padding: 0 1px; }
+  .chat-popup-icon-btn svg, .chat-popup-icon-btn .MuiSvgIcon-root { width: 20px; height: 20px; font-size: 20px; }
+  .chat-popup-input { padding: 8px 10px; font-size: 14px; }
+  /* Make send button a fixed small square */
+  .chat-popup-send-btn { flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
+}
+
+/* Ultra narrow (<=340px) Hide less critical icons to free space */
+@media (max-width: 340px) {
+  /* Hide attachment first to keep emoji available */
+  .chat-popup-attach-wrapper:first-of-type { display: none; }
+  .chat-popup-username { max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* If still cramped, allow header elements to wrap */
+  .chat-popup-header { flex-wrap: wrap; row-gap: 4px; }
 }
 
 /* Animație pentru loading spinner */
@@ -557,7 +691,7 @@
 }
 
 .dark-mode .chat-popup-emoji-popover {
-  background: var(--dm-bg-elev) !important;
+  background: var(--dm-bg-elev) !important; /* override the white background in dark mode */
   box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
   border: 1px solid var(--dm-border) !important;
 }
@@ -568,4 +702,22 @@
 
 .dark-mode .chat-popup-emoji-option:hover {
   background: rgba(245, 24, 102, 0.18);
+}
+
+/* Dark mode file preview */
+.dark-mode .chat-popup-file-preview {
+  background: var(--dm-bg-soft);
+  border-color: var(--dm-border);
+}
+
+.dark-mode .chat-popup-file-name {
+  color: var(--dm-text);
+}
+
+.dark-mode .chat-popup-file-send {
+  background: var(--dm-pink);
+}
+
+.dark-mode .chat-popup-file-send:hover {
+  background: var(--dm-pink-soft);
 }
