@@ -76,6 +76,42 @@ body {
   font-family: Roboto, 'Open sans', 'Helvetica Neue', sans-serif;
 }
 
+/* ===== Mobile / Touch Improvements ===== */
+/* Elimină highlight-ul albastru implicit pe mobile WebKit */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Elimină contururile inestetice la tap, dar păstrează accesibilitatea pentru tastatură */
+*:focus {
+  outline: none;
+}
+/* Reintroducem un focus vizibil doar când navighează tastatura (Tab) */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Pentru elementele interactive, dezactivează dublu-tap zoom și activează fluiditate la apăsare */
+button, a, [role="button"], input, textarea, select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* Elimină glow / ring MUI default la apăsare pe mobile (dacă apare) */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Optional: mică animație la apăsare pentru feedback tactil */
+button:active, a:active, .category-card:active, .favorite-announcement-card:active, .my-announcement-card:active {
+  transform: scale(0.97);
+  transition: transform 80ms ease;
+}
+
 /* Mobile: avoid sub-pixel rounding and horizontal overflow */
 @media (max-width: 600px) {
   html { zoom: 100%; }

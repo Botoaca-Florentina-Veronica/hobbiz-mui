@@ -273,6 +273,17 @@ const addAnnouncement = async (req, res) => {
       images
     });
     await announcement.save();
+
+    // Emit realtime event doar utilizatorului (lista lui) – în viitor se poate extinde
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(userId));
+        if (sid) io.to(sid).emit('announcementCreated', { id: announcement._id });
+      }
+    } catch (_) {}
+
     res.status(201).json({ message: 'Anunț adăugat cu succes!' });
   } catch (error) {
     console.error('Eroare la adăugare anunț:', error);
@@ -316,6 +327,16 @@ const deleteAnnouncement = async (req, res) => {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit sau nu îți aparține.' });
     }
     await Announcement.deleteOne({ _id: announcementId });
+    // Emit realtime
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(userId));
+        if (sid) io.to(sid).emit('announcementDeleted', { id: announcementId });
+      }
+    } catch (_) {}
+
     res.json({ message: 'Anunț șters cu succes!' });
   } catch (error) {
     console.error('Eroare la ștergerea anunțului:', error);
@@ -347,6 +368,15 @@ const updateAnnouncement = async (req, res) => {
     }
     // Dacă nu există fișiere noi, păstrează imaginile vechi
     await announcement.save();
+    // Emit realtime update (could be treated similar to created for list refresh)
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(userId));
+        if (sid) io.to(sid).emit('announcementCreated', { id: announcement._id, updated: true });
+      }
+    } catch (_) {}
     res.json({ message: 'Anunț actualizat cu succes!' });
   } catch (error) {
     console.error('Eroare la actualizare anunț:', error);

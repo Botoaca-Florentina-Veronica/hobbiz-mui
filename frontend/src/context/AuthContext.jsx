@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import apiClient, { getProfile } from '../api/api';
+import useSocket from '../hooks/useSocket';
 
 /*
   AuthContext furnizează:
@@ -19,8 +20,17 @@ export const AuthProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]); // doar ID-uri
   const [fullFavorites, setFullFavorites] = useState([]); // obiecte populate
   const [loading, setLoading] = useState(true);
+  const lastHydrateRef = useRef(0);
 
-  const hydrate = useCallback(async () => {
+  // Obține userId curent pentru socket după ce user este setat
+  const userId = user?._id;
+  const { on, off } = useSocket(userId || null);
+
+  const hydrate = useCallback(async (opts = {}) => {
+    const now = Date.now();
+    // Throttling: dacă apelurile sunt prea dese (<3s) și nu e forced
+    if (!opts.force && now - lastHydrateRef.current < 3000) return;
+    lastHydrateRef.current = now;
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) {
       setUser(null);
@@ -52,9 +62,66 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Hydrate inițial
   useEffect(() => {
-    hydrate();
+    hydrate({ force: true });
   }, [hydrate]);
+
+  // Re-hydrate pe visibility change / focus / online
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') hydrate();
+    };
+    const handleFocus = () => hydrate();
+    const handleOnline = () => hydrate();
+    window.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [hydrate]);
+
+  // Interval refresh (stale-while-revalidate) la 60s dacă tab activ
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (document.visibilityState === 'visible') hydrate();
+    }, 60000);
+    return () => clearInterval(id);
+  }, [hydrate]);
+
+  // Socket: ascultă evenimente realtime pentru sync
+  useEffect(() => {
+    if (!userId) return; // așteaptă user autentificat
+
+    const handleFavoritesUpdated = (payload) => {
+      // payload: { favoriteIds? } - dacă nu există, facem hydrate complet
+      if (payload?.favoriteIds) {
+        setFavorites(payload.favoriteIds);
+        window.dispatchEvent(new Event('favorites:updated'));
+      } else {
+        hydrate();
+      }
+    };
+    const handleAnnouncementCreated = () => {
+      // Re-hydrate parțial (doar user announcements în paginile care cer) => aici mai simplu full hydrate
+      hydrate();
+    };
+    const handleAnnouncementDeleted = () => {
+      hydrate();
+    };
+
+    on('favoritesUpdated', handleFavoritesUpdated);
+    on('announcementCreated', handleAnnouncementCreated);
+    on('announcementDeleted', handleAnnouncementDeleted);
+    return () => {
+      off('favoritesUpdated', handleFavoritesUpdated);
+      off('announcementCreated', handleAnnouncementCreated);
+      off('announcementDeleted', handleAnnouncementDeleted);
+    };
+  }, [userId, on, off, hydrate]);
 
   // Toggle favorite (optimistic)
   const toggleFavorite = async (announcementId) => {
@@ -82,7 +149,7 @@ export const AuthProvider = ({ children }) => {
     favorites,
     fullFavorites,
     loading,
-    refreshUser: hydrate,
+  refreshUser: (opts) => hydrate({ force: !!opts?.force }),
     toggleFavorite
   };
 

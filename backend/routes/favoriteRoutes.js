@@ -36,6 +36,16 @@ router.post('/:announcementId', auth, async (req, res) => {
 
     await Promise.all([user.save(), ann.save()]);
 
+    // Emit realtime update doar către utilizatorul curent
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(req.userId));
+        if (sid) io.to(sid).emit('favoritesUpdated', { favoriteIds: user.favorites });
+      }
+    } catch (_) {}
+
     res.status(201).json({
       message: 'Adăugat la favorite',
       favoriteIds: user.favorites,
@@ -65,6 +75,16 @@ router.delete('/:announcementId', auth, async (req, res) => {
     }
 
     await user.save();
+
+    // Emit realtime update doar către utilizatorul curent
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(req.userId));
+        if (sid) io.to(sid).emit('favoritesUpdated', { favoriteIds: user.favorites });
+      }
+    } catch (_) {}
 
     res.json({
       message: removed ? 'Eliminat din favorite' : 'Nu era în favorite',
