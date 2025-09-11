@@ -17,6 +17,7 @@ import OAuthSuccess from './pages/OAuthSuccess';
 import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
+import PublicProfile from './pages/PublicProfile';
 import MyAnnouncements from './pages/MyAnnouncements';
 import ChatPage from './pages/ChatPage';
 
@@ -191,6 +192,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <ProfilePage />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/profil/:userId" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <PublicProfile />
             <Footer hideOnMobile />
           </>
         } />

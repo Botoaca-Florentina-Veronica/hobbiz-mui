@@ -292,6 +292,19 @@ const getMyAnnouncements = async (req, res) => {
   }
 };
 
+// Returnează anunțurile publice pentru un utilizator specific (vizualizare publică)
+const getUserAnnouncementsPublic = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) return res.status(400).json({ error: 'Lipsește userId' });
+    const announcements = await Announcement.find({ user: userId }).sort({ createdAt: -1 });
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la listare anunțuri publice:', error);
+    res.status(500).json({ error: 'Eroare server la listare anunțuri publice' });
+  }
+};
+
 // Șterge un anunț după id
 const deleteAnnouncement = async (req, res) => {
   try {
@@ -371,6 +384,7 @@ module.exports = {
   updatePassword,
   addAnnouncement,
   getMyAnnouncements,
+  getUserAnnouncementsPublic,
   deleteAnnouncement,
   updateAnnouncement,
   updateProfile,

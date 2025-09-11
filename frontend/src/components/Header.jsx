@@ -23,7 +23,8 @@ export default function Header() {
   const [avatar, setAvatar] = useState(null); // Avatar personal sau Google
   const [unreadCount, setUnreadCount] = useState(0); // Număr notificări necitite
   const [chatUnreadCount, setChatUnreadCount] = useState(0); // Număr mesaje chat necitite
-  const [favoriteCount, setFavoriteCount] = useState(0); // Număr anunțuri favorite
+  // Versiune pentru recalcularea numărului de favorite în modul guest (se actualizează la evenimente)
+  const [guestFavVersion, setGuestFavVersion] = useState(0);
   const auth = useAuth();
 
   // Funcție pentru a obține numărul de notificări necitite
@@ -91,16 +92,6 @@ export default function Header() {
       setAvatar(null);
       setUnreadCount(0);
       setChatUnreadCount(0);
-      // calculează favorite guest
-      const guestKey = 'favoriteAnnouncements_guest';
-      try {
-        const raw = localStorage.getItem(guestKey);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          const len = Array.isArray(parsed) ? (typeof parsed[0] === 'string' ? parsed.length : parsed.length) : 0;
-          setFavoriteCount(len);
-        } else setFavoriteCount(0);
-      } catch { setFavoriteCount(0); }
       return;
     }
     // Dacă există token, verifică și cu backendul (pentru sesiuni Google etc)
@@ -117,17 +108,15 @@ export default function Header() {
         }
         
         // Dacă utilizatorul este autentificat, obține numărul de notificări și chat necitite
-        if (response.data.isAuthenticated) {
+  if (response.data.isAuthenticated) {
           fetchUnreadCount();
           fetchChatUnreadCount();
-          updateFavoriteCount();
         }
       } catch (error) {
         setIsAuthenticated(false);
         setAvatar(null);
         setUnreadCount(0);
         setChatUnreadCount(0);
-        updateFavoriteCount();
       }
     };
     checkAuth();
@@ -138,7 +127,6 @@ export default function Header() {
     if (isAuthenticated) {
       fetchUnreadCount();
       fetchChatUnreadCount();
-  updateFavoriteCount();
     }
   }, [location.pathname, isAuthenticated]);
 
@@ -149,48 +137,44 @@ export default function Header() {
     const interval = setInterval(() => {
       fetchUnreadCount();
       fetchChatUnreadCount();
-  updateFavoriteCount();
     }, 30000); // 30 secunde
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
-  // Funcție pentru a actualiza numărul de favorite din localStorage
-  const updateFavoriteCount = () => {
-    // Dacă avem context și user autentificat, folosim lista din context
-    if (auth?.user) {
-      setFavoriteCount(auth.favorites?.length || 0);
-      return;
-    }
-    // Guest fallback (localStorage legacy)
-    try {
-      const key = 'favoriteAnnouncements_guest';
-      const raw = localStorage.getItem(key);
-      if (!raw) { setFavoriteCount(0); return; }
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        setFavoriteCount(parsed.length);
-      } else {
-        setFavoriteCount(0);
-      }
-    } catch { setFavoriteCount(0); }
-  };
-
-  // Ascultă modificările favorite (eveniment custom + storage cross-tab)
+  // Recalculează pentru guest când se schimbă favoritele (eveniment custom + storage cross-tab)
   useEffect(() => {
-    const handler = () => updateFavoriteCount();
+    const handler = () => setGuestFavVersion(v => v + 1);
     if (typeof window !== 'undefined') {
       window.addEventListener('favorites:updated', handler);
       window.addEventListener('storage', handler);
     }
-    updateFavoriteCount();
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('favorites:updated', handler);
         window.removeEventListener('storage', handler);
       }
     };
-  }, [auth?.favorites, auth?.user]);
+  }, []);
+
+  // Calculează numărul de favorite pentru guest la fiecare re-randare relevantă
+  const computeGuestFavoriteCount = () => {
+    try {
+      const raw = localStorage.getItem('favoriteAnnouncements_guest');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return 0;
+      // Suportă ambele formate: [string] sau [{id, addedAt}]
+      if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
+        return parsed.length;
+      }
+      return parsed.length;
+    } catch {
+      return 0;
+    }
+  };
+
+  const favoriteCount = auth?.user ? (auth?.favorites?.length || 0) : computeGuestFavoriteCount();
 
   // Ascultă evenimentul global emis din ChatPage pentru a actualiza instant badge-ul
   useEffect(() => {
@@ -315,7 +299,10 @@ export default function Header() {
           location.pathname.startsWith('/notificari') ||
           // Hide MobileHeader on announcement details and category pages on mobile
           location.pathname.startsWith('/announcement/') ||
-          location.pathname.startsWith('/anunturi-categorie')
+          location.pathname.startsWith('/anunturi-categorie') ||
+          // Hide MobileHeader on add/edit announcement pages
+          location.pathname.startsWith('/adauga-anunt') ||
+          location.pathname.startsWith('/edit-announcement')
         ) ? null : (
           <MobileHeader 
             notificationCount={unreadCount} 

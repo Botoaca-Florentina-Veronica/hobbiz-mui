@@ -175,6 +175,10 @@ export default function AnnouncementDetails() {
       const updated = exists ? list.filter(i => i.id !== announcement._id) : [...list, { id: announcement._id, addedAt: Date.now() }];
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       setIsFavorite(!exists);
+      // Notifică header-ul (și alte componente) că s-a schimbat numărul de favorite
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('favorites:updated'));
+      }
     }
   };
 
@@ -532,7 +536,7 @@ export default function AnnouncementDetails() {
                 </Typography>
 
                 {/* Seller Avatar and Info */}
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, cursor: 'pointer' }} onClick={() => navigate(`/profil/${announcement.user._id}`)}>
                   <Avatar
                     src={announcement.user.avatar}
                     sx={{
@@ -612,17 +616,21 @@ export default function AnnouncementDetails() {
                       </Box>
                     </Paper>
 
-                    {/* Email Contact */}
-                    {announcement.contactEmail && (
-                      <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <EmailIcon sx={{ color: getAccentCss(), fontSize: 20 }} />
-                          <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
-                            {announcement.contactEmail}
-                          </Typography>
-                        </Box>
-                      </Paper>
-                    )}
+                    {/* Vizualizare profil (în locul email-ului) */}
+                    <Button
+                      variant="outlined"
+                      onClick={() => navigate(`/profil/${announcement.user._id}`)}
+                      fullWidth
+                      sx={{
+                        borderColor: getAccentCss(),
+                        color: getAccentCss(),
+                        borderRadius: 2,
+                        py: 1.5,
+                        '&:hover': { borderColor: getAccentHover(), bgcolor: 'transparent' }
+                      }}
+                    >
+                      Vizualizare profil
+                    </Button>
                   </Box>
                 )}
 

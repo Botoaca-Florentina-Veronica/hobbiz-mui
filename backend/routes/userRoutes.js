@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
-const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
 // Șterge contul utilizatorului și toate anunțurile sale
@@ -14,6 +14,8 @@ router.post('/register', register);  // User e folosit în controller
 router.post('/login', login);       // User e folosit în controller
 router.get('/profile', auth, getProfile); // User e folosit în controller
 router.get('/profile/:userId', optionalAuth, getProfile); // Profil public pentru orice utilizator
+// Anunțuri publice pentru un utilizator (folosite pe pagina publică de profil)
+router.get('/announcements/:userId', optionalAuth, getUserAnnouncementsPublic);
 router.put('/update-email', auth, updateEmail); // Noua rută pentru actualizarea email-ului
 router.put('/update-password', auth, updatePassword); // Rută pentru schimbarea parolei
 router.post('/my-announcements', auth, upload.array('images', 10), addAnnouncement);
