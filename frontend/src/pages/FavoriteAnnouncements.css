@@ -234,32 +234,34 @@
   .favorite-announcement-card {
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 140px !important;
+    min-height: 130px !important;
     flex-direction: row !important;
-    padding: 12px !important;
+    padding: 16px !important;
     display: flex !important;
     align-items: stretch !important;
     border-radius: 16px !important;
     box-shadow: 0 2px 8px rgba(63,63,63,0.12) !important;
     position: relative !important;
+    gap: 12px !important; /* spațiu consistent între imagine și conținut */
   }
   
   .favorite-announcement-card:hover {
     box-shadow: 0 4px 12px rgba(63,63,63,0.18) !important;
+    transform: translateY(-1px) !important; /* efect subtil de ridicare */
   }
   
   .favorite-announcement-image {
     flex-shrink: 0 !important;
-    margin-right: 12px !important;
-    width: 100px !important;
-    height: 100px !important;
+    width: 90px !important;
+    height: 90px !important;
     display: block !important;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
+    align-self: center !important; /* centrează vertical imaginea */
   }
   
   .favorite-announcement-img {
-    width: 100px !important;
-    height: 100px !important;
+    width: 90px !important;
+    height: 90px !important;
     border-radius: 12px !important;
     object-fit: cover !important;
   }
@@ -269,42 +271,42 @@
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important; /* distribuie uniform conținutul */
     height: auto !important;
-    min-height: 100px !important;
+    min-height: 90px !important;
     position: relative !important;
     margin: 0 !important;
   }
   
-  /* Resetare și stilizare pentru primul div cu data și heart */
+  /* Container pentru partea de sus (data + heart) */
   .favorite-announcement-info > div:first-child {
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-start !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
     position: relative !important;
     width: 100% !important;
     flex-direction: row !important;
   }
   
-  /* Span cu data */
+  /* Data - poziționată în partea stângă sus */
   .favorite-date,
   .favorite-announcement-info > div:first-child > span {
     color: #717171 !important;
-    font-size: 11px !important;
+    font-size: 10px !important;
     font-weight: 400 !important;
     line-height: 1.2 !important;
     flex: 1 !important;
-    margin-right: 10px !important;
+    margin-right: 8px !important;
     display: block !important;
     text-align: left !important;
   }
   
-  /* Heart container - forțez să rămână în linie */
+  /* Heart - poziționat în partea dreaptă sus */
   .favorite-heart {
     position: static !important;
-    width: 32px !important;
-    height: 32px !important;
+    width: 28px !important;
+    height: 28px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -319,10 +321,14 @@
     bottom: auto !important;
   }
   
-  /* Titlu - forțez să fie pe propria linie */
+  .favorite-heart .MuiSvgIcon-root {
+    font-size: 22px !important; /* iconița puțin mai mică pentru proporționalitate */
+  }
+  
+  /* Titlu - poziționat sub data/heart cu mai mult spațiu */
   .favorite-announcement-title {
-    font-size: 15px !important;
-    margin-bottom: 4px !important;
+    font-size: 14px !important;
+    margin-bottom: 6px !important;
     line-height: 1.3 !important;
     font-weight: 600 !important;
     display: -webkit-box !important;
@@ -335,35 +341,44 @@
     width: 100% !important;
   }
   
-  /* Categorie - forțez să fie pe propria linie */
+  /* Container pentru categoria și locația */
+  .favorite-meta-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  /* Categorie */
   .favorite-announcement-category {
-    font-size: 12px !important;
-    margin-bottom: 3px !important;
+    font-size: 11px !important;
+    margin-bottom: 0 !important;
     font-weight: 500 !important;
     color: #575757 !important;
     display: block !important;
     width: 100% !important;
   }
   
-  /* Locație - forțez să fie pe propria linie */
+  /* Locație */
   .favorite-announcement-location {
-    font-size: 12px !important;
-    margin-bottom: 4px !important;
+    font-size: 11px !important;
+    margin-bottom: 0 !important;
     display: block !important;
     color: #717171 !important;
     width: 100% !important;
   }
   
-  /* Preț - ultimul div cu inline styles */
+  /* Preț - poziționat în partea de jos cu mai mult accent */
   .favorite-price,
   .favorite-announcement-info > div:last-child {
     font-weight: 700 !important;
-    font-size: 16px !important;
-    color: #3f3f3f !important;
+    font-size: 15px !important;
+    color: #355070 !important; /* culoare accent pentru preț */
     margin-top: auto !important;
     margin-bottom: 0 !important;
     display: block !important;
     width: 100% !important;
+    align-self: flex-end !important;
   }
 
   /* Mobile header visible only on small and tablet screens */
@@ -390,7 +405,7 @@
     justify-content: center !important;
     background-color: var(--chat-elev) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    margin-top: 12px !important; /* aliniat la același nivel cu titlul */
+    margin-top: 42px !important; /* aliniat la același nivel cu titlul */
   }
   .my-announcements-container .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
 
@@ -406,7 +421,7 @@
     font-size: 24px !important; /* MUI h5 on mobile */
     line-height: 1.334 !important;
     margin: 0 !important; /* reset */
-    margin-top: 12px !important; /* adaug spațiu deasupra titlului - crescut la 12px */
+    margin-top: 42px !important; /* aliniat la același nivel cu butonul - crescut la 22px */
     flex: 0 0 auto !important; /* prevent stretching to the right */
     margin-left: 4px !important; /* nudge closer to the back button */
   }

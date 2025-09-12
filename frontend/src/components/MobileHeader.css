@@ -23,10 +23,15 @@
   height: 0;
 }
 
-.mobile-search-container {
-  flex: 1;
-  max-width: calc(100% - 60px);
-}
+  .mobile-search-container {
+    flex: 1;
+    max-width: calc(100% - 50px); /* reduce puțin pentru a lăsa mai mult spațiu butonului */
+  }
+  
+  .mobile-search-bar {
+    min-width: 0; /* permite shrinking */
+    overflow: visible; /* asigură că iconița nu e ascunsă */
+  }
 
 .mobile-search-bar {
   display: flex;
@@ -37,6 +42,7 @@
   min-height: var(--mh-search-height);
   align-items: center;
   box-shadow: var(--mh-shadow);
+  margin-top: 3rem;
 }
 
 .mobile-search-input {
@@ -68,17 +74,25 @@
   height: var(--mh-search-height);
   min-width: 50px;
   transition: background-color 0.2s ease;
+  /* Asigură centrarea perfectă pentru orice conținut */
+  position: relative;
+  box-sizing: border-box;
 }
 
 .mobile-search-btn:hover {
   background: var(--primary-hover);
 }
 
-/* Ensure the icon inherits the button color */
+/* Ensure the icon inherits the button color and is perfectly centered */
 .mobile-search-btn svg,
 .mobile-search-btn .MuiSvgIcon-root {
   color: currentColor !important;
   fill: currentColor !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: auto !important; /* centrează iconița perfect */
+  vertical-align: middle !important;
 }
 
 .mobile-notification-btn {
@@ -93,6 +107,7 @@
   transition: background-color 0.2s ease;
   min-width: var(--mh-search-height);
   min-height: var(--mh-search-height);
+  margin-top: 3rem;
 }
 
 .mobile-notification-btn:hover { background: var(--mh-hover-bg); }
@@ -142,4 +157,65 @@
 /* Make sure the search button itself uses brand with proper contrast */
 .mobile-search-btn { color: var(--primary-contrast); }
 .mobile-search-btn:hover { color: var(--primary-contrast); }
+
+/* Media queries pentru dispozitive foarte mici */
+@media (max-width: 480px) {
+  .mobile-header {
+    padding: calc(24px + env(safe-area-inset-top)) 12px 12px !important; /* reduce padding-ul lateral */
+    gap: 8px !important; /* reduce gap-ul */
+  }
+  
+  .mobile-search-container {
+    max-width: calc(100% - 60px) !important; /* lasă mai mult spațiu pentru buton */
+  }
+  
+  .mobile-search-input {
+    padding: 12px 10px 12px 12px !important; /* reduce padding-ul */
+    font-size: 0.95rem !important;
+  }
+  
+  .mobile-search-btn {
+    min-width: 48px !important; /* crește lățimea minimă */
+    padding: 0 12px !important; /* reduce padding-ul lateral */
+    font-size: 1.1rem !important; /* micșorează iconița puțin pentru a încăpea */
+    flex-shrink: 0 !important; /* împiedică shrinking-ul butonului */
+  }
+  
+  .mobile-search-btn svg,
+  .mobile-search-btn .MuiSvgIcon-root {
+    font-size: 20px !important; /* mărimea exactă pentru iconița de lupă */
+    min-width: 20px !important;
+    min-height: 20px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-header {
+    padding: calc(24px + env(safe-area-inset-top)) 8px 12px !important; /* reduce și mai mult */
+    gap: 6px !important;
+  }
+  
+  .mobile-search-container {
+    max-width: calc(100% - 66px) !important; /* mai mult spațiu pentru buton */
+  }
+  
+  .mobile-search-input {
+    padding: 12px 8px 12px 10px !important;
+    font-size: 0.9rem !important;
+    min-width: 1rem !important; /* permite shrinking */
+  }
+  
+  .mobile-search-btn {
+    min-width: 44px !important;
+    padding: 0 10px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .mobile-search-btn svg,
+  .mobile-search-btn .MuiSvgIcon-root {
+    font-size: 18px !important; /* iconița și mai mică pentru telefoane foarte mici */
+    min-width: 18px !important;
+    min-height: 18px !important;
+  }
+}
 
