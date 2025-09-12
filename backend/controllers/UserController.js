@@ -26,6 +26,59 @@ const Announcement = require('../models/Announcement');
 const multer = require('multer');
 const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
+const mongoose = require('mongoose');
+
+// Utilitare pentru email normalization & duplicate merge
+const normalizeEmail = (email) => (email || '').trim().toLowerCase();
+const escapeRegex = (str='') => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+async function mergeDuplicateUsersByEmail(normalizedEmail) {
+  if (!normalizedEmail) return null;
+  try {
+    // Căutăm toate conturile care diferă doar prin case
+    const regex = new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i');
+    const users = await User.find({ email: regex });
+    if (users.length <= 1) return users[0] || null;
+
+    // Alegem "primary" pe baza priorităților: are și googleId și password > are password > are googleId > cel mai vechi
+    const score = (u) => (
+      (u.googleId ? 2 : 0) + (u.password ? 3 : 0) + Math.max(0, 1 - Math.min(1, (Date.now() - u.createdAt)/86400000))
+    );
+    let primary = users[0];
+    for (const u of users) {
+      if (score(u) > score(primary)) primary = u;
+    }
+
+    // Construim set de favorite și păstrăm câmpuri lipsă (firstName/lastName/avatar) dacă primary nu le are
+    const favSet = new Set();
+    users.forEach(u => (u.favorites || []).forEach(f => favSet.add(f.toString())));
+    primary.favorites = Array.from(favSet);
+
+    // Completează date lipsă
+    for (const u of users) {
+      if (!primary.firstName && u.firstName) primary.firstName = u.firstName;
+      if (!primary.lastName && u.lastName) primary.lastName = u.lastName;
+      if (!primary.avatar && u.avatar) primary.avatar = u.avatar;
+      if (!primary.phone && u.phone) primary.phone = u.phone;
+      if (!primary.localitate && u.localitate) primary.localitate = u.localitate;
+    }
+
+    // Normalizează email-ul principal la lowercase
+    primary.email = normalizeEmail(primary.email);
+    await primary.save();
+
+    // Șterge duplicatele non-primary
+    const toDelete = users.filter(u => String(u._id) !== String(primary._id));
+    if (toDelete.length) {
+      await User.deleteMany({ _id: { $in: toDelete.map(u => u._id) } });
+      console.log(`[MergeFavorites] Eliminat duplicate: ${toDelete.map(u=>u._id).join(', ')} -> primary ${primary._id}`);
+    }
+    return primary;
+  } catch (e) {
+    console.warn('[MergeFavorites] Eroare la merge duplicate:', e.message);
+    return null;
+  }
+}
 
 // Șterge utilizatorul și toate anunțurile sale
 const deleteAccount = async (req, res) => {
@@ -45,15 +98,16 @@ const deleteAccount = async (req, res) => {
 // Înregistrare utilizator
 const register = async (req, res) => {
   try { 
-    const { firstName, lastName, email, password, phone } = req.body;
+    let { firstName, lastName, email, password, phone } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
     // Validare date
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !normalizedEmail || !password) {
       return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii' });
     }
 
     // Verifică dacă emailul există
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
     if (existingUser) {
       return res.status(400).json({ error: 'Emailul este deja înregistrat' });
     }
@@ -62,7 +116,7 @@ const register = async (req, res) => {
     const user = new User({
       firstName,
       lastName,
-      email,
+      email: normalizedEmail,
       password,
       phone
     });
@@ -91,15 +145,17 @@ const register = async (req, res) => {
 // Autentificare utilizator
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+  let { email, password } = req.body;
+  const normalizedEmail = normalizeEmail(email);
 
     // Validare
-    if (!email || !password) {
+  if (!normalizedEmail || !password) {
       return res.status(400).json({ error: 'Email și parolă sunt obligatorii' });
     }
 
     // Găsește utilizator
-    const user = await User.findOne({ email });
+  // Căutare case-insensitive
+  let user = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
     if (!user) {
       return res.status(401).json({ error: 'Date de autentificare invalide' });
     }
@@ -111,7 +167,7 @@ const login = async (req, res) => {
     }
 
     // === MITM DETECTION ===
-    execFile('../mitm-detector.exe', ['Ethernet'], (error, stdout, stderr) => {
+  execFile('../mitm-detector.exe', ['Ethernet'], (error, stdout, stderr) => {
       let alerts = [];
       if (error) {
         console.error('Eroare la rularea detectorului:', error);
@@ -140,13 +196,22 @@ const login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    console.log('Token generat:', token);
+    // Normalizează email-ul în document dacă nu e deja (evită viitoare duplicate)
+    if (user.email !== normalizedEmail) {
+      user.email = normalizedEmail;
+      try { await user.save(); } catch (_) {}
+    }
+
+    // Merge duplicate accounts (dacă există) -> preferăm contul curent ca primary
+    const mergedPrimary = await mergeDuplicateUsersByEmail(normalizedEmail) || user;
+
+    console.log('Token generat pentru user:', mergedPrimary._id);
 
     res.json({ 
       message: 'Autentificare reușită',
       token,
-      userId: user._id,
-      firstName: user.firstName
+      userId: mergedPrimary._id,
+      firstName: mergedPrimary.firstName
     });
 
   } catch (error) {

@@ -67,7 +67,8 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AnnouncementsByCategory />
-            <Footer />
+            {/* Ascundem secțiunea legal + copyright pe mobil pentru paginile de categorie */}
+            <Footer hideOnMobile />
           </>
         } />
         <Route path="/notificari" element={

@@ -55,6 +55,38 @@ passport.use(new FacebookStrategy({
 
 */
 
+// Helperi pentru Google OAuth favorit merge
+const normalizeEmail = (e='') => e.trim().toLowerCase();
+const escapeRegex = (str='') => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+async function mergeDupesByEmail(baseEmail, preferredUserId) {
+  try {
+    if (!baseEmail) return null;
+    const regex = new RegExp(`^${escapeRegex(baseEmail)}$`, 'i');
+    const users = await User.find({ email: regex });
+    if (users.length <= 1) return users[0] || null;
+    let primary = users.find(u => String(u._id) === String(preferredUserId)) || users.find(u => u.googleId) || users[0];
+    const favSet = new Set();
+    users.forEach(u => (u.favorites||[]).forEach(f => favSet.add(f.toString())));
+    primary.favorites = Array.from(favSet);
+    // Completează câmpuri lipsă
+    for (const u of users) {
+      if (!primary.firstName && u.firstName) primary.firstName = u.firstName;
+      if (!primary.lastName && u.lastName) primary.lastName = u.lastName;
+      if (!primary.avatar && u.avatar) primary.avatar = u.avatar;
+      if (!primary.phone && u.phone) primary.phone = u.phone;
+      if (!primary.localitate && u.localitate) primary.localitate = u.localitate;
+    }
+    primary.email = normalizeEmail(primary.email);
+    await primary.save();
+    const toDelete = users.filter(u => String(u._id) !== String(primary._id));
+    if (toDelete.length) await User.deleteMany({ _id: { $in: toDelete.map(u => u._id) } });
+    return primary;
+  } catch (e) {
+    console.warn('[GoogleOAuthMerge] Eroare merge:', e.message);
+    return null;
+  }
+}
+
 // Google OAuth2.0 Strategy (optional in local/dev)
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL) {
   passport.use(new GoogleStrategy({
@@ -62,46 +94,36 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
   }, async (accessToken, refreshToken, profile, done) => {
-  try {
-    // Try to find the user by googleId
-    let user = await User.findOne({ googleId: profile.id });
-
-    if (user) {
-      // Sincronizează avatarul și numele la fiecare login cu Google
-      user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
-      user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
-      user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
-      await user.save();
-      return done(null, user);
-    } else {
-      // If not found by googleId, try to find by email
-      user = await User.findOne({ email: profile.emails[0].value });
+    try {
+      const primaryEmail = profile.emails && profile.emails[0] ? normalizeEmail(profile.emails[0].value) : undefined;
+      let user = await User.findOne({ googleId: profile.id });
+      if (!user && primaryEmail) {
+        user = await User.findOne({ email: new RegExp(`^${escapeRegex(primaryEmail)}$`, 'i') });
+      }
 
       if (user) {
-        // If user found by email, update their googleId and also sync name and avatar
-        user.googleId = profile.id;
-        user.avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : user.avatar;
-        user.firstName = profile.name && profile.name.givenName ? profile.name.givenName : user.firstName;
-        user.lastName = profile.name && profile.name.familyName ? profile.name.familyName : user.lastName;
+        // Actualizează date profil
+        user.googleId = user.googleId || profile.id;
+        user.avatar = (profile.photos && profile.photos[0]) ? profile.photos[0].value : user.avatar;
+        user.firstName = profile.name?.givenName || user.firstName;
+        user.lastName = profile.name?.familyName || user.lastName;
+        if (primaryEmail) user.email = primaryEmail; // normalize
         await user.save();
-        return done(null, user);
       } else {
-        // If user not found by either googleId or email, create a new one
         user = await User.create({
           googleId: profile.id,
-          firstName: profile.name.givenName, // Use givenName for firstName
-          lastName: profile.name.familyName, // Use familyName for lastName
-          email: profile.emails[0].value,
-          avatar: profile.photos[0].value,
-          // Password is not required for Google users
+            firstName: profile.name?.givenName || '',
+            lastName: profile.name?.familyName || '',
+            email: primaryEmail || '',
+            avatar: (profile.photos && profile.photos[0]) ? profile.photos[0].value : ''
         });
-        return done(null, user);
       }
-    }
 
-  } catch (err) {
-    return done(err, null);
-  }
+      await mergeDupesByEmail(primaryEmail, user._id);
+      return done(null, user);
+    } catch (err) {
+      return done(err, null);
+    }
   }));
 } else {
   console.warn('⚠️ Google OAuth not configured: missing env vars. Skipping strategy setup.');

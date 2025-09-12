@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
-import apiClient, { sendMessage, getMessages, deleteMessage } from '../api/api';
+import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessage } from '../api/api';
 import './ChatPopup.css';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
@@ -182,67 +182,77 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
 
   const handleSend = async (e) => {
     e.preventDefault();
-    
-    if (!input.trim() || sending || !conversationId) return;
-    
-    const messageText = input.trim();
-    setInput("");
+    if (sending || !conversationId) return;
+
+    const hasText = !!input.trim();
+    const hasFile = !!selectedFile;
+    if (!hasText && !hasFile) return;
+
+    const recipientId = seller._id || seller.id;
+    if (!recipientId || !effectiveUserId) return;
+
+    const textToSend = input.trim();
     setSending(true);
-    
-    // Determină destinatarul corect - logic simplu
-  const recipientId = seller._id || seller.id;
-    
-    // Validare înainte de trimitere
-    if (!recipientId || !effectiveUserId || !conversationId) {
-      console.error('❌ Date lipsă pentru trimiterea mesajului:', {
-        recipientId,
-        effectiveUserId,
-        conversationId,
-        seller,
-        announcement
-      });
-      // Nu mai afișăm alert - doar logăm eroarea
-      setSending(false);
-      setInput(messageText);
-      return;
-    }
-    
-    const messageData = {
+
+    // Pregătim optimistic message
+    const tempId = 'tmp-' + Date.now();
+    const optimistic = {
+      _id: tempId,
       conversationId,
       senderId: effectiveUserId,
-      text: messageText,
-      announcementId: announcement.id || announcement._id,
-      destinatarId: recipientId
+      senderRole: 'cumparator',
+      destinatarId: recipientId,
+      text: hasText ? textToSend : undefined,
+      image: hasFile ? URL.createObjectURL(selectedFile) : undefined,
+      imageFile: hasFile ? selectedFile.name : undefined,
+      createdAt: new Date().toISOString()
     };
-    
+    setMessages(prev => [...prev, optimistic]);
+
+    // Reset UI rapid
+    setInput('');
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+
     try {
-      console.log('📤 Trimitere mesaj:', messageData);
-  const response = await sendMessage(messageData);
-      
-      if (response.data) {
-        // Adaugă mesajul la lista existentă
-        setMessages(prev => [...prev, response.data]);
-        console.log('✅ Mesaj trimis cu succes:', response.data);
-        
-        // Notifică componenta părinte despre mesajul nou
-        if (onMessageSent) {
-          onMessageSent();
-        }
+      let response;
+      if (hasFile) {
+        const formData = new FormData();
+        formData.append('conversationId', conversationId);
+        formData.append('senderId', effectiveUserId);
+        formData.append('senderRole', 'cumparator');
+        formData.append('destinatarId', recipientId);
+        formData.append('announcementId', announcement.id || announcement._id);
+        if (hasText) formData.append('text', textToSend);
+        formData.append('image', selectedFile);
+        formData.append('imageFile', selectedFile.name);
+        response = await sendMessageMultipart(formData);
+      } else {
+        const payload = {
+          conversationId,
+          senderId: effectiveUserId,
+          senderRole: 'cumparator',
+          destinatarId: recipientId,
+          announcementId: announcement.id || announcement._id,
+          text: textToSend
+        };
+        response = await sendMessage(payload);
+      }
+
+      if (response?.data) {
+        setMessages(prev => prev.map(m => m._id === tempId ? response.data : m));
+        if (onMessageSent) onMessageSent();
+      } else {
+        // fallback remove optimistic
+        setMessages(prev => prev.filter(m => m._id !== tempId));
       }
     } catch (error) {
-      console.error('❌ Eroare la trimiterea mesajului:', error);
-      
-      // Nu mai afișăm popup-uri - doar logăm erorile în consolă
-      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-        console.error('❌ Backend-ul nu răspunde. Verifică dacă serverul rulează pe portul 5000.');
-      } else if (error.response?.status === 500) {
-        console.error('❌ Eroare de server la trimiterea mesajului. Verifică log-urile backend-ului.');
-      } else {
-        console.error(`❌ Eroare la trimiterea mesajului: ${error.message}`);
-      }
-      
-      // Restaurează textul în input dacă trimiterea a eșuat
-      setInput(messageText);
+      console.error('❌ Eroare la trimiterea mesajului/file:', error);
+      // Revoce optimistic
+      setMessages(prev => prev.filter(m => m._id !== tempId));
+      // Reintrodu textul dacă avea
+      if (hasText) setInput(textToSend);
+      if (hasFile) setSelectedFile(selectedFile); // repunem fișierul
     } finally {
       setSending(false);
     }
@@ -308,18 +318,9 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
 
   // Send file message (placeholder - extend as needed for your backend)
   const handleSendFile = async () => {
-    if (!selectedFile || !conversationId) return;
-    
-    console.log('📤 Trimitere fișier:', selectedFile.name);
-    // Here you would typically upload to your backend
-    // For now, just simulate by adding a text message
-    const fileMessage = `📎 Fișier: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)}KB)`;
-    setInput(fileMessage);
-    setSelectedFile(null);
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    // Trimite imediat chiar dacă nu este text
+    if (!selectedFile) return;
+    await handleSend(new Event('submit'));
   };
 
   // Verifică dacă componenta poate fi afișată
@@ -422,7 +423,20 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                       )}
                     </div>
                   )}
-                  <div className="chat-popup-message-text">{msg.text}</div>
+                  <div className="chat-popup-message-text">
+                    {msg.image && (
+                      <div className="chat-popup-image-wrapper">
+                        <img
+                          src={msg.image}
+                          alt={msg.imageFile || 'image'}
+                          className="chat-popup-image"
+                          onLoad={() => messagesEndRef.current?.scrollIntoView({behavior:'smooth'})}
+                        />
+                        {msg.imageFile && <div className="chat-popup-image-filename">{msg.imageFile}</div>}
+                      </div>
+                    )}
+                    {msg.text && <div>{msg.text}</div>}
+                  </div>
                   {msg.createdAt && (
                     <div className="chat-popup-message-time">
                       {new Date(msg.createdAt).toLocaleTimeString('ro-RO', { 
