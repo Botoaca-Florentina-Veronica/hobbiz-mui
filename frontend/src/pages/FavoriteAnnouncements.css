@@ -380,7 +380,7 @@
   }
 
   /* Force IconButton dimensions and visuals on mobile */
-  .mobile-back-btn {
+  .my-announcements-container .mobile-back-btn {
     width: 40px !important;
     height: 40px !important;
     padding: 8px !important;
@@ -390,20 +390,23 @@
     justify-content: center !important;
     background-color: var(--chat-elev) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    margin-top: 12px !important; /* aliniat la același nivel cu titlul */
   }
-  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+  .my-announcements-container .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
 
   /* Match icon and title styling exactly */
   .mobile-header .MuiSvgIcon-root {
     font-size: 24px !important;
     color: var(--chat-text) !important;
   }
-  .mobile-header-title {
+  /* Selector mai specific pentru pagina de favorite */
+  .my-announcements-container .mobile-header-title {
     font-weight: 600 !important;
     color: var(--chat-text) !important;
     font-size: 24px !important; /* MUI h5 on mobile */
     line-height: 1.334 !important;
-    margin: 0 !important;
+    margin: 0 !important; /* reset */
+    margin-top: 12px !important; /* adaug spațiu deasupra titlului - crescut la 12px */
     flex: 0 0 auto !important; /* prevent stretching to the right */
     margin-left: 4px !important; /* nudge closer to the back button */
   }
