@@ -74,7 +74,18 @@ body {
   box-sizing: border-box;
   flex-direction: column;
   font-family: Roboto, 'Open sans', 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
 }
+
+/* Elimină orice spațiu alb provenit din stacking context/root container */
+html, body, #root {
+  background: var(--app-bg) !important; /* #f3f5f6 în light mode */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+#root { display: flex; flex-direction: column; min-height: 100vh; }
 
 /* ===== Mobile / Touch Improvements ===== */
 /* Elimină highlight-ul albastru implicit pe mobile WebKit */

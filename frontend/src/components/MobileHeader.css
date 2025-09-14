@@ -8,8 +8,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(24px + env(safe-area-inset-top)) 16px 12px !important;
-  background: transparent; /* transparent bar; card effect is on search */
+  padding: calc(env(safe-area-inset-top) + 4px) 16px 6px !important; /* și mai compact top padding */
+  background: #f3f5f6 !important; /* unificare fundal */
   box-shadow: none;
   /* On mobile, let the header scroll away instead of staying fixed/sticky */
   position: static;
@@ -42,7 +42,7 @@
   min-height: var(--mh-search-height);
   align-items: center;
   box-shadow: var(--mh-shadow);
-  margin-top: 3rem;
+  margin-top: 0; /* elimin spațiul suplimentar */
 }
 
 .mobile-search-input {
@@ -107,7 +107,7 @@
   transition: background-color 0.2s ease;
   min-width: var(--mh-search-height);
   min-height: var(--mh-search-height);
-  margin-top: 3rem;
+  margin-top: 0; /* aliniere cu search bar */
 }
 
 .mobile-notification-btn:hover { background: var(--mh-hover-bg); }
@@ -161,8 +161,9 @@
 /* Media queries pentru dispozitive foarte mici */
 @media (max-width: 480px) {
   .mobile-header {
-    padding: calc(24px + env(safe-area-inset-top)) 12px 12px !important; /* reduce padding-ul lateral */
-    gap: 8px !important; /* reduce gap-ul */
+    padding: calc(env(safe-area-inset-top) + 4px) 12px 6px !important; /* compactare suplimentară */
+    gap: 8px !important;
+    background: #f3f5f6 !important; /* asigurare consistentă */
   }
   
   .mobile-search-container {
@@ -191,8 +192,9 @@
 
 @media (max-width: 360px) {
   .mobile-header {
-    padding: calc(24px + env(safe-area-inset-top)) 8px 12px !important; /* reduce și mai mult */
+    padding: calc(env(safe-area-inset-top) + 2px) 8px 4px !important; /* minim păstrând safe-area */
     gap: 6px !important;
+    background: #f3f5f6 !important;
   }
   
   .mobile-search-container {

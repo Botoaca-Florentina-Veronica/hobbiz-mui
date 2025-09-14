@@ -388,7 +388,7 @@
     justify-content: flex-start !important; /* ensure items stick together on the left */
     gap: 8px !important; /* reduced distance between back button and title */
     margin-bottom: 8px !important; /* matches old mb:1 */
-    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-top: 2px !important; /* ultra-compact spacing */
     padding-left: 8px !important;
     padding-right: 8px !important;
     color: var(--chat-text) !important;
@@ -405,7 +405,7 @@
     justify-content: center !important;
     background-color: var(--chat-elev) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    margin-top: 42px !important; /* aliniat la același nivel cu titlul */
+    margin-top: -2rem !important; /* eliminat complet spațiul superior */
   }
   .my-announcements-container .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
 
@@ -421,7 +421,7 @@
     font-size: 24px !important; /* MUI h5 on mobile */
     line-height: 1.334 !important;
     margin: 0 !important; /* reset */
-    margin-top: 42px !important; /* aliniat la același nivel cu butonul - crescut la 22px */
+    margin-top: -2rem !important; /* eliminat complet spațiul superior */
     flex: 0 0 auto !important; /* prevent stretching to the right */
     margin-left: 4px !important; /* nudge closer to the back button */
   }
