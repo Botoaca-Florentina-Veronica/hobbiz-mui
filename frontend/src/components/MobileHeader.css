@@ -18,6 +18,11 @@
   gap: 12px;
 }
 
+/* Dark mode background fix */
+.dark-mode .mobile-header {
+  background: var(--app-bg) !important;
+}
+
 .mobile-header-spacer {
   /* No spacer needed when header is not sticky */
   height: 0;

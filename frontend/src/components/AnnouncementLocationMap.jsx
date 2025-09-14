@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import './AnnouncementLocationMap.css';
+import { Card, CardContent, Typography, Box, Divider } from '@mui/material';
 
 // Componentă ce afișează un headline "Locație" + hartă Google Maps prin iframe.
 // Folosește cheia din Vite: import.meta.env.VITE_GOOGLE_MAPS_KEY (opțional).
 // Dacă nu există sau este invalidă, cade pe un embed public (search) fără cheie.
-export default function AnnouncementLocationMap({ location, darkMode = false, height = 260 }) {
+export default function AnnouncementLocationMap({ location, darkMode = false, height = 260, accentColor = '#355070' }) {
   const [encoded, setEncoded] = useState('');
   const [src, setSrc] = useState('');
   const [errored, setErrored] = useState(false);
@@ -27,28 +28,33 @@ export default function AnnouncementLocationMap({ location, darkMode = false, he
   if (!location) return null;
 
   return (
-    <div className={`announcement-location-map-box ${darkMode ? 'dark-mode' : ''}`}>      
-      <div className="alm-header">Locație</div>
-      <div className="alm-map-wrapper" style={{ height }}>
-        {src && (
-          <iframe
-            title={`Harta pentru ${location}`}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            src={src}
-            allowFullScreen
-            onError={() => setErrored(true)}
-          />
-        )}
-        {errored && (
-          <div className="alm-error-msg">
-            Nu s-a putut încărca harta.
-            <br />
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encoded}`} target="_blank" rel="noopener noreferrer">Deschide în Google Maps</a>
-          </div>
-        )}
-      </div>
-      <div className="alm-location-label">📍 {location}</div>
-    </div>
+    <Card elevation={2} className={`announcement-location-map-box ${darkMode ? 'dark-mode' : ''}`} sx={{ borderRadius: 3, overflow: 'hidden', mt: 0 }}>
+      <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+        <Typography variant="h6" sx={{ fontWeight:600, mb: 2, color: accentColor }}>Locație</Typography>
+        <Box className="alm-map-wrapper" sx={{ height, borderRadius: 2, overflow: 'hidden', mb: 2 }}>
+          {src && (
+            <iframe
+              title={`Harta pentru ${location}`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src={src}
+              allowFullScreen
+              onError={() => setErrored(true)}
+            />
+          )}
+          {errored && (
+            <div className="alm-error-msg">
+              Nu s-a putut încărca harta.
+              <br />
+              <a href={`https://www.google.com/maps/search/?api=1&query=${encoded}`} target="_blank" rel="noopener noreferrer">Deschide în Google Maps</a>
+            </div>
+          )}
+        </Box>
+        <Divider sx={{ mb: 2 }} />
+        <Typography variant="body1" className="alm-location-label" sx={{ display:'flex', alignItems:'center', gap:1 }}>
+          <span role="img" aria-label="locatie">📍</span> {location}
+        </Typography>
+      </CardContent>
+    </Card>
   );
 }

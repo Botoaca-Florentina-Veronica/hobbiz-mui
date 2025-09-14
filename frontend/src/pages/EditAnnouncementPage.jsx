@@ -358,8 +358,9 @@ export default function EditAnnouncementPage() {
         }
       });
       
-      setSuccess('Anunț actualizat cu succes!');
-      setTimeout(() => navigate('/anunturile-mele'), 1200);
+  setSuccess('Anunț actualizat cu succes!');
+  // Redirecționează către pagina de detalii a anunțului cu flag updated=1
+  setTimeout(() => navigate(`/announcement/${announcementId}?updated=1`, { state: { updated: true } }), 800);
     } catch (e) {
       console.error('Error updating announcement:', e);
       if (e.response?.status === 401) {

@@ -5,6 +5,21 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Updated banner animation states */
+.updated-banner {
+  opacity: 0;
+  transform: translateY(-12px) scale(.98);
+  transition: opacity .45s ease, transform .45s cubic-bezier(.4,0,.2,1);
+}
+.updated-banner.enter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.updated-banner.exit {
+  opacity: 0;
+  transform: translateY(-14px) scale(.96);
+}
+
 /* Container pentru pagina de detalii - in light mode, mosteneste fundalul global */
 .announcement-details-page {
   min-height: 100vh;
@@ -382,6 +397,18 @@ html {
 
 .dark-mode .announcement-image-container::before {
   background: linear-gradient(135deg, rgba(245, 24, 102, 0.1) 0%, transparent 50%);
+}
+
+/* Meta footer under description */
+.announcement-meta-footer {
+  font-size: 12px;
+  animation: slideInUp .5s ease;
+}
+.announcement-meta-footer button svg { margin-right: 4px; }
+.announcement-meta-footer .MuiTypography-caption { user-select: text; }
+
+.dark-mode .announcement-meta-footer {
+  border-color: rgba(255,255,255,0.15) !important;
 }
 
 /* Price highlight should use primary palette in dark mode */

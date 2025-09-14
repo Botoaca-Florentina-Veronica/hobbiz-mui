@@ -136,12 +136,12 @@ export default function CookiePolicy() {
                 <div className="reason-card">
                   <div className="reason-icon">🔐</div>
                   <h4>Securitate și autentificare</h4>
-                  <p>Pentru a-ți menține contul securizat pe Hobbiz și pentru a-ți permite să publici anunțuri și să folosești chat-ul în siguranță.</p>
+                  <p>Pentru a-ți menține contul securizat și pentru a-ți permite să publici anunțuri și să folosești chat-ul în siguranță.</p>
                 </div>
                 <div className="reason-card">
                   <div className="reason-icon">⚙️</div>
                   <h4>Funcționalitate și îmbunătățiri</h4>
-                  <p>Pentru a salva preferințele tale (tema, regiunea, categoriile favorite) și pentru a îmbunătăți platforma pe baza modului în care este folosită.</p>
+                  <p>Pentru a salva preferințele tale (tema, regiunea, anunțurile favorite) și pentru a îmbunătăți platforma pe baza modului în care este folosită.</p>
                 </div>
                 <div className="reason-card">
                   <div className="reason-icon">🎯</div>
@@ -186,7 +186,7 @@ export default function CookiePolicy() {
               <ul>
                 <li><strong>Cloudinary:</strong> Pentru optimizarea și livrarea rapidă a imaginilor anunțurilor</li>
                 <li><strong>Google Analytics/Umami</strong> Folosite pentru a analiza traficul pe site și comportamentul utilizatorilor</li>
-                <li><strong>Google Maps:</strong> Pentru afișarea locațiilor anunțurilor (dacă este cazul)</li>
+                <li><strong>Google Maps:</strong> Pentru afișarea locațiilor anunțurilor</li>
               </ul>
               <p>
                 Aceste servicii au propriile politici de confidențialitate și cookie-uri pe care te încurajăm să le citești.

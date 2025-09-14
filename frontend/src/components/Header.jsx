@@ -383,7 +383,6 @@ export default function Header() {
                     <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>Anunțurile mele</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>Profil</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>
-                    <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); }}>Contul tău</a>
                     <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>Deconectează-te</a>
                   </div>
                 )}

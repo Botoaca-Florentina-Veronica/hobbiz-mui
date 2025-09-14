@@ -11,6 +11,8 @@ const announcementSchema = new mongoose.Schema({
   contactPhone: { type: String },
   images: [String],
   favoritesCount: { type: Number, default: 0 },
+  // Track number of views for displaying in announcement footer
+  views: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 

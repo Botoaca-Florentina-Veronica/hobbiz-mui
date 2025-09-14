@@ -40,12 +40,18 @@ router.get('/popular', async (req, res) => {
 // GET /api/announcements/:id - detalii anunț
 router.get('/:id', async (req, res) => {
   try {
-    const announcement = await Announcement.findById(req.params.id).populate('user', 'firstName lastName email phone avatar createdAt');
+    // Increment views atomically then populate user
+    const announcement = await Announcement.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    ).populate('user', 'firstName lastName email phone avatar createdAt');
     if (!announcement) {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit.' });
     }
     res.json(announcement);
   } catch (error) {
+    console.error('Eroare la incrementarea views:', error);
     res.status(500).json({ error: 'Eroare server la preluarea anunțului.' });
   }
 });

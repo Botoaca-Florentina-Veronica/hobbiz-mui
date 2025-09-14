@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import ImageZoomModal from '../components/ImageZoomModal';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -42,6 +42,9 @@ import ChatPopup from '../components/ChatPopup';
 
 export default function AnnouncementDetails() {
   const { id } = useParams();
+  const locationHook = useLocation();
+  const [showUpdatedBanner, setShowUpdatedBanner] = useState(false);
+  const [bannerPhase, setBannerPhase] = useState('idle'); // idle | enter | shown | exit
   const navigate = useNavigate();
   const [announcement, setAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,38 +72,21 @@ export default function AnnouncementDetails() {
   const getAccentCss = () => (isDarkMode ? '#f51866' : '#355070');
   const getAccentHover = () => (isDarkMode ? '#fa4875' : '#406b92');
 
-  // Tooltip styling helper (bule de hover deasupra butoanelor)
-  const getTooltipProps = () => ({
-    placement: 'top',
-    arrow: true,
-    TransitionComponent: Fade,
-    enterDelay: 200,
-    enterTouchDelay: 100,
-    leaveTouchDelay: 3000,
-    disableInteractive: true, // Prevents tooltip from interfering with positioning
-    componentsProps: {
-      tooltip: {
-        sx: {
-          bgcolor: getIsDarkMode() ? '#282828' : '#355070',
-          color: '#ffffff',
-          border: `1px solid ${getIsDarkMode() ? '#3f3f3f' : '#4a6b8a'}`,
-          fontSize: '0.8rem',
-          boxShadow: 'none',
-          position: 'relative' // Ensure proper positioning
-        }
-      },
-      arrow: {
-        sx: {
-          color: getIsDarkMode() ? '#282828' : '#355070'
-        }
-      },
-      popper: {
-        sx: {
-          '& .MuiTooltip-tooltip': {
-            margin: '0px !important' // Remove default margins that might offset positioning
-          }
-        }
-      }
+  // Tooltip simplu și centrat pentru butoanele de acțiune
+  const getTooltipStyles = () => ({
+    tooltip: {
+      backgroundColor: getIsDarkMode() ? '#1a1a1a' : '#2c3e50',
+      color: '#ffffff',
+      fontSize: '0.75rem',
+      fontWeight: 500,
+      padding: '8px 12px',
+      borderRadius: '8px',
+      boxShadow: getIsDarkMode() 
+        ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
+        : '0 4px 12px rgba(44, 62, 80, 0.3)'
+    },
+    arrow: {
+      color: getIsDarkMode() ? '#1a1a1a' : '#2c3e50'
     }
   });
 
@@ -128,6 +114,35 @@ export default function AnnouncementDetails() {
       }
     }
     fetchAnnouncement();
+    // Detectare param updated
+    try {
+      let shouldShow = false;
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('updated') === '1') {
+        shouldShow = true;
+      }
+      if (locationHook.state?.updated) {
+        shouldShow = true;
+      }
+      if (shouldShow) {
+        setShowUpdatedBanner(true);
+        setBannerPhase('enter');
+        // finalize enter -> shown
+        setTimeout(() => setBannerPhase('shown'), 30);
+        // start exit after 6s
+        setTimeout(() => {
+          setBannerPhase('exit');
+          // unmount after exit animation
+          setTimeout(() => setShowUpdatedBanner(false), 450);
+        }, 6000);
+        // Curățare parametru 'updated' din URL pentru a evita reapariția la refresh
+        if (params.get('updated') === '1' && window.history.replaceState) {
+          params.delete('updated');
+          const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+          window.history.replaceState({ ...window.history.state, updated: false }, '', newUrl);
+        }
+      }
+    } catch { /* ignore */ }
   }, [id]);
 
   // Sync local isFavorite with context when data changes
@@ -322,6 +337,54 @@ export default function AnnouncementDetails() {
           pb: { xs: 'calc(96px + env(safe-area-inset-bottom))', md: 0 }
         }}
       >
+        {showUpdatedBanner && (
+          <div
+            className={`updated-banner ${bannerPhase === 'enter' || bannerPhase === 'shown' ? 'enter' : ''} ${bannerPhase === 'exit' ? 'exit' : ''}`}
+            style={{
+              background: getIsDarkMode() ? 'linear-gradient(135deg,#195a32,#237f45)' : 'linear-gradient(135deg,#38a169,#48bb78)',
+              color: '#fff',
+              padding: '14px 20px',
+              borderRadius: '14px',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              boxShadow: '0 4px 14px -2px rgba(0,0,0,0.18)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:42,height:42,borderRadius:12,background:'rgba(255,255,255,0.15)',backdropFilter:'blur(4px)'}}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:600,fontSize:'1rem'}}>Anunț actualizat</div>
+              <div style={{opacity:.9,fontSize:'.9rem',marginTop:2}}>Modificările au fost salvate și sunt vizibile public.</div>
+            </div>
+            <button
+              onClick={() => {
+                setBannerPhase('exit');
+                setTimeout(() => setShowUpdatedBanner(false), 450);
+              }}
+              aria-label="Închide"
+              style={{
+                background:'rgba(255,255,255,0.18)',
+                border:'none',
+                color:'#fff',
+                cursor:'pointer',
+                width:34,
+                height:34,
+                display:'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                borderRadius:10,
+                fontSize:18,
+                lineHeight:1,
+                fontWeight:600
+              }}
+            >×</button>
+          </div>
+        )}
         {/* Back Button */}
         <Button
           startIcon={<ArrowBackIcon />}
@@ -329,6 +392,7 @@ export default function AnnouncementDetails() {
           sx={{ 
             mb: 3, 
             color: getAccentCss(),
+            display: { xs: 'inline-flex', sm: 'inline-flex', md: 'none' },
             '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)' }
           }}
         >
@@ -339,7 +403,7 @@ export default function AnnouncementDetails() {
           {/* Main Content */}
           <Grid item xs={12} md={8} order={{ xs: 1, md: 1 }}>
             {/* Image Carousel */}
-            <Card elevation={3} sx={{ mb: 3, borderRadius: 3, overflow: 'hidden' }}>
+            <Card elevation={3} sx={{ mb: 3, borderRadius: 3, overflow: 'hidden', mt: { xs: 0, md: 4 } }}>
               <Box sx={{ position: 'relative', height: { xs: '58vw', sm: '60vw', md: 500 } }}>
                 {images.length > 0 ? (
                   <>
@@ -451,10 +515,15 @@ export default function AnnouncementDetails() {
                   
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Tooltip 
-                      {...getTooltipProps()} 
                       title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
                       placement="top"
                       arrow
+                      enterDelay={300}
+                      leaveDelay={200}
+                      componentsProps={{
+                        tooltip: { sx: getTooltipStyles().tooltip },
+                        arrow: { sx: getTooltipStyles().arrow }
+                      }}
                     >
                       <IconButton
                         onClick={handleToggleFavorite}
@@ -473,10 +542,15 @@ export default function AnnouncementDetails() {
                       </IconButton>
                     </Tooltip>
                     <Tooltip 
-                      {...getTooltipProps()} 
                       title="Partajează"
                       placement="top"
                       arrow
+                      enterDelay={300}
+                      leaveDelay={200}
+                      componentsProps={{
+                        tooltip: { sx: getTooltipStyles().tooltip },
+                        arrow: { sx: getTooltipStyles().arrow }
+                      }}
                     >
                       <IconButton
                         onClick={handleShare}
@@ -513,6 +587,57 @@ export default function AnnouncementDetails() {
                   {announcement.description}
                 </Typography>
 
+                {/* Footer meta info under description */}
+                <Box
+                  className="announcement-meta-footer"
+                  sx={{
+                    mt: 4,
+                    pt: 2.5,
+                    borderTop: '1px solid',
+                    borderColor: getIsDarkMode() ? 'rgba(255,255,255,0.12)' : 'rgba(53,80,112,0.25)',
+                    display: 'flex',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1.5, sm: 3 },
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: '.5px', opacity: .75 }}>
+                        ID:
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '.75rem', opacity: .9 }}>
+                        {announcement._id?.slice(-8) || '—'}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: .5 }}>
+                      <VisibilityIcon sx={{ fontSize: 18, color: getAccentCss(), opacity: .85 }} />
+                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                        {typeof announcement.views === 'number' ? announcement.views : 0} vizualizări
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Button
+                    size="small"
+                    onClick={() => alert('Funcționalitatea de raportare va fi disponibilă în curând.')}
+                    startIcon={
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
+                    }
+                    sx={{
+                      alignSelf: { xs: 'flex-end', sm: 'center' },
+                      color: '#e5533d',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(229,83,61,0.08)' : 'rgba(229,83,61,0.08)' },
+                      fontSize: '.75rem',
+                      letterSpacing: '.5px'
+                    }}
+                  >
+                    Raportează
+                  </Button>
+                </Box>
+
                 {announcement.price && (
                   <>
                     <Divider sx={{ my: 3 }} />
@@ -531,7 +656,7 @@ export default function AnnouncementDetails() {
           {/* Seller Information Sidebar + Location Map */}
           <Grid item xs={12} md={4} order={{ xs: 2, md: 2 }}>
             <Box sx={{ position: { md: 'sticky' }, top: { md: 120 } }}>
-            <Card elevation={2} sx={{ borderRadius: 3, mb: 3 }}>
+            <Card elevation={2} sx={{ borderRadius: 3, mb: 3, mt: { xs: 0, md: 4 } }}>
               <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>
                   Informații vânzător
@@ -649,6 +774,7 @@ export default function AnnouncementDetails() {
             <AnnouncementLocationMap
               location={announcement.location}
               darkMode={getIsDarkMode()}
+              accentColor={getAccentCss()}
             />
             </Box>
           </Grid>
