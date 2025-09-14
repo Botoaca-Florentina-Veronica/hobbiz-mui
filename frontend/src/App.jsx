@@ -31,11 +31,15 @@ import CookiePolicy from './pages/CookiePolicy';
 import TermsConditions from './pages/TermsConditions';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
+import useScrollToTop from './hooks/useScrollToTop';
 import './App.css';
 import './mediaQueries.css';
 import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
 
 function App() {
+  // Automatically scroll to top on route changes
+  useScrollToTop();
+  
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';
   });

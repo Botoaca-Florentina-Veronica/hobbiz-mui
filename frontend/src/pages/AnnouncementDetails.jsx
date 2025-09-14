@@ -36,6 +36,7 @@ import {
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import './AnnouncementDetails.css';
+import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
 // Header and Footer are provided by the App.jsx route layout
 import ChatPopup from '../components/ChatPopup';
 
@@ -527,9 +528,10 @@ export default function AnnouncementDetails() {
             </Card>
           </Grid>
 
-          {/* Seller Information Sidebar */}
+          {/* Seller Information Sidebar + Location Map */}
           <Grid item xs={12} md={4} order={{ xs: 2, md: 2 }}>
-            <Card elevation={2} sx={{ borderRadius: 3, position: { md: 'sticky' }, top: { md: 120 } }}>
+            <Box sx={{ position: { md: 'sticky' }, top: { md: 120 } }}>
+            <Card elevation={2} sx={{ borderRadius: 3, mb: 3 }}>
               <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>
                   Informații vânzător
@@ -643,6 +645,12 @@ export default function AnnouncementDetails() {
                 )}
               </CardContent>
             </Card>
+            {/* Map Section - va sta imediat sub card */}
+            <AnnouncementLocationMap
+              location={announcement.location}
+              darkMode={getIsDarkMode()}
+            />
+            </Box>
           </Grid>
         </Grid>
       </Container>

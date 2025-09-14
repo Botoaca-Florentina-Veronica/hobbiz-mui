@@ -248,12 +248,13 @@
 @media (max-width: 768px) {
   .privacy-policy {
     padding: 20px 0;
-    /* Safe-area-aware padding on mobile */
-    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+    /* Safe-area-aware padding on mobile - ultra-compact */
+    padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
   }
   
   .privacy-policy__container {
     padding: 0 16px;
+    margin-top: 1rem; /* redus de la 4rem pentru mai puțin spațiu de sus */
   }
   
   .privacy-policy__header {
@@ -390,7 +391,7 @@
     gap: 8px !important;
     margin-bottom: 8px !important;
     margin-top: -3rem !important;
-    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-top: 2px !important; /* ultra-compact spacing */
     padding-left: 8px !important;
     padding-right: 8px !important;
     color: var(--chat-text) !important;
@@ -406,6 +407,7 @@
     justify-content: center !important;
     background-color: var(--chat-elev) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    margin-top: 0 !important; /* eliminat spațiul superior */
   }
 
   .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
@@ -421,6 +423,7 @@
     font-size: 24px !important;
     line-height: 1.334 !important;
     margin: 0 !important;
+    margin-top: 0 !important; /* eliminat spațiul superior */
     flex: 0 0 auto !important;
     margin-left: 4px !important;
     padding-right: 2rem !important;
