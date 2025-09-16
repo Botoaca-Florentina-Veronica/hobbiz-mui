@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -63,13 +64,25 @@ export default function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <input
-          type="password"
-          placeholder="Parola"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="password-field-wrapper">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Parola"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            aria-label="Parola"
+            autoComplete="current-password"
+          />
+          <button
+            type="button"
+            className="toggle-password-btn"
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword(p => !p)}
+          >
+            {showPassword ? 'Ascunde parola' : 'Afișează parola'}
+          </button>
+        </div>
         <button 
           className="submit-btn" 
           type="submit"

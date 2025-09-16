@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-// TODO: Migrare către AuthContext (favorites persistente). Pagină păstrată temporar pentru compatibilitate.
+// Integrare cu AuthContext pentru favorite persistente + fallback guest localStorage
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -7,6 +7,7 @@ import { IconButton, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import './FavoriteAnnouncements.css';
+import { useAuth } from '../context/AuthContext.jsx';
 
 function Toast({ message, onClose }) {
   useEffect(() => {
@@ -24,113 +25,91 @@ function Toast({ message, onClose }) {
 }
 
 export default function FavoriteAnnouncements() {
-  const [announcements, setAnnouncements] = useState([]);
   const navigate = useNavigate();
-  // Cheie unică pentru favorite per utilizator
-  const userId = localStorage.getItem('userId');
-  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
-  
-  const [favoriteIds, setFavoriteIds] = useState(() => {
-    const stored = localStorage.getItem(FAVORITES_KEY);
+  const { user, favorites: authFavoriteIds, fullFavorites, toggleFavorite } = useAuth() || {};
+  // Guest localStorage fallback
+  const guestUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+  const FAVORITES_KEY = guestUserId ? `favoriteAnnouncements_${guestUserId}` : 'favoriteAnnouncements_guest';
+
+  const isAuthenticated = !!user;
+
+  // Local state only used for guest mode
+  const [guestFavoriteIds, setGuestFavoriteIds] = useState(() => {
+    if (isAuthenticated) return []; // auth path ignores localStorage
+    const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
     if (!stored) return [];
-    
     try {
       const parsed = JSON.parse(stored);
-      // Verifică dacă e în formatul vechi (array de string-uri) sau nou (array de obiecte)
       if (parsed.length > 0 && typeof parsed[0] === 'string') {
-        // Convertește din formatul vechi în cel nou
         const converted = parsed.map(id => ({ id, addedAt: Date.now() }));
         localStorage.setItem(FAVORITES_KEY, JSON.stringify(converted));
-        return parsed; // returnează ID-urile pentru compatibilitate
+        return parsed;
       } else {
-        // Format nou - returnează doar ID-urile pentru compatibilitate
         return parsed.map(item => item.id);
       }
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   });
-  
-  const [favoriteObjects, setFavoriteObjects] = useState(() => {
-    const stored = localStorage.getItem(FAVORITES_KEY);
+
+  const [guestFavoriteObjects, setGuestFavoriteObjects] = useState(() => {
+    if (isAuthenticated) return [];
+    const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
     if (!stored) return [];
-    
     try {
       const parsed = JSON.parse(stored);
       if (parsed.length > 0 && typeof parsed[0] === 'string') {
-        // Format vechi - convertește
         return parsed.map(id => ({ id, addedAt: Date.now() }));
-      } else {
-        // Format nou
-        return parsed;
       }
-    } catch {
-      return [];
-    }
+      return parsed;
+    } catch { return []; }
   });
+
+  const [guestAnnouncements, setGuestAnnouncements] = useState([]);
   const [showToast, setShowToast] = useState(false);
 
+  // Guest mode: fetch announcements then filter
   useEffect(() => {
-    if (favoriteIds.length === 0) {
-      setAnnouncements([]);
+    if (isAuthenticated) return; // skip guest-only logic
+    if (guestFavoriteIds.length === 0) {
+      setGuestAnnouncements([]);
       return;
     }
-    apiClient.get(`/api/announcements`)
+    apiClient.get('/api/announcements')
       .then(res => {
-        const filtered = res.data.filter(a => favoriteIds.includes(a._id));
-        
-        // Sortează anunțurile în ordinea în care au fost adăugate în favorite (cel mai recent primul)
+        const filtered = res.data.filter(a => guestFavoriteIds.includes(a._id));
         const sorted = filtered.sort((a, b) => {
-          const aFavorite = favoriteObjects.find(fav => fav.id === a._id);
-          const bFavorite = favoriteObjects.find(fav => fav.id === b._id);
-          
-          if (!aFavorite || !bFavorite) return 0;
-          return bFavorite.addedAt - aFavorite.addedAt; // Cel mai recent primul
+          const aFav = guestFavoriteObjects.find(f => f.id === a._id);
+          const bFav = guestFavoriteObjects.find(f => f.id === b._id);
+          if (!aFav || !bFav) return 0;
+          return bFav.addedAt - aFav.addedAt;
         });
-        
-        setAnnouncements(sorted);
+        setGuestAnnouncements(sorted);
       })
-      .catch(() => setAnnouncements([]));
-  }, [favoriteIds, favoriteObjects, FAVORITES_KEY]);
+      .catch(() => setGuestAnnouncements([]));
+  }, [isAuthenticated, guestFavoriteIds, guestFavoriteObjects, FAVORITES_KEY]);
 
   const handleToggleFavorite = (id) => {
-    setFavoriteObjects((prev) => {
+    if (isAuthenticated) {
+      toggleFavorite?.(id);
+      // Nu avem încă actualizare optimistă pentru fullFavorites; se poate adăuga ulterior.
+      return;
+    }
+    // Guest local storage path (legacy)
+    setGuestFavoriteObjects(prev => {
       let updated;
       const exists = prev.find(item => item.id === id);
-      
       if (exists) {
-        // Elimină din favorite (optimistic)
-        updated = prev.filter((item) => item.id !== id);
+        updated = prev.filter(item => item.id !== id);
         setShowToast(true);
-        // Backend: decrement favoritesCount
-        apiClient.delete(`/api/announcements/${id}/favorite`).catch(() => {});
+        apiClient.delete(`/api/announcements/${id}/favorite`).catch(() => {}); // optional: sync global count
       } else {
-        // Adaugă în favorite cu timestamp-ul curent (optimistic)
         updated = [...prev, { id, addedAt: Date.now() }];
-        // Backend: increment favoritesCount
         apiClient.post(`/api/announcements/${id}/favorite`).catch(() => {});
       }
-      
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-      // Notifică restul aplicației că favoritele s-au schimbat
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('favorites:updated'));
-      }
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
       return updated;
     });
-    
-    // Actualizează și array-ul simplu de ID-uri pentru compatibilitate
-    setFavoriteIds((prev) => {
-      if (prev.includes(id)) {
-  const next = prev.filter((fid) => fid !== id);
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
-  return next;
-      } else {
-  const next = [...prev, id];
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
-  return next;
-      }
-    });
+    setGuestFavoriteIds(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   };
 
   return (
@@ -151,12 +130,14 @@ export default function FavoriteAnnouncements() {
           <Typography variant="h5" className="mobile-header-title">Favorite</Typography>
         </div>
         <h1 className="my-announcements-title">Anunturile tale favorite</h1>
-        <div className="favorite-count">Anunțuri favorite ({announcements.length}/150)</div>
-        {announcements.length === 0 ? (
+        <div className="favorite-count">
+          Anunțuri favorite ({(isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length)}/150)
+        </div>
+        {(isAuthenticated ? (fullFavorites?.length === 0) : (guestAnnouncements.length === 0)) ? (
           <div>Nu ai anunțuri favorite salvate.</div>
         ) : (
           <div className="favorite-announcements-list">
-            {announcements.map((a) => (
+            {(isAuthenticated ? fullFavorites : guestAnnouncements).map((a) => (
               <div
                 key={a._id}
                 className="favorite-announcement-card"
@@ -183,10 +164,10 @@ export default function FavoriteAnnouncements() {
                   <span className="favorite-date">
                     {a.createdAt ? `Postat ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}` : ''}
                   </span>
-                  <div className={`favorite-heart ${favoriteIds.includes(a._id) ? 'filled' : ''}`}
+                  <div className={`favorite-heart ${(isAuthenticated ? authFavoriteIds : guestFavoriteIds).includes(a._id) ? 'filled' : ''}`}
                     onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
                   >
-                    {favoriteIds.includes(a._id) ? (
+                    {(isAuthenticated ? authFavoriteIds : guestFavoriteIds).includes(a._id) ? (
                       <FavoriteIcon />
                     ) : (
                       <FavoriteBorderIcon />

@@ -57,6 +57,44 @@
   text-align: center;
 }
 
+/* Password toggle wrapper */
+.password-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+.password-field-wrapper input {
+  flex: 1;
+  padding-right: 130px; /* spațiu pentru buton */
+}
+.toggle-password-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #355070;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: .5px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background .2s ease, color .2s ease;
+}
+.toggle-password-btn:hover, .toggle-password-btn:focus-visible {
+  background: rgba(53,80,112,0.08);
+  outline: none;
+}
+.toggle-password-btn:active { transform: translateY(calc(-50% + 1px)); }
+
+/* Dark mode adjustments */
+.dark-mode .toggle-password-btn { color: #f51866; }
+.dark-mode .toggle-password-btn:hover, .dark-mode .toggle-password-btn:focus-visible {
+  background: rgba(245,24,102,0.15);
+}
+
 /* Dark Mode Styles */
 .dark-mode .login-container {
   background: #282828; /* solid, the darker color from the previous gradient */
