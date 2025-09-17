@@ -4,7 +4,7 @@ import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
 import puzzleLogo from '../assets/images/puzzle.png';
 import puzzle2 from '../assets/images/puzzle2.png';
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from '../context/AuthContext.jsx';
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
@@ -26,6 +26,29 @@ export default function Header() {
   // Versiune pentru recalcularea numărului de favorite în modul guest (se actualizează la evenimente)
   const [guestFavVersion, setGuestFavVersion] = useState(0);
   const auth = useAuth();
+  const [avatarError, setAvatarError] = useState(false);
+  const [avatarIdx, setAvatarIdx] = useState(0);
+
+  // Helper: rezolvă URL relativ (ex: "/uploads/...") la URL absolut către backend
+  const resolveAvatarUrl = (url) => {
+    if (!url) return null;
+    if (/^https?:\/\//i.test(url) || url.startsWith('//')) return url;
+    const base = (apiClient?.defaults?.baseURL || '').replace(/\/$/, '');
+    const normalized = url.startsWith('/') ? url : `/${url}`;
+    return `${base}${normalized}`;
+  };
+
+  // Construiește o listă de candidați pentru avatar (ex: din context + auth/check)
+  const avatarCandidates = useMemo(() => {
+    if (!isAuthenticated) return [];
+    const lastStored = (typeof window !== 'undefined') ? (localStorage.getItem('lastAvatarUrl') || null) : null;
+    const rawList = [auth?.user?.avatar, avatar, lastStored].filter(Boolean);
+    const normalized = rawList
+      .map((u) => resolveAvatarUrl(u))
+      .filter((u) => !!u);
+    // elimină duplicatele păstrând ordinea
+    return Array.from(new Set(normalized));
+  }, [isAuthenticated, auth?.user?.avatar, avatar]);
 
   // Funcție pentru a obține numărul de notificări necitite
   const fetchUnreadCount = async () => {
@@ -92,6 +115,7 @@ export default function Header() {
       setAvatar(null);
       setUnreadCount(0);
       setChatUnreadCount(0);
+      try { localStorage.removeItem('lastAvatarUrl'); } catch {}
       return;
     }
     // Dacă există token, verifică și cu backendul (pentru sesiuni Google etc)
@@ -106,6 +130,7 @@ export default function Header() {
         } else {
           setAvatar(null);
         }
+        setAvatarError(false);
         
         // Dacă utilizatorul este autentificat, obține numărul de notificări și chat necitite
   if (response.data.isAuthenticated) {
@@ -115,11 +140,35 @@ export default function Header() {
       } catch (error) {
         setIsAuthenticated(false);
         setAvatar(null);
+        setAvatarError(false);
         setUnreadCount(0);
         setChatUnreadCount(0);
+        try { localStorage.removeItem('lastAvatarUrl'); } catch {}
       }
     };
     checkAuth();
+  }, []);
+
+  // Reset fallback dacă avatarul din context sau din state se schimbă
+  useEffect(() => {
+    setAvatarError(false);
+    setAvatarIdx(0);
+  }, [auth?.user?.avatar, avatar, isAuthenticated]);
+
+  // Reîncearcă afișarea avatarului la revenirea în tab (în caz de erori temporare)
+  useEffect(() => {
+    const onFocus = () => {
+      setAvatarError(false);
+      setAvatarIdx(0);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', onFocus);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', onFocus);
+      }
+    };
   }, []);
 
   // Actualizează contoarele când se schimbă pagina (pentru a reflecta citirea notificărilor/chat)
@@ -248,7 +297,12 @@ export default function Header() {
       logout().finally(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        try { localStorage.removeItem('lastAvatarUrl'); } catch {}
         setIsAuthenticated(false);
+        setAvatar(null);
+        setUnreadCount(0);
+        setChatUnreadCount(0);
+        setAvatarError(false);
         setOpenSnackbar(true);
         navigate('/');
         window.location.reload();
@@ -370,11 +424,40 @@ export default function Header() {
                   className="for-dropdown" 
                   onClick={handleAccountClick}
                 >
-                  {avatar ? (
-                    <img src={avatar} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }} />
-                  ) : (
-                    <HiOutlineUser size={24} />
-                  )}
+                  {(() => {
+                    if (!isAuthenticated) {
+                      return <HiOutlineUser size={24} />;
+                    }
+                    const src = avatarCandidates[avatarIdx];
+                    if (src && !avatarError) {
+                      return (
+                        <img
+                          key={src}
+                          src={src}
+                          alt="Avatar"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onLoad={() => {
+                            try {
+                              if (typeof window !== 'undefined') {
+                                localStorage.setItem('lastAvatarUrl', src);
+                              }
+                            } catch {}
+                          }}
+                          onError={() => {
+                            // Încearcă următorul candidat sau marchează eroare dacă nu mai sunt
+                            if (avatarIdx < avatarCandidates.length - 1) {
+                              setAvatarIdx((i) => i + 1);
+                            } else {
+                              setAvatarError(true);
+                            }
+                          }}
+                          style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 8, border: '2px solid #fff', boxSizing: 'border-box' }}
+                        />
+                      );
+                    }
+                    return <HiOutlineUser size={24} />;
+                  })()}
                   <span>Contul tău</span>
                 </label>
                 {isAuthenticated && (

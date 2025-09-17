@@ -101,6 +101,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
       
       {/* Mobile Footer - doar pe mobile */}
       <div className="footer-mobile-buttons">
+        <div className="footer-active-indicator"></div>
         <div className="footer-icons">
           <div 
             className={`footer-icon ${location.pathname === '/' ? 'active' : ''}`}
@@ -152,7 +153,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
           </div>
           
           <div 
-            className={`footer-icon footer-account ${location.pathname.includes('/profil') || location.pathname.includes('/setari-cont') ? 'active' : ''}`}
+            className={`footer-icon footer-account ${location.pathname.includes('/profil') || location.pathname.includes('/setari-cont') || location.pathname.includes('/cont') || location.pathname.includes('/anunturile-mele') ? 'active' : ''}`}
             onClick={handleAccountClick}
             style={{ position: 'relative' }}
             aria-label="Cont"

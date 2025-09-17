@@ -4,6 +4,8 @@ import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './Soci
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import '../pages/LoginSignup.css';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -78,9 +80,14 @@ export default function LoginPage() {
             type="button"
             className="toggle-password-btn"
             aria-pressed={showPassword}
+            aria-label={showPassword ? 'Ascunde parola' : 'Afișează parola'}
             onClick={() => setShowPassword(p => !p)}
           >
-            {showPassword ? 'Ascunde parola' : 'Afișează parola'}
+            {showPassword ? (
+              <VisibilityOffIcon fontSize="small" />
+            ) : (
+              <VisibilityIcon fontSize="small" />
+            )}
           </button>
         </div>
         <button 

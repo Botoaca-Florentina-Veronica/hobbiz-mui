@@ -26,6 +26,8 @@ const resolveAvatarUrl = (src) => {
 
 export default function ChatPage() {
   const navigate = useNavigate();
+  const handledConversationRef = useRef(null); // track handled conversationId from route state
+  const triedSwitchRef = useRef(false); // avoid infinite tab toggling
   const [activeTab, setActiveTab] = useState('buying'); // 'buying' sau 'selling'
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -307,22 +309,30 @@ export default function ChatPage() {
 
   // Auto-selectează conversația din state (din notificări)
   useEffect(() => {
-    if (location.state?.conversationId && conversations.length > 0) {
-      // Extragem participanții din conversationId pentru a găsi utilizatorul
-      const conversationId = location.state.conversationId;
-      const participantIds = conversationId.split('-');
-      const otherParticipantId = participantIds.find(id => id !== userId);
-      
-      if (otherParticipantId) {
-        const targetConversation = conversations.find(conv => 
-          conv.conversationId === conversationId
-        );
-        if (targetConversation) {
-          setSelectedConversation(targetConversation);
-        }
+    const desiredId = location.state?.conversationId;
+    if (!desiredId) return;
+
+    // If we've already handled this conversation id, do nothing
+    if (handledConversationRef.current === desiredId) return;
+
+    if (conversations.length > 0) {
+      const found = conversations.find(c => c.conversationId === desiredId);
+      if (found) {
+        setSelectedConversation(found);
+        handledConversationRef.current = desiredId;
+        // Clear state to avoid re-triggering on subsequent renders
+        try {
+          navigate('/chat', { replace: true });
+        } catch (_) {}
+        return;
+      }
+      // Not found in current tab: try switching tab once
+      if (!triedSwitchRef.current) {
+        triedSwitchRef.current = true;
+        setActiveTab(prev => (prev === 'selling' ? 'buying' : 'selling'));
       }
     }
-  }, [location.state, conversations, userId]);
+  }, [location.state, conversations, userId, navigate]);
 
   // Fetch messages pentru conversația selectată
   useEffect(() => {

@@ -407,6 +407,31 @@ html {
 .announcement-meta-footer button svg { margin-right: 4px; }
 .announcement-meta-footer .MuiTypography-caption { user-select: text; }
 
+/* Mobile optimizations for announcement footer */
+@media (max-width: 600px) {
+  .announcement-meta-footer {
+    /* Ensure all elements stay on same line */
+    overflow: hidden;
+  }
+  
+  .announcement-meta-footer .MuiTypography-caption {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Make button more compact on mobile */
+  .announcement-meta-footer .MuiButton-root {
+    min-height: 28px;
+    line-height: 1.2;
+  }
+  
+  .announcement-meta-footer .MuiButton-root .MuiSvgIcon-root,
+  .announcement-meta-footer .MuiButton-root svg {
+    margin-right: 2px;
+  }
+}
+
 .dark-mode .announcement-meta-footer {
   border-color: rgba(255,255,255,0.15) !important;
 }

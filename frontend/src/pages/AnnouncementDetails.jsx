@@ -596,24 +596,49 @@ export default function AnnouncementDetails() {
                     borderTop: '1px solid',
                     borderColor: getIsDarkMode() ? 'rgba(255,255,255,0.12)' : 'rgba(53,80,112,0.25)',
                     display: 'flex',
-                    alignItems: { xs: 'flex-start', sm: 'center' },
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    gap: { xs: 1.5, sm: 3 },
-                    justifyContent: 'space-between'
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    gap: { xs: 1, sm: 3 },
+                    justifyContent: 'space-between',
+                    flexWrap: { xs: 'nowrap', sm: 'wrap' },
+                    minHeight: { xs: '36px', sm: 'auto' }
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: '.5px', opacity: .75 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: { xs: 1.5, sm: 3 }, 
+                    flexWrap: 'nowrap',
+                    minWidth: 0,
+                    flex: '1 1 auto'
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, flexShrink: 0 }}>
+                      <Typography variant="caption" sx={{ 
+                        fontWeight: 600, 
+                        letterSpacing: '.5px', 
+                        opacity: .75,
+                        fontSize: { xs: '.65rem', sm: '.75rem' }
+                      }}>
                         ID:
                       </Typography>
-                      <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '.75rem', opacity: .9 }}>
+                      <Typography variant="caption" sx={{ 
+                        fontFamily: 'monospace', 
+                        fontSize: { xs: '.65rem', sm: '.75rem' }, 
+                        opacity: .9 
+                      }}>
                         {announcement._id?.slice(-8) || '—'}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: .5 }}>
-                      <VisibilityIcon sx={{ fontSize: 18, color: getAccentCss(), opacity: .85 }} />
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.25, sm: 0.5 }, flexShrink: 0 }}>
+                      <VisibilityIcon sx={{ 
+                        fontSize: { xs: 14, sm: 18 }, 
+                        color: getAccentCss(), 
+                        opacity: .85 
+                      }} />
+                      <Typography variant="caption" sx={{ 
+                        fontWeight: 500,
+                        fontSize: { xs: '.65rem', sm: '.75rem' }
+                      }}>
                         {typeof announcement.views === 'number' ? announcement.views : 0} vizualizări
                       </Typography>
                     </Box>
@@ -622,16 +647,19 @@ export default function AnnouncementDetails() {
                     size="small"
                     onClick={() => alert('Funcționalitatea de raportare va fi disponibilă în curând.')}
                     startIcon={
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width={window.innerWidth < 600 ? "12" : "16"} height={window.innerWidth < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
                     }
                     sx={{
-                      alignSelf: { xs: 'flex-end', sm: 'center' },
                       color: '#e5533d',
                       textTransform: 'none',
                       fontWeight: 600,
                       '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(229,83,61,0.08)' : 'rgba(229,83,61,0.08)' },
-                      fontSize: '.75rem',
-                      letterSpacing: '.5px'
+                      fontSize: { xs: '.65rem', sm: '.75rem' },
+                      letterSpacing: '.5px',
+                      minWidth: { xs: '70px', sm: 'auto' },
+                      px: { xs: 1, sm: 1.5 },
+                      py: { xs: 0.5, sm: 0.75 },
+                      flexShrink: 0
                     }}
                   >
                     Raportează

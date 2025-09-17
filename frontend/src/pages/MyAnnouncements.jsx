@@ -366,6 +366,13 @@ export default function MyAnnouncements() {
         )}
       </div>
       {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => { setConfirmOpen(false); setDeleteId(null); }}
+        onConfirm={handleConfirmDelete}
+        title="Sigur vrei să ștergi acest anunț?"
+        description="Această acțiune nu poate fi anulată."
+      />
     </>
   );
 }

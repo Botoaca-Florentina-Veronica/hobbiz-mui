@@ -129,14 +129,35 @@
     right: 0;
     height: 65px;
     display: flex !important;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: flex-end;
     align-items: center;
     background: var(--app-surface);
     z-index: 1000;
-    padding: 0.5rem 0;
+    padding: 0;
     box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
     border-top: 1px solid var(--app-border);
+    /* Hardware acceleration for smooth animations */
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Active indicator with improved positioning */
+  .footer-active-indicator {
+    position: absolute;
+    top: 0;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 0 0 2px 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(-1px);
+  }
+
+  .footer-mobile-buttons:has(.footer-icon.active) .footer-active-indicator {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .footer-mobile-buttons .footer-icons {
@@ -144,6 +165,9 @@
     justify-content: space-around;
     width: 100%;
     gap: 0;
+    height: 65px;
+    align-items: center;
+    position: relative;
   }
 
   .footer-mobile-buttons .footer-icon {
@@ -154,27 +178,83 @@
     font-size: 0.75rem;
     gap: 0.2rem;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0.5rem;
     min-width: 60px;
     min-height: 55px;
     justify-content: center;
     cursor: pointer;
+    position: relative;
+    flex: 1;
+    /* Performance optimizations */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
-  .footer-mobile-buttons .footer-icon:hover,
+  /* Enhanced interaction states */
+  .footer-mobile-buttons .footer-icon:hover {
+    color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  .footer-mobile-buttons .footer-icon:active {
+    transform: translateY(0px) scale(0.96);
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+
   .footer-mobile-buttons .footer-icon.active {
     color: var(--primary);
+  }
+
+  /* Ripple effect */
+  .footer-mobile-buttons .footer-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: var(--primary);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .footer-mobile-buttons .footer-icon:active::before {
+    width: 40px;
+    height: 40px;
+    opacity: 0.1;
   }
 
   .footer-mobile-buttons .footer-icon svg {
     font-size: 1.5rem;
     margin-bottom: 0.2rem;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-mobile-buttons .footer-icon:hover svg {
+    transform: scale(1.1);
+  }
+
+  .footer-mobile-buttons .footer-icon.active svg {
+    transform: scale(1.05);
   }
 
   .footer-mobile-buttons .footer-icon span {
     font-weight: 500;
     font-size: 0.7rem;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-mobile-buttons .footer-icon:hover span {
+    transform: scale(1.05);
   }
 
   /* Butonul special de Vinde (inspirat din OLX) */
@@ -193,6 +273,17 @@
     justify-content: center;
     margin-bottom: 0.2rem;
     box-shadow: 0 2px 8px rgba(26, 90, 135, 0.3);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .footer-mobile-buttons .footer-publish:hover .footer-publish-icon {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(26, 90, 135, 0.4);
+  }
+
+  .footer-mobile-buttons .footer-publish:active .footer-publish-icon {
+    transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(26, 90, 135, 0.3);
   }
 
   .footer-mobile-buttons .footer-publish span {

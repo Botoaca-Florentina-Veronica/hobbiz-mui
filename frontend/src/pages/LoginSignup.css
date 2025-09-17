@@ -65,22 +65,24 @@
 }
 .password-field-wrapper input {
   flex: 1;
-  padding-right: 130px; /* spațiu pentru buton */
+  padding-right: 44px; /* spațiu pentru buton icon */
 }
 .toggle-password-btn {
   position: absolute;
-  right: 8px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: #355070;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: .5px;
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   transition: background .2s ease, color .2s ease;
 }
 .toggle-password-btn:hover, .toggle-password-btn:focus-visible {

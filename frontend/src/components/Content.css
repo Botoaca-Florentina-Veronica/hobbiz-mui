@@ -48,6 +48,131 @@
     padding: 20px 10px 30px 10px;
     margin-top: 0;
   }
+  
+  /* Mobile-specific optimizations for popular announcements - 2 per row */
+  .popular-announcements-container {
+    max-width: 100% !important;
+    padding: 20px 12px !important;
+    gap: 12px !important;
+  }
+  
+  .popular-announcements-container .MuiCard-root {
+    margin-bottom: 12px;
+    flex-basis: calc(50% - 6px) !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root {
+    padding: 6px !important;
+    height: 90px !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+    -webkit-line-clamp: 2 !important;
+    line-clamp: 2 !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .popular-announcements-container .MuiTypography-caption {
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+  }
+  
+  .popular-announcements-container svg {
+    width: 9px !important;
+    height: 9px !important;
+  }
+}
+
+/* Tablet optimizations - Small tablets */
+@media (min-width: 701px) and (max-width: 900px) {
+  .content {
+    padding: 80px 0 80px 0;
+    font-size: 1.3rem;
+    height: auto;
+  }
+  .content h2 {
+    font-size: 2.5rem;
+    padding: 30px 20px 40px 20px;
+  }
+  
+  .popular-announcements-container {
+    max-width: 100% !important;
+    padding: 20px 16px !important;
+    gap: 16px !important;
+  }
+  
+  .popular-announcements-container .MuiCard-root {
+    margin-bottom: 16px;
+    flex-basis: calc(50% - 8px) !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root {
+    padding: 8px !important;
+    height: 100px !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
+    font-size: 0.85rem !important;
+    line-height: 1.15 !important;
+    margin-bottom: 3px !important;
+  }
+  
+  .popular-announcements-container .MuiTypography-caption {
+    font-size: 0.65rem !important;
+    line-height: 1.05 !important;
+  }
+  
+  .popular-announcements-container svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+}
+
+/* Large tablet optimizations */
+@media (min-width: 901px) and (max-width: 1199px) {
+  .content {
+    padding: 100px 0 100px 0;
+    font-size: 1.4rem;
+    height: auto;
+  }
+  .content h2 {
+    font-size: 3rem;
+    padding: 40px 30px 50px 30px;
+  }
+  
+  .popular-announcements-container {
+    max-width: 100% !important;
+    padding: 20px 20px !important;
+    gap: 20px !important;
+  }
+  
+  .popular-announcements-container .MuiCard-root {
+    margin-bottom: 20px;
+    flex-basis: calc(50% - 10px) !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root {
+    padding: 12px !important;
+    height: 110px !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
+    font-size: 0.95rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .popular-announcements-container .MuiTypography-caption {
+    font-size: 0.7rem !important;
+    line-height: 1.1 !important;
+  }
+  
+  .popular-announcements-container svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
 }
 
 .content h2 {
