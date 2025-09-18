@@ -1,6 +1,6 @@
-/* AddAnnouncementPage.mobile.css - Stiluri dedicate pentru mobile (max-width: 600px) */
+/* AddAnnouncementPage.mobile.css - Stiluri dedicate pentru mobile (max-width: 499px) */
 
-@media (max-width: 600px) {
+@media (max-width: 499px) {
   /* Ensure no child overflows its container due to padding/border */
   .add-announcement-container,
   .add-announcement-container * {

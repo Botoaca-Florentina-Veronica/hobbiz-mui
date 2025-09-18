@@ -83,16 +83,7 @@ export default function EditAnnouncementPage() {
   const location = useLocation();
   const [announcementId, setAnnouncementId] = useState(null);
   
-  // Detectare mobile pentru stiluri responsive
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // detectare mobile: folosește același prag ca în pagina de adăugare (sub 500px = mobile)
 
   // Încarcă datele anunțului pentru editare
   useEffect(() => {
@@ -393,6 +384,8 @@ export default function EditAnnouncementPage() {
 
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
+  // Keep mobile category UI below 500px for consistency with Add page
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 500;
 
   return (
     <div className="add-announcement-container">
@@ -481,11 +474,10 @@ export default function EditAnnouncementPage() {
           PaperProps={{ 
             sx: {
               // Mobile: responsive width using clamp(min, preferred, max)
-              width: isMobile ? 'clamp(280px, calc(100vw - 64px), 420px)' : undefined,
-              minWidth: isMobile ? undefined : 800,
-              maxWidth: isMobile ? undefined : 1000,
-              minHeight: isMobile ? '50vh' : 600,
-              maxHeight: isMobile ? '78vh' : 'calc(100vh - 100px)',
+              width: isMobile ? 'clamp(280px, calc(100vw - 64px), 420px)' : 'min(92vw, 1100px)',
+              maxWidth: isMobile ? undefined : 1200,
+              minHeight: isMobile ? '50vh' : 440,
+              maxHeight: isMobile ? '78vh' : 'calc(100vh - 72px)',
               // Keep scroll on mobile, hide scrollbar on desktop
               overflowY: 'auto',
               ...(isMobile ? {} : {
@@ -497,13 +489,13 @@ export default function EditAnnouncementPage() {
                 }
               }),
               borderRadius: isMobile ? 10 : 8,
-              p: isMobile ? 0 : 0,
+              p: isMobile ? 0 : 'clamp(12px, 3vw, 24px)',
               zIndex: (theme) => theme.zIndex.modal + 1,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
               color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
               border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
               '& .categories-grid-popover': {
-                padding: isMobile ? '0' : '2rem'
+                padding: 0
               }
             }
           }}

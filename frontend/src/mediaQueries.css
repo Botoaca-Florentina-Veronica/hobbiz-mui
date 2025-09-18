@@ -1,5 +1,5 @@
-/* =============== Dispozitive Mobile (până la 768px) =============== */
-@media (max-width: 768px) {
+/* =============== Dispozitive Mobile (până la 900px) =============== */
+@media (max-width: 900px) {
   /* ----------------- Header Principal - Ascuns pe Mobile ----------------- */
   .header {
     display: none !important;
@@ -296,17 +296,17 @@
   }
 
   /* Afișează și pe mobile footer-ul de desktop și zona legală */
+  /* Ascunde elementele de desktop pe mobil; MobileLegal/compact rămâne gestionat din Footer.css */
   .desktop-footer {
-    display: block !important;
-    margin-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
+    display: none !important;
   }
 
   .legal-section {
-    display: flex !important;
+    display: none !important;
   }
 
   .footer-separator {
-    display: block !important;
+    display: none !important;
   }
 
   /* ----------------- General Mobile Adjustments ----------------- */
@@ -346,8 +346,8 @@
   }
 }
 
-/* =============== Tabletă (769px - 1024px) =============== */
-@media (min-width: 769px) and (max-width: 1024px) {
+/* =============== Tabletă (901px - 1024px) =============== */
+@media (min-width: 901px) and (max-width: 1024px) {
   /* Folosim doar MobileHeader pe tabletă */
   .header,
   .fixed-header {

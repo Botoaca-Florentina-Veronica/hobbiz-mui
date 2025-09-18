@@ -500,7 +500,8 @@ export default function AddAnnouncementPage() {
 
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 600;
+  // Mobile category menu for widths under 500px; desktop popover from 500px+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 500;
 
   return (
     <div className="add-announcement-container">
@@ -589,11 +590,11 @@ export default function AddAnnouncementPage() {
           PaperProps={{ 
             sx: {
               // Mobile: responsive width using clamp(min, preferred, max)
-              width: isMobile ? 'clamp(280px, calc(100vw - 64px), 420px)' : undefined,
-              minWidth: isMobile ? undefined : 800,
-              maxWidth: isMobile ? undefined : 1000,
-              minHeight: isMobile ? '50vh' : 600,
-              maxHeight: isMobile ? '78vh' : 'calc(100vh - 100px)',
+              width: isMobile ? 'clamp(280px, calc(100vw - 64px), 420px)' : 'min(92vw, 1100px)',
+              // For desktop/tablet widths (>=500px), keep a flexible max
+              maxWidth: isMobile ? undefined : 1200,
+              minHeight: isMobile ? '50vh' : 440,
+              maxHeight: isMobile ? '78vh' : 'calc(100vh - 72px)',
               // Keep scroll on mobile, hide scrollbar on desktop
               overflowY: 'auto',
               ...(isMobile ? {} : {
@@ -605,13 +606,14 @@ export default function AddAnnouncementPage() {
                 }
               }),
               borderRadius: isMobile ? 10 : 8,
-              p: isMobile ? 0 : 0,
+              // Add interior padding on desktop for visible margins
+              p: isMobile ? 0 : 'clamp(12px, 3vw, 24px)',
               zIndex: (theme) => theme.zIndex.modal + 1,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
               color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
               border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
               '& .categories-grid-popover': {
-                padding: isMobile ? '0' : '2rem'
+                padding: 0
               }
             }
           }}

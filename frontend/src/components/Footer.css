@@ -200,7 +200,7 @@
   .mobile-legal__list a:hover { color: var(--primary); text-decoration: underline; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   /* Hide desktop footer on small screens to avoid overlap with fixed mobile bar */
   .desktop-footer {
     display: none !important;
@@ -651,4 +651,10 @@
   .footer.hide-legal-upto-1200 .mobile-legal {
     display: none !important;
   }
+}
+
+/* Hard override: ensure mobile footer is visible up to 900px regardless of import order */
+@media (max-width: 900px) {
+  .footer-mobile-buttons { display: flex !important; }
+  .desktop-footer { display: none !important; }
 }

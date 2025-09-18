@@ -1,4 +1,4 @@
-@media (min-width: 601px) {
+@media (min-width: 500px) {
   .category-title-popover {
     display: none !important;
   }
@@ -10,7 +10,7 @@
 }
 
 /* Desktop: hide mobile drawer header elements for "Alege categoria" popover */
-@media (min-width: 769px) {
+@media (min-width: 500px) {
   .categories-popover-header-mobile,
   .categories-popover-close,
   .categories-popover-title {
@@ -40,14 +40,6 @@
     margin-top: 0 !important;
     background: var(--app-bg) !important;
   }
-}
-
-.add-announcement-title {
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: #183642;
-  margin-bottom: 32px;
-  margin-left: 2.5rem;
 }
 
 .add-announcement-form {
@@ -159,12 +151,11 @@
 .categories-grid-popover {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
   gap: 1rem;
-  justify-items: center;
-  align-items: center;
+  justify-items: stretch;
+  align-items: stretch;
   width: 100%;
-  padding: 1.2rem 0.5rem;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -172,21 +163,73 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box;
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 18px;
     cursor: pointer;
     padding: 1.1rem;
     width: 170px;
-    height: 140px;
+    height: auto;
+    min-height: 140px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     transition: transform 0.2s, box-shadow 0.2s;
     justify-content: flex-start;
   }
 
+/* Responsive columns for desktop popover */
+@media (min-width: 500px) and (max-width: 699px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .category-card-popover {
+    width: 100%;
+    min-height: 160px;
+    padding: 0.8rem;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 899px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  .category-card-popover {
+    width: 100%;
+    min-height: 170px;
+  }
+}
+
+@media (min-width: 900px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+  .category-card-popover {
+    width: 100%;
+    min-height: 170px;
+  }
+}
+
+/* Ultra-wide: add a 5th column to reduce horizontal whitespace */
+@media (min-width: 1400px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 .category-card-popover:hover {
   transform: scale(1.04);
   box-shadow: 0 4px 16px rgba(24,54,66,0.10);
+}
+
+/* Avoid hover scale on smaller desktop/tablet to preserve gaps */
+@media (max-width: 899px) {
+  .category-card-popover:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
 }
 
 .image-container-popover {
@@ -227,6 +270,39 @@
     line-height: 1.2;
     display: block;
   }
+
+/* Desktop enhancements: ensure text fits cleanly */
+@media (min-width: 500px) {
+  .category-description-popover,
+  .category-hint-popover {
+    display: block;
+  }
+  .category-description-popover {
+    color: #183642;
+    font-size: 0.95rem;
+    line-height: 1.25;
+    text-align: center;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    min-height: calc(1.25em * 2);
+  }
+  .category-hint-popover {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    opacity: 0.9;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    min-height: calc(1.2em * 2);
+  }
+}
 
 /* Other Sections */
   .add-announcement-actions-section {
