@@ -10,7 +10,8 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+// ForumOutlinedIcon removed — replaced by gumballChat image for desktop-only
+import gumballChat from '../assets/images/gumballChat.jpg';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { Box, IconButton, Typography } from '@mui/material';
@@ -927,7 +928,8 @@ export default function ChatPage() {
           {!selectedConversation ? (
             <div className="chat-empty-main">
               <div className="chat-empty-icon">
-                <ForumOutlinedIcon sx={{ fontSize: 96 }} />
+                {/* Desktop: show gumball image; Mobile: show ForumOutlinedIcon fallback */}
+                <img src={gumballChat} alt="Chat" className="chat-empty-img" />
               </div>
               <div className="chat-empty-text">Selectează o conversație pentru a o citi</div>
               <div className="chat-empty-subtitle">

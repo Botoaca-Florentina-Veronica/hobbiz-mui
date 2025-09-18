@@ -18,6 +18,7 @@ import {
   Person, 
   Payment, 
   AccountCircle, 
+  Notifications,
   Logout,
   DarkMode,
   LightMode
@@ -80,6 +81,7 @@ export default function AccountMenuMobile() {
     { icon: <Settings />, label: 'Setări', path: '/setari-cont' },
     { icon: <Campaign />, label: 'Anunțurile mele', path: '/anunturile-mele' },
     { icon: <Person />, label: 'Profil', path: '/profil' },
+    { icon: <Notifications />, label: 'Notificări', path: '/notificari' },
     { icon: <Payment />, label: 'Plăți', path: '/plati' },
     { icon: <AccountCircle />, label: 'Contul tău', path: '/contul-tau' }
   ];
@@ -125,10 +127,11 @@ export default function AccountMenuMobile() {
       </Box>
 
       {/* Menu Items */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, mb: 2 }}>
+      <Box className="mobile-account-menu__list" sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, mb: 2 }}>
         {menuItems.map((item, index) => (
           <Card
             key={index}
+            data-menu-key={item.path}
             onClick={() => navigate(item.path)}
             sx={{
               cursor: 'pointer',

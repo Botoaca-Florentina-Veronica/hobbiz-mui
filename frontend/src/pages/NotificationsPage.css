@@ -266,8 +266,13 @@
  * ============================== */
 /* Stări pentru loading și fără notificări */
 .notifications-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   text-align: center;
-  padding: 60px 20px;
+  padding: 26px 20px;
   color: #6b7280;
   font-size: 1.1rem;
 }
@@ -293,12 +298,23 @@
   100% { transform: rotate(360deg); }
 }
 
-.notifications-empty::before {
-  content: '🔔';
+.notifications-empty::before { display: none; }
+
+/* Decorative image for empty notifications */
+.notifications-empty-icon img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
   display: block;
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.5;
+  margin: 0 auto;
+  margin-bottom: -2rem;
+}
+
+@media (max-width: 899.98px) {
+  /* On mobile show a smaller version of the empty image */
+  .notifications-empty-icon img { display: block; width: 120px; height: 120px; border-radius: 10px; }
+  .notifications-empty { padding: 20px 12px; gap: 8px; }
+  .notifications-empty-text { font-size: 1rem; }
 }
 
 /* ==============================

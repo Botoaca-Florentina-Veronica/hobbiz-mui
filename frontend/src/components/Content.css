@@ -54,6 +54,8 @@
     max-width: 100% !important;
     padding: 20px 12px !important;
     gap: 12px !important;
+    background: #f3f5f6 !important;
+    border-radius: 12px !important;
   }
   
   .popular-announcements-container .MuiCard-root {
@@ -101,6 +103,8 @@
     max-width: 100% !important;
     padding: 20px 16px !important;
     gap: 16px !important;
+    background: #f3f5f6 !important;
+    border-radius: 12px !important;
   }
   
   .popular-announcements-container .MuiCard-root {
@@ -146,6 +150,8 @@
     max-width: 100% !important;
     padding: 20px 20px !important;
     gap: 20px !important;
+    background: #f3f5f6!important;
+    border-radius: 12px !important;
   }
   
   .popular-announcements-container .MuiCard-root {
@@ -187,6 +193,12 @@
 .dark-mode .content {
   background-color: var(--app-surface);
   color: var(--app-text);
+}
+
+/* In dark mode ensure the popular container has a suitable surface color */
+.dark-mode .popular-announcements-container {
+  background: var(--app-surface) !important;
+  border-radius: 12px !important;
 }
 
 .dark-mode .content h2 {

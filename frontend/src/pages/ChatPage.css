@@ -161,6 +161,32 @@ TOC (sumar rapid):
   border: 1px solid var(--chat-border);
 }
 
+/* Empty main area (no conversation selected) */
+.chat-empty-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  color: var(--chat-muted);
+}
+
+.chat-empty-icon {
+  margin-bottom: 16px;
+}
+
+.chat-empty-icon img.chat-empty-img {
+  width: 160px;
+  height: 160px;
+  margin-bottom: -2rem;
+  object-fit: cover;
+}
+
+/* On mobile hide the decorative image (keeps layout light) */
+@media (max-width: 870px) {
+  .chat-empty-icon img.chat-empty-img { display: none; }
+}
+
 /* 4) Conversation list */
 .chat-conversation-list {
   flex: 1;

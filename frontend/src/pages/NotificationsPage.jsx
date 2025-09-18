@@ -5,6 +5,7 @@ import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../api/api';
 import './NotificationsPage.css';
+import gumballPeace from '../assets/images/gumballPeace.jpg';
 
 // Normalize avatar/announcement relative URLs to work with /uploads
 const resolveAvatarUrl = (src) => {
@@ -206,7 +207,10 @@ export default function NotificationsPage() {
               </div>
             ) : notifications.length === 0 ? (
               <div className="notifications-empty">
-                Nu ai notificări noi.
+                <div className="notifications-empty-icon">
+                  <img src={gumballPeace} alt="Fără notificări" />
+                </div>
+                <div className="notifications-empty-text">Nu ai notificări noi.</div>
               </div>
             ) : (
               <ul className="notifications-list">

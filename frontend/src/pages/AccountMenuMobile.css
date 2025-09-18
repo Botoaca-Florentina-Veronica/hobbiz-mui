@@ -1,6 +1,6 @@
 /* Color tokens for Account page (light + dark via CSS vars) */
 :root {
-  --acc-bg: #f8fafc;
+  --acc-bg: #f3f5f6;
   --acc-card: #ffffff;
   --acc-border: #e5e7eb;
   --acc-text: #1a1a1a;
@@ -66,6 +66,13 @@
   border-radius: 10px;
   margin-bottom: 10px;
   font-weight: 600;
+}
+
+/* Hide the specific "Contul tău" menu card on mobile devices */
+@media (max-width: 900px) {
+  .mobile-account-menu__list [data-menu-key="/contul-tau"] {
+    display: none !important;
+  }
 }
 
 .mobile-account-menu__footer {
