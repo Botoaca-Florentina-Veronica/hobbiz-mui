@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import './FavoriteAnnouncements.css';
 import { useAuth } from '../context/AuthContext.jsx';
+import gumballSiDarwin from '../assets/images/gumballSiDarwin.png';
 
 function Toast({ message, onClose }) {
   useEffect(() => {
@@ -65,6 +66,31 @@ export default function FavoriteAnnouncements() {
 
   const [guestAnnouncements, setGuestAnnouncements] = useState([]);
   const [showToast, setShowToast] = useState(false);
+
+  // Listen for favorites updates from other components (same-tab) and refresh guest lists
+  useEffect(() => {
+    const handler = () => {
+      if (isAuthenticated) return; // auth path handled by context
+      const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
+      if (!stored) {
+        setGuestFavoriteIds([]);
+        setGuestFavoriteObjects([]);
+        setGuestAnnouncements([]);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(stored);
+        const ids = parsed.length > 0 && typeof parsed[0] === 'string' ? parsed : parsed.map(p => p.id);
+        setGuestFavoriteIds(ids);
+        setGuestFavoriteObjects(parsed.length > 0 && typeof parsed[0] === 'string' ? parsed.map(id => ({ id, addedAt: Date.now() })) : parsed);
+      } catch {
+        setGuestFavoriteIds([]);
+        setGuestFavoriteObjects([]);
+      }
+    };
+    window.addEventListener('favorites:updated', handler);
+    return () => window.removeEventListener('favorites:updated', handler);
+  }, [isAuthenticated, FAVORITES_KEY]);
 
   // Guest mode: fetch announcements then filter
   useEffect(() => {
@@ -134,7 +160,12 @@ export default function FavoriteAnnouncements() {
           Anunțuri favorite ({(isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length)}/150)
         </div>
         {(isAuthenticated ? (fullFavorites?.length === 0) : (guestAnnouncements.length === 0)) ? (
-          <div>Nu ai anunțuri favorite salvate.</div>
+          <div className="favorites-empty">
+            <div className="favorites-empty-icon">
+              <img src={gumballSiDarwin} alt="Favorite goale" />
+            </div>
+            <div className="favorites-empty-text">Nu ai anunturi favorite salvate, e timpul să îți adaugi</div>
+          </div>
         ) : (
           <div className="favorite-announcements-list">
             {(isAuthenticated ? fullFavorites : guestAnnouncements).map((a) => (

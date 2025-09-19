@@ -487,3 +487,50 @@
     margin-top: 80px;
   }
 }
+
+/* Empty state for Favorites */
+.favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 16px;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 5rem;
+  margin-bottom: -9rem;
+}
+
+.favorites-empty-icon img {
+  width: 350px;
+  height: auto;
+  max-width: 80%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.favorites-empty-text {
+  font-size: 1.1rem;
+  color: #3f3f3f;
+}
+
+
+  @media (max-width: 900px) {
+  .favorites-empty-icon img { width: 350px; }
+  .favorites-empty-text { font-size: 1rem; padding: 0 8px; }
+
+  .favorites-empty {
+  margin-top: 12rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .favorites-empty-icon img { width: 270px; }
+  .favorites-empty-text { font-size: 1rem; padding: 0 8px; }
+
+  .favorites-empty {
+  margin-top: 8rem;
+  }
+}

@@ -27,6 +27,7 @@ import {
   Sort as SortIcon 
 } from '@mui/icons-material';
 import apiClient from '../api/api';
+import { useAuth } from '../context/AuthContext.jsx';
 import './MyAnnouncements.css';
 import './AnnouncementsByCategory.css';
 
@@ -43,7 +44,8 @@ export default function AnnouncementsByCategory() {
   
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
-  
+  const { user, favorites: authFavorites, toggleFavorite } = useAuth() || {};
+
   const [favoriteIds, setFavoriteIds] = useState(() => {
     const stored = localStorage.getItem(FAVORITES_KEY);
     if (!stored) return [];
@@ -387,39 +389,47 @@ export default function AnnouncementsByCategory() {
                     zIndex: 2
                   }}
                   onClick={ev => {
-                    ev.stopPropagation();
-                    const stored = localStorage.getItem(FAVORITES_KEY);
-                    let favoriteObjects = [];
-                    try {
-                      const parsed = JSON.parse(stored || '[]');
-                      if (parsed.length > 0 && typeof parsed[0] === 'string') {
-                        favoriteObjects = parsed.map(id => ({ id, addedAt: Date.now() }));
-                      } else {
-                        favoriteObjects = parsed;
+                      ev.stopPropagation();
+                      // If user is authenticated, use AuthContext toggle which syncs with backend
+                      if (user) {
+                        toggleFavorite?.(a._id);
+                        return;
                       }
-                    } catch {
-                      favoriteObjects = [];
-                    }
-                    const exists = favoriteObjects.find(item => item.id === a._id);
-                    let updatedObjects;
-                    if (exists) {
-                      updatedObjects = favoriteObjects.filter(item => item.id !== a._id);
-                    } else {
-                      updatedObjects = [...favoriteObjects, { id: a._id, addedAt: Date.now() }];
-                    }
-                    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
-                    setFavoriteIds((prev) => {
-                      if (prev.includes(a._id)) {
-                        return prev.filter((id) => id !== a._id);
-                      } else {
-                        return [...prev, a._id];
+                      // Guest/localStorage path
+                      const stored = localStorage.getItem(FAVORITES_KEY);
+                      let favoriteObjects = [];
+                      try {
+                        const parsed = JSON.parse(stored || '[]');
+                        if (parsed.length > 0 && typeof parsed[0] === 'string') {
+                          favoriteObjects = parsed.map(id => ({ id, addedAt: Date.now() }));
+                        } else {
+                          favoriteObjects = parsed;
+                        }
+                      } catch {
+                        favoriteObjects = [];
                       }
-                    });
-                  }}
+                      const exists = favoriteObjects.find(item => item.id === a._id);
+                      let updatedObjects;
+                      if (exists) {
+                        updatedObjects = favoriteObjects.filter(item => item.id !== a._id);
+                      } else {
+                        updatedObjects = [...favoriteObjects, { id: a._id, addedAt: Date.now() }];
+                      }
+                      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
+                      // Notify other parts of the app in the same tab
+                      if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
+                      setFavoriteIds((prev) => {
+                        if (prev.includes(a._id)) {
+                          return prev.filter((id) => id !== a._id);
+                        } else {
+                          return [...prev, a._id];
+                        }
+                      });
+                    }}
                   onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                 >
-                  {favoriteIds.includes(a._id) ? (
+                  {(user ? (authFavorites || []).includes(a._id) : favoriteIds.includes(a._id)) ? (
                     <FavoriteIcon sx={{ color: 'red', fontSize: 28 }} />
                   ) : (
                     <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 28 }} />
