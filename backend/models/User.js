@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
   lastSeen: { type: Date, default: Date.now }, // Adăugat câmpul pentru ultima activitate
   // Persistență pentru anunțurile favorite ale utilizatorului (cross-device)
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Announcement' }]
+  ,
+  // Reviews left for this user - stored as references to Review documents for clarity and fast lookup
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }]
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

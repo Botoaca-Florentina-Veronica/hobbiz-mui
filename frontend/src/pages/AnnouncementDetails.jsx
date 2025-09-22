@@ -88,10 +88,33 @@ export default function AnnouncementDetails() {
     setRatingComment('');
   };
   const handleRateSubmit = async () => {
-    // Placeholder: you can call an API endpoint to save the rating here.
-    // Example: await apiClient.post(`/api/users/${announcement.user._id}/rate`, { rating: ratingValue, comment: ratingComment })
-    console.log('Submitting rating', { ratingValue, ratingComment });
-    handleRateClose();
+    try {
+      // Ensure we have the target user id
+      const reviewedUserId = announcement?.user?._id || announcement?.user?.id;
+      if (!reviewedUserId) {
+        alert('Utilizatorul nu este disponibil pentru evaluare.');
+        return;
+      }
+
+      // POST to backend reviews route. Backend expects { user, score, comment }
+      const payload = { user: reviewedUserId, score: ratingValue, comment: ratingComment };
+  const resp = await apiClient.post('/api/reviews', payload);
+  console.log('Review POST response:', resp?.data);
+
+  // Close dialog and navigate to the public profile page so the freshly posted review is visible
+  handleRateClose();
+  // Navigate carrying a small state so the profile page can show a confirmation message
+  navigate(`/profil/${reviewedUserId}`, { state: { reviewPosted: true, reviewCreateResponse: resp?.data } });
+
+    } catch (err) {
+      console.error('Eroare la trimiterea recenziei:', err);
+      // Provide user feedback
+      if (err?.response?.data?.error) {
+        alert(`Eroare: ${err.response.data.error}`);
+      } else {
+        alert('A apărut o eroare la trimiterea recenziei. Încearcă din nou.');
+      }
+    }
   };
 
   // Dark mode helpers and accent palette

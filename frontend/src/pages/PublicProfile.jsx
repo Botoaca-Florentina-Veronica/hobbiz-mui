@@ -26,6 +26,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import './ProfilePage.css';
 import './PublicProfile.css';
 import apiClient from '../api/api';
+import { useLocation } from 'react-router-dom';
 
 export default function PublicProfile() {
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ export default function PublicProfile() {
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const carouselRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const location = useLocation();
+  const [showReviewPosted, setShowReviewPosted] = useState(false);
 
   // Detectează dark mode ca în ProfilePage.jsx
   useEffect(() => {
@@ -97,6 +100,16 @@ export default function PublicProfile() {
       }
     }
     if (userId) fetchProfile();
+    // If navigated here carrying state that a review was posted, show confirmation
+    if (location?.state?.reviewPosted) {
+      setShowReviewPosted(true);
+      // remove the state from history so refresh doesn't keep showing it
+      if (window.history && window.history.replaceState) {
+        const newState = { ...window.history.state };
+        try { delete newState.state?.reviewPosted; } catch(_) {}
+        window.history.replaceState(newState, '');
+      }
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -148,6 +161,14 @@ export default function PublicProfile() {
       {error && (
         <Fade in={!!error}>
           <Alert severity="error" className="profile-alert">{error}</Alert>
+        </Fade>
+      )}
+
+      {showReviewPosted && (
+        <Fade in={showReviewPosted}>
+          <Alert severity="success" className="profile-alert" onClose={() => setShowReviewPosted(false)}>
+            Recenzia a fost publicată. Mulțumim pentru feedback!
+          </Alert>
         </Fade>
       )}
 
