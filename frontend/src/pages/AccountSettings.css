@@ -283,6 +283,36 @@
   }
 }
 
+/* Make action items and buttons easier to tap on larger phones/tablets up to 1000px */
+@media (max-width: 1000px) {
+  .settings-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 16px 18px !important;
+    font-size: 1.05rem !important;
+    border-radius: 10px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Ensure buttons inside dynamic sections are full width */
+  .email-change-section button,
+  .settings-menu button,
+  .settings-menu .MuiButton-root {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 12px 16px !important;
+    font-size: 1rem !important;
+  }
+
+  /* Slightly increase hit area for back button on small tablets */
+  .mobile-back-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
 /* Mobile header styles (match Favorites/Notifications) */
 @media (max-width: 899.98px) {
   /* Hide desktop title on mobile */

@@ -460,6 +460,33 @@ export default function PublicProfile() {
                       </div>
                     ));
                   })()}
+                  
+                  {/* Reviews list: show individual reviews made for this user */}
+                  <div className="public-profile-review-list">
+                    {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
+                      profile.reviews.map((r) => (
+                        <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="public-profile-review-item">
+                          <div className="public-profile-review-item-header">
+                            <div className="public-profile-review-author">
+                              <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:28, height:28, fontSize:14 }}>
+                                {(r.authorName || r.name || 'U').charAt(0)}
+                              </Avatar>
+                              <div className="public-profile-review-author-name">
+                                {r.authorName || r.name || 'Utilizator'}
+                                <div className="public-profile-review-meta">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                              </div>
+                            </div>
+                            <div className="public-profile-review-score-small">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
+                          </div>
+                          {r.comment && (
+                            <div className="public-profile-review-body">{r.comment}</div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>

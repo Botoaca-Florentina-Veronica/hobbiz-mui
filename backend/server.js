@@ -31,6 +31,7 @@ const Alert = require('./models/Alert');
 const path = require('path');
 const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -206,6 +207,7 @@ app.use('/api/mitm', mitmRoutes); // Adaugă rutele pentru mitm
 app.use('/api/announcements', announcementRoutes); // Rute pentru anunturi publice
 app.use('/api/favorites', favoriteRoutes); // Rute pentru favorite persistente
 app.use('/api/messages', messageRoutes); // Rute pentru mesaje chat
+app.use('/api/reviews', reviewRoutes); // Rute pentru recenzii (create/list)
 
 // Servire imagini uploadate din frontend/public/uploads
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));

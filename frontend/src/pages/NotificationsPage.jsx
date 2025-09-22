@@ -68,9 +68,9 @@ export default function NotificationsPage() {
   const navigate = useNavigate();
 
   // Funcție pentru navigarea la chat
-  const handleChatNavigation = (notificationId, chatLink) => {
-    // Marchează notificarea ca citită
-    markAsRead(notificationId);
+  const handleChatNavigation = async (notificationId, chatLink) => {
+    // Șterge notificarea după ce a fost vizualizată
+    await deleteNotification(notificationId);
     
     // Extrage conversationId din link
     if (chatLink && chatLink.startsWith('/chat/')) {
@@ -218,7 +218,7 @@ export default function NotificationsPage() {
                   <li key={n._id} className={`notification-item ${!n.read ? 'unread' : 'read'}`}>
                     <div className="notification-content">
                       <div className="notification-header">
-                        <div className="notification-main-content" onClick={() => !n.read && markAsRead(n._id)}>
+                          <div className="notification-main-content" onClick={() => !n.read && deleteNotification(n._id)}>
                           {!n.read && <div className="unread-indicator"></div>}
                           {n.senderName && (
                             <div className="notification-sender">{n.senderName}</div>

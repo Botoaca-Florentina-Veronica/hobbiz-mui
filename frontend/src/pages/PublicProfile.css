@@ -281,3 +281,66 @@ body.dark-mode .public-profile-reviews-score {
 body.dark-mode .public-profile-rating-bar-outer {
   background: #3a3a3a;
 }
+
+/* Individual review list under the summary */
+.public-profile-review-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.public-profile-review-item {
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px 6px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.public-profile-review-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.public-profile-review-author {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.public-profile-review-author-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.public-profile-review-meta {
+  font-size: 0.8rem;
+  color: var(--pf-text-muted, #6b7280);
+}
+.public-profile-review-score-small {
+  background: #f7f8fa;
+  color: #1f2937;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  min-width: 44px;
+  text-align: center;
+}
+.public-profile-review-body {
+  margin-top: 8px;
+  color: var(--pf-text, #2d3748);
+  font-size: 0.95rem;
+}
+.public-profile-no-reviews {
+  color: var(--pf-text-muted, #6b7280);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 6px 0;
+}
+
+/* Dark mode tweaks */
+body.dark-mode .public-profile-review-item {
+  border-color: rgba(255,255,255,0.06);
+}
+body.dark-mode .public-profile-review-score-small {
+  background: #1f2937;
+  color: #fff;
+}

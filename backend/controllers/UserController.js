@@ -226,11 +226,44 @@ const getProfile = async (req, res) => {
     // Verificăm dacă există userId în parametri (profil public) sau folosim userId din auth (profil propriu)
     const targetUserId = req.params.userId || req.userId;
     
+    // Găsim utilizatorul fără parola
     const user = await User.findById(targetUserId).select('-password');
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit' });
     }
-    res.json(user);
+
+    // Atașăm recenziile asociate acestui utilizator (dacă modelul Review există)
+    try {
+      const Review = require('../models/Review');
+      const reviews = await Review.find({ user: targetUserId }).sort({ createdAt: -1 }).lean();
+      // Populate basic author info if possible
+      const UserModel = require('../models/User');
+      const authorIds = Array.from(new Set(reviews.map(r => String(r.author)).filter(Boolean)));
+      let authors = {};
+      if (authorIds.length) {
+        const authorDocs = await UserModel.find({ _id: { $in: authorIds } }).select('firstName lastName avatar').lean();
+        authorDocs.forEach(a => { authors[String(a._id)] = a; });
+      }
+      // Map reviews to include authorName/authorAvatar for frontend convenience
+      const reviewsMapped = reviews.map(r => ({
+        _id: r._id,
+        score: r.score,
+        comment: r.comment,
+        createdAt: r.createdAt,
+        author: r.author,
+        authorName: r.author ? ((authors[String(r.author)]?.firstName || '') + (authors[String(r.author)]?.lastName ? (' ' + authors[String(r.author)].lastName) : '')) : undefined,
+        authorAvatar: r.author ? authors[String(r.author)]?.avatar : undefined
+      }));
+
+      const userObj = user.toObject();
+      userObj.reviews = reviewsMapped;
+      return res.json(userObj);
+    } catch (e) {
+      // Dacă modelul Review nu există sau există o eroare, returnăm userul fără recenzii
+      console.warn('Nu am reușit să încarc recenziile:', e.message);
+      return res.json(user);
+    }
+
   } catch (error) {
     console.error('Eroare profil:', error);
     res.status(500).json({ error: 'Eroare server la obținerea profilului' });
