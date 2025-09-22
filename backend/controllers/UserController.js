@@ -252,7 +252,10 @@ const getProfile = async (req, res) => {
         createdAt: r.createdAt,
         author: r.author,
         authorName: r.author ? ((authors[String(r.author)]?.firstName || '') + (authors[String(r.author)]?.lastName ? (' ' + authors[String(r.author)].lastName) : '')) : undefined,
-        authorAvatar: r.author ? authors[String(r.author)]?.avatar : undefined
+        authorAvatar: r.author ? authors[String(r.author)]?.avatar : undefined,
+        likes: r.likes || [],
+        likesCount: (r.likes || []).length,
+        likedByCurrentUser: req.userId ? ((r.likes || []).some(id => String(id) === String(req.userId))) : false
       }));
 
       const userObj = user.toObject();

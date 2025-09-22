@@ -14,11 +14,25 @@ import {
   Avatar,
   Divider
 } from '@mui/material';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import PersonIcon from '@mui/icons-material/Person';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import EmailIcon from '@mui/icons-material/Email';
@@ -26,6 +40,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import './ProfilePage.css';
 import './PublicProfile.css';
 import apiClient from '../api/api';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useLocation } from 'react-router-dom';
 
 export default function PublicProfile() {
@@ -40,6 +55,35 @@ export default function PublicProfile() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
   const [showReviewPosted, setShowReviewPosted] = useState(false);
+  const { user } = useAuth() || {};
+  // Normalized current user id (AuthContext may store profile with _id)
+  const currentUserId = user ? (user._id || user.userId || user.id) : null;
+
+  // local state to track liked reviews to update UI optimistically
+  const [likedState, setLikedState] = useState({});
+  // State for review action menus
+  const [menuState, setMenuState] = useState({ anchorEl: null, reviewId: null });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editPayload, setEditPayload] = useState({ reviewId: null, comment: '', score: '' });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+
+  // Helper: normalize review author id from different shapes (string, ObjectId, populated object)
+  const getReviewAuthorId = (r) => {
+    if (!r) return null;
+    // If populated as an object with _id
+    if (r.author && typeof r.author === 'object') {
+      if (r.author._id) return String(r.author._id);
+      // If it's a full user object, try id or userId
+      if (r.author.id) return String(r.author.id);
+      // Fallback to calling String on the object (works for ObjectId-like values)
+      try { return String(r.author); } catch (_) { return null; }
+    }
+    // If author is a primitive (string/ObjectId), return its string form
+    if (r.author) return String(r.author);
+    if (r.authorId) return String(r.authorId);
+    return null;
+  };
 
   // Detectează dark mode ca în ProfilePage.jsx
   useEffect(() => {
@@ -103,12 +147,16 @@ export default function PublicProfile() {
     // If navigated here carrying state that a review was posted, show confirmation
     if (location?.state?.reviewPosted) {
       setShowReviewPosted(true);
+      // Hide after 4 seconds automatically
+      const dismissTimer = setTimeout(() => setShowReviewPosted(false), 4000);
       // remove the state from history so refresh doesn't keep showing it
       if (window.history && window.history.replaceState) {
         const newState = { ...window.history.state };
         try { delete newState.state?.reviewPosted; } catch(_) {}
         window.history.replaceState(newState, '');
       }
+      // Clean up the timeout if the component unmounts or effect re-runs
+      return () => clearTimeout(dismissTimer);
     }
   }, [userId]);
 
@@ -482,34 +530,178 @@ export default function PublicProfile() {
                     ));
                   })()}
                   
-                  {/* Reviews list: show individual reviews made for this user */}
-                  <div className="public-profile-review-list">
-                    {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
-                      profile.reviews.map((r) => (
-                        <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="public-profile-review-item">
-                          <div className="public-profile-review-item-header">
-                            <div className="public-profile-review-author">
-                              <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:28, height:28, fontSize:14 }}>
-                                {(r.authorName || r.name || 'U').charAt(0)}
-                              </Avatar>
-                              <div className="public-profile-review-author-name">
-                                {r.authorName || r.name || 'Utilizator'}
-                                <div className="public-profile-review-meta">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
-                              </div>
-                            </div>
-                            <div className="public-profile-review-score-small">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
-                          </div>
-                          {r.comment && (
-                            <div className="public-profile-review-body">{r.comment}</div>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
-                    )}
-                  </div>
+                  {/* Placeholder: individual reviews are rendered in a separate section below */}
+                  <div className="public-profile-review-list-placeholder" />
                 </CardContent>
               </Card>
+              {/* Compact reviews list nested under the summary card (shares the same column width) */}
+              <div style={{ marginTop: 16 }} className="public-profile-reviews-list-container">
+                <div className="public-profile-reviews-list-inner">
+                  {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
+                    profile.reviews.map((r) => (
+                      <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="compact-review-item">
+                        <div className="compact-review-left">
+                          <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:44, height:44, fontSize:16 }}>
+                            {(r.authorName || r.name || 'U').charAt(0)}
+                          </Avatar>
+                        </div>
+                        <div className="compact-review-main">
+                          <div className="compact-review-top">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <div className="compact-review-author">{r.authorName || r.name || 'Utilizator'}</div>
+                              <div className="compact-review-meta">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                            </div>
+                            {/* three-dots menu visible only to author */}
+                            {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
+                              <div className="review-actions-menu">
+                                <IconButton size="small" onClick={(e) => setMenuState({ anchorEl: e.currentTarget, reviewId: r._id })}>
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
+                              </div>
+                            )}
+                          </div>
+                          <div className="compact-review-body">{r.comment}</div>
+                              <div className="compact-review-actions">
+                                <div className="compact-review-score">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={async () => {
+                                      try {
+                                        if (!user) { alert('Trebuie să fii autentificat pentru a da like'); return; }
+                                        // optimistic UI
+                                        const prev = likedState[r._id] || { liked: false, count: (r.likes || []).length };
+                                        const newLiked = !prev.liked;
+                                        setLikedState(s => ({ ...s, [r._id]: { liked: newLiked, count: prev.count + (newLiked ? 1 : -1) } }));
+                                        const resp = await apiClient.post(`/api/reviews/${r._id}/like`);
+                                        setLikedState(s => ({ ...s, [r._id]: { liked: resp.data.liked, count: resp.data.likesCount } }));
+                                      } catch (e) {
+                                        console.error('Like error', e);
+                                        alert('A apărut o eroare la like. Încearcă din nou.');
+                                      }
+                                    }}
+                                  >
+                                    <ThumbUpIcon fontSize="small" color={(likedState[r._id]?.liked || (r.likes || []).some(id=>String(id)===String(currentUserId))) ? 'primary' : 'action'} />
+                                  </IconButton>
+                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--pf-text-muted)' }}>{(likedState[r._id]?.count ?? (r.likes || []).length) || 0}</div>
+                                </div>
+                              </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
+                  )}
+                  {/* Action menu for reviews (styled and positioned to the left of button) */}
+                  <Menu
+                    anchorEl={menuState.anchorEl}
+                    open={!!menuState.anchorEl}
+                    onClose={() => setMenuState({ anchorEl: null, reviewId: null })}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    PaperProps={{
+                      sx: {
+                        borderRadius: 2,
+                        boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+                        background: 'var(--pf-card-bg, #fff)',
+                        border: '1px solid var(--pf-divider, #e6eef6)',
+                        minWidth: 160,
+                        py: 0.5,
+                        // nudge left to sit closer to the button
+                        transform: 'translateX(-10px)'
+                      }
+                    }}
+                  >
+                    <MenuItem onClick={() => {
+                      const id = menuState.reviewId;
+                      if (!id) return;
+                      // open edit dialog with current values
+                      const current = profile.reviews.find(rr => rr._id === id) || {};
+                      setEditPayload({ reviewId: id, comment: current.comment || '', score: (current.score || current.rating || '') });
+                      setMenuState({ anchorEl: null, reviewId: null });
+                      setEditDialogOpen(true);
+                    }} sx={{ py: 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}><EditIcon fontSize="small" /></ListItemIcon>
+                      <ListItemText primary={'Editează'} />
+                    </MenuItem>
+                    <MenuItem onClick={() => {
+                      const id = menuState.reviewId;
+                      if (!id) return;
+                      setMenuState({ anchorEl: null, reviewId: null });
+                      setDeleteTargetId(id);
+                      setDeleteDialogOpen(true);
+                    }} sx={{ py: 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}><DeleteIcon fontSize="small" /></ListItemIcon>
+                      <ListItemText primary={'Șterge'} />
+                    </MenuItem>
+                  </Menu>
+
+                  {/* Edit dialog */}
+                  <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm">
+                    <DialogTitle>Editează recenzia</DialogTitle>
+                    <DialogContent dividers>
+                      <TextField
+                        label="Scor (0-5)"
+                        type="number"
+                        inputProps={{ min: 0, max: 5, step: 0.5 }}
+                        fullWidth
+                        margin="dense"
+                        value={editPayload.score}
+                        onChange={(e) => setEditPayload(p => ({ ...p, score: e.target.value }))}
+                      />
+                      <TextField
+                        label="Comentariu"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        margin="dense"
+                        value={editPayload.comment}
+                        onChange={(e) => setEditPayload(p => ({ ...p, comment: e.target.value }))}
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setEditDialogOpen(false)}>Anulează</Button>
+                      <Button variant="contained" onClick={async () => {
+                        try {
+                          const id = editPayload.reviewId;
+                          const body = { comment: editPayload.comment };
+                          if (editPayload.score !== '') body.score = editPayload.score;
+                          const resp = await apiClient.put(`/api/reviews/${id}`, body);
+                          // update profile state with returned review
+                          setProfile(prev => ({ ...prev, reviews: prev.reviews.map(rr => rr._id === id ? ({ ...rr, comment: resp.data.review.comment, score: resp.data.review.score }) : rr) }));
+                          setEditDialogOpen(false);
+                        } catch (e) {
+                          console.error('Edit review error', e);
+                          alert('A apărut o eroare la editare.');
+                        }
+                      }}>Salvează</Button>
+                    </DialogActions>
+                  </Dialog>
+
+                  {/* Delete confirmation dialog */}
+                  <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                    <DialogTitle>Confirmare ștergere</DialogTitle>
+                    <DialogContent dividers>
+                      <Typography>Ești sigur(ă) că vrei să ștergi această recenzie? Această acțiune nu poate fi anulată.</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setDeleteDialogOpen(false)}>Anulează</Button>
+                      <Button color="error" variant="contained" onClick={async () => {
+                        try {
+                          const id = deleteTargetId;
+                          await apiClient.delete(`/api/reviews/${id}`);
+                          setProfile(prev => ({ ...prev, reviews: prev.reviews.filter(rr => rr._id !== id) }));
+                        } catch (e) {
+                          console.error('Delete review error', e);
+                          alert('A apărut o eroare la ștergere.');
+                        } finally {
+                          setDeleteDialogOpen(false);
+                        }
+                      }}>Șterge</Button>
+                    </DialogActions>
+                  </Dialog>
+                </div>
+              </div>
             </div>
           </Grid>
         </Grid>
