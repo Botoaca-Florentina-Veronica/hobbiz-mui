@@ -234,6 +234,11 @@
   margin: 0;
 }
 
+/* Rating stars in profile header */
+.profile-rating-row { display: flex; align-items: center; gap: 8px; }
+.profile-star { color: var(--pf-text-muted); font-size: 20px; }
+.profile-star.filled { color: #FFD24A; }
+
 .profile-view-button {
   background: none;
   border: none;

@@ -18,7 +18,13 @@ import {
   Divider,
   Tooltip,
   Fade,
-  Skeleton
+  Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Rating
 } from '@mui/material';
 import {
   Favorite as FavoriteIcon,
@@ -34,6 +40,7 @@ import {
   Person as PersonIcon,
   Visibility as VisibilityIcon
 } from '@mui/icons-material';
+import StarIcon from '@mui/icons-material/Star';
 import apiClient from '../api/api';
 import './AnnouncementDetails.css';
 import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
@@ -65,6 +72,27 @@ export default function AnnouncementDetails() {
   // Chat and contact logic
   const [showChat, setShowChat] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
+
+  // Rating dialog state
+  const [rateOpen, setRateOpen] = useState(false);
+  const [ratingValue, setRatingValue] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
+
+  const handleRateClick = (e) => {
+    e?.stopPropagation();
+    setRateOpen(true);
+  };
+  const handleRateClose = () => {
+    setRateOpen(false);
+    setRatingValue(5);
+    setRatingComment('');
+  };
+  const handleRateSubmit = async () => {
+    // Placeholder: you can call an API endpoint to save the rating here.
+    // Example: await apiClient.post(`/api/users/${announcement.user._id}/rate`, { rating: ratingValue, comment: ratingComment })
+    console.log('Submitting rating', { ratingValue, ratingComment });
+    handleRateClose();
+  };
 
   // Dark mode helpers and accent palette
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -705,7 +733,7 @@ export default function AnnouncementDetails() {
                   >
                     {!announcement.user.avatar && getInitials(announcement.user)}
                   </Avatar>
-                  <Box>
+                  <Box sx={{ flex: 1 }}>
                     <Typography variant="h6" sx={{ fontWeight: 600, color: getIsDarkMode() ? '#f5f5f5' : '#2d3748' }}>
                       {announcement.user.firstName} {announcement.user.lastName}
                     </Typography>
@@ -717,13 +745,33 @@ export default function AnnouncementDetails() {
 
                 {/* Contact Person */}
                 {announcement.contactPerson && (
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      Persoană de contact:
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      {announcement.contactPerson}
-                    </Typography>
+                  <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        Persoană de contact:
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {announcement.contactPerson}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ ml: 2 }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<StarIcon />}
+                        onClick={handleRateClick}
+                        sx={{
+                          borderColor: getAccentCss(),
+                          color: getAccentCss(),
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          px: 1.25,
+                          py: 0.5
+                        }}
+                      >
+                        Evaluează
+                      </Button>
+                    </Box>
                   </Box>
                 )}
 
@@ -829,6 +877,34 @@ export default function AnnouncementDetails() {
           userRole="cumparator"
         />
       )}
+
+      {/* Rating Dialog */}
+      <Dialog open={rateOpen} onClose={handleRateClose} fullWidth maxWidth="sm">
+        <DialogTitle>Evaluează utilizatorul</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <Rating
+              name="rating"
+              value={ratingValue}
+              onChange={(e, v) => setRatingValue(v)}
+              size="large"
+            />
+            <Typography variant="body2">{ratingValue}.0</Typography>
+          </Box>
+          <TextField
+            label="Comentariu (opțional)"
+            fullWidth
+            multiline
+            minRows={3}
+            value={ratingComment}
+            onChange={(e) => setRatingComment(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleRateClose}>Anulează</Button>
+          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() } }}>Trimite</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Image Zoom Modal */}
       {zoomOpen && (

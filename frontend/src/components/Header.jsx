@@ -273,9 +273,9 @@ export default function Header() {
   const isHomepage = location.pathname === '/' || location.pathname === '';
   const showMobileHeader = isHomepage ? windowWidth < 1200 : isMobile;
 
-  // Asigură că pe pagina de chat, când trecem în layout-ul "desktop" al chat-ului ( > 870px ),
+  // Asigură că pe pagina de chat, când trecem în layout-ul "desktop" al chat-ului ( > 900px ),
   // afișăm întotdeauna header-ul de desktop chiar dacă încă suntem sub 1200px (interval 871-1199px).
-  const CHAT_DESKTOP_BREAKPOINT = 870; // folosit și în ChatPage.jsx
+  const CHAT_DESKTOP_BREAKPOINT = 900; // folosit și în ChatPage.jsx (aliniat la 900px)
   const isChatRoute = location.pathname.startsWith('/chat');
   const effectiveShowMobileHeader = (isChatRoute && windowWidth > CHAT_DESKTOP_BREAKPOINT)
     ? false

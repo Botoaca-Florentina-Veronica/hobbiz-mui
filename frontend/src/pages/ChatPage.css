@@ -11,7 +11,7 @@ TOC (sumar rapid):
   6) Message bubble, ticks, images — .chat-message-*
   7) Composer (input, butoane, emoji) — .chat-input-*
   8) Separator (desktop resize) — .chat-separator
-  9) Responsive: mobile (<870px), intermediate (871–1199px)
+   9) Responsive: mobile (<900px), intermediate (901–1199px)
  10) Dark mode overrides — .dark-mode ...
 ====================================================
 */
@@ -46,7 +46,7 @@ TOC (sumar rapid):
 }
 
 /* Mobile-only tweaks for dark mode pills */
-@media (max-width: 870px) {
+@media (max-width: 900px) {
   .dark-mode .chat-mobile-title { color: var(--dm-text); }
   .dark-mode .chat-tab { background: #3a3a3a; color: var(--dm-text); }
   .dark-mode .chat-tab.active,
@@ -54,6 +54,37 @@ TOC (sumar rapid):
   .dark-mode .chat-section-label { color: var(--dm-text); border-bottom: 1px solid var(--dm-border); }
   .dark-mode .chat-conversation-item { border-bottom: 1px solid var(--dm-border); }
   .dark-mode .chat-back-btn { background: #3a3a3a; color: var(--dm-text); }
+
+  /* Mobile layout adjustments: remove large top spacing and allow full-height flow */
+  .chat-page-container {
+    margin-top: 2rem !important; /* elimina spatiul mare de deasupra */
+    height: auto; /* permite ca pagina sa ocupe inaltimea normala pe mobil */
+    min-height: calc(100vh - var(--header-height, 56px));
+    border-radius: 0; /* fara colturi rotunjite pe mobil */
+    overflow: visible;
+  }
+
+  /* Ensure mobile-chatting variant also resets margin top */
+  .chat-page-container.mobile-chatting {
+    margin-top: 0 !important;
+  }
+
+  /* Make the mobile topbar visible on small screens */
+  .chat-mobile-topbar { display: block; }
+
+  /* Override large padding-top applied via MUI Box sx (pt: 'clamp(36px, 7vh, 72px)') */
+  /* Reduce to a small safe-area aware offset so the header/title sits at top without big gap */
+  .chat-sidebar .MuiBox-root {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Main header used when chatting on mobile (has class chat-main-header) */
+  .chat-main .chat-main-header {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    padding-bottom: 8px !important;
+  }
 }
 
 /* 3) Sidebar & tabs */
@@ -183,7 +214,7 @@ TOC (sumar rapid):
 }
 
 /* On mobile hide the decorative image (keeps layout light) */
-@media (max-width: 870px) {
+@media (max-width: 900px) {
   .chat-empty-icon img.chat-empty-img { display: none; }
 }
 
@@ -391,7 +422,7 @@ TOC (sumar rapid):
 }
 
 /* Hide separator on small screens (mobile) */
-@media (max-width: 870px) {
+@media (max-width: 900px) {
   .chat-separator { display: none; }
 }
 
@@ -823,7 +854,7 @@ TOC (sumar rapid):
   }
 }
 
-@media (max-width: 870px) {
+@media (max-width: 900px) {
   html, body { overflow-x: hidden; background: var(--chat-bg) !important; }
   
   .chat-page-container {
@@ -1215,7 +1246,7 @@ TOC (sumar rapid):
 }
 
 /* Dark mode: și containerul de mesaje pe mobil are același fundal */
-@media (max-width: 870px) {
+@media (max-width: 900px) {
   .dark-mode html, .dark-mode body { background: var(--dm-bg) !important; }
   .dark-mode .chat-messages-container {
     background: var(--dm-bg) !important;
@@ -1453,7 +1484,7 @@ TOC (sumar rapid):
 }
 
 /* Responsive pentru noile funcționalități */
-@media (max-width: 870px) {
+@media (max-width: 900px) {
   .chat-input-buttons {
     gap: 4px;
   }

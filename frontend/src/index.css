@@ -31,6 +31,17 @@
   --chat-muted: #6b7280;
   --chat-accent: #355070;
   --chat-accent-contrast: #ffffff;
+
+  /* PublicProfile layout tokens (centralized here so widths are global and editable) */
+  /* Adjust these to change PublicProfile container widths at breakpoints */
+  --pp-md-width: 96%;
+  /* Make the large breakpoint container wider so pages use more horizontal space */
+  --pp-lg-width: min(99%, 1500px);
+  --pp-xl-width: 94%;
+  --pp-sticky-top: 120px;
+  --pp-score-size: 2.6rem;
+  --pp-score-size-mobile: 2rem;
+  --pp-reviews-max-width: 620px;
 }
 
 .dark-mode {

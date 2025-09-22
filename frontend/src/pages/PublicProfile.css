@@ -1,0 +1,283 @@
+/* PublicProfile specific styles
+   - Controls container max width on desktop to reduce whitespace
+   - Styles the reviews summary card (stars, score, bars)
+*/
+
+/* Utility classes for quick per-page adjustments.
+   Prefer editing the global variables in `src/index.css` for app-wide changes.
+   Use these classes on the Container element to override widths for this page only.
+*/
+.pp-container--wide { --pp-lg-width: min(99%, 1500px); }
+.pp-container--narrow { --pp-lg-width: min(92%, 1200px); }
+
+/* -------------------------------------------------------------------------------- */
+
+.public-profile-container {
+  margin: 24px auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+  /* Default fallback max-width (will be overridden by percentage-based rules) */
+  max-width: 1200px;
+}
+
+/* Page-level wrapper to avoid the global .profile-page-container token that sets a fixed max-width
+  We create a separate page container so wide screens can expand the layout while preserving
+  the original spacing and token variables. Use this wrapper instead of .profile-page-container
+  inside `PublicProfile.jsx`.
+*/
+.public-profile-page-container {
+  /* Only override width-related tokens so we preserve the original profile visual spacing
+    (margins/padding) provided by `.profile-page-container`. */
+  --pp-lg-width: min(98%, 1600px);
+  --pp-md-width: min(98%, 1300px);
+  --pp-xl-width: min(96%, 1800px);
+  /* keep sticky top in rem units so it matches the vertical spacing used on the page
+    (the `.profile-page-container` uses `margin-top: 6rem`) — use 6rem so header and
+    reviews card start aligned on desktop. */
+  --pp-sticky-top: 6rem;
+  --pp-reviews-max-width: 420px;
+  --pp-score-size: 40px;
+  --pp-score-size-mobile: 32px;
+
+  /* Ensure the page-level wrapper can expand to the width limits defined above */
+  max-width: var(--pp-lg-width);
+}
+
+/* Ensure the page always leaves a small responsive bottom padding so the last card
+   isn't flush with the viewport bottom (accounts for safe area on mobile). */
+.public-profile-page-container {
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+/* Ensure the page wrappers allow the page to grow (prevent clipping) and leave room
+   for fixed footers. This forces the page to scroll if content is taller than viewport. */
+.public-profile-page-container,
+.public-profile-container,
+.profile-page-container {
+  overflow: visible !important;
+  min-height: auto !important;
+  padding-bottom: calc(var(--footer-height, 6px) + 10px);
+}
+
+/* Wider container percentages at breakpoints */
+@media (min-width: 900px) {
+  /* md and up */
+  .public-profile-container { max-width: var(--pp-md-width); }
+}
+@media (min-width: 1200px) {
+  /* lg and up */
+  .public-profile-container { max-width: var(--pp-lg-width); }
+}
+@media (min-width: 1600px) {
+  /* xl */
+  .public-profile-container { max-width: var(--pp-xl-width); }
+}
+
+/* Reviews card wrapper to emulate sticky on desktop */
+.public-profile-reviews-wrap {
+  position: relative;
+}
+/* Desktop sticky: only enable sticky on wider desktop (>1000px) so tablet / small-desktop
+   layouts between 600-1000px behave predictably and don't produce visual shifts. */
+@media (min-width: 1001px) {
+  .public-profile-reviews-wrap {
+    position: sticky;
+    top: var(--pp-sticky-top);
+    margin-top: 0;
+    align-self: flex-start;
+  }
+}
+
+/* Tablet / small-desktop range: 600px - 1000px — ensure reviews card sits aligned with
+   seller info, has appropriate widths and padding, and is not sticky (prevents jumpy behavior). */
+@media (min-width: 600px) and (max-width: 1000px) {
+  .public-profile-reviews-wrap {
+    position: relative;
+    top: auto;
+    margin-top: 0;
+    align-self: flex-start;
+  }
+
+  .public-profile-reviews-card {
+    /* Let it take full column width but don't exceed a comfortable size */
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .public-profile-reviews-content {
+    padding: 16px;
+  }
+
+  /* Slightly reduce the rating score font on mid sizes for balance */
+  .public-profile-reviews-score {
+    font-size: calc(var(--pp-score-size) * 0.85);
+  }
+}
+
+/* Make the page container wider on tablets (so left column + reviews have more room) */
+@media (min-width: 600px) and (max-width: 1000px) {
+  .public-profile-container {
+    max-width: 1100px; /* increase width for tablet and larger mobiles */
+  }
+}
+
+.public-profile-reviews-card {
+  /* Match visual style of other profile cards */
+  border-radius: var(--pf-card-radius, 12px);
+  box-shadow: var(--pf-card-shadow, 0 2px 8px rgba(0,0,0,0.1));
+  background: var(--pf-card-bg, #ffffff);
+  border: 1px solid var(--pf-divider, #e0e0e0);
+  overflow: hidden;
+  /* Ensure the card spans the entire Grid column width like other profile cards */
+  width: 100%;
+  /* Remove max-width so it matches other cards and doesn't appear too small */
+  max-width: none;
+  margin: 0 0 0 0;
+  box-sizing: border-box;
+}
+.public-profile-reviews-content {
+  padding: 20px;
+}
+.public-profile-reviews-title {
+  color: var(--pf-accent, #355070);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.public-profile-reviews-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.public-profile-reviews-score {
+  font-size: var(--pp-score-size);
+  font-weight: 700;
+  color: var(--pf-text, #2d3748);
+  line-height: 1;
+}
+.public-profile-reviews-stars {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.public-star {
+  font-size: 20px;
+}
+.public-star.filled {
+  color: #FFD24A;
+}
+.public-star.empty {
+  color: #cbd5e1;
+}
+.public-profile-reviews-count {
+  color: var(--pf-text-muted, #6b7280);
+  margin-top: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.public-profile-reviews-divider {
+  margin: 10px 0 12px 0;
+}
+
+.public-profile-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.public-profile-rating-star {
+  width: 36px;
+  font-weight: 600;
+  color: #374151;
+}
+.public-profile-rating-bar-outer {
+  flex: 1;
+  height: 12px;
+  background: var(--pf-divider, #eef2f7);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.public-profile-rating-bar-inner {
+  height: 100%;
+  background: #FFD24A;
+  transition: width .5s ease;
+}
+.public-profile-rating-count {
+  width: 32px;
+  text-align: right;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Small tweaks for mobile */
+@media (max-width: 899px) {
+  .public-profile-reviews-content {
+    padding: 14px;
+  }
+  .public-profile-reviews-score {
+    font-size: var(--pp-score-size-mobile);
+  }
+}
+
+/* Mobile height-constrained screens: ensure reviews card doesn't overflow viewport height
+   We use calc with safe-area-inset and a conservative offset to leave room for header/footer.
+   The card becomes internally scrollable if content exceeds available height. */
+/* For small screens allow the reviews card to expand naturally so the page scrolls
+   instead of the card having its own internal scrolling. This ensures the card is
+   always fully visible and not clipped on some device heights. */
+@media (max-width: 600px) {
+  .public-profile-reviews-card {
+    overflow: visible;
+  }
+  .public-profile-reviews-card .public-profile-reviews-content {
+    overflow: visible;
+    padding: 12px;
+  }
+}
+
+/* If the viewport height is small, re-enable an internal max-height for the reviews
+   card so it doesn't overflow the visible area. These thresholds are conservative;
+   adjust numbers if your header/footer heights differ. */
+@media (max-height: 720px) {
+  .public-profile-page-container { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .public-profile-reviews-card {
+    /* Allow room for header (~6rem) + some gap. Use the dynamically computed
+       --pp-available-height where possible so the value adapts to UI chrome. */
+    max-height: calc(var(--pp-available-height, 100vh) - 6rem - 80px);
+    overflow: hidden;
+  }
+  .public-profile-reviews-card .public-profile-reviews-content {
+    max-height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-height: 560px) {
+  /* For very short viewports, be more strict so content doesn't get lost under UI chrome */
+  .public-profile-reviews-card {
+    max-height: calc(100vh - 6rem - 80px);
+  }
+}
+
+/* Dark mode overrides to align with `ProfilePage.css` tokens */
+body.dark-mode .public-profile-reviews-card {
+  background: #282828;
+  border-color: #3f3f3f;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .public-profile-reviews-card .public-profile-reviews-content {
+  color: #ffffff;
+}
+
+body.dark-mode .public-profile-reviews-score {
+  color: #ffffff;
+}
+
+body.dark-mode .public-profile-rating-bar-outer {
+  background: #3a3a3a;
+}
