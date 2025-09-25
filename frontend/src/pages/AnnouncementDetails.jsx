@@ -496,7 +496,7 @@ export default function AnnouncementDetails() {
           {/* Main Content */}
           <Grid item xs={12} md={8} order={{ xs: 1, md: 1 }}>
             {/* Image Carousel */}
-            <Card elevation={3} sx={{ mb: 3, borderRadius: 3, overflow: 'hidden', mt: { xs: 0, md: 4 } }}>
+            <Card className="seller-card" elevation={3} sx={{ mb: 3, overflow: 'hidden', mt: { xs: 0, md: 4 } }}>
               <Box sx={{ position: 'relative', height: { xs: '58vw', sm: '60vw', md: 500 } }}>
                 {images.length > 0 ? (
                   <>
@@ -579,7 +579,7 @@ export default function AnnouncementDetails() {
 
             {/* Details card */}
 
-            <Card elevation={2} sx={{ borderRadius: 3, bgcolor: getIsDarkMode() ? '#282828' : '#f5f5f5' }}>
+            <Card className="seller-card" elevation={2}>
               <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
                 {/* Header with actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
@@ -613,6 +613,7 @@ export default function AnnouncementDetails() {
                       arrow
                       enterDelay={300}
                       leaveDelay={200}
+                      PopperProps={{ strategy: 'fixed' }}
                       componentsProps={{
                         tooltip: { sx: getTooltipStyles().tooltip },
                         arrow: { sx: getTooltipStyles().arrow }
@@ -640,6 +641,7 @@ export default function AnnouncementDetails() {
                       arrow
                       enterDelay={300}
                       leaveDelay={200}
+                      PopperProps={{ strategy: 'fixed' }}
                       componentsProps={{
                         tooltip: { sx: getTooltipStyles().tooltip },
                         arrow: { sx: getTooltipStyles().arrow }
@@ -777,7 +779,7 @@ export default function AnnouncementDetails() {
           {/* Seller Information Sidebar + Location Map */}
           <Grid item xs={12} md={4} order={{ xs: 2, md: 2 }}>
             <Box sx={{ position: { md: 'sticky' }, top: { md: 120 } }}>
-            <Card elevation={2} sx={{ borderRadius: 3, mb: 3, mt: { xs: 0, md: 4 } }}>
+            <Card className="seller-card" elevation={2} sx={{ mb: 3, mt: { xs: 0, md: 4 } }}>
               <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>
                   Informații vânzător

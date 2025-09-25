@@ -215,6 +215,69 @@ export default function PublicProfile() {
     );
   }
 
+    // prepare reviews list JSX to avoid nested ternary/JSX parsing issues
+    const reviewsList = Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
+      profile.reviews.map((r) => {
+        const annId = r.announcement?._id || r.announcementId || r.announcement;
+        const annFromList = annId ? (announcements || []).find(a => String(a._id || a.id) === String(annId)) : null;
+        const annTitle = r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name)) || (annFromList && (annFromList.title || annFromList.name));
+        return (
+          <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="compact-review-item">
+            <div className="compact-review-left">
+              <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:44, height:44, fontSize:16 }}>
+                {(r.authorName || r.name || 'U').charAt(0)}
+              </Avatar>
+            </div>
+            <div className="compact-review-main">
+              <div className="compact-review-top">
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="compact-review-author">{r.authorName || r.name || 'Utilizator'}</div>
+                  <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                  { annTitle && (
+                    <div className="compact-review-ann-title">{annTitle}</div>
+                  ) }
+                </div>
+                {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
+                  <div className="review-actions-menu">
+                    <IconButton size="small" onClick={(e) => setMenuState({ anchorEl: e.currentTarget, reviewId: r._id })}>
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                  </div>
+                )}
+              </div>
+              <div className="compact-review-body">{r.comment}</div>
+              <div className="compact-review-actions">
+                <div className="compact-review-score">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
+                  <IconButton
+                    size="small"
+                    onClick={async () => {
+                      try {
+                        if (!user) { alert('Trebuie să fii autentificat pentru a da like'); return; }
+                        const prev = likedState[r._id] || { liked: false, count: (r.likes || []).length };
+                        const newLiked = !prev.liked;
+                        setLikedState(s => ({ ...s, [r._id]: { liked: newLiked, count: prev.count + (newLiked ? 1 : -1) } }));
+                        const resp = await apiClient.post(`/api/reviews/${r._id}/like`);
+                        setLikedState(s => ({ ...s, [r._id]: { liked: resp.data.liked, count: resp.data.likesCount } }));
+                      } catch (e) {
+                        console.error('Like error', e);
+                        alert('A apărut o eroare la like. Încearcă din nou.');
+                      }
+                    }}
+                  >
+                    <ThumbUpIcon fontSize="small" color={(likedState[r._id]?.liked || (r.likes || []).some(id=>String(id)===String(currentUserId))) ? 'primary' : 'action'} />
+                  </IconButton>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--pf-text-muted)' }}>{(likedState[r._id]?.count ?? (r.likes || []).length) || 0}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
+    );
+
   return (
   <div className="profile-page-container public-profile-page-container">
       <div className="mobile-header">
@@ -576,65 +639,7 @@ export default function PublicProfile() {
               {/* Compact reviews list nested under the summary card (shares the same column width) */}
               <div style={{ marginTop: 16 }} className="public-profile-reviews-list-container">
                 <div className="public-profile-reviews-list-inner">
-                  {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
-                    profile.reviews.map((r) => (
-                      <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="compact-review-item">
-                        <div className="compact-review-left">
-                          <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:44, height:44, fontSize:16 }}>
-                            {(r.authorName || r.name || 'U').charAt(0)}
-                          </Avatar>
-                        </div>
-                        <div className="compact-review-main">
-                          <div className="compact-review-top">
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <div className="compact-review-author">{r.authorName || r.name || 'Utilizator'}</div>
-                              <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
-                              {/* Announcement title (if provided by backend) - appears under the date and is more pronounced */}
-                              { (r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name))) && (
-                                <div className="compact-review-ann-title">{r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name))}</div>
-                              ) }
-                            </div>
-                            {/* three-dots menu visible only to author */}
-                            {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
-                              <div className="review-actions-menu">
-                                <IconButton size="small" onClick={(e) => setMenuState({ anchorEl: e.currentTarget, reviewId: r._id })}>
-                                  <MoreVertIcon fontSize="small" />
-                                </IconButton>
-                              </div>
-                            )}
-                          </div>
-                          <div className="compact-review-body">{r.comment}</div>
-                              <div className="compact-review-actions">
-                                <div className="compact-review-score">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={async () => {
-                                      try {
-                                        if (!user) { alert('Trebuie să fii autentificat pentru a da like'); return; }
-                                        // optimistic UI
-                                        const prev = likedState[r._id] || { liked: false, count: (r.likes || []).length };
-                                        const newLiked = !prev.liked;
-                                        setLikedState(s => ({ ...s, [r._id]: { liked: newLiked, count: prev.count + (newLiked ? 1 : -1) } }));
-                                        const resp = await apiClient.post(`/api/reviews/${r._id}/like`);
-                                        setLikedState(s => ({ ...s, [r._id]: { liked: resp.data.liked, count: resp.data.likesCount } }));
-                                      } catch (e) {
-                                        console.error('Like error', e);
-                                        alert('A apărut o eroare la like. Încearcă din nou.');
-                                      }
-                                    }}
-                                  >
-                                    <ThumbUpIcon fontSize="small" color={(likedState[r._id]?.liked || (r.likes || []).some(id=>String(id)===String(currentUserId))) ? 'primary' : 'action'} />
-                                  </IconButton>
-                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--pf-text-muted)' }}>{(likedState[r._id]?.count ?? (r.likes || []).length) || 0}</div>
-                                </div>
-                              </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
-                  )}
+                  {reviewsList}
                   {/* 'Toate comentariile' button appears under the individual reviews list */}
                   {Array.isArray(profile?.reviews) && profile.reviews.length >= 2 && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>

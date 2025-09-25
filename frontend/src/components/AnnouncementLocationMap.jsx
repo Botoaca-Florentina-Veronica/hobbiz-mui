@@ -28,7 +28,7 @@ export default function AnnouncementLocationMap({ location, darkMode = false, he
   if (!location) return null;
 
   return (
-    <Card elevation={2} className={`announcement-location-map-box ${darkMode ? 'dark-mode' : ''}`} sx={{ borderRadius: 3, overflow: 'hidden', mt: 0 }}>
+    <Card elevation={2} className={`announcement-location-map-box seller-card ${darkMode ? 'dark-mode' : ''}`} sx={{ overflow: 'hidden', mt: 0 }}>
       <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
         <Typography variant="h6" sx={{ fontWeight:600, mb: 2, color: accentColor }}>Locație</Typography>
         <Box className="alm-map-wrapper" sx={{ height, borderRadius: 2, overflow: 'hidden', mb: 2 }}>

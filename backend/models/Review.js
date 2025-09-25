@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const reviewSchema = new mongoose.Schema({
 	user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // reviewed user
 	author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // who left the review (optional)
+	// Optional reference to an Announcement the review is attached to (if applicable)
+	announcement: { type: mongoose.Schema.Types.ObjectId, ref: 'Announcement' },
 	score: { type: Number, required: true, min: 0, max: 5 },
 	comment: { type: String },
 	// Users who liked this review (each user can like once)

@@ -235,7 +235,11 @@ const getProfile = async (req, res) => {
     // Atașăm recenziile asociate acestui utilizator (dacă modelul Review există)
     try {
       const Review = require('../models/Review');
-      const reviews = await Review.find({ user: targetUserId }).sort({ createdAt: -1 }).lean();
+      // Populate announcement title when available so frontend can display it under each review
+      const reviews = await Review.find({ user: targetUserId })
+        .sort({ createdAt: -1 })
+        .populate('announcement', 'title')
+        .lean();
       // Populate basic author info if possible
       const UserModel = require('../models/User');
       const authorIds = Array.from(new Set(reviews.map(r => String(r.author)).filter(Boolean)));
@@ -255,7 +259,10 @@ const getProfile = async (req, res) => {
         authorAvatar: r.author ? authors[String(r.author)]?.avatar : undefined,
         likes: r.likes || [],
         likesCount: (r.likes || []).length,
-        likedByCurrentUser: req.userId ? ((r.likes || []).some(id => String(id) === String(req.userId))) : false
+        likedByCurrentUser: req.userId ? ((r.likes || []).some(id => String(id) === String(req.userId))) : false,
+        // announcement populated (if available) plus convenient field for frontend
+        announcementTitle: r.announcement ? r.announcement.title : undefined,
+        announcement: r.announcement ? { _id: r.announcement._id, title: r.announcement.title } : undefined
       }));
 
       const userObj = user.toObject();
