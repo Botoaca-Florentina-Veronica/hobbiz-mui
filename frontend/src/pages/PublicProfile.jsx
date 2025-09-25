@@ -55,6 +55,10 @@ export default function PublicProfile() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
   const [showReviewPosted, setShowReviewPosted] = useState(false);
+  const [alertMounted, setAlertMounted] = useState(false);
+  const [alertLeaving, setAlertLeaving] = useState(false);
+  const alertTimerRef = useRef(null);
+  const alertLeaveTimerRef = useRef(null);
   const { user } = useAuth() || {};
   // Normalized current user id (AuthContext may store profile with _id)
   const currentUserId = user ? (user._id || user.userId || user.id) : null;
@@ -146,17 +150,37 @@ export default function PublicProfile() {
     if (userId) fetchProfile();
     // If navigated here carrying state that a review was posted, show confirmation
     if (location?.state?.reviewPosted) {
+      // mount alert and schedule graceful leave
       setShowReviewPosted(true);
-      // Hide after 4 seconds automatically
-      const dismissTimer = setTimeout(() => setShowReviewPosted(false), 4000);
+      setAlertMounted(true);
+      setAlertLeaving(false);
+      // schedule start of leave a bit before full 4s so animation can play
+      const visibleMs = 4000;
+      const leaveAnimMs = 420; // should match CSS animation duration
+      if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+      if (alertLeaveTimerRef.current) clearTimeout(alertLeaveTimerRef.current);
+      alertTimerRef.current = setTimeout(() => {
+        // start leave animation
+        setAlertLeaving(true);
+        alertLeaveTimerRef.current = setTimeout(() => {
+          setAlertMounted(false);
+          setShowReviewPosted(false);
+          setAlertLeaving(false);
+        }, leaveAnimMs);
+      }, visibleMs - leaveAnimMs);
+
       // remove the state from history so refresh doesn't keep showing it
       if (window.history && window.history.replaceState) {
         const newState = { ...window.history.state };
         try { delete newState.state?.reviewPosted; } catch(_) {}
         window.history.replaceState(newState, '');
       }
-      // Clean up the timeout if the component unmounts or effect re-runs
-      return () => clearTimeout(dismissTimer);
+
+      // Clean up timers
+      return () => {
+        if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+        if (alertLeaveTimerRef.current) clearTimeout(alertLeaveTimerRef.current);
+      };
     }
   }, [userId]);
 
@@ -213,11 +237,24 @@ export default function PublicProfile() {
       )}
 
       {showReviewPosted && (
-        <Fade in={showReviewPosted}>
-          <Alert severity="success" className="profile-alert" onClose={() => setShowReviewPosted(false)}>
-            Recenzia a fost publicată. Mulțumim pentru feedback!
-          </Alert>
-        </Fade>
+        // Keep mounted while animating; CSS handles enter/leave
+        alertMounted && (
+          <div className={`profile-alert-wrapper ${alertLeaving ? 'alert-leaving' : 'alert-entering'}`}>
+            <Alert severity="success" className="profile-alert" onClose={() => {
+              // start graceful leave
+              if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+              if (alertLeaveTimerRef.current) clearTimeout(alertLeaveTimerRef.current);
+              setAlertLeaving(true);
+              alertLeaveTimerRef.current = setTimeout(() => {
+                setAlertMounted(false);
+                setShowReviewPosted(false);
+                setAlertLeaving(false);
+              }, 420);
+            }}>
+              Recenzia a fost publicată. Mulțumim pentru feedback!
+            </Alert>
+          </div>
+        )
       )}
 
       {/*
@@ -510,6 +547,8 @@ export default function PublicProfile() {
                     </div>
                   </div>
 
+                  {/* Show summary info; 'Toate comentariile' moved below the individual reviews list */}
+
                   <Divider className="public-profile-reviews-divider" />
 
                   {/* Rating bars */}
@@ -547,9 +586,13 @@ export default function PublicProfile() {
                         </div>
                         <div className="compact-review-main">
                           <div className="compact-review-top">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
                               <div className="compact-review-author">{r.authorName || r.name || 'Utilizator'}</div>
-                              <div className="compact-review-meta">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                              <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                              {/* Announcement title (if provided by backend) - appears under the date and is more pronounced */}
+                              { (r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name))) && (
+                                <div className="compact-review-ann-title">{r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name))}</div>
+                              ) }
                             </div>
                             {/* three-dots menu visible only to author */}
                             {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
@@ -591,6 +634,14 @@ export default function PublicProfile() {
                     ))
                   ) : (
                     <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
+                  )}
+                  {/* 'Toate comentariile' button appears under the individual reviews list */}
+                  {Array.isArray(profile?.reviews) && profile.reviews.length >= 2 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                      <Button size="small" variant="outlined" onClick={() => navigate(`/profil/${userId}/toate-recenziile`)}>
+                        Toate comentariile
+                      </Button>
+                    </div>
                   )}
                   {/* Action menu for reviews (styled and positioned to the left of button) */}
                   <Menu

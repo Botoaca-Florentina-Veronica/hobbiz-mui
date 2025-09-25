@@ -89,8 +89,8 @@ html {
 .announcement-image-container {
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-radius: var(--pf-card-radius, 12px);
+  box-shadow: var(--pf-card-shadow, 0 8px 32px rgba(0, 0, 0, 0.12));
 }
 
 .announcement-image-container::before {
@@ -108,7 +108,7 @@ html {
 /* Gradient overlay pentru hero section */
 .announcement-hero-overlay {
   background: linear-gradient(135deg, rgba(53, 80, 112, 0.03) 0%, transparent 100%);
-  border-radius: 16px;
+  border-radius: var(--pf-card-radius, 12px);
   padding: 2rem;
 }
 
@@ -123,16 +123,25 @@ html {
   box-shadow: 0 2px 8px rgba(53, 80, 112, 0.15) !important;
 }
 
-/* Contact paper styling */
+/* Contact paper styling - use shared tokens for consistency */
 .contact-paper {
-  background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%) !important;
+  background: var(--pf-card-bg, #ffffff) !important;
   border: 1px solid rgba(53, 80, 112, 0.08) !important;
+  border-radius: var(--pf-card-radius, 12px) !important;
+  box-shadow: var(--pf-card-shadow, 0 4px 16px rgba(53, 80, 112, 0.06)) !important;
   transition: all 0.3s ease !important;
 }
-
 .contact-paper:hover {
-  border-color: rgba(53, 80, 112, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(53, 80, 112, 0.1) !important;
+  border-color: rgba(53, 80, 112, 0.15) !important;
+  box-shadow: 0 6px 20px rgba(53, 80, 112, 0.08) !important;
+}
+
+/* Image carousel enhancements */
+.image-carousel-container {
+  position: relative;
+  border-radius: var(--pf-card-radius, 12px);
+  overflow: hidden;
+  box-shadow: var(--pf-card-shadow, 0 12px 48px rgba(53, 80, 112, 0.15));
 }
 
 /* Price highlight */
@@ -150,9 +159,21 @@ html {
   transition: all 0.3s ease;
 }
 
+.seller-card {
+  background: var(--pf-card-bg, #ffffff);
+  border: 1px solid rgba(53, 80, 112, 0.08);
+  border-radius: var(--pf-card-radius, 12px);
+  box-shadow: var(--pf-card-shadow, 0 8px 32px rgba(53, 80, 112, 0.08));
+  transition: all 0.3s ease;
+}
+.seller-card:hover {
+  border-color: rgba(53, 80, 112, 0.15);
+  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.12);
+}
+
 /* Loading skeleton enhancements */
 .MuiSkeleton-root {
-  border-radius: 12px !important;
+  border-radius: var(--pf-card-radius, 12px) !important;
 }
 
 /* Responsive enhancements */

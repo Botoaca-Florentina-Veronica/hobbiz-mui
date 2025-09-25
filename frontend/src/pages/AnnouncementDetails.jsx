@@ -78,6 +78,10 @@ export default function AnnouncementDetails() {
   const [ratingValue, setRatingValue] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
 
+  // Seller profile & reviews (used to display a short review summary in the seller card)
+  const [sellerProfile, setSellerProfile] = useState(null);
+  const [sellerReviewsLoading, setSellerReviewsLoading] = useState(false);
+
   const handleRateClick = (e) => {
     e?.stopPropagation();
     setRateOpen(true);
@@ -115,6 +119,44 @@ export default function AnnouncementDetails() {
         alert('A apărut o eroare la trimiterea recenziei. Încearcă din nou.');
       }
     }
+  };
+
+  // Fetch seller public profile (contains reviews) when announcement is loaded
+  useEffect(() => {
+    let mounted = true;
+    async function fetchSellerProfile() {
+      try {
+        if (!announcement?.user?._id) return;
+        setSellerReviewsLoading(true);
+        const res = await apiClient.get(`/api/users/profile/${announcement.user._id}`);
+        if (!mounted) return;
+        setSellerProfile(res.data);
+      } catch (e) {
+        console.error('Failed to load seller profile for reviews', e);
+        if (mounted) setSellerProfile(null);
+      } finally {
+        if (mounted) setSellerReviewsLoading(false);
+      }
+    }
+    fetchSellerProfile();
+    return () => { mounted = false; };
+  }, [announcement?.user?._id]);
+
+  const renderSellerReviewsSummary = () => {
+    const reviews = sellerProfile?.reviews;
+    if (!Array.isArray(reviews) || reviews.length === 0) {
+      return (
+        <Typography variant="body2" color="text.secondary">nu există review-uri</Typography>
+      );
+    }
+    const avg = reviews.reduce((s, r) => s + Number(r.score || 0), 0) / reviews.length;
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Rating value={avg} precision={0.1} readOnly size="small" />
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{avg.toFixed(1)}</Typography>
+        <Typography variant="body2" color="text.secondary">({reviews.length} recenzii)</Typography>
+      </Box>
+    );
   };
 
   // Dark mode helpers and accent palette
@@ -760,9 +802,12 @@ export default function AnnouncementDetails() {
                     <Typography variant="h6" sx={{ fontWeight: 600, color: getIsDarkMode() ? '#f5f5f5' : '#2d3748' }}>
                       {announcement.user.firstName} {announcement.user.lastName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Membru din {formatDate(announcement.user.createdAt)}
-                    </Typography>
+                    {/* Show seller reviews summary instead of "Membru din" */}
+                    {sellerReviewsLoading ? (
+                      <Typography variant="body2" color="text.secondary">Se încarcă...</Typography>
+                    ) : (
+                      renderSellerReviewsSummary()
+                    )}
                   </Box>
                 </Box>
 

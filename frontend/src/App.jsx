@@ -18,6 +18,7 @@ import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import PublicProfile from './pages/PublicProfile';
+import PublicProfileAllReviews from './pages/PublicProfileAllReviews';
 import MyAnnouncements from './pages/MyAnnouncements';
 import ChatPage from './pages/ChatPage';
 
@@ -205,6 +206,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <PublicProfile />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/profil/:userId/toate-recenziile" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <PublicProfileAllReviews />
             <Footer hideOnMobile />
           </>
         } />

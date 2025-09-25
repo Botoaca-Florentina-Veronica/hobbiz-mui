@@ -17,6 +17,8 @@
 
   /* Surfaces */
   --pf-card-radius: 12px;
+  --pf-card-bg: #ffffff;
+  --pf-card-gap: 1.25rem;
   --pf-card-shadow: 0 3px 10px rgba(0,0,0,0.1);
 
   /* Spacing */
@@ -109,11 +111,12 @@
 .profile-card-wrapper:hover { transform: translateY(-2px); }
 
 .announcement-card {
-  border-radius: 8px;
+  border-radius: var(--pf-card-radius);
   overflow: hidden;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border: 1px solid #e0e0e0;
+  background-color: var(--pf-card-bg, #ffffff);
+  box-shadow: var(--pf-card-shadow, 0 2px 8px rgba(0,0,0,0.1));
+  border: 1px solid var(--pf-divider, #e0e0e0);
+  margin-bottom: 1rem; /* tightened for the three modified containers */
 }
 .announcement-image { width: 100%; height: clamp(120px, 38vw, 160px); object-fit: cover; }
 .announcement-image-placeholder {
@@ -140,9 +143,11 @@
 
 .profile-header-card {
   padding: 2rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem; /* tightened spacing to match announcement card */
   border-radius: var(--pf-card-radius);
   box-shadow: var(--pf-card-shadow);
+  background: var(--pf-card-bg, #ffffff);
+  border: 1px solid var(--pf-divider, #e0e0e0);
 }
 
 .profile-header-grid {
@@ -260,6 +265,9 @@
 .profile-info-main-card {
   border-radius: var(--pf-card-radius);
   box-shadow: var(--pf-card-shadow);
+  background: var(--pf-card-bg, #ffffff);
+  border: 1px solid var(--pf-divider, #e0e0e0);
+  margin-bottom: 1rem; /* tightened spacing to match other cards */
 }
 
 .profile-info-content {
