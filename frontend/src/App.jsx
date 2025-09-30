@@ -35,7 +35,9 @@ import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import useScrollToTop from './hooks/useScrollToTop';
 import './App.css';
 import './mediaQueries.css';
+import './components/Content.css';
 import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
+import CookieConsent from './components/CookieConsent';
 
 function App() {
   // Automatically scroll to top on route changes
@@ -155,6 +157,7 @@ function App() {
             <Categories />
             <CallToAction />
             <Footer />
+            <CookieConsent />
           </div>
         } />
         <Route path="/*" element={
@@ -167,6 +170,7 @@ function App() {
             <CallToAction />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
+            <CookieConsent />
           </div>
         } />
         <Route path="/setari-cont" element={

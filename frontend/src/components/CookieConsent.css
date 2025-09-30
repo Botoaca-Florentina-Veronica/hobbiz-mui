@@ -1,0 +1,111 @@
+.cookie-consent-root {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.cookie-consent-card {
+  max-width: 520px;
+  /* Fully opaque surface so text is always readable */
+  background: var(--app-surface);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+}
+
+.cookie-consent-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+}
+
+.cookie-consent-card p {
+  margin: 0 0 14px 0;
+  color: var(--app-muted);
+  line-height: 1.4;
+}
+
+.cookie-settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.cookie-settings:hover {
+  color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.gear { font-size: 1.05rem; }
+
+.cookie-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.cookie-accept {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cookie-accept:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 8px 20px rgba(53,80,112,0.18);
+  transform: translateY(-2px);
+}
+
+.cookie-reject {
+  /* Use surface fill so it reads well on top of the card; in dark-mode this becomes a dark button */
+  background: var(--app-elev);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cookie-reject:hover {
+  background: linear-gradient(180deg, var(--app-elev), var(--app-surface));
+  border-color: var(--primary);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+/* focus styles */
+.cookie-accept:focus, .cookie-reject:focus, .cookie-settings:focus {
+  outline: 3px solid rgba(53,80,112,0.18);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions and reduced-motion respect */
+.cookie-settings, .cookie-accept, .cookie-reject {
+  transition: transform 180ms ease, box-shadow 220ms ease, background-color 180ms ease, color 140ms ease, border-color 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-settings, .cookie-accept, .cookie-reject { transition: none; transform: none; }
+}
+
+/* Dark mode overrides: rely on CSS variables already set in .dark-mode */
+@media (max-width: 760px) {
+  .cookie-consent-root { right: 12px; left: 12px; bottom: 16px; }
+  .cookie-consent-card { width: 100%; max-width: none; padding: 16px; border-radius: 12px; }
+  .cookie-accept, .cookie-reject { flex: 1; }
+  .cookie-actions { gap: 8px; }
+}

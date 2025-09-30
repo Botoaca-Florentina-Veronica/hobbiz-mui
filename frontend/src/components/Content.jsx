@@ -10,7 +10,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { ChevronLeft, ChevronRight, FavoriteOutlined } from '@mui/icons-material';
-import './Content.css';
+// Content.css is imported in App.jsx to ensure it is loaded after global styles
 import apiClient from '../api/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,7 +49,7 @@ export default function Content() {
   return (
     <section className="content">
       <h2>Anunțuri populare</h2>
-      <Box sx={{ 
+        <Box sx={{ 
         maxWidth: '1100px',
         margin: '0 auto',
         position: 'relative'
@@ -78,15 +78,16 @@ export default function Content() {
           ref={carouselRef}
           className="popular-announcements-container"
           sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: { xs: 'wrap', lg: 'nowrap' }, // Wrap until large screens
+            /* Use grid on small screens to guarantee 2 columns, switch to horizontal flex/scroll on large screens */
+            display: { xs: 'grid', lg: 'flex' },
+            gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
             gap: { xs: '12px', sm: '16px', md: '20px', lg: '20px' },
-            overflowX: { xs: 'visible', sm: 'visible', md: 'visible', lg: 'auto' }, // Horizontal scroll only on large screens
+            flexWrap: { lg: 'nowrap' },
+            overflowX: { xs: 'hidden', sm: 'hidden', md: 'hidden', lg: 'auto' },
             overflowY: 'visible',
             scrollBehavior: 'smooth',
             padding: { xs: '20px 12px', sm: '20px 16px', md: '20px 20px', lg: '20px 10px' },
-            justifyContent: { xs: 'space-between', sm: 'space-between', md: 'space-between', lg: 'flex-start' },
+            justifyContent: { lg: 'flex-start' },
             maxHeight: { xs: 'none', sm: 'none', md: 'none', lg: 'auto' },
             '&::-webkit-scrollbar': {
               height: '8px',
@@ -109,24 +110,10 @@ export default function Content() {
               <Card
                 key={index}
                 sx={{
-                  minWidth: { 
-                    xs: 'calc(50% - 6px)', 
-                    sm: 'calc(50% - 8px)', 
-                    md: 'calc(50% - 10px)', 
-                    lg: 320 
-                  },
-                  maxWidth: { 
-                    xs: 'calc(50% - 6px)', 
-                    sm: 'calc(50% - 8px)', 
-                    md: 'calc(50% - 10px)', 
-                    lg: 320 
-                  },
-                  width: { 
-                    xs: 'calc(50% - 6px)', 
-                    sm: 'calc(50% - 8px)', 
-                    md: 'calc(50% - 10px)', 
-                    lg: 320 
-                  },
+                  /* Full width within grid columns on small screens, fixed card width on large screens */
+                  width: { xs: '100%', sm: '100%', md: '100%', lg: 320 },
+                  minWidth: { lg: 320 },
+                  maxWidth: { lg: 320 },
                   height: { 
                     xs: 220, 
                     sm: 260, 
@@ -164,24 +151,9 @@ export default function Content() {
                 key={a._id || index}
                 onClick={() => a?._id && navigate(`/announcement/${a._id}`)}
                 sx={{
-                  minWidth: { 
-                    xs: 'calc(50% - 6px)', 
-                    sm: 'calc(50% - 8px)', 
-                    md: 'calc(50% - 10px)', 
-                    lg: 320 
-                  },
-                  maxWidth: { 
-                    xs: 'calc(50% - 6px)', 
-                    sm: 'calc(50% - 8px)', 
-                    md: 'calc(50% - 10px)', 
-                    lg: 320 
-                  },
-                  width: { 
-                    xs: 'calc(50% - 6px)', 
-                    sm: 'calc(50% - 8px)', 
-                    md: 'calc(50% - 10px)', 
-                    lg: 320 
-                  },
+                  width: { xs: '100%', sm: '100%', md: '100%', lg: 320 },
+                  minWidth: { lg: 320 },
+                  maxWidth: { lg: 320 },
                   height: { 
                     xs: 220, 
                     sm: 260, 

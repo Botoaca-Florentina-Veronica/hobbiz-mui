@@ -39,26 +39,20 @@ const createReview = async (req, res) => {
       console.warn('Nu am putut actualiza câmpul reviews al user-ului:', pushErr.message);
     }
 
-    // Return populated review (author and announcement basic info) for frontend convenience
+    // Return populated review (author basic info) for frontend convenience
     try {
-      const populated = await Review.findById(review._id)
-        .populate('author', 'firstName lastName avatar')
-        .populate('announcement', 'title')
-        .lean();
-      // Normalize response shape: include authorName and authorAvatar and announcementTitle for frontend convenience
+      const populated = await Review.findById(review._id).populate('author', 'firstName lastName avatar').lean();
+      // Normalize response shape: include authorName and authorAvatar for older frontend code
       const enriched = {
         ...populated,
         authorName: populated.author ? `${populated.author.firstName || ''}${populated.author.lastName ? ' ' + populated.author.lastName : ''}`.trim() : undefined,
-        authorAvatar: populated.author ? populated.author.avatar : undefined,
-        announcementTitle: populated.announcement ? populated.announcement.title : undefined
+        authorAvatar: populated.author ? populated.author.avatar : undefined
       };
       return res.status(201).json({ message: 'Recenzie creată', review: enriched });
     } catch (e) {
       // If populate fails, fallback to returning basic review object
       console.warn('Populate failed for review response:', e.message);
-      const obj = review.toObject();
-      obj.announcementTitle = undefined;
-      return res.status(201).json({ message: 'Recenzie creată', review: obj });
+      return res.status(201).json({ message: 'Recenzie creată', review: review.toObject() });
     }
   } catch (e) {
     console.error('Eroare createReview:', e);
@@ -72,18 +66,12 @@ const getReviewsForUser = async (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(400).json({ error: 'Lipsește userId' });
     // Populate author basic info to make frontend rendering easier
-    const reviews = await Review.find({ user: userId })
-      .sort({ createdAt: -1 })
-      .populate('author', 'firstName lastName avatar')
-      .populate('announcement', 'title')
-      .lean();
+    const reviews = await Review.find({ user: userId }).sort({ createdAt: -1 }).populate('author', 'firstName lastName avatar').lean();
     const mapped = reviews.map(r => ({
       ...r,
       authorName: r.author ? `${r.author.firstName || ''}${r.author.lastName ? ' ' + r.author.lastName : ''}`.trim() : undefined,
       authorAvatar: r.author ? r.author.avatar : undefined,
-      score: r.score,
-      announcementTitle: r.announcement ? r.announcement.title : undefined,
-      announcement: r.announcement ? { _id: r.announcement._id, title: r.announcement.title } : undefined
+      score: r.score
     }));
     res.json(mapped);
   } catch (e) {

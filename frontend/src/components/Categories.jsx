@@ -93,12 +93,12 @@ export default function Categories() {
                     }}
                   />
                 </Box>
-                <CardContent sx={{ p: { xs: 1, sm: 1.5, md: 2 }, textAlign: 'center' }}>
+                <CardContent className="category-text-area" sx={{ p: { xs: 1, sm: 1.5, md: 2 }, textAlign: 'center' }}>
                   <Typography 
                     variant="subtitle2" 
                     component="h3"
+                    className="category-description"
                     sx={{ 
-                      color: 'white',
                       fontWeight: 700,
                       fontSize: { xs: '0.8rem', sm: '0.95rem' },
                       lineHeight: 1.2,

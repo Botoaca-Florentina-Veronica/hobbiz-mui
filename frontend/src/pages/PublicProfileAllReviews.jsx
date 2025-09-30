@@ -12,7 +12,6 @@ export default function PublicProfileAllReviews() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -22,11 +21,6 @@ export default function PublicProfileAllReviews() {
         const res = await apiClient.get(`/api/users/profile/${userId}`);
         if (!mounted) return;
         setProfile(res.data);
-        // also fetch user's announcements for title lookup
-        try {
-          const aRes = await apiClient.get(`/api/users/announcements/${userId}`);
-          if (mounted) setAnnouncements(aRes.data || []);
-        } catch (_) { if (mounted) setAnnouncements([]); }
       } catch (e) {
         console.error('Failed to load profile for all reviews', e);
         setProfile(null);
@@ -41,43 +35,6 @@ export default function PublicProfileAllReviews() {
   if (loading) return <Container className="public-profile-container"><div>Se încarcă...</div></Container>;
   if (!profile) return <Container className="public-profile-container"><div>Profil indisponibil</div></Container>;
 
-  // prepare reviews list JSX to avoid nested ternary/JSX parsing issues
-  const reviewsList = Array.isArray(profile.reviews) && profile.reviews.length > 0 ? (
-    profile.reviews.map(r => {
-      const annId = r.announcement?._id || r.announcementId || r.announcement;
-      const annFromList = annId ? (announcements || []).find(a => String(a._id || a.id) === String(annId)) : null;
-      const annTitle = r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name)) || (annFromList && (annFromList.title || annFromList.name));
-      return (
-        <div key={r._id} className="compact-review-item">
-          <div className="compact-review-left">
-            <Avatar src={r.authorAvatar} sx={{ width:44, height:44 }}>{(r.authorName||'U').charAt(0)}</Avatar>
-          </div>
-          <div className="compact-review-main">
-            <div className="compact-review-top">
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="compact-review-author">{r.authorName || 'Utilizator'}</div>
-                <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
-                { annTitle && (
-                  <div className="compact-review-ann-title">{annTitle}</div>
-                ) }
-              </div>
-              <div />
-            </div>
-            <div className="compact-review-body">{r.comment}</div>
-            <div className="compact-review-actions">
-              <div className="compact-review-score">{Number(r.score || 0).toFixed(1)}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
-                <ThumbUpIcon fontSize="small" />
-                <div style={{ fontWeight: 700 }}>{(r.likes || []).length || 0}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    })
-  ) : (
-    <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
-  );
   return (
     <Container maxWidth={false} className="public-profile-container">
       <Box style={{ margin: '20px 0' }}>
@@ -97,8 +54,37 @@ export default function PublicProfileAllReviews() {
         {/* All reviews list below */}
         <div style={{ marginTop: 16 }} className="public-profile-reviews-list-container">
           <div className="public-profile-reviews-list-inner">
-            {/** reviewsList will be injected here (computed above) */}
-            {reviewsList}
+            {Array.isArray(profile.reviews) && profile.reviews.length > 0 ? (
+              profile.reviews.map(r => (
+                <div key={r._id} className="compact-review-item">
+                  <div className="compact-review-left">
+                    <Avatar src={r.authorAvatar} sx={{ width:44, height:44 }}>{(r.authorName||'U').charAt(0)}</Avatar>
+                  </div>
+                  <div className="compact-review-main">
+                    <div className="compact-review-top">
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="compact-review-author">{r.authorName || 'Utilizator'}</div>
+                        <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                        { (r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name))) && (
+                          <div className="compact-review-ann-title">{r.announcementTitle || (r.announcement && (r.announcement.title || r.announcement.name))}</div>
+                        ) }
+                      </div>
+                      <div />
+                    </div>
+                    <div className="compact-review-body">{r.comment}</div>
+                    <div className="compact-review-actions">
+                      <div className="compact-review-score">{Number(r.score || 0).toFixed(1)}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
+                        <ThumbUpIcon fontSize="small" />
+                        <div style={{ fontWeight: 700 }}>{(r.likes || []).length || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
+            )}
           </div>
         </div>
       </GridLikeWrapper>

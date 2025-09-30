@@ -4,8 +4,7 @@
   text-align: center;
   background-color: #355070;
   height: auto;
-  /* Avoid forcing an overly tall section; let content dictate height */
-  min-height: auto;
+  min-height: 120vh;
 }
 
 @media (max-width: 700px) {
@@ -30,9 +29,8 @@
 .categories-title {
   text-align: center;
   font-size: 3.5rem;
-  /* Reduce vertical spacing so the section isn't taller than necessary */
-  margin-bottom: 5rem;
-  margin-top: 2rem;
+  margin-bottom: 6rem;
+  margin-top: 5rem;
   color: #fff;
 }
 
@@ -94,12 +92,17 @@
   border-radius: 50%;
 }
 
+.category-text-area {
+  background: rgba(214, 216, 216, 0.493); /* subtle off-white panel for text in light mode */
+  border-radius: 12px;
+}
+
 .category-description {
   margin-top: 0.8rem;
   text-align: center;
   font-size: 1rem;
   font-weight: bold;
-  color: white;
+  color: #0f2940; /* dark blue text (matches app blue background tone) */
 }
 
 .dark-mode .categories-container{
@@ -112,6 +115,11 @@
 
 .dark-mode .category-description{
   color: #fe6585;
+}
+
+/* Ensure in dark mode the text area looks appropriate */
+.dark-mode .category-text-area {
+  background: transparent !important;
 }
 
 /* Stiluri pentru cardurile Material-UI */

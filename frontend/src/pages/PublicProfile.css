@@ -365,6 +365,16 @@ body.dark-mode .public-profile-rating-bar-outer {
   padding: 6px 0;
 }
 
+.review-ann-link {
+  color: #355070;
+  text-decoration: none;
+}
+
+.review-ann-link:hover {
+  text-decoration: underline;
+}
+
+
 /* Dark mode tweaks */
 body.dark-mode .public-profile-review-item {
   border-color: rgba(255,255,255,0.06);
