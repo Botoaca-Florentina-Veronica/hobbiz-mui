@@ -270,8 +270,28 @@ app.post('/login', async (req, res) => {
 
 // Pornire server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`🔥 Server pe http://localhost:${PORT}`);
+// Print LAN IPs to help debugging from physical devices
+try {
+  const os = require('os');
+  const nets = os.networkInterfaces();
+  const addresses = [];
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        addresses.push(net.address);
+      }
+    }
+  }
+  if (addresses.length) {
+    console.log('🔍 LAN addresses:', addresses.join(', '));
+  }
+} catch (e) {
+  // ignore
+}
+
+// Listen on all interfaces so physical devices on the same LAN can reach the server
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🔥 Server pe http://0.0.0.0:${PORT} (accessible on LAN)`);
   console.log(`🔌 Socket.IO enabled for real-time chat`);
 });
 
