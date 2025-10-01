@@ -59,6 +59,9 @@ try {
   if (__DEV__) {
     // eslint-disable-next-line no-console
     console.log('[mobile-app] API baseURL =', _base);
+    if (typeof _base === 'string' && _base.includes('10.0.2.2')) {
+      console.warn('[mobile-app] Detected Android emulator fallback (10.0.2.2). If you run on a physical Android device, set EXPO_PUBLIC_API_URL to http://<YOUR_PC_IP>:5000');
+    }
   }
 } catch (e) {
   // ignore
@@ -83,7 +86,10 @@ api.interceptors.response.use(
   (error) => {
     try {
       // eslint-disable-next-line no-console
-      console.error('[mobile-app] API error:', error?.message, 'url:', error?.config?.url);
+      const cfg = error?.config || {};
+      const base = cfg.baseURL || api.defaults.baseURL;
+      const url = cfg.url || '(unknown)';
+      console.error('[mobile-app] API error:', error?.message, 'baseURL:', base, 'url:', url);
     } catch (e) {
       // ignore
     }
