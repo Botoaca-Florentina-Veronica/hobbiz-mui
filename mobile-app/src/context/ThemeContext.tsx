@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
+import storage from '../services/storage';
 import { lightTokens, darkTokens, Tokens } from '../theme/tokens';
 
 type ThemeMode = 'light' | 'dark' | 'auto';
@@ -24,7 +24,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     (async () => {
       try {
-        const saved = await SecureStore.getItemAsync(THEME_KEY);
+        const saved = await storage.getItemAsync(THEME_KEY);
         if (saved === 'light' || saved === 'dark' || saved === 'auto') {
           setModeState(saved);
         }
@@ -37,7 +37,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const setMode = async (newMode: ThemeMode) => {
     setModeState(newMode);
     try {
-      await SecureStore.setItemAsync(THEME_KEY, newMode);
+      await storage.setItemAsync(THEME_KEY, newMode);
     } catch (e) {
       // Silently fail
     }

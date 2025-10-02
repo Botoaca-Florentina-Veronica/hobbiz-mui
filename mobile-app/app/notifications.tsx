@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'expo-router';
 
 // Placeholder fetch function – replace with real API integration later
@@ -22,6 +23,7 @@ interface NotificationItem {
 
 export default function NotificationsScreen() {
   const { tokens, isDark } = useAppTheme();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
@@ -71,6 +73,21 @@ export default function NotificationsScreen() {
       </View>
     );
   };
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return (
+      <View style={[styles.screen, { backgroundColor: tokens.colors.bg, paddingTop: insets.top, alignItems: 'center', justifyContent: 'center' }]}>        
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   return (
   <View style={[styles.screen, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
@@ -153,16 +170,18 @@ const styles = StyleSheet.create({
   emptyWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
-    gap: 16,
+    paddingVertical: 0,
+    gap: 0,
   },
   emptyImage: {
     width: 160,
     height: 160,
+    marginBottom: -44,
     borderRadius: 12,
   },
   emptyText: {
     fontSize: 16,
+    marginTop: 0,
   },
   listContent: {
     paddingBottom: 24,
@@ -172,7 +191,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     padding: 16,
-    marginBottom: 12,
+    marginBottom:12,
   },
   notificationMain: {
     flex: 1,

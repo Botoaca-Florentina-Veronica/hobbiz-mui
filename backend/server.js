@@ -50,7 +50,10 @@ const io = socketIo(server, {
           'https://hobbiz-mui.netlify.app',
           'https://hobbiz-mui.onrender.com',
           'http://localhost:5173',
-          'http://localhost:5174'
+          'http://localhost:5174',
+          'http://localhost:8081', // Expo Dev Server
+          'http://localhost:19000', // Expo alternative port
+          'http://localhost:19006'  // Expo web
         ].filter(Boolean);
         if (allowedOrigins.includes(origin) || isNetlify) {
           return callback(null, true);
@@ -154,7 +157,10 @@ const allowedOrigins = [
   'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.onrender.com',
   'http://localhost:5173',
-  'http://localhost:5174'
+  'http://localhost:5174',
+  'http://localhost:8081', // Expo Dev Server
+  'http://localhost:19000', // Expo alternative port
+  'http://localhost:19006'  // Expo web
 ].filter(Boolean);
 
 const corsOptions = {

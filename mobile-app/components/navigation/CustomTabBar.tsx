@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Animated, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Animated, Platform, Image } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../src/context/AuthContext';
 
 // Map route name -> icon + label (adjust later as you add screens)
 const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolean }> = {
@@ -15,6 +16,7 @@ const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolea
 
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const { tokens } = useAppTheme();
+  const { isAuthenticated, loading, user } = useAuth();
   const activeColor = tokens.colors.primary;
   const inactiveColor = tokens.colors.muted;
 
@@ -50,6 +52,11 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
           const isFocused = state.index === index;
           const config = TAB_CONFIG[route.name] || { icon: 'ellipse', label: route.name };
           const onPress = () => {
+            // Dacă nu e autentificat și nu este tab-ul Explorează (index), redirecționează la login
+            if (!loading && !isAuthenticated && route.name !== 'index') {
+              navigation.navigate('login' as any);
+              return;
+            }
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
@@ -83,11 +90,15 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                     { backgroundColor: isFocused ? activeColor : activeColor, shadowColor: '#000' },
                   ] : undefined}
                 >
-                  <Ionicons
-                    name={config.icon as any}
-                    size={config.special ? 22 : 23}
-                    color={config.special ? tokens.colors.primaryContrast : isFocused ? activeColor : inactiveColor}
-                  />
+                  {route.name === 'account' && user?.avatar ? (
+                    <Image source={{ uri: user.avatar }} style={{ width: config.special ? 28 : 24, height: config.special ? 28 : 24, borderRadius: 999 }} />
+                  ) : (
+                    <Ionicons
+                      name={config.icon as any}
+                      size={config.special ? 22 : 23}
+                      color={config.special ? tokens.colors.primaryContrast : isFocused ? activeColor : inactiveColor}
+                    />
+                  )}
                 </View>
               </View>
               <Text style={[styles.label, { color: isFocused ? activeColor : inactiveColor, fontWeight: isFocused ? '600' : '500' }]}>

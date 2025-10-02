@@ -1,19 +1,24 @@
 import api from './api';
-import * as SecureStore from 'expo-secure-store';
+import storage from './storage';
 
 export async function loginWithCredentials(email: string, password: string) {
-  const res = await api.post('/login', { username: email, password });
-  return res.data;
+  try {
+    const res = await api.post('/api/users/login', { email, password });
+    return res.data;
+  } catch (e: any) {
+    const msg = e?.response?.data?.error || 'Eroare la autentificare';
+    throw new Error(msg);
+  }
 }
 
 export async function saveToken(token: string) {
-  await SecureStore.setItemAsync('userToken', token);
+  await storage.setItemAsync('userToken', token);
 }
 
 export async function getToken() {
-  return SecureStore.getItemAsync('userToken');
+  return storage.getItemAsync('userToken');
 }
 
 export async function logout() {
-  await SecureStore.deleteItemAsync('userToken');
+  await storage.deleteItemAsync('userToken');
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import storage from './storage';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
@@ -70,7 +70,7 @@ try {
 // Attach token from SecureStore
 api.interceptors.request.use(async (config) => {
   try {
-    const token = await SecureStore.getItemAsync('userToken');
+    const token = await storage.getItemAsync('userToken');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
