@@ -20,8 +20,9 @@ export default function AccountScreen() {
     { key: 'my-ads', label: 'Anunțurile mele', icon: 'megaphone-outline' },
     { key: 'profile', label: 'Profil', icon: 'person-outline' },
     { key: 'notifications', label: 'Notificări', icon: 'notifications-outline' },
-    { key: 'payments', label: 'Plăți', icon: 'card-outline' },
-    { key: 'darkmode', label: 'Mod întunecat', icon: 'moon-outline', type: 'switch' },
+  { key: 'legal', label: 'Informații legale', icon: 'document-text-outline', action: () => router.push('/legal') },
+  { key: 'about', label: 'Despre noi', icon: 'information-circle-outline', action: () => router.push('/about') },
+  { key: 'darkmode', label: 'Mod întunecat', icon: 'moon-outline', type: 'switch' },
   ];
 
   const logoutRow: RowSpec = { key: 'logout', label: 'Deconectează-te', icon: 'log-out-outline', type: 'danger' };
@@ -65,16 +66,18 @@ export default function AccountScreen() {
                   <Ionicons name={r.icon as any} size={18} color={tokens.colors.primary} style={styles.rowIcon} />
                   <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
                 </View>
+                  {/* chevron on the right for tappable rows */}
+                  <Ionicons name="chevron-forward" size={18} color={tokens.colors.muted} />
               </TouchableOpacity>
             );
           })}
         </View>
 
-        <View style={styles.group}>          
-          <TouchableOpacity activeOpacity={0.7} style={[styles.row, styles.dangerRow, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
+        <View style={styles.group}>
+          <TouchableOpacity activeOpacity={0.8} style={[styles.row, styles.logoutButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.primary }]}>
             <View style={styles.rowLeft}>
               <Ionicons name={logoutRow.icon as any} size={18} color={tokens.colors.primary} style={styles.rowIcon} />
-              <ThemedText style={[styles.rowLabel, styles.dangerLabel]}>{logoutRow.label}</ThemedText>
+              <ThemedText style={[styles.rowLabel, { color: tokens.colors.primary, fontWeight: '700' }]}>{logoutRow.label}</ThemedText>
             </View>
           </TouchableOpacity>
         </View>
@@ -96,4 +99,10 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 15, fontWeight: '500' },
   dangerRow: { },
   dangerLabel: { color: '#355070', fontWeight: '600' },
+  logoutButton: {
+    borderWidth: 2,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
 });

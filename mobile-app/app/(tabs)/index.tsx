@@ -83,8 +83,8 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Legal Footer */}
-        <LegalFooter />
+  {/* Legal Footer (hide 'Legal' section in Explore) */}
+  <LegalFooter hideLegalSection />
       </ScrollView>
     </ThemedView>
   );

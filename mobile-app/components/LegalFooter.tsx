@@ -15,14 +15,6 @@ interface LegalSection {
 
 const legalSections: LegalSection[] = [
   {
-    title: 'Linkuri utile',
-    links: [
-  { label: 'Despre noi', url: '/about' },
-      { label: 'Contact', url: '/contact' },
-      { label: 'Cum funcționează', url: '/cum-functioneaza' },
-    ],
-  },
-  {
     title: 'Legal',
     links: [
       { label: 'Termeni și condiții', url: '/termeni' },
@@ -32,7 +24,7 @@ const legalSections: LegalSection[] = [
   },
 ];
 
-export default function LegalFooter() {
+export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: boolean }) {
   const { tokens } = useAppTheme();
   const { width } = useWindowDimensions();
   const router = useRouter();
@@ -45,6 +37,11 @@ export default function LegalFooter() {
       router.push('/about');
       return;
     }
+    if (url === '/termeni') {
+      // the mobile route is /legal
+      router.push('/legal');
+      return;
+    }
     if (url.startsWith('/')) {
       console.log('Internal route not yet implemented:', url);
       return;
@@ -52,10 +49,12 @@ export default function LegalFooter() {
     Linking.openURL(url).catch(() => console.warn('Cannot open URL: ', url));
   };
 
+  const sectionsToRender = legalSections.filter((s) => !(hideLegalSection && s.title === 'Legal'));
+
   return (
     <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
       <View style={[styles.sectionsWrapper, isTabletOrLarger && styles.sectionsRow]}>
-        {legalSections.map((section, sectionIndex) => (
+        {sectionsToRender.map((section, sectionIndex) => (
           <View 
             key={sectionIndex} 
             style={[

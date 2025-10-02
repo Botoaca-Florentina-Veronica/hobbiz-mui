@@ -21,6 +21,11 @@ export default function RootLayout() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false }} />
+            <Stack.Screen name="about" options={{ headerShown: false }} />
+            <Stack.Screen name="legal" options={{ headerShown: false }} />
+            <Stack.Screen name="legal/terms" options={{ headerShown: false }} />
+            <Stack.Screen name="legal/cookies" options={{ headerShown: false }} />
+            <Stack.Screen name="legal/privacy" options={{ headerShown: false }} />
             <Stack.Screen name="notifications" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
