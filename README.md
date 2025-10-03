@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://hobbiz.netlify.app" target="_blank"><img src="frontend/public/assets/images/puzzle.png" height="70" alt="Hobbiz" /></a>
+<a href="https://hobbiz.netlify.app" target="_blank"><img src="./frontend/src/assets/images/puzzle.png" height="70" alt="Hobbiz" /></a>
 
 # Hobbiz
 https://hobbiz.netlify.app/
