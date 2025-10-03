@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
@@ -44,8 +45,48 @@ export default function SellScreen() {
   const remainingDesc = 9000 - description.length;
 
   const addImagePlaceholder = () => {
-    setImages(prev => [...prev, { id: Date.now().toString() }]);
+    pickImages();
   };
+
+  async function pickImages() {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permisiune necesară', 'Te rog permite accesul la galerie pentru a selecta imagini.');
+        return;
+      }
+
+      const result: any = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        quality: 0.8,
+      });
+
+      // Newer API returns { canceled, assets: [{uri, ...}] }
+      if (result.canceled) return;
+
+      const assets = result.assets || (result.selected ? result.selected : []);
+      if (!assets || assets.length === 0) return;
+
+      const jpgAssets = assets.filter((a: any) => {
+        const uri = a.uri || a;
+        if (!uri) return false;
+        const low = uri.toLowerCase();
+        return low.endsWith('.jpg') || low.endsWith('.jpeg') || (a.type && a.type === 'image/jpeg');
+      });
+
+      if (jpgAssets.length === 0) {
+        Alert.alert('Format neacceptat', 'Te rog selectează fișiere JPG (jpeg).');
+        return;
+      }
+
+      const newImages = jpgAssets.map((a: any, idx: number) => ({ id: Date.now().toString() + '_' + idx, uri: a.uri }));
+      setImages(prev => [...prev, ...newImages]);
+    } catch (e) {
+      console.error('pickImages error', e);
+      Alert.alert('Eroare', 'Nu am putut selecta imaginile.');
+    }
+  }
 
   const disabledPublish = title.length < 16 || description.length < 40 || !contactName;
 
@@ -105,8 +146,12 @@ export default function SellScreen() {
               <View style={styles.addUnderline} />
             </TouchableOpacity>
             {images.map(img => (
-              <View key={img.id} style={[styles.imageCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}>
-                <Ionicons name="camera" size={28} color={tokens.colors.text} />
+              <View key={img.id} style={[styles.imageCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}> 
+                {img.uri ? (
+                  <Image source={{ uri: img.uri }} style={styles.imageThumb} resizeMode="cover" />
+                ) : (
+                  <Ionicons name="camera" size={28} color={tokens.colors.text} />
+                )}
               </View>
             ))}
             {/* Placeholder extra slot */}
@@ -270,7 +315,7 @@ export default function SellScreen() {
 
 const styles = StyleSheet.create({
   container:{ flex:1 },
-  scroll:{ padding:16, paddingBottom:140, gap:20 },
+  scroll:{ padding:16, paddingBottom:24, gap:20 },
   headerRow:{ flexDirection:'row', alignItems:'center', gap:12 },
   backButton:{ width:44, height:44, borderRadius:999, alignItems:'center', justifyContent:'center', borderWidth:1 },
   headerTitle:{ fontSize:24, fontWeight:'600' },
@@ -290,7 +335,8 @@ const styles = StyleSheet.create({
   addImageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center', padding:12, gap:8 },
   addImageText:{ fontSize:14, fontWeight:'600', textAlign:'center' },
   addUnderline:{ height:2, width:38, backgroundColor:'#e0b400' },
-  imageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center' },
+  imageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center', overflow:'hidden' },
+  imageThumb:{ width:'100%', height:'100%' },
   bottomButtonsWrapper:{ flexDirection:'row', gap:12, marginTop:8 },
   previewBtn:{ flex:1, paddingVertical:16, borderRadius:12, borderWidth:1, alignItems:'center', justifyContent:'center' },
   publishBtn:{ flex:1, paddingVertical:16, borderRadius:12, alignItems:'center', justifyContent:'center' },

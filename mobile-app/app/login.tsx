@@ -6,12 +6,17 @@ import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'expo-router';
 
+export const options = {
+  headerShown: false,
+};
+
 export default function LoginScreen() {
   const { tokens } = useAppTheme();
   const { login, loading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
   async function onSubmit() {
@@ -68,14 +73,24 @@ export default function LoginScreen() {
           value={email}
           onChangeText={setEmail}
         />
-        <TextInput
-          style={[styles.input, { borderColor: tokens.colors.border, color: tokens.colors.text }]}
-          placeholder="Parola"
-          placeholderTextColor={tokens.colors.placeholder}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordWrapper}>
+          <TextInput
+            style={[styles.input, styles.passwordInput, { borderColor: tokens.colors.border, color: tokens.colors.text }]}
+            placeholder="Parola"
+            placeholderTextColor={tokens.colors.placeholder}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword((s) => !s)}
+            activeOpacity={0.7}
+            style={styles.eyeBtn}
+            accessibilityLabel={showPassword ? 'Ascunde parola' : 'Arată parola'}
+          >
+            <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={tokens.colors.muted || '#666'} />
+          </TouchableOpacity>
+        </View>
         {error ? <ThemedText style={[styles.error, { color: '#d33' }]}>{error}</ThemedText> : null}
         <TouchableOpacity
           disabled={loading}
@@ -111,6 +126,9 @@ const styles = StyleSheet.create({
   divider: { flex: 1, borderBottomWidth: 1 },
   dividerText: { fontSize: 12, fontWeight: '600', letterSpacing: 1 },
   input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
+  passwordWrapper: { position: 'relative' },
+  passwordInput: { paddingRight: 56 },
+  eyeBtn: { position: 'absolute', right: 8, top: 0, bottom: 0, width: 40, alignItems: 'center', justifyContent: 'center', padding: 6 },
   error: { fontSize: 12, marginTop: -4 },
   loginBtn: { paddingVertical: 14, borderRadius: 8, alignItems: 'center' },
   loginText: { color: '#fff', fontWeight: '600', fontSize: 15 },
