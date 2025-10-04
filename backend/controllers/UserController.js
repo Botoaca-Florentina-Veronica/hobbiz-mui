@@ -404,6 +404,22 @@ const getMyAnnouncements = async (req, res) => {
   }
 };
 
+// Obține un singur anunț după ID (doar al utilizatorului autentificat)
+const getMyAnnouncementById = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { id } = req.params;
+    const announcement = await Announcement.findOne({ _id: id, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit' });
+    }
+    res.json(announcement);
+  } catch (error) {
+    console.error('Eroare la obținere anunț:', error);
+    res.status(500).json({ error: 'Eroare server la obținere anunț' });
+  }
+};
+
 // Returnează anunțurile publice pentru un utilizator specific (vizualizare publică)
 const getUserAnnouncementsPublic = async (req, res) => {
   try {
@@ -450,7 +466,7 @@ const updateAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
     const { id } = req.params;
-    const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone, existingImages } = req.body;
     let announcement = await Announcement.findOne({ _id: id, user: userId });
     if (!announcement) {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit' });
@@ -463,11 +479,31 @@ const updateAnnouncement = async (req, res) => {
     announcement.contactPerson = contactPerson;
     announcement.contactEmail = contactEmail;
     announcement.contactPhone = contactPhone;
-    // Imagini noi (upload multiplu)
-    if (req.files && req.files.length > 0) {
-      announcement.images = req.files.map(f => f.path);
+    
+    // Gestionează imaginile
+    let finalImages = [];
+    
+    // Adaugă imaginile existente care nu au fost șterse
+    if (existingImages) {
+      try {
+        const parsedExisting = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+        if (Array.isArray(parsedExisting)) {
+          finalImages = parsedExisting;
+        }
+      } catch (e) {
+        console.error('Error parsing existingImages:', e);
+      }
     }
-    // Dacă nu există fișiere noi, păstrează imaginile vechi
+    
+    // Adaugă imaginile noi uploadate
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map(f => f.path);
+      finalImages = [...finalImages, ...newImages];
+    }
+    
+    // Limitează la maxim 10 imagini
+    announcement.images = finalImages.slice(0, 10);
+    
     await announcement.save();
     // Emit realtime update (could be treated similar to created for list refresh)
     try {
@@ -515,6 +551,7 @@ module.exports = {
   updatePassword,
   addAnnouncement,
   getMyAnnouncements,
+  getMyAnnouncementById,
   getUserAnnouncementsPublic,
   deleteAnnouncement,
   updateAnnouncement,

@@ -22,14 +22,14 @@ export const lightTokens = {
 
 export const darkTokens = {
   colors: {
-    bg: '#121212',
-    surface: '#282828',
-    elev: '#2e2e2e',
-    border: '#3f3f3f',
-    text: '#eceeef',
-    muted: '#8b8b8b',
-    placeholder: '#8b8b8b',
-    // Conform web index.css pentru dark mode (roz accent)
+    bg: '#121212',        // Surface - a10 (darkest)
+    surface: '#282828',   // Surface - a20
+    elev: '#3f3f3f',      // Surface - a30
+    border: '#575757',    // Surface - a40
+    text: '#eceeef',      // Light text on dark bg
+    muted: '#8b8b8b',     // Surface - a60 (lightest from image)
+    placeholder: '#717171', // Surface - a50
+    // Primary pink from web dark mode
     primary: '#f51866',
     primaryHover: '#fa4875',
     primaryContrast: '#ffffff',

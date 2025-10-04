@@ -21,7 +21,7 @@ export default function AccountScreen() {
 
   const rows: RowSpec[] = [
     { key: 'settings', label: 'Setări', icon: 'settings-outline', action: () => router.push('/settings') },
-    { key: 'my-ads', label: 'Anunțurile mele', icon: 'megaphone-outline' },
+    { key: 'my-ads', label: 'Anunțurile mele', icon: 'megaphone-outline', action: () => router.push('/my-announcements') },
     { key: 'profile', label: 'Profil', icon: 'person-outline', action: () => router.push('/profile') },
     { key: 'notifications', label: 'Notificări', icon: 'notifications-outline' },
     { key: 'legal', label: 'Informații legale', icon: 'document-text-outline', action: () => router.push('/legal') },
