@@ -7,13 +7,13 @@ import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-// Color constants from web version for fidelity
-const WEB_PRIMARY = '#355070';
-const WEB_ACCENT = '#f8b595';
-const WEB_ACCENT_GRAD_TO = '#f67e7d';
-const WEB_BORDER_LIGHT = '#f1f5f9';
-const WEB_TEXT_DARK = '#2d3748';
-const WEB_TEXT_BODY = '#4a5568';
+// App palette per user request
+const WEB_PRIMARY = '#100e9aff';
+const WEB_ACCENT = '#fcc22eff';
+const WEB_ACCENT_GRAD_TO = '#fcc22eff';
+const WEB_BORDER_LIGHT = '#ffffff';
+const WEB_TEXT_DARK = '#100e9aff';
+const WEB_TEXT_BODY = '#64748b';
 
 export default function TermsScreen() {
   const { tokens, isDark } = useAppTheme();
@@ -206,9 +206,9 @@ const styles = StyleSheet.create({
   headerIcon: { fontSize: 54, marginBottom: 16, zIndex: 2 },
   headerH1: { fontSize: 40, fontWeight: '700', letterSpacing: -0.5, color: '#fff', zIndex: 2, marginBottom: 12 },
   headerDate: { fontSize: 15, color: 'rgba(255,255,255,0.9)', zIndex: 2 },
-  radialOverlay: { position: 'absolute', top: -120, right: -120, width: 360, height: 360, backgroundColor: 'rgba(248,181,149,0.15)', borderRadius: 360, transform: [{ rotate: '30deg' }] },
+  radialOverlay: { position: 'absolute', top: -120, right: -120, width: 360, height: 360, backgroundColor: 'rgba(252,194,46,0.15)', borderRadius: 360, transform: [{ rotate: '30deg' }] },
 
-  introCard: { borderRadius: 20, padding: 28, backgroundColor: WEB_ACCENT, shadowColor: '#f67e7d', shadowOpacity: 0.3, shadowRadius: 32, shadowOffset: { width: 0, height: 8 }, elevation: 4 },
+  introCard: { borderRadius: 20, padding: 28, backgroundColor: WEB_ACCENT, shadowColor: WEB_ACCENT_GRAD_TO, shadowOpacity: 0.3, shadowRadius: 32, shadowOffset: { width: 0, height: 8 }, elevation: 4 },
   introRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 20 },
   introIcon: { fontSize: 30, marginTop: 2 },
   introStrong: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 10 },

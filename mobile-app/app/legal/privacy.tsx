@@ -8,6 +8,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// App palette per user request
+const WEB_PRIMARY = '#100e9aff';
+const WEB_ACCENT = '#fcc22eff';
+const WEB_ACCENT_GRAD_TO = '#fcc22eff';
+const WEB_BORDER_LIGHT = '#ffffff';
+const WEB_TEXT_DARK = '#100e9aff';
+const WEB_TEXT_BODY = '#64748b';
+
 export default function PrivacyScreen() {
   const { tokens } = useAppTheme();
   const insets = useSafeAreaInsets();
@@ -24,9 +32,9 @@ export default function PrivacyScreen() {
   );
 
   const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <View style={[styles.sectionCard, { backgroundColor: isDark ? '#282828' : '#ffffff', borderColor: isDark ? 'rgba(245,24,102,0.3)' : 'rgba(53,80,112,0.15)' }]}>      
-      <LinearGradient colors={[tokens.colors.primary, isDark ? '#f5186644' : '#F8B195']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.sectionGradient} />
-      <ThemedText style={[styles.sectionHeading, { color: isDark ? '#ffffff' : '#355070' }]}>{title}</ThemedText>
+    <View style={[styles.sectionCard, { backgroundColor: isDark ? '#282828' : '#ffffff', borderColor: isDark ? 'rgba(245,24,102,0.3)' : WEB_BORDER_LIGHT }]}>      
+      <LinearGradient colors={[tokens.colors.primary, isDark ? '#f5186644' : WEB_ACCENT]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.sectionGradient} />
+      <ThemedText style={[styles.sectionHeading, { color: isDark ? '#ffffff' : WEB_PRIMARY }]}>{title}</ThemedText>
       {children}
     </View>
   );
@@ -43,7 +51,7 @@ export default function PrivacyScreen() {
         </View>
 
         {/* Hero Card */}
-        <View style={[styles.heroCard, { backgroundColor: isDark ? '#35507022' : '#355070' }]}>          
+        <View style={[styles.heroCard, { backgroundColor: isDark ? `${WEB_PRIMARY}22` : WEB_PRIMARY }]}>          
           <View style={styles.heroOverlay} />
             <ThemedText style={[styles.heroIcon, { color: isDark ? tokens.colors.primary : '#fff' }]}>🛡️</ThemedText>
             <ThemedText style={[styles.heroTitle, { color: '#fff' }]}>Politica de confidențialitate</ThemedText>
@@ -51,7 +59,7 @@ export default function PrivacyScreen() {
         </View>
 
         {/* Intro / Transparency Box */}
-        <View style={[styles.introBox, { backgroundColor: isDark ? '#282828' : '#b3d9e8', borderColor: isDark ? 'rgba(245,24,102,0.3)' : '#b3d9e8' }]}>          
+        <View style={[styles.introBox, { backgroundColor: isDark ? '#282828' : WEB_ACCENT, borderColor: isDark ? 'rgba(245,24,102,0.3)' : WEB_ACCENT }]}>          
           <ThemedText style={[styles.introIcon, { color: isDark ? tokens.colors.primary : '#2c5f7a' }]}>ℹ️</ThemedText>
           <View style={styles.introContent}>            
             <ThemedText style={[styles.introStrong, { color: isDark ? '#fff' : '#2c5f7a' }]}>Transparență și protecție a datelor</ThemedText>
@@ -128,7 +136,7 @@ const styles = StyleSheet.create({
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   title: { fontSize: 22, fontWeight: '700' },
   heroCard: { padding: 40, borderRadius: 24, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 24, shadowOffset: { width: 0, height: 8 } },
-  heroOverlay: { position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: 150, backgroundColor: 'rgba(248,181,149,0.18)' },
+  heroOverlay: { position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: 150, backgroundColor: 'rgba(252,194,46,0.18)' },
   heroIcon: { fontSize: 48, marginBottom: 20 },
   heroTitle: { fontSize: 26, fontWeight: '700', textAlign: 'center', marginBottom: 12, letterSpacing: -0.5 },
   heroDate: { fontSize: 14, fontWeight: '500', opacity: 0.95 },

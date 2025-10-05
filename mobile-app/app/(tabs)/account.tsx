@@ -1,13 +1,14 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Modal, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type RowSpec = { key: string; label: string; icon: string; action?: () => void; type?: 'switch' | 'danger' };
 
@@ -16,45 +17,119 @@ export default function AccountScreen() {
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [confirmVisible, setConfirmVisible] = React.useState(false);
 
-  const rows: RowSpec[] = [
+  const accountRows: RowSpec[] = [
     { key: 'settings', label: 'Setări', icon: 'settings-outline', action: () => router.push('/settings') },
     { key: 'my-ads', label: 'Anunțurile mele', icon: 'megaphone-outline', action: () => router.push('/my-announcements') },
     { key: 'profile', label: 'Profil', icon: 'person-outline', action: () => router.push('/profile') },
     { key: 'notifications', label: 'Notificări', icon: 'notifications-outline' },
-    { key: 'legal', label: 'Informații legale', icon: 'document-text-outline', action: () => router.push('/legal') },
-    { key: 'about', label: 'Despre noi', icon: 'information-circle-outline', action: () => router.push('/about') },
     { key: 'darkmode', label: 'Mod întunecat', icon: 'moon-outline', type: 'switch' },
   ];
 
-  const logoutRow: RowSpec = { key: 'logout', label: 'Deconectează-te', icon: 'log-out-outline', type: 'danger' };
+  const infoRows: RowSpec[] = [
+    { key: 'about', label: 'Despre noi', icon: 'information-circle-outline', action: () => router.push('/about') },
+    { key: 'legal', label: 'Informații legale', icon: 'document-text-outline', action: () => router.push('/legal') },
+  ];
+
+  // Combine primary and accent for a pleasing gradient (left: primary -> right: accent)
+  // const primaryColor = '#355070';
+  // const accent = '#F8B195';
+  // const accentLight = '#FCEDE6';
+
+  // Header and name colors respond to dark mode per user's request:
+  // - header (blue in light) becomes black in dark mode
+  // - name color is the light-mode yellow and becomes #F51866 in dark mode
+  const headerColor = isDark ? '#000000' : '#100e9aff';
+  const gradientColors = [headerColor, headerColor] as const;
+  const nameColor = isDark ? '#F51866' : '#fcc22eff';
+
+  const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : 'Utilizator';
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerRow}>
-          <View style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
-            <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
+        {/* Header with Gradient Background */}
+        <LinearGradient
+          colors={[...gradientColors]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.header, { paddingTop: insets.top + 16 }]}
+        >
+          <View style={styles.headerRow}
+          >
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >            
+              <Ionicons name="arrow-back" size={24} color="#ffffff" />
+            </TouchableOpacity>
+            <ThemedText style={styles.headerTitle}>Profile</ThemedText>
           </View>
-          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Contul tău</ThemedText>
+          {/* Greeting placed in the blue header. Name is pulled from user and colored yellow. */}
+          <View style={styles.greetingContainer}>
+            <ThemedText style={[styles.greetingText, { color: '#ffffff' }]}>Ceau{' '}
+              <ThemedText style={[styles.greetingText, { color: nameColor }]}>{displayName}!</ThemedText>
+            </ThemedText>
+          </View>
+         </LinearGradient>
+
+        {/* Profile Card */}
+        <View style={[styles.profileCard, { backgroundColor: tokens.colors.surface }]}>
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatarOuter}>
+              <View style={[styles.halfTop, { backgroundColor: '#ffffff' }]} />
+              <View style={[styles.halfBottom, { backgroundColor: '#100e9aff' }]} />
+              <View style={[styles.avatarInner, { backgroundColor: tokens.colors.surface }]}> 
+                {user?.avatar ? (
+                  <Image 
+                    source={{ uri: user.avatar }} 
+                    style={styles.avatar}
+                  />
+                ) : (
+                  <View style={[styles.avatarPlaceholder, { backgroundColor: tokens.colors.surface }]}>
+                    <Ionicons name="person" size={50} color={tokens.colors.text} />
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+          
+          <ThemedText style={[styles.userName, { color: tokens.colors.text }]}>
+            {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Utilizator'}
+          </ThemedText>
+          
+          {user?.phone && (
+            <ThemedText style={[styles.userInfo, { color: tokens.colors.muted }]}>
+              {user.phone}
+            </ThemedText>
+          )}
+          
+          {user?.email && (
+            <ThemedText style={[styles.userInfo, { color: tokens.colors.muted }]}>
+              {user.email}
+            </ThemedText>
+          )}
         </View>
 
-        <View style={styles.group}>          
-          {rows.map((r) => {
+        {/* Account Options Group */}
+        <View style={styles.section}>          
+          {accountRows.map((r) => {
             if (r.type === 'switch') {
               return (
-                <View key={r.key} style={[styles.row, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>                  
+                <View key={r.key} style={[styles.row, { backgroundColor: tokens.colors.surface }]}>                  
                   <View style={styles.rowLeft}>                    
-                    <Ionicons name={r.icon as any} size={18} color={tokens.colors.primary} style={styles.rowIcon} />
+                    <View style={[styles.iconCircle, { backgroundColor: isDark ? tokens.colors.elev : '#F3F5F6' }]}>
+                      <Ionicons name={r.icon as any} size={20} color={tokens.colors.text} />
+                    </View>
                     <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
                   </View>
                   <Switch
                     value={isDark}
                     onValueChange={(v) => setMode(v ? 'dark' : 'light')}
-                    thumbColor={isDark ? tokens.colors.primaryContrast : '#fff'}
-                    trackColor={{ false: tokens.colors.border, true: tokens.colors.primaryHover }}
+                    thumbColor={'#ffffff'}
+                    trackColor={{ false: tokens.colors.border, true: headerColor }}
                   />
                 </View>
               );
@@ -63,30 +138,50 @@ export default function AccountScreen() {
               <TouchableOpacity
                 key={r.key}
                 activeOpacity={0.7}
-                style={[styles.row, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
+                style={[styles.row, { backgroundColor: tokens.colors.surface }]}
                 onPress={r.action}
               >
                 <View style={styles.rowLeft}>
-                  <Ionicons name={r.icon as any} size={18} color={tokens.colors.primary} style={styles.rowIcon} />
+                  <View style={[styles.iconCircle, { backgroundColor: isDark ? tokens.colors.elev : '#F3F5F6' }]}>
+                    <Ionicons name={r.icon as any} size={20} color={tokens.colors.text} />
+                  </View>
                   <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
                 </View>
-                  {/* chevron on the right for tappable rows */}
-                  <Ionicons name="chevron-forward" size={18} color={tokens.colors.muted} />
+                <Ionicons name="chevron-forward" size={20} color={tokens.colors.muted} />
               </TouchableOpacity>
             );
           })}
         </View>
 
-        <View style={styles.group}>
+        {/* Info Options Group */}
+        <View style={styles.section}>
+          {infoRows.map((r) => (
+            <TouchableOpacity
+              key={r.key}
+              activeOpacity={0.7}
+              style={[styles.row, { backgroundColor: tokens.colors.surface }]}
+              onPress={r.action}
+            >
+              <View style={styles.rowLeft}>
+                <View style={[styles.iconCircle, { backgroundColor: isDark ? tokens.colors.elev : '#F3F5F6' }]}>
+                  <Ionicons name={r.icon as any} size={20} color={tokens.colors.text} />
+                </View>
+                <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={tokens.colors.muted} />
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Logout Button */}
+        <View style={styles.section}>
           <TouchableOpacity
             activeOpacity={0.8}
-            style={[styles.row, styles.logoutButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.primary }]}
+            style={styles.logoutTextContainer}
             onPress={() => setConfirmVisible(true)}
           >
-            <View style={styles.rowLeft}>
-              <Ionicons name={logoutRow.icon as any} size={18} color={tokens.colors.primary} style={styles.rowIcon} />
-              <ThemedText style={[styles.rowLabel, { color: tokens.colors.primary, fontWeight: '700' }]}>{logoutRow.label}</ThemedText>
-            </View>
+            <ThemedText style={styles.logoutTextRed}>Ieși din cont</ThemedText>
+            <View style={styles.logoutUnderline} />
           </TouchableOpacity>
         </View>
 
@@ -109,7 +204,7 @@ export default function AccountScreen() {
                   <Text style={{ color: tokens.colors.text }}>Anulează</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.modalBtn, styles.modalBtnConfirm, { backgroundColor: tokens.colors.primary }]}
+                  style={[styles.modalBtn, styles.modalBtnConfirm, { backgroundColor: headerColor }]}
                   onPress={async () => {
                     try {
                       await logout();
@@ -121,7 +216,7 @@ export default function AccountScreen() {
                     }
                   }}
                 >
-                  <Text style={{ color: tokens.colors.primaryContrast }}>Deconectează-te</Text>
+                  <Text style={{ color: '#ffffff' }}>Deconectează-te</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -133,30 +228,233 @@ export default function AccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContent: { padding: 16, paddingBottom: 40, gap: 20 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  title: { fontSize: 24, fontWeight: '600' },
-  group: { gap: 12 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, paddingVertical: 14, paddingHorizontal: 14, borderRadius: 14 },
-  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  rowIcon: { },
-  rowLabel: { fontSize: 15, fontWeight: '500' },
-  dangerRow: { },
-  dangerLabel: { color: '#355070', fontWeight: '600' },
-  logoutButton: {
-    borderWidth: 2,
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+  container: { 
+    flex: 1,
   },
-  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  modalCard: { width: '100%', maxWidth: 420, borderRadius: 12, padding: 18, borderWidth: 1 },
-  modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  modalMessage: { fontSize: 14, marginBottom: 16 },
-  modalButtons: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12 },
-  modalBtn: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
-  modalBtnCancel: { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'transparent' },
-  modalBtnConfirm: { paddingHorizontal: 16, borderRadius: 10 },
+  scrollContent: { 
+    paddingBottom: 40,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingBottom: 120,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // keep content left-aligned; title will sit to the right of the back button
+  },
+  backButton: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 999, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  headerTitle: { 
+    fontSize: 28, 
+    fontWeight: '700',
+    color: '#ffffff',
+    marginLeft: 12,
+  },
+  greetingContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 28,
+    marginBottom: 54,
+    paddingHorizontal: 4,
+  },
+  greetingText: 
+  {
+    fontSize: 40,
+    fontWeight: '800',
+    lineHeight: 44,
+  },
+  profileCard: {
+    marginTop: -80,
+    marginHorizontal: 20,
+    borderRadius: 16,
+    paddingTop: 70,
+    paddingBottom: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  avatarContainer: {
+    position: 'absolute',
+    top: -60,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  avatarBorder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 6,
+    padding: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Two-tone avatar outer ring
+  avatarOuter: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  halfTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
+  },
+  halfBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    borderBottomLeftRadius: 60,
+    borderBottomRightRadius: 60,
+  },
+  avatarInner: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatar: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+  },
+  avatarPlaceholder: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  userInfo: {
+    fontSize: 14,
+    marginTop: 2,
+  },
+  section: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  row: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between',
+    paddingVertical: 16, 
+    paddingHorizontal: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  rowLeft: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 14,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowLabel: { 
+    fontSize: 16, 
+    fontWeight: '500',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+  },
+  modalOverlay: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: 20,
+  },
+  modalCard: { 
+    width: '100%', 
+    maxWidth: 420, 
+    borderRadius: 16, 
+    padding: 24, 
+    borderWidth: 1,
+  },
+  modalTitle: { 
+    fontSize: 20, 
+    fontWeight: '700', 
+    marginBottom: 10,
+  },
+  modalMessage: { 
+    fontSize: 15, 
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButtons: { 
+    flexDirection: 'row', 
+    justifyContent: 'flex-end', 
+    gap: 12,
+  },
+  modalBtn: { 
+    paddingVertical: 12, 
+    paddingHorizontal: 20, 
+    borderRadius: 12,
+  },
+  modalBtnCancel: { 
+    backgroundColor: 'transparent',
+  },
+  modalBtnConfirm: { 
+    paddingHorizontal: 24,
+  },
+  logoutTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderRadius: 12,
+    width: '100%',
+    backgroundColor: 'transparent',
+  },
+  logoutTextRed: {
+    color: '#ff2d2d',
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 0.2,
+  },
+  logoutUnderline: {
+    marginTop: 6,
+    width: 56,
+    height: 4,
+    backgroundColor: '#ff2d2d',
+    borderRadius: 2,
+  },
 });

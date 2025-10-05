@@ -235,15 +235,21 @@ export default function SellScreen() {
 
         {/* Bottom buttons */}
         <View style={styles.bottomButtonsWrapper}>
-          <TouchableOpacity activeOpacity={0.8} style={[styles.previewBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
-            <ThemedText style={[styles.previewText, { color: tokens.colors.text }]}>Previzualizați anunțul</ThemedText>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[styles.previewBtn, { backgroundColor: '#ffffff', borderColor: '#ffffff' }]}
+          >            
+            <ThemedText style={[styles.previewText, { color: '#100e9aff' }]}>Previzualizați anunțul</ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={disabledPublish}
-            style={[styles.publishBtn, { backgroundColor: disabledPublish ? tokens.colors.muted : tokens.colors.primary }]}
+            style={[
+              styles.publishBtn,
+              { backgroundColor: '#100e9aff' },
+            ]}
           >
-            <ThemedText style={[styles.publishText, { color: tokens.colors.primaryContrast }]}>Publică un anunț</ThemedText>
+            <ThemedText style={[styles.publishText, { color: '#ffffff' }]}>Publică un anunț</ThemedText>
           </TouchableOpacity>
         </View>
       </ScrollView>

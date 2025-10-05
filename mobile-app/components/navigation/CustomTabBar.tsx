@@ -4,6 +4,7 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
+import { useTabBar } from '../../src/context/TabBarContext';
 
 // Map route name -> icon + label (adjust later as you add screens)
 const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolean }> = {
@@ -17,7 +18,8 @@ const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolea
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const { tokens } = useAppTheme();
   const { isAuthenticated, loading, user } = useAuth();
-  const activeColor = tokens.colors.primary;
+  const { hidden } = useTabBar();
+  const activeColor = '#100e9aff';
   const inactiveColor = tokens.colors.muted;
 
   // Indicator bazat pe măsurători reale
@@ -43,6 +45,8 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
       ]).start();
     }
   }, [state.index, layouts]);
+
+  if (hidden) return null;
 
   return (
     <View style={[styles.wrapper, { backgroundColor: tokens.colors.surface, borderTopColor: tokens.colors.border }]}>      

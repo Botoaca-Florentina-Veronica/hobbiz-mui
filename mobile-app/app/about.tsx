@@ -55,13 +55,17 @@ export default function AboutScreen() {
   ];
 
   // StrokeWord: layered white text behind the colored word to simulate a simple contour/stroke
-  const StrokeWord = ({ children }: { children: React.ReactNode }) => (
+  const StrokeWord = ({ children, color = '#100e9aff', stroke = true }: { children: React.ReactNode; color?: string; stroke?: boolean }) => (
     <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-      <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryContrast, position: 'absolute', left: -1, top: 0, zIndex: 0 }]}>{children}</ThemedText>
-      <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryContrast, position: 'absolute', left: 1, top: 0, zIndex: 0 }]}>{children}</ThemedText>
-      <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryContrast, position: 'absolute', left: 0, top: -1, zIndex: 0 }]}>{children}</ThemedText>
-      <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryContrast, position: 'absolute', left: 0, top: 1, zIndex: 0 }]}>{children}</ThemedText>
-      <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryHover, fontWeight: '800', zIndex: 1 }]}>{children}</ThemedText>
+      {stroke && (
+        <>
+          <ThemedText style={[styles.heroTitle, { color: '#ffffff', position: 'absolute', left: -1, top: 0, zIndex: 0 }]}>{children}</ThemedText>
+          <ThemedText style={[styles.heroTitle, { color: '#ffffff', position: 'absolute', left: 1, top: 0, zIndex: 0 }]}>{children}</ThemedText>
+          <ThemedText style={[styles.heroTitle, { color: '#ffffff', position: 'absolute', left: 0, top: -1, zIndex: 0 }]}>{children}</ThemedText>
+          <ThemedText style={[styles.heroTitle, { color: '#ffffff', position: 'absolute', left: 0, top: 1, zIndex: 0 }]}>{children}</ThemedText>
+        </>
+      )}
+      <ThemedText style={[styles.heroTitle, { color: color, fontWeight: '800', zIndex: 1 }]}>{children}</ThemedText>
     </View>
   );
 
@@ -85,7 +89,7 @@ export default function AboutScreen() {
               style={[
                 styles.heroCard,
                 {
-                  backgroundColor: tokens.colors.primary,
+                  backgroundColor: '#100e9aff',
                   borderRadius: tokens.radius.lg,
                   padding: tokens.spacing.xl,
                   ...tokens.shadow.elev2,
@@ -96,7 +100,7 @@ export default function AboutScreen() {
                   style={[
                     styles.badgePill,
                     {
-                      backgroundColor: tokens.colors.primaryContrast,
+                      backgroundColor: '#ffffff',
                       borderRadius: tokens.radius.pill,
                       paddingHorizontal: tokens.spacing.lg,
                       paddingVertical: tokens.spacing.sm,
@@ -105,15 +109,15 @@ export default function AboutScreen() {
                     },
                   ]}
                 >
-                  <ThemedText style={[styles.badgeText, { color: tokens.colors.primary, textAlign: 'center' }]}>✨ Platforma pasionaților</ThemedText>
+                  <ThemedText style={[styles.badgeText, { color: '#100e9aff', textAlign: 'center' }]}>✨ Platforma pasionaților</ThemedText>
                 </View>
 
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', marginTop: tokens.spacing.md }}>
-                <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryContrast }]}>Transformă-ți </ThemedText>
+                <ThemedText style={[styles.heroTitle, { color: '#ffffff' }]}>Transformă-ți </ThemedText>
                 <View style={{ marginHorizontal: 4 }}>
-                  <StrokeWord>pasiunea</StrokeWord>
+                  <StrokeWord color="#fcc22eff" stroke={false}>pasiunea</StrokeWord>
                 </View>
-                <ThemedText style={[styles.heroTitle, { color: tokens.colors.primaryContrast }]}> în oportunitate</ThemedText>
+                <ThemedText style={[styles.heroTitle, { color: '#ffffff' }]}> în oportunitate</ThemedText>
               </View>
 
             {/* subtle decorative element: a lighter strip to mimic web gradient */}
@@ -125,7 +129,7 @@ export default function AboutScreen() {
                   width: 160,
                   height: 160,
                   borderRadius: 80,
-                  backgroundColor: tokens.colors.primaryHover,
+                  backgroundColor: '#fcc22eff',
                   opacity: 0.12,
                   transform: [{ rotate: '20deg' }],
                 }}
@@ -170,7 +174,7 @@ export default function AboutScreen() {
                   <View key={line} style={styles.checkRow}>
                     <View style={[styles.checkIconWrapper, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}
                     >
-                      <Ionicons name="checkmark" size={16} color={tokens.colors.primary} />
+                      <Ionicons name="checkmark" size={16} color={'#100e9aff'} />
                     </View>
                     <ThemedText style={[styles.checkText, { color: tokens.colors.muted }]}>{line}</ThemedText>
                   </View>
@@ -185,7 +189,7 @@ export default function AboutScreen() {
                 {reasons.map(line => (
                   <View key={line} style={styles.checkRow}>
                     <View style={[styles.checkIconWrapper, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}>
-                      <Ionicons name="checkmark" size={16} color={tokens.colors.primary} />
+                      <Ionicons name="checkmark" size={16} color={'#100e9aff'} />
                     </View>
                     <ThemedText style={[styles.checkText, { color: tokens.colors.muted }]}>{line}</ThemedText>
                   </View>
