@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../../src/context/ThemeContext';
@@ -41,15 +41,33 @@ export default function AccountScreen() {
   // Header and name colors respond to dark mode per user's request:
   // - header (blue in light) becomes black in dark mode
   // - name color is the light-mode yellow and becomes #F51866 in dark mode
-  const headerColor = isDark ? '#000000' : '#100e9aff';
+  const headerColor = isDark ? '#000000' : '#F8B195';
   const gradientColors = [headerColor, headerColor] as const;
-  const nameColor = isDark ? '#F51866' : '#fcc22eff';
+  const nameColor = isDark ? '#F51866' : '#355070';
 
   const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : 'Utilizator';
+  // How much of the sun should remain visible when we push it into the status bar area.
+  // Increase this value to show more of the sun (pixels). We use a modest default so it still overlaps but not too much.
+  const sunOverlap = 28;
+  // Small device-specific nudge to ensure the sun reaches the very top on phones where a thin gap appears.
+  const sunTopNudge = Platform.select({ android: 8, ios: 4, default: 6 });
+  // On web safe-area insets are usually 0 which would produce a positive top (gap).
+  // Use a different formula for web so the sun is moved up into the corner.
+  const sunTop = Platform.OS === 'web'
+    ? -Math.round(sunOverlap / 2)
+    : -insets.top + sunOverlap - (sunTopNudge as number);
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
+        {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
+  <View pointerEvents="none" style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }]}> 
+          <Image
+            source={require('../../assets/images/sun.png')}
+            resizeMode="contain"
+            style={styles.sunImage}
+          />
+        </View>
         {/* Header with Gradient Background */}
         <LinearGradient
           colors={[...gradientColors]}
@@ -80,7 +98,7 @@ export default function AccountScreen() {
           <View style={styles.avatarContainer}>
             <View style={styles.avatarOuter}>
               <View style={[styles.halfTop, { backgroundColor: '#ffffff' }]} />
-              <View style={[styles.halfBottom, { backgroundColor: '#100e9aff' }]} />
+              <View style={[styles.halfBottom, { backgroundColor: '#F8B195' }]} />
               <View style={[styles.avatarInner, { backgroundColor: tokens.colors.surface }]}> 
                 {user?.avatar ? (
                   <Image 
@@ -456,5 +474,20 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#ff2d2d',
     borderRadius: 2,
+  },
+  // Sun decoration in top-right corner
+  sunWrapper: {
+    position: 'absolute',
+    width: 128,
+    height: 128,
+    zIndex: 50,
+    elevation: 50,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sunImage: {
+    width: '100%',
+    height: '100%',
   },
 });

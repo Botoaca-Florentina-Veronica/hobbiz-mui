@@ -19,7 +19,8 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { tokens } = useAppTheme();
   const { isAuthenticated, loading, user } = useAuth();
   const { hidden } = useTabBar();
-  const activeColor = '#100e9aff';
+  // Use project-wide accent for active tab icons per request
+  const activeColor = '#355070';
   const inactiveColor = tokens.colors.muted;
 
   // Indicator bazat pe măsurători reale

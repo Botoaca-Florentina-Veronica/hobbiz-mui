@@ -239,14 +239,14 @@ export default function SellScreen() {
             activeOpacity={0.8}
             style={[styles.previewBtn, { backgroundColor: '#ffffff', borderColor: '#ffffff' }]}
           >            
-            <ThemedText style={[styles.previewText, { color: '#100e9aff' }]}>Previzualizați anunțul</ThemedText>
+            <ThemedText style={[styles.previewText, { color: '#355070' }]}>Previzualizați anunțul</ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={disabledPublish}
             style={[
               styles.publishBtn,
-              { backgroundColor: '#100e9aff' },
+              { backgroundColor: '#355070' },
             ]}
           >
             <ThemedText style={[styles.publishText, { color: '#ffffff' }]}>Publică un anunț</ThemedText>

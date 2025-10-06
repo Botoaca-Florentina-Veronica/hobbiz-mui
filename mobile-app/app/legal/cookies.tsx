@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, findNodeHandle, UIManager, Animated, Easing } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@/src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,51 @@ export default function CookiesScreen() {
   const { tokens, isDark } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const scrollRef = useRef<any>(null);
+  const scrollAnim = useRef(new Animated.Value(0)).current;
+  const secCeRef = useRef<View | null>(null);
+  const secTipuriRef = useRef<View | null>(null);
+  const secDeCeRef = useRef<View | null>(null);
+  const secGestionareRef = useRef<View | null>(null);
+  const secTertiRef = useRef<View | null>(null);
+  const secConsimRef = useRef<View | null>(null);
+  const secUpdatesRef = useRef<View | null>(null);
+  const secContactRef = useRef<View | null>(null);
+
+  const scrollToSection = (ref: React.RefObject<View | null>) => {
+    if (!ref.current || !scrollRef.current) return;
+    const node = findNodeHandle(ref.current);
+    const scrollNode = findNodeHandle(scrollRef.current as any);
+    if (!node || !scrollNode) return;
+    try {
+      UIManager.measureLayout(
+        node,
+        scrollNode,
+        () => {},
+        (_x, y, _w, _h) => {
+          // Animate the scroll position using Animated.Value to control duration/easing
+          Animated.timing(scrollAnim, {
+            toValue: Math.max(0, y - 12),
+            duration: 550,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: false,
+          }).start();
+        }
+      );
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // Keep the Animated value driving the actual ScrollView position.
+  useEffect(() => {
+    const id = scrollAnim.addListener(({ value }) => {
+      scrollRef.current?.scrollTo({ y: value, animated: false });
+    });
+    return () => {
+      scrollAnim.removeListener(id);
+    };
+  }, [scrollAnim]);
 
   function CookieTag({ children }: { children: React.ReactNode }) {
     return (
@@ -23,7 +68,7 @@ export default function CookiesScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+  <Animated.ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
@@ -67,24 +112,24 @@ export default function CookiesScreen() {
         <View style={styles.cookieToc}>
           <ThemedText style={styles.tocTitle}>Cuprins</ThemedText>
           <View style={styles.tocList}>
-            <ThemedText style={styles.tocItem}>• Ce sunt cookie-urile?</ThemedText>
-            <ThemedText style={styles.tocItem}>• Tipuri de cookie-uri</ThemedText>
-            <ThemedText style={styles.tocItem}>• De ce folosim cookie-uri?</ThemedText>
-            <ThemedText style={styles.tocItem}>• Cum să gestionezi cookie-urile</ThemedText>
-            <ThemedText style={styles.tocItem}>• Cookie-uri de la terți</ThemedText>
-            <ThemedText style={styles.tocItem}>• Consimțământul tău</ThemedText>
-            <ThemedText style={styles.tocItem}>• Actualizări</ThemedText>
-            <ThemedText style={styles.tocItem}>• Contact</ThemedText>
+            <TouchableOpacity onPress={() => scrollToSection(secCeRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Ce sunt cookie-urile?</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secTipuriRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Tipuri de cookie-uri</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secDeCeRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• De ce folosim cookie-uri?</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secGestionareRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Cum să gestionezi cookie-urile</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secTertiRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Cookie-uri de la terți</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secConsimRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Consimțământul tău</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secUpdatesRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Actualizări</ThemedText></TouchableOpacity>
+            <TouchableOpacity onPress={() => scrollToSection(secContactRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Contact</ThemedText></TouchableOpacity>
           </View>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: '#ffffff', borderColor: '#8b8b8b' }]}>
+  <View ref={secCeRef} style={[styles.sectionCard, { backgroundColor: '#ffffff', borderColor: '#8b8b8b' }]}>
           <ThemedText style={[styles.h2, { color: isDark ? '#ffffff' : tokens.colors.text }]}>Ce sunt cookie-urile?</ThemedText>
           <ThemedText style={[styles.paragraph, { color: isDark ? '#d6d6d6' : '#575757' }]}>Cookie-urile sunt fișiere text mici care sunt plasate pe dispozitivul tău (computer, telefon mobil sau tabletă) atunci când vizitezi un site web. Acestea sunt procesate și stocate de browser-ul tău web și ne ajută să îți oferim o experiență mai bună pe site-ul nostru.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: isDark ? '#d6d6d6' : '#575757' }]}>Cookie-urile sunt inofensive în sine și servesc funcții cruciale pentru site-uri web. Ele pot fi vizualizate și șterse cu ușurință din setările browser-ului tău.</ThemedText>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: '#ffffff', borderColor: '#8b8b8b' }]}> 
+  <View ref={secTipuriRef} style={[styles.sectionCard, { backgroundColor: '#ffffff', borderColor: '#8b8b8b' }]}> 
           <ThemedText style={[styles.h2, { color: '#3f3f3f' }]}>Tipuri de cookie-uri pe care le folosim</ThemedText>
 
           <View style={styles.cookieType}>
@@ -132,7 +177,7 @@ export default function CookiesScreen() {
           </View>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secDeCeRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>De ce folosim cookie-uri?</ThemedText>
           <View style={styles.reasonsGrid}>
             <View style={styles.reasonCard}>
@@ -153,7 +198,7 @@ export default function CookiesScreen() {
           </View>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secGestionareRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Cum să gestionezi cookie-urile</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Poți controla și/sau șterge cookie-urile după cum dorești. Poți șterge toate cookie-urile care sunt deja pe computerul tău și poți seta majoritatea browserelor să le împiedice să fie plasate.</ThemedText>
 
@@ -167,7 +212,7 @@ export default function CookiesScreen() {
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Dacă dezactivezi anumite cookie-uri, este posibil ca unele funcții ale platformei Hobbiz să nu funcționeze corect. De exemplu, s-ar putea să nu poți rămâne autentificat, să-ți pierzi anunțurile favorite salvate, sau să nu primești notificări noi pentru mesajele din chat.</ThemedText>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secTertiRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Cookie-uri de la terți</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Pe platforma Hobbiz folosim servicii de la terți care pot plasa propriile cookie-uri pentru a îmbunătăți experiența ta:</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Cloudinary:</ThemedText> Pentru optimizarea și livrarea rapidă a imaginilor anunțurilor</ThemedText>
@@ -176,19 +221,19 @@ export default function CookiesScreen() {
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Aceste servicii au propriile politici de confidențialitate și cookie-uri pe care te încurajăm să le citești.</ThemedText>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secConsimRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Consimțământul tău</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Prin utilizarea platformei Hobbiz, îți dai consimțământul pentru utilizarea cookie-urilor conform acestei politici. Pentru funcțiile esențiale (autentificare, publicare anunțuri, chat), cookie-urile sunt necesare pentru buna funcționare a serviciului.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Poți să-ți retragi consimțământul pentru cookie-urile non-esențiale oricând prin modificarea setărilor browser-ului tău sau prin contactarea echipei Hobbiz.</ThemedText>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secUpdatesRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Actualizări ale acestei politici</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești această pagină din când în când.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}><ThemedText style={styles.strong}>Ultima actualizare:</ThemedText> Septembrie 2025</ThemedText>
         </View>
 
-        <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secContactRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Contactează-ne</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Dacă ai întrebări despre această politică de cookie-uri sau despre utilizarea datelor pe platforma Hobbiz, te rugăm să ne contactezi:</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}><ThemedText style={styles.strong}>Email:</ThemedText> privacy@hobbiz.ro</ThemedText>
@@ -196,7 +241,7 @@ export default function CookiesScreen() {
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}><ThemedText style={styles.strong}>Adresă:</ThemedText> București, România</ThemedText>
         </View>
       
-      </ScrollView>
+  </Animated.ScrollView>
     </ThemedView>
   );
 }

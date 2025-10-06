@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import api from '../../src/services/api';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface Announcement {
   _id: string;
@@ -119,50 +120,63 @@ export default function FavoritesScreen() {
             <Text style={[styles.emptyMessage, { color: tokens.colors.muted }]}>Explorează anunțurile și adaugă-le la favorite</Text>
           </View>
         ) : (
-          favorites.map((ann) => {
+          favorites.map((ann, index) => {
             const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
             const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
+            const palettes = [
+              { bg: '#FFE2D5', g1: '#FFB996', g2: '#FFCDB0', text: '#3A2E2A' },
+              { bg: '#D9EEF2', g1: '#8AC6D1', g2: '#B5E4EB', text: '#15393F' },
+              { bg: '#FFE8BC', g1: '#FFD079', g2: '#FFE1A3', text: '#563C05' },
+              { bg: '#D8E0F5', g1: '#425D9E', g2: '#6E85C4', text: '#1C2844' },
+              { bg: '#E9DCF6', g1: '#A678E0', g2: '#C2A3EE', text: '#35224B' },
+              { bg: '#E4F7D9', g1: '#89C46C', g2: '#B3E29A', text: '#234314' },
+            ];
+            const palette = palettes[index % palettes.length];
+
             return (
-              <TouchableOpacity
+              <Pressable
                 key={ann._id}
-                style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
                 onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
-                activeOpacity={0.8}
+                style={({ pressed }) => [
+                  styles.modernCard,
+                  styles.modernRow,
+                  {
+                    backgroundColor: palette.bg,
+                    opacity: pressed ? 0.92 : 1,
+                  },
+                ]}
               >
-                {/* Image */}
-                <View style={styles.cardImageWrapper}>
+                <LinearGradient
+                  colors={[palette.g1, palette.g2]}
+                  style={styles.leftAccent}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                />
+                <View style={styles.squareImageWrapper}>
                   {firstImage ? (
-                    <Image source={{ uri: firstImage }} style={styles.cardImage} resizeMode="cover" />
+                    <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
                   ) : (
-                    <View style={[styles.cardImagePlaceholder, { backgroundColor: tokens.colors.elev }]}>
-                      <Ionicons name="image-outline" size={32} color={tokens.colors.placeholder} />
+                    <View style={styles.squareImagePlaceholder}>
+                      <Ionicons name="image-outline" size={32} color="rgba(0,0,0,0.25)" />
                     </View>
                   )}
                 </View>
-
-                {/* Content */}
-                <View style={styles.cardContent}>
-                  <View style={styles.cardHeader}>
-                    <Text style={[styles.cardDate, { color: tokens.colors.muted }]}>
-                      Postat {new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}
-                    </Text>
+                <View style={styles.squareContent}>
+                  <Text style={[styles.modernTitle, { color: palette.text }]} numberOfLines={2}>{ann.title}</Text>
+                  <View style={styles.categoryBadgeModern}>
+                    <Text style={[styles.categoryBadgeText, { color: palette.text }]} numberOfLines={1}>{ann.category}</Text>
                   </View>
-                  <Text style={[styles.cardTitle, { color: tokens.colors.text }]} numberOfLines={2}>{ann.title}</Text>
-                  <View style={[styles.categoryBadge, { backgroundColor: tokens.colors.elev }]}>
-                    <Text style={[styles.categoryText, { color: tokens.colors.primary }]}>{ann.category}</Text>
-                  </View>
-                  <Text style={[styles.cardSeller, { color: tokens.colors.primary }]}>{sellerName}</Text>
+                  <Text style={[styles.modernSub, { color: palette.text, opacity: 0.75 }]} numberOfLines={1}>{sellerName}</Text>
+                  <Text style={[styles.modernDate, { color: palette.text, opacity: 0.55 }]}>Postat {new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
                 </View>
-
-                {/* Favorite button */}
                 <TouchableOpacity
                   onPress={() => handleRemoveFavorite(ann._id)}
-                  style={styles.favoriteButton}
-                  activeOpacity={0.7}
+                  style={styles.modernFavBtn}
+                  activeOpacity={0.75}
                 >
-                  <Ionicons name="heart" size={22} color="#E0245E" />
+                  <Ionicons name="heart" size={20} color="#E0245E" />
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </Pressable>
             );
           })
         )}
@@ -186,16 +200,82 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 16, fontWeight: '600' },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
-  card: { flexDirection: 'row', borderRadius: 16, borderWidth: 1, overflow: 'hidden', padding: 12, gap: 12 },
-  cardImageWrapper: { width: 100, height: 100, borderRadius: 12, overflow: 'hidden' },
-  cardImage: { width: '100%', height: '100%' },
-  cardImagePlaceholder: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
-  cardContent: { flex: 1, justifyContent: 'space-between' },
-  cardHeader: { marginBottom: 4 },
-  cardDate: { fontSize: 11, fontWeight: '500' },
-  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  categoryBadge: { alignSelf: 'flex-start', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 4 },
-  categoryText: { fontSize: 12, fontWeight: '600' },
-  cardSeller: { fontSize: 13, fontWeight: '600' },
-  favoriteButton: { position: 'absolute', top: 12, right: 12 },
+  /* Legacy card styles removed in favor of modern design */
+  modernCard: {
+    borderRadius: 26,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  modernRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  leftAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 16,
+    borderTopLeftRadius: 26,
+    borderBottomLeftRadius: 26,
+  },
+  squareImageWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginLeft: 22, // leave space for accent
+    marginRight: 14,
+    backgroundColor: 'rgba(0,0,0,0.05)'
+  },
+  squareImage: { width: '100%', height: '100%' },
+  squareImagePlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  squareContent: { flex: 1, gap: 6, paddingRight: 40 },
+  modernTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+  modernSub: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  modernDate: {
+    fontSize: 11,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  categoryBadgeModern: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+  },
+  categoryBadgeText: {
+    fontSize: 12,
+    fontWeight: '600'
+  },
+  modernFavBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+  },
 });

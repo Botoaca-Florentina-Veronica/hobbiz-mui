@@ -13,7 +13,14 @@ import {
   Platform,
   Dimensions,
   Alert,
+  Modal,
+  Pressable,
+  UIManager,
+  findNodeHandle,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
+import * as Clipboard from 'expo-clipboard';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { PermissionsAndroid } from 'react-native';
@@ -27,6 +34,18 @@ import api from '../../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../../src/services/storage';
 import { useAuth } from '../../src/context/AuthContext';
+// NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
+// NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
+// Dacă vrei snapshot real pentru web mai târziu, putem introduce o implementare fallback bazată pe canvas.
+let captureRef: any = null;
+if (Platform.OS !== 'web') {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    captureRef = require('react-native-view-shot').captureRef;
+  } catch (e) {
+    captureRef = null;
+  }
+}
 
 interface Conversation {
   id: string;
@@ -57,6 +76,8 @@ interface Message {
   senderInfo?: { firstName?: string; lastName?: string; avatar?: string };
   replyTo?: { messageId: string; senderId: string; text?: string; image?: string };
   reactions?: Array<{ userId: string; emoji: string }>;
+  // If true the message has been deleted and should render a placeholder bubble
+  deleted?: boolean;
 }
 
 export default function ChatScreen() {
@@ -75,12 +96,22 @@ export default function ChatScreen() {
   const { user } = useAuth();
   const [userId, setUserId] = useState<string | null>(user?.id || null);
   const messagesEndRef = useRef<ScrollView>(null);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
+  // dynamic menu positioning states
+  const [menuPosition, setMenuPosition] = useState<null | { x: number; y: number; width: number; height: number; showAbove: boolean }>(null);
+  const [menuHeight, setMenuHeight] = useState(0);
+  const [reactionBarWidth, setReactionBarWidth] = useState(0);
+  const [reactionBarHeight, setReactionBarHeight] = useState(0);
+  // Hold refs for each bubble to measure its screen position
+  const bubbleRefs = useRef<Record<string, View | null>>({});
 
   const width = Dimensions.get('window').width;
   
   // Page colors (solid): primary used for headers, accent used for tabs
-  const primaryColor = '#100e9aff';
-  const accent = '#fcc22eff';
+  const primaryColor = '#355070';
+  const accent = '#F8B195';
 
   // Keep local userId in sync with AuthContext
   useEffect(() => {
@@ -364,24 +395,90 @@ export default function ChatScreen() {
   // Pick a generic file (document). Uses dynamic import for expo-document-picker so the dependency is optional.
   const handlePickFilePress = async () => {
     try {
+      // On Android modern SDKs there are different permissions; try to request whichever exist.
       if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert('Permisiune', 'Trebuie să permiți accesul la fișiere pentru a selecta un document.');
-          return;
+        try {
+          // Try the common READ_EXTERNAL_STORAGE permission first
+          const perm = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+          if (perm) {
+            const granted = await PermissionsAndroid.request(perm);
+            if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+              // If not granted, try the newer media permissions if available
+              const imgPerm = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES || PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+              const vidPerm = PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO || PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+              const g2 = await PermissionsAndroid.requestMultiple([imgPerm, vidPerm]);
+              const ok = Object.values(g2).some((v) => v === PermissionsAndroid.RESULTS.GRANTED);
+              if (!ok) {
+                Alert.alert('Permisiune', 'Trebuie să permiți accesul la fișiere pentru a selecta un document.');
+                return;
+              }
+            }
+          }
+        } catch (pErr) {
+          // ignore and proceed — DocumentPicker may request its own permissions
+          console.warn('Permission request failed, proceeding to picker', pErr);
         }
       }
 
       let DocumentPicker: any = null;
       try {
         // dynamic import to avoid build-time errors if not installed
-        // If the package isn't installed TypeScript/node might complain at build time;
-        // we ignore the type error here because this import is optional at runtime.
         // @ts-ignore
-        // eslint-disable-next-line global-require
         DocumentPicker = await import('expo-document-picker');
       } catch (e) {
-        Alert.alert('Lipsă dependență', 'Pentru a selecta fișiere instalează pachetul expo-document-picker: `expo install expo-document-picker`.');
+        // If the package isn't installed, offer the user to open the gallery as a fallback
+        Alert.alert(
+          'Selector fișiere lipsă',
+          'Pentru a selecta orice tip de fișier instalează pachetul expo-document-picker. Vrei să deschizi galeria ca alternativă?',
+          [
+            { text: 'Anulează', style: 'cancel' },
+            {
+              text: 'Deschide galerie',
+              onPress: async () => {
+                try {
+                  const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.All, quality: 0.8 });
+                  if ((res as any).canceled) return;
+                  const asset: any = (res as any).assets ? (res as any).assets[0] : res;
+                  if (!asset || !asset.uri) return;
+                  // Reuse the upload flow for files (image) picked from gallery
+                  const uri = asset.uri;
+                  const fileName = asset.name || asset.fileName || uri.split('/').pop() || `file_${Date.now()}`;
+                  const mimeType = asset.type ? `${asset.type}/${(fileName.split('.').pop() || 'jpg')}` : asset.mimeType || 'application/octet-stream';
+
+                  const tempMessage: Message = {
+                    _id: Date.now().toString(),
+                    conversationId: selectedConversation!.conversationId,
+                    senderId: userId!,
+                    image: uri,
+                    createdAt: new Date().toISOString(),
+                    senderInfo: { firstName: 'Tu', lastName: '' },
+                  };
+                  setMessages((prev) => [...prev, tempMessage]);
+
+                  const form = new FormData();
+                  // @ts-ignore
+                  form.append('image', { uri, name: fileName, type: mimeType });
+                  form.append('conversationId', selectedConversation!.conversationId);
+                  form.append('destinatarId', selectedConversation!.otherParticipant.id);
+                  form.append('senderRole', 'cumparator');
+                  if (selectedConversation!.announcementId) {
+                    form.append('announcementId', selectedConversation!.announcementId);
+                  }
+
+                  const r = await api.post('/api/messages', form as any, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                  });
+                  if (r?.data) {
+                    setMessages((prev) => prev.map((m) => (m._id === tempMessage._id ? { ...r.data, senderInfo: tempMessage.senderInfo } : m)));
+                  }
+                } catch (err) {
+                  console.error('Fallback gallery upload failed', err);
+                  Alert.alert('Eroare', 'Nu s-a putut încărca fișierul din galerie.');
+                }
+              },
+            },
+          ]
+        );
         return;
       }
 
@@ -479,6 +576,156 @@ export default function ChatScreen() {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=355070&color=fff`;
   };
 
+  const handleLongPressMessage = (message: Message) => {
+    // Haptic feedback
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
+    const ref = bubbleRefs.current[message._id];
+    if (!ref) {
+      setSelectedMessage(message);
+      setMenuPosition(null);
+      setContextMenuVisible(true);
+      return;
+    }
+    const node = findNodeHandle(ref);
+    if (!node) {
+      setSelectedMessage(message);
+      setMenuPosition(null);
+      setContextMenuVisible(true);
+      return;
+    }
+    // First measurement (immediate)
+    UIManager.measureInWindow(node, (x, y, width, height) => {
+      const screenHeight = Dimensions.get('window').height;
+      const spaceAbove = y - insets.top;
+      const spaceBelow = screenHeight - (y + height) - insets.bottom;
+      const estimatedMenuHeight = 320; // rough estimate
+      const showAbove = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
+      // set initial values so UI can render quickly
+      setSelectedMessage(message);
+      setMenuPosition({ x, y, width, height, showAbove });
+      setContextMenuVisible(true);
+
+      // Re-measure after a very short delay to get a stabilized height/width
+      // (addresses race conditions where layout/line-wrapping can change slightly)
+      setTimeout(() => {
+        try {
+          UIManager.measureInWindow(node, (x2, y2, w2, h2) => {
+            const screenH2 = Dimensions.get('window').height;
+            const spaceAbove2 = y2 - insets.top;
+            const spaceBelow2 = screenH2 - (y2 + h2) - insets.bottom;
+            const showAbove2 = spaceBelow2 < estimatedMenuHeight && spaceAbove2 > spaceBelow2;
+            setMenuPosition({ x: x2, y: y2, width: w2, height: h2, showAbove: showAbove2 });
+          });
+        } catch (e) {
+          // ignore failed re-measure
+        }
+      }, 45);
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenuVisible(false);
+    setShowReactionPicker(false);
+    setMenuPosition(null);
+    setTimeout(() => setSelectedMessage(null), 250);
+  };
+
+  const handleReaction = async (emoji: string) => {
+    if (!selectedMessage || !userId) return;
+    try {
+      // Optimistic update
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m._id === selectedMessage._id) {
+            const reactions = m.reactions || [];
+            const existingIdx = reactions.findIndex((r) => r.userId === userId && r.emoji === emoji);
+            if (existingIdx >= 0) {
+              // Remove reaction
+              return { ...m, reactions: reactions.filter((_, i) => i !== existingIdx) };
+            } else {
+              // Add reaction
+              return { ...m, reactions: [...reactions, { userId, emoji }] };
+            }
+          }
+          return m;
+        })
+      );
+      closeContextMenu();
+      // TODO: send reaction to server
+      // await api.post(`/api/messages/${selectedMessage._id}/reaction`, { emoji });
+    } catch (err) {
+      console.error('Reaction error:', err);
+    }
+  };
+
+  const handleDeleteMessage = async () => {
+    if (!selectedMessage) return;
+    Alert.alert(
+      'Șterge mesaj',
+      'Ești sigur că vrei să ștergi acest mesaj?',
+      [
+        { text: 'Anulează', style: 'cancel' },
+        {
+          text: 'Șterge',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Optimistically mark message as deleted so it stays in the list but shows a placeholder
+              setMessages((prev) => prev.map((m) => (m._id === selectedMessage._id ? { ...m, deleted: true, text: undefined, image: undefined } : m)));
+              closeContextMenu();
+              // Try deleting on server but don't remove locally if it fails; server may physically delete, but UI keeps a placeholder
+              try {
+                await api.delete(`/api/messages/${selectedMessage._id}`);
+              } catch (serverErr) {
+                // If server deletion fails, keep local deleted flag — it represents that user removed it locally.
+                console.warn('Server delete failed, message kept as deleted locally', serverErr);
+              }
+            } catch (err) {
+              console.error('Delete error:', err);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleCopyMessage = async () => {
+    if (selectedMessage?.text) {
+      await Clipboard.setStringAsync(selectedMessage.text);
+      Alert.alert('Copiat', 'Mesajul a fost copiat.');
+      closeContextMenu();
+    }
+  };
+
+  const handleReplyMessage = () => {
+    // TODO: implement reply functionality
+    Alert.alert('Reply', 'Funcționalitate în curând');
+    closeContextMenu();
+  };
+
+  const handleForwardMessage = () => {
+    // TODO: implement forward functionality
+    Alert.alert('Forward', 'Funcționalitate în curând');
+    closeContextMenu();
+  };
+
+  const handleStarMessage = () => {
+    // TODO: implement star/favorite functionality
+    Alert.alert('Star', 'Funcționalitate în curând');
+    closeContextMenu();
+  };
+
+  const handleReportMessage = () => {
+    Alert.alert('Raportează mesaj', 'Vrei să raportezi acest mesaj?', [
+      { text: 'Anulează', style: 'cancel' },
+      { text: 'Raportează', onPress: () => {
+        // TODO: report to server
+        Alert.alert('Raportat', 'Mesajul a fost raportat.');
+        closeContextMenu();
+      }},
+    ]);
+  };
+
   const unreadConversations = conversations.filter((conv) => conv.unread);
   const readConversations = conversations.filter((conv) => !conv.unread);
 
@@ -508,7 +755,15 @@ export default function ChatScreen() {
             {/* thin separator between title row and announcement preview */}
             <View style={styles.headerSeparator} />
 
-            <View style={styles.announcementRow}>
+            <TouchableOpacity
+              style={styles.announcementRow}
+              activeOpacity={0.85}
+              onPress={() => {
+                const aid = selectedConversation?.announcementId;
+                if (!aid) return;
+                router.push(`/announcement-details?id=${encodeURIComponent(aid)}`);
+              }}
+            >
               <Image
                 source={{ uri: selectedConversation.avatar || selectedConversation.participantAvatar || getAvatarFallback(selectedConversation.participantName) }}
                 style={styles.announcementThumb}
@@ -519,10 +774,10 @@ export default function ChatScreen() {
                   <Text style={styles.announcementId}>ID: {selectedConversation.announcementId}</Text>
                 ) : null}
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.moreBtn}>
+          <TouchableOpacity style={[styles.moreBtn, styles.moreBtnTop]}>
             <Ionicons name="ellipsis-vertical" size={22} color="#000000" />
           </TouchableOpacity>
         </View>
@@ -553,45 +808,107 @@ export default function ChatScreen() {
                   !prevMessage || 
                   new Date(message.createdAt).toLocaleDateString() !== new Date(prevMessage.createdAt).toLocaleDateString();
 
+                // Only show the time for the last message in a run of messages that share the same minute
+                const timeForMessage = formatTime(message.createdAt);
+                const nextMessage = idx < messages.length - 1 ? messages[idx + 1] : null;
+                const nextTime = nextMessage ? formatTime(nextMessage.createdAt) : null;
+                const showTime = !nextMessage || nextTime !== timeForMessage;
+                const compactBelow = !!nextMessage && nextTime === timeForMessage; // reduce spacing when next message has same minute
+
                 return (
                   <View key={message._id}>
                     {/* Date separator */}
                     {showDateSeparator && (
                       <View style={styles.dateSeparator}>
+                        <View style={styles.dateLine} />
                         <Text style={styles.dateSeparatorText}>
                           {new Date(message.createdAt).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }).toUpperCase()}
                         </Text>
+                        <View style={styles.dateLine} />
                       </View>
                     )}
 
                     {/* Message bubble */}
-                    <View style={[styles.messageRow, isOwn && styles.messageRowOwn]}>
-                      <View 
-                        style={[
-                          styles.messageBubbleClean, 
-                          isOwn
-                            ? { backgroundColor: '#d1e7ff', marginLeft: 'auto', marginRight: 12 }
-                            : { backgroundColor: '#f0f0f0', marginLeft: 12, marginRight: 'auto' }
-                        ]}
-                      >
-                        {message.text && (
-                          <Text style={[styles.messageTextClean, { color: '#1a1a1a' }]}>
-                            {message.text}
-                          </Text>
+                    <View style={[styles.messageRow, isOwn && styles.messageRowOwn, compactBelow && styles.messageRowCompact]}>
+                      <View style={styles.messageGroup}>
+                        {/* Reactions display above message */}
+                        {message.reactions && message.reactions.length > 0 && (
+                          <View style={[styles.reactionsContainer, isOwn ? { alignSelf: 'flex-end', marginRight: 12 } : { alignSelf: 'flex-start', marginLeft: 12 }]}>
+                            {message.reactions.slice(0, 3).map((reaction, rIdx) => (
+                              <View key={`${reaction.userId}-${reaction.emoji}-${rIdx}`} style={styles.reactionBubble}>
+                                <Text style={styles.reactionEmoji}>{reaction.emoji}</Text>
+                              </View>
+                            ))}
+                            {message.reactions.length > 3 && (
+                              <View style={styles.reactionBubble}>
+                                <Text style={styles.reactionCount}>+{message.reactions.length - 3}</Text>
+                              </View>
+                            )}
+                          </View>
                         )}
-                        {message.image && (
-                          <Image source={{ uri: message.image }} style={styles.messageImage} resizeMode="cover" />
-                        )}
-                        <Text style={[styles.messageTimeClean, { color: '#888888' }]}>
-                          {formatTime(message.createdAt)}
-                        </Text>
-                        {isOwn && (
-                          <Ionicons
-                            name="checkmark-done"
-                            size={14}
-                            color={message.isRead ? '#34B7F1' : '#888888'}
-                            style={styles.tickIconClean}
-                          />
+                        <Pressable
+                          ref={(r) => { bubbleRefs.current[message._id] = r; }}
+                          onLongPress={() => handleLongPressMessage(message)}
+                          delayLongPress={400}
+                          style={[
+                            styles.messageBubbleClean, 
+                            isOwn
+                              ? {
+                                  backgroundColor: '#d1e7ff',
+                                  marginLeft: 'auto',
+                                  marginRight: 12,
+                                  borderTopLeftRadius: 20,
+                                  borderTopRightRadius: 20,
+                                  borderBottomLeftRadius: 20,
+                                  borderBottomRightRadius: 6,
+                                }
+                              : {
+                                  backgroundColor: '#f0f0f0',
+                                  marginLeft: 12,
+                                  marginRight: 'auto',
+                                  borderTopLeftRadius: 20,
+                                  borderTopRightRadius: 20,
+                                  borderBottomLeftRadius: 6,
+                                  borderBottomRightRadius: 20,
+                                },
+                            selectedMessage && contextMenuVisible && selectedMessage._id === message._id ? { opacity: 0 } : null
+                          ]}
+                        >
+                          {message.deleted ? (
+                            <Text style={[styles.messageTextClean, { color: '#888888', fontStyle: 'italic' }]}>acest mesaj a fost șters</Text>
+                          ) : (
+                            <>
+                              {message.text && (
+                                <Text style={[styles.messageTextClean, { color: '#1a1a1a' }]}>
+                                  {message.text}
+                                </Text>
+                              )}
+                              {message.image && (
+                                <Image source={{ uri: message.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
+                              )}
+                              {isOwn && (
+                                <Ionicons
+                                  name="checkmark-done"
+                                  size={15}
+                                  color={message.isRead ? '#34B7F1' : '#888888'}
+                                  style={styles.tickIconClean}
+                                />
+                              )}
+                            </>
+                          )}
+                        </Pressable>
+                        {/* Time + checkmarks below bubble (only shown at end of same-time group) */}
+                        {showTime && (
+                          <View 
+                            style={[
+                              styles.messageTimestamp, 
+                              isOwn ? { alignSelf: 'flex-end', marginRight: 12 } : { alignSelf: 'flex-start', marginLeft: 12 }
+                            ]}
+                          >
+                            <Text style={[styles.messageTimeClean, { color: '#888888' }]}>
+                              {timeForMessage}
+                            </Text>
+                          </View>
                         )}
                       </View>
                     </View>
@@ -626,6 +943,168 @@ export default function ChatScreen() {
             <Ionicons name="send" size={20} color="#100e9aff" />
           </TouchableOpacity>
         </View>
+
+        {/* Dynamic Context Menu Modal */}
+        <Modal visible={contextMenuVisible} transparent animationType="fade" onRequestClose={closeContextMenu}>
+          <Pressable style={styles.modalOverlay} onPress={closeContextMenu}>
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="box-none">
+              {selectedMessage && menuPosition && (
+                <>
+                  {/* Floating original message bubble (above blur) */}
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.floatingBubble,
+                      {
+                        top: menuPosition.y,
+                        left: menuPosition.x,
+                        // Lock width to measured bubble; avoid forcing height (can clip wrapped text)
+                        width: menuPosition.width,
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.messageBubbleClean,
+                        // Recreate original bubble visual without external margins (already accounted for in absolute positioning)
+                        selectedMessage.senderId === userId
+                          ? {
+                              backgroundColor: '#d1e7ff',
+                              borderTopLeftRadius: 20,
+                              borderTopRightRadius: 20,
+                              borderBottomLeftRadius: 20,
+                              borderBottomRightRadius: 6,
+                            }
+                          : {
+                              backgroundColor: '#f0f0f0',
+                              borderTopLeftRadius: 20,
+                              borderTopRightRadius: 20,
+                              borderBottomLeftRadius: 6,
+                              borderBottomRightRadius: 20,
+                            },
+                        { marginHorizontal: 0, width: '100%', maxWidth: undefined, alignItems: 'flex-start' },
+                      ]}
+                    >
+                      {selectedMessage.text && (
+                        <Text style={[styles.messageTextClean, { color: '#1a1a1a', flexShrink: 1, flexWrap: 'wrap' }]}>
+                          {selectedMessage.text}
+                        </Text>
+                      )}
+                      {selectedMessage.image && (
+                        <Image source={{ uri: selectedMessage.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
+                      )}
+                      {selectedMessage.senderId === userId && (
+                        <Ionicons
+                          name="checkmark-done"
+                          size={15}
+                          color={selectedMessage.isRead ? '#34B7F1' : '#888888'}
+                          style={styles.tickIconClean}
+                        />
+                      )}
+                    </View>
+                  </View>
+
+                  {/* Reaction bar */}
+                  <View
+                    onLayout={(e) => { setReactionBarWidth(e.nativeEvent.layout.width); setReactionBarHeight(e.nativeEvent.layout.height); }}
+                    style={[
+                      styles.reactionBarAbsolute,
+                      (() => {
+                        const screenW = Dimensions.get('window').width;
+                        const estWidth = reactionBarWidth || 280;
+                        const rbH = reactionBarHeight || 48;
+                        const top = Math.max(insets.top + 8, menuPosition.y - rbH - 8);
+                        const left = Math.max(8, Math.min(menuPosition.x + menuPosition.width / 2 - estWidth / 2, screenW - estWidth - 8));
+                        return { top, left };
+                      })(),
+                    ]}
+                  >
+                    {['👍', '❤️', '😂', '😮', '😢', '🙏'].map((emoji) => (
+                      <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.quickReactionButton}>
+                        <Text style={styles.quickReactionEmoji}>{emoji}</Text>
+                      </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity onPress={() => setShowReactionPicker((p) => !p)} style={styles.quickReactionButton}>
+                      <Ionicons name={showReactionPicker ? 'close' : 'add-circle-outline'} size={24} color="#666" />
+                    </TouchableOpacity>
+                    {showReactionPicker && (
+                      <View style={styles.reactionPickerDropdown}>
+                        {['🤩','😎','🔥','🎉','😔','🙌','👌','🥳','🤔','🤯'].map((emoji) => (
+                          <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.reactionPickerButton}>
+                            <Text style={styles.reactionPickerEmoji}>{emoji}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Context menu (above or below) without duplicate preview */}
+                  <View
+                    onLayout={(e) => setMenuHeight(e.nativeEvent.layout.height)}
+                    style={[
+                      styles.contextMenuAbsolute,
+                      (() => {
+                        const win = Dimensions.get('window');
+                        const rbH = reactionBarHeight || 48;
+                        const reactionBarTop = Math.max(insets.top + 8, menuPosition.y - rbH - 8);
+                        const top = menuPosition.showAbove
+                          ? Math.max(insets.top + 8, reactionBarTop - (menuHeight || 0) - 6)
+                          : Math.min(win.height - insets.bottom - menuHeight - 8, menuPosition.y + menuPosition.height + 12);
+                        const left = Math.max(8, Math.min(menuPosition.x, win.width - 300 - 8));
+                        return { top, left };
+                      })(),
+                    ]}
+                  >
+                    <View style={styles.contextMenu}>
+                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
+                        <Text style={styles.contextMenuText}>Star</Text>
+                        <Ionicons name="star-outline" size={20} color="#333" />
+                      </TouchableOpacity>
+                      <View style={styles.contextMenuDivider} />
+                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
+                        <Text style={styles.contextMenuText}>Reply</Text>
+                        <Ionicons name="arrow-undo-outline" size={20} color="#333" />
+                      </TouchableOpacity>
+                      <View style={styles.contextMenuDivider} />
+                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleForwardMessage}>
+                        <Text style={styles.contextMenuText}>Forward</Text>
+                        <Ionicons name="arrow-redo-outline" size={20} color="#333" />
+                      </TouchableOpacity>
+                      {selectedMessage.text && (
+                        <>
+                          <View style={styles.contextMenuDivider} />
+                          <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
+                            <Text style={styles.contextMenuText}>Copy</Text>
+                            <Ionicons name="copy-outline" size={20} color="#333" />
+                          </TouchableOpacity>
+                        </>
+                      )}
+                      <View style={styles.contextMenuDivider} />
+                      <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert('Speak', 'Text-to-speech funcționalitate în curând'); closeContextMenu(); }}>
+                        <Text style={styles.contextMenuText}>Speak</Text>
+                        <Ionicons name="volume-medium-outline" size={20} color="#333" />
+                      </TouchableOpacity>
+                      <View style={styles.contextMenuDivider} />
+                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
+                        <Text style={styles.contextMenuText}>Report</Text>
+                        <Ionicons name="warning-outline" size={20} color="#333" />
+                      </TouchableOpacity>
+                      {selectedMessage.senderId === userId && (
+                        <>
+                          <View style={styles.contextMenuDivider} />
+                          <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
+                            <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>Delete</Text>
+                            <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                </>
+              )}
+            </BlurView>
+          </Pressable>
+        </Modal>
       </KeyboardAvoidingView>
     );
   }
@@ -1004,6 +1483,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     width: '100%',
   },
+  messageRowCompact: {
+    marginBottom: 4,
+  },
   messageRowOwn: {
     alignSelf: 'flex-end',
   },
@@ -1086,17 +1568,23 @@ const styles = StyleSheet.create({
   moreBtn: {
     padding: 4,
   },
+  moreBtnTop: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 8,
+  },
   headerCenter: {
     flex: 1,
     alignItems: 'flex-start',
     justifyContent: 'center',
-    paddingLeft: 8,
+    paddingLeft: 0,
   },
   headerTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginLeft: 6,
+    marginLeft: 0,
   },
   headerAvatarClean: {
     width: 44,
@@ -1135,7 +1623,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   dateSeparator: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginVertical: 16,
   },
   dateSeparatorText: {
@@ -1144,11 +1634,21 @@ const styles = StyleSheet.create({
     color: '#888888',
     letterSpacing: 0.5,
   },
+  dateLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#e6e6e6',
+    marginHorizontal: 12,
+  },
+  messageGroup: {
+    flex: 1,
+  },
   messageBubbleClean: {
     paddingHorizontal: 14,
+    paddingRight: 24,
     paddingVertical: 10,
     borderRadius: 18,
-    maxWidth: '75%',
+    maxWidth: '75%', // original constraint for normal list; floating bubble will override if needed
     marginHorizontal: 12,
     shadowColor: '#000',
     shadowOpacity: 0.04,
@@ -1160,10 +1660,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
   },
-  messageTimeClean: {
-    fontSize: 10,
+  messageTimestamp: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 4,
-    alignSelf: 'flex-end',
+  },
+  messageTimeClean: {
+    fontSize: 11,
   },
   tickIconClean: {
     position: 'absolute',
@@ -1190,5 +1693,176 @@ const styles = StyleSheet.create({
   },
   sendBtnClean: {
     padding: 8,
+  },
+  // Reactions styles
+  reactionsContainer: {
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 4,
+    paddingHorizontal: 4,
+  },
+  reactionBubble: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    minWidth: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reactionEmoji: {
+    fontSize: 16,
+  },
+  reactionCount: {
+    fontSize: 11,
+    color: '#666666',
+    fontWeight: '600',
+  },
+  // Context menu styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contextMenuContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 16,
+    padding: 0,
+    width: Dimensions.get('window').width * 0.75,
+    maxWidth: 320,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
+  },
+  contextMessagePreview: {
+    padding: 16,
+    backgroundColor: '#f8f8f8',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: 120,
+  },
+  contextMessageText: {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 20,
+  },
+  contextMessageImage: {
+    width: '100%',
+    height: 80,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  quickReactions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8e8e8',
+  },
+  quickReactionButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  quickReactionEmoji: {
+    fontSize: 24,
+  },
+  reactionPicker: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  reactionPickerButton: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  reactionPickerEmoji: {
+    fontSize: 28,
+  },
+  contextMenu: {
+    backgroundColor: '#ffffff',
+  },
+  contextMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  contextMenuText: {
+    fontSize: 16,
+    color: '#333333',
+    fontWeight: '500',
+  },
+  contextMenuDivider: {
+    height: 0.5,
+    backgroundColor: '#e8e8e8',
+    marginHorizontal: 20,
+  },
+  // Dynamic absolute positioned elements
+  reactionBarAbsolute: {
+    position: 'absolute',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 28,
+    gap: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  reactionPickerDropdown: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    marginTop: 6,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 18,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 12,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  contextMenuAbsolute: {
+    position: 'absolute',
+    width: 300,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
+  },
+  floatingBubble: {
+    position: 'absolute',
+    zIndex: 20,
+    // width & left set dynamically
   },
 });
