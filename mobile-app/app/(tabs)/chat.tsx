@@ -17,6 +17,7 @@ import {
   Pressable,
   UIManager,
   findNodeHandle,
+  Linking,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
@@ -28,12 +29,13 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BackHandler } from 'react-native';
 import { useTabBar } from '../../src/context/TabBarContext';
 import { Ionicons } from '@expo/vector-icons';
-// LinearGradient removed — headers use solid colors now
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import api from '../../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../../src/services/storage';
 import { useAuth } from '../../src/context/AuthContext';
+import ImageViewing from 'react-native-image-viewing';
 // NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
 // NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
 // Dacă vrei snapshot real pentru web mai târziu, putem introduce o implementare fallback bazată pe canvas.
@@ -86,8 +88,8 @@ export default function ChatScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { hideTabBar, showTabBar } = useTabBar();
-  const [activeTab, setActiveTab] = useState<'buying' | 'selling'>('buying');
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversationFilter, setConversationFilter] = useState<'selling' | 'buying'>('buying');
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -104,8 +106,14 @@ export default function ChatScreen() {
   const [menuHeight, setMenuHeight] = useState(0);
   const [reactionBarWidth, setReactionBarWidth] = useState(0);
   const [reactionBarHeight, setReactionBarHeight] = useState(0);
+  const [floatingSnapshot, setFloatingSnapshot] = useState<string | null>(null);
+  const [floatingReady, setFloatingReady] = useState(false);
+  const [overlayPlacement, setOverlayPlacement] = useState<'above' | 'below'>('above');
   // Hold refs for each bubble to measure its screen position
   const bubbleRefs = useRef<Record<string, View | null>>({});
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageViewerImages, setImageViewerImages] = useState<{ uri: string }[]>([]);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
 
   const width = Dimensions.get('window').width;
   
@@ -159,26 +167,14 @@ export default function ChatScreen() {
           announcementId: conv.announcementId,
         };
       });
-
-      const sellingConversations = formattedConversations.filter(
-        (conv: Conversation) => conv.announcementOwnerId === userId
-      );
-      const buyingConversations = formattedConversations.filter(
-        (conv: Conversation) => conv.announcementOwnerId !== userId
-      );
-
-      if (activeTab === 'selling') {
-        setConversations(sellingConversations);
-      } else {
-        setConversations(buyingConversations);
-      }
+      setConversations(formattedConversations);
     } catch (error) {
       console.error('Error loading conversations:', error);
       setConversations([]);
     } finally {
       setLoading(false);
     }
-  }, [userId, activeTab]);
+  }, [userId]);
 
   useEffect(() => {
     fetchConversations();
@@ -571,6 +567,33 @@ export default function ChatScreen() {
     return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\\/]/, '')}`;
   };
 
+  const handleOpenImage = useCallback(
+    (uri?: string) => {
+      if (!uri) return;
+      if (Platform.OS === 'web') {
+        Linking.openURL(uri).catch((err) => console.error('Nu s-a putut deschide imaginea în browser.', err));
+        return;
+      }
+
+      const imageMessages = messages.filter((m) => !!m.image);
+      const gallery = imageMessages.length > 0 ? imageMessages.map((m) => ({ uri: m.image! })) : [{ uri }];
+      const initialIndex = imageMessages.findIndex((m) => m.image === uri);
+
+      setImageViewerImages(gallery);
+      setImageViewerIndex(initialIndex >= 0 ? initialIndex : 0);
+      setImageViewerVisible(true);
+    },
+    [messages]
+  );
+
+  const handleCloseImageViewer = useCallback(() => {
+    setImageViewerVisible(false);
+    setTimeout(() => {
+      setImageViewerImages([]);
+      setImageViewerIndex(0);
+    }, 250);
+  }, []);
+
   const getAvatarFallback = (name: string) => {
     const initial = name.slice(0, 1).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=355070&color=fff`;
@@ -579,6 +602,8 @@ export default function ChatScreen() {
   const handleLongPressMessage = (message: Message) => {
     // Haptic feedback
     try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
+    setFloatingSnapshot(null);
+    setFloatingReady(false);
     const ref = bubbleRefs.current[message._id];
     if (!ref) {
       setSelectedMessage(message);
@@ -604,7 +629,10 @@ export default function ChatScreen() {
       setSelectedMessage(message);
       setMenuPosition({ x, y, width, height, showAbove });
       setContextMenuVisible(true);
-
+      if (!captureRef) {
+        // Fallback clone will be used; consider it ready immediately
+        setFloatingReady(true);
+      }
       // Re-measure after a very short delay to get a stabilized height/width
       // (addresses race conditions where layout/line-wrapping can change slightly)
       setTimeout(() => {
@@ -616,8 +644,34 @@ export default function ChatScreen() {
             const showAbove2 = spaceBelow2 < estimatedMenuHeight && spaceAbove2 > spaceBelow2;
             setMenuPosition({ x: x2, y: y2, width: w2, height: h2, showAbove: showAbove2 });
           });
+          // Try to capture a pixel-perfect snapshot of the original bubble so we can
+          // render it above the BlurView (avoids blurring the message). This only
+          // works on native when captureRef is available; otherwise we'll fallback
+          // to rendering a cloned view above the blur.
+          if (captureRef) {
+            try {
+              // captureRef can fail if view transiently changes; ignore failures
+              // @ts-ignore
+              captureRef(ref, { format: 'png', quality: 1, result: 'tmpfile' })
+                .then((uri: string) => {
+                  setFloatingSnapshot(uri as string);
+                  setFloatingReady(true);
+                })
+                .catch(() => {
+                  // ignore, fallback handled in render
+                  setFloatingReady(true);
+                });
+            } catch (e) {
+              // ignore
+              setFloatingReady(true);
+            }
+          } else {
+            // captureRef unavailable → fallback clone considered ready already (if not yet set)
+            setFloatingReady(true);
+          }
         } catch (e) {
           // ignore failed re-measure
+          setFloatingReady(true);
         }
       }, 45);
     });
@@ -627,8 +681,38 @@ export default function ChatScreen() {
     setContextMenuVisible(false);
     setShowReactionPicker(false);
     setMenuPosition(null);
+    setFloatingSnapshot(null);
+    setFloatingReady(false);
     setTimeout(() => setSelectedMessage(null), 250);
   };
+
+  // Recompute where to place reaction bar + context menu so they NEVER overlap bubble
+  useEffect(() => {
+    if (!menuPosition || !contextMenuVisible) return;
+    const screenH = Dimensions.get('window').height;
+    const gap = 8; // base gap between elements
+    const rbH = reactionBarHeight || 48; // fallback estimate
+    const mH = menuHeight || 300; // until measured
+    const spaceAbove = menuPosition.y - insets.top;
+    const spaceBelow = screenH - (menuPosition.y + menuPosition.height) - insets.bottom;
+    const neededTotal = rbH + mH + gap * 3; // reaction bar + menu + gaps
+
+    if (spaceAbove >= neededTotal) {
+      setOverlayPlacement('above');
+      return;
+    }
+    if (spaceBelow >= neededTotal) {
+      setOverlayPlacement('below');
+      return;
+    }
+    // Not enough continuous space on either side for full stack.
+    // Choose side with more space; elements will compress toward bubble but keep gap.
+    if (spaceAbove >= spaceBelow) {
+      setOverlayPlacement('above');
+    } else {
+      setOverlayPlacement('below');
+    }
+  }, [menuPosition, reactionBarHeight, menuHeight, insets.top, insets.bottom, contextMenuVisible]);
 
   const handleReaction = async (emoji: string) => {
     if (!selectedMessage || !userId) return;
@@ -728,15 +812,15 @@ export default function ChatScreen() {
 
   const unreadConversations = conversations.filter((conv) => conv.unread);
   const readConversations = conversations.filter((conv) => !conv.unread);
+  const sellingConversations = conversations.filter((conv) => conv.announcementOwnerId === userId);
+  const buyingConversations = conversations.filter((conv) => conv.announcementOwnerId !== userId);
+  const filteredConversations = conversationFilter === 'selling' ? sellingConversations : buyingConversations;
+  const totalConversations = conversations.length;
 
   // If conversation is selected, show chat view
   if (selectedConversation) {
     return (
-      <KeyboardAvoidingView
-        style={[styles.container, { backgroundColor: '#ffffff' }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
+      <View style={[styles.container, { backgroundColor: '#ffffff' }]}>
         {/* Clean header with back button, seller avatar + name, and announcement preview below */}
         <View style={[styles.chatHeaderClean, { paddingTop: insets.top + 12, backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' }]}>
           {/* Center block: avatar + name (centered), announcement preview below */}
@@ -809,11 +893,17 @@ export default function ChatScreen() {
                   new Date(message.createdAt).toLocaleDateString() !== new Date(prevMessage.createdAt).toLocaleDateString();
 
                 // Only show the time for the last message in a run of messages that share the same minute
+                // BUT only collapse/hide the time when the next message is from the same sender.
                 const timeForMessage = formatTime(message.createdAt);
                 const nextMessage = idx < messages.length - 1 ? messages[idx + 1] : null;
                 const nextTime = nextMessage ? formatTime(nextMessage.createdAt) : null;
-                const showTime = !nextMessage || nextTime !== timeForMessage;
-                const compactBelow = !!nextMessage && nextTime === timeForMessage; // reduce spacing when next message has same minute
+                const sameSenderAsNext = !!nextMessage && nextMessage.senderId === message.senderId;
+                const sameTimeAsNext = !!nextMessage && nextTime === timeForMessage;
+                // showTime is true when there is no next message OR the next message either has a different time
+                // or is from a different sender. We only hide the time when both time and sender match.
+                const showTime = !nextMessage || !(sameTimeAsNext && sameSenderAsNext);
+                // compactBelow reduces spacing only when next message is from the same sender and same minute
+                const compactBelow = sameTimeAsNext && sameSenderAsNext;
 
                 return (
                   <View key={message._id}>
@@ -851,7 +941,7 @@ export default function ChatScreen() {
                           onLongPress={() => handleLongPressMessage(message)}
                           delayLongPress={400}
                           style={[
-                            styles.messageBubbleClean, 
+                            styles.messageBubbleClean,
                             isOwn
                               ? {
                                   backgroundColor: '#d1e7ff',
@@ -871,7 +961,6 @@ export default function ChatScreen() {
                                   borderBottomLeftRadius: 6,
                                   borderBottomRightRadius: 20,
                                 },
-                            selectedMessage && contextMenuVisible && selectedMessage._id === message._id ? { opacity: 0 } : null
                           ]}
                         >
                           {message.deleted ? (
@@ -884,7 +973,12 @@ export default function ChatScreen() {
                                 </Text>
                               )}
                               {message.image && (
-                                <Image source={{ uri: message.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
+                                <TouchableOpacity
+                                  activeOpacity={0.85}
+                                  onPress={() => handleOpenImage(message.image)}
+                                >
+                                  <Image source={{ uri: message.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
+                                </TouchableOpacity>
                               )}
                               {isOwn && (
                                 <Ionicons
@@ -920,7 +1014,11 @@ export default function ChatScreen() {
         </ScrollView>
 
         {/* Input bar with icons */}
-        <View style={[styles.inputContainerClean, { backgroundColor: '#ffffff', borderTopWidth: 1, borderTopColor: '#e0e0e0' }]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <View style={[styles.inputContainerClean, { backgroundColor: '#ffffff', borderTopWidth: 1, borderTopColor: '#e0e0e0' }]}>
           <TouchableOpacity style={styles.inputIcon} onPress={handlePickImagePress}>
             <Ionicons name="image-outline" size={26} color="#888888" />
           </TouchableOpacity>
@@ -942,474 +1040,469 @@ export default function ChatScreen() {
           >
             <Ionicons name="send" size={20} color="#100e9aff" />
           </TouchableOpacity>
-        </View>
+          </View>
+        </KeyboardAvoidingView>
+
+        {Platform.OS !== 'web' && (
+          <ImageViewing
+            images={imageViewerImages}
+            imageIndex={imageViewerIndex}
+            visible={imageViewerVisible}
+            onRequestClose={handleCloseImageViewer}
+            onImageIndexChange={setImageViewerIndex}
+            swipeToCloseEnabled
+            doubleTapToZoomEnabled
+            backgroundColor="rgba(0,0,0,0.96)"
+            HeaderComponent={() => (
+              <View style={[styles.imageViewerHeader, { paddingTop: insets.top + 12 }] }>
+                <TouchableOpacity
+                  onPress={handleCloseImageViewer}
+                  activeOpacity={0.85}
+                  style={styles.imageViewerCloseButton}
+                >
+                  <Ionicons name="close" size={22} color="#ffffff" />
+                </TouchableOpacity>
+              </View>
+            )}
+            FooterComponent={({ imageIndex }) =>
+              imageViewerImages.length > 1 ? (
+                <View style={[styles.imageViewerFooter, { paddingBottom: insets.bottom + 20 }] }>
+                  <Text style={styles.imageViewerFooterText}>{`${imageIndex + 1} / ${imageViewerImages.length}`}</Text>
+                </View>
+              ) : null
+            }
+          />
+        )}
 
         {/* Dynamic Context Menu Modal */}
-        <Modal visible={contextMenuVisible} transparent animationType="fade" onRequestClose={closeContextMenu}>
+  <Modal visible={contextMenuVisible} transparent animationType="none" onRequestClose={closeContextMenu}>
           <Pressable style={styles.modalOverlay} onPress={closeContextMenu}>
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="box-none">
-              {selectedMessage && menuPosition && (
-                <>
-                  {/* Floating original message bubble (above blur) */}
-                  <View
-                    pointerEvents="none"
-                    style={[
-                      styles.floatingBubble,
-                      {
-                        top: menuPosition.y,
-                        left: menuPosition.x,
-                        // Lock width to measured bubble; avoid forcing height (can clip wrapped text)
-                        width: menuPosition.width,
-                      },
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.messageBubbleClean,
-                        // Recreate original bubble visual without external margins (already accounted for in absolute positioning)
-                        selectedMessage.senderId === userId
-                          ? {
-                              backgroundColor: '#d1e7ff',
-                              borderTopLeftRadius: 20,
-                              borderTopRightRadius: 20,
-                              borderBottomLeftRadius: 20,
-                              borderBottomRightRadius: 6,
-                            }
-                          : {
-                              backgroundColor: '#f0f0f0',
-                              borderTopLeftRadius: 20,
-                              borderTopRightRadius: 20,
-                              borderBottomLeftRadius: 6,
-                              borderBottomRightRadius: 20,
-                            },
-                        { marginHorizontal: 0, width: '100%', maxWidth: undefined, alignItems: 'flex-start' },
-                      ]}
-                    >
-                      {selectedMessage.text && (
-                        <Text style={[styles.messageTextClean, { color: '#1a1a1a', flexShrink: 1, flexWrap: 'wrap' }]}>
-                          {selectedMessage.text}
-                        </Text>
-                      )}
-                      {selectedMessage.image && (
-                        <Image source={{ uri: selectedMessage.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
-                      )}
-                      {selectedMessage.senderId === userId && (
-                        <Ionicons
-                          name="checkmark-done"
-                          size={15}
-                          color={selectedMessage.isRead ? '#34B7F1' : '#888888'}
-                          style={styles.tickIconClean}
-                        />
-                      )}
-                    </View>
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
+            {selectedMessage && menuPosition && (
+              <>
+                {/* Floating snapshot OR fallback clone (unblurred) */}
+                {floatingReady && floatingSnapshot ? (
+                  <View pointerEvents="none" style={[styles.floatingBubble, { top: menuPosition.y, left: menuPosition.x, width: menuPosition.width, height: menuPosition.height, zIndex: 30 }]}> 
+                    <Image source={{ uri: floatingSnapshot }} style={{ width: menuPosition.width, height: menuPosition.height, borderRadius: 12 }} resizeMode="cover" />
                   </View>
+                ) : null}
+                {/* When snapshot unavailable (e.g., web), keep original bubble visible */}
 
-                  {/* Reaction bar */}
-                  <View
-                    onLayout={(e) => { setReactionBarWidth(e.nativeEvent.layout.width); setReactionBarHeight(e.nativeEvent.layout.height); }}
-                    style={[
-                      styles.reactionBarAbsolute,
-                      (() => {
-                        const screenW = Dimensions.get('window').width;
-                        const estWidth = reactionBarWidth || 280;
-                        const rbH = reactionBarHeight || 48;
-                        const top = Math.max(insets.top + 8, menuPosition.y - rbH - 8);
-                        const left = Math.max(8, Math.min(menuPosition.x + menuPosition.width / 2 - estWidth / 2, screenW - estWidth - 8));
-                        return { top, left };
-                      })(),
-                    ]}
-                  >
-                    {['👍', '❤️', '😂', '😮', '😢', '🙏'].map((emoji) => (
-                      <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.quickReactionButton}>
-                        <Text style={styles.quickReactionEmoji}>{emoji}</Text>
-                      </TouchableOpacity>
-                    ))}
-                    <TouchableOpacity onPress={() => setShowReactionPicker((p) => !p)} style={styles.quickReactionButton}>
-                      <Ionicons name={showReactionPicker ? 'close' : 'add-circle-outline'} size={24} color="#666" />
+                {/* Reaction bar (unblurred) */}
+                <View
+                  onLayout={(e) => { setReactionBarWidth(e.nativeEvent.layout.width); setReactionBarHeight(e.nativeEvent.layout.height); }}
+                  style={[
+                    styles.reactionBarAbsolute,
+                    { zIndex: 40 },
+                    (() => {
+                      const screenW = Dimensions.get('window').width;
+                      const estWidth = reactionBarWidth || 280;
+                      const rbH = reactionBarHeight || 48;
+                      const gap = 8;
+                      let top: number;
+                      if (overlayPlacement === 'above') {
+                        // place reaction bar just above bubble with gap
+                        top = menuPosition.y - rbH - gap;
+                        // if not enough space, clamp but do NOT let it overlap the bubble: if clamped, we might have to switch placement
+                        if (top < insets.top + gap) {
+                          // fallback: put below bubble
+                          top = menuPosition.y + menuPosition.height + gap;
+                        }
+                      } else {
+                        // below placement
+                        top = menuPosition.y + menuPosition.height + gap;
+                        const screenBottomLimit = Dimensions.get('window').height - insets.bottom - rbH - gap;
+                        if (top > screenBottomLimit) {
+                          // fallback: try above
+                          const alt = menuPosition.y - rbH - gap;
+                          if (alt >= insets.top + gap) top = alt; // else keep and allow scroll
+                        }
+                      }
+                      const left = Math.max(8, Math.min(menuPosition.x + menuPosition.width / 2 - estWidth / 2, screenW - estWidth - 8));
+                      return { top, left };
+                    })(),
+                  ]}
+                >
+                  {['👍', '❤️', '😂', '😮', '😢', '🙏'].map((emoji) => (
+                    <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.quickReactionButton}>
+                      <Text style={styles.quickReactionEmoji}>{emoji}</Text>
                     </TouchableOpacity>
-                    {showReactionPicker && (
-                      <View style={styles.reactionPickerDropdown}>
-                        {['🤩','😎','🔥','🎉','😔','🙌','👌','🥳','🤔','🤯'].map((emoji) => (
-                          <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.reactionPickerButton}>
-                            <Text style={styles.reactionPickerEmoji}>{emoji}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
+                  ))}
+                  <TouchableOpacity onPress={() => setShowReactionPicker((p) => !p)} style={styles.quickReactionButton}>
+                    <Ionicons name={showReactionPicker ? 'close' : 'add-circle-outline'} size={24} color="#666" />
+                  </TouchableOpacity>
+                  {showReactionPicker && (
+                    <View style={styles.reactionPickerDropdown}>
+                      {['🤩','😎','🔥','🎉','😔','🙌','👌','🥳','🤔','🤯'].map((emoji) => (
+                        <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.reactionPickerButton}>
+                          <Text style={styles.reactionPickerEmoji}>{emoji}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
+
+                {/* Context menu (unblurred) */}
+                <View
+                  onLayout={(e) => setMenuHeight(e.nativeEvent.layout.height)}
+                  style={[
+                    styles.contextMenuAbsolute,
+                    { zIndex: 50 },
+                    (() => {
+                      const win = Dimensions.get('window');
+                      const gap = 6;
+                      const rbH = reactionBarHeight || 48;
+                      const mH = menuHeight || 300;
+                      let reactionBarTop: number;
+                      // replicate reaction bar top logic (must match where we actually placed it):
+                      if (overlayPlacement === 'above') {
+                        reactionBarTop = Math.max(menuPosition.y - rbH - 8, insets.top + 8);
+                        if (reactionBarTop >= menuPosition.y - rbH - 8 + 1) {
+                          // if we had to clamp, placement might have changed; treat as below fallback
+                          if (reactionBarTop + rbH + gap > menuPosition.y) {
+                            // overlapping risk, treat as below
+                            reactionBarTop = menuPosition.y + menuPosition.height + 8;
+                          }
+                        }
+                      } else {
+                        reactionBarTop = menuPosition.y + menuPosition.height + 8;
+                      }
+                      let top: number;
+                      if (overlayPlacement === 'above') {
+                        top = reactionBarTop - mH - gap;
+                        if (top < insets.top + 8) {
+                          // fallback below stack
+                          top = reactionBarTop + rbH + gap;
+                          // ensure not overlapping bubble top if forced below while we intended above
+                          if (top < menuPosition.y + menuPosition.height + gap) {
+                            top = menuPosition.y + menuPosition.height + rbH + gap * 2;
+                          }
+                        }
+                      } else {
+                        // below placement
+                        top = reactionBarTop + rbH + gap;
+                        const maxTop = win.height - insets.bottom - mH - 8;
+                        if (top > maxTop) {
+                          // try above instead
+                          const alt = reactionBarTop - mH - gap;
+                          if (alt >= insets.top + 8) top = alt; else top = maxTop;
+                        }
+                      }
+                      const left = Math.max(8, Math.min(menuPosition.x, win.width - 300 - 8));
+                      return { top, left };
+                    })(),
+                  ]}
+                >
+                  <View style={styles.contextMenu}>
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
+                      <Text style={styles.contextMenuText}>Star</Text>
+                      <Ionicons name="star-outline" size={20} color="#333" />
+                    </TouchableOpacity>
+                    <View style={styles.contextMenuDivider} />
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
+                      <Text style={styles.contextMenuText}>Reply</Text>
+                      <Ionicons name="arrow-undo-outline" size={20} color="#333" />
+                    </TouchableOpacity>
+                    <View style={styles.contextMenuDivider} />
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={handleForwardMessage}>
+                      <Text style={styles.contextMenuText}>Forward</Text>
+                      <Ionicons name="arrow-redo-outline" size={20} color="#333" />
+                    </TouchableOpacity>
+                    {selectedMessage.text && (
+                      <>
+                        <View style={styles.contextMenuDivider} />
+                        <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
+                          <Text style={styles.contextMenuText}>Copy</Text>
+                          <Ionicons name="copy-outline" size={20} color="#333" />
+                        </TouchableOpacity>
+                      </>
+                    )}
+                    <View style={styles.contextMenuDivider} />
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert('Speak', 'Text-to-speech funcționalitate în curând'); closeContextMenu(); }}>
+                      <Text style={styles.contextMenuText}>Speak</Text>
+                      <Ionicons name="volume-medium-outline" size={20} color="#333" />
+                    </TouchableOpacity>
+                    <View style={styles.contextMenuDivider} />
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
+                      <Text style={styles.contextMenuText}>Report</Text>
+                      <Ionicons name="warning-outline" size={20} color="#333" />
+                    </TouchableOpacity>
+                    {selectedMessage.senderId === userId && (
+                      <>
+                        <View style={styles.contextMenuDivider} />
+                        <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
+                          <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>Delete</Text>
+                          <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+                        </TouchableOpacity>
+                      </>
                     )}
                   </View>
-
-                  {/* Context menu (above or below) without duplicate preview */}
-                  <View
-                    onLayout={(e) => setMenuHeight(e.nativeEvent.layout.height)}
-                    style={[
-                      styles.contextMenuAbsolute,
-                      (() => {
-                        const win = Dimensions.get('window');
-                        const rbH = reactionBarHeight || 48;
-                        const reactionBarTop = Math.max(insets.top + 8, menuPosition.y - rbH - 8);
-                        const top = menuPosition.showAbove
-                          ? Math.max(insets.top + 8, reactionBarTop - (menuHeight || 0) - 6)
-                          : Math.min(win.height - insets.bottom - menuHeight - 8, menuPosition.y + menuPosition.height + 12);
-                        const left = Math.max(8, Math.min(menuPosition.x, win.width - 300 - 8));
-                        return { top, left };
-                      })(),
-                    ]}
-                  >
-                    <View style={styles.contextMenu}>
-                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
-                        <Text style={styles.contextMenuText}>Star</Text>
-                        <Ionicons name="star-outline" size={20} color="#333" />
-                      </TouchableOpacity>
-                      <View style={styles.contextMenuDivider} />
-                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
-                        <Text style={styles.contextMenuText}>Reply</Text>
-                        <Ionicons name="arrow-undo-outline" size={20} color="#333" />
-                      </TouchableOpacity>
-                      <View style={styles.contextMenuDivider} />
-                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleForwardMessage}>
-                        <Text style={styles.contextMenuText}>Forward</Text>
-                        <Ionicons name="arrow-redo-outline" size={20} color="#333" />
-                      </TouchableOpacity>
-                      {selectedMessage.text && (
-                        <>
-                          <View style={styles.contextMenuDivider} />
-                          <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
-                            <Text style={styles.contextMenuText}>Copy</Text>
-                            <Ionicons name="copy-outline" size={20} color="#333" />
-                          </TouchableOpacity>
-                        </>
-                      )}
-                      <View style={styles.contextMenuDivider} />
-                      <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert('Speak', 'Text-to-speech funcționalitate în curând'); closeContextMenu(); }}>
-                        <Text style={styles.contextMenuText}>Speak</Text>
-                        <Ionicons name="volume-medium-outline" size={20} color="#333" />
-                      </TouchableOpacity>
-                      <View style={styles.contextMenuDivider} />
-                      <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
-                        <Text style={styles.contextMenuText}>Report</Text>
-                        <Ionicons name="warning-outline" size={20} color="#333" />
-                      </TouchableOpacity>
-                      {selectedMessage.senderId === userId && (
-                        <>
-                          <View style={styles.contextMenuDivider} />
-                          <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
-                            <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>Delete</Text>
-                            <Ionicons name="trash-outline" size={20} color="#ff3b30" />
-                          </TouchableOpacity>
-                        </>
-                      )}
-                    </View>
-                  </View>
-                </>
-              )}
-            </BlurView>
+                </View>
+              </>
+            )}
           </Pressable>
         </Modal>
-      </KeyboardAvoidingView>
+      </View>
     );
   }
 
   // Conversation list view
   return (
-    <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
-      {/* Header with solid primary color */}
-      <View style={[styles.gradientHeader, { paddingTop: insets.top + 16, backgroundColor: primaryColor }]}> 
-        <View style={styles.headerContent}>
-          <View style={styles.headerTopRow}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.headerBackBtn}>
-              <Ionicons name="arrow-back" size={24} color="#ffffff" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>MESSAGES</Text>
-            <TouchableOpacity style={styles.searchIconBtn}>
-              <Ionicons name="search" size={24} color="#ffffff" />
-            </TouchableOpacity>
+    <View style={[styles.listContainer, { backgroundColor: tokens.colors.bg }]}> 
+      <LinearGradient
+        colors={['#355070', '#2a4160']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.listHeaderGradient, { paddingTop: insets.top + 18 }]}
+      >
+        <View style={styles.listHeaderTopRow}>
+          <View>
+            <Text style={styles.listHeaderTitle}>Mesaje ({totalConversations})</Text>
+            <Text style={styles.listHeaderSubtitle}>Continuă conversațiile tale</Text>
           </View>
-          
-          {/* Horizontal Scrolling Avatars */}
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.avatarScroll}
-            style={{ marginTop: 16 }}
-          >
-            {conversations.slice(0, 8).map((conv, idx) => (
-              <TouchableOpacity 
-                key={conv.conversationId}
-                onPress={() => setSelectedConversation(conv)}
-                style={styles.storyAvatar}
+          <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85}>
+            <Ionicons name="search" size={22} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.filterSegment}>
+          {(['buying', 'selling'] as const).map((filterKey) => (
+            <TouchableOpacity
+              key={filterKey}
+              style={[
+                styles.filterButton,
+                conversationFilter === filterKey && styles.filterButtonActive,
+              ]}
+              activeOpacity={0.85}
+              onPress={() => setConversationFilter(filterKey)}
+            >
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  conversationFilter === filterKey && styles.filterButtonTextActive,
+                ]}
               >
-                <View style={styles.avatarWrapper}>
-                  <Image 
-                    source={{ uri: conv.avatar || conv.participantAvatar || getAvatarFallback(conv.participantName) }} 
-                    style={styles.storyImage} 
+                {filterKey === 'buying' ? 'De cumpărat' : 'De vândut'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </LinearGradient>
+
+  <View style={[styles.listContentWrapper, { backgroundColor: 'transparent', marginTop: 0, paddingTop: 0 }] }>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.listContent}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#355070" />}
+        >
+          {loading && conversations.length === 0 ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#355070" />
+              <Text style={[styles.loadingText, { color: '#6d7a99' }]}>Se încarcă conversațiile...</Text>
+            </View>
+          ) : filteredConversations.length > 0 ? (
+            filteredConversations.map((conv) => (
+              <TouchableOpacity
+                key={conv.conversationId}
+                activeOpacity={0.9}
+                onPress={async () => {
+                  setSelectedConversation(conv);
+                  setConversations((prev) =>
+                    prev.map((c) => (c.conversationId === conv.conversationId ? { ...c, unread: false } : c))
+                  );
+                  if (conv.unread) {
+                    try {
+                      await api.put(`/api/messages/conversation/${conv.conversationId}/mark-read`);
+                    } catch (e) {
+                      // ignore
+                    }
+                  }
+                }}
+                style={[styles.conversationCardFlat, conv.unread && styles.conversationCardUnread, { borderBottomColor: tokens.colors.border }]}
+              >
+                <View style={styles.conversationAvatarWrapper}>
+                  <Image
+                    source={{ uri: conv.avatar || conv.participantAvatar || getAvatarFallback(conv.participantName) }}
+                    style={styles.conversationAvatar}
                   />
-                  {conv.unread && <View style={styles.onlineDot} />}
+                  {conv.unread && (
+                    <View style={styles.conversationBadge}>
+                      <Text style={styles.conversationBadgeText}>•</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.conversationInfo}>
+                  <View style={styles.conversationRowTop}>
+                    <Text style={styles.conversationName} numberOfLines={1}>
+                      {conv.participantName}
+                    </Text>
+                    <Text style={styles.conversationTime}>{conv.time}</Text>
+                  </View>
+                  <Text style={styles.conversationSnippet} numberOfLines={1}>
+                    {conv.lastMessage}
+                  </Text>
+                  <Text style={styles.conversationTopic} numberOfLines={1}>
+                    {conv.announcementTitle}
+                  </Text>
                 </View>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-  </View>
-
-      {/* Tabs */}
-      <View style={[styles.tabs, { backgroundColor: tokens.colors.surface }]}>
-        <TouchableOpacity
-          onPress={() => setActiveTab('buying')}
-          style={[styles.tab, activeTab === 'buying' && { backgroundColor: accent }]}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'buying' ? '#fff' : tokens.colors.muted }]}>Cumpărare</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setActiveTab('selling')}
-          style={[styles.tab, activeTab === 'selling' && { backgroundColor: accent }]}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'selling' ? '#fff' : tokens.colors.muted }]}>Vânzare</Text>
-        </TouchableOpacity>
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="chatbubbles-outline" size={80} color="#b4bed8" />
+              <Text style={[styles.emptyText, { color: '#6d7a99' }]}>Nu există conversații {conversationFilter === 'buying' ? 'de cumpărat' : 'de vândut'} momentan.</Text>
+            </View>
+          )}
+        </ScrollView>
       </View>
-
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />}
-      >
-        {loading && conversations.length === 0 ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={tokens.colors.primary} />
-            <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă conversațiile...</Text>
-          </View>
-        ) : (
-          <>
-            {/* Unread section */}
-            {unreadConversations.length > 0 && (
-              <>
-                {unreadConversations.map((conv) => (
-                  <TouchableOpacity
-                    key={conv.conversationId}
-                    onPress={async () => {
-                      setSelectedConversation(conv);
-                      setConversations((prev) =>
-                        prev.map((c) => (c.conversationId === conv.conversationId ? { ...c, unread: false } : c))
-                      );
-                      try {
-                        await api.put(`/api/messages/conversation/${conv.conversationId}/mark-read`);
-                      } catch (e) {}
-                    }}
-                    style={[styles.conversationItem, { backgroundColor: tokens.colors.surface }]}
-                  >
-                    <View style={styles.avatarBadgeWrapper}>
-                      <Image source={{ uri: conv.avatar || conv.participantAvatar || getAvatarFallback(conv.participantName) }} style={styles.avatar} />
-                      {conv.unread && <View style={styles.unreadBadge} />}
-                    </View>
-                    <View style={styles.conversationContent}>
-                      <View style={styles.convTopRow}>
-                        <Text style={[styles.convName, { color: tokens.colors.text }]} numberOfLines={1}>
-                          {conv.participantName}
-                        </Text>
-                        <Text style={[styles.convTime, { color: tokens.colors.muted }]}>{conv.time}</Text>
-                      </View>
-                      <Text style={[styles.convMessage, { color: tokens.colors.text, fontWeight: '600' }]} numberOfLines={1}>
-                        {conv.lastMessage}
-                      </Text>
-                      <Text style={[styles.convSubtitle, { color: tokens.colors.muted }]} numberOfLines={1}>
-                        {conv.announcementTitle}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </>
-            )}
-
-            {/* Read section */}
-            {readConversations.length > 0 && (
-              <>
-                {readConversations.map((conv) => (
-                  <TouchableOpacity
-                    key={conv.conversationId}
-                    onPress={() => setSelectedConversation(conv)}
-                    style={[styles.conversationItem, { backgroundColor: tokens.colors.surface }]}
-                  >
-                    <View style={styles.avatarBadgeWrapper}>
-                      <Image source={{ uri: conv.avatar || conv.participantAvatar || getAvatarFallback(conv.participantName) }} style={styles.avatar} />
-                    </View>
-                    <View style={styles.conversationContent}>
-                      <View style={styles.convTopRow}>
-                        <Text style={[styles.convName, { color: tokens.colors.text }]} numberOfLines={1}>
-                          {conv.participantName}
-                        </Text>
-                        <Text style={[styles.convTime, { color: tokens.colors.muted }]}>{conv.time}</Text>
-                      </View>
-                      <Text style={[styles.convMessage, { color: tokens.colors.muted }]} numberOfLines={1}>
-                        {conv.lastMessage}
-                      </Text>
-                      <Text style={[styles.convSubtitle, { color: tokens.colors.muted }]} numberOfLines={1}>
-                        {conv.announcementTitle}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </>
-            )}
-            
-            {conversations.length === 0 && !loading && (
-              <View style={styles.emptyContainer}>
-                <Ionicons name="chatbubbles-outline" size={80} color={tokens.colors.placeholder} />
-                <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>
-                  {activeTab === 'buying' ? 'Nicio conversație de cumpărare' : 'Nicio conversație de vânzare'}
-                </Text>
-              </View>
-            )}
-          </>
-        )}
-      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  // Modern gradient header
-  gradientHeader: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
+  listContainer: {
+    flex: 1,
   },
-  headerContent: {
-    gap: 8,
+  listHeaderGradient: {
+    paddingHorizontal: 24,
+    paddingBottom: 36,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
-  headerTopRow: {
+  listHeaderTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 24,
   },
-  headerBackBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  headerTitle: {
-    fontSize: 18,
+  listHeaderTitle: {
+    fontSize: 28,
     fontWeight: '700',
     color: '#ffffff',
-    letterSpacing: 1,
-    flex: 1,
-    textAlign: 'center',
+    letterSpacing: 0.4,
   },
-  searchIconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  listHeaderSubtitle: {
+    marginTop: 8,
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.75)',
+  },
+  headerIconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
-  // Horizontal avatar scroll
-  avatarScroll: {
-    paddingVertical: 4,
-    gap: 16,
-  },
-  storyAvatar: {
-    alignItems: 'center',
-  },
-  avatarWrapper: {
-    position: 'relative',
-  },
-  storyImage: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    borderWidth: 3,
-    borderColor: '#ffffff',
-  },
-  onlineDot: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#4CAF50',
-    borderWidth: 2,
-    borderColor: '#ffffff',
-  },
-  // Tabs
-  tabs: {
+  filterSegment: {
     flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    padding: 4,
+    borderRadius: 999,
+    alignSelf: 'flex-start',
   },
-  tab: {
-    flex: 1,
+  filterButton: {
     paddingVertical: 10,
-    borderRadius: 20,
-    alignItems: 'center',
+    paddingHorizontal: 22,
+    borderRadius: 999,
   },
-  tabText: {
+  filterButtonActive: {
+    backgroundColor: '#ffffff',
+  },
+  filterButtonText: {
     fontSize: 14,
     fontWeight: '600',
+    color: 'rgba(255,255,255,0.8)',
   },
-  // Conversation list
-  conversationItem: {
+  filterButtonTextActive: {
+    color: '#355070',
+  },
+  listContentWrapper: {
+    flex: 1,
+    marginTop: 0,
+    backgroundColor: 'transparent',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    paddingTop: 0,
+  },
+  listContent: {
+    paddingBottom: 48,
+    paddingHorizontal: 20,
+  },
+  conversationCard: {
+    // kept for backward compatibility; use flat variant for list
+  },
+  conversationCardFlat: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    padding: 16,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e6e6e6',
   },
-  avatarBadgeWrapper: {
+  conversationCardUnread: {
+    borderWidth: 1.2,
+    borderColor: 'rgba(53, 80, 112, 0.25)',
+  },
+  conversationAvatarWrapper: {
     position: 'relative',
+    marginRight: 16,
   },
-  avatar: {
+  conversationAvatar: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    borderWidth: 2,
-    borderColor: '#F8B195',
   },
-  unreadBadge: {
+  conversationBadge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#F8B195',
+    bottom: -3,
+    right: -3,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#355070',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: '#ffffff',
   },
-  conversationContent: {
-    flex: 1,
-    gap: 2,
+  conversationBadgeText: {
+    color: '#ffffff',
+    fontSize: 16,
+    marginTop: -4,
   },
-  convTopRow: {
+  conversationInfo: {
+    flex: 1,
+  },
+  conversationRowTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  conversationName: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#273043',
+    marginRight: 12,
+  },
+  conversationTime: {
+    fontSize: 12,
+    color: '#7f89a8',
+  },
+  conversationSnippet: {
+    fontSize: 14,
+    color: '#46506a',
     marginBottom: 4,
   },
-  convName: {
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-  },
-  convMessage: {
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  convSubtitle: {
+  conversationTopic: {
     fontSize: 13,
-  },
-  convTime: {
-    fontSize: 12,
+    color: '#9aa3c0',
   },
   loadingContainer: {
     flex: 1,
@@ -1509,6 +1602,40 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 16,
     marginBottom: 6,
+  },
+  imageViewerHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  imageViewerCloseButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageViewerFooter: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 24,
+  },
+  imageViewerFooterText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '600',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
   },
   messageTime: {
     fontSize: 11,

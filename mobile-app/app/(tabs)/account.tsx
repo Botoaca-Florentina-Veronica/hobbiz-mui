@@ -97,8 +97,8 @@ export default function AccountScreen() {
         <View style={[styles.profileCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatarOuter}>
-              <View style={[styles.halfTop, { backgroundColor: '#ffffff' }]} />
-              <View style={[styles.halfBottom, { backgroundColor: '#F8B195' }]} />
+              <View style={[styles.halfTop, { backgroundColor: '#355070' }]} />
+              <View style={[styles.halfBottom, { backgroundColor: '#355070' }]} />
               <View style={[styles.avatarInner, { backgroundColor: tokens.colors.surface }]}> 
                 {user?.avatar ? (
                   <Image 
@@ -319,6 +319,7 @@ const styles = StyleSheet.create({
     padding: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    borderColor: '#2ecc71',
   },
   // Two-tone avatar outer ring
   avatarOuter: {

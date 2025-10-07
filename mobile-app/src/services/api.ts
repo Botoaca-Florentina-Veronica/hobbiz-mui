@@ -50,6 +50,8 @@ const api = axios.create({
     'Content-Type': 'application/json'
   },
   withCredentials: true,
+  // Increase timeout for slower/dev networks (ms). Previously requests could fail quickly
+  timeout: 15000,
 });
 
 // Log chosen baseURL for easier debugging in Expo console
@@ -89,7 +91,21 @@ api.interceptors.response.use(
       const cfg = error?.config || {};
       const base = cfg.baseURL || api.defaults.baseURL;
       const url = cfg.url || '(unknown)';
-      console.error('[mobile-app] API error:', error?.message, 'baseURL:', base, 'url:', url);
+      // Detect timeouts vs other network errors
+      const isTimeout = error?.code === 'ECONNABORTED' || (error?.message || '').toLowerCase().includes('timeout');
+      if (isTimeout) {
+        console.error('[mobile-app] API timeout:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
+      } else {
+        console.error('[mobile-app] API error:', error?.message, 'baseURL:', base, 'url:', url);
+      }
+
+      // Simple one-time retry for transient network errors/timeouts
+      if (cfg && !cfg.__isRetryRequest && (isTimeout || error?.message === 'Network Error')) {
+        // mark it so we don't loop
+        cfg.__isRetryRequest = true;
+        // small backoff before retrying
+        return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => api(cfg));
+      }
     } catch (e) {
       // ignore
     }
