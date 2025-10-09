@@ -6,9 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
+import api from '../src/services/api';
 
 export default function ProfileScreen() {
   const { tokens } = useAppTheme();
@@ -18,6 +19,30 @@ export default function ProfileScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { userId } = useLocalSearchParams<{ userId?: string }>();
+  const [publicProfile, setPublicProfile] = React.useState<any | null>(null);
+  const [loadingPublic, setLoadingPublic] = React.useState(false);
+
+  // If userId present in query, fetch public profile for that user
+  React.useEffect(() => {
+    const fetchPublic = async () => {
+      if (!userId) {
+        setPublicProfile(null);
+        return;
+      }
+      try {
+        setLoadingPublic(true);
+        const res = await api.get(`/api/users/profile/${encodeURIComponent(String(userId))}`);
+        setPublicProfile(res.data);
+      } catch (e) {
+        console.error('Error loading public profile:', e);
+        setPublicProfile(null);
+      } finally {
+        setLoadingPublic(false);
+      }
+    };
+    fetchPublic();
+  }, [userId]);
 
   // Format member since date
   const formatMemberDate = (dateStr?: string) => {
@@ -26,6 +51,8 @@ export default function ProfileScreen() {
     const months = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
+
+  const profileToShow = publicProfile || user;
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
@@ -58,7 +85,7 @@ export default function ProfileScreen() {
           >
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>My Profile</ThemedText>
+          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'My Profile'}</ThemedText>
           <TouchableOpacity
             onPress={() => router.push('/settings')}
             activeOpacity={0.7}
@@ -71,8 +98,8 @@ export default function ProfileScreen() {
         {/* Profile Header Card - Avatar + Rating + Name */}
         <View style={[styles.profileHeaderCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.avatarContainer}>
-            {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            {profileToShow?.avatar ? (
+              <Image source={{ uri: profileToShow.avatar }} style={styles.avatar} />
             ) : (
               <View style={[styles.avatarPlaceholder, { backgroundColor: '#E8F0FE' }]}>
                 <Ionicons name="person" size={32} color={pageAccent} />
@@ -87,11 +114,11 @@ export default function ProfileScreen() {
             </View>
 
             <ThemedText style={[styles.userName, { color: tokens.colors.text }]}>
-              {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Utilizator'}
+              {profileToShow?.firstName && profileToShow?.lastName ? `${profileToShow.firstName} ${profileToShow.lastName}` : 'Utilizator'}
             </ThemedText>
             
             <ThemedText style={[styles.registerDate, { color: tokens.colors.muted }]}>
-              Membru din {formatMemberDate(user?.createdAt)}
+              Membru din {formatMemberDate(profileToShow?.createdAt)}
             </ThemedText>
           </View>
         </View>
@@ -106,9 +133,9 @@ export default function ProfileScreen() {
           </View>
           
           <View style={[styles.mapContainer, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            {user?.localitate ? (
+            {profileToShow?.localitate ? (
               (() => {
-                const encoded = encodeURIComponent(user.localitate);
+                const encoded = encodeURIComponent(profileToShow.localitate);
                 const key = (Constants?.expoConfig?.extra?.VITE_GOOGLE_MAPS_KEY as string) || (Constants?.manifest?.extra?.VITE_GOOGLE_MAPS_KEY as string) || process.env?.EXPO_PUBLIC_GOOGLE_MAPS_KEY || process.env?.VITE_GOOGLE_MAPS_KEY;
                 const mapUrl = key
                   ? `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encoded}`
@@ -193,7 +220,7 @@ export default function ProfileScreen() {
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Telefon</ThemedText>
                 <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]}>
-                  {user?.phone || 'N/A'}
+                  {profileToShow?.phone || 'N/A'}
                 </ThemedText>
               </View>
             </View>
@@ -203,7 +230,7 @@ export default function ProfileScreen() {
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Email</ThemedText>
                 <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]} numberOfLines={1}>
-                  {user?.email || 'N/A'}
+                  {profileToShow?.email || 'N/A'}
                 </ThemedText>
               </View>
             </View>

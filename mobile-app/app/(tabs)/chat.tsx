@@ -15,6 +15,7 @@ import {
   Alert,
   Modal,
   Pressable,
+  Keyboard,
   UIManager,
   findNodeHandle,
   Linking,
@@ -103,7 +104,10 @@ export default function ChatScreen() {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   // dynamic menu positioning states
   const [menuPosition, setMenuPosition] = useState<null | { x: number; y: number; width: number; height: number; showAbove: boolean }>(null);
-  const [menuHeight, setMenuHeight] = useState(0);
+  const [menuHeight, setMenuHeight] = useState(0); // reserved for future measuring if needed
+  const FIXED_MENU_WIDTH = 300;
+  const MENU_ITEM_HEIGHT = 48;
+  const MENU_DIVIDER_HEIGHT = StyleSheet.hairlineWidth || 1;
   const [reactionBarWidth, setReactionBarWidth] = useState(0);
   const [reactionBarHeight, setReactionBarHeight] = useState(0);
   const [floatingSnapshot, setFloatingSnapshot] = useState<string | null>(null);
@@ -114,6 +118,8 @@ export default function ChatScreen() {
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageViewerImages, setImageViewerImages] = useState<{ uri: string }[]>([]);
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
+  const [bubbleLayoutsMap, setBubbleLayoutsMap] = useState<Record<string, {x:number;y:number;width:number;height:number}>>({});
+  const [reactionDimsMap, setReactionDimsMap] = useState<Record<string, {width:number;height:number}>>({});
 
   const width = Dimensions.get('window').width;
   
@@ -602,6 +608,8 @@ export default function ChatScreen() {
   const handleLongPressMessage = (message: Message) => {
     // Haptic feedback
     try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
+    // Ensure the keyboard doesn't steal vertical space when opening the menu
+    try { Keyboard.dismiss(); } catch {}
     setFloatingSnapshot(null);
     setFloatingReady(false);
     const ref = bubbleRefs.current[message._id];
@@ -689,10 +697,13 @@ export default function ChatScreen() {
   // Recompute where to place reaction bar + context menu so they NEVER overlap bubble
   useEffect(() => {
     if (!menuPosition || !contextMenuVisible) return;
-    const screenH = Dimensions.get('window').height;
-    const gap = 8; // base gap between elements
-    const rbH = reactionBarHeight || 48; // fallback estimate
-    const mH = menuHeight || 300; // until measured
+  const screenH = Dimensions.get('window').height;
+  const gap = 8; // base gap between elements
+  const rbH = reactionBarHeight || 48; // fallback estimate
+  const menuCountBase = 6; // Star, Reply, Forward, Copy, Speak, Report
+  const includeDelete = !!(selectedMessage && String(selectedMessage.senderId) === String(userId) && !selectedMessage.deleted);
+  const mCount = menuCountBase + (includeDelete ? 1 : 0);
+  const mH = mCount * MENU_ITEM_HEIGHT + Math.max(0, mCount - 1) * MENU_DIVIDER_HEIGHT;
     const spaceAbove = menuPosition.y - insets.top;
     const spaceBelow = screenH - (menuPosition.y + menuPosition.height) - insets.bottom;
     const neededTotal = rbH + mH + gap * 3; // reaction bar + menu + gaps
@@ -744,6 +755,19 @@ export default function ChatScreen() {
 
   const handleDeleteMessage = async () => {
     if (!selectedMessage) return;
+    // Only allow actual delete if current user is the sender
+    if (String(selectedMessage.senderId) !== String(userId)) {
+      Alert.alert('Nu poți șterge', 'Nu ești proprietarul acestui mesaj. Poți folosi Raportează dacă este neadecvat.');
+      closeContextMenu();
+      return;
+    }
+
+    if (selectedMessage.deleted) {
+      Alert.alert('Mesaj deja șters', 'Acest mesaj este deja marcat ca șters.');
+      closeContextMenu();
+      return;
+    }
+
     Alert.alert(
       'Șterge mesaj',
       'Ești sigur că vrei să ștergi acest mesaj?',
@@ -774,10 +798,24 @@ export default function ChatScreen() {
   };
 
   const handleCopyMessage = async () => {
-    if (selectedMessage?.text) {
-      await Clipboard.setStringAsync(selectedMessage.text);
-      Alert.alert('Copiat', 'Mesajul a fost copiat.');
+    if (!selectedMessage) return;
+    try {
+      if (selectedMessage.text) {
+        await Clipboard.setStringAsync(selectedMessage.text);
+        Alert.alert('Copiat', 'Mesajul a fost copiat.');
+        closeContextMenu();
+        return;
+      }
+      if (selectedMessage.image) {
+        await Clipboard.setStringAsync(selectedMessage.image);
+        Alert.alert('Copiat', 'Link-ul imaginii a fost copiat.');
+        closeContextMenu();
+        return;
+      }
+      Alert.alert('Nimic de copiat', 'Mesajul nu conține text sau imagine ce poate fi copiat.');
       closeContextMenu();
+    } catch (err) {
+      console.error('Copy error:', err);
     }
   };
 
@@ -794,9 +832,43 @@ export default function ChatScreen() {
   };
 
   const handleStarMessage = () => {
-    // TODO: implement star/favorite functionality
-    Alert.alert('Star', 'Funcționalitate în curând');
-    closeContextMenu();
+    if (!selectedMessage || !userId) return;
+    (async () => {
+      try {
+        const key = `starredMessages:${userId}`;
+        console.log('[star] key=', key, 'messageId=', selectedMessage._id);
+        const raw = await storage.getItemAsync(key);
+        const list = raw ? JSON.parse(raw) : [];
+        const exists = list.find((s: any) => String(s._id) === String(selectedMessage._id));
+        if (exists) {
+          const updated = list.filter((s: any) => String(s._id) !== String(selectedMessage._id));
+          await storage.setItemAsync(key, JSON.stringify(updated));
+          console.log('[star] removed, newCount=', updated.length);
+          Alert.alert('Removed', 'Mesajul a fost eliminat din favorite.');
+        } else {
+          // store minimal message snapshot
+          const snapshot = {
+            _id: selectedMessage._id,
+            conversationId: selectedMessage.conversationId,
+            senderId: selectedMessage.senderId,
+            text: selectedMessage.text,
+            image: selectedMessage.image,
+            createdAt: selectedMessage.createdAt,
+          };
+          list.push(snapshot);
+          await storage.setItemAsync(key, JSON.stringify(list));
+          const confirmRaw = await storage.getItemAsync(key);
+          const confirmList = confirmRaw ? JSON.parse(confirmRaw) : [];
+          console.log('[star] saved, newCount=', confirmList.length);
+          Alert.alert('Saved', `Mesajul a fost marcat cu stea. (${confirmList.length} total)`);
+        }
+      } catch (err) {
+        console.error('Star error:', err);
+        Alert.alert('Eroare', 'Nu s-a putut actualiza mesajele favorite.');
+      } finally {
+        closeContextMenu();
+      }
+    })();
   };
 
   const handleReportMessage = () => {
@@ -829,11 +901,25 @@ export default function ChatScreen() {
               <TouchableOpacity onPress={() => setSelectedConversation(null)} style={styles.backBtnClean}>
                 <Ionicons name="arrow-back" size={26} color="#000000" />
               </TouchableOpacity>
-              <Image
-                source={{ uri: selectedConversation.participantAvatar || getAvatarFallback(selectedConversation.participantName) }}
-                style={styles.headerAvatarClean}
-              />
-              <Text style={styles.headerNameClean}>{selectedConversation.participantName}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  const otherId = selectedConversation.id || selectedConversation.otherParticipant?.id;
+                  if (!otherId) return;
+                  try {
+                    router.push(`/profile?userId=${encodeURIComponent(String(otherId))}`);
+                  } catch (e) {
+                    // ignore navigation errors
+                  }
+                }}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+                activeOpacity={0.8}
+              >
+                <Image
+                  source={{ uri: selectedConversation.participantAvatar || getAvatarFallback(selectedConversation.participantName) }}
+                  style={styles.headerAvatarClean}
+                />
+                <Text style={styles.headerNameClean}>{selectedConversation.participantName}</Text>
+              </TouchableOpacity>
             </View>
 
             {/* thin separator between title row and announcement preview */}
@@ -861,7 +947,7 @@ export default function ChatScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={[styles.moreBtn, styles.moreBtnTop]}>
+          <TouchableOpacity style={[styles.moreBtn, styles.moreBtnTop, { top: insets.top + 12 }]}>
             <Ionicons name="ellipsis-vertical" size={22} color="#000000" />
           </TouchableOpacity>
         </View>
@@ -920,24 +1006,93 @@ export default function ChatScreen() {
 
                     {/* Message bubble */}
                     <View style={[styles.messageRow, isOwn && styles.messageRowOwn, compactBelow && styles.messageRowCompact]}>
-                      <View style={styles.messageGroup}>
-                        {/* Reactions display above message */}
-                        {message.reactions && message.reactions.length > 0 && (
-                          <View style={[styles.reactionsContainer, isOwn ? { alignSelf: 'flex-end', marginRight: 12 } : { alignSelf: 'flex-start', marginLeft: 12 }]}>
-                            {message.reactions.slice(0, 3).map((reaction, rIdx) => (
-                              <View key={`${reaction.userId}-${reaction.emoji}-${rIdx}`} style={styles.reactionBubble}>
-                                <Text style={styles.reactionEmoji}>{reaction.emoji}</Text>
-                              </View>
-                            ))}
-                            {message.reactions.length > 3 && (
-                              <View style={styles.reactionBubble}>
-                                <Text style={styles.reactionCount}>+{message.reactions.length - 3}</Text>
-                              </View>
-                            )}
-                          </View>
-                        )}
+                      <View style={[styles.messageGroup, { position: 'relative' }]}>
+                        {/* Reactions display above message - absolutely positioned next to bubble */}
+                        {message.reactions && message.reactions.length > 0 && (() => {
+                          // Group reactions by emoji and count how many of each
+                          const counts: Record<string, number> = {};
+                          (message.reactions || []).forEach((r) => {
+                            counts[r.emoji] = (counts[r.emoji] || 0) + 1;
+                          });
+                          const entries = Object.keys(counts).map((emoji) => ({ emoji, count: counts[emoji] }));
+                          // sort by count desc then emoji for deterministic order
+                          entries.sort((a, b) => b.count - a.count || a.emoji.localeCompare(b.emoji));
+                          const visible = entries.slice(0, 3);
+                          const more = Math.max(0, entries.length - visible.length);
+                          // compute absolute position if we have bubble layout and reaction dims
+                          const bLayout = bubbleLayoutsMap[message._id];
+                          const rDims = reactionDimsMap[message._id];
+                          const winW = Dimensions.get('window').width;
+                          const gap = 4;
+                          let absStyle: any = { position: 'absolute' };
+                          if (bLayout) {
+                            // Vertical centering: align reaction container center with bubble center (relative to same parent)
+                            const bubbleCenterY = bLayout.y + bLayout.height / 2;
+                            // If we measured reaction dims, use them for perfect centering,
+                            // otherwise use an estimated height to position reasonably while measuring.
+                            const estHeight = rDims ? rDims.height : 28;
+                            let top = bubbleCenterY - estHeight / 2;
+                            // Keep top non-negative relative to parent
+                            if (top < 0) top = 0;
+                            if (rDims) {
+                              // Horizontal placement: flush to bubble edge (left for others, right for own)
+                              if (isOwn) {
+                                // own message -> place to the left, flush
+                                let left = bLayout.x - rDims.width - gap;
+                                // clamp so not off screen
+                                if (left < 8) left = 8;
+                                absStyle.left = left;
+                              } else {
+                                // other user's message -> place to the right, flush
+                                let left = bLayout.x + bLayout.width + gap;
+                                if (left + rDims.width > winW - 8) left = winW - rDims.width - 8;
+                                absStyle.left = left;
+                              }
+                            } else {
+                              // No reaction dims yet: position using bubble edges and estimated width
+                              const estWidth = Math.min(200, winW * 0.5);
+                              if (isOwn) {
+                                let left = Math.max(8, bLayout.x - estWidth - gap);
+                                absStyle.left = left;
+                              } else {
+                                let left = Math.min(winW - estWidth - 8, bLayout.x + bLayout.width + gap);
+                                absStyle.left = left;
+                              }
+                            }
+
+                            absStyle.top = top;
+                          } else {
+                            // fallback to align near bubble edges using margins
+                            absStyle = isOwn ? { right: 12, top: -36 } : { left: 12, top: -36 };
+                          }
+                          return (
+                            <View
+                              onLayout={(e) => {
+                                const { width, height } = e.nativeEvent.layout;
+                                setReactionDimsMap((prev) => ({ ...prev, [message._id]: { width, height } }));
+                              }}
+                              style={[styles.reactionsContainer, absStyle]}
+                            >
+                              {visible.map((e) => (
+                                <View key={`r-${e.emoji}`} style={styles.reactionBubble}>
+                                  <Text style={styles.reactionEmoji}>{e.emoji}</Text>
+                                  {e.count > 1 && <Text style={styles.reactionCount}>{e.count}</Text>}
+                                </View>
+                              ))}
+                              {more > 0 && (
+                                <View style={styles.reactionBubble}>
+                                  <Text style={styles.reactionCount}>+{more}</Text>
+                                </View>
+                              )}
+                            </View>
+                          );
+                        })()}
                         <Pressable
                           ref={(r) => { bubbleRefs.current[message._id] = r; }}
+                          onLayout={(e) => {
+                            const { x, y, width, height } = e.nativeEvent.layout;
+                            setBubbleLayoutsMap((prev) => ({ ...prev, [message._id]: { x, y, width, height } }));
+                          }}
                           onLongPress={() => handleLongPressMessage(message)}
                           delayLongPress={400}
                           style={[
@@ -1097,23 +1252,28 @@ export default function ChatScreen() {
                       const estWidth = reactionBarWidth || 280;
                       const rbH = reactionBarHeight || 48;
                       const gap = 8;
+                      // Place reaction bar on the opposite side of the context menu so both are visible
+                      const desiredBarSide = overlayPlacement === 'above' ? 'below' : 'above';
                       let top: number;
-                      if (overlayPlacement === 'above') {
-                        // place reaction bar just above bubble with gap
+                      if (desiredBarSide === 'above') {
+                        // place reaction bar above the bubble
                         top = menuPosition.y - rbH - gap;
-                        // if not enough space, clamp but do NOT let it overlap the bubble: if clamped, we might have to switch placement
-                        if (top < insets.top + gap) {
-                          // fallback: put below bubble
-                          top = menuPosition.y + menuPosition.height + gap;
-                        }
+                        // clamp to not go off the top
+                        if (top < insets.top + gap) top = insets.top + gap;
+                        // if still overlapping bubble due to tiny space, push it below instead
+                        if (top + rbH > menuPosition.y) top = menuPosition.y + menuPosition.height + gap;
                       } else {
-                        // below placement
+                        // place reaction bar below the bubble
                         top = menuPosition.y + menuPosition.height + gap;
                         const screenBottomLimit = Dimensions.get('window').height - insets.bottom - rbH - gap;
                         if (top > screenBottomLimit) {
-                          // fallback: try above
+                          // clamp to bottom
+                          top = Math.max(insets.top + gap, screenBottomLimit);
+                        }
+                        // if overlaps bubble (very rare), push above
+                        if (top < menuPosition.y + menuPosition.height + gap) {
                           const alt = menuPosition.y - rbH - gap;
-                          if (alt >= insets.top + gap) top = alt; // else keep and allow scroll
+                          if (alt >= insets.top + gap) top = alt;
                         }
                       }
                       const left = Math.max(8, Math.min(menuPosition.x + menuPosition.width / 2 - estWidth / 2, screenW - estWidth - 8));
@@ -1142,56 +1302,40 @@ export default function ChatScreen() {
 
                 {/* Context menu (unblurred) */}
                 <View
-                  onLayout={(e) => setMenuHeight(e.nativeEvent.layout.height)}
                   style={[
                     styles.contextMenuAbsolute,
                     { zIndex: 50 },
                     (() => {
                       const win = Dimensions.get('window');
-                      const gap = 6;
-                      const rbH = reactionBarHeight || 48;
-                      const mH = menuHeight || 300;
-                      let reactionBarTop: number;
-                      // replicate reaction bar top logic (must match where we actually placed it):
-                      if (overlayPlacement === 'above') {
-                        reactionBarTop = Math.max(menuPosition.y - rbH - 8, insets.top + 8);
-                        if (reactionBarTop >= menuPosition.y - rbH - 8 + 1) {
-                          // if we had to clamp, placement might have changed; treat as below fallback
-                          if (reactionBarTop + rbH + gap > menuPosition.y) {
-                            // overlapping risk, treat as below
-                            reactionBarTop = menuPosition.y + menuPosition.height + 8;
-                          }
-                        }
-                      } else {
-                        reactionBarTop = menuPosition.y + menuPosition.height + 8;
-                      }
+                      const gap = 8; // match reaction bar spacing to keep both close to the bubble
+                      // Exact menu height based on current items (Delete shown only for own, non-deleted messages)
+                      const baseCount = 6; // Star, Reply, Forward, Copy, Speak, Report
+                      const showDelete = !!(selectedMessage && String(selectedMessage.senderId) === String(userId) && !selectedMessage.deleted);
+                      const count = baseCount + (showDelete ? 1 : 0);
+                      const desiredH = count * MENU_ITEM_HEIGHT + Math.max(0, count - 1) * MENU_DIVIDER_HEIGHT;
+                      const desiredW = FIXED_MENU_WIDTH;
                       let top: number;
                       if (overlayPlacement === 'above') {
-                        top = reactionBarTop - mH - gap;
-                        if (top < insets.top + 8) {
-                          // fallback below stack
-                          top = reactionBarTop + rbH + gap;
-                          // ensure not overlapping bubble top if forced below while we intended above
-                          if (top < menuPosition.y + menuPosition.height + gap) {
-                            top = menuPosition.y + menuPosition.height + rbH + gap * 2;
-                          }
-                        }
+                        // place the context menu directly above the bubble with small gap
+                        top = menuPosition.y - desiredH - gap;
+                        // if that places it off-screen above, clamp to top
+                        if (top < insets.top + 8) top = insets.top + 8;
                       } else {
-                        // below placement
-                        top = reactionBarTop + rbH + gap;
-                        const maxTop = win.height - insets.bottom - mH - 8;
-                        if (top > maxTop) {
-                          // try above instead
-                          const alt = reactionBarTop - mH - gap;
-                          if (alt >= insets.top + 8) top = alt; else top = maxTop;
-                        }
+                        // place the context menu directly below the bubble with small gap
+                        top = menuPosition.y + menuPosition.height + gap;
+                        // clamp so it doesn't overflow bottom
+                        if (top + desiredH + insets.bottom > win.height) top = Math.max(insets.top + 8, win.height - insets.bottom - desiredH - 8);
                       }
-                      const left = Math.max(8, Math.min(menuPosition.x, win.width - 300 - 8));
-                      return { top, left };
+                      const left = Math.max(8, Math.min(menuPosition.x, win.width - desiredW - 8));
+                      return { top, left, width: desiredW, height: desiredH };
                     })(),
                   ]}
                 >
-                  <View style={styles.contextMenu}>
+                  <View style={[{ width: FIXED_MENU_WIDTH, height: '100%', overflow: 'hidden' }]}
+                    pointerEvents="box-none">
+                    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ backgroundColor: '#ffffff' }}
+                      keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                      <View style={styles.contextMenu}>
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
                       <Text style={styles.contextMenuText}>Star</Text>
                       <Ionicons name="star-outline" size={20} color="#333" />
@@ -1206,15 +1350,11 @@ export default function ChatScreen() {
                       <Text style={styles.contextMenuText}>Forward</Text>
                       <Ionicons name="arrow-redo-outline" size={20} color="#333" />
                     </TouchableOpacity>
-                    {selectedMessage.text && (
-                      <>
-                        <View style={styles.contextMenuDivider} />
-                        <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
-                          <Text style={styles.contextMenuText}>Copy</Text>
-                          <Ionicons name="copy-outline" size={20} color="#333" />
-                        </TouchableOpacity>
-                      </>
-                    )}
+                    <View style={styles.contextMenuDivider} />
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
+                      <Text style={styles.contextMenuText}>Copy</Text>
+                      <Ionicons name="copy-outline" size={20} color="#333" />
+                    </TouchableOpacity>
                     <View style={styles.contextMenuDivider} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert('Speak', 'Text-to-speech funcționalitate în curând'); closeContextMenu(); }}>
                       <Text style={styles.contextMenuText}>Speak</Text>
@@ -1225,7 +1365,7 @@ export default function ChatScreen() {
                       <Text style={styles.contextMenuText}>Report</Text>
                       <Ionicons name="warning-outline" size={20} color="#333" />
                     </TouchableOpacity>
-                    {selectedMessage.senderId === userId && (
+                    {String(selectedMessage?.senderId) === String(userId) && !selectedMessage?.deleted ? (
                       <>
                         <View style={styles.contextMenuDivider} />
                         <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
@@ -1233,7 +1373,9 @@ export default function ChatScreen() {
                           <Ionicons name="trash-outline" size={20} color="#ff3b30" />
                         </TouchableOpacity>
                       </>
-                    )}
+                    ) : null}
+                    </View>
+                    </ScrollView>
                   </View>
                 </View>
               </>
@@ -1258,9 +1400,14 @@ export default function ChatScreen() {
             <Text style={styles.listHeaderTitle}>Mesaje ({totalConversations})</Text>
             <Text style={styles.listHeaderSubtitle}>Continuă conversațiile tale</Text>
           </View>
-          <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85}>
-            <Ionicons name="search" size={22} color="#ffffff" />
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85} onPress={() => router.push('/starred-messages')}>
+              <Ionicons name="star-outline" size={22} color="#ffffff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85}>
+              <Ionicons name="search" size={22} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.filterSegment}>
@@ -1829,16 +1976,18 @@ const styles = StyleSheet.create({
   reactionBubble: {
     backgroundColor: '#ffffff',
     borderRadius: 12,
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 4,
     borderWidth: 1,
     borderColor: '#e0e0e0',
     minWidth: 32,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
   },
   reactionEmoji: {
     fontSize: 16,
+    marginRight: 2,
   },
   reactionCount: {
     fontSize: 11,

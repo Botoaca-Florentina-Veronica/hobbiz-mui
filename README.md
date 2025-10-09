@@ -4,14 +4,14 @@
 
 # Hobbiz
 https://hobbiz.netlify.app/
-Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API Node/Express + aplicație mobilă Expo/React Native + realtime (Socket.IO).
+Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API Node/Express + aplicație mobilă Expo/React Native
 
 </div>
 
 ---
 
 ## 🧭 Descriere
-Hobbiz este o platformă unde utilizatorii își pot publica anunțuri pentru hobby‑uri / micro‑servicii, pot discuta în chat privat, pot oferi/prime recenzii, pot salva favorite și primesc notificări în timp real.
+Hobbiz este o platformă unde utilizatorii își pot publica anunțuri pentru monetizarea hobby‑urilor. Aici pot discuta în chat privat, oferi/primi recenzii, salvează anunțurile lor favorite și primesc notificări în timp real.
 
 ---
 
