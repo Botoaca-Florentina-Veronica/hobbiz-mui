@@ -67,8 +67,11 @@ export default function FavoritesScreen() {
   const getImageSrc = (img?: string) => {
     if (!img) return null;
     if (img.startsWith('http')) return img;
-    if (img.startsWith('/uploads')) return `${api.defaults.baseURL}${img}`;
-    return `${api.defaults.baseURL}/uploads/${img.replace(/^.*[\\/]/, '')}`;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    if (!base) return img;
+    if (img.startsWith('/uploads')) return `${base}${img}`;
+    if (img.startsWith('uploads/')) return `${base}/${img}`;
+    return `${base}/uploads/${img.replace(/^.*[\\\/]/, '')}`;
   };
 
   if (loading) {

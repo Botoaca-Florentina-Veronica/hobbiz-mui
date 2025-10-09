@@ -35,7 +35,7 @@ import api from '../../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../../src/services/storage';
 import { useAuth } from '../../src/context/AuthContext';
-import ImageViewing from 'react-native-image-viewing';
+import ImageViewing from '../../src/components/ImageViewer';
 // NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
 // NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
 // Dacă vrei snapshot real pentru web mai târziu, putem introduce o implementare fallback bazată pe canvas.
@@ -1043,36 +1043,34 @@ export default function ChatScreen() {
           </View>
         </KeyboardAvoidingView>
 
-        {Platform.OS !== 'web' && (
-          <ImageViewing
-            images={imageViewerImages}
-            imageIndex={imageViewerIndex}
-            visible={imageViewerVisible}
-            onRequestClose={handleCloseImageViewer}
-            onImageIndexChange={setImageViewerIndex}
-            swipeToCloseEnabled
-            doubleTapToZoomEnabled
-            backgroundColor="rgba(0,0,0,0.96)"
-            HeaderComponent={() => (
-              <View style={[styles.imageViewerHeader, { paddingTop: insets.top + 12 }] }>
-                <TouchableOpacity
-                  onPress={handleCloseImageViewer}
-                  activeOpacity={0.85}
-                  style={styles.imageViewerCloseButton}
-                >
-                  <Ionicons name="close" size={22} color="#ffffff" />
-                </TouchableOpacity>
+        <ImageViewing
+          images={imageViewerImages}
+          imageIndex={imageViewerIndex}
+          visible={imageViewerVisible}
+          onRequestClose={handleCloseImageViewer}
+          onImageIndexChange={setImageViewerIndex}
+          swipeToCloseEnabled
+          doubleTapToZoomEnabled
+          backgroundColor="rgba(0,0,0,0.96)"
+          HeaderComponent={() => (
+            <View style={[styles.imageViewerHeader, { paddingTop: insets.top + 12 }] }>
+              <TouchableOpacity
+                onPress={handleCloseImageViewer}
+                activeOpacity={0.85}
+                style={styles.imageViewerCloseButton}
+              >
+                <Ionicons name="close" size={22} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
+          )}
+          FooterComponent={({ imageIndex }: { imageIndex: number }) =>
+            imageViewerImages.length > 1 ? (
+              <View style={[styles.imageViewerFooter, { paddingBottom: insets.bottom + 20 }] }>
+                <Text style={styles.imageViewerFooterText}>{`${imageIndex + 1} / ${imageViewerImages.length}`}</Text>
               </View>
-            )}
-            FooterComponent={({ imageIndex }) =>
-              imageViewerImages.length > 1 ? (
-                <View style={[styles.imageViewerFooter, { paddingBottom: insets.bottom + 20 }] }>
-                  <Text style={styles.imageViewerFooterText}>{`${imageIndex + 1} / ${imageViewerImages.length}`}</Text>
-                </View>
-              ) : null
-            }
-          />
-        )}
+            ) : null
+          }
+        />
 
         {/* Dynamic Context Menu Modal */}
   <Modal visible={contextMenuVisible} transparent animationType="none" onRequestClose={closeContextMenu}>

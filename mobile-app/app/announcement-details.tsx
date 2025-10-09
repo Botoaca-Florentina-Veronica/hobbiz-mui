@@ -35,6 +35,7 @@ export default function AnnouncementDetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [imgIndex, setImgIndex] = useState(0);
   const [viewerVisible, setViewerVisible] = useState(false);
+  const [fallbackImage, setFallbackImage] = useState<string | null>(null);
   const [viewerScale, setViewerScale] = useState(1);
   const viewerScrollRef = useRef<any>(null);
   const [favorited, setFavorited] = useState<boolean>(false);
@@ -88,12 +89,17 @@ export default function AnnouncementDetailsScreen() {
   const getImageSrc = (img?: string) => {
     if (!img) return null;
     if (img.startsWith('http')) return img;
-    if (img.startsWith('/uploads')) return `${api.defaults.baseURL}${img}`;
-    return `${api.defaults.baseURL}/uploads/${img.replace(/^.*[\\/]/, '')}`;
+    // ensure baseURL has no trailing slash
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    if (!base) return img;
+    if (img.startsWith('/uploads')) return `${base}${img}`;
+    // handle "uploads/xxx.jpg" or bare filenames
+    if (img.startsWith('uploads/')) return `${base}/${img}`;
+    return `${base}/uploads/${img.replace(/^.*[\\\/]/, '')}`;
   };
 
   const images = announcement?.images || [];
-  const currentImage = images[imgIndex] ? getImageSrc(images[imgIndex]) : null;
+  const currentImage = fallbackImage || (images[imgIndex] ? getImageSrc(images[imgIndex]) : null);
 
   const initials = () => {
     const f = announcement?.user?.firstName?.[0] || '';
@@ -149,8 +155,40 @@ export default function AnnouncementDetailsScreen() {
       {/* Image area */}
       <View style={[styles.imageCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
         {currentImage ? (
-          <TouchableOpacity activeOpacity={0.9} onPress={() => { setViewerVisible(true); setViewerScale(1); }}>
-            <Image source={{ uri: currentImage }} resizeMode="contain" style={isLarge ? styles.heroImageLarge : styles.heroImage} />
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => {
+              // Diagnostic log: show resolved URL in Expo console
+              try {
+                // eslint-disable-next-line no-console
+                console.log('[announcement-details] Open image:', currentImage, 'api.baseURL=', api.defaults.baseURL);
+              } catch (e) {}
+              setViewerVisible(true);
+              setViewerScale(1);
+            }}
+          >
+            <Image
+              source={{ uri: currentImage }}
+              resizeMode="contain"
+              style={isLarge ? styles.heroImageLarge : styles.heroImage}
+              onError={(e) => {
+                try {
+                  // try alternative URL forms once
+                  const original = images[imgIndex] || '';
+                  const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+                  const alt1 = original.startsWith('/') ? `${base}${original}` : `${base}/uploads/${original.replace(/^.*[\\\\/]/, '')}`;
+                  if (alt1 !== currentImage) {
+                    // eslint-disable-next-line no-console
+                    console.warn('[announcement-details] image load failed, trying fallback:', currentImage, '->', alt1);
+                    setFallbackImage(alt1);
+                    return;
+                  }
+                } catch (er) {
+                  // ignore
+                }
+                // final fallback: show placeholder (handled by conditional render)
+              }}
+            />
           </TouchableOpacity>
         ) : (
           <View style={[styles.heroPlaceholder, { backgroundColor: tokens.colors.elev }]}>            

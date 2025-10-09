@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useRouter } from 'expo-router';
 
-type SettingRow = { key: string; label: string; expandable?: boolean };
+type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
 export default function SettingsScreen() {
   const { tokens } = useAppTheme();
@@ -20,13 +20,13 @@ export default function SettingsScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const settings: SettingRow[] = [
-    { key: 'change-password', label: 'Schimbă parola', expandable: true },
-    { key: 'change-email', label: 'Schimbă email-ul', expandable: true },
-    { key: 'announcements', label: 'Anunțuri' },
-    { key: 'notifications', label: 'Setează notificările' },
-    { key: 'billing', label: 'Date de facturare' },
-    { key: 'logout-devices', label: 'Ieși din cont de pe toate dispozitivele' },
-    { key: 'delete-account', label: 'Șterge contul' },
+    { key: 'change-password', label: 'Schimbă parola', icon: 'key-outline', expandable: true },
+    { key: 'change-email', label: 'Schimbă email-ul', icon: 'mail-outline', expandable: true },
+    { key: 'announcements', label: 'Anunțuri', icon: 'megaphone-outline' },
+    { key: 'notifications', label: 'Setează notificările', icon: 'notifications-outline' },
+    { key: 'billing', label: 'Date de facturare', icon: 'document-text-outline' },
+    { key: 'logout-devices', label: 'Ieși din cont de pe toate dispozitivele', icon: 'phone-portrait-outline' },
+    { key: 'delete-account', label: 'Șterge contul', icon: 'trash-outline' },
   ];
 
   const toggleSection = (key: string) => {
@@ -56,12 +56,17 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
                 style={[
                   styles.row,
-                  { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border },
+                  { backgroundColor: tokens.colors.surface },
                   index === settings.length - 1 && !expandedSection && styles.lastRow,
                 ]}
-                onPress={() => item.expandable ? toggleSection(item.key) : null}
+                onPress={() => (item.expandable ? toggleSection(item.key) : null)}
               >
-                <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{item.label}</ThemedText>
+                <View style={styles.rowLeft}>
+                  <View style={[styles.iconCircle, { backgroundColor: tokens.colors.elev }]}> 
+                    <Ionicons name={item.icon as any} size={20} color={tokens.colors.text} />
+                  </View>
+                  <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{item.label}</ThemedText>
+                </View>
               </TouchableOpacity>
 
               {/* Expanded content for Change Password */}
@@ -155,18 +160,34 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '600' },
   card: {
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
     gap: 12,
     borderWidth: 1,
   },
   row: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   lastRow: { marginBottom: 0 },
-  rowLabel: { fontSize: 15, fontWeight: '500' },
+  rowLabel: { fontSize: 15, fontWeight: '500', flexShrink: 1 },
   expandedContent: {
     marginTop: 12,
     padding: 18,

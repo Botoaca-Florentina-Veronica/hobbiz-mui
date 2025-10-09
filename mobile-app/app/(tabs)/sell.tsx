@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
@@ -7,6 +7,9 @@ import { ThemedText } from '@/components/themed-text';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../src/context/AuthContext';
+import api from '../../src/services/api';
+import { localitatiPeJudet } from '../../assets/comunePeJudet';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
@@ -38,8 +41,11 @@ export default function SellScreen() {
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('Toată țara');
   const [images, setImages] = useState<ImageItem[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [countyExpanded, setCountyExpanded] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   const remainingTitle = 70 - title.length;
   const remainingDesc = 9000 - description.length;
@@ -88,7 +94,94 @@ export default function SellScreen() {
     }
   }
 
-  const disabledPublish = title.length < 16 || description.length < 40 || !contactName;
+  const disabledPublish = title.length < 16 || description.length < 40 || !contactName || submitting;
+
+  const handleSubmit = async () => {
+    // Validations (mirror edit flow)
+    if (!isAuthenticated) {
+      Alert.alert('Eroare', 'Trebuie să fii autentificat pentru a publica un anunț.');
+      return;
+    }
+    if (title.length < 16) {
+      Alert.alert('Validare', 'Titlul trebuie să aibă cel puțin 16 caractere.');
+      return;
+    }
+    if (!category) {
+      Alert.alert('Validare', 'Trebuie să selectezi o categorie.');
+      return;
+    }
+    if (description.length < 40) {
+      Alert.alert('Validare', 'Descrierea trebuie să aibă cel puțin 40 de caractere.');
+      return;
+    }
+    if (!contactName.trim()) {
+      Alert.alert('Validare', 'Numele persoanei de contact este obligatoriu.');
+      return;
+    }
+    if (!email.trim() && !phone.trim()) {
+      Alert.alert('Validare', 'Trebuie să completezi cel puțin email-ul sau telefonul.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('category', category || '');
+      formData.append('description', description);
+      formData.append('location', location);
+      formData.append('contactPerson', contactName);
+      if (email.trim()) formData.append('contactEmail', email);
+      if (phone.trim()) formData.append('contactPhone', phone);
+
+      images.forEach((img) => {
+        if (img.uri) {
+          const filename = img.uri.split('/').pop() || `image_${Date.now()}.jpg`;
+          const match = /\.(\w+)$/.exec(filename);
+          const type = match ? `image/${match[1]}` : 'image/jpeg';
+          // For React Native / Expo, pass an object with uri, name, type
+          formData.append('images', {
+            uri: img.uri,
+            name: filename,
+            type,
+          } as any);
+        }
+      });
+
+      await api.post('/api/users/my-announcements', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      // clear the form so the Sell page doesn't keep the submitted data
+      const resetForm = () => {
+        setTitle('');
+        setCategory(null);
+        setDescription('');
+        setContactName('');
+        setEmail('');
+        setPhone('');
+        setLocation('Toată țara');
+        setImages([]);
+        setCategoryModalOpen(false);
+        setLocationModalOpen(false);
+        setCountyExpanded(null);
+      };
+
+      resetForm();
+
+      Alert.alert('Succes', 'Anunțul a fost publicat cu succes!', [
+        { text: 'OK', onPress: () => router.push('/my-announcements') },
+      ]);
+    } catch (error: any) {
+      console.error('Error publishing announcement:', error);
+      const errMsg = error?.response?.data?.error || 'Eroare la publicarea anunțului. Încearcă din nou.';
+      Alert.alert('Eroare', errMsg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
   <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
@@ -244,12 +337,17 @@ export default function SellScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={disabledPublish}
+            onPress={handleSubmit}
             style={[
               styles.publishBtn,
-              { backgroundColor: '#355070' },
+              { backgroundColor: disabledPublish ? '#7a86a0' : '#355070' },
             ]}
           >
-            <ThemedText style={[styles.publishText, { color: '#ffffff' }]}>Publică un anunț</ThemedText>
+            {submitting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <ThemedText style={[styles.publishText, { color: '#ffffff' }]}>Publică un anunț</ThemedText>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -289,27 +387,68 @@ export default function SellScreen() {
         <View style={[styles.categoryOverlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.4)' }]}>          
           <View style={[styles.categorySheet, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
             <View style={[styles.categoryHeader, { borderColor: tokens.colors.border }]}>              
-              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege localitatea</ThemedText>
-              <TouchableOpacity onPress={() => setLocationModalOpen(false)} style={styles.closeBtn}>
-                <Ionicons name="close" size={22} color={tokens.colors.text} />
-              </TouchableOpacity>
+              {/* When a county is expanded show back arrow + county name, otherwise show default title */}
+              {countyExpanded ? (
+                <>
+                  <TouchableOpacity onPress={() => setCountyExpanded(null)} style={[styles.closeBtn, { marginRight: 8 }]}> 
+                    <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
+                  </TouchableOpacity>
+                  <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{countyExpanded}</ThemedText>
+                  <TouchableOpacity onPress={() => { setLocationModalOpen(false); setCountyExpanded(null); }} style={styles.closeBtn}>
+                    <Ionicons name="close" size={22} color={tokens.colors.text} />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege localitatea</ThemedText>
+                  <TouchableOpacity onPress={() => setLocationModalOpen(false)} style={styles.closeBtn}>
+                    <Ionicons name="close" size={22} color={tokens.colors.text} />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
             <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
-              {[
-                'Toată țara', 'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila',
-                'Buzău', 'Călărași', 'Cluj', 'Constanța', 'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu', 'Gorj',
-                'Harghita', 'Hunedoara', 'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț', 'Olt',
-                'Prahova', 'Satu Mare', 'Sălaj', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea', 'Vaslui', 'Vâlcea', 'Vrancea'
-              ].map(loc => (
-                <TouchableOpacity
-                  key={loc}
-                  onPress={() => { setLocation(loc); setLocationModalOpen(false); }}
-                  activeOpacity={0.65}
-                  style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
-                >
-                  <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{loc}</ThemedText>
-                </TouchableOpacity>
-              ))}
+              {/* If a county is expanded, show its localities, otherwise show the list of counties + 'Toată țara' */}
+              {countyExpanded ? (
+                // show localities for selected county
+                (() => {
+                  const data = (localitatiPeJudet as any)[countyExpanded];
+                  const orase = data?.orase?.map((o: any) => o.nume) || [];
+                  const comune = data?.comune || [];
+                  const localities = [...orase, ...comune];
+                  return localities.map((loc: string) => (
+                    <TouchableOpacity
+                      key={loc}
+                      onPress={() => { setLocation(loc + ', ' + countyExpanded); setLocationModalOpen(false); setCountyExpanded(null); }}
+                      activeOpacity={0.65}
+                      style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
+                    >
+                      <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{loc}</ThemedText>
+                    </TouchableOpacity>
+                  ));
+                })()
+              ) : (
+                // show counties list
+                ['Toată țara', ...Object.keys(localitatiPeJudet)].map((loc: string) => (
+                  <TouchableOpacity
+                    key={loc}
+                    onPress={() => {
+                      if (loc === 'Toată țara') {
+                        setLocation(loc);
+                        setLocationModalOpen(false);
+                        setCountyExpanded(null);
+                      } else {
+                        // expand county to show localities
+                        setCountyExpanded(loc);
+                      }
+                    }}
+                    activeOpacity={0.65}
+                    style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
+                  >
+                    <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{loc}</ThemedText>
+                  </TouchableOpacity>
+                ))
+              )}
               <View style={{ height: 24 }} />
             </ScrollView>
           </View>
