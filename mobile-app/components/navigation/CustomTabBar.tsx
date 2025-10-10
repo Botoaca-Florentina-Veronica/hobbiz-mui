@@ -16,11 +16,11 @@ const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolea
 };
 
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const { isAuthenticated, loading, user } = useAuth();
   const { hidden } = useTabBar();
-  // Use project-wide accent for active tab icons per request
-  const activeColor = '#355070';
+  // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
+  const activeColor = isDark ? tokens.colors.primary : '#355070';
   const inactiveColor = tokens.colors.muted;
 
   // Indicator bazat pe măsurători reale
@@ -82,6 +82,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
               accessibilityLabel={options.tabBarAccessibilityLabel}
               onPress={onPress}
               onLongPress={onLongPress}
+              android_ripple={{ color: isDark ? 'rgba(245, 24, 102, 0.2)' : 'rgba(53, 80, 112, 0.12)', radius: 28 }}
               style={({ pressed }) => [
                 styles.tab,
                 pressed && !config.special && { opacity: 0.6 },
@@ -92,7 +93,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                 <View
                   style={config.special ? [
                     styles.publishCircle,
-                    { backgroundColor: isFocused ? activeColor : activeColor, shadowColor: '#000' },
+                    { backgroundColor: activeColor, shadowColor: '#000' },
                   ] : undefined}
                 >
                   {route.name === 'account' && user?.avatar ? (

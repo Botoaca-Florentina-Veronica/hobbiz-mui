@@ -1,15 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'expo-router';
-
-// Placeholder fetch function – replace with real API integration later
-async function fetchNotifications(): Promise<NotificationItem[]> {
-  return new Promise(resolve => setTimeout(() => resolve([]), 600));
-}
+import api from '../src/services/api';
 
 interface NotificationItem {
   _id: string;
@@ -23,25 +19,64 @@ interface NotificationItem {
 
 export default function NotificationsScreen() {
   const { tokens, isDark } = useAppTheme();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const userId = user?.id;
+
+  // Ensure avatar URLs are absolute for React Native <Image>
+  const resolveUrl = useCallback((u?: string | null) => {
+    if (!u) return undefined;
+    if (/^https?:\/\//i.test(u)) return u;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    const path = u.startsWith('/') ? u : `/${u}`;
+    return `${base}${path}`;
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchNotifications();
+      if (!userId) { setItems([]); return; }
+      const res = await api.get(`/api/notifications/${userId}`);
+      const data = Array.isArray(res.data) ? res.data : [];
       setItems(data);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  const openLink = useCallback(async (link?: string, id?: string) => {
+    if (!link) return;
+    // Mark as read optimistically
+    if (id) {
+      setItems(prev => prev.map(it => it._id === id ? { ...it, read: true } : it));
+      try { await api.patch(`/api/notifications/${id}/read`); } catch {}
+    }
+    // Expected format: /chat/:conversationId
+    if (link.startsWith('/chat/')) {
+      const conversationId = link.replace('/chat/', '').trim();
+      // Navigate to chat tab and open the conversation by matching ID (handled by Chat screen list)
+      router.push('/(tabs)/chat');
+      // We rely on Chat list to auto-mark as read when user selects it; alternatively we could add a deep param context
+      // Minimal: emit a small delay then try to open; skipping for now due to scope
+    }
+  }, [router]);
+
+  const onDelete = useCallback(async (id: string) => {
+    try {
+      await api.delete(`/api/notifications/${id}`);
+      setItems(prev => prev.filter(it => it._id !== id));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Delete notification failed:', (e as any)?.message);
+    }
+  }, []);
 
   const renderItem = ({ item }: { item: NotificationItem }) => {
     return (
@@ -56,18 +91,21 @@ export default function NotificationsScreen() {
           ) : null}
           <View style={styles.messageRow}>
             <View style={styles.avatarWrapper}>
-              <Image source={{ uri: item.senderAvatar || 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128' }} style={styles.avatar} />
+              <Image
+                source={{ uri: resolveUrl(item.senderAvatar) || 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128' }}
+                style={styles.avatar}
+              />
             </View>
             <Text style={[styles.messageText, { color: tokens.colors.text }]} numberOfLines={3}>{item.preview || 'Nu există conținut.'}</Text>
           </View>
           <Text style={[styles.dateText, { color: tokens.colors.muted }]}>{item.createdAt ? new Date(item.createdAt).toLocaleString('ro-RO') : ''}</Text>
           {item.link && (
-            <TouchableOpacity style={[styles.chatButton, { borderColor: tokens.colors.primary + '55', backgroundColor: isDark ? 'rgba(245,24,102,0.12)' : 'rgba(53,80,112,0.06)' }]} onPress={() => console.log('Open chat', item.link)}>
+            <TouchableOpacity style={[styles.chatButton, { borderColor: tokens.colors.primary + '55', backgroundColor: isDark ? 'rgba(245,24,102,0.12)' : 'rgba(53,80,112,0.06)' }]} onPress={() => openLink(item.link, item._id)}>
               <Text style={[styles.chatButtonText, { color: isDark ? '#ffdbe6' : tokens.colors.primary }]}>Deschide chat</Text>
             </TouchableOpacity>
           )}
         </View>
-        <TouchableOpacity style={styles.deleteBtn} onPress={() => console.log('Delete', item._id)}>
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item._id)}>
           <Ionicons name="trash-outline" size={20} color={tokens.colors.muted} />
         </TouchableOpacity>
       </View>

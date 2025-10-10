@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import api from '../src/services/api';
 
@@ -16,7 +15,6 @@ export default function ProfileScreen() {
   // Page-level accent requested by user
   const pageAccent = '#100e9aff';
   const router = useRouter();
-  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { userId } = useLocalSearchParams<{ userId?: string }>();
@@ -60,24 +58,15 @@ export default function ProfileScreen() {
         {/* Header with back button and title */}
         <View style={styles.headerRow}>
           <TouchableOpacity
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             onPress={() => {
               try {
-                // Try native navigation first
-                // @ts-ignore
-                if (navigation?.canGoBack && navigation.canGoBack()) {
-                  // @ts-ignore
-                  navigation.goBack();
-                  return;
-                }
-              } catch (e) {
-                // ignore and fallback to router
-              }
-              // fallback to router.back(); if that doesn't navigate, push to root
-              try {
+                // Prefer router.back() from expo-router which works across navigation modes
                 router.back();
               } catch (e) {
-                router.push('/');
+                // Fallback to pushing to root if no history is available
+                try {
+                  router.push('/');
+                } catch (_) {}
               }
             }}
             activeOpacity={0.7}
@@ -85,7 +74,11 @@ export default function ProfileScreen() {
           >
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'My Profile'}</ThemedText>
+
+          <View style={styles.titleWrapper} pointerEvents="none">
+            <ThemedText style={[styles.titleText, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'My Profile'}</ThemedText>
+          </View>
+
           <TouchableOpacity
             onPress={() => router.push('/settings')}
             activeOpacity={0.7}
@@ -296,6 +289,19 @@ const styles = StyleSheet.create({
     pointerEvents: 'none', // allow touches to pass through the centered title so underlying buttons are tappable
     // RN Text does not support pointerEvents on all platforms reliably, so ensure hitSlop on buttons as well
     // leave as-is; semantic comment only
+  },
+
+  titleWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  titleText: {
+    fontSize: 20,
+    fontWeight: '700',
   },
   
   settingsButton: {

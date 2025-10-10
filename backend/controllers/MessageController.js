@@ -277,6 +277,33 @@ const createMessage = async (req, res) => {
             link,
           });
         }
+
+        // Trimite push notification dacă destinatarul are pushToken
+        try {
+          const recipient = await User.findById(destinatarId).select('pushToken');
+          let sender = null;
+          try { sender = await User.findById(senderId).select('firstName lastName'); } catch (_) {}
+          const title = sender ? `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Mesaj nou' : 'Mesaj nou';
+          const body = hasText ? String(text).slice(0, 120) : (messageData.image ? 'Imagine nouă' : 'Mesaj nou');
+          if (recipient && recipient.pushToken && /^ExponentPushToken\[.+\]$/.test(recipient.pushToken)) {
+            // Folosim fetch global (Node 18+) cu fallback la node-fetch dacă e necesar
+            const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
+            await doFetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: recipient.pushToken,
+                title,
+                body,
+                data: { link },
+                priority: 'high',
+                sound: 'default'
+              })
+            }).catch(() => {});
+          }
+        } catch (e) {
+          console.warn('⚠️ Eroare trimitere push notification:', e.message);
+        }
       } catch (notifErr) {
         console.warn('⚠️ Eroare la crearea notificării (non-fatal):', notifErr.message);
       }

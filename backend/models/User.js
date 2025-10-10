@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
   phone: { type: String },
   googleId: { type: String, unique: true, sparse: true },
   avatar: { type: String },
+  // Expo/FCM push token for mobile notifications
+  pushToken: { type: String },
   createdAt: { type: Date, default: Date.now },
   localitate: { type: String }, // Adăugat câmpul localitate
   lastSeen: { type: Date, default: Date.now }, // Adăugat câmpul pentru ultima activitate

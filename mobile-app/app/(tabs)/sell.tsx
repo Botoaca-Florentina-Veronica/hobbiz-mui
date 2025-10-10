@@ -29,6 +29,22 @@ const CATEGORIES: Category[] = [
   { key: 'meditatii', label: 'Meditații', icon: 'school-outline', color: '#82E0AA' },
 ];
 
+// Map category keys to the same images used in the Explore page
+const CATEGORY_IMAGES: Record<string, any> = {
+  fotografie: require('../../assets/images/camera.png'),
+  prajituri: require('../../assets/images/bake.png'),
+  muzica: require('../../assets/images/guitar.png'),
+  reparatii: require('../../assets/images/pipe.png'),
+  dans: require('../../assets/images/salsa.png'),
+  curatenie: require('../../assets/images/cleaning.png'),
+  gradinarit: require('../../assets/images/gardening-logo.jpg'),
+  sport: require('../../assets/images/tennis.png'),
+  arta: require('../../assets/images/arta.png'),
+  tehnologie: require('../../assets/images/laptop.png'),
+  auto: require('../../assets/images/car.png'),
+  meditatii: require('../../assets/images/carte.png'),
+};
+
 export default function SellScreen() {
   const { tokens, isDark } = useAppTheme();
   const router = useRouter();
@@ -234,9 +250,9 @@ export default function SellScreen() {
           <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Imagini</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.</ThemedText>
           <View style={styles.imagesRow}>
-            <TouchableOpacity onPress={addImagePlaceholder} activeOpacity={0.8} style={[styles.addImageCard, { backgroundColor: '#fff8ea', borderColor: '#ffe7b3' }]}>              
+            <TouchableOpacity onPress={addImagePlaceholder} activeOpacity={0.8} style={[styles.addImageCard, { backgroundColor: isDark ? tokens.colors.elev : '#fff8ea', borderColor: isDark ? tokens.colors.border : '#ffe7b3' }]}>              
               <ThemedText style={[styles.addImageText, { color: tokens.colors.text }]}>Adaugă imagini</ThemedText>
-              <View style={styles.addUnderline} />
+              <View style={[styles.addUnderline, { backgroundColor: isDark ? tokens.colors.primary : '#e0b400' }]} />
             </TouchableOpacity>
             {images.map(img => (
               <View key={img.id} style={[styles.imageCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}> 
@@ -330,9 +346,9 @@ export default function SellScreen() {
         <View style={styles.bottomButtonsWrapper}>
           <TouchableOpacity
             activeOpacity={0.8}
-            style={[styles.previewBtn, { backgroundColor: '#ffffff', borderColor: '#ffffff' }]}
+            style={[styles.previewBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
           >            
-            <ThemedText style={[styles.previewText, { color: '#355070' }]}>Previzualizați anunțul</ThemedText>
+            <ThemedText style={[styles.previewText, { color: tokens.colors.primary }]}>Previzualizați anunțul</ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.85}
@@ -340,13 +356,20 @@ export default function SellScreen() {
             onPress={handleSubmit}
             style={[
               styles.publishBtn,
-              { backgroundColor: disabledPublish ? '#7a86a0' : '#355070' },
+              {
+                backgroundColor: isDark ? '#f51866' : (disabledPublish ? tokens.colors.muted : tokens.colors.primary),
+                opacity: isDark && disabledPublish ? 0.6 : 1,
+                borderColor: isDark ? '#f51866' : tokens.colors.border,
+                // remove shadow/elevation in dark mode so the color isn't visually darkened
+                shadowOpacity: isDark ? 0 : undefined,
+                elevation: isDark ? 0 : undefined,
+              },
             ]}
           >
             {submitting ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={isDark ? '#ffffff' : tokens.colors.primaryContrast} />
             ) : (
-              <ThemedText style={[styles.publishText, { color: '#ffffff' }]}>Publică un anunț</ThemedText>
+              <ThemedText style={[styles.publishText, { color: isDark ? '#ffffff' : tokens.colors.primaryContrast }]}>Publică un anunț</ThemedText>
             )}
           </TouchableOpacity>
         </View>
@@ -369,8 +392,12 @@ export default function SellScreen() {
                   activeOpacity={0.65}
                   style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
                 >
-                  <View style={[styles.categoryIconWrap, { backgroundColor: cat.color + '22' }]}>                    
-                    <Ionicons name={cat.icon as any} size={18} color={cat.color} />
+                  <View style={[styles.categoryIconWrap]}>                    
+                    {CATEGORY_IMAGES[cat.key] ? (
+                      <Image source={CATEGORY_IMAGES[cat.key]} style={{ width: 36, height: 36 }} resizeMode="contain" />
+                    ) : (
+                      <Ionicons name={cat.icon as any} size={22} color={cat.color} />
+                    )}
                   </View>
                   <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{cat.label}</ThemedText>
                   {category === cat.label && (
@@ -494,6 +521,6 @@ const styles = StyleSheet.create({
   closeBtn:{ padding:6, borderRadius:8 },
   categoryList:{ },
   categoryRow:{ flexDirection:'row', alignItems:'center', gap:14, paddingHorizontal:16, paddingVertical:14, borderBottomWidth:1 },
-  categoryIconWrap:{ width:34, height:34, borderRadius:10, alignItems:'center', justifyContent:'center' },
+  categoryIconWrap:{ width:44, height:44, borderRadius:10, alignItems:'center', justifyContent:'center' },
   categoryLabel:{ fontSize:15, fontWeight:'500' },
 });

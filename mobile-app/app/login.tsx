@@ -46,17 +46,17 @@ export default function LoginScreen() {
       <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
         <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Intră în cont</ThemedText>
         <View style={styles.socialGroup}>
-          <TouchableOpacity style={[styles.socialBtn, styles.googleBtn]} activeOpacity={0.85} onPress={() => {/* TODO: implement Google OAuth for mobile */}}>
+          <TouchableOpacity style={[styles.socialBtn, styles.googleBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} activeOpacity={0.85} onPress={() => {/* TODO: implement Google OAuth for mobile */}}>
             <Image source={{ uri: 'https://www.gstatic.com/images/branding/googleg/2x/googleg_standard_color_64dp.png' }} style={styles.googleImage} />
-            <ThemedText style={[styles.socialText, styles.googleText]}>Continuă cu Google</ThemedText>
+            <ThemedText style={[styles.socialText, { color: tokens.colors.text }]}>Continuă cu Google</ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.socialBtn, styles.facebookBtn]} activeOpacity={0.85} onPress={() => {/* placeholder */}}>
-            <Ionicons name="logo-facebook" size={18} color="#fff" style={styles.socialIcon} />
-            <ThemedText style={[styles.socialText, { color: '#fff' }]}>Continuă cu Facebook</ThemedText>
+          <TouchableOpacity style={[styles.socialBtn, styles.facebookBtn, { backgroundColor: '#1877f2' }]} activeOpacity={0.85} onPress={() => {/* placeholder */}}>
+            <Ionicons name="logo-facebook" size={18} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
+            <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast }]}>Continuă cu Facebook</ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.socialBtn, styles.appleBtn]} activeOpacity={0.85} onPress={() => {/* placeholder */}}>
-            <Ionicons name="logo-apple" size={18} color="#fff" style={styles.socialIcon} />
-            <ThemedText style={[styles.socialText, { color: '#fff' }]}>Continuă cu Apple</ThemedText>
+          <TouchableOpacity style={[styles.socialBtn, styles.appleBtn, { backgroundColor: '#000000' }]} activeOpacity={0.85} onPress={() => {/* placeholder */}}>
+            <Ionicons name="logo-apple" size={18} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
+            <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast }]}>Continuă cu Apple</ThemedText>
           </TouchableOpacity>
         </View>
         <View style={styles.dividerWrap}>
@@ -91,14 +91,14 @@ export default function LoginScreen() {
             <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={tokens.colors.muted || '#666'} />
           </TouchableOpacity>
         </View>
-        {error ? <ThemedText style={[styles.error, { color: '#d33' }]}>{error}</ThemedText> : null}
+        {error ? <ThemedText style={[styles.error, { color: tokens.colors.primary }]}>{error}</ThemedText> : null}
         <TouchableOpacity
           disabled={loading}
-          style={[styles.loginBtn, { backgroundColor: '#2f9e44', opacity: loading ? 0.7 : 1 }]}
+          style={[styles.loginBtn, { backgroundColor: tokens.colors.primary, opacity: loading ? 0.7 : 1 }]}
           onPress={onSubmit}
           activeOpacity={0.85}
         >
-          {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.loginText}>Intră în cont</ThemedText>}
+          {loading ? <ActivityIndicator color={tokens.colors.primaryContrast} /> : <ThemedText style={[styles.loginText, { color: tokens.colors.primaryContrast }]}>Intră în cont</ThemedText>}
         </TouchableOpacity>
         <View style={styles.linksRow}>
           <TouchableOpacity><ThemedText style={[styles.link, { color: tokens.colors.primary }]}>Ai uitat parola?</ThemedText></TouchableOpacity>

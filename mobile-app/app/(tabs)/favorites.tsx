@@ -19,7 +19,25 @@ interface Announcement {
 }
 
 export default function FavoritesScreen() {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
+  // Dark-mode palette (from attachment): use only these surface tints + pink primary and white for contrast
+  const darkPalette = {
+    bg: '#121212', // a10
+    surface: '#282828', // a20
+    elev: '#3f3f3f', // a30 (elevated surface)
+    border: '#575757', // a40
+    placeholder: '#717171', // a50
+    muted: '#8b8b8b', // a60
+    text: '#FFFFFF',
+    primary: '#f51866', // tint a10 (accent)
+    // Pink tints for accents/gradients
+    pink2: '#fa4875', // a20
+    pink3: '#fe6585', // a30
+    pink4: '#ff7e95', // a40
+    pink5: '#ff96a6', // a50
+    pink6: '#ffabb7', // a60
+  } as const;
+  const colors = isDark ? darkPalette : tokens.colors;
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -76,19 +94,25 @@ export default function FavoritesScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>
-        <ActivityIndicator size="large" color={tokens.colors.primary} />
-        <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă favorite...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.bg, paddingTop: insets.top }]}> 
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.muted }]}>Se încarcă favorite...</Text>
       </View>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <View style={[styles.emptyContainer, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>
-        <Ionicons name="heart-outline" size={64} color={tokens.colors.placeholder} />
-        <Text style={[styles.emptyTitle, { color: tokens.colors.text }]}>Autentifică-te</Text>
-        <Text style={[styles.emptyMessage, { color: tokens.colors.muted }]}>Pentru a vedea anunțurile tale favorite</Text>
+      <View style={[styles.emptyContainer, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
+        <Ionicons name="heart-outline" size={64} color={colors.placeholder} />
+        <Text style={[styles.emptyTitle, { color: colors.text }]}>Autentifică-te</Text>
+        <Text style={[styles.emptyMessage, { color: colors.muted }]}>Pentru a vedea anunțurile tale favorite</Text>
+        <TouchableOpacity
+          style={[styles.loginButton, { backgroundColor: colors.primary }]}
+          onPress={() => router.push('/login')}
+        >
+          <Text style={{ color: '#ffffff', fontWeight: '600' }}>Mergi la autentificare</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -96,31 +120,31 @@ export default function FavoritesScreen() {
   return (
     <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: tokens.colors.bg, borderBottomColor: tokens.colors.border }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
+          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="arrow-back" size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Favorite</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Favorite</Text>
         </View>
       </View>
 
       {/* Subtitle */}
       <View style={styles.subtitleContainer}>
-        <Text style={[styles.subtitle, { color: tokens.colors.text }]}>Anunțuri favorite ({favorites.length}/150)</Text>
+        <Text style={[styles.subtitle, { color: colors.text }]}>Anunțuri favorite ({favorites.length}/150)</Text>
       </View>
 
       {/* List */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
         {favorites.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="heart-outline" size={64} color={tokens.colors.placeholder} />
-            <Text style={[styles.emptyTitle, { color: tokens.colors.text }]}>Niciun favorit</Text>
-            <Text style={[styles.emptyMessage, { color: tokens.colors.muted }]}>Explorează anunțurile și adaugă-le la favorite</Text>
+            <Ionicons name="heart-outline" size={64} color={colors.placeholder} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Niciun favorit</Text>
+            <Text style={[styles.emptyMessage, { color: colors.muted }]}>Explorează anunțurile și adaugă-le la favorite</Text>
           </View>
         ) : (
           favorites.map((ann, index) => {
@@ -135,6 +159,12 @@ export default function FavoritesScreen() {
               { bg: '#E4F7D9', g1: '#89C46C', g2: '#B3E29A', text: '#234314' },
             ];
             const palette = palettes[index % palettes.length];
+            // For dark mode: all cards identical (same bg + pink gradient accent)
+            const cardBg = isDark ? colors.surface : palette.bg;
+            const gradientColors: [string, string] = isDark 
+              ? [colors.primary as string, (colors as any).pink4 as string]  // pink gradient (#f51866 → #ff7e95)
+              : [palette.g1, palette.g2];
+            const textColor = isDark ? colors.text : palette.text;
 
             return (
               <Pressable
@@ -144,13 +174,13 @@ export default function FavoritesScreen() {
                   styles.modernCard,
                   styles.modernRow,
                   {
-                    backgroundColor: palette.bg,
+                    backgroundColor: cardBg,
                     opacity: pressed ? 0.92 : 1,
                   },
                 ]}
               >
                 <LinearGradient
-                  colors={[palette.g1, palette.g2]}
+                  colors={gradientColors}
                   style={styles.leftAccent}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 0, y: 1 }}
@@ -160,24 +190,28 @@ export default function FavoritesScreen() {
                     <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
                   ) : (
                     <View style={styles.squareImagePlaceholder}>
-                      <Ionicons name="image-outline" size={32} color="rgba(0,0,0,0.25)" />
+                      <Ionicons name="image-outline" size={32} color={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
                     </View>
                   )}
                 </View>
                 <View style={styles.squareContent}>
-                  <Text style={[styles.modernTitle, { color: palette.text }]} numberOfLines={2}>{ann.title}</Text>
-                  <View style={styles.categoryBadgeModern}>
-                    <Text style={[styles.categoryBadgeText, { color: palette.text }]} numberOfLines={1}>{ann.category}</Text>
+                  <Text style={[styles.modernTitle, { color: textColor }]} numberOfLines={2}>{ann.title}</Text>
+                  <View style={[styles.categoryBadgeModern, { 
+                    backgroundColor: isDark ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)',
+                    borderWidth: isDark ? 1 : 0,
+                    borderColor: isDark ? (colors as any).pink5 : 'transparent'
+                  }]}>
+                    <Text style={[styles.categoryBadgeText, { color: isDark ? (colors as any).pink6 : textColor }]} numberOfLines={1}>{ann.category}</Text>
                   </View>
-                  <Text style={[styles.modernSub, { color: palette.text, opacity: 0.75 }]} numberOfLines={1}>{sellerName}</Text>
-                  <Text style={[styles.modernDate, { color: palette.text, opacity: 0.55 }]}>Postat {new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
+                  <Text style={[styles.modernSub, { color: textColor, opacity: 0.75 }]} numberOfLines={1}>{sellerName}</Text>
+                  <Text style={[styles.modernDate, { color: textColor, opacity: 0.55 }]}>Postat {new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => handleRemoveFavorite(ann._id)}
-                  style={styles.modernFavBtn}
+                  style={[styles.modernFavBtn, { backgroundColor: isDark ? colors.elev : 'rgba(255,255,255,0.65)' }]}
                   activeOpacity={0.75}
                 >
-                  <Ionicons name="heart" size={20} color="#E0245E" />
+                  <Ionicons name="heart" size={20} color={isDark ? colors.primary : '#E0245E'} />
                 </TouchableOpacity>
               </Pressable>
             );
@@ -274,6 +308,14 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginButton: {
+    marginTop: 20,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

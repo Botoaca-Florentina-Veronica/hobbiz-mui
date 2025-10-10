@@ -19,6 +19,7 @@ import {
   UIManager,
   findNodeHandle,
   Linking,
+  ViewStyle,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
@@ -84,7 +85,7 @@ interface Message {
 }
 
 export default function ChatScreen() {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -123,7 +124,7 @@ export default function ChatScreen() {
 
   const width = Dimensions.get('window').width;
   
-  // Page colors (solid): primary used for headers, accent used for tabs
+  // Page colors (kept for backward compatibility; use tokens below)
   const primaryColor = '#355070';
   const accent = '#F8B195';
 
@@ -727,6 +728,8 @@ export default function ChatScreen() {
 
   const handleReaction = async (emoji: string) => {
     if (!selectedMessage || !userId) return;
+    // Keep a snapshot to rollback in case of server error
+    const previousMessages = messages;
     try {
       // Optimistic update
       setMessages((prev) =>
@@ -746,10 +749,26 @@ export default function ChatScreen() {
         })
       );
       closeContextMenu();
-      // TODO: send reaction to server
-      // await api.post(`/api/messages/${selectedMessage._id}/reaction`, { emoji });
+
+      // Send reaction to server (toggle/update)
+      const res = await api.post(`/api/messages/${selectedMessage._id}/react`, { emoji });
+      // Server returns the updated message object — sync local state with authoritative response
+      const updatedMessage = res.data;
+      if (updatedMessage && updatedMessage._id) {
+        setMessages((prev) => prev.map((m) => (m._id === updatedMessage._id ? updatedMessage : m)));
+      }
     } catch (err) {
       console.error('Reaction error:', err);
+      // Rollback optimistic update
+      try {
+        setMessages(previousMessages || []);
+      } catch (e) {
+        // ignore
+      }
+      // Inform user (non-blocking)
+      try {
+        Alert.alert('Eroare', 'Nu s-a putut salva reacția. Verifică conexiunea și încearcă din nou.');
+      } catch (e) {}
     }
   };
 
@@ -892,14 +911,22 @@ export default function ChatScreen() {
   // If conversation is selected, show chat view
   if (selectedConversation) {
     return (
-      <View style={[styles.container, { backgroundColor: '#ffffff' }]}>
+      <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
         {/* Clean header with back button, seller avatar + name, and announcement preview below */}
-        <View style={[styles.chatHeaderClean, { paddingTop: insets.top + 12, backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' }]}>
+        <View style={[
+          styles.chatHeaderClean,
+          {
+            paddingTop: insets.top + 12,
+            backgroundColor: tokens.colors.surface,
+            borderBottomWidth: 1,
+            borderBottomColor: tokens.colors.border,
+          },
+        ]}>
           {/* Center block: avatar + name (centered), announcement preview below */}
           <View style={styles.headerCenter}>
             <View style={styles.headerTitleRow}>
               <TouchableOpacity onPress={() => setSelectedConversation(null)} style={styles.backBtnClean}>
-                <Ionicons name="arrow-back" size={26} color="#000000" />
+                <Ionicons name="arrow-back" size={26} color={tokens.colors.text} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -948,7 +975,7 @@ export default function ChatScreen() {
           </View>
 
           <TouchableOpacity style={[styles.moreBtn, styles.moreBtnTop, { top: insets.top + 12 }]}>
-            <Ionicons name="ellipsis-vertical" size={22} color="#000000" />
+            <Ionicons name="ellipsis-vertical" size={22} color={tokens.colors.text} />
           </TouchableOpacity>
         </View>
 
@@ -957,18 +984,18 @@ export default function ChatScreen() {
           ref={messagesEndRef}
           style={styles.messagesContainer}
           contentContainerStyle={{ paddingHorizontal: 0, paddingVertical: 20 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#100e9aff" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />}
         >
           {loading && messages.length === 0 ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#100e9aff" />
-              <Text style={[styles.loadingText, { color: '#888888' }]}>Se încarcă mesajele...</Text>
-            </View>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={tokens.colors.primary} />
+                <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă mesajele...</Text>
+              </View>
           ) : messages.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="chatbubbles-outline" size={64} color="#cccccc" />
-              <Text style={[styles.emptyText, { color: '#888888' }]}>Nicio conversație încă. Scrie primul mesaj!</Text>
-            </View>
+              <View style={styles.emptyContainer}>
+                <Ionicons name="chatbubbles-outline" size={64} color={tokens.colors.border} />
+                <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>Nicio conversație încă. Scrie primul mesaj!</Text>
+              </View>
           ) : (
             <>
               {messages.map((message, idx) => {
@@ -1019,52 +1046,10 @@ export default function ChatScreen() {
                           entries.sort((a, b) => b.count - a.count || a.emoji.localeCompare(b.emoji));
                           const visible = entries.slice(0, 3);
                           const more = Math.max(0, entries.length - visible.length);
-                          // compute absolute position if we have bubble layout and reaction dims
-                          const bLayout = bubbleLayoutsMap[message._id];
-                          const rDims = reactionDimsMap[message._id];
-                          const winW = Dimensions.get('window').width;
-                          const gap = 4;
-                          let absStyle: any = { position: 'absolute' };
-                          if (bLayout) {
-                            // Vertical centering: align reaction container center with bubble center (relative to same parent)
-                            const bubbleCenterY = bLayout.y + bLayout.height / 2;
-                            // If we measured reaction dims, use them for perfect centering,
-                            // otherwise use an estimated height to position reasonably while measuring.
-                            const estHeight = rDims ? rDims.height : 28;
-                            let top = bubbleCenterY - estHeight / 2;
-                            // Keep top non-negative relative to parent
-                            if (top < 0) top = 0;
-                            if (rDims) {
-                              // Horizontal placement: flush to bubble edge (left for others, right for own)
-                              if (isOwn) {
-                                // own message -> place to the left, flush
-                                let left = bLayout.x - rDims.width - gap;
-                                // clamp so not off screen
-                                if (left < 8) left = 8;
-                                absStyle.left = left;
-                              } else {
-                                // other user's message -> place to the right, flush
-                                let left = bLayout.x + bLayout.width + gap;
-                                if (left + rDims.width > winW - 8) left = winW - rDims.width - 8;
-                                absStyle.left = left;
-                              }
-                            } else {
-                              // No reaction dims yet: position using bubble edges and estimated width
-                              const estWidth = Math.min(200, winW * 0.5);
-                              if (isOwn) {
-                                let left = Math.max(8, bLayout.x - estWidth - gap);
-                                absStyle.left = left;
-                              } else {
-                                let left = Math.min(winW - estWidth - 8, bLayout.x + bLayout.width + gap);
-                                absStyle.left = left;
-                              }
-                            }
-
-                            absStyle.top = top;
-                          } else {
-                            // fallback to align near bubble edges using margins
-                            absStyle = isOwn ? { right: 12, top: -36 } : { left: 12, top: -36 };
-                          }
+                          // Simple absolute placement relative to the bubble
+                          const absStyle: ViewStyle = isOwn
+                            ? { position: 'absolute', right: 12, top: -36 }
+                            : { position: 'absolute', left: 12, top: -36 };
                           return (
                             <View
                               onLayout={(e) => {
@@ -1099,7 +1084,7 @@ export default function ChatScreen() {
                             styles.messageBubbleClean,
                             isOwn
                               ? {
-                                  backgroundColor: '#d1e7ff',
+                                  backgroundColor: isDark ? tokens.colors.primary : '#d1e7ff',
                                   marginLeft: 'auto',
                                   marginRight: 12,
                                   borderTopLeftRadius: 20,
@@ -1108,7 +1093,7 @@ export default function ChatScreen() {
                                   borderBottomRightRadius: 6,
                                 }
                               : {
-                                  backgroundColor: '#f0f0f0',
+                                  backgroundColor: tokens.colors.elev,
                                   marginLeft: 12,
                                   marginRight: 'auto',
                                   borderTopLeftRadius: 20,
@@ -1119,11 +1104,11 @@ export default function ChatScreen() {
                           ]}
                         >
                           {message.deleted ? (
-                            <Text style={[styles.messageTextClean, { color: '#888888', fontStyle: 'italic' }]}>acest mesaj a fost șters</Text>
+                            <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>acest mesaj a fost șters</Text>
                           ) : (
                             <>
                               {message.text && (
-                                <Text style={[styles.messageTextClean, { color: '#1a1a1a' }]}>
+                                <Text style={[styles.messageTextClean, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
                                   {message.text}
                                 </Text>
                               )}
@@ -1139,7 +1124,7 @@ export default function ChatScreen() {
                                 <Ionicons
                                   name="checkmark-done"
                                   size={15}
-                                  color={message.isRead ? '#34B7F1' : '#888888'}
+                                  color={message.isRead ? (isDark ? '#ffabb7' : '#34B7F1') : tokens.colors.muted}
                                   style={styles.tickIconClean}
                                 />
                               )}
@@ -1154,7 +1139,7 @@ export default function ChatScreen() {
                               isOwn ? { alignSelf: 'flex-end', marginRight: 12 } : { alignSelf: 'flex-start', marginLeft: 12 }
                             ]}
                           >
-                            <Text style={[styles.messageTimeClean, { color: '#888888' }]}>
+                            <Text style={[styles.messageTimeClean, { color: tokens.colors.muted }] }>
                               {timeForMessage}
                             </Text>
                           </View>
@@ -1170,20 +1155,20 @@ export default function ChatScreen() {
 
         {/* Input bar with icons */}
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? insets.bottom + 90 : insets.bottom + 16}
         >
-          <View style={[styles.inputContainerClean, { backgroundColor: '#ffffff', borderTopWidth: 1, borderTopColor: '#e0e0e0' }]}>
+          <View style={[styles.inputContainerClean, { backgroundColor: tokens.colors.surface, borderTopWidth: 1, borderTopColor: tokens.colors.border }]}>
           <TouchableOpacity style={styles.inputIcon} onPress={handlePickImagePress}>
-            <Ionicons name="image-outline" size={26} color="#888888" />
+            <Ionicons name="image-outline" size={26} color={tokens.colors.muted} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.inputIcon} onPress={handlePickFilePress}>
-            <Ionicons name="attach-outline" size={26} color="#888888" />
+            <Ionicons name="attach-outline" size={26} color={tokens.colors.muted} />
           </TouchableOpacity>
           <TextInput
             style={styles.inputClean}
             placeholder="Scrie mesajul tău..."
-            placeholderTextColor="#999999"
+            placeholderTextColor={tokens.colors.placeholder}
             value={newMessage}
             onChangeText={setNewMessage}
             multiline
@@ -1193,7 +1178,7 @@ export default function ChatScreen() {
             disabled={!newMessage.trim()}
             style={[styles.sendBtnClean, { opacity: newMessage.trim() ? 1 : 0.4 }]}
           >
-            <Ionicons name="send" size={20} color="#100e9aff" />
+            <Ionicons name="send" size={20} color={tokens.colors.primary} />
           </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -1390,7 +1375,7 @@ export default function ChatScreen() {
   return (
     <View style={[styles.listContainer, { backgroundColor: tokens.colors.bg }]}> 
       <LinearGradient
-        colors={['#355070', '#2a4160']}
+        colors={isDark ? ['#f51866', '#ff7e95'] : ['#355070', '#2a4160']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.listHeaderGradient, { paddingTop: insets.top + 18 }]}
@@ -1438,12 +1423,12 @@ export default function ChatScreen() {
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={styles.listContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#355070" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={isDark ? tokens.colors.primary : '#355070'} />}
         >
           {loading && conversations.length === 0 ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#355070" />
-              <Text style={[styles.loadingText, { color: '#6d7a99' }]}>Se încarcă conversațiile...</Text>
+              <ActivityIndicator size="large" color={isDark ? tokens.colors.primary : '#355070'} />
+              <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă conversațiile...</Text>
             </View>
           ) : filteredConversations.length > 0 ? (
             filteredConversations.map((conv) => (
@@ -1478,15 +1463,15 @@ export default function ChatScreen() {
                 </View>
                 <View style={styles.conversationInfo}>
                   <View style={styles.conversationRowTop}>
-                    <Text style={styles.conversationName} numberOfLines={1}>
+                    <Text style={[styles.conversationName, { color: tokens.colors.text }]} numberOfLines={1}>
                       {conv.participantName}
                     </Text>
-                    <Text style={styles.conversationTime}>{conv.time}</Text>
+                    <Text style={[styles.conversationTime, { color: tokens.colors.muted }]}>{conv.time}</Text>
                   </View>
-                  <Text style={styles.conversationSnippet} numberOfLines={1}>
+                  <Text style={[styles.conversationSnippet, { color: tokens.colors.muted }]} numberOfLines={1}>
                     {conv.lastMessage}
                   </Text>
-                  <Text style={styles.conversationTopic} numberOfLines={1}>
+                  <Text style={[styles.conversationTopic, { color: tokens.colors.muted }]} numberOfLines={1}>
                     {conv.announcementTitle}
                   </Text>
                 </View>
@@ -1494,8 +1479,8 @@ export default function ChatScreen() {
             ))
           ) : (
             <View style={styles.emptyContainer}>
-              <Ionicons name="chatbubbles-outline" size={80} color="#b4bed8" />
-              <Text style={[styles.emptyText, { color: '#6d7a99' }]}>Nu există conversații {conversationFilter === 'buying' ? 'de cumpărat' : 'de vândut'} momentan.</Text>
+              <Ionicons name="chatbubbles-outline" size={80} color={tokens.colors.border} />
+              <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>Nu există conversații {conversationFilter === 'buying' ? 'de cumpărat' : 'de vândut'} momentan.</Text>
             </View>
           )}
         </ScrollView>
@@ -1835,7 +1820,7 @@ const styles = StyleSheet.create({
   headerNameClean: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: '#1a1a1a', // overridden at runtime by tokens where used
   },
   moreBtn: {
     padding: 4,
@@ -1887,11 +1872,11 @@ const styles = StyleSheet.create({
   },
   announcementTitle: {
     fontSize: 14,
-    color: '#444444',
+    color: '#444444', // overridden at runtime
   },
   announcementId: {
     fontSize: 12,
-    color: '#999999',
+    color: '#999999', // overridden at runtime
     marginTop: 2,
   },
   dateSeparator: {

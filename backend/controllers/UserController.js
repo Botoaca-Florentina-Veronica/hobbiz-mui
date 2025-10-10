@@ -220,6 +220,40 @@ const login = async (req, res) => {
   }
 };
 
+// Înregistrează Expo/FCM push token pentru utilizatorul autentificat
+const registerPushToken = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { token } = req.body || {};
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ error: 'Token invalid' });
+    }
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
+    user.pushToken = token;
+    await user.save();
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Eroare registerPushToken:', e);
+    res.status(500).json({ error: 'Eroare la salvarea push token' });
+  }
+};
+
+// Elimină push token (logout/dezinstalare)
+const removePushToken = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
+    user.pushToken = undefined;
+    await user.save();
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Eroare removePushToken:', e);
+    res.status(500).json({ error: 'Eroare la eliminarea push token' });
+  }
+};
+
 // Obține profil utilizator
 const getProfile = async (req, res) => {
   try {
@@ -556,5 +590,7 @@ module.exports = {
   deleteAnnouncement,
   updateAnnouncement,
   updateProfile,
-  uploadAvatar
+  uploadAvatar,
+  registerPushToken,
+  removePushToken
 };

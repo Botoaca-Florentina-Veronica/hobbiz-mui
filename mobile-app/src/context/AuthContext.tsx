@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import storage from '../services/storage';
 import api from '../services/api';
 import { loginWithCredentials, saveToken, logout as doLogout } from '../services/auth';
@@ -61,6 +63,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (stored) {
         setToken(stored);
         await fetchProfile();
+        // After profile is available, register for push notifications
+        try {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus === 'granted') {
+            const projectId = (Constants as any)?.expoConfig?.extra?.eas?.projectId || (Constants as any)?.easConfig?.projectId;
+            const pushTokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined as any);
+            const tokenValue = (pushTokenData as any)?.data || (pushTokenData as any)?.expoPushToken;
+            if (tokenValue) {
+              try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+            }
+          }
+        } catch (e) {
+          // ignore push errors to not block auth
+        }
       } else {
         setUser(null);
       }
@@ -97,6 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setLoading(true);
     try {
+      try { await api.delete('/api/users/push-token'); } catch (_) {}
       await doLogout();
       setUser(null);
       setToken(null);

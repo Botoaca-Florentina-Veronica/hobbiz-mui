@@ -38,12 +38,11 @@ export default function AccountScreen() {
   // const accent = '#F8B195';
   // const accentLight = '#FCEDE6';
 
-  // Header and name colors respond to dark mode per user's request:
-  // - header (blue in light) becomes black in dark mode
-  // - name color is the light-mode yellow and becomes #F51866 in dark mode
-  const headerColor = isDark ? '#000000' : '#F8B195';
+  // Header gradient uses surface/surface in dark, peach in light
+  // Name uses primary pink in dark, blue in light
+  const headerColor = isDark ? tokens.colors.surface : '#F8B195';
   const gradientColors = [headerColor, headerColor] as const;
-  const nameColor = isDark ? '#F51866' : '#355070';
+  const nameColor = isDark ? tokens.colors.primary : '#355070';
 
   const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : 'Utilizator';
   // How much of the sun should remain visible when we push it into the status bar area.
@@ -96,9 +95,9 @@ export default function AccountScreen() {
         {/* Profile Card */}
         <View style={[styles.profileCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.avatarContainer}>
-            <View style={styles.avatarOuter}>
-              <View style={[styles.halfTop, { backgroundColor: '#355070' }]} />
-              <View style={[styles.halfBottom, { backgroundColor: '#355070' }]} />
+              <View style={styles.avatarOuter}>
+              <View style={[styles.halfTop, { backgroundColor: isDark ? '#f51866' : '#355070' }]} />
+              <View style={[styles.halfBottom, { backgroundColor: isDark ? '#f51866' : '#355070' }]} />
               <View style={[styles.avatarInner, { backgroundColor: tokens.colors.surface }]}> 
                 {user?.avatar ? (
                   <Image 
