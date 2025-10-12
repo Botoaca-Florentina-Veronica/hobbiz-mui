@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Linking, Platform, Modal, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Linking, Platform, Modal, Share, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useAppTheme } from '../src/context/ThemeContext';
 import api from '../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,6 +41,11 @@ export default function AnnouncementDetailsScreen() {
   const viewerScrollRef = useRef<any>(null);
   const [favorited, setFavorited] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [showPhone, setShowPhone] = useState(false);
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [ratingScore, setRatingScore] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   const width = Dimensions.get('window').width;
   const isLarge = width >= 768;
@@ -105,6 +111,26 @@ export default function AnnouncementDetailsScreen() {
     const f = announcement?.user?.firstName?.[0] || '';
     const l = announcement?.user?.lastName?.[0] || '';
     return (f + l || 'U').toUpperCase();
+  };
+
+  const rating = (announcement as any)?.user?.rating ?? 0;
+  const reviewCount = (announcement as any)?.user?.reviewCount ?? 0;
+
+  const goToChat = () => {
+    try {
+      // Navigate to Messages tab; further deep-linking can be wired later
+      // @ts-ignore
+      router.push('/(tabs)/chat');
+    } catch {}
+  };
+
+  const goToProfile = () => {
+    const uid = announcement?.user?._id;
+    try {
+      // Navigate to profile; param is optional depending on implementation
+      // @ts-ignore
+      router.push({ pathname: '/profile', params: uid ? { id: String(uid) } : undefined });
+    } catch {}
   };
 
   if (loading) {
@@ -273,7 +299,9 @@ export default function AnnouncementDetailsScreen() {
       {/* Seller Card */}
       <View style={[styles.sellerCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
         <Text style={[styles.sellerHeading, { color: tokens.colors.text }]}>Informații vânzător</Text>
-        <View style={styles.sellerRow}>          
+
+        {/* Avatar + Name + Rating */}
+        <View style={styles.sellerTopRow}>
           <View style={[styles.avatar, { backgroundColor: tokens.colors.elev, overflow: 'hidden' }]}>            
             {announcement.user?.avatar ? (
               <Image
@@ -287,13 +315,139 @@ export default function AnnouncementDetailsScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.sellerName, { color: tokens.colors.text }]}>{announcement.user?.firstName} {announcement.user?.lastName}</Text>
-            <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>nu există review-uri</Text>
-            <Text style={[styles.contactLabel, { color: tokens.colors.muted }]}>Persoană de contact:</Text>
-            <Text style={[styles.contactValue, { color: tokens.colors.text }]}>{announcement.contactPerson}</Text>
+            {rating > 0 && reviewCount > 0 ? (
+              <View style={styles.ratingRow}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Ionicons
+                    key={i}
+                    name={i < Math.round(rating) ? 'star' : 'star-outline'}
+                    size={16}
+                    color="#FFC107"
+                  />
+                ))}
+                <Text style={[styles.ratingValue, { color: tokens.colors.text }]}>{Number(rating).toFixed(1)}</Text>
+                <Text style={[styles.ratingCount, { color: tokens.colors.muted }]}>({reviewCount} recenzii)</Text>
+              </View>
+            ) : (
+              <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>nu există review-uri</Text>
+            )}
           </View>
         </View>
-        <Text style={[styles.ownBadge, { color: tokens.colors.muted }]}>Acesta este anunțul tău</Text>
+
+        {/* Contact label + Evaluate button */}
+        <View style={styles.contactTopRow}>
+          <Text style={[styles.contactLabel, { color: tokens.colors.muted }]}>Persoană de contact:</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setRatingModalVisible(true);
+            }}
+            style={[styles.evaluateBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="star-outline" size={16} color={tokens.colors.text} style={{ marginRight: 6 }} />
+            <Text style={[styles.evaluateText, { color: tokens.colors.text }]}>Evaluează</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.contactValue, { color: tokens.colors.text }]}>{announcement.contactPerson}</Text>
+
+        {/* Primary CTA: Send Message */}
+        <TouchableOpacity
+          onPress={goToChat}
+          style={[styles.primaryCta, { backgroundColor: tokens.colors.primary }]}
+          activeOpacity={0.9}
+        >
+          <Ionicons name="chatbubble-ellipses-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+          <Text style={styles.primaryCtaText}>TRIMITE MESAJ</Text>
+        </TouchableOpacity>
+
+        {/* Phone Card */}
+        <View style={[styles.phoneCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
+          <Ionicons name="call-outline" size={20} color={tokens.colors.primary} style={{ marginRight: 10 }} />
+          <Text style={[styles.phoneValue, { color: tokens.colors.text }]}>
+            {showPhone ? (announcement.contactPhone || '—') : 'xxx xxx xxx'}
+          </Text>
+          {!!announcement.contactPhone && (
+            <TouchableOpacity onPress={() => setShowPhone((s) => !s)} activeOpacity={0.8}>
+              <Text style={[styles.showPhoneLink, { color: tokens.colors.primary }]}>
+                {showPhone ? 'ASCUNDE' : 'ARATĂ'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Outline: View Profile */}
+        <TouchableOpacity
+          onPress={goToProfile}
+          style={[styles.outlineBtn, { borderColor: tokens.colors.border }]}
+          activeOpacity={0.85}
+        >
+          <Text style={[styles.outlineBtnText, { color: tokens.colors.text }]}>VIZUALIZARE PROFIL</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Rating Modal */}
+      <Modal visible={ratingModalVisible} transparent animationType="fade" onRequestClose={() => setRatingModalVisible(false)}>
+        <View style={styles.ratingModalOverlay}>
+          {/* Blur behind popup */}
+          <BlurView intensity={80} tint="default" style={StyleSheet.absoluteFill} />
+
+          <View style={[styles.ratingModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
+            <View style={styles.ratingStarsRow}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TouchableOpacity key={i} onPress={() => setRatingScore(i + 1)} activeOpacity={0.8}>
+                  <Ionicons name={i < ratingScore ? 'star' : 'star-outline'} size={36} color="#FFC107" style={{ marginRight: 6 }} />
+                </TouchableOpacity>
+              ))}
+              <Text style={[styles.ratingNumeric, { color: tokens.colors.text }]}>{Number(ratingScore).toFixed(1)}</Text>
+            </View>
+
+            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}> 
+              <TextInput
+                multiline
+                numberOfLines={4}
+                onChangeText={setRatingComment}
+                value={ratingComment}
+                style={[styles.ratingInput, { color: tokens.colors.text }]}
+                placeholder="Comentariu (opțional)"
+                placeholderTextColor={tokens.colors.placeholder}
+              />
+            </View>
+
+            <View style={styles.ratingModalActions}>
+              <TouchableOpacity onPress={() => setRatingModalVisible(false)} style={styles.ratingCancelBtn}>
+                <Text style={[styles.ratingCancelText, { color: tokens.colors.primary }]}>ANULEAZĂ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (!announcement?.user?._id) return;
+                  setSubmittingRating(true);
+                  try {
+                    await api.post('/api/reviews', {
+                      user: announcement.user._id,
+                      score: ratingScore,
+                      comment: ratingComment || undefined,
+                    });
+                    setRatingModalVisible(false);
+                    setRatingComment('');
+                    // optimistic UI: increase reviewCount and average - simplified
+                    // Could re-fetch seller profile for accurate numbers
+                  } catch (err) {
+                    console.warn('Failed to submit review', err);
+                    alert('Nu am putut trimite recenzia. Încearcă din nou mai târziu.');
+                  } finally {
+                    setSubmittingRating(false);
+                  }
+                }}
+                style={styles.ratingSubmitBtn}
+                activeOpacity={0.9}
+              >
+                <Text style={[styles.ratingSubmitText, { color: '#ffffff' }]}>{submittingRating ? 'TRIMITE...' : 'TRIMITE'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Location Card */}
       <View style={[styles.locationCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
@@ -470,16 +624,30 @@ const styles = StyleSheet.create({
   divider: { borderBottomWidth: 1, marginVertical: 8 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
   metaItem: { fontSize: 11, fontWeight: '500' },
-  sellerCard: { marginHorizontal: 16, borderWidth: 1, borderRadius: 18, padding: 20, marginBottom: 20, gap: 16 },
+  sellerCard: { marginHorizontal: 16, borderWidth: 1, borderRadius: 18, padding: 16, marginBottom: 20, gap: 8 },
   sellerHeading: { fontSize: 18, fontWeight: '700' },
   sellerRow: { flexDirection: 'row', gap: 14 },
+  sellerTopRow: { flexDirection: 'row', gap: 10, alignItems: 'center' },
   avatar: { width: 64, height: 64, borderRadius: 50, alignItems: 'center', justifyContent: 'center' },
   avatarText: { fontSize: 24, fontWeight: '700' },
   sellerName: { fontSize: 16, fontWeight: '700' },
   sellerSub: { fontSize: 13, fontWeight: '500' },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  ratingValue: { marginLeft: 4, fontSize: 13, fontWeight: '700' },
+  ratingCount: { marginLeft: 4, fontSize: 12, fontWeight: '600' },
+  contactTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
   contactLabel: { fontSize: 11, fontWeight: '600', marginTop: 8, textTransform: 'uppercase' },
   contactValue: { fontSize: 14, fontWeight: '600', marginTop: 2 },
   ownBadge: { fontSize: 12, fontWeight: '500', textAlign: 'center', marginTop: 12 },
+  evaluateBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderRadius: 10 },
+  evaluateText: { fontSize: 13, fontWeight: '700' },
+  primaryCta: { marginTop: 6, paddingVertical: 10, borderRadius: 12, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 1 },
+  primaryCtaText: { color: '#ffffff', fontSize: 15, fontWeight: '700', letterSpacing: 0.3 },
+  phoneCard: { marginTop: 6, borderWidth: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  phoneValue: { flex: 1, fontSize: 15, fontWeight: '700' },
+  showPhoneLink: { fontSize: 13, fontWeight: '800', letterSpacing: 0.3 },
+  outlineBtn: { marginTop: 6, borderWidth: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center', justifyContent: 'center' },
+  outlineBtnText: { fontSize: 14, fontWeight: '700' },
   locationCard: { marginHorizontal: 16, borderWidth: 1, borderRadius: 18, padding: 20, marginBottom: 40, gap: 16 },
   locationHeading: { fontSize: 18, fontWeight: '700' },
   locationMapPlaceholder: { width: '100%', height: 180, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
@@ -488,4 +656,17 @@ const styles = StyleSheet.create({
   mapWebview: { flex: 1, backgroundColor: 'transparent' },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   locationText: { fontSize: 14, fontWeight: '600' },
+  /* Rating modal */
+  ratingModalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
+  ratingModalCard: { width: '100%', maxWidth: 520, borderRadius: 10, padding: 18, borderWidth: 1, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 6 }, elevation: 6 },
+  ratingModalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
+  ratingStarsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  ratingNumeric: { marginLeft: 8, fontWeight: '700' },
+  ratingInputWrapper: { borderWidth: 1, borderRadius: 8, padding: 12, minHeight: 90, marginBottom: 12 },
+  ratingInput: { minHeight: 64, textAlignVertical: 'top', padding: 0, margin: 0 },
+  ratingModalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, alignItems: 'center' },
+  ratingCancelBtn: { paddingHorizontal: 12, paddingVertical: 8 },
+  ratingCancelText: { fontSize: 15, fontWeight: '700' },
+  ratingSubmitBtn: { backgroundColor: '#355070', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
+  ratingSubmitText: { fontSize: 15, fontWeight: '700' },
 });

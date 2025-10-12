@@ -142,9 +142,9 @@ export default function FavoritesScreen() {
       >
         {favorites.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="heart-outline" size={64} color={colors.placeholder} />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>Niciun favorit</Text>
-            <Text style={[styles.emptyMessage, { color: colors.muted }]}>Explorează anunțurile și adaugă-le la favorite</Text>
+            <Image source={require('../../assets/images/gumballSiDarwin.png')} style={styles.emptyImage} resizeMode="contain" />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Niciun anunț favorit</Text>
+            <Text style={[styles.emptyMessage, { color: colors.muted }]}>Știi ce înseamnă asta, e timpul să îți adaugi!</Text>
           </View>
         ) : (
           favorites.map((ann, index) => {
@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 12, fontSize: 14, fontWeight: '500' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24 },
+  emptyImage: { width: 220, height: 180, marginTop: 28, marginBottom: -52 },
   emptyTitle: { fontSize: 20, fontWeight: '700', marginTop: 16 },
   emptyMessage: { fontSize: 14, textAlign: 'center', marginTop: 8 },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },

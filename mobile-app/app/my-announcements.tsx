@@ -51,6 +51,9 @@ export default function MyAnnouncementsScreen() {
   const [categoryFilter, setCategoryFilter] = useState('Toate');
   const [sortFilter, setSortFilter] = useState('cea mai recenta');
   const [activePickerType, setActivePickerType] = useState<'category' | 'sort' | null>(null);
+  // Track per-card content heights so the left image can match the card height exactly
+  const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
+  const [rowWidths, setRowWidths] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -301,16 +304,27 @@ export default function MyAnnouncementsScreen() {
             const imageUri = announcement.images?.[0]
               ? getImageSrc(announcement.images[0])
               : null;
+            const measuredContentHeight = rowHeights[announcement._id];
+            const baseMobileHeight = 170;
+            const imageTargetHeight = isLarge
+              ? undefined
+              : Math.max(baseMobileHeight, measuredContentHeight || 0);
 
             return (
-              <TouchableOpacity
+              <View
                 key={announcement._id}
-                activeOpacity={0.85}
-                onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
                 style={[styles.card, isLarge && styles.cardLarge]}
               >
-                {/* Image */}
-                <View style={[styles.cardImage, isLarge ? (isNarrowTablet ? styles.cardImageNarrowTablet : styles.cardImageLarge) : null]}>
+                {/* Image - Left side */}
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
+                  style={[
+                    styles.cardImage,
+                    isLarge ? (isNarrowTablet ? styles.cardImageNarrowTablet : styles.cardImageLarge) : null,
+                    !isLarge && imageTargetHeight ? { height: imageTargetHeight } : null,
+                  ]}
+                >
                   {imageUri ? (
                     <Image
                       source={{ uri: imageUri }}
@@ -322,59 +336,98 @@ export default function MyAnnouncementsScreen() {
                       <Ionicons name="image-outline" size={40} color={tokens.colors.placeholder} />
                     </View>
                   )}
-                </View>
+                </TouchableOpacity>
 
-                {/* Content */}
-                <View style={[styles.cardContent, isLarge ? (isNarrowTablet ? styles.cardContentNarrowTablet : styles.cardContentLarge) : null]}>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.cardHeaderLeft}>
-                      <Text style={styles.cardTitle} numberOfLines={2}>
+                {/* Content - Right side */}
+                <View
+                  style={[
+                    styles.cardContent,
+                    isLarge ? (isNarrowTablet ? styles.cardContentNarrowTablet : styles.cardContentLarge) : null,
+                  ]}
+                  onLayout={(e) => {
+                    const h = e.nativeEvent.layout.height;
+                    const w = e.nativeEvent.layout.width;
+                    setRowHeights((prev) => {
+                      const curr = prev[announcement._id];
+                      // Avoid unnecessary re-renders
+                      if (curr && Math.abs(curr - h) < 1) return prev;
+                      return { ...prev, [announcement._id]: h };
+                    });
+                    setRowWidths((prev) => {
+                      const currW = prev[announcement._id];
+                      if (currW && Math.abs(currW - w) < 1) return prev;
+                      return { ...prev, [announcement._id]: w };
+                    });
+                  }}
+                >
+                  {/* Top section: Title + ID */}
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
+                  >
+                    <View style={styles.cardTopRow}>
+                      <Text style={styles.cardTitle}>
                         {announcement.title}
                       </Text>
-                      <View style={styles.categoryBadge}>
-                        <Text style={styles.categoryText}>{announcement.category}</Text>
-                      </View>
-                      <View style={styles.locationRow}>
-                        <Ionicons name="location" size={16} color={tokens.colors.muted} />
-                        <Text style={styles.locationText} numberOfLines={1}>
-                          {announcement.location}
-                        </Text>
+                      <View style={styles.idBadge}>
+                        <Text style={styles.idText}>ID: {announcement._id?.slice(-8) || ''}</Text>
                       </View>
                     </View>
-                    <View style={styles.idBadge}>
-                      <Text style={styles.idText}>ID: {announcement._id?.slice(-9) || ''}</Text>
-                    </View>
-                  </View>
 
-                  {/* Actions */}
-                  <View style={[styles.actions, isLarge && styles.actionsLarge]}>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.primaryButton]}
-                      onPress={() => handleEdit(announcement)}
-                    >
-                      <Text style={styles.primaryButtonText}>Editează</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.secondaryButton]}
-                      onPress={() => handleReactivate(announcement)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Reactualizează</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.dangerButton]}
-                      onPress={() => handleDelete(announcement._id)}
-                    >
-                      <Text style={styles.dangerButtonText}>Șterge</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.secondaryButton]}
-                      onPress={() => handleDeactivate(announcement)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Dezactivează</Text>
-                    </TouchableOpacity>
+                    {/* Category badge */}
+                    <View style={styles.categoryBadge}>
+                      <Text style={styles.categoryText}>{announcement.category}</Text>
+                    </View>
+
+                    {/* Location removed as requested - keep placeholder spacing so buttons stay at bottom */}
+                    <View style={styles.locationPlaceholder} />
+                  </TouchableOpacity>
+
+                  {/* Action buttons - 2x2 layout with variable width per label */}
+                  <View style={styles.actionsGrid}>
+                    {/** Determine if there's enough width to make all 4 buttons equal */}
+                    {(() => {
+                      const contentW = rowWidths[announcement._id] || 0;
+                      // conservative needed width: 4 * 120 + gaps
+                      const needed = 4 * 120 + 3 * 6;
+                      const equalButtons = isLarge && contentW >= needed;
+
+                      return (
+                        <>
+                          <View style={styles.actionsRow}>
+                            <TouchableOpacity
+                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.fillButton, styles.primaryButton]}
+                              onPress={() => handleEdit(announcement)}
+                            >
+                              <Text style={styles.primaryButtonText}>Editează</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.compactButton, styles.secondaryButton]}
+                              onPress={() => handleDeactivate(announcement)}
+                            >
+                              <Text style={styles.secondaryButtonText}>Dezactivează</Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View style={styles.actionsRow}>
+                            <TouchableOpacity
+                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.fillButton, styles.dangerButton]}
+                              onPress={() => handleDelete(announcement._id)}
+                            >
+                              <Text style={styles.dangerButtonText}>Șterge</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.compactButton, styles.secondaryButton]}
+                              onPress={() => handleReactivate(announcement)}
+                            >
+                              <Text style={styles.secondaryButtonText}>Reactualizează</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </>
+                      );
+                    })()}
                   </View>
                 </View>
-              </TouchableOpacity>
+              </View>
             );
           })
         )}
@@ -715,8 +768,10 @@ const createStyles = (tokens: any) => StyleSheet.create({
   card: {
     backgroundColor: tokens.colors.surface,
     borderRadius: 16,
-  marginBottom: 8,
+    marginBottom: 12,
     overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -761,8 +816,8 @@ const createStyles = (tokens: any) => StyleSheet.create({
     justifyContent: 'space-between',
   },
   cardImage: {
-    width: '100%',
-    height: 160,
+    width: '42%',
+    height: 170,
     backgroundColor: tokens.colors.border,
   },
   image: {
@@ -775,7 +830,16 @@ const createStyles = (tokens: any) => StyleSheet.create({
     backgroundColor: tokens.colors.elev,
   },
   cardContent: {
-    padding: 16,
+    flex: 1,
+    padding: 8,
+    paddingTop: 10,
+    justifyContent: 'space-between',
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 6,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -787,43 +851,42 @@ const createStyles = (tokens: any) => StyleSheet.create({
     marginRight: 8,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: tokens.colors.text,
-    marginBottom: 6,
+    marginBottom: 0,
+    marginRight: 8,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   categoryBadge: {
     alignSelf: 'flex-start',
     backgroundColor: tokens.colors.elev,
-    borderRadius: 16,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    marginBottom: 6,
+    borderRadius: 12,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    marginBottom: 4,
+    marginTop: 2,
   },
   categoryText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
     color: tokens.colors.primary,
   },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  locationText: {
-    fontSize: 13,
-    color: tokens.colors.muted,
-    fontWeight: '500',
+  // locationRow and locationText removed — location not shown in list cards anymore
+  locationPlaceholder: {
+    height: 18,
+    marginBottom: 6,
   },
   idBadge: {
     backgroundColor: tokens.colors.bg,
     borderRadius: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    height: 24,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    alignSelf: 'flex-start',
   },
   idText: {
-    fontSize: 11,
+    fontSize: 10,
     color: tokens.colors.placeholder,
   },
   actions: {
@@ -835,39 +898,72 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
   },
-  actionButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    borderWidth: 2,
-    minWidth: 84,
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  actionsRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
+    width: '100%',
+  },
+  fillButton: {
+    flex: 1,
+    marginRight: 6,
+  },
+  equalButton: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: 6,
+  },
+  compactButton: {
+    flexShrink: 0,
+    minWidth: 100,
+  },
+  actionButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+    borderWidth: 2,
+    // Let each button size to its content; rows will manage spacing
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   primaryButton: {
     borderColor: tokens.colors.primary,
     backgroundColor: tokens.colors.surface,
   },
   primaryButtonText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: tokens.colors.primary,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   secondaryButton: {
     borderColor: tokens.colors.muted,
     backgroundColor: tokens.colors.surface,
   },
   secondaryButtonText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: tokens.colors.muted,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   dangerButton: {
     borderColor: '#dc3545',
     backgroundColor: tokens.colors.surface,
   },
   dangerButtonText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#dc3545',
+    textAlign: 'center',
+    includeFontPadding: false,
   },
 });

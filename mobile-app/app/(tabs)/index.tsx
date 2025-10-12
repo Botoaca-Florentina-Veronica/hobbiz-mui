@@ -14,6 +14,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import api from '../../src/services/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Text } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const categories = [
   { description: 'Fotografie', color: '#FF6B6B', image: require('../../assets/images/camera.png') },
@@ -31,7 +32,7 @@ const categories = [
 ];
 
 export default function HomeScreen() {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const { columnsForCategories, width: screenWidth } = useResponsive();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -39,6 +40,19 @@ export default function HomeScreen() {
   const [notifCount, setNotifCount] = useState(0);
   const [popular, setPopular] = useState<any[]>([]);
   const [popularLoading, setPopularLoading] = useState(false);
+
+  // helper: convert hex #RRGGBB to rgba(r,g,b,a)
+  const hexToRgba = useCallback((hex: string, alpha: number) => {
+    try {
+      const h = hex.replace('#', '');
+      const r = parseInt(h.substring(0, 2), 16);
+      const g = parseInt(h.substring(2, 4), 16);
+      const b = parseInt(h.substring(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    } catch {
+      return hex; // fallback
+    }
+  }, []);
 
   // Configure notifications behavior and Android channel once
   useEffect(() => {
@@ -114,11 +128,11 @@ export default function HomeScreen() {
 
             return (
                 <View style={[styles.mainHeroWrap, { height: heroHeight, marginBottom: -22 }]}> 
-                  <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', borderRadius: 16, overflow: 'hidden' }}>
                     <Image
                       source={require('../../assets/images/hobby_img.jpg')}
-                      style={[styles.mainHeroImage, { width: heroImageWidth, height: heroHeight - 20 }]} 
-                      resizeMode="contain"
+                      style={[styles.mainHeroImage, { width: heroImageWidth -20, height: heroHeight -32, borderRadius: 16 }]} 
+                      resizeMode="cover"
                     />
                   </View>
                 </View>
@@ -232,7 +246,20 @@ export default function HomeScreen() {
                     ]}
                     onPress={() => router.push(`/category-announcements?category=${encodeURIComponent(category.description)}`)}
                   >
-                    <View style={[styles.imageContainer, { backgroundColor: `${category.color}20` }]}>
+                    {/* Gradient fade background overlay (theme-aware intensity) */}
+                    <LinearGradient
+                      pointerEvents="none"
+                      colors={[
+                        // Higher opacity in light mode, softer in dark mode
+                        hexToRgba(category.color, isDark ? 0.18 : 0.35),
+                        hexToRgba(category.color, isDark ? 0.08 : 0.15),
+                        hexToRgba(category.color, 0),
+                      ]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={[StyleSheet.absoluteFillObject, { borderRadius: 12 }]}
+                    />
+                    <View style={[styles.imageContainer, { backgroundColor: 'transparent' }]}>
                       <Image 
                         source={category.image} 
                         style={styles.categoryImage}

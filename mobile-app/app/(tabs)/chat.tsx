@@ -128,6 +128,17 @@ export default function ChatScreen() {
   const primaryColor = '#355070';
   const accent = '#F8B195';
 
+  const hexToRgba = (hex: string, alpha = 1) => {
+    if (!hex) return `rgba(0,0,0,${alpha})`;
+    const h = hex.replace('#', '');
+    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    const int = parseInt(full, 16);
+    const r = (int >> 16) & 255;
+    const g = (int >> 8) & 255;
+    const b = int & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
   // Keep local userId in sync with AuthContext
   useEffect(() => {
     setUserId(user?.id || null);
@@ -1264,23 +1275,25 @@ export default function ChatScreen() {
                       const left = Math.max(8, Math.min(menuPosition.x + menuPosition.width / 2 - estWidth / 2, screenW - estWidth - 8));
                       return { top, left };
                     })(),
+                    // theme-aware overrides
+                    { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)', shadowOpacity: isDark ? 0.08 : 0.15 },
                   ]}
                 >
                   {['👍', '❤️', '😂', '😮', '😢', '🙏'].map((emoji) => (
-                    <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.quickReactionButton}>
+                    <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={[styles.quickReactionButton, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }]}>
                       <Text style={styles.quickReactionEmoji}>{emoji}</Text>
                     </TouchableOpacity>
                   ))}
-                  <TouchableOpacity onPress={() => setShowReactionPicker((p) => !p)} style={styles.quickReactionButton}>
-                    <Ionicons name={showReactionPicker ? 'close' : 'add-circle-outline'} size={24} color="#666" />
+                  <TouchableOpacity onPress={() => setShowReactionPicker((p) => !p)} style={[styles.quickReactionButton, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }]}>
+                    <Ionicons name={showReactionPicker ? 'close' : 'add-circle-outline'} size={24} color={isDark ? tokens.colors.muted : '#666'} />
                   </TouchableOpacity>
                   {showReactionPicker && (
-                    <View style={styles.reactionPickerDropdown}>
+                    <View style={[styles.reactionPickerDropdown, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }] }>
                       {['🤩','😎','🔥','🎉','😔','🙌','👌','🥳','🤔','🤯'].map((emoji) => (
-                        <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={styles.reactionPickerButton}>
-                          <Text style={styles.reactionPickerEmoji}>{emoji}</Text>
-                        </TouchableOpacity>
-                      ))}
+                          <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={[styles.reactionPickerButton, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }]}>
+                            <Text style={styles.reactionPickerEmoji}>{emoji}</Text>
+                          </TouchableOpacity>
+                        ))}
                     </View>
                   )}
                 </View>
@@ -1314,45 +1327,47 @@ export default function ChatScreen() {
                       const left = Math.max(8, Math.min(menuPosition.x, win.width - desiredW - 8));
                       return { top, left, width: desiredW, height: desiredH };
                     })(),
+                  // theme sensitive background/shadow
+                  , { backgroundColor: isDark ? tokens.colors.surface : '#ffffff', shadowOpacity: isDark ? 0.18 : 0.3 }
                   ]}
                 >
                   <View style={[{ width: FIXED_MENU_WIDTH, height: '100%', overflow: 'hidden' }]}
                     pointerEvents="box-none">
-                    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ backgroundColor: '#ffffff' }}
+                    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }}
                       keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                      <View style={styles.contextMenu}>
+                      <View style={[styles.contextMenu, { backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }] }>
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
-                      <Text style={styles.contextMenuText}>Star</Text>
-                      <Ionicons name="star-outline" size={20} color="#333" />
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Star</Text>
+                      <Ionicons name="star-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
-                    <View style={styles.contextMenuDivider} />
+                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
-                      <Text style={styles.contextMenuText}>Reply</Text>
-                      <Ionicons name="arrow-undo-outline" size={20} color="#333" />
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Reply</Text>
+                      <Ionicons name="arrow-undo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
-                    <View style={styles.contextMenuDivider} />
+                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleForwardMessage}>
-                      <Text style={styles.contextMenuText}>Forward</Text>
-                      <Ionicons name="arrow-redo-outline" size={20} color="#333" />
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Forward</Text>
+                      <Ionicons name="arrow-redo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
-                    <View style={styles.contextMenuDivider} />
+                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
-                      <Text style={styles.contextMenuText}>Copy</Text>
-                      <Ionicons name="copy-outline" size={20} color="#333" />
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Copy</Text>
+                      <Ionicons name="copy-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
-                    <View style={styles.contextMenuDivider} />
+                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert('Speak', 'Text-to-speech funcționalitate în curând'); closeContextMenu(); }}>
-                      <Text style={styles.contextMenuText}>Speak</Text>
-                      <Ionicons name="volume-medium-outline" size={20} color="#333" />
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Speak</Text>
+                      <Ionicons name="volume-medium-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
-                    <View style={styles.contextMenuDivider} />
+                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
-                      <Text style={styles.contextMenuText}>Report</Text>
-                      <Ionicons name="warning-outline" size={20} color="#333" />
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Report</Text>
+                      <Ionicons name="warning-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     {String(selectedMessage?.senderId) === String(userId) && !selectedMessage?.deleted ? (
                       <>
-                        <View style={styles.contextMenuDivider} />
+                        <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                         <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
                           <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>Delete</Text>
                           <Ionicons name="trash-outline" size={20} color="#ff3b30" />
@@ -1375,7 +1390,15 @@ export default function ChatScreen() {
   return (
     <View style={[styles.listContainer, { backgroundColor: tokens.colors.bg }]}> 
       <LinearGradient
-        colors={isDark ? ['#f51866', '#ff7e95'] : ['#355070', '#2a4160']}
+        colors={
+          isDark
+            ? ['#f51866', '#ff7e95']
+            : [
+                tokens.colors.primary || '#355070',
+                hexToRgba(tokens.colors.primary || '#355070', 0.75),
+                tokens.colors.bg || '#ffffff',
+              ]
+        }
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.listHeaderGradient, { paddingTop: insets.top + 18 }]}
@@ -1419,11 +1442,12 @@ export default function ChatScreen() {
         </View>
       </LinearGradient>
 
-  <View style={[styles.listContentWrapper, { backgroundColor: 'transparent', marginTop: 0, paddingTop: 0 }] }>
+      <View style={[styles.listContentWrapper, { backgroundColor: 'transparent', marginTop: 0, paddingTop: 0 }] }>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: Math.max(64, insets.bottom + 40) }]}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={isDark ? tokens.colors.primary : '#355070'} />}
+          keyboardShouldPersistTaps="handled"
         >
           {loading && conversations.length === 0 ? (
             <View style={styles.loadingContainer}>

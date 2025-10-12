@@ -1,7 +1,8 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -20,6 +21,8 @@ export default function ProfileScreen() {
   const { userId } = useLocalSearchParams<{ userId?: string }>();
   const [publicProfile, setPublicProfile] = React.useState<any | null>(null);
   const [loadingPublic, setLoadingPublic] = React.useState(false);
+  const [currentAvatar, setCurrentAvatar] = React.useState<string | undefined>(undefined);
+  const [avatarUploading, setAvatarUploading] = React.useState(false);
 
   // If userId present in query, fetch public profile for that user
   React.useEffect(() => {
@@ -41,6 +44,71 @@ export default function ProfileScreen() {
     };
     fetchPublic();
   }, [userId]);
+
+  // keep a local displayed avatar so we can optimistically update after upload
+  React.useEffect(() => {
+    const active = publicProfile || user;
+    setCurrentAvatar(active?.avatar || undefined);
+  }, [publicProfile, user]);
+
+  const isViewingOwnProfile = !publicProfile || (user && String(user.id) === String(publicProfile?.id));
+
+  const handlePickAvatar = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permission.status !== 'granted') {
+        Alert.alert('Permisiune', 'Trebuie să permiți accesul la galerie pentru a schimba poza de profil.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.8, allowsEditing: true });
+      // expo-image-picker v13 returns { canceled, assets }
+      if ((result as any).canceled) return;
+      const asset: any = (result as any).assets ? (result as any).assets[0] : result;
+      if (!asset || !asset.uri) return;
+
+      // Ask for confirmation before uploading
+      Alert.alert(
+        'Schimbă poza de profil',
+        'Ești sigur că vrei să modifica poza de profil a contului?',
+        [
+          { text: 'Anulează', style: 'cancel' },
+          {
+            text: 'Confirmă',
+            onPress: async () => {
+              // proceed to upload
+              const uri = asset.uri;
+              const fileName = asset.fileName || uri.split('/').pop() || `avatar_${Date.now()}.jpg`;
+              const extMatch = /\.([a-zA-Z0-9]+)$/.exec(fileName);
+              const ext = extMatch ? extMatch[1] : 'jpg';
+              const mimeType = asset.type ? `${asset.type}/${ext}` : `image/${ext}`;
+              const form = new FormData();
+              // @ts-ignore
+              form.append('avatar', { uri, name: fileName, type: mimeType });
+              try {
+                setAvatarUploading(true);
+                const res = await api.post('/api/users/avatar', form as any, { headers: { 'Content-Type': 'multipart/form-data' } });
+                // server should return the updated avatar URL; fall back to local uri
+                const newAvatar = res?.data?.avatar || res?.data?.url || uri;
+                setCurrentAvatar(newAvatar);
+                // If viewing a publicProfile (which should be oneself), update it too
+                if (publicProfile) setPublicProfile((p: any) => ({ ...(p || {}), avatar: newAvatar }));
+                Alert.alert('Actualizat', 'Poza de profil a fost actualizată.');
+              } catch (err) {
+                console.error('Avatar upload error:', err);
+                Alert.alert('Eroare', 'Nu s-a putut încărca poza. Încearcă din nou.');
+              } finally {
+                setAvatarUploading(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (err) {
+      console.error('handlePickAvatar error:', err);
+      Alert.alert('Eroare', 'A apărut o eroare la selectarea imaginii.');
+    }
+  };
 
   // Format member since date
   const formatMemberDate = (dateStr?: string) => {
@@ -91,12 +159,22 @@ export default function ProfileScreen() {
         {/* Profile Header Card - Avatar + Rating + Name */}
         <View style={[styles.profileHeaderCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.avatarContainer}>
-            {profileToShow?.avatar ? (
-              <Image source={{ uri: profileToShow.avatar }} style={styles.avatar} />
+            {currentAvatar ? (
+              <Image source={{ uri: currentAvatar }} style={styles.avatar} />
             ) : (
               <View style={[styles.avatarPlaceholder, { backgroundColor: '#E8F0FE' }]}>
                 <Ionicons name="person" size={32} color={pageAccent} />
               </View>
+            )}
+
+            {isViewingOwnProfile && (
+              <TouchableOpacity style={[styles.cameraButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} onPress={handlePickAvatar} activeOpacity={0.8}>
+                {avatarUploading ? (
+                  <ActivityIndicator size="small" color={tokens.colors.primary} />
+                ) : (
+                  <Ionicons name="camera" size={18} color={tokens.colors.text} />
+                )}
+              </TouchableOpacity>
             )}
           </View>
           
@@ -330,15 +408,11 @@ const styles = StyleSheet.create({
     width: 80, 
     height: 80,
     marginRight: 16,
+    position: 'relative',
   },
   profileInfo: {
     flex: 1,
     justifyContent: 'center',
-  },
-  avatar: { 
-    width: 80, 
-    height: 80, 
-    borderRadius: 40,
   },
   avatarPlaceholder: { 
     width: 80, 
@@ -346,6 +420,28 @@ const styles = StyleSheet.create({
     borderRadius: 40, 
     alignItems: 'center', 
     justifyContent: 'center',
+  },
+  cameraButton: {
+    position: 'absolute',
+    right: -6,
+    bottom: -6,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  avatar: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 40,
+    overflow: 'hidden',
   },
   ratingBadge: {
     flexDirection: 'row',

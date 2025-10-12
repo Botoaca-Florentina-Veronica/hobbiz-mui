@@ -405,7 +405,7 @@ export default function SellScreen() {
                   )}
                 </TouchableOpacity>
               ))}
-              <View style={{ height: 24 }} />
+            
             </ScrollView>
           </View>
         </View>
@@ -476,7 +476,7 @@ export default function SellScreen() {
                   </TouchableOpacity>
                 ))
               )}
-              <View style={{ height: 24 }} />
+              
             </ScrollView>
           </View>
         </View>
