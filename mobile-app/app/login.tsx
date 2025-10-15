@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, Image, Alert, useWindowDimensions, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
+import api from '../src/services/api';
+import { saveToken } from '../src/services/auth';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export const options = {
   headerShown: false,
@@ -12,12 +18,50 @@ export const options = {
 
 export default function LoginScreen() {
   const { tokens } = useAppTheme();
-  const { login, loading, isAuthenticated } = useAuth();
+  const { login, loading, isAuthenticated, restore } = useAuth();
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [socialLoading, setSocialLoading] = useState(false);
+
+  // Calculează lățimea cardului în funcție de dimensiunea ecranului
+  const getCardWidth = (): number | string => {
+    if (width < 600) return '100%'; // mobil
+    if (width < 900) return '80%'; // tabletă mică
+    if (width < 1200) return '50%'; // tabletă mare
+    return '40%'; // desktop
+  };
+
+  // Determină dimensiunile elementelor în funcție de mărimea ecranului
+  const isSmallDevice = width < 600;
+  const isMediumDevice = width >= 600 && width < 900;
+  const isLargeDevice = width >= 900 && width < 1200;
+  const isExtraLargeDevice = width >= 1200;
+
+  // Calculează dimensiunile responsive
+  const responsiveSizes = {
+    titleSize: isSmallDevice ? 26 : isMediumDevice ? 30 : isLargeDevice ? 34 : 38,
+    inputPadding: isSmallDevice ? 12 : isMediumDevice ? 16 : 16,
+    inputFontSize: isSmallDevice ? 15 : isMediumDevice ? 18 : 17,
+    buttonPadding: isSmallDevice ? 14 : isMediumDevice ? 18 : isLargeDevice ? 18 : 20,
+    buttonFontSize: isSmallDevice ? 15 : isMediumDevice ? 18 : 17,
+    cardPadding: isSmallDevice ? 24 : isMediumDevice ? 28 : isLargeDevice ? 32 : 36,
+    cardGap: isSmallDevice ? 16 : isMediumDevice ? 18 : isLargeDevice ? 20 : 22,
+    socialButtonGap: isSmallDevice ? 12 : isMediumDevice ? 16 : 18,
+    iconSize: isSmallDevice ? 18 : isMediumDevice ? 20 : 22,
+    linkFontSize: isSmallDevice ? 13 : isMediumDevice ? 16 : 15,
+  };
+
+  const cardStyle = {
+    width: getCardWidth() as any,
+    maxWidth: 650,
+    alignSelf: 'center' as const,
+    padding: responsiveSizes.cardPadding,
+    gap: responsiveSizes.cardGap,
+  };
 
   async function onSubmit() {
     setError('');
@@ -38,25 +82,136 @@ export default function LoginScreen() {
     setTimeout(() => router.replace('/(tabs)'), 0);
   }
 
+  // Extract token from an oauth redirect URL and finalize login
+  const handleOAuthRedirectUrl = async (url?: string) => {
+    if (!url) return false;
+    const parsed = Linking.parse(url);
+    const token = (parsed?.queryParams as any)?.token as string | undefined;
+    if (token) {
+      await saveToken(token);
+      // update axios header for subsequent requests in this session
+      (api.defaults.headers as any).Authorization = `Bearer ${token}`;
+      await restore();
+      router.replace('/(tabs)');
+      return true;
+    }
+    return false;
+  };
+
+  // Handle OAuth redirect back into the app (custom scheme)
+  useEffect(() => {
+    const handler = async (event: { url: string }) => {
+      try {
+        const url = event.url || '';
+        await handleOAuthRedirectUrl(url);
+      } catch (e: any) {
+        Alert.alert('Autentificare', e?.message || 'Eroare la procesarea autentificării');
+      } finally {
+        setSocialLoading(false);
+      }
+    };
+    const sub = Linking.addEventListener('url', handler);
+    return () => {
+      try { sub.remove(); } catch {}
+    };
+  }, [restore, router]);
+
+  async function onGoogleLogin() {
+    try {
+      setError('');
+      setSocialLoading(true);
+      // Build backend URL for Google OAuth
+      const baseURL = (api.defaults.baseURL as string) || '';
+  const authUrl = `${baseURL}/auth/google?state=mobile&mobile=1`;
+
+      // Prepare redirect handler for iOS
+      const redirectUrl = Linking.createURL('oauth'); // mobileapp://oauth
+      // Open browser session
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl, { showInRecents: true, createTask: true });
+      // On some platforms, openAuthSessionAsync returns the redirected URL
+      if (result && 'url' in result && result.url) {
+        const finished = await handleOAuthRedirectUrl(result.url);
+        if (finished) return;
+      }
+      // Note: On Android, the redirect event will be captured by the listener above
+    } catch (e: any) {
+      setError(e?.message || 'Eroare la autentificarea cu Google');
+      setSocialLoading(false);
+    }
+  }
+
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: tokens.colors.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
-        <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Intră în cont</ThemedText>
-        <View style={styles.socialGroup}>
-          <TouchableOpacity style={[styles.socialBtn, styles.googleBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} activeOpacity={0.85} onPress={() => {/* TODO: implement Google OAuth for mobile */}}>
-            <Image source={{ uri: 'https://www.gstatic.com/images/branding/googleg/2x/googleg_standard_color_64dp.png' }} style={styles.googleImage} />
-            <ThemedText style={[styles.socialText, { color: tokens.colors.text }]}>Continuă cu Google</ThemedText>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={[styles.card, cardStyle, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
+          <ThemedText style={[styles.title, { color: tokens.colors.text, fontSize: responsiveSizes.titleSize }]}>Intră în cont</ThemedText>
+        <View style={[styles.socialGroup, { gap: responsiveSizes.socialButtonGap }]}>
+          <TouchableOpacity 
+            style={[
+              styles.socialBtn, 
+              styles.googleBtn, 
+              { 
+                backgroundColor: tokens.colors.surface, 
+                borderColor: tokens.colors.border, 
+                opacity: socialLoading ? 0.7 : 1,
+                paddingVertical: responsiveSizes.buttonPadding,
+              }
+            ]} 
+            activeOpacity={0.85} 
+            onPress={socialLoading ? undefined : onGoogleLogin}
+          >
+            {socialLoading ? (
+              <ActivityIndicator style={{ marginRight: 12 }} />
+            ) : (
+              <Image 
+                source={{ uri: 'https://www.gstatic.com/images/branding/googleg/2x/googleg_standard_color_64dp.png' }} 
+                style={[styles.googleImage, { width: responsiveSizes.iconSize + 2, height: responsiveSizes.iconSize + 2 }]} 
+              />
+            )}
+            <ThemedText style={[styles.socialText, { color: tokens.colors.text, fontSize: responsiveSizes.buttonFontSize }]}>
+              {socialLoading ? 'Se conectează...' : 'Continuă cu Google'}
+            </ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.socialBtn, styles.facebookBtn, { backgroundColor: '#1877f2' }]} activeOpacity={0.85} onPress={() => {/* placeholder */}}>
-            <Ionicons name="logo-facebook" size={18} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
-            <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast }]}>Continuă cu Facebook</ThemedText>
+          <TouchableOpacity 
+            style={[
+              styles.socialBtn, 
+              styles.facebookBtn, 
+              { 
+                backgroundColor: '#1877f2',
+                paddingVertical: responsiveSizes.buttonPadding,
+              }
+            ]} 
+            activeOpacity={0.85} 
+            onPress={() => {/* placeholder */}}
+          >
+            <Ionicons name="logo-facebook" size={responsiveSizes.iconSize} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
+            <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast, fontSize: responsiveSizes.buttonFontSize }]}>
+              Continuă cu Facebook
+            </ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.socialBtn, styles.appleBtn, { backgroundColor: '#000000' }]} activeOpacity={0.85} onPress={() => {/* placeholder */}}>
-            <Ionicons name="logo-apple" size={18} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
-            <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast }]}>Continuă cu Apple</ThemedText>
+          <TouchableOpacity 
+            style={[
+              styles.socialBtn, 
+              styles.appleBtn, 
+              { 
+                backgroundColor: '#000000',
+                paddingVertical: responsiveSizes.buttonPadding,
+              }
+            ]} 
+            activeOpacity={0.85} 
+            onPress={() => {/* placeholder */}}
+          >
+            <Ionicons name="logo-apple" size={responsiveSizes.iconSize} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
+            <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast, fontSize: responsiveSizes.buttonFontSize }]}>
+              Continuă cu Apple
+            </ThemedText>
           </TouchableOpacity>
         </View>
         <View style={styles.dividerWrap}>
@@ -65,7 +220,16 @@ export default function LoginScreen() {
           <View style={[styles.divider, { borderColor: tokens.colors.border }]} />
         </View>
         <TextInput
-          style={[styles.input, { borderColor: tokens.colors.border, color: tokens.colors.text }]}
+          style={[
+            styles.input, 
+            { 
+              borderColor: tokens.colors.border, 
+              color: tokens.colors.text,
+              paddingHorizontal: 14,
+              paddingVertical: responsiveSizes.inputPadding,
+              fontSize: responsiveSizes.inputFontSize,
+            }
+          ]}
           placeholder="Adresa ta de email"
           placeholderTextColor={tokens.colors.placeholder}
           autoCapitalize="none"
@@ -75,7 +239,17 @@ export default function LoginScreen() {
         />
         <View style={styles.passwordWrapper}>
           <TextInput
-            style={[styles.input, styles.passwordInput, { borderColor: tokens.colors.border, color: tokens.colors.text }]}
+            style={[
+              styles.input, 
+              styles.passwordInput, 
+              { 
+                borderColor: tokens.colors.border, 
+                color: tokens.colors.text,
+                paddingHorizontal: 14,
+                paddingVertical: responsiveSizes.inputPadding,
+                fontSize: responsiveSizes.inputFontSize,
+              }
+            ]}
             placeholder="Parola"
             placeholderTextColor={tokens.colors.placeholder}
             secureTextEntry={!showPassword}
@@ -91,47 +265,82 @@ export default function LoginScreen() {
             <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={tokens.colors.muted || '#666'} />
           </TouchableOpacity>
         </View>
-        {error ? <ThemedText style={[styles.error, { color: tokens.colors.primary }]}>{error}</ThemedText> : null}
+        {error ? <ThemedText style={[styles.error, { color: tokens.colors.primary, fontSize: responsiveSizes.linkFontSize - 1 }]}>{error}</ThemedText> : null}
         <TouchableOpacity
           disabled={loading}
-          style={[styles.loginBtn, { backgroundColor: tokens.colors.primary, opacity: loading ? 0.7 : 1 }]}
+          style={[
+            styles.loginBtn, 
+            { 
+              backgroundColor: tokens.colors.primary, 
+              opacity: loading ? 0.7 : 1,
+              paddingVertical: responsiveSizes.buttonPadding,
+            }
+          ]}
           onPress={onSubmit}
           activeOpacity={0.85}
         >
-          {loading ? <ActivityIndicator color={tokens.colors.primaryContrast} /> : <ThemedText style={[styles.loginText, { color: tokens.colors.primaryContrast }]}>Intră în cont</ThemedText>}
+          {loading ? (
+            <ActivityIndicator color={tokens.colors.primaryContrast} /> 
+          ) : (
+            <ThemedText style={[styles.loginText, { color: tokens.colors.primaryContrast, fontSize: responsiveSizes.buttonFontSize }]}>
+              Intră în cont
+            </ThemedText>
+          )}
         </TouchableOpacity>
         <View style={styles.linksRow}>
-          <TouchableOpacity><ThemedText style={[styles.link, { color: tokens.colors.primary }]}>Ai uitat parola?</ThemedText></TouchableOpacity>
-          <TouchableOpacity><ThemedText style={[styles.link, { color: tokens.colors.primary }]}>Creează cont</ThemedText></TouchableOpacity>
+          <TouchableOpacity>
+            <ThemedText style={[styles.link, { color: tokens.colors.primary, fontSize: responsiveSizes.linkFontSize }]}>
+              Ai uitat parola?
+            </ThemedText>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <ThemedText style={[styles.link, { color: tokens.colors.primary, fontSize: responsiveSizes.linkFontSize }]}>
+              Creează cont
+            </ThemedText>
+          </TouchableOpacity>
         </View>
-      </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, justifyContent: 'flex-start' },
-  card: { borderWidth: 1, borderRadius: 14, padding: 20, gap: 16 },
-  title: { fontSize: 26, fontWeight: '700' },
-  socialGroup: { gap: 12 },
-  socialBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 6, paddingVertical: 14, paddingHorizontal: 14, justifyContent: 'center', borderWidth: 1 },
+  container: { 
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    minHeight: '100%',
+  },
+  card: { 
+    borderWidth: 1, 
+    borderRadius: 14, 
+    width: '100%',
+  },
+  title: { fontWeight: '700' },
+  socialGroup: {},
+  socialBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center', borderWidth: 1 },
   socialIcon: { marginRight: 10 },
-  socialText: { fontSize: 14, fontWeight: '600' },
-  googleBtn: { backgroundColor: '#fff', borderColor: '#e0e0e0' },
-  googleImage: { width: 20, height: 20, marginRight: 12 },
+  socialText: { fontWeight: '600' },
+  googleBtn: {  },
+  googleImage: { marginRight: 12 },
   googleText: { color: '#000' },
   facebookBtn: { backgroundColor: '#1877F2', borderColor: '#1877F2' },
   appleBtn: { backgroundColor: '#000', borderColor: '#000' },
   dividerWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   divider: { flex: 1, borderBottomWidth: 1 },
   dividerText: { fontSize: 12, fontWeight: '600', letterSpacing: 1 },
-  input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
+  input: { borderWidth: 1, borderRadius: 8 },
   passwordWrapper: { position: 'relative' },
   passwordInput: { paddingRight: 56 },
   eyeBtn: { position: 'absolute', right: 8, top: 0, bottom: 0, width: 40, alignItems: 'center', justifyContent: 'center', padding: 6 },
-  error: { fontSize: 12, marginTop: -4 },
-  loginBtn: { paddingVertical: 14, borderRadius: 8, alignItems: 'center' },
-  loginText: { color: '#fff', fontWeight: '600', fontSize: 15 },
+  error: { marginTop: -4 },
+  loginBtn: { borderRadius: 8, alignItems: 'center' },
+  loginText: { color: '#fff', fontWeight: '600' },
   linksRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
-  link: { fontSize: 13, fontWeight: '500' },
+  link: { fontWeight: '500' },
 });

@@ -32,7 +32,7 @@ export default function PrivacyScreen() {
   );
 
   const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <View style={[styles.sectionCard, { backgroundColor: isDark ? '#282828' : '#ffffff', borderColor: isDark ? 'rgba(245,24,102,0.3)' : WEB_BORDER_LIGHT }]}>      
+    <View style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>      
       <LinearGradient colors={[tokens.colors.primary, isDark ? '#f5186644' : WEB_ACCENT]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.sectionGradient} />
       <ThemedText style={[styles.sectionHeading, { color: isDark ? '#ffffff' : WEB_PRIMARY }]}>{title}</ThemedText>
       {children}
@@ -44,7 +44,7 @@ export default function PrivacyScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Top header with back */}
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} activeOpacity={0.8}>
+          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
           <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Politica de confidențialitate</ThemedText>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 48, gap: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 4 },
-  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700' },
   heroCard: { padding: 40, borderRadius: 24, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 24, shadowOffset: { width: 0, height: 8 } },
   heroOverlay: { position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: 150, backgroundColor: 'rgba(252,194,46,0.18)' },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   introIcon: { fontSize: 30, marginTop: 4 },
   introContent: { flex: 1 },
   introStrong: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  sectionCard: { borderRadius: 20, padding: 24, borderWidth: 1, marginBottom: 10, overflow: 'hidden', position: 'relative', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 20, shadowOffset: { width: 0, height: 6 } },
+  sectionCard: { borderRadius: 20, padding: 24, marginBottom: 10, overflow: 'hidden', position: 'relative', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 20, shadowOffset: { width: 0, height: 6 } },
   sectionGradient: { position: 'absolute', top: 0, left: 0, height: 4, right: 0 },
   sectionHeading: { fontSize: 20, fontWeight: '700', marginBottom: 12 },
   subHeading: { fontSize: 16, fontWeight: '600', marginTop: 8, marginBottom: 6 },

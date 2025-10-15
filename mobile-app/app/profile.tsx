@@ -13,8 +13,8 @@ import api from '../src/services/api';
 
 export default function ProfileScreen() {
   const { tokens } = useAppTheme();
-  // Page-level accent requested by user
-  const pageAccent = '#100e9aff';
+  // Page-level accent aligned with theme primary (dark: #f51866)
+  const pageAccent = tokens.colors.primary;
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
@@ -52,6 +52,10 @@ export default function ProfileScreen() {
   }, [publicProfile, user]);
 
   const isViewingOwnProfile = !publicProfile || (user && String(user.id) === String(publicProfile?.id));
+
+  // local asset for empty-location illustration (shown when own profile has no location)
+  // Metro will bundle this image because we use require()
+  const anaisImg = require('../assets/images/anais.png');
 
   const handlePickAvatar = async () => {
     try {
@@ -93,10 +97,10 @@ export default function ProfileScreen() {
                 setCurrentAvatar(newAvatar);
                 // If viewing a publicProfile (which should be oneself), update it too
                 if (publicProfile) setPublicProfile((p: any) => ({ ...(p || {}), avatar: newAvatar }));
-                Alert.alert('Actualizat', 'Poza de profil a fost actualizată.');
+                Alert.alert('Actualizat', 'Poza de profil a fost actualizată');
               } catch (err) {
                 console.error('Avatar upload error:', err);
-                Alert.alert('Eroare', 'Nu s-a putut încărca poza. Încearcă din nou.');
+                Alert.alert('Eroare', 'Nu s-a putut încărca poza. Încearcă din nou');
               } finally {
                 setAvatarUploading(false);
               }
@@ -106,7 +110,7 @@ export default function ProfileScreen() {
       );
     } catch (err) {
       console.error('handlePickAvatar error:', err);
-      Alert.alert('Eroare', 'A apărut o eroare la selectarea imaginii.');
+      Alert.alert('Eroare', 'A apărut o eroare la selectarea imaginii');
     }
   };
 
@@ -144,7 +148,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
 
           <View style={styles.titleWrapper} pointerEvents="none">
-            <ThemedText style={[styles.titleText, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'My Profile'}</ThemedText>
+            <ThemedText style={[styles.titleText, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'Profilul meu'}</ThemedText>
           </View>
 
           <TouchableOpacity
@@ -162,7 +166,7 @@ export default function ProfileScreen() {
             {currentAvatar ? (
               <Image source={{ uri: currentAvatar }} style={styles.avatar} />
             ) : (
-              <View style={[styles.avatarPlaceholder, { backgroundColor: '#E8F0FE' }]}>
+              <View style={[styles.avatarPlaceholder, { backgroundColor: tokens.colors.elev }]}>
                 <Ionicons name="person" size={32} color={pageAccent} />
               </View>
             )}
@@ -180,8 +184,8 @@ export default function ProfileScreen() {
           
           <View style={styles.profileInfo}>
             <View style={styles.ratingBadge}>
-              <Ionicons name="star" size={14} color="#FFD700" />
-              <ThemedText style={styles.ratingText}>4.7</ThemedText>
+              <Ionicons name="star" size={14} color={tokens.colors.primary} />
+              <ThemedText style={[styles.ratingText, { color: tokens.colors.text }]}>4.7</ThemedText>
             </View>
 
             <ThemedText style={[styles.userName, { color: tokens.colors.text }]}>
@@ -268,8 +272,12 @@ export default function ProfileScreen() {
               })()
             ) : (
               <View style={[styles.mapPlaceholder, { alignItems: 'center', justifyContent: 'center' }]}>                
-                <Ionicons name="map" size={48} color={tokens.colors.muted} />
-                <ThemedText style={[styles.mapText, { color: tokens.colors.muted, marginTop: 8 }]}>Locația ta va apărea aici</ThemedText>
+                {isViewingOwnProfile ? (
+                  <Image source={anaisImg} style={styles.anaisImage} resizeMode="contain" />
+                ) : (
+                  <Ionicons name="map" size={48} color={tokens.colors.muted} />
+                )}
+                <ThemedText style={[styles.mapText, { color: tokens.colors.muted, marginTop: 8 }]}>Nu ți-ai setat încă locația, dc?</ThemedText>
               </View>
             )}
             {/* map pin removed as requested */}
@@ -287,7 +295,7 @@ export default function ProfileScreen() {
 
           <View style={styles.infoGrid}>
             <View style={[styles.infoItem, { borderColor: tokens.colors.border }]}>
-              <Ionicons name="call-outline" size={20} color={pageAccent} />
+              <Ionicons name="call-outline" size={20} color={tokens.colors.primary} />
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Telefon</ThemedText>
                 <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]}>
@@ -297,7 +305,7 @@ export default function ProfileScreen() {
             </View>
 
             <View style={[styles.infoItem, { borderColor: tokens.colors.border }]}>
-              <Ionicons name="mail-outline" size={20} color={pageAccent} />
+              <Ionicons name="mail-outline" size={20} color={tokens.colors.primary} />
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Email</ThemedText>
                 <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]} numberOfLines={1}>
@@ -319,7 +327,7 @@ export default function ProfileScreen() {
 
           <View style={styles.announcementStats}>
             <View style={styles.statItem}>
-              <ThemedText style={[styles.statValue, { color: pageAccent }]}>6</ThemedText>
+              <ThemedText style={[styles.statValue, { color: tokens.colors.primary }]}>6</ThemedText>
               <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Active</ThemedText>
             </View>
             <View style={[styles.statDivider, { backgroundColor: tokens.colors.border }]} />
@@ -431,7 +439,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    shadowColor: '#000',
+  shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -452,7 +460,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    // color injected at runtime from tokens
   },
   userName: {
     fontSize: 18,
@@ -588,5 +596,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  anaisImage: {
+    width: 100,
+    height: 100,
+    marginBottom: -12,
   },
 });

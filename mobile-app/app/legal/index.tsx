@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { StyleSheet, TouchableOpacity, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppTheme } from '../src/context/ThemeContext';
+import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -22,7 +22,7 @@ export default function LegalMenu() {
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} activeOpacity={0.8}>
+          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
           <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Informații legale</ThemedText>
@@ -33,7 +33,7 @@ export default function LegalMenu() {
             <TouchableOpacity
               key={it.key}
               activeOpacity={0.75}
-              style={[styles.row, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
+              style={[styles.row, { backgroundColor: tokens.colors.surface }]}
               onPress={() => router.push(it.route as any)}
             >
               <View style={styles.rowLeft}>
@@ -53,10 +53,10 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 40, gap: 16 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700' },
   group: { marginTop: 12, gap: 12 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, paddingVertical: 14, paddingHorizontal: 14, borderRadius: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 14, borderRadius: 14 },
   rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   rowIcon: {},
   rowLabel: { fontSize: 15, fontWeight: '600' },

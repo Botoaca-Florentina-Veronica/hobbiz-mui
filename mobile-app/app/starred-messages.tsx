@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
+import { useAppTheme } from '../src/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../src/services/storage';
 import { useAuth } from '../src/context/AuthContext';
@@ -8,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function StarredMessagesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
+  const { tokens, isDark } = useAppTheme();
   const { user } = useAuth();
   const [items, setItems] = useState<any[]>([]);
 
@@ -59,7 +61,7 @@ export default function StarredMessagesScreen({ navigation }: any) {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 12 }] }>
+    <View style={[styles.container, { paddingTop: insets.top + 12, backgroundColor: tokens.colors.bg }] }>
       <View style={styles.header}>
         <Text style={styles.title}>Mesaje cu stea</Text>
       </View>
@@ -79,7 +81,7 @@ export default function StarredMessagesScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1 },
   header: { paddingHorizontal: 16, paddingBottom: 12 },
   title: { fontSize: 20, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },

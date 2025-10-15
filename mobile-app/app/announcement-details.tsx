@@ -127,9 +127,14 @@ export default function AnnouncementDetailsScreen() {
   const goToProfile = () => {
     const uid = announcement?.user?._id;
     try {
-      // Navigate to profile; param is optional depending on implementation
-      // @ts-ignore
-      router.push({ pathname: '/profile', params: uid ? { id: String(uid) } : undefined });
+      // Navigate to the public profile of the announcement's author.
+      // The Profile page expects `userId` as a query param (e.g. /profile?userId=...)
+      if (uid) {
+        router.push(`/profile?userId=${encodeURIComponent(String(uid))}`);
+      } else {
+        // fallback to profile root (own profile)
+        router.push('/profile');
+      }
     } catch {}
   };
 

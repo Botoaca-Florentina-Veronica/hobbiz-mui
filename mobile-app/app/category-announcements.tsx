@@ -182,9 +182,9 @@ export default function CategoryAnnouncementsScreen() {
               />
             </TouchableOpacity>
 
-            {/* Results Count */}
-            <View style={styles.resultsCount}>
-              <Text style={[styles.resultsText, { color: tokens.colors.muted }]}>
+            {/* Results Count (keep on a single line) */}
+            <View style={[styles.resultsCount, { alignItems: 'center' }]}> 
+              <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.resultsText, { color: tokens.colors.muted, flexShrink: 0 }]}>
                 {filteredAndSortedAnnouncements.length} rezultate
               </Text>
             </View>
@@ -405,8 +405,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   resultsCount: {
-    flex: 1,
     paddingHorizontal: 8,
+    minWidth: 72,
+    flexShrink: 0,
   },
   resultsText: {
     fontSize: 13,

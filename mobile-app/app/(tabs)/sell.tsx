@@ -112,6 +112,14 @@ export default function SellScreen() {
 
   const disabledPublish = title.length < 16 || description.length < 40 || !contactName || submitting;
 
+  // Dev-only: preview the success screen without posting
+  const handlePreviewSuccess = () => {
+    if (__DEV__) {
+      const sampleTitle = title.trim() || 'Anunț demo';
+      router.push({ pathname: '/post-success', params: { title: sampleTitle } });
+    }
+  };
+
   const handleSubmit = async () => {
     // Validations (mirror edit flow)
     if (!isAuthenticated) {
@@ -170,6 +178,7 @@ export default function SellScreen() {
           'Content-Type': 'multipart/form-data',
         },
       });
+      const submittedTitle = title.trim();
       // clear the form so the Sell page doesn't keep the submitted data
       const resetForm = () => {
         setTitle('');
@@ -186,10 +195,7 @@ export default function SellScreen() {
       };
 
       resetForm();
-
-      Alert.alert('Succes', 'Anunțul a fost publicat cu succes!', [
-        { text: 'OK', onPress: () => router.push('/my-announcements') },
-      ]);
+  router.replace({ pathname: '/post-success', params: { title: submittedTitle } });
     } catch (error: any) {
       console.error('Error publishing announcement:', error);
       const errMsg = error?.response?.data?.error || 'Eroare la publicarea anunțului. Încearcă din nou.';
@@ -481,6 +487,15 @@ export default function SellScreen() {
           </View>
         </View>
       )}
+      {__DEV__ && (
+        <TouchableOpacity
+          onPress={handlePreviewSuccess}
+          activeOpacity={0.85}
+          style={[styles.devPreviewBtn, { backgroundColor: '#f51866' }]}
+        >
+          <ThemedText style={{ color: '#fff', fontWeight: '700' }}>Preview Success</ThemedText>
+        </TouchableOpacity>
+      )}
     </ThemedView>
   );
 }
@@ -523,4 +538,17 @@ const styles = StyleSheet.create({
   categoryRow:{ flexDirection:'row', alignItems:'center', gap:14, paddingHorizontal:16, paddingVertical:14, borderBottomWidth:1 },
   categoryIconWrap:{ width:44, height:44, borderRadius:10, alignItems:'center', justifyContent:'center' },
   categoryLabel:{ fontSize:15, fontWeight:'500' },
+  devPreviewBtn: {
+    position: 'absolute',
+    right: 16,
+    bottom: 24,
+    paddingVertical:12,
+    paddingHorizontal:16,
+    borderRadius:16,
+    elevation:8,
+    shadowColor:'#000',
+    shadowOffset:{ width:0, height:6 },
+    shadowOpacity:0.12,
+    shadowRadius:12,
+  },
 });

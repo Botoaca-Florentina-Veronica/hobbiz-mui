@@ -22,6 +22,17 @@ export default function AboutScreen() {
   const router = useRouter();
   const [open, setOpen] = useState<number | null>(null);
 
+  // Dark palette tints (used as accents). Matches the attached palette.
+  const tints = {
+    a10: '#f51866',
+    a20: '#fa4875',
+    a30: '#fe6585',
+    a40: '#ff7e95',
+    a50: '#ff96a6',
+    a60: '#ffabb7',
+  } as const;
+  const tintList = [tints.a10, tints.a20, tints.a30, tints.a40, tints.a50, tints.a60];
+
   const toggle = (idx: number) => setOpen(open === idx ? null : idx);
   const features = [
     'Descoperi o nouă sursă de venit',
@@ -55,7 +66,7 @@ export default function AboutScreen() {
   ];
 
   // StrokeWord: layered white text behind the colored word to simulate a simple contour/stroke
-  const StrokeWord = ({ children, color = '#100e9aff', stroke = true }: { children: React.ReactNode; color?: string; stroke?: boolean }) => (
+  const StrokeWord = ({ children, color = tints.a10, stroke = true }: { children: React.ReactNode; color?: string; stroke?: boolean }) => (
     <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
       {stroke && (
         <>
@@ -89,7 +100,7 @@ export default function AboutScreen() {
               style={[
                 styles.heroCard,
                 {
-                  backgroundColor: '#100e9aff',
+                  backgroundColor: tints.a10,
                   borderRadius: tokens.radius.lg,
                   padding: tokens.spacing.xl,
                   ...tokens.shadow.elev2,
@@ -109,13 +120,13 @@ export default function AboutScreen() {
                     },
                   ]}
                 >
-                  <ThemedText style={[styles.badgeText, { color: '#100e9aff', textAlign: 'center' }]}>✨ Platforma pasionaților</ThemedText>
+                  <ThemedText style={[styles.badgeText, { color: tints.a10, textAlign: 'center' }]}>✨ Platforma pasionaților</ThemedText>
                 </View>
 
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', marginTop: tokens.spacing.md }}>
                 <ThemedText style={[styles.heroTitle, { color: '#ffffff' }]}>Transformă-ți </ThemedText>
                 <View style={{ marginHorizontal: 4 }}>
-                  <StrokeWord color="#fcc22eff" stroke={false}>pasiunea</StrokeWord>
+                  <StrokeWord color={tints.a40} stroke={false}>pasiunea</StrokeWord>
                 </View>
                 <ThemedText style={[styles.heroTitle, { color: '#ffffff' }]}> în oportunitate</ThemedText>
               </View>
@@ -129,7 +140,7 @@ export default function AboutScreen() {
                   width: 160,
                   height: 160,
                   borderRadius: 80,
-                  backgroundColor: '#fcc22eff',
+                  backgroundColor: tints.a60,
                   opacity: 0.12,
                   transform: [{ rotate: '20deg' }],
                 }}
@@ -174,7 +185,7 @@ export default function AboutScreen() {
                   <View key={line} style={styles.checkRow}>
                     <View style={[styles.checkIconWrapper, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}
                     >
-                      <Ionicons name="checkmark" size={16} color={'#100e9aff'} />
+                      <Ionicons name="checkmark" size={16} color={tintList[features.indexOf(line) % tintList.length]} />
                     </View>
                     <ThemedText style={[styles.checkText, { color: tokens.colors.muted }]}>{line}</ThemedText>
                   </View>
@@ -189,7 +200,7 @@ export default function AboutScreen() {
                 {reasons.map(line => (
                   <View key={line} style={styles.checkRow}>
                     <View style={[styles.checkIconWrapper, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}>
-                      <Ionicons name="checkmark" size={16} color={'#100e9aff'} />
+                      <Ionicons name="checkmark" size={16} color={tintList[reasons.indexOf(line) % tintList.length]} />
                     </View>
                     <ThemedText style={[styles.checkText, { color: tokens.colors.muted }]}>{line}</ThemedText>
                   </View>
@@ -200,10 +211,10 @@ export default function AboutScreen() {
             {/* How it works */}
             <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
               <ThemedText style={[styles.sectionHeader, { color: tokens.colors.text }]}>Cum funcționează?</ThemedText>
-              {steps.map(step => (
+              {steps.map((step, idx) => (
                 <View key={step.n} style={styles.stepRow}>
-                  <View style={[styles.stepCircle, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}>
-                    <ThemedText style={[styles.stepNumber, { color: tokens.colors.text }]}>{step.n}</ThemedText>
+                  <View style={[styles.stepCircle, { backgroundColor: tintList[idx % tintList.length], borderColor: 'transparent', borderWidth: 0 }]}>
+                    <ThemedText style={[styles.stepNumber, { color: '#ffffff' }]}>{step.n}</ThemedText>
                   </View>
                   <View style={{ flex: 1 }}>
                     <ThemedText style={[styles.stepTitle, { color: tokens.colors.text }]}>{step.t}</ThemedText>
@@ -230,23 +241,29 @@ export default function AboutScreen() {
             {/* FAQ */}
             <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
               <ThemedText style={[styles.sectionHeader, { color: tokens.colors.text }]}>Întrebări frecvente</ThemedText>
-              {FAQS.map((f, idx) => (
-                <View key={f.question}>
-                  <TouchableOpacity
-                    onPress={() => toggle(idx)}
-                    activeOpacity={0.7}
-                    style={[styles.faqQuestion, { borderColor: tokens.colors.border }]}
-                  >
-                    <ThemedText style={[styles.faqQuestionText, { color: tokens.colors.text }]}>{f.question}</ThemedText>
-                    <Ionicons name={open === idx ? 'chevron-up' : 'chevron-down'} size={18} color={tokens.colors.muted} />
-                  </TouchableOpacity>
-                  {open === idx && (
-                    <View style={styles.faqAnswer}>                  
-                      <ThemedText style={{ color: tokens.colors.muted, lineHeight: 20 }}>{f.answer}</ThemedText>
-                    </View>
-                  )}
-                </View>
-              ))}
+              {FAQS.map((f, idx) => {
+                const tint = tintList[idx % tintList.length];
+                return (
+                  <View key={f.question}>
+                    <TouchableOpacity
+                      onPress={() => toggle(idx)}
+                      activeOpacity={0.7}
+                      style={[
+                        styles.faqQuestion,
+                        { borderColor: tokens.colors.border, borderLeftWidth: 4, borderLeftColor: tint, paddingLeft: 12 },
+                      ]}
+                    >
+                      <ThemedText style={[styles.faqQuestionText, { color: tint }]}>{f.question}</ThemedText>
+                      <Ionicons name={open === idx ? 'chevron-up' : 'chevron-down'} size={18} color={tint} />
+                    </TouchableOpacity>
+                    {open === idx && (
+                      <View style={styles.faqAnswer}>                  
+                        <ThemedText style={{ color: tokens.colors.muted, lineHeight: 20 }}>{f.answer}</ThemedText>
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
               <ThemedText style={[styles.updateText, { color: tokens.colors.muted }]}>Ultima actualizare: 19 iulie 2025</ThemedText>
             </View>
       </ScrollView>

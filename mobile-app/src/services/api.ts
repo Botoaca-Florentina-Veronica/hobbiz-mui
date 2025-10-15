@@ -86,26 +86,34 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (res) => res,
   (error) => {
-    try {
-      // eslint-disable-next-line no-console
-      const cfg = error?.config || {};
-      const base = cfg.baseURL || api.defaults.baseURL;
-      const url = cfg.url || '(unknown)';
-      // Detect timeouts vs other network errors
-      const isTimeout = error?.code === 'ECONNABORTED' || (error?.message || '').toLowerCase().includes('timeout');
-      if (isTimeout) {
-        console.error('[mobile-app] API timeout:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
-      } else {
-        console.error('[mobile-app] API error:', error?.message, 'baseURL:', base, 'url:', url);
-      }
+      try {
+        // eslint-disable-next-line no-console
+        const cfg = error?.config || {};
+        const base = cfg.baseURL || api.defaults.baseURL;
+        const url = cfg.url || '(unknown)';
+        // Detect timeouts vs other network errors
+        const isTimeout = error?.code === 'ECONNABORTED' || (error?.message || '').toLowerCase().includes('timeout');
+        // If server responded with 401, it's an auth issue — show as warn to reduce noise
+        const status = error?.response?.status;
+        if (status === 401) {
+          console.warn('[mobile-app] API 401 Unauthorized:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
+          // Do not attempt retry for 401
+          return Promise.reject(error);
+        }
 
-      // Simple one-time retry for transient network errors/timeouts
-      if (cfg && !cfg.__isRetryRequest && (isTimeout || error?.message === 'Network Error')) {
-        // mark it so we don't loop
-        cfg.__isRetryRequest = true;
-        // small backoff before retrying
-        return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => api(cfg));
-      }
+        if (isTimeout) {
+          console.error('[mobile-app] API timeout:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
+        } else {
+          console.error('[mobile-app] API error:', error?.message, 'baseURL:', base, 'url:', url);
+        }
+
+        // Simple one-time retry for transient network errors/timeouts
+        if (cfg && !cfg.__isRetryRequest && (isTimeout || error?.message === 'Network Error')) {
+          // mark it so we don't loop
+          cfg.__isRetryRequest = true;
+          // small backoff before retrying
+          return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => api(cfg));
+        }
     } catch (e) {
       // ignore
     }

@@ -33,6 +33,7 @@ export default function RootLayout() {
               <Stack.Screen name="profile" options={{ headerShown: false }} />
               <Stack.Screen name="my-announcements" options={{ headerShown: false }} />
               <Stack.Screen name="edit-announcement" options={{ headerShown: false }} />
+              <Stack.Screen name="post-success" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             </Stack>
             <StatusBar style="auto" />

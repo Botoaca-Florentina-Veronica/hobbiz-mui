@@ -67,7 +67,7 @@ export default function TermsScreen() {
   </View>
 
         {/* Section 1 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>1. Definiții și interpretare</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
             În cadrul acestor termeni și condiții, următoarele definiții se aplică: <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Platforma&quot;</ThemedText> se referă la website-ul Hobbiz și toate aplicațiile mobile asociate; <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Servicii&quot;</ThemedText> include toate funcționalitățile oferite prin platformă, inclusiv publicarea anunțurilor, căutarea, comunicarea între utilizatori și procesarea plăților; <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Utilizator&quot;</ThemedText> desemnează orice persoană fizică sau juridică care accesează sau folosește platforma; <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Conținut&quot;</ThemedText> include texte, imagini, video, date și alte materiale încărcate pe platformă.
@@ -78,7 +78,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 2 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>2. Eligibilitate și înregistrare</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Cerințe de vârstă și capacitate juridică</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru a utiliza serviciile Hobbiz, trebuie să aveți minimum 18 ani și să dețineți capacitatea juridică deplină conform legislației românești. Minorilor cu vârsta cuprinsă între 16-18 ani li se permite utilizarea platformei doar cu consimțământul explicit al părinților sau reprezentanților legali și sub supravegherea acestora.</ThemedText>
@@ -90,7 +90,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 3 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>3. Utilizarea platformei și anunțuri</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Publicarea anunțurilor</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Utilizatorii pot publica anunțuri pentru vânzarea de produse noi sau second-hand, prestarea de servicii, închirierea de bunuri sau alte tranzacții comerciale legale. Fiecare anunț trebuie să conțină o descriere exactă și completă a produsului sau serviciului, fotografii reale și nemodificate și un preț corect și transparent.</ThemedText>
@@ -102,7 +102,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 4 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>4. Tranzacții și plăți</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Facilitarea tranzacțiilor</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Hobbiz acționează ca intermediar tehnologic între cumpărători și vânzători, fără a fi parte în tranzacțiile efectuate. Nu garantăm calitatea, autenticitatea sau conformitatea produselor vândute, acestea fiind responsabilitatea exclusivă a vânzătorilor. Recomandăm utilizatorilor să fie precauți și să verifice întotdeauna produsele înainte de finalizarea tranzacțiilor.</ThemedText>
@@ -114,7 +114,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 5 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>5. Proprietate intelectuală</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Drepturile platformei</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Codul sursă, designul, logo-ul, mărcile comerciale și toate elementele tehnice ale platformei Hobbiz sunt protejate prin drepturi de autor și proprietate intelectuală. Utilizarea neautorizată a acestor elemente, inclusiv copierea codului sau replicarea designului, constituie o încălcare a drepturilor noastre și poate fi urmărită legal.</ThemedText>
@@ -126,7 +126,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 6 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>6. Securitate și protecția datelor</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Măsuri de securitate tehnice</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Implementăm măsuri avansate de securitate informatică: criptarea SSL/TLS pentru toate comunicațiile, hashing-ul securizat al parolelor cu algoritmi bcrypt, protecție împotriva atacurilor CSRF și XSS, firewall-uri configurate și monitorizare constantă pentru activități suspecte. Actualizăm regulat toate componentele software pentru a corecta vulnerabilitățile de securitate.</ThemedText>
@@ -138,7 +138,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 7 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>7. Limitări de răspundere</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Excluderi de răspundere</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Hobbiz nu este responsabil pentru: daunele rezultate din tranzacțiile între utilizatori, pierderea de date din cauza defecțiunilor hardware sau software, întreruperile temporare ale serviciilor din motive tehnice, acțiunile frauduloase ale utilizatorilor sau terților sau consecințele utilizării inadecvate a platformei.</ThemedText>
@@ -150,7 +150,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 8 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>8. Modificări și încetarea serviciilor</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Modificări ale termenilor</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Ne rezervăm dreptul de a modifica acești termeni și condiții pentru a reflecta schimbările în serviciile oferite, cerințele legale sau practicile comerciale. Utilizatorii vor fi notificați cu minimum 30 de zile înainte de intrarea în vigoare a modificărilor majore prin email și notificări în platformă.</ThemedText>
@@ -162,7 +162,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 9 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>9. Legea aplicabilă și jurisdicția</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Cadrul legal</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Acești termeni și condiții sunt guvernați de legea română și se interpretează conform acesteia. Toate disputele rezultate din utilizarea platformei vor fi soluționate de instanțele competente din România, utilizatorii renunțând la orice pretenție de incompetență teritorială.</ThemedText>
@@ -174,7 +174,7 @@ export default function TermsScreen() {
         </View>
 
         {/* Section 10 */}
-        <View style={[styles.sectionCard, { backgroundColor: surface, borderColor: WEB_BORDER_LIGHT }]}>          
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
           <ThemedText style={[styles.h2, { color: headingColor }]}>10. Contact și asistență</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Informații de contact</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru întrebări despre acești termeni și condiții, reclamații sau solicitări de asistență, ne puteți contacta prin următoarele modalități: email oficial la <ThemedText style={styles.strong}>legal@hobbiz.ro</ThemedText>, formularul de contact din platformă sau poșta tradițională la adresa sediului social înregistrat.</ThemedText>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   introStrong: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 10 },
   introParagraph: { fontSize: 14, lineHeight: 20, color: 'rgba(255,255,255,0.95)' },
 
-  sectionCard: { borderRadius: 16, padding: 28, borderWidth: 1, marginTop: 4, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 24, shadowOffset: { width: 0, height: 4 }, backgroundColor: '#fff' },
+  sectionCard: { borderRadius: 16, padding: 28, marginTop: 4, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 24, shadowOffset: { width: 0, height: 4 } },
   h2: { fontSize: 26, fontWeight: '700', marginBottom: 20, paddingBottom: 10, borderBottomWidth: 3, borderBottomColor: WEB_ACCENT, alignSelf: 'flex-start' },
   h3: { fontSize: 18, fontWeight: '600', marginTop: 28, marginBottom: 12, paddingLeft: 20, position: 'relative' },
   paragraph: { fontSize: 14, lineHeight: 22, marginBottom: 14, textAlign: 'left' },

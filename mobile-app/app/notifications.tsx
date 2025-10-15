@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     marginBottom: -44,
+    marginTop: 62,
     borderRadius: 12,
   },
   emptyText: {

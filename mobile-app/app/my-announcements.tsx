@@ -385,41 +385,72 @@ export default function MyAnnouncementsScreen() {
 
                   {/* Action buttons - 2x2 layout with variable width per label */}
                   <View style={styles.actionsGrid}>
-                    {/** Determine if there's enough width to make all 4 buttons equal */}
                     {(() => {
                       const contentW = rowWidths[announcement._id] || 0;
-                      // conservative needed width: 4 * 120 + gaps
-                      const needed = 4 * 120 + 3 * 6;
-                      const equalButtons = isLarge && contentW >= needed;
+                      // Threshold to fit 4 equal buttons on one row: 4 * 120px + 3 gaps (6px)
+                      const neededOneRow = 4 * 120 + 3 * 6;
+                      const canOneRow = contentW >= neededOneRow;
 
+                      if (canOneRow) {
+                        return (
+                          <View style={styles.actionsRowWrap}>
+                            <TouchableOpacity
+                              style={[styles.actionButton, styles.equalButtonFour, styles.primaryButton]}
+                              onPress={() => handleEdit(announcement)}
+                            >
+                              <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[styles.actionButton, styles.equalButtonFour, styles.secondaryButton]}
+                              onPress={() => handleDeactivate(announcement)}
+                            >
+                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[styles.actionButton, styles.equalButtonFour, styles.dangerButton]}
+                              onPress={() => handleDelete(announcement._id)}
+                            >
+                              <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[styles.actionButton, styles.equalButtonFour, styles.secondaryButton]}
+                              onPress={() => handleReactivate(announcement)}
+                            >
+                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      }
+
+                      // Fallback to 2x2 layout
                       return (
                         <>
                           <View style={styles.actionsRow}>
                             <TouchableOpacity
-                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.fillButton, styles.primaryButton]}
+                              style={[styles.actionButton, styles.fillButton, styles.primaryButton]}
                               onPress={() => handleEdit(announcement)}
                             >
-                              <Text style={styles.primaryButtonText}>Editează</Text>
+                              <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.compactButton, styles.secondaryButton]}
+                              style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
                               onPress={() => handleDeactivate(announcement)}
                             >
-                              <Text style={styles.secondaryButtonText}>Dezactivează</Text>
+                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
                             </TouchableOpacity>
                           </View>
                           <View style={styles.actionsRow}>
                             <TouchableOpacity
-                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.fillButton, styles.dangerButton]}
+                              style={[styles.actionButton, styles.fillButton, styles.dangerButton]}
                               onPress={() => handleDelete(announcement._id)}
                             >
-                              <Text style={styles.dangerButtonText}>Șterge</Text>
+                              <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                              style={[styles.actionButton, equalButtons ? styles.equalButton : styles.compactButton, styles.secondaryButton]}
+                              style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
                               onPress={() => handleReactivate(announcement)}
                             >
-                              <Text style={styles.secondaryButtonText}>Reactualizează</Text>
+                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
                             </TouchableOpacity>
                           </View>
                         </>
@@ -910,6 +941,14 @@ const createStyles = (tokens: any) => StyleSheet.create({
     gap: 6,
     width: '100%',
   },
+  actionsRowWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
+    width: '100%',
+    flexWrap: 'nowrap',
+  },
   fillButton: {
     flex: 1,
     marginRight: 6,
@@ -918,6 +957,10 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flex: 1,
     minWidth: 0,
     marginRight: 6,
+  },
+  equalButtonFour: {
+    flex: 1,
+    minWidth: 0,
   },
   compactButton: {
     flexShrink: 0,

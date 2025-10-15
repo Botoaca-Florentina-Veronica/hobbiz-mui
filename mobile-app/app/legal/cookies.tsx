@@ -70,7 +70,7 @@ export default function CookiesScreen() {
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
   <Animated.ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]} activeOpacity={0.8}>
+          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
           <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Politica cookie-urilor</ThemedText>
@@ -109,7 +109,7 @@ export default function CookiesScreen() {
 
         {/* Content */}
         {/* Table of Contents */}
-        <View style={styles.cookieToc}>
+  <View style={[styles.cookieToc, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
           <ThemedText style={styles.tocTitle}>Cuprins</ThemedText>
           <View style={styles.tocList}>
             <TouchableOpacity onPress={() => scrollToSection(secCeRef)} activeOpacity={0.7}><ThemedText style={styles.tocItem}>• Ce sunt cookie-urile?</ThemedText></TouchableOpacity>
@@ -123,13 +123,13 @@ export default function CookiesScreen() {
           </View>
         </View>
 
-  <View ref={secCeRef} style={[styles.sectionCard, { backgroundColor: '#ffffff', borderColor: '#8b8b8b' }]}>
+  <View ref={secCeRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: isDark ? '#ffffff' : tokens.colors.text }]}>Ce sunt cookie-urile?</ThemedText>
           <ThemedText style={[styles.paragraph, { color: isDark ? '#d6d6d6' : '#575757' }]}>Cookie-urile sunt fișiere text mici care sunt plasate pe dispozitivul tău (computer, telefon mobil sau tabletă) atunci când vizitezi un site web. Acestea sunt procesate și stocate de browser-ul tău web și ne ajută să îți oferim o experiență mai bună pe site-ul nostru.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: isDark ? '#d6d6d6' : '#575757' }]}>Cookie-urile sunt inofensive în sine și servesc funcții cruciale pentru site-uri web. Ele pot fi vizualizate și șterse cu ușurință din setările browser-ului tău.</ThemedText>
         </View>
 
-  <View ref={secTipuriRef} style={[styles.sectionCard, { backgroundColor: '#ffffff', borderColor: '#8b8b8b' }]}> 
+  <View ref={secTipuriRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: '#3f3f3f' }]}>Tipuri de cookie-uri pe care le folosim</ThemedText>
 
           <View style={styles.cookieType}>
@@ -177,7 +177,7 @@ export default function CookiesScreen() {
           </View>
         </View>
 
-  <View ref={secDeCeRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secDeCeRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>De ce folosim cookie-uri?</ThemedText>
           <View style={styles.reasonsGrid}>
             <View style={styles.reasonCard}>
@@ -198,7 +198,7 @@ export default function CookiesScreen() {
           </View>
         </View>
 
-  <View ref={secGestionareRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secGestionareRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Cum să gestionezi cookie-urile</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Poți controla și/sau șterge cookie-urile după cum dorești. Poți șterge toate cookie-urile care sunt deja pe computerul tău și poți seta majoritatea browserelor să le împiedice să fie plasate.</ThemedText>
 
@@ -212,7 +212,7 @@ export default function CookiesScreen() {
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Dacă dezactivezi anumite cookie-uri, este posibil ca unele funcții ale platformei Hobbiz să nu funcționeze corect. De exemplu, s-ar putea să nu poți rămâne autentificat, să-ți pierzi anunțurile favorite salvate, sau să nu primești notificări noi pentru mesajele din chat.</ThemedText>
         </View>
 
-  <View ref={secTertiRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secTertiRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Cookie-uri de la terți</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Pe platforma Hobbiz folosim servicii de la terți care pot plasa propriile cookie-uri pentru a îmbunătăți experiența ta:</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Cloudinary:</ThemedText> Pentru optimizarea și livrarea rapidă a imaginilor anunțurilor</ThemedText>
@@ -221,19 +221,19 @@ export default function CookiesScreen() {
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Aceste servicii au propriile politici de confidențialitate și cookie-uri pe care te încurajăm să le citești.</ThemedText>
         </View>
 
-  <View ref={secConsimRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secConsimRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Consimțământul tău</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Prin utilizarea platformei Hobbiz, îți dai consimțământul pentru utilizarea cookie-urilor conform acestei politici. Pentru funcțiile esențiale (autentificare, publicare anunțuri, chat), cookie-urile sunt necesare pentru buna funcționare a serviciului.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Poți să-ți retragi consimțământul pentru cookie-urile non-esențiale oricând prin modificarea setărilor browser-ului tău sau prin contactarea echipei Hobbiz.</ThemedText>
         </View>
 
-  <View ref={secUpdatesRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secUpdatesRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Actualizări ale acestei politici</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești această pagină din când în când.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}><ThemedText style={styles.strong}>Ultima actualizare:</ThemedText> Septembrie 2025</ThemedText>
         </View>
 
-  <View ref={secContactRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+  <View ref={secContactRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>Contactează-ne</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Dacă ai întrebări despre această politică de cookie-uri sau despre utilizarea datelor pe platforma Hobbiz, te rugăm să ne contactezi:</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}><ThemedText style={styles.strong}>Email:</ThemedText> privacy@hobbiz.ro</ThemedText>
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 40, gap: 16 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
-  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 20, fontWeight: '700' },
 
   hero: { borderRadius: 18, paddingVertical: 28, paddingHorizontal: 18, marginBottom: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffd6db', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
@@ -262,26 +262,26 @@ const styles = StyleSheet.create({
   heroTitle: { fontSize: 34, fontWeight: '900', textAlign: 'center', lineHeight: 40 },
   highlight: { fontWeight: '900' },
 
-  sectionCard: { borderRadius: 12, padding: 16, borderWidth: 1, marginBottom: 12 },
+  sectionCard: { borderRadius: 12, padding: 16, marginBottom: 12 },
   h2: { fontSize: 20, fontWeight: '700', marginBottom: 8 },
   h3: { fontSize: 16, fontWeight: '600', marginTop: 8, marginBottom: 6 },
   paragraph: { fontSize: 14, lineHeight: 20, marginBottom: 8 },
   strong: { fontWeight: '700' },
 
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
-  tag: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 8, backgroundColor: '#eef2ff', marginRight: 8, fontSize: 13 },
+  tag: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 8, marginRight: 8, fontSize: 13 },
 
   reasonsGrid: { flexDirection: 'row', gap: 12, justifyContent: 'space-between' },
   reasonCard: { flex: 1, padding: 12, borderRadius: 10, alignItems: 'center' },
   reasonIcon: { fontSize: 22, marginBottom: 8 },
   reasonTitle: { fontSize: 15, fontWeight: '700', marginBottom: 6 },
-  /* TOC and content styles (from web CSS) */
-  cookieToc: { backgroundColor: '#ffffff', borderRadius: 14, paddingVertical: 18, paddingHorizontal: 16, marginBottom: 20, borderWidth: 1, borderColor: '#8b8b8b', shadowColor: '#3f3f3f', shadowOpacity: 0.08, shadowRadius: 6, elevation: 1 },
-  tocTitle: { fontSize: 18, fontWeight: '700', color: '#3f3f3f', marginBottom: 8 },
+  /* TOC and content styles */
+  cookieToc: { borderRadius: 14, paddingVertical: 18, paddingHorizontal: 16, marginBottom: 20, shadowColor: '#3f3f3f', shadowOpacity: 0.08, shadowRadius: 6, elevation: 1 },
+  tocTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
   tocList: { gap: 6 },
-  tocItem: { color: '#575757', fontWeight: '600', fontSize: 15, paddingVertical: 6 },
+  tocItem: { fontWeight: '600', fontSize: 15, paddingVertical: 6 },
 
-  cookieType: { backgroundColor: '#ffffff', borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#8b8b8b' },
+  cookieType: { borderRadius: 16, padding: 16, marginBottom: 16 },
   cookieExamples: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   cookieTag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, marginRight: 8, marginBottom: 8 },
   cookieTagText: { color: '#ffffff', fontSize: 13, fontWeight: '500' },

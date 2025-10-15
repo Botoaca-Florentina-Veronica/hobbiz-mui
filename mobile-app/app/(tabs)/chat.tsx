@@ -123,6 +123,9 @@ export default function ChatScreen() {
   const [reactionDimsMap, setReactionDimsMap] = useState<Record<string, {width:number;height:number}>>({});
 
   const width = Dimensions.get('window').width;
+  // Static local empty-state image (added to mobile-app/assets/images)
+  // Use require so Metro bundles the asset for native apps.
+  const gumballChat = require('../../assets/images/gumballChat.jpg');
   
   // Page colors (kept for backward compatibility; use tokens below)
   const primaryColor = '#355070';
@@ -1502,9 +1505,16 @@ export default function ChatScreen() {
               </TouchableOpacity>
             ))
           ) : (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="chatbubbles-outline" size={80} color={tokens.colors.border} />
-              <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>Nu există conversații {conversationFilter === 'buying' ? 'de cumpărat' : 'de vândut'} momentan.</Text>
+            <View style={styles.chatEmptyMain}>
+              <View style={styles.chatEmptyIcon}>
+                <Image
+                  source={gumballChat}
+                  style={{ width: Math.min(160, width * 0.6), height: Math.min(320, width * 0.6), borderRadius: 8 }}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={[styles.chatEmptyText, { color: tokens.colors.text }]}>Nu ai conversații </Text>
+              <Text style={[styles.chatEmptySubtitle, { color: tokens.colors.muted }]}>E momentul tău Eminescu, începe să scrii!</Text>
             </View>
           )}
         </ScrollView>
@@ -1679,6 +1689,31 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     textAlign: 'center',
+  },
+  // Web-like empty state for conversations list
+  chatEmptyMain: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+    paddingHorizontal: 24,
+  },
+  chatEmptyIcon: {
+    marginBottom: -55,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chatEmptyText: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  chatEmptySubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 20,
   },
   // Chat view
   chatHeaderGradient: {

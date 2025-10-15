@@ -38,11 +38,23 @@ export default function AccountScreen() {
   // const accent = '#F8B195';
   // const accentLight = '#FCEDE6';
 
-  // Header gradient uses surface/surface in dark, peach in light
-  // Name uses primary pink in dark, blue in light
-  const headerColor = isDark ? tokens.colors.surface : '#F8B195';
-  const gradientColors = [headerColor, headerColor] as const;
-  const nameColor = isDark ? tokens.colors.primary : '#355070';
+  // Centralized per-screen palette so dark-mode tweaks are simple in one place
+  const palette = React.useMemo(() => ({
+    // Header background (use a flat gradient; you can make a real gradient by changing end color)
+    headerBgStart: isDark ? '#f51866' : '#F8B195',
+    headerBgEnd: isDark ? tokens.colors.primaryHover : '#F8B195',
+    headerText: '#ffffff',
+    // Name accent color within header greeting
+    nameAccent: isDark ? '#121212' : '#355070',
+    // Background for circular icons on rows
+    iconBg: isDark ? tokens.colors.elev : '#F3F5F6',
+  // Icon color (pink in dark mode)
+  iconColor: isDark ? '#f51866' : tokens.colors.text,
+    // Track ON color for the dark mode switch and generic confirm buttons
+    emphasisBg: isDark ? tokens.colors.primary : '#F8B195',
+    // Logout color accent
+    danger: isDark ? '#ff5566' : '#ff2d2d',
+  }), [isDark, tokens]);
 
   const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : 'Utilizator';
   // How much of the sun should remain visible when we push it into the status bar area.
@@ -60,16 +72,16 @@ export default function AccountScreen() {
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
       <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
         {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
-  <View pointerEvents="none" style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }]}> 
+        <View pointerEvents="none" style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }]}> 
           <Image
-            source={require('../../assets/images/sun.png')}
+            source={isDark ? require('../../assets/images/night.png') : require('../../assets/images/sun.png')}
             resizeMode="contain"
-            style={styles.sunImage}
+            style={[styles.sunImage, isDark && styles.nightShift]}
           />
         </View>
         {/* Header with Gradient Background */}
         <LinearGradient
-          colors={[...gradientColors]}
+          colors={[palette.headerBgStart, palette.headerBgEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[styles.header, { paddingTop: insets.top + 16 }]}
@@ -80,14 +92,14 @@ export default function AccountScreen() {
               style={styles.backButton}
               onPress={() => router.back()}
             >            
-              <Ionicons name="arrow-back" size={24} color="#ffffff" />
+              <Ionicons name="arrow-back" size={24} color={palette.headerText} />
             </TouchableOpacity>
             <ThemedText style={styles.headerTitle}>Profile</ThemedText>
           </View>
           {/* Greeting placed in the blue header. Name is pulled from user and colored yellow. */}
           <View style={styles.greetingContainer}>
-            <ThemedText style={[styles.greetingText, { color: '#ffffff' }]}>Ceau{' '}
-              <ThemedText style={[styles.greetingText, { color: nameColor }]}>{displayName}!</ThemedText>
+            <ThemedText style={[styles.greetingText, { color: palette.headerText }]}>Ceau{' '}
+              <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{displayName}!</ThemedText>
             </ThemedText>
           </View>
          </LinearGradient>
@@ -96,8 +108,8 @@ export default function AccountScreen() {
         <View style={[styles.profileCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.avatarContainer}>
               <View style={styles.avatarOuter}>
-              <View style={[styles.halfTop, { backgroundColor: isDark ? '#f51866' : '#355070' }]} />
-              <View style={[styles.halfBottom, { backgroundColor: isDark ? '#f51866' : '#355070' }]} />
+              <View style={[styles.halfTop, { backgroundColor: isDark ? '#ffffff' : '#355070' }]} />
+              <View style={[styles.halfBottom, { backgroundColor: isDark ? '#ffffff' : '#355070' }]} />
               <View style={[styles.avatarInner, { backgroundColor: tokens.colors.surface }]}> 
                 {user?.avatar ? (
                   <Image 
@@ -106,7 +118,7 @@ export default function AccountScreen() {
                   />
                 ) : (
                   <View style={[styles.avatarPlaceholder, { backgroundColor: tokens.colors.surface }]}>
-                    <Ionicons name="person" size={50} color={tokens.colors.text} />
+                    <Ionicons name="person" size={50} color={palette.iconColor} />
                   </View>
                 )}
               </View>
@@ -138,7 +150,7 @@ export default function AccountScreen() {
                 <View key={r.key} style={[styles.row, { backgroundColor: tokens.colors.surface }]}>                  
                   <View style={styles.rowLeft}>                    
                     <View style={[styles.iconCircle, { backgroundColor: isDark ? tokens.colors.elev : '#F3F5F6' }]}>
-                      <Ionicons name={r.icon as any} size={20} color={tokens.colors.text} />
+                      <Ionicons name={r.icon as any} size={20} color={palette.iconColor} />
                     </View>
                     <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
                   </View>
@@ -146,7 +158,7 @@ export default function AccountScreen() {
                     value={isDark}
                     onValueChange={(v) => setMode(v ? 'dark' : 'light')}
                     thumbColor={'#ffffff'}
-                    trackColor={{ false: tokens.colors.border, true: headerColor }}
+                    trackColor={{ false: tokens.colors.border, true: palette.emphasisBg }}
                   />
                 </View>
               );
@@ -159,8 +171,8 @@ export default function AccountScreen() {
                 onPress={r.action}
               >
                 <View style={styles.rowLeft}>
-                  <View style={[styles.iconCircle, { backgroundColor: isDark ? tokens.colors.elev : '#F3F5F6' }]}>
-                    <Ionicons name={r.icon as any} size={20} color={tokens.colors.text} />
+                  <View style={[styles.iconCircle, { backgroundColor: palette.iconBg }]}>
+                    <Ionicons name={r.icon as any} size={20} color={palette.iconColor} />
                   </View>
                   <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
                 </View>
@@ -180,8 +192,8 @@ export default function AccountScreen() {
               onPress={r.action}
             >
               <View style={styles.rowLeft}>
-                <View style={[styles.iconCircle, { backgroundColor: isDark ? tokens.colors.elev : '#F3F5F6' }]}>
-                  <Ionicons name={r.icon as any} size={20} color={tokens.colors.text} />
+                <View style={[styles.iconCircle, { backgroundColor: palette.iconBg }]}>
+                  <Ionicons name={r.icon as any} size={20} color={palette.iconColor} />
                 </View>
                 <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{r.label}</ThemedText>
               </View>
@@ -197,8 +209,8 @@ export default function AccountScreen() {
             style={styles.logoutTextContainer}
             onPress={() => setConfirmVisible(true)}
           >
-            <ThemedText style={styles.logoutTextRed}>Ieși din cont</ThemedText>
-            <View style={styles.logoutUnderline} />
+            <ThemedText style={[styles.logoutTextRed, { color: palette.danger }]}>Ieși din cont</ThemedText>
+            <View style={[styles.logoutUnderline, { backgroundColor: palette.danger }]} />
           </TouchableOpacity>
         </View>
 
@@ -221,7 +233,7 @@ export default function AccountScreen() {
                   <Text style={{ color: tokens.colors.text }}>Anulează</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.modalBtn, styles.modalBtnConfirm, { backgroundColor: headerColor }]}
+                  style={[styles.modalBtn, styles.modalBtnConfirm, { backgroundColor: palette.emphasisBg }]}
                   onPress={async () => {
                     try {
                       await logout();
@@ -489,5 +501,8 @@ const styles = StyleSheet.create({
   sunImage: {
     width: '100%',
     height: '100%',
+  },
+  nightShift: {
+    transform: [{ translateY: 8 }],
   },
 });
