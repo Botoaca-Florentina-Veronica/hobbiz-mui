@@ -311,11 +311,16 @@ const getProfile = async (req, res) => {
 const updateEmail = async (req, res) => {
   try {
     const userId = req.userId; // Obținut din middleware-ul de autentificare
-    const { newEmail } = req.body;
+    const { newEmail, password } = req.body;
 
     // Validare email
     if (!newEmail) {
       return res.status(400).json({ error: 'Noul email este obligatoriu' });
+    }
+
+    // Validare parolă
+    if (!password) {
+      return res.status(400).json({ error: 'Parola este obligatorie pentru confirmare' });
     }
 
     // Basic email format validation (can be more robust)
@@ -330,10 +335,16 @@ const updateEmail = async (req, res) => {
       return res.status(400).json({ error: 'Acest email este deja utilizat' });
     }
 
-    // Găsește utilizatorul și actualizează email-ul
+    // Găsește utilizatorul și verifică parola
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit' });
+    }
+
+    // Verifică parola
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Parola este incorectă' });
     }
 
     user.email = newEmail;

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useRouter } from 'expo-router';
+import { updateEmail, updatePassword } from '../src/services/auth';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
@@ -18,6 +19,58 @@ export default function SettingsScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      Alert.alert('Eroare', 'Toate câmpurile sunt obligatorii');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Alert.alert('Eroare', 'Parola nouă trebuie să aibă cel puțin 6 caractere');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await updatePassword(currentPassword, newPassword);
+      Alert.alert('Succes', 'Parola a fost schimbată cu succes!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setExpandedSection(null);
+    } catch (error: any) {
+      Alert.alert('Eroare', error.message || 'Nu s-a putut schimba parola');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangeEmail = async () => {
+    if (!newEmail || !confirmPassword) {
+      Alert.alert('Eroare', 'Toate câmpurile sunt obligatorii');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      Alert.alert('Eroare', 'Format email invalid');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await updateEmail(newEmail, confirmPassword);
+      Alert.alert('Succes', 'Email-ul a fost actualizat cu succes!');
+      setNewEmail('');
+      setConfirmPassword('');
+      setExpandedSection(null);
+    } catch (error: any) {
+      Alert.alert('Eroare', error.message || 'Nu s-a putut actualiza email-ul');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const settings: SettingRow[] = [
     { key: 'change-password', label: 'Schimbă parola', icon: 'key-outline', expandable: true },
@@ -97,8 +150,12 @@ export default function SettingsScreen() {
                   <TouchableOpacity
                     style={[styles.saveButton, { backgroundColor: tokens.colors.primary }]}
                     activeOpacity={0.8}
+                    onPress={handleChangePassword}
+                    disabled={isLoading}
                   >
-                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>Salvează</ThemedText>
+                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>
+                      {isLoading ? 'Se salvează...' : 'Salvează'}
+                    </ThemedText>
                   </TouchableOpacity>
                 </View>
               )}
@@ -132,8 +189,12 @@ export default function SettingsScreen() {
                   <TouchableOpacity
                     style={[styles.saveButton, { backgroundColor: tokens.colors.primary }]}
                     activeOpacity={0.8}
+                    onPress={handleChangeEmail}
+                    disabled={isLoading}
                   >
-                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>Salvează</ThemedText>
+                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>
+                      {isLoading ? 'Se salvează...' : 'Salvează'}
+                    </ThemedText>
                   </TouchableOpacity>
                 </View>
               )}

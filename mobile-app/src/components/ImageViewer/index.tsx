@@ -24,8 +24,19 @@ export default function ImageViewer(props: Props) {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const ImageViewing = require('react-native-image-viewing').default;
       return (
-        // @ts-ignore - pass through props to native component
-        <ImageViewing images={images as any} imageIndex={imageIndex} visible={visible} onRequestClose={onRequestClose} onImageIndexChange={onImageIndexChange} {...rest} />
+        // @ts-ignore - pass through props to native component with smooth transition settings
+        <ImageViewing 
+          images={images as any} 
+          imageIndex={imageIndex} 
+          visible={visible} 
+          onRequestClose={onRequestClose} 
+          onImageIndexChange={onImageIndexChange}
+          animationType="fade"
+          swipeToCloseEnabled={true}
+          doubleTapToZoomEnabled={true}
+          presentationStyle="overFullScreen"
+          {...rest} 
+        />
       );
     } catch (e) {
       // If require fails for any reason, fall through to web fallback below.

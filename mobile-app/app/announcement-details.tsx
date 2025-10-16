@@ -7,6 +7,7 @@ import { BlurView } from 'expo-blur';
 import { useAppTheme } from '../src/context/ThemeContext';
 import api from '../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ImageViewing from '../src/components/ImageViewer';
 import Constants from 'expo-constants';
 
 interface Announcement {
@@ -27,7 +28,7 @@ interface Announcement {
 
 export default function AnnouncementDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -35,10 +36,10 @@ export default function AnnouncementDetailsScreen() {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(true);
   const [imgIndex, setImgIndex] = useState(0);
-  const [viewerVisible, setViewerVisible] = useState(false);
+  // Use the shared ImageViewer component to handle native pinch/zoom and swiping.
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
   const [fallbackImage, setFallbackImage] = useState<string | null>(null);
-  const [viewerScale, setViewerScale] = useState(1);
-  const viewerScrollRef = useRef<any>(null);
   const [favorited, setFavorited] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showPhone, setShowPhone] = useState(false);
@@ -49,6 +50,17 @@ export default function AnnouncementDetailsScreen() {
 
   const width = Dimensions.get('window').width;
   const isLarge = width >= 768;
+  const imageScrollRef = useRef<ScrollView | null>(null);
+  const containerWidth = Math.max(0, width - 32); // account for imageCardWrapper marginHorizontal:16
+
+  // Memoize the viewer header to prevent recreating it on every render (which causes page reload effect)
+  const viewerHeaderComponent = useCallback(() => (
+    <View style={[styles.viewerHeader, { paddingTop: insets.top + 8 }]}>
+      <TouchableOpacity onPress={() => setImageViewerVisible(false)} style={[styles.viewerCloseBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+        <Ionicons name="close" size={20} color={tokens.colors.text} />
+      </TouchableOpacity>
+    </View>
+  ), [insets.top, tokens.colors.surface, tokens.colors.border, tokens.colors.text]);
 
   const fetchAnnouncement = useCallback(async () => {
     if (!id) return;
@@ -107,6 +119,14 @@ export default function AnnouncementDetailsScreen() {
   const images = announcement?.images || [];
   const currentImage = fallbackImage || (images[imgIndex] ? getImageSrc(images[imgIndex]) : null);
 
+  // Memoize the gallery to prevent recreating it on every render
+  const imageGallery = React.useMemo(() => {
+    return (images || [])
+      .map((im) => getImageSrc(im))
+      .filter((u): u is string => !!u)
+      .map((u) => ({ uri: u }));
+  }, [images]);
+
   const initials = () => {
     const f = announcement?.user?.firstName?.[0] || '';
     const l = announcement?.user?.lastName?.[0] || '';
@@ -118,10 +138,27 @@ export default function AnnouncementDetailsScreen() {
 
   const goToChat = () => {
     try {
-      // Navigate to Messages tab; further deep-linking can be wired later
+      // Navigate to Messages tab and pass info to open a conversation with the announcement owner.
+      // Chat screen will try to match an existing conversationId or create a temporary conversation view.
+      const ownerId = announcement?.user?._id;
+      if (!ownerId) {
+        router.push('/(tabs)/chat');
+        return;
+      }
+      const params = {
+        announcementOwnerId: String(ownerId),
+        announcementOwnerFirstName: announcement?.user?.firstName || '',
+        announcementOwnerLastName: announcement?.user?.lastName || '',
+        announcementOwnerAvatar: announcement?.user?.avatar || '',
+        announcementId: String(announcement._id),
+        announcementTitle: announcement.title || '',
+      } as any;
       // @ts-ignore
-      router.push('/(tabs)/chat');
-    } catch {}
+      router.push({ pathname: '/(tabs)/chat', params });
+    } catch (err) {
+      console.warn('goToChat navigation failed', err);
+      try { router.push('/(tabs)/chat'); } catch (_) {}
+    }
   };
 
   const goToProfile = () => {
@@ -183,60 +220,72 @@ export default function AnnouncementDetailsScreen() {
         </View>
       </View>
 
-      {/* Image area */}
-      <View style={[styles.imageCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
-        {currentImage ? (
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => {
-              // Diagnostic log: show resolved URL in Expo console
-              try {
-                // eslint-disable-next-line no-console
-                console.log('[announcement-details] Open image:', currentImage, 'api.baseURL=', api.defaults.baseURL);
-              } catch (e) {}
-              setViewerVisible(true);
-              setViewerScale(1);
-            }}
-          >
-            <Image
-              source={{ uri: currentImage }}
-              resizeMode="contain"
-              style={isLarge ? styles.heroImageLarge : styles.heroImage}
-              onError={(e) => {
-                try {
-                  // try alternative URL forms once
-                  const original = images[imgIndex] || '';
-                  const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
-                  const alt1 = original.startsWith('/') ? `${base}${original}` : `${base}/uploads/${original.replace(/^.*[\\\\/]/, '')}`;
-                  if (alt1 !== currentImage) {
-                    // eslint-disable-next-line no-console
-                    console.warn('[announcement-details] image load failed, trying fallback:', currentImage, '->', alt1);
-                    setFallbackImage(alt1);
-                    return;
-                  }
-                } catch (er) {
-                  // ignore
-                }
-                // final fallback: show placeholder (handled by conditional render)
+      {/* Image area (wrapper allows overflow so buttons can overlay outside while inner card stays rounded) */}
+      <View style={styles.imageCardWrapper}>
+        <View style={[styles.imageCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
+          {imageGallery.length > 0 ? (
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              ref={(r) => { imageScrollRef.current = r; }}
+              onMomentumScrollEnd={(e) => {
+                const x = e.nativeEvent.contentOffset.x || 0;
+                const newIndex = Math.round(x / containerWidth);
+                if (newIndex !== imgIndex) setImgIndex(newIndex);
               }}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View style={[styles.heroPlaceholder, { backgroundColor: tokens.colors.elev }]}>            
-            <Ionicons name="image-outline" size={64} color={tokens.colors.placeholder} />
-          </View>
-        )}
-        {/* Image counter / nav */}
+              style={{ width: containerWidth, alignSelf: 'center' }}
+            >
+              {imageGallery.map((src, idx) => (
+                <TouchableOpacity key={idx} activeOpacity={0.9} onPress={() => { setImageViewerIndex(idx); setImageViewerVisible(true); }} style={{ width: containerWidth }}>
+                  <Image source={{ uri: src.uri }} resizeMode="cover" style={[isLarge ? styles.heroImageLarge : styles.heroImage, { width: containerWidth }]} onError={() => { /* fallback handled earlier */ }} />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={[styles.heroPlaceholder, { backgroundColor: tokens.colors.elev }]}>            
+              <Ionicons name="image-outline" size={64} color={tokens.colors.placeholder} />
+            </View>
+          )}
+        </View>
+
+        {/* Left / Right nav buttons positioned near image edges (overlay) */}
         {images.length > 1 && (
-          <View style={styles.carouselControls}>            
-            <TouchableOpacity onPress={() => setImgIndex(i => i > 0 ? i - 1 : images.length - 1)} style={[styles.navBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>              
-              <Ionicons name="chevron-back" size={20} color={tokens.colors.text} />
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                const newIndex = imgIndex > 0 ? imgIndex - 1 : images.length - 1;
+                setImgIndex(newIndex);
+                imageScrollRef.current?.scrollTo({ x: newIndex * width, animated: true });
+              }}
+              style={[
+                styles.navBtnLeft,
+                { borderColor: tokens.colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)'}
+              ]}
+            >
+              <Ionicons name="chevron-back" size={22} color={tokens.colors.text} />
             </TouchableOpacity>
-            <Text style={[styles.counter, { color: tokens.colors.text }]}>{imgIndex + 1} / {images.length}</Text>
-            <TouchableOpacity onPress={() => setImgIndex(i => i < images.length - 1 ? i + 1 : 0)} style={[styles.navBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>              
-              <Ionicons name="chevron-forward" size={20} color={tokens.colors.text} />
+
+            <TouchableOpacity
+              onPress={() => {
+                const newIndex = imgIndex < images.length - 1 ? imgIndex + 1 : 0;
+                setImgIndex(newIndex);
+                imageScrollRef.current?.scrollTo({ x: newIndex * width, animated: true });
+              }}
+              style={[
+                styles.navBtnRight,
+                { borderColor: tokens.colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)'}
+              ]}
+            >
+              <Ionicons name="chevron-forward" size={22} color={tokens.colors.text} />
             </TouchableOpacity>
-          </View>
+
+            <View style={styles.carouselCounter} pointerEvents="none">
+              <View style={[styles.carouselCounterBubble, { backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)' }]}>
+                <Text style={[styles.counter, { color: isDark ? '#000' : '#000' }]}>{imgIndex + 1} / {images.length}</Text>
+              </View>
+            </View>
+          </>
         )}
       </View>
 
@@ -392,9 +441,13 @@ export default function AnnouncementDetailsScreen() {
 
       {/* Rating Modal */}
       <Modal visible={ratingModalVisible} transparent animationType="fade" onRequestClose={() => setRatingModalVisible(false)}>
-        <View style={styles.ratingModalOverlay}>
-          {/* Blur behind popup */}
-          <BlurView intensity={80} tint="default" style={StyleSheet.absoluteFill} />
+        <BlurView 
+          intensity={Platform.OS === 'android' ? 90 : 100} 
+          tint={isDark ? 'dark' : 'light'}
+          style={StyleSheet.absoluteFill}
+        >
+          <View style={[styles.ratingModalOverlay, { backgroundColor: Platform.OS === 'android' ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.2)' }]}>
+          {/* Blur effect container */}
 
           <View style={[styles.ratingModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
             <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
@@ -451,7 +504,8 @@ export default function AnnouncementDetailsScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+          </View>
+        </BlurView>
       </Modal>
 
       {/* Location Card */}
@@ -549,42 +603,14 @@ export default function AnnouncementDetailsScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      {/* Image Viewer Modal */}
-      <Modal visible={viewerVisible} animationType="fade" onRequestClose={() => setViewerVisible(false)} transparent>
-        <View style={styles.viewerOverlay}> 
-          <View style={styles.viewerHeader}>
-            <TouchableOpacity onPress={() => setViewerVisible(false)} style={[styles.viewerCloseBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-              <Ionicons name="close" size={20} color={tokens.colors.text} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.viewerBody}>
-            <ScrollView
-              ref={(r) => { viewerScrollRef.current = r; }}
-              maximumZoomScale={3}
-              minimumZoomScale={1}
-              contentContainerStyle={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              pinchGestureEnabled={true}
-            >
-              <Image source={{ uri: currentImage || undefined }} style={styles.viewerImage} resizeMode="contain" />
-            </ScrollView>
-          </View>
-
-          <View style={styles.viewerFooter}>
-            <TouchableOpacity onPress={() => { setViewerScale(s => Math.max(1, s - 0.5)); }} style={[styles.viewerControl, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-              <Ionicons name="remove" size={18} color={tokens.colors.text} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setViewerScale(1); viewerScrollRef.current?.scrollTo({ x: 0, y: 0, animated: true }); }} style={[styles.viewerControl, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-              <Ionicons name="refresh" size={18} color={tokens.colors.text} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setViewerScale(s => Math.min(3, s + 0.5)); }} style={[styles.viewerControl, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-              <Ionicons name="add" size={18} color={tokens.colors.text} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      {/* Image Viewer: reuse shared component that handles native pinch/zoom and swiping */}
+      <ImageViewing
+        images={imageGallery}
+        imageIndex={imageViewerIndex}
+        visible={imageViewerVisible}
+        onRequestClose={() => setImageViewerVisible(false)}
+        HeaderComponent={viewerHeaderComponent}
+      />
     </ScrollView>
   );
 }
@@ -602,9 +628,10 @@ const styles = StyleSheet.create({
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   backText: { marginLeft: 8, fontSize: 18, fontWeight: '700' },
   headerTitle: { fontSize: 18, fontWeight: '700' },
-  imageCard: { marginHorizontal: 16, borderRadius: 18, borderWidth: 1, overflow: 'hidden', marginBottom: 20 },
-  heroImage: { width: '100%', height: 320 },
-  heroImageLarge: { width: '100%', height: 480 },
+  imageCardWrapper: { marginHorizontal: 16, marginBottom: 20, position: 'relative', overflow: 'visible' },
+  imageCard: { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 0 },
+  heroImage: { width: '100%', height: 320, backgroundColor: 'transparent' },
+  heroImageLarge: { width: '100%', height: 480, backgroundColor: 'transparent' },
   heroPlaceholder: { width: '100%', height: 320, justifyContent: 'center', alignItems: 'center' },
   viewerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center' },
   viewerHeader: { position: 'absolute', top: 28, right: 16, zIndex: 20 },
@@ -613,8 +640,14 @@ const styles = StyleSheet.create({
   viewerImage: { width: '100%', height: '80%' },
   viewerFooter: { position: 'absolute', bottom: 24, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 12 },
   viewerControl: { width: 48, height: 48, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  carouselControls: { position: 'absolute', left: 0, right: 0, bottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 18 },
-  navBtn: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  // place left/right nav buttons as overlays on the sides of the image, vertically centered
+  carouselControls: { position: 'absolute', left: 0, right: 0, top: '50%', transform: [{ translateY: -24 }], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, zIndex: 20 },
+  navBtn: { width: 48, height: 48, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1, backgroundColor: 'transparent' },
+  // smaller side buttons placed close to image edges
+  navBtnLeft: { position: 'absolute', left: -12, top: '50%', transform: [{ translateY: -28 }], width: 50, height: 50, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 1, zIndex: 30, elevation: 6 },
+  navBtnRight: { position: 'absolute', right: -12, top: '50%', transform: [{ translateY: -28 }], width: 50, height: 50, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 1, zIndex: 30, elevation: 6 },
+  carouselCounter: { position: 'absolute', left: 0, right: 0, bottom: 12, alignItems: 'center', justifyContent: 'center', zIndex: 15 },
+  carouselCounterBubble: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, alignItems: 'center', justifyContent: 'center', minWidth: 48 },
   counter: { fontSize: 13, fontWeight: '600' },
   cardActions: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', gap: 12 },
   actionCircle: { width: 52, height: 52, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 0, backgroundColor: 'transparent' },

@@ -24,7 +24,7 @@ import {
 import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { PermissionsAndroid } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -78,7 +78,7 @@ interface Message {
   createdAt: string;
   isRead?: boolean;
   senderInfo?: { firstName?: string; lastName?: string; avatar?: string };
-  replyTo?: { messageId: string; senderId: string; text?: string; image?: string };
+  replyTo?: { messageId: string; senderId: string; senderName: string; text?: string; image?: string };
   reactions?: Array<{ userId: string; emoji: string }>;
   // If true the message has been deleted and should render a placeholder bubble
   deleted?: boolean;
@@ -121,6 +121,7 @@ export default function ChatScreen() {
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
   const [bubbleLayoutsMap, setBubbleLayoutsMap] = useState<Record<string, {x:number;y:number;width:number;height:number}>>({});
   const [reactionDimsMap, setReactionDimsMap] = useState<Record<string, {width:number;height:number}>>({});
+  const [replyTo, setReplyTo] = useState<{ messageId: string; senderId: string; senderName: string; text?: string; image?: string } | null>(null);
 
   const width = Dimensions.get('window').width;
   // Static local empty-state image (added to mobile-app/assets/images)
@@ -146,6 +147,64 @@ export default function ChatScreen() {
   useEffect(() => {
     setUserId(user?.id || null);
   }, [user]);
+
+  // Check incoming route params to auto-open a conversation (e.g. from announcement details)
+  const routeParams = useLocalSearchParams();
+  const handledRouteConversationIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    const ownerId = (routeParams as any)?.announcementOwnerId;
+    const announcementId = (routeParams as any)?.announcementId;
+    if (!ownerId) return;
+
+    // Construct deterministic conversationId similar to backend logic.
+    let expectedConversationId = '';
+    if (announcementId) {
+      expectedConversationId = `${ownerId}-${userId}-${announcementId}`;
+    } else {
+      expectedConversationId = [String(ownerId), String(userId)].sort().join('-');
+    }
+
+    // If we've already handled this route, don't repeat
+    if (handledRouteConversationIdRef.current === expectedConversationId) return;
+
+    // Try to find an existing conversation
+    const found = conversations.find(
+      (c) => c.conversationId === expectedConversationId || (announcementId && c.announcementId === announcementId && c.announcementOwnerId === ownerId)
+    );
+
+    if (found) {
+      setSelectedConversation(found);
+      handledRouteConversationIdRef.current = expectedConversationId;
+      return;
+    }
+
+    // If not found, create a temporary conversation object so the UI opens a detail view
+    const tempConv: Conversation = {
+      id: ownerId,
+      conversationId: expectedConversationId,
+      name: (routeParams as any)?.announcementTitle || '(fără titlu)',
+      avatar: (routeParams as any)?.announcementOwnerAvatar || '',
+      participantName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
+      participantAvatar: (routeParams as any)?.announcementOwnerAvatar || '',
+      announcementTitle: (routeParams as any)?.announcementTitle || '',
+      announcementOwnerName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
+      lastMessage: '',
+      time: new Date().toLocaleString('ro-RO'),
+      unread: false,
+      otherParticipant: { id: ownerId, firstName: (routeParams as any)?.announcementOwnerFirstName, lastName: (routeParams as any)?.announcementOwnerLastName, avatar: (routeParams as any)?.announcementOwnerAvatar },
+      lastSeen: undefined,
+      announcementOwnerId: ownerId,
+      announcementId: announcementId || '',
+    };
+
+    // Open the temporary conversation but don't mutate the fetched conversations array.
+    setSelectedConversation(tempConv);
+    handledRouteConversationIdRef.current = expectedConversationId;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeParams, userId, conversations]);
 
   // Fetch conversations
   const fetchConversations = useCallback(async () => {
@@ -303,10 +362,12 @@ export default function ChatScreen() {
         firstName: 'Tu',
         lastName: '',
       },
+      ...(replyTo ? { replyTo } : {}),
     };
 
     setMessages((prev) => [...prev, tempMessage]);
     setNewMessage('');
+    setReplyTo(null);
 
     try {
       const messageData = {
@@ -316,6 +377,7 @@ export default function ChatScreen() {
         destinatarId: selectedConversation.otherParticipant.id,
         text: newMessage.trim(),
         ...(selectedConversation.announcementId ? { announcementId: selectedConversation.announcementId } : {}),
+        ...(replyTo ? { replyTo } : {}),
       };
 
       const response = await api.post('/api/messages', messageData);
@@ -853,8 +915,21 @@ export default function ChatScreen() {
   };
 
   const handleReplyMessage = () => {
-    // TODO: implement reply functionality
-    Alert.alert('Reply', 'Funcționalitate în curând');
+    if (!selectedMessage) return;
+    
+    // Determine sender name
+    const senderName = selectedMessage.senderId === userId 
+      ? 'Tu'
+      : selectedConversation?.participantName || 'Utilizator';
+    
+    setReplyTo({
+      messageId: selectedMessage._id,
+      senderId: selectedMessage.senderId,
+      senderName,
+      text: selectedMessage.text,
+      image: selectedMessage.image,
+    });
+    
     closeContextMenu();
   };
 
@@ -1121,6 +1196,49 @@ export default function ChatScreen() {
                             <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>acest mesaj a fost șters</Text>
                           ) : (
                             <>
+                              {/* Reply preview in message bubble */}
+                              {message.replyTo && (
+                                <View style={[styles.replyInBubble, { 
+                                  backgroundColor: isOwn 
+                                    ? (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)') 
+                                    : 'rgba(0,0,0,0.05)',
+                                  borderLeftColor: tokens.colors.primary 
+                                }]}>
+                                  <Text style={[styles.replyInBubbleName, { 
+                                    color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.primary 
+                                  }]}>
+                                    {message.replyTo.senderName}
+                                  </Text>
+                                  {message.replyTo.text && (
+                                    <Text 
+                                      style={[styles.replyInBubbleText, { 
+                                        color: isOwn && isDark ? 'rgba(255,255,255,0.7)' : tokens.colors.muted 
+                                      }]} 
+                                      numberOfLines={1}
+                                    >
+                                      {message.replyTo.text}
+                                    </Text>
+                                  )}
+                                  {message.replyTo.image && (
+                                    <View style={styles.replyInBubbleImageRow}>
+                                      <Ionicons 
+                                        name="image-outline" 
+                                        size={14} 
+                                        color={isOwn && isDark ? 'rgba(255,255,255,0.7)' : tokens.colors.muted} 
+                                      />
+                                      <Text 
+                                        style={[styles.replyInBubbleText, { 
+                                          color: isOwn && isDark ? 'rgba(255,255,255,0.7)' : tokens.colors.muted,
+                                          marginLeft: 4 
+                                        }]}
+                                      >
+                                        Fotografie
+                                      </Text>
+                                    </View>
+                                  )}
+                                </View>
+                              )}
+                              
                               {message.text && (
                                 <Text style={[styles.messageTextClean, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
                                   {message.text}
@@ -1172,6 +1290,34 @@ export default function ChatScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? insets.bottom + 90 : insets.bottom + 16}
         >
+          {/* Reply Preview */}
+          {replyTo && (
+            <View style={[styles.replyPreviewContainer, { backgroundColor: tokens.colors.elev, borderTopColor: tokens.colors.border }]}>
+              <View style={[styles.replyPreviewBar, { backgroundColor: tokens.colors.primary }]} />
+              <View style={styles.replyPreviewContent}>
+                <Text style={[styles.replyPreviewName, { color: tokens.colors.primary }]}>
+                  {replyTo.senderName}
+                </Text>
+                {replyTo.text && (
+                  <Text style={[styles.replyPreviewText, { color: tokens.colors.muted }]} numberOfLines={1}>
+                    {replyTo.text}
+                  </Text>
+                )}
+                {replyTo.image && (
+                  <View style={styles.replyPreviewImageRow}>
+                    <Ionicons name="image-outline" size={16} color={tokens.colors.muted} />
+                    <Text style={[styles.replyPreviewText, { color: tokens.colors.muted, marginLeft: 4 }]}>
+                      Fotografie
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <TouchableOpacity onPress={() => setReplyTo(null)} style={styles.replyPreviewClose}>
+                <Ionicons name="close" size={20} color={tokens.colors.muted} />
+              </TouchableOpacity>
+            </View>
+          )}
+          
           <View style={[styles.inputContainerClean, { backgroundColor: tokens.colors.surface, borderTopWidth: 1, borderTopColor: tokens.colors.border }]}>
           <TouchableOpacity style={styles.inputIcon} onPress={handlePickImagePress}>
             <Ionicons name="image-outline" size={26} color={tokens.colors.muted} />
@@ -2182,5 +2328,58 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 20,
     // width & left set dynamically
+  },
+  // Reply preview styles (above input)
+  replyPreviewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderTopWidth: 1,
+  },
+  replyPreviewBar: {
+    width: 3,
+    height: '100%',
+    marginRight: 8,
+    borderRadius: 2,
+  },
+  replyPreviewContent: {
+    flex: 1,
+  },
+  replyPreviewName: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  replyPreviewText: {
+    fontSize: 13,
+  },
+  replyPreviewImageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  replyPreviewClose: {
+    padding: 8,
+  },
+  // Reply in message bubble styles
+  replyInBubble: {
+    borderLeftWidth: 3,
+    paddingLeft: 8,
+    paddingVertical: 6,
+    paddingRight: 8,
+    marginBottom: 6,
+    borderRadius: 6,
+  },
+  replyInBubbleName: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  replyInBubbleText: {
+    fontSize: 12,
+  },
+  replyInBubbleImageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

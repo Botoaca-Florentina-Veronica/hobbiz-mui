@@ -112,13 +112,7 @@ export default function SellScreen() {
 
   const disabledPublish = title.length < 16 || description.length < 40 || !contactName || submitting;
 
-  // Dev-only: preview the success screen without posting
-  const handlePreviewSuccess = () => {
-    if (__DEV__) {
-      const sampleTitle = title.trim() || 'Anunț demo';
-      router.push({ pathname: '/post-success', params: { title: sampleTitle } });
-    }
-  };
+  
 
   const handleSubmit = async () => {
     // Validations (mirror edit flow)
@@ -487,15 +481,7 @@ export default function SellScreen() {
           </View>
         </View>
       )}
-      {__DEV__ && (
-        <TouchableOpacity
-          onPress={handlePreviewSuccess}
-          activeOpacity={0.85}
-          style={[styles.devPreviewBtn, { backgroundColor: '#f51866' }]}
-        >
-          <ThemedText style={{ color: '#fff', fontWeight: '700' }}>Preview Success</ThemedText>
-        </TouchableOpacity>
-      )}
+      
     </ThemedView>
   );
 }
@@ -552,3 +538,4 @@ const styles = StyleSheet.create({
     shadowRadius:12,
   },
 });
+

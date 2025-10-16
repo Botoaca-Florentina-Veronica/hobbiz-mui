@@ -22,3 +22,23 @@ export async function getToken() {
 export async function logout() {
   await storage.deleteItemAsync('userToken');
 }
+
+export async function updateEmail(newEmail: string, password: string) {
+  try {
+    const res = await api.put('/api/users/update-email', { newEmail, password });
+    return res.data;
+  } catch (e: any) {
+    const msg = e?.response?.data?.error || 'Eroare la actualizarea email-ului';
+    throw new Error(msg);
+  }
+}
+
+export async function updatePassword(currentPassword: string, newPassword: string) {
+  try {
+    const res = await api.put('/api/users/update-password', { currentPassword, newPassword });
+    return res.data;
+  } catch (e: any) {
+    const msg = e?.response?.data?.error || 'Eroare la schimbarea parolei';
+    throw new Error(msg);
+  }
+}

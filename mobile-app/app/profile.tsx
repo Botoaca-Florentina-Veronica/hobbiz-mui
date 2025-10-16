@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -125,8 +125,14 @@ export default function ProfileScreen() {
   const profileToShow = publicProfile || user;
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <>
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor="rgba(0,0,0,0.3)" 
+        translucent={true}
+      />
+      <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header with back button and title */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -344,6 +350,7 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
     </ThemedView>
+    </>
   );
 }
 
