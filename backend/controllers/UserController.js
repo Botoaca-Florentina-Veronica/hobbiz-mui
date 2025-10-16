@@ -1,3 +1,14 @@
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { execFile } = require('child_process');
+const Alert = require('../models/Alert');
+const Announcement = require('../models/Announcement');
+const multer = require('multer');
+const path = require('path');
+const cloudinaryUpload = require('../config/cloudinaryMulter');
+const mongoose = require('mongoose');
+
 // Upload avatar utilizator
 const uploadAvatar = async (req, res) => {
   try {
@@ -17,16 +28,6 @@ const uploadAvatar = async (req, res) => {
     res.status(500).json({ error: 'Eroare server la upload avatar.' });
   }
 };
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { execFile } = require('child_process');
-const Alert = require('../models/Alert');
-const Announcement = require('../models/Announcement');
-const multer = require('multer');
-const path = require('path');
-const cloudinaryUpload = require('../config/cloudinaryMulter');
-const mongoose = require('mongoose');
 
 // Utilitare pentru email normalization & duplicate merge
 const normalizeEmail = (email) => (email || '').trim().toLowerCase();

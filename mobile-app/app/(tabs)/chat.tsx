@@ -266,7 +266,17 @@ export default function ChatScreen() {
     try {
       setLoading(true);
       const response = await api.get(`/api/messages/conversation/${selectedConversation.conversationId}`);
-      setMessages(response.data || []);
+      const raw = (response.data || []) as any[];
+      // Enrich replyTo with senderName if backend doesn't include it
+      const normalized = raw.map((m: any) => {
+        if (m && m.replyTo && !m.replyTo.senderName) {
+          const isSelf = String(m.replyTo.senderId || '') === String(userId || '');
+          const fallbackName = isSelf ? 'Tu' : (selectedConversation?.participantName || 'Utilizator');
+          return { ...m, replyTo: { ...m.replyTo, senderName: fallbackName } };
+        }
+        return m;
+      });
+      setMessages(normalized);
 
       // Mark as read
       try {
@@ -351,6 +361,8 @@ export default function ChatScreen() {
 
   const handleSendMessage = async () => {
     if (!userId || !newMessage.trim() || !selectedConversation) return;
+    // Capture replyTo now so clearing state doesn't remove the data we send
+    const capturedReply = replyTo;
 
     const tempMessage: Message = {
       _id: Date.now().toString(),
@@ -362,22 +374,24 @@ export default function ChatScreen() {
         firstName: 'Tu',
         lastName: '',
       },
-      ...(replyTo ? { replyTo } : {}),
+      ...(capturedReply ? { replyTo: capturedReply } : {}),
     };
 
+    // Optimistic update
     setMessages((prev) => [...prev, tempMessage]);
     setNewMessage('');
+    // Clear reply preview for the UI but we kept capturedReply for sending/preserving in the message
     setReplyTo(null);
 
     try {
-      const messageData = {
+      const messageData: any = {
         conversationId: selectedConversation.conversationId,
         senderId: userId,
         senderRole: 'cumparator',
         destinatarId: selectedConversation.otherParticipant.id,
         text: newMessage.trim(),
         ...(selectedConversation.announcementId ? { announcementId: selectedConversation.announcementId } : {}),
-        ...(replyTo ? { replyTo } : {}),
+        ...(capturedReply ? { replyTo: capturedReply } : {}),
       };
 
       const response = await api.post('/api/messages', messageData);
@@ -387,8 +401,18 @@ export default function ChatScreen() {
           prev.map((msg) =>
             msg._id === tempMessage._id
               ? {
+                  // Merge server data but preserve senderInfo and ensure replyTo keeps senderName
                   ...response.data,
                   senderInfo: tempMessage.senderInfo,
+                  replyTo: (() => {
+                    const serverReply: any = response.data.replyTo || {};
+                    const localReply: any = tempMessage.replyTo || {};
+                    return {
+                      ...(serverReply || {}),
+                      // If server didn't include senderName, take it from our optimistic reply
+                      ...(localReply.senderName && !serverReply?.senderName ? { senderName: localReply.senderName } : {}),
+                    };
+                  })(),
                 }
               : msg
           )
@@ -437,6 +461,7 @@ export default function ChatScreen() {
         image: uri,
         createdAt: new Date().toISOString(),
         senderInfo: { firstName: 'Tu', lastName: '' },
+        ...(replyTo ? { replyTo } : {}),
       };
 
       setMessages((prev) => [...prev, tempMessage]);
@@ -451,6 +476,10 @@ export default function ChatScreen() {
       if (selectedConversation!.announcementId) {
         form.append('announcementId', selectedConversation!.announcementId);
       }
+      if (replyTo) {
+        // send replyTo as JSON string in multipart
+        form.append('replyTo', JSON.stringify(replyTo));
+      }
 
       try {
         const res = await api.post('/api/messages', form as any, {
@@ -458,7 +487,15 @@ export default function ChatScreen() {
         });
 
         if (res?.data) {
-          setMessages((prev) => prev.map((m) => (m._id === tempMessage._id ? { ...res.data, senderInfo: tempMessage.senderInfo } : m)));
+          setMessages((prev) => prev.map((m) => {
+            if (m._id !== tempMessage._id) return m;
+            const server = res.data;
+            return {
+              ...server,
+              senderInfo: tempMessage.senderInfo,
+              replyTo: server.replyTo || tempMessage.replyTo,
+            };
+          }));
         }
       } catch (err) {
         console.error('Upload image error:', err);
@@ -531,6 +568,7 @@ export default function ChatScreen() {
                     image: uri,
                     createdAt: new Date().toISOString(),
                     senderInfo: { firstName: 'Tu', lastName: '' },
+                    ...(replyTo ? { replyTo } : {}),
                   };
                   setMessages((prev) => [...prev, tempMessage]);
 
@@ -543,12 +581,21 @@ export default function ChatScreen() {
                   if (selectedConversation!.announcementId) {
                     form.append('announcementId', selectedConversation!.announcementId);
                   }
+                  if (replyTo) form.append('replyTo', JSON.stringify(replyTo));
 
                   const r = await api.post('/api/messages', form as any, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                   });
                   if (r?.data) {
-                    setMessages((prev) => prev.map((m) => (m._id === tempMessage._id ? { ...r.data, senderInfo: tempMessage.senderInfo } : m)));
+                    setMessages((prev) => prev.map((m) => {
+                      if (m._id !== tempMessage._id) return m;
+                      const server = r.data;
+                      return {
+                        ...server,
+                        senderInfo: tempMessage.senderInfo,
+                        replyTo: server.replyTo || tempMessage.replyTo,
+                      };
+                    }));
                   }
                 } catch (err) {
                   console.error('Fallback gallery upload failed', err);
@@ -575,6 +622,7 @@ export default function ChatScreen() {
         image: uri, // reuse image field for backend; backend accepts any uploaded file under 'image'
         createdAt: new Date().toISOString(),
         senderInfo: { firstName: 'Tu', lastName: '' },
+        ...(replyTo ? { replyTo } : {}),
       };
 
       setMessages((prev) => [...prev, tempMessage]);
@@ -588,13 +636,22 @@ export default function ChatScreen() {
       if (selectedConversation!.announcementId) {
         form.append('announcementId', selectedConversation!.announcementId);
       }
+      if (replyTo) form.append('replyTo', JSON.stringify(replyTo));
 
       try {
         const r = await api.post('/api/messages', form as any, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         if (r?.data) {
-          setMessages((prev) => prev.map((m) => (m._id === tempMessage._id ? { ...r.data, senderInfo: tempMessage.senderInfo } : m)));
+          setMessages((prev) => prev.map((m) => {
+            if (m._id !== tempMessage._id) return m;
+            const server = r.data;
+            return {
+              ...server,
+              senderInfo: tempMessage.senderInfo,
+              replyTo: server.replyTo || tempMessage.replyTo,
+            };
+          }));
         }
       } catch (err) {
         console.error('Upload file error:', err);
@@ -1000,7 +1057,11 @@ export default function ChatScreen() {
   // If conversation is selected, show chat view
   if (selectedConversation) {
     return (
-      <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
+      <KeyboardAvoidingView
+        style={[styles.container, { backgroundColor: tokens.colors.bg }]}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={0}
+      >
         {/* Clean header with back button, seller avatar + name, and announcement preview below */}
         <View style={[
           styles.chatHeaderClean,
@@ -1285,13 +1346,8 @@ export default function ChatScreen() {
           )}
         </ScrollView>
 
-        {/* Input bar with icons */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? insets.bottom + 90 : insets.bottom + 16}
-        >
-          {/* Reply Preview */}
-          {replyTo && (
+        {/* Reply Preview */}
+        {replyTo && (
             <View style={[styles.replyPreviewContainer, { backgroundColor: tokens.colors.elev, borderTopColor: tokens.colors.border }]}>
               <View style={[styles.replyPreviewBar, { backgroundColor: tokens.colors.primary }]} />
               <View style={styles.replyPreviewContent}>
@@ -1318,7 +1374,11 @@ export default function ChatScreen() {
             </View>
           )}
           
-          <View style={[styles.inputContainerClean, { backgroundColor: tokens.colors.surface, borderTopWidth: 1, borderTopColor: tokens.colors.border }]}>
+          <View style={[styles.inputContainerClean, { 
+            backgroundColor: tokens.colors.surface, 
+            borderTopWidth: 1, 
+            borderTopColor: tokens.colors.border,
+          }]}>
           <TouchableOpacity style={styles.inputIcon} onPress={handlePickImagePress}>
             <Ionicons name="image-outline" size={26} color={tokens.colors.muted} />
           </TouchableOpacity>
@@ -1341,7 +1401,6 @@ export default function ChatScreen() {
             <Ionicons name="send" size={20} color={tokens.colors.primary} />
           </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
 
         <ImageViewing
           images={imageViewerImages}
@@ -1531,7 +1590,7 @@ export default function ChatScreen() {
             )}
           </Pressable>
         </Modal>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 

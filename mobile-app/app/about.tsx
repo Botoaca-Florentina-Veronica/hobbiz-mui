@@ -62,7 +62,8 @@ export default function AboutScreen() {
   const values = [
     { icon: '🛡️', title: 'Securitate', text: 'Protejăm datele și interacțiunile tale.' },
     { icon: '🤝', title: 'Comunitate', text: 'Spațiu prietenos și colaborativ.' },
-    { icon: '⚡', title: 'Inovație', text: 'Îmbunătățim constant experiența.' },
+    { icon: '🏗️', title: 'Dezvoltare', text: 'Îmbunătățim constant experiența.' },
+    { icon: '⚡', title: 'Simplitate', text: 'Ne dorim să facilităm cât mai mult utilizarea platformei.' },
   ];
 
   // StrokeWord: layered white text behind the colored word to simulate a simple contour/stroke
