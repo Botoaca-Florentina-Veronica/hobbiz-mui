@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar, FlatList, Text, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,39 @@ import { useAuth } from '../src/context/AuthContext';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Constants from 'expo-constants';
 import api from '../src/services/api';
+
+interface UserAnnouncement {
+  _id: string;
+  title: string;
+  category: string;
+  location: string;
+  images?: string[];
+  createdAt: string;
+  views?: number;
+  favoritesCount?: number;
+}
+
+interface UserReview {
+  _id: string;
+  rating: number;
+  comment: string;
+  reviewerName: string;
+  reviewerAvatar?: string;
+  createdAt: string;
+  likes?: number;
+}
+
+interface ReviewStats {
+  averageRating: number;
+  totalReviews: number;
+  distribution: {
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
+}
 
 export default function ProfileScreen() {
   const { tokens } = useAppTheme();
@@ -23,6 +56,20 @@ export default function ProfileScreen() {
   const [loadingPublic, setLoadingPublic] = React.useState(false);
   const [currentAvatar, setCurrentAvatar] = React.useState<string | undefined>(undefined);
   const [avatarUploading, setAvatarUploading] = React.useState(false);
+  const [userAnnouncements, setUserAnnouncements] = React.useState<UserAnnouncement[]>([]);
+  const [announcementsLoading, setAnnouncementsLoading] = React.useState(false);
+  
+  // Reviews state
+  const [reviewStats, setReviewStats] = React.useState<ReviewStats | null>(null);
+  const [recentReviews, setRecentReviews] = React.useState<UserReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = React.useState(false);
+  
+  // Edit mode state for contact info
+  const [isEditingContact, setIsEditingContact] = React.useState(false);
+  const [editFirstName, setEditFirstName] = React.useState('');
+  const [editLastName, setEditLastName] = React.useState('');
+  const [editPhone, setEditPhone] = React.useState('');
+  const [isSaving, setIsSaving] = React.useState(false);
 
   // If userId present in query, fetch public profile for that user
   React.useEffect(() => {
@@ -50,6 +97,92 @@ export default function ProfileScreen() {
     const active = publicProfile || user;
     setCurrentAvatar(active?.avatar || undefined);
   }, [publicProfile, user]);
+
+  // Fetch user announcements
+  React.useEffect(() => {
+    const fetchUserAnnouncements = async () => {
+      const targetUserId = userId || user?.id;
+      if (!targetUserId) return;
+      
+      try {
+        setAnnouncementsLoading(true);
+        // If viewing another user's profile, use public endpoint
+        const endpoint = userId 
+          ? `/api/users/announcements/${encodeURIComponent(String(userId))}`
+          : '/api/users/my-announcements';
+        const res = await api.get(endpoint);
+        setUserAnnouncements(res.data || []);
+      } catch (e) {
+        console.error('Error loading user announcements:', e);
+        setUserAnnouncements([]);
+      } finally {
+        setAnnouncementsLoading(false);
+      }
+    };
+    fetchUserAnnouncements();
+  }, [userId, user?.id]);
+
+  // Fetch user reviews
+  React.useEffect(() => {
+    const fetchUserReviews = async () => {
+      const targetUserId = userId || user?.id;
+      if (!targetUserId) return;
+      
+      try {
+        setReviewsLoading(true);
+        // Fetch reviews for this user - correct endpoint is /api/reviews/:userId
+        const res = await api.get(`/api/reviews/${encodeURIComponent(String(targetUserId))}`);
+        const reviewsArray = Array.isArray(res.data) ? res.data : [];
+        
+        console.log('Fetched reviews:', reviewsArray.length, reviewsArray);
+        
+        // Calculate stats from reviews array
+        if (reviewsArray.length > 0) {
+          const totalReviews = reviewsArray.length;
+          const totalScore = reviewsArray.reduce((sum, r) => sum + (r.score || 0), 0);
+          const averageRating = totalScore / totalReviews;
+          
+          // Calculate distribution
+          const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+          reviewsArray.forEach(r => {
+            const score = Math.round(r.score || 0);
+            if (score >= 1 && score <= 5) {
+              distribution[score as keyof typeof distribution]++;
+            }
+          });
+          
+          setReviewStats({
+            averageRating,
+            totalReviews,
+            distribution
+          });
+          
+          // Map reviews to expected format and take 2 most recent
+          const mappedReviews = reviewsArray.slice(0, 2).map(r => ({
+            _id: r._id,
+            rating: r.score || 0,
+            comment: r.comment || '',
+            reviewerName: r.authorName || 'Utilizator',
+            reviewerAvatar: r.authorAvatar,
+            createdAt: r.createdAt,
+            likes: (r.likes || []).length
+          }));
+          
+          setRecentReviews(mappedReviews);
+        } else {
+          setReviewStats(null);
+          setRecentReviews([]);
+        }
+      } catch (e) {
+        console.error('Error loading user reviews:', e);
+        setReviewStats(null);
+        setRecentReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    fetchUserReviews();
+  }, [userId, user?.id]);
 
   const isViewingOwnProfile = !publicProfile || (user && String(user.id) === String(publicProfile?.id));
 
@@ -122,6 +255,66 @@ export default function ProfileScreen() {
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
+  // Get correct image URL
+  const getImageSrc = (img?: string) => {
+    if (!img) return null;
+    if (img.startsWith('http')) return img;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    if (!base) return img;
+    if (img.startsWith('/uploads')) return `${base}${img}`;
+    return `${base}/uploads/${img}`;
+  };
+
+  // Start editing contact info
+  const handleStartEdit = () => {
+    const profile = profileToShow;
+    setEditFirstName(profile?.firstName || '');
+    setEditLastName(profile?.lastName || '');
+    setEditPhone(profile?.phone || '');
+    setIsEditingContact(true);
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setIsEditingContact(false);
+    setEditFirstName('');
+    setEditLastName('');
+    setEditPhone('');
+  };
+
+  // Save contact info changes
+  const handleSaveContact = async () => {
+    try {
+      setIsSaving(true);
+      const updateData = {
+        firstName: editFirstName.trim(),
+        lastName: editLastName.trim(),
+        phone: editPhone.trim(),
+      };
+      
+      await api.put('/api/users/profile', updateData);
+      
+      // Update local user state if viewing own profile
+      if (!userId && user) {
+        // Refetch or manually update - for simplicity, we'll show success and let next mount refresh
+        Alert.alert('Succes', 'Informațiile au fost actualizate');
+      }
+      
+      setIsEditingContact(false);
+      
+      // Refresh the profile data
+      if (userId) {
+        const res = await api.get(`/api/users/profile/${encodeURIComponent(String(userId))}`);
+        setPublicProfile(res.data);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Eroare', 'Nu s-au putut actualiza informațiile. Încearcă din nou.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const profileToShow = publicProfile || user;
 
   return (
@@ -157,13 +350,7 @@ export default function ProfileScreen() {
             <ThemedText style={[styles.titleText, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'Profilul meu'}</ThemedText>
           </View>
 
-          <TouchableOpacity
-            onPress={() => router.push('/settings')}
-            activeOpacity={0.7}
-            style={[styles.settingsButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
-          >
-            <Ionicons name="settings-outline" size={20} color={tokens.colors.text} />
-          </TouchableOpacity>
+          {/* settings button removed intentionally */}
         </View>
 
         {/* Profile Header Card - Avatar + Rating + Name */}
@@ -191,7 +378,9 @@ export default function ProfileScreen() {
           <View style={styles.profileInfo}>
             <View style={styles.ratingBadge}>
               <Ionicons name="star" size={14} color={tokens.colors.primary} />
-              <ThemedText style={[styles.ratingText, { color: tokens.colors.text }]}>4.7</ThemedText>
+              <ThemedText style={[styles.ratingText, { color: tokens.colors.text }]}>
+                {reviewStats ? reviewStats.averageRating.toFixed(1) : '—'}
+              </ThemedText>
             </View>
 
             <ThemedText style={[styles.userName, { color: tokens.colors.text }]}>
@@ -207,9 +396,9 @@ export default function ProfileScreen() {
         {/* My Location Section */}
         <View style={styles.locationSection}>
           <View style={styles.locationHeader}>
-            <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>My Location</ThemedText>
+            <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Locația mea</ThemedText>
             <TouchableOpacity>
-              <ThemedText style={[styles.specifyLink, { color: tokens.colors.muted }]}>Specify Location</ThemedText>
+              <ThemedText style={[styles.specifyLink, { color: tokens.colors.muted }]}>Specificați locația</ThemedText>
             </TouchableOpacity>
           </View>
           
@@ -294,24 +483,85 @@ export default function ProfileScreen() {
         <View style={[styles.dashboardCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.dashboardHeader}>
             <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>Informații de Contact</ThemedText>
-            <TouchableOpacity>
-              <Ionicons name="arrow-forward" size={20} color={tokens.colors.muted} />
-            </TouchableOpacity>
+            {isViewingOwnProfile && !isEditingContact && (
+              <TouchableOpacity 
+                onPress={handleStartEdit}
+                style={[styles.editButton, { backgroundColor: '#fff', borderColor: tokens.colors.primary, borderWidth: 1 }]}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.editButtonText, { color: tokens.colors.primary }]}>Editează</ThemedText>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.infoGrid}>
+            {/* Nume */}
             <View style={[styles.infoItem, { borderColor: tokens.colors.border }]}>
-              <Ionicons name="call-outline" size={20} color={tokens.colors.primary} />
+              <Ionicons name="person-outline" size={18} color={tokens.colors.primary} />
               <View style={styles.infoItemContent}>
-                <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Telefon</ThemedText>
-                <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]}>
-                  {profileToShow?.phone || 'N/A'}
-                </ThemedText>
+                <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Nume</ThemedText>
+                {isEditingContact ? (
+                  <TextInput
+                    value={editLastName}
+                    onChangeText={setEditLastName}
+                    style={[styles.editInput, { color: tokens.colors.text, borderColor: tokens.colors.border }]}
+                    placeholder="Introduceți numele"
+                    placeholderTextColor={tokens.colors.placeholder}
+                  />
+                ) : (
+                  <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]}>
+                    {profileToShow?.lastName || 'N/A'}
+                  </ThemedText>
+                )}
               </View>
             </View>
 
+            {/* Prenume */}
             <View style={[styles.infoItem, { borderColor: tokens.colors.border }]}>
-              <Ionicons name="mail-outline" size={20} color={tokens.colors.primary} />
+              <Ionicons name="person-outline" size={18} color={tokens.colors.primary} />
+              <View style={styles.infoItemContent}>
+                <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Prenume</ThemedText>
+                {isEditingContact ? (
+                  <TextInput
+                    value={editFirstName}
+                    onChangeText={setEditFirstName}
+                    style={[styles.editInput, { color: tokens.colors.text, borderColor: tokens.colors.border }]}
+                    placeholder="Introduceți prenumele"
+                    placeholderTextColor={tokens.colors.placeholder}
+                  />
+                ) : (
+                  <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]}>
+                    {profileToShow?.firstName || 'N/A'}
+                  </ThemedText>
+                )}
+              </View>
+            </View>
+
+            {/* Telefon */}
+            <View style={[styles.infoItem, { borderColor: tokens.colors.border }]}>
+              <Ionicons name="call-outline" size={18} color={tokens.colors.primary} />
+              <View style={styles.infoItemContent}>
+                <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Telefon</ThemedText>
+                {isEditingContact ? (
+                  <TextInput
+                    value={editPhone}
+                    onChangeText={setEditPhone}
+                    style={[styles.editInput, { color: tokens.colors.text, borderColor: tokens.colors.border }]}
+                    placeholder="Introduceți telefonul"
+                    placeholderTextColor={tokens.colors.placeholder}
+                    keyboardType="phone-pad"
+                  />
+                ) : (
+                  <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]}>
+                    {profileToShow?.phone || 'N/A'}
+                  </ThemedText>
+                )}
+              </View>
+            </View>
+
+            {/* Email */}
+            <View style={[styles.infoItem, { borderColor: tokens.colors.border }]}>
+              <Ionicons name="mail-outline" size={18} color={tokens.colors.primary} />
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>Email</ThemedText>
                 <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text }]} numberOfLines={1}>
@@ -320,33 +570,265 @@ export default function ProfileScreen() {
               </View>
             </View>
           </View>
+
+          {/* Save/Cancel buttons when editing */}
+          {isEditingContact && (
+            <View style={styles.editActions}>
+              <TouchableOpacity 
+                onPress={handleCancelEdit}
+                style={[styles.actionButton, styles.cancelButton, { borderColor: tokens.colors.border }]}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.actionButtonText, { color: tokens.colors.text }]}>Anulează</ThemedText>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                onPress={handleSaveContact}
+                style={[styles.actionButton, styles.saveButton, { backgroundColor: tokens.colors.primary }]}
+                activeOpacity={0.8}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <ThemedText style={[styles.actionButtonText, { color: '#fff' }]}>Salvează</ThemedText>
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Reviews Dashboard */}
+        <View style={[styles.dashboardCard, { backgroundColor: tokens.colors.surface }]}>
+          <View style={styles.dashboardHeader}>
+            <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>Rezultatul evaluării</ThemedText>
+          </View>
+
+          {reviewsLoading ? (
+            <View style={styles.reviewsLoadingContainer}>
+              <ActivityIndicator size="small" color={tokens.colors.primary} />
+            </View>
+          ) : reviewStats && reviewStats.totalReviews > 0 ? (
+            <>
+              {/* Rating Summary */}
+              <View style={styles.ratingsSummary}>
+                <View style={styles.ratingsLeft}>
+                  <Text style={[styles.ratingScore, { color: tokens.colors.text }]}>
+                    {reviewStats.averageRating.toFixed(1)}
+                  </Text>
+                  <View style={styles.starsRow}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Ionicons
+                        key={star}
+                        name={star <= Math.round(reviewStats.averageRating) ? 'star' : 'star-outline'}
+                        size={16}
+                        color="#FFC107"
+                      />
+                    ))}
+                  </View>
+                  <Text style={[styles.reviewCount, { color: tokens.colors.muted }]}>
+                    {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
+                  </Text>
+                </View>
+
+                {/* Rating Distribution Bars */}
+                <View style={styles.ratingsRight}>
+                  {[5, 4, 3, 2, 1].map((rating) => {
+                    const count = reviewStats.distribution[rating as keyof typeof reviewStats.distribution] || 0;
+                    const percentage = reviewStats.totalReviews > 0 
+                      ? (count / reviewStats.totalReviews) * 100 
+                      : 0;
+                    
+                    return (
+                      <View key={rating} style={styles.ratingBar}>
+                        <Text style={[styles.ratingLabel, { color: tokens.colors.text }]}>
+                          {rating} ★
+                        </Text>
+                        <View style={[styles.barBackground, { backgroundColor: tokens.colors.border }]}>
+                          <View 
+                            style={[
+                              styles.barFill, 
+                              { 
+                                width: `${percentage}%`,
+                                backgroundColor: rating === 5 ? '#FFC107' : tokens.colors.border 
+                              }
+                            ]} 
+                          />
+                        </View>
+                        <Text style={[styles.ratingCount, { color: tokens.colors.muted }]}>
+                          {count}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {/* Recent Reviews */}
+              {recentReviews.length > 0 && (
+                <View style={styles.recentReviewsSection}>
+                  {recentReviews.map((review) => {
+                    const reviewDate = new Date(review.createdAt);
+                    const formattedDate = `${reviewDate.getDate().toString().padStart(2, '0')}.${(reviewDate.getMonth() + 1).toString().padStart(2, '0')}.${reviewDate.getFullYear()}`;
+                    
+                    return (
+                      <View key={review._id} style={[styles.reviewCard, { borderColor: tokens.colors.border }]}>
+                        <View style={styles.reviewHeader}>
+                          <View style={styles.reviewerInfo}>
+                            {review.reviewerAvatar ? (
+                              <Image 
+                                source={{ uri: review.reviewerAvatar }} 
+                                style={styles.reviewerAvatar} 
+                              />
+                            ) : (
+                              <View style={[styles.reviewerAvatarPlaceholder, { backgroundColor: tokens.colors.elev }]}>
+                                <Ionicons name="person" size={20} color={tokens.colors.primary} />
+                              </View>
+                            )}
+                            <View style={styles.reviewerDetails}>
+                              <Text style={[styles.reviewerName, { color: tokens.colors.text }]}>
+                                {review.reviewerName}
+                              </Text>
+                              <Text style={[styles.reviewDate, { color: tokens.colors.muted }]}>
+                                {formattedDate}
+                              </Text>
+                            </View>
+                          </View>
+                          <View style={styles.reviewRatingBadge}>
+                            <Text style={[styles.reviewRatingText, { color: tokens.colors.text }]}>
+                              {review.rating.toFixed(1)}
+                            </Text>
+                          </View>
+                        </View>
+                        
+                        <Text style={[styles.reviewComment, { color: tokens.colors.text }]}>
+                          {review.comment}
+                        </Text>
+                        
+                        {review.likes !== undefined && review.likes > 0 && (
+                          <View style={styles.reviewFooter}>
+                            <Ionicons name="thumbs-up" size={14} color={tokens.colors.primary} />
+                            <Text style={[styles.reviewLikes, { color: tokens.colors.muted }]}>
+                              {review.likes}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
+                  
+                  {/* View All Reviews Button */}
+                  {reviewStats.totalReviews > 2 && (
+                    <TouchableOpacity 
+                      style={[styles.viewAllButton, { borderColor: tokens.colors.primary }]}
+                      onPress={() => {
+                        // TODO: Navigate to all reviews page
+                        Alert.alert('Info', 'Navigare către toate review-urile');
+                      }}
+                    >
+                      <Text style={[styles.viewAllText, { color: tokens.colors.primary }]}>
+                        TOATE COMENTARIILE
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </>
+          ) : (
+            <View style={styles.noReviewsContainer}>
+              <Image source={require('../assets/images/gumballCrying.png')} style={styles.noReviewsImage} resizeMode="contain" />
+              <Text style={[styles.noReviewsText, { color: tokens.colors.muted }]}>
+                Nu există încă review-uri
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Announcements Dashboard */}
         <View style={[styles.dashboardCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.dashboardHeader}>
             <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>Anunțurile Mele</ThemedText>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/my-announcements')}>
               <Ionicons name="arrow-forward" size={20} color={tokens.colors.muted} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.announcementStats}>
             <View style={styles.statItem}>
-              <ThemedText style={[styles.statValue, { color: tokens.colors.primary }]}>6</ThemedText>
+              <ThemedText style={[styles.statValue, { color: tokens.colors.primary }]}>
+                {userAnnouncements.length}
+              </ThemedText>
               <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Active</ThemedText>
             </View>
             <View style={[styles.statDivider, { backgroundColor: tokens.colors.border }]} />
             <View style={styles.statItem}>
-              <ThemedText style={[styles.statValue, { color: tokens.colors.text }]}>12</ThemedText>
+              <ThemedText style={[styles.statValue, { color: tokens.colors.text }]}>
+                {userAnnouncements.length}
+              </ThemedText>
               <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Total</ThemedText>
             </View>
             <View style={[styles.statDivider, { backgroundColor: tokens.colors.border }]} />
             <View style={styles.statItem}>
-              <ThemedText style={[styles.statValue, { color: tokens.colors.text }]}>89</ThemedText>
+              <ThemedText style={[styles.statValue, { color: tokens.colors.text }]}>
+                {userAnnouncements.reduce((sum, a) => sum + (a.views || 0), 0)}
+              </ThemedText>
               <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Views</ThemedText>
             </View>
           </View>
+
+          {/* Horizontal Announcements List */}
+          {announcementsLoading ? (
+            <View style={styles.announcementsLoadingContainer}>
+              <ActivityIndicator size="small" color={tokens.colors.primary} />
+            </View>
+          ) : userAnnouncements.length === 0 ? (
+            <View style={styles.emptyAnnouncementsContainer}>
+              <Ionicons name="albums-outline" size={40} color={tokens.colors.placeholder} />
+              <Text style={[styles.emptyAnnouncementsText, { color: tokens.colors.muted }]}>
+                Nu ai încă anunțuri postate
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={userAnnouncements}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item._id}
+              contentContainerStyle={styles.announcementsList}
+              renderItem={({ item }) => {
+                const imageUri = item.images?.[0] ? getImageSrc(item.images[0]) : null;
+                return (
+                  <TouchableOpacity
+                    style={[styles.announcementCard, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}
+                    onPress={() => router.push(`/announcement-details?id=${item._id}`)}
+                    activeOpacity={0.7}
+                  >
+                    <Image
+                      source={{
+                        uri: imageUri || 'https://via.placeholder.com/150x150?text=No+Image'
+                      }}
+                      style={styles.announcementImage}
+                    />
+                    <View style={styles.announcementInfo}>
+                      <Text 
+                        numberOfLines={2} 
+                        style={[styles.announcementTitle, { color: tokens.colors.text }]}
+                      >
+                        {item.title}
+                      </Text>
+                      <Text 
+                        numberOfLines={1} 
+                        style={[styles.announcementLocation, { color: tokens.colors.muted }]}
+                      >
+                        <Ionicons name="location-outline" size={12} color={tokens.colors.muted} />
+                        {' '}{item.location || 'Nedefinit'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          )}
         </View>
       </ScrollView>
     </ThemedView>
@@ -543,25 +1025,67 @@ const styles = StyleSheet.create({
   
   // Info Grid
   infoGrid: {
-    gap: 12,
+    gap: 8,
   },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
     borderWidth: 1,
   },
   infoItemContent: {
     flex: 1,
   },
   infoItemLabel: {
-    fontSize: 12,
+    fontSize: 11,
     marginBottom: 2,
   },
   infoItemValue: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  // Edit Mode Styles
+  editButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  editButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  editInput: {
+    fontSize: 13,
+    fontWeight: '600',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderRadius: 6,
+    marginTop: 2,
+  },
+  editActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButton: {
+    borderWidth: 1,
+  },
+  saveButton: {
+    // backgroundColor set dynamically
+  },
+  actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
   },
@@ -608,5 +1132,207 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: -12,
+  },
+
+  // Announcements List Styles
+  announcementsLoadingContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyAnnouncementsContainer: {
+    paddingVertical: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  emptyAnnouncementsText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  announcementsList: {
+    paddingVertical: 16,
+    gap: 2,
+  },
+  announcementCard: {
+    width: 150,
+    borderRadius: 12,
+    marginRight: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  announcementImage: {
+    width: '100%',
+    height: 120,
+    backgroundColor: '#eee',
+  },
+  announcementInfo: {
+    padding: 10,
+  },
+  announcementTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 6,
+    lineHeight: 16,
+  },
+  announcementLocation: {
+    fontSize: 11,
+    lineHeight: 14,
+  },
+
+  // Reviews Section Styles
+  reviewsLoadingContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noReviewsContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  noReviewsImage: {
+    width: 210,
+    height: 210,
+    marginBottom:-40,
+  },
+  noReviewsText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  ratingsSummary: {
+    flexDirection: 'row',
+    gap: 20,
+    marginBottom: 20,
+  },
+  ratingsLeft: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+  },
+  ratingScore: {
+    fontSize: 36,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  starsRow: {
+    flexDirection: 'row',
+    gap: 2,
+    marginBottom: 4,
+  },
+  reviewCount: {
+    fontSize: 11,
+  },
+  ratingsRight: {
+    flex: 1,
+    gap: 4,
+  },
+  ratingBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  ratingLabel: {
+    fontSize: 11,
+    width: 30,
+  },
+  barBackground: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  ratingCount: {
+    fontSize: 11,
+    width: 20,
+    textAlign: 'right',
+  },
+  recentReviewsSection: {
+    gap: 12,
+  },
+  reviewCard: {
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  reviewerInfo: {
+    flexDirection: 'row',
+    gap: 10,
+    flex: 1,
+  },
+  reviewerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  reviewerAvatarPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewerDetails: {
+    flex: 1,
+  },
+  reviewerName: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  reviewDate: {
+    fontSize: 11,
+  },
+  reviewRatingBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: '#FFC107',
+  },
+  reviewRatingText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  reviewComment: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  reviewFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  reviewLikes: {
+    fontSize: 11,
+  },
+  viewAllButton: {
+    marginTop: 8,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewAllText: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });

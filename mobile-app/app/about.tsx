@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +21,8 @@ export default function AboutScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [open, setOpen] = useState<number | null>(null);
+  const { width } = useWindowDimensions();
+  const isLarge = width >= 350;
 
   // Dark palette tints (used as accents). Matches the attached palette.
   const tints = {
@@ -230,7 +232,11 @@ export default function AboutScreen() {
               <ThemedText style={[styles.sectionHeader, { color: tokens.colors.text }]}>Valorile noastre</ThemedText>
               <View style={styles.valuesGrid}>
                 {values.map(v => (
-                  <View key={v.title} style={[styles.valueCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}>
+                  <View key={v.title} style={[
+                    styles.valueCard, 
+                    { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border },
+                    isLarge ? { width: 'calc(50% - 6px)' as any } : { width: '100%' }
+                  ]}>
                     <ThemedText style={styles.valueIcon}>{v.icon}</ThemedText>
                     <ThemedText style={[styles.valueTitle, { color: tokens.colors.text }]}>{v.title}</ThemedText>
                     <ThemedText style={[styles.valueText, { color: tokens.colors.muted }]}>{v.text}</ThemedText>
@@ -315,7 +321,7 @@ const styles = StyleSheet.create({
   stepDesc: { fontSize: 13, lineHeight: 18 },
 
   valuesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12 },
-  valueCard: { flexBasis: '48%', padding: 14, borderRadius: 14, borderWidth: 1, gap: 8 },
+  valueCard: { padding: 14, borderRadius: 14, borderWidth: 1, gap: 8 },
   valueIcon: { fontSize: 22 },
   valueTitle: { fontSize: 15, fontWeight: '700' },
   valueText: { fontSize: 12, lineHeight: 16 },

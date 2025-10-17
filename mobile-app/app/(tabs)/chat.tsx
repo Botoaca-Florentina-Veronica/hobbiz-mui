@@ -1912,7 +1912,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: -35,
   },
   chatEmptySubtitle: {
     fontSize: 14,

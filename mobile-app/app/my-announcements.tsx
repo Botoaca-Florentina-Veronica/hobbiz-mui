@@ -383,79 +383,73 @@ export default function MyAnnouncementsScreen() {
                     <View style={styles.locationPlaceholder} />
                   </TouchableOpacity>
 
-                  {/* Action buttons - 2x2 layout with variable width per label */}
+                  {/* Action buttons - Always 2x2 layout on large screens */}
                   <View style={styles.actionsGrid}>
-                    {(() => {
-                      const contentW = rowWidths[announcement._id] || 0;
-                      // Threshold to fit 4 equal buttons on one row: 4 * 120px + 3 gaps (6px)
-                      const neededOneRow = 4 * 120 + 3 * 6;
-                      const canOneRow = contentW >= neededOneRow;
-
-                      if (canOneRow) {
-                        return (
-                          <View style={styles.actionsRowWrap}>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.equalButtonFour, styles.primaryButton]}
-                              onPress={() => handleEdit(announcement)}
-                            >
-                              <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.equalButtonFour, styles.secondaryButton]}
-                              onPress={() => handleDeactivate(announcement)}
-                            >
-                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.equalButtonFour, styles.dangerButton]}
-                              onPress={() => handleDelete(announcement._id)}
-                            >
-                              <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.equalButtonFour, styles.secondaryButton]}
-                              onPress={() => handleReactivate(announcement)}
-                            >
-                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
-                            </TouchableOpacity>
-                          </View>
-                        );
-                      }
-
-                      // Fallback to 2x2 layout
-                      return (
-                        <>
-                          <View style={styles.actionsRow}>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.fillButton, styles.primaryButton]}
-                              onPress={() => handleEdit(announcement)}
-                            >
-                              <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
-                              onPress={() => handleDeactivate(announcement)}
-                            >
-                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.actionsRow}>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.fillButton, styles.dangerButton]}
-                              onPress={() => handleDelete(announcement._id)}
-                            >
-                              <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
-                              onPress={() => handleReactivate(announcement)}
-                            >
-                              <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
-                            </TouchableOpacity>
-                          </View>
-                        </>
-                      );
-                    })()}
+                    {isLarge ? (
+                      // For tablets/large screens: Always use 2x2 grid with equal-width buttons
+                      <>
+                        <View style={styles.actionsRow}>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.primaryButton]}
+                            onPress={() => handleEdit(announcement)}
+                          >
+                            <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton]}
+                            onPress={() => handleDeactivate(announcement)}
+                          >
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.actionsRow}>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.dangerButton]}
+                            onPress={() => handleDelete(announcement._id)}
+                          >
+                            <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton]}
+                            onPress={() => handleReactivate(announcement)}
+                          >
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
+                    ) : (
+                      // For mobile: Keep original adaptive layout
+                      <>
+                        <View style={styles.actionsRow}>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.fillButton, styles.primaryButton]}
+                            onPress={() => handleEdit(announcement)}
+                          >
+                            <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
+                            onPress={() => handleDeactivate(announcement)}
+                          >
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.actionsRow}>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.fillButton, styles.dangerButton]}
+                            onPress={() => handleDelete(announcement._id)}
+                          >
+                            <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
+                            onPress={() => handleReactivate(announcement)}
+                          >
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
+                    )}
                   </View>
                 </View>
               </View>
@@ -589,7 +583,7 @@ const createStyles = (tokens: any) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    marginLeft: 4,
+    marginLeft: -10,
   },
   headerTitle: {
     fontSize: 22,
@@ -957,6 +951,10 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flex: 1,
     minWidth: 0,
     marginRight: 6,
+  },
+  equalButtonTwo: {
+    flex: 1,
+    minWidth: 0,
   },
   equalButtonFour: {
     flex: 1,
