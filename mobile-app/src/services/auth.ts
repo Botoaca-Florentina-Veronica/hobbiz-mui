@@ -42,3 +42,13 @@ export async function updatePassword(currentPassword: string, newPassword: strin
     throw new Error(msg);
   }
 }
+
+export async function deleteAccount() {
+  try {
+    const res = await api.delete('/api/users/delete-account');
+    return res.data;
+  } catch (e: any) {
+    const msg = e?.response?.data?.error || 'Nu s-a putut șterge contul';
+    throw new Error(msg);
+  }
+}

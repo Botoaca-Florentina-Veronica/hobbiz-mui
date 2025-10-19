@@ -22,7 +22,8 @@ export default function AboutScreen() {
   const router = useRouter();
   const [open, setOpen] = useState<number | null>(null);
   const { width } = useWindowDimensions();
-  const isLarge = width >= 350;
+  // Use a conservative breakpoint: >=350dp -> 2 coloane, altfel 1 coloană
+  const isTwoCol = width >= 350;
 
   // Dark palette tints (used as accents). Matches the attached palette.
   const tints = {
@@ -235,7 +236,7 @@ export default function AboutScreen() {
                   <View key={v.title} style={[
                     styles.valueCard, 
                     { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border },
-                    isLarge ? { width: 'calc(50% - 6px)' as any } : { width: '100%' }
+                    isTwoCol ? { width: '48%' } : { width: '100%' }
                   ]}>
                     <ThemedText style={styles.valueIcon}>{v.icon}</ThemedText>
                     <ThemedText style={[styles.valueTitle, { color: tokens.colors.text }]}>{v.title}</ThemedText>
@@ -320,11 +321,11 @@ const styles = StyleSheet.create({
   stepTitle: { fontSize: 15, fontWeight: '700' },
   stepDesc: { fontSize: 13, lineHeight: 18 },
 
-  valuesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12 },
-  valueCard: { padding: 14, borderRadius: 14, borderWidth: 1, gap: 8 },
+  valuesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 12 },
+  valueCard: { padding: 14, borderRadius: 14, borderWidth: 1, gap: 8, minHeight: 130, marginBottom: 12 },
   valueIcon: { fontSize: 22 },
   valueTitle: { fontSize: 15, fontWeight: '700' },
-  valueText: { fontSize: 12, lineHeight: 16 },
+  valueText: { fontSize: 12, lineHeight: 16, flex: 1 },
 
   faqQuestion: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1 },
   faqQuestionText: { fontSize: 15, fontWeight: '600', flex: 1, paddingRight: 8 },

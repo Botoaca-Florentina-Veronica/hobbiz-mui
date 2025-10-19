@@ -1904,7 +1904,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   chatEmptyIcon: {
-    marginBottom: -55,
+    marginBottom: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1912,7 +1912,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: -35,
+    marginTop: -55,
   },
   chatEmptySubtitle: {
     fontSize: 14,

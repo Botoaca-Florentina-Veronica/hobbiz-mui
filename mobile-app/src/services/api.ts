@@ -49,9 +49,10 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true,
-  // Increase timeout for slower/dev networks (ms). Previously requests could fail quickly
-  timeout: 15000,
+  // React Native doesn't use browser cookies by default; rely on Authorization header
+  // withCredentials is ignored in RN; omit to avoid any side-effects
+  // Increase timeout for cold starts on Render and slower/dev networks (ms)
+  timeout: 45000,
 });
 
 // Log chosen baseURL for easier debugging in Expo console
@@ -82,7 +83,7 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Better logging for response errors — prints message and requested URL
+// Better logging + resilient retries for transient network errors (cold starts, timeouts, 5xx)
 api.interceptors.response.use(
   (res) => res,
   (error) => {
@@ -93,8 +94,10 @@ api.interceptors.response.use(
         const url = cfg.url || '(unknown)';
         // Detect timeouts vs other network errors
         const isTimeout = error?.code === 'ECONNABORTED' || (error?.message || '').toLowerCase().includes('timeout');
+        const status = error?.response?.status as number | undefined;
+        const isNetwork = (error?.message === 'Network Error') || (!status && !error?.response);
+        const isRetriableStatus = status === 502 || status === 503 || status === 504; // gateway errors during cold start
         // If server responded with 401, it's an auth issue — show as warn to reduce noise
-        const status = error?.response?.status;
         if (status === 401) {
           console.warn('[mobile-app] API 401 Unauthorized:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
           // Do not attempt retry for 401
@@ -104,15 +107,17 @@ api.interceptors.response.use(
         if (isTimeout) {
           console.error('[mobile-app] API timeout:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
         } else {
-          console.error('[mobile-app] API error:', error?.message, 'baseURL:', base, 'url:', url);
+          console.error('[mobile-app] API error:', error?.message, 'code:', error?.code, 'status:', status, 'baseURL:', base, 'url:', url);
         }
 
-        // Simple one-time retry for transient network errors/timeouts
-        if (cfg && !cfg.__isRetryRequest && (isTimeout || error?.message === 'Network Error')) {
-          // mark it so we don't loop
-          cfg.__isRetryRequest = true;
-          // small backoff before retrying
-          return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => api(cfg));
+        // Retry up to 3 times for timeouts, network errors, and common 5xx cold-start statuses
+        const MAX_RETRIES = 3;
+        const retryCount = (cfg as any).__retryCount || 0;
+        const shouldRetry = (isTimeout || isNetwork || isRetriableStatus) && retryCount < MAX_RETRIES;
+        if (cfg && shouldRetry) {
+          (cfg as any).__retryCount = retryCount + 1;
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 6000); // 1s, 2s, 4s caps at 6s
+          return new Promise((resolve) => setTimeout(resolve, delay)).then(() => api(cfg));
         }
     } catch (e) {
       // ignore

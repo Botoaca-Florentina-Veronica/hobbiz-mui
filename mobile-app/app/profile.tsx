@@ -29,7 +29,10 @@ interface UserReview {
   reviewerName: string;
   reviewerAvatar?: string;
   createdAt: string;
-  likes?: number;
+  likes?: any[]; // array of user IDs who liked
+  unlikes?: any[]; // array of user IDs who unliked
+  likesCount?: number;
+  unlikesCount?: number;
 }
 
 interface ReviewStats {
@@ -63,6 +66,8 @@ export default function ProfileScreen() {
   const [reviewStats, setReviewStats] = React.useState<ReviewStats | null>(null);
   const [recentReviews, setRecentReviews] = React.useState<UserReview[]>([]);
   const [reviewsLoading, setReviewsLoading] = React.useState(false);
+  // Track like/unlike state for each review
+  const [reviewLikeState, setReviewLikeState] = React.useState<Record<string, { liked: boolean; unliked: boolean; locked?: boolean }>>({});
   
   // Edit mode state for contact info
   const [isEditingContact, setIsEditingContact] = React.useState(false);
@@ -159,16 +164,30 @@ export default function ProfileScreen() {
           
           // Map reviews to expected format and take 2 most recent
           const mappedReviews = reviewsArray.slice(0, 2).map(r => ({
-            _id: r._id,
+            _id: String(r._id),
             rating: r.score || 0,
             comment: r.comment || '',
             reviewerName: r.authorName || 'Utilizator',
             reviewerAvatar: r.authorAvatar,
             createdAt: r.createdAt,
-            likes: (r.likes || []).length
+            likes: r.likes || [],
+            unlikes: r.unlikes || [],
+            likesCount: (r.likes || []).length,
+            unlikesCount: (r.unlikes || []).length
           }));
           
           setRecentReviews(mappedReviews);
+          
+          // Initialize like/unlike state based on current user
+          if (user?.id) {
+            const initialState: Record<string, { liked: boolean; unliked: boolean; locked?: boolean }> = {};
+            mappedReviews.forEach(r => {
+              const userLiked = (r.likes || []).some((uid: any) => String(uid) === String(user.id));
+              const userUnliked = (r.unlikes || []).some((uid: any) => String(uid) === String(user.id));
+              initialState[r._id] = { liked: userLiked, unliked: userUnliked };
+            });
+            setReviewLikeState(initialState);
+          }
         } else {
           setReviewStats(null);
           setRecentReviews([]);
@@ -316,6 +335,125 @@ export default function ProfileScreen() {
   };
 
   const profileToShow = publicProfile || user;
+
+  // Helper to set reaction using unified endpoint with optimistic update
+  const setReviewReaction = async (reviewId: string, desired: 'like' | 'unlike' | 'none') => {
+    const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };
+
+    // Snapshot for revert
+    const prevState = { ...currentState };
+    const prevCounts = recentReviews.find(r => r._id === reviewId) || { likesCount: 0, unlikesCount: 0 } as any;
+
+    // Compute optimistic deltas
+    let likesDelta = 0;
+    let unlikesDelta = 0;
+    if (desired === 'like') {
+      likesDelta += currentState.liked ? 0 : 1;
+      unlikesDelta += currentState.unliked ? -1 : 0;
+    } else if (desired === 'unlike') {
+      unlikesDelta += currentState.unliked ? 0 : 1;
+      likesDelta += currentState.liked ? -1 : 0;
+    } else if (desired === 'none') {
+      likesDelta += currentState.liked ? -1 : 0;
+      unlikesDelta += currentState.unliked ? -1 : 0;
+    }
+
+    // Apply optimistic UI
+    setReviewLikeState(prev => ({
+      ...prev,
+      [reviewId]: {
+        liked: desired === 'like',
+        unliked: desired === 'unlike',
+      },
+    }));
+    setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
+      ...r,
+      likesCount: Math.max(0, (r.likesCount || 0) + likesDelta),
+      unlikesCount: Math.max(0, (r.unlikesCount || 0) + unlikesDelta),
+    } : r));
+
+    try {
+      const res = await api.post(`/api/reviews/${reviewId}/react`, { reaction: desired });
+      const data = res?.data || {};
+      setReviewLikeState(prev => ({
+        ...prev,
+        [reviewId]: { liked: !!data.liked, unliked: !!data.unliked },
+      }));
+      setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
+        ...r,
+        likesCount: data.likesCount ?? r.likesCount ?? 0,
+        unlikesCount: data.unlikesCount ?? r.unlikesCount ?? 0,
+      } : r));
+    } catch (error: any) {
+      console.error('Error setting reaction:', error);
+
+      // If endpoint is not found on deployed backend (404), fallback to legacy toggle endpoints
+      const status = error?.response?.status;
+      if (status === 404) {
+        try {
+          let legacyRes;
+          if (desired === 'like') {
+            legacyRes = await api.post(`/api/reviews/${reviewId}/like`);
+          } else if (desired === 'unlike') {
+            legacyRes = await api.post(`/api/reviews/${reviewId}/unlike`);
+          } else if (desired === 'none') {
+            // Undo: call the toggle corresponding to previous state
+            if (prevState.liked) {
+              legacyRes = await api.post(`/api/reviews/${reviewId}/like`);
+            } else if (prevState.unliked) {
+              legacyRes = await api.post(`/api/reviews/${reviewId}/unlike`);
+            }
+          }
+
+          const data = legacyRes?.data || {};
+          // Legacy endpoints return { liked } or { unliked } and counts; normalize
+          setReviewLikeState(prev => ({
+            ...prev,
+            [reviewId]: { liked: !!data.liked, unliked: !!data.unliked },
+          }));
+          setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
+            ...r,
+            likesCount: data.likesCount ?? r.likesCount ?? 0,
+            unlikesCount: data.unlikesCount ?? r.unlikesCount ?? 0,
+          } : r));
+          return;
+        } catch (legacyErr) {
+          console.error('Legacy fallback failed:', legacyErr);
+        }
+      }
+
+      // Revert on error (either non-404 or fallback failed)
+      setReviewLikeState(prev => ({ ...prev, [reviewId]: prevState }));
+      setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
+        ...r,
+        likesCount: prevCounts.likesCount || 0,
+        unlikesCount: prevCounts.unlikesCount || 0,
+      } : r));
+      Alert.alert('Eroare', 'Nu s-a putut salva reacția. Încearcă din nou.');
+    }
+  };
+
+  // Handle like toggle for a review (uses unified endpoint)
+  const handleToggleLike = async (reviewId: string) => {
+    if (!user?.id) {
+      Alert.alert('Autentificare necesară', 'Trebuie să fii conectat pentru a da like.');
+      return;
+    }
+    const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };
+    const desired: 'like' | 'unlike' | 'none' = currentState.liked ? 'none' : 'like';
+    await setReviewReaction(reviewId, desired);
+  };
+
+  // Handle unlike toggle for a review (uses unified endpoint)
+  const handleToggleUnlike = async (reviewId: string) => {
+    if (!user?.id) {
+      Alert.alert('Autentificare necesară', 'Trebuie să fii conectat pentru a da unlike.');
+      return;
+    }
+    const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };
+    const desired: 'like' | 'unlike' | 'none' = currentState.unliked ? 'none' : 'unlike';
+    await setReviewReaction(reviewId, desired);
+  };
 
   return (
     <>
@@ -705,14 +843,64 @@ export default function ProfileScreen() {
                           {review.comment}
                         </Text>
                         
-                        {review.likes !== undefined && review.likes > 0 && (
-                          <View style={styles.reviewFooter}>
-                            <Ionicons name="thumbs-up" size={14} color={tokens.colors.primary} />
-                            <Text style={[styles.reviewLikes, { color: tokens.colors.muted }]}>
-                              {review.likes}
-                            </Text>
+                        {/* Like/Unlike buttons */}
+                        <View style={styles.reviewFooter}>
+                          <View style={styles.reviewActions}>
+                            {/* Like button */}
+                            <TouchableOpacity
+                              style={styles.actionButtonContainer}
+                              onPress={() => handleToggleLike(review._id)}
+                              activeOpacity={0.7}
+                            >
+                              <Ionicons 
+                                name="thumbs-up" 
+                                size={18} 
+                                color={
+                                  reviewLikeState[review._id]?.liked 
+                                    ? '#2196F3' 
+                                    : tokens.colors.muted
+                                }
+                              />
+                              <Text style={[
+                                styles.actionCount, 
+                                { 
+                                  color: reviewLikeState[review._id]?.liked 
+                                    ? '#2196F3' 
+                                    : tokens.colors.muted 
+                                }
+                              ]}>
+                                {review.likesCount || 0}
+                              </Text>
+                            </TouchableOpacity>
+
+                            {/* Unlike button */}
+                            <TouchableOpacity
+                              style={styles.actionButtonContainer}
+                              onPress={() => handleToggleUnlike(review._id)}
+                              activeOpacity={0.7}
+                            >
+                              <Ionicons 
+                                name="thumbs-down" 
+                                size={18} 
+                                color={
+                                  reviewLikeState[review._id]?.unliked 
+                                    ? '#F44336' 
+                                    : tokens.colors.muted
+                                }
+                              />
+                              <Text style={[
+                                styles.actionCount, 
+                                { 
+                                  color: reviewLikeState[review._id]?.unliked 
+                                    ? '#F44336' 
+                                    : tokens.colors.muted 
+                                }
+                              ]}>
+                                {review.unlikesCount || 0}
+                              </Text>
+                            </TouchableOpacity>
                           </View>
-                        )}
+                        </View>
                       </View>
                     );
                   })}
@@ -1317,7 +1505,24 @@ const styles = StyleSheet.create({
   reviewFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+  },
+  reviewActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 24,
+  },
+  actionButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  actionCount: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   reviewLikes: {
     fontSize: 11,

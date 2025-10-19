@@ -6,13 +6,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useRouter } from 'expo-router';
-import { updateEmail, updatePassword } from '../src/services/auth';
+import { updateEmail, updatePassword, deleteAccount } from '../src/services/auth';
+import { useAuth } from '../src/context/AuthContext';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
 export default function SettingsScreen() {
   const { tokens } = useAppTheme();
   const router = useRouter();
+  const { logout } = useAuth();
   const insets = useSafeAreaInsets();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -86,6 +88,33 @@ export default function SettingsScreen() {
     setExpandedSection(expandedSection === key ? null : key);
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Ștergere cont',
+      'Această acțiune este permanentă. Ești sigur(ă) că vrei să-ți ștergi contul și toate anunțurile asociate?',
+      [
+        { text: 'Anulează', style: 'cancel' },
+        {
+          text: 'Șterge',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              await deleteAccount();
+              await logout();
+              Alert.alert('Cont șters', 'Contul tău a fost șters cu succes.');
+              router.replace('/login');
+            } catch (e: any) {
+              Alert.alert('Eroare', e?.message || 'Nu s-a putut șterge contul');
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -112,7 +141,12 @@ export default function SettingsScreen() {
                   { backgroundColor: tokens.colors.surface },
                   index === settings.length - 1 && !expandedSection && styles.lastRow,
                 ]}
-                onPress={() => (item.expandable ? toggleSection(item.key) : null)}
+                onPress={() => {
+                  if (item.expandable) return toggleSection(item.key);
+                  if (item.key === 'delete-account') return handleDeleteAccount();
+                  // Aici poți adăuga alte acțiuni simple non-expandable
+                  return null;
+                }}
               >
                 <View style={styles.rowLeft}>
                   <View style={[styles.iconCircle, { backgroundColor: tokens.colors.elev }]}> 

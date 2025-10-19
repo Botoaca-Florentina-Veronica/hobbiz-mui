@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
-const { createReview, getReviewsForUser, toggleLike, updateReview, deleteReview } = require('../controllers/ReviewController');
+const { createReview, getReviewsForUser, setReaction, toggleLike, toggleUnlike, updateReview, deleteReview } = require('../controllers/ReviewController');
 
 // Public: list reviews for a given user
 router.get('/:userId', getReviewsForUser);
@@ -13,6 +13,11 @@ router.post('/', optionalAuth, createReview);
 
 // Toggle like on a review (must be authenticated)
 router.post('/:id/like', auth, toggleLike);
+
+// Toggle unlike on a review (must be authenticated)
+router.post('/:id/unlike', auth, toggleUnlike);
+// Unified reaction endpoint
+router.post('/:id/react', auth, setReaction);
 
 // Edit a review (author only)
 router.put('/:id', auth, updateReview);

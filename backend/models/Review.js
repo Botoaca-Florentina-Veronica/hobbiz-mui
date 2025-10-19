@@ -6,7 +6,9 @@ const reviewSchema = new mongoose.Schema({
 	score: { type: Number, required: true, min: 0, max: 5 },
 	comment: { type: String },
 	// Users who liked this review (each user can like once)
-	likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+	likes: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] },
+	// Users who disliked this review (each user can unlike once)
+	unlikes: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] },
 	createdAt: { type: Date, default: Date.now }
 });
 

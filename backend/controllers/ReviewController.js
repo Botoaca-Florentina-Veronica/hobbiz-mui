@@ -80,6 +80,50 @@ const getReviewsForUser = async (req, res) => {
   }
 };
 
+// Set reaction for a review to 'like' | 'unlike' | 'none'
+const setReaction = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const reviewId = req.params.id;
+    const { reaction } = req.body || {};
+    if (!userId) return res.status(401).json({ error: 'Trebuie autentificat pentru a reacționa' });
+    if (!reviewId) return res.status(400).json({ error: 'Lipsește id review' });
+    if (!['like', 'unlike', 'none'].includes(reaction)) {
+      return res.status(400).json({ error: 'Reacție invalidă' });
+    }
+
+    // Build atomic update: always pull user from both arrays, then add to the requested one
+    const update = {
+      $pull: { likes: userId, unlikes: userId },
+    };
+    if (reaction === 'like') {
+      update.$addToSet = { likes: userId };
+    } else if (reaction === 'unlike') {
+      update.$addToSet = { unlikes: userId };
+    }
+
+    // Apply update and fetch new document
+    const updated = await Review.findByIdAndUpdate(reviewId, update, { new: true, upsert: false });
+    if (!updated) return res.status(404).json({ error: 'Recenzie negăsită' });
+
+    console.log('[setReaction] user', userId, 'reaction', reaction, 'for review', reviewId, '=>', {
+      likesCount: (updated.likes || []).length,
+      unlikesCount: (updated.unlikes || []).length,
+    });
+
+    return res.json({
+      reaction,
+      liked: reaction === 'like',
+      unliked: reaction === 'unlike',
+      likesCount: (updated.likes || []).length,
+      unlikesCount: (updated.unlikes || []).length,
+    });
+  } catch (e) {
+    console.error('Eroare setReaction:', e);
+    res.status(500).json({ error: 'Eroare server la setare reacție' });
+  }
+};
+
 // Toggle like for a review - requires authentication
 const toggleLike = async (req, res) => {
   try {
@@ -91,24 +135,34 @@ const toggleLike = async (req, res) => {
     const review = await Review.findById(reviewId);
     if (!review) return res.status(404).json({ error: 'Recenzie negăsită' });
 
-    const idx = (review.likes || []).findIndex(id => String(id) === String(userId));
-    let liked = false;
-    if (idx === -1) {
-      // add like
-      review.likes = review.likes || [];
-      review.likes.push(userId);
-      liked = true;
-    } else {
-      // remove like
-      review.likes.splice(idx, 1);
-      liked = false;
-    }
-    await review.save();
-
-    res.json({ liked, likesCount: (review.likes || []).length });
+    // Delegate to setReaction: toggle like
+    const already = (review.likes || []).some(id => String(id) === String(userId));
+    req.body = { reaction: already ? 'none' : 'like' };
+    return setReaction(req, res);
   } catch (e) {
     console.error('Eroare toggleLike:', e);
     res.status(500).json({ error: 'Eroare server la like' });
+  }
+};
+
+// Toggle unlike for a review - requires authentication
+const toggleUnlike = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const reviewId = req.params.id;
+    if (!userId) return res.status(401).json({ error: 'Trebuie autentificat pentru a da unlike' });
+    if (!reviewId) return res.status(400).json({ error: 'Lipsește id review' });
+
+    const review = await Review.findById(reviewId);
+    if (!review) return res.status(404).json({ error: 'Recenzie negăsită' });
+
+    // Delegate to setReaction: toggle unlike
+    const already = (review.unlikes || []).some(id => String(id) === String(userId));
+    req.body = { reaction: already ? 'none' : 'unlike' };
+    return setReaction(req, res);
+  } catch (e) {
+    console.error('Eroare toggleUnlike:', e);
+    res.status(500).json({ error: 'Eroare server la unlike' });
   }
 };
 
@@ -181,6 +235,6 @@ const deleteReview = async (req, res) => {
   }
 };
 
-module.exports = { createReview, getReviewsForUser, toggleLike, updateReview, deleteReview };
+module.exports = { createReview, getReviewsForUser, setReaction, toggleLike, toggleUnlike, updateReview, deleteReview };
 
 

@@ -36,6 +36,19 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const app = express();
 const server = http.createServer(app);
 
+// Utility: detect private/local hosts (LAN IPs, localhost)
+function isPrivateHostname(hostname) {
+  if (!hostname) return false;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+  // 10.0.0.0/8
+  if (/^10\./.test(hostname)) return true;
+  // 192.168.0.0/16
+  if (/^192\.168\./.test(hostname)) return true;
+  // 172.16.0.0 - 172.31.255.255
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)) return true;
+  return false;
+}
+
 // Configure Socket.IO with CORS
 const io = socketIo(server, {
   cors: {
@@ -55,7 +68,7 @@ const io = socketIo(server, {
           'http://localhost:19000', // Expo alternative port
           'http://localhost:19006'  // Expo web
         ].filter(Boolean);
-        if (allowedOrigins.includes(origin) || isNetlify) {
+        if (allowedOrigins.includes(origin) || isNetlify || isPrivateHostname(hostname)) {
           return callback(null, true);
         }
         return callback(new Error('Not allowed by CORS'));
@@ -170,7 +183,7 @@ const corsOptions = {
     try {
       const hostname = new URL(origin).hostname;
       const isNetlify = /\.netlify\.app$/.test(hostname);
-      if (allowedOrigins.includes(origin) || isNetlify) {
+      if (allowedOrigins.includes(origin) || isNetlify || isPrivateHostname(hostname)) {
         return callback(null, true);
       }
       console.warn(`CORS blocat pentru origin: ${origin}`);
