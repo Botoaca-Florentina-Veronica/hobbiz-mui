@@ -60,6 +60,7 @@ const io = socketIo(server, {
         const isDigitalOcean = /\.ondigitalocean\.app$/.test(hostname);
         const allowedOrigins = [
           process.env.FRONTEND_URL,
+          'https://hobbiz-app-kkull.ondigitalocean.app/',
           'https://hobbiz.netlify.app',
           'https://hobbiz-mui.netlify.app',
           'https://hobbiz-mui.onrender.com',
@@ -170,6 +171,7 @@ const allowedOrigins = [
   'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.onrender.com',
+  'https://hobbiz-app-kkull.ondigitalocean.app/',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:8081', // Expo Dev Server

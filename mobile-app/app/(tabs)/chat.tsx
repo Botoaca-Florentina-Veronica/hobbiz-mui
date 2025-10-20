@@ -453,6 +453,9 @@ export default function ChatScreen() {
       const ext = extMatch ? extMatch[1] : 'jpg';
       const mimeType = asset.type ? `${asset.type}/${ext}` : `image/${ext}`;
 
+      // Capture replyTo now so we can clear UI immediately and keep data for send
+      const capturedReplyForImage = replyTo;
+
       // Optimistic UI: add a temporary message
       const tempMessage: Message = {
         _id: Date.now().toString(),
@@ -461,10 +464,12 @@ export default function ChatScreen() {
         image: uri,
         createdAt: new Date().toISOString(),
         senderInfo: { firstName: 'Tu', lastName: '' },
-        ...(replyTo ? { replyTo } : {}),
+        ...(capturedReplyForImage ? { replyTo: capturedReplyForImage } : {}),
       };
 
       setMessages((prev) => [...prev, tempMessage]);
+      // Clear reply preview in composer now that we've captured it
+      setReplyTo(null);
 
       // Prepare multipart form data
       const form = new FormData();
@@ -476,9 +481,9 @@ export default function ChatScreen() {
       if (selectedConversation!.announcementId) {
         form.append('announcementId', selectedConversation!.announcementId);
       }
-      if (replyTo) {
+      if (capturedReplyForImage) {
         // send replyTo as JSON string in multipart
-        form.append('replyTo', JSON.stringify(replyTo));
+        form.append('replyTo', JSON.stringify(capturedReplyForImage));
       }
 
       try {
@@ -561,6 +566,8 @@ export default function ChatScreen() {
                   const fileName = asset.name || asset.fileName || uri.split('/').pop() || `file_${Date.now()}`;
                   const mimeType = asset.type ? `${asset.type}/${(fileName.split('.').pop() || 'jpg')}` : asset.mimeType || 'application/octet-stream';
 
+                  // Capture replyTo and clear it from the composer immediately
+                  const capturedReplyForFallback = replyTo;
                   const tempMessage: Message = {
                     _id: Date.now().toString(),
                     conversationId: selectedConversation!.conversationId,
@@ -568,9 +575,10 @@ export default function ChatScreen() {
                     image: uri,
                     createdAt: new Date().toISOString(),
                     senderInfo: { firstName: 'Tu', lastName: '' },
-                    ...(replyTo ? { replyTo } : {}),
+                    ...(capturedReplyForFallback ? { replyTo: capturedReplyForFallback } : {}),
                   };
                   setMessages((prev) => [...prev, tempMessage]);
+                  setReplyTo(null);
 
                   const form = new FormData();
                   // @ts-ignore
@@ -581,7 +589,7 @@ export default function ChatScreen() {
                   if (selectedConversation!.announcementId) {
                     form.append('announcementId', selectedConversation!.announcementId);
                   }
-                  if (replyTo) form.append('replyTo', JSON.stringify(replyTo));
+                  if (capturedReplyForFallback) form.append('replyTo', JSON.stringify(capturedReplyForFallback));
 
                   const r = await api.post('/api/messages', form as any, {
                     headers: { 'Content-Type': 'multipart/form-data' },
@@ -615,6 +623,8 @@ export default function ChatScreen() {
       const fileName = res.name || uri.split('/').pop() || `file_${Date.now()}`;
       const mimeType = res.mimeType || 'application/octet-stream';
 
+      // Capture replyTo and clear the preview in composer
+      const capturedReplyForFile = replyTo;
       const tempMessage: Message = {
         _id: Date.now().toString(),
         conversationId: selectedConversation!.conversationId,
@@ -622,10 +632,11 @@ export default function ChatScreen() {
         image: uri, // reuse image field for backend; backend accepts any uploaded file under 'image'
         createdAt: new Date().toISOString(),
         senderInfo: { firstName: 'Tu', lastName: '' },
-        ...(replyTo ? { replyTo } : {}),
+        ...(capturedReplyForFile ? { replyTo: capturedReplyForFile } : {}),
       };
 
       setMessages((prev) => [...prev, tempMessage]);
+      setReplyTo(null);
 
       const form = new FormData();
       // @ts-ignore
@@ -636,7 +647,7 @@ export default function ChatScreen() {
       if (selectedConversation!.announcementId) {
         form.append('announcementId', selectedConversation!.announcementId);
       }
-      if (replyTo) form.append('replyTo', JSON.stringify(replyTo));
+  if (capturedReplyForFile) form.append('replyTo', JSON.stringify(capturedReplyForFile));
 
       try {
         const r = await api.post('/api/messages', form as any, {
@@ -1257,8 +1268,8 @@ export default function ChatScreen() {
                             <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>acest mesaj a fost șters</Text>
                           ) : (
                             <>
-                              {/* Reply preview in message bubble */}
-                              {message.replyTo && (
+                              {/* Reply preview in message bubble (only when replyTo.messageId exists) */}
+                              {message.replyTo && message.replyTo.messageId && (
                                 <View style={[styles.replyInBubble, { 
                                   backgroundColor: isOwn 
                                     ? (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)') 
@@ -1346,8 +1357,8 @@ export default function ChatScreen() {
           )}
         </ScrollView>
 
-        {/* Reply Preview */}
-        {replyTo && (
+    {/* Reply Preview (only when replying to a real message) */}
+    {replyTo && replyTo.messageId && (
             <View style={[styles.replyPreviewContainer, { backgroundColor: tokens.colors.elev, borderTopColor: tokens.colors.border }]}>
               <View style={[styles.replyPreviewBar, { backgroundColor: tokens.colors.primary }]} />
               <View style={styles.replyPreviewContent}>
