@@ -10,12 +10,17 @@ const useSocket = (userId) => {
     if (!userId) return;
 
     // Resolve Socket.IO server URL using Vite env
-    // Prefer explicit VITE_SOCKET_URL, else fallback based on mode
+    // Prefer explicit VITE_SOCKET_URL, else fallback to VITE_API_URL, else localhost in dev
     const mode = import.meta.env.MODE;
-    const explicitUrl = import.meta.env.VITE_SOCKET_URL;
+    const explicitUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL;
     const serverUrl = explicitUrl || (mode === 'production'
-      ? 'https://hobbiz-mui.onrender.com'
+      ? 'https://hobbiz-app-kkull.ondigitalocean.app/' // In production, require explicit env to avoid wrong origin
       : 'http://localhost:5000');
+
+    if (!serverUrl) {
+      console.warn('[useSocket] No Socket.IO server URL set. Define VITE_SOCKET_URL or VITE_API_URL.');
+      return;
+    }
 
     socketRef.current = io(serverUrl, {
       withCredentials: true,

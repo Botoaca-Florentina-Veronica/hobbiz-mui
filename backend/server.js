@@ -57,6 +57,7 @@ const io = socketIo(server, {
       try {
         const hostname = new URL(origin).hostname;
         const isNetlify = /\.netlify\.app$/.test(hostname);
+        const isDigitalOcean = /\.ondigitalocean\.app$/.test(hostname);
         const allowedOrigins = [
           process.env.FRONTEND_URL,
           'https://hobbiz.netlify.app',
@@ -68,7 +69,7 @@ const io = socketIo(server, {
           'http://localhost:19000', // Expo alternative port
           'http://localhost:19006'  // Expo web
         ].filter(Boolean);
-        if (allowedOrigins.includes(origin) || isNetlify || isPrivateHostname(hostname)) {
+        if (allowedOrigins.includes(origin) || isNetlify || isDigitalOcean || isPrivateHostname(hostname)) {
           return callback(null, true);
         }
         return callback(new Error('Not allowed by CORS'));
@@ -162,7 +163,7 @@ app.set('io', io);
 app.set('activeUsers', activeUsers);
 
 // Middleware
-// CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify
+// CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify și DigitalOcean
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://hobbiz.netlify.app',
@@ -183,7 +184,8 @@ const corsOptions = {
     try {
       const hostname = new URL(origin).hostname;
       const isNetlify = /\.netlify\.app$/.test(hostname);
-      if (allowedOrigins.includes(origin) || isNetlify || isPrivateHostname(hostname)) {
+      const isDigitalOcean = /\.ondigitalocean\.app$/.test(hostname);
+      if (allowedOrigins.includes(origin) || isNetlify || isDigitalOcean || isPrivateHostname(hostname)) {
         return callback(null, true);
       }
       console.warn(`CORS blocat pentru origin: ${origin}`);
