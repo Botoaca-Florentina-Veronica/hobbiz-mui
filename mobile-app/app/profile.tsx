@@ -366,6 +366,7 @@ export default function ProfileScreen() {
         unliked: desired === 'unlike',
       },
     }));
+    console.log('[Profile] optimistic reaction', { reviewId, desired, likesDelta, unlikesDelta });
     setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
       ...r,
       likesCount: Math.max(0, (r.likesCount || 0) + likesDelta),
@@ -375,9 +376,10 @@ export default function ProfileScreen() {
     try {
       const res = await api.post(`/api/reviews/${reviewId}/react`, { reaction: desired });
       const data = res?.data || {};
+      console.log('[Profile] setReaction success', { reviewId, data });
       setReviewLikeState(prev => ({
         ...prev,
-        [reviewId]: { liked: !!data.liked, unliked: !!data.unliked },
+        [reviewId]: { liked: !!data.liked || data.reaction === 'like', unliked: !!data.unliked || data.reaction === 'unlike' },
       }));
       setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
         ...r,
@@ -404,12 +406,12 @@ export default function ProfileScreen() {
               legacyRes = await api.post(`/api/reviews/${reviewId}/unlike`);
             }
           }
-
           const data = legacyRes?.data || {};
+          console.log('[Profile] legacy fallback response', { reviewId, data, legacyUrl: legacyRes?.config?.url });
           // Legacy endpoints return { liked } or { unliked } and counts; normalize
           setReviewLikeState(prev => ({
             ...prev,
-            [reviewId]: { liked: !!data.liked, unliked: !!data.unliked },
+            [reviewId]: { liked: !!data.liked || data.reaction === 'like', unliked: !!data.unliked || data.reaction === 'unlike' },
           }));
           setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
             ...r,
@@ -418,11 +420,11 @@ export default function ProfileScreen() {
           } : r));
           return;
         } catch (legacyErr) {
-          console.error('Legacy fallback failed:', legacyErr);
+          console.error('[Profile] Legacy fallback failed:', legacyErr);
         }
       }
-
       // Revert on error (either non-404 or fallback failed)
+      console.error('[Profile] setReviewReaction error response', { reviewId, status, body: error?.response?.data });
       setReviewLikeState(prev => ({ ...prev, [reviewId]: prevState }));
       setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
         ...r,
