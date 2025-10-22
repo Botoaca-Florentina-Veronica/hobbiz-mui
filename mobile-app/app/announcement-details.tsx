@@ -280,7 +280,10 @@ export default function AnnouncementDetailsScreen() {
               <Ionicons name="chevron-forward" size={22} color={tokens.colors.text} />
             </TouchableOpacity>
 
-            <View style={styles.carouselCounter} pointerEvents="none">
+            <View
+              style={[styles.carouselCounter, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
+              {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+            >
               <View style={[styles.carouselCounterBubble, { backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)' }]}>
                 <Text style={[styles.counter, { color: isDark ? '#000' : '#000' }]}>{imgIndex + 1} / {images.length}</Text>
               </View>

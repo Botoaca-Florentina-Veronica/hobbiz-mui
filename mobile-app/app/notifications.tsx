@@ -42,6 +42,12 @@ export default function NotificationsScreen() {
       const res = await api.get(`/api/notifications/${userId}`);
       const data = Array.isArray(res.data) ? res.data : [];
       setItems(data);
+    } catch (e: any) {
+      // Suppress 404 and 401 errors (user not authenticated or endpoint not found)
+      if (e?.response?.status !== 404 && e?.response?.status !== 401) {
+        console.error('Error loading notifications:', e);
+      }
+      setItems([]);
     } finally {
       setLoading(false);
     }

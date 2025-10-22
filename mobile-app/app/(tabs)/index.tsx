@@ -69,13 +69,20 @@ export default function HomeScreen() {
 
   const loadCount = useCallback(async () => {
     try {
-      if (!isAuthenticated || !user?.id) { setNotifCount(0); return; }
+      if (!isAuthenticated || !user?.id) { 
+        setNotifCount(0); 
+        return; 
+      }
       const res = await api.get(`/api/notifications/${user.id}`);
       const list = Array.isArray(res.data) ? res.data : [];
       // Considerăm ne-citit orice element cu read === false
       const unread = list.filter((n: any) => n && n.read === false).length;
       setNotifCount(unread);
-    } catch (e) {
+    } catch (e: any) {
+      // Suppress 404 and 401 errors in console (user not fully authenticated yet)
+      if (e?.response?.status !== 404 && e?.response?.status !== 401) {
+        console.error('Error loading notification count:', e);
+      }
       setNotifCount(0);
     }
   }, [isAuthenticated, user?.id]);
@@ -248,7 +255,6 @@ export default function HomeScreen() {
                   >
                     {/* Gradient fade background overlay (theme-aware intensity) */}
                     <LinearGradient
-                      pointerEvents="none"
                       colors={[
                         // Higher opacity in light mode, softer in dark mode
                         hexToRgba(category.color, isDark ? 0.18 : 0.35),
@@ -257,7 +263,7 @@ export default function HomeScreen() {
                       ]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
-                      style={[StyleSheet.absoluteFillObject, { borderRadius: 12 }]}
+                      style={[StyleSheet.absoluteFillObject, { borderRadius: 12 }, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
                     />
                     <View style={[styles.imageContainer, { backgroundColor: 'transparent' }]}>
                       <Image 

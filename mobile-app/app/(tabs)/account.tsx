@@ -72,7 +72,10 @@ export default function AccountScreen() {
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
       <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
         {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
-        <View pointerEvents="none" style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }]}> 
+        <View
+          style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
+          {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+        > 
           <Image
             source={isDark ? require('../../assets/images/night.png') : require('../../assets/images/sun.png')}
             resizeMode="contain"

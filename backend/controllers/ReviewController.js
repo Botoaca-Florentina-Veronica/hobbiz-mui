@@ -80,46 +80,111 @@ const getReviewsForUser = async (req, res) => {
   }
 };
 
-// Set reaction for a review to 'like' | 'unlike' | 'none'
+// Debug/utility: get a single review by id with raw likes/unlikes
+const getReviewById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Lipsește id' });
+    const review = await Review.findById(id).lean();
+    if (!review) return res.status(404).json({ error: 'Recenzie negăsită' });
+    return res.json({
+      _id: review._id,
+      user: review.user,
+      author: review.author,
+      score: review.score,
+      comment: review.comment,
+      createdAt: review.createdAt,
+      likes: review.likes || [],
+      unlikes: review.unlikes || [],
+      likesCount: (review.likes || []).length,
+      unlikesCount: (review.unlikes || []).length
+    });
+  } catch (e) {
+    console.error('Eroare getReviewById:', e);
+    res.status(500).json({ error: 'Eroare server la getReviewById' });
+  }
+};
+
+// Unified reaction endpoint: robust read-modify-save implementation to ensure persistence
 const setReaction = async (req, res) => {
   try {
     const userId = req.userId;
     const reviewId = req.params.id;
     const { reaction } = req.body || {};
+
     if (!userId) return res.status(401).json({ error: 'Trebuie autentificat pentru a reacționa' });
     if (!reviewId) return res.status(400).json({ error: 'Lipsește id review' });
     if (!['like', 'unlike', 'none'].includes(reaction)) {
       return res.status(400).json({ error: 'Reacție invalidă' });
     }
 
-    // Build atomic update: always pull user from both arrays, then add to the requested one
-    const update = {
-      $pull: { likes: userId, unlikes: userId },
-    };
+    const mongoose = require('mongoose');
+    const actorId = (() => {
+      try { return new mongoose.Types.ObjectId(String(userId)); } catch (e) { return String(userId); }
+    })();
+
+    // Read-modify-save: load review, modify arrays in JS, then save.
+    const review = await Review.findById(reviewId);
+    if (!review) return res.status(404).json({ error: 'Recenzie negăsită' });
+
+    // Normalize arrays to strings for comparison
+    const likes = Array.isArray(review.likes) ? review.likes.map(x => String(x)) : [];
+    const unlikes = Array.isArray(review.unlikes) ? review.unlikes.map(x => String(x)) : [];
+    const actorStr = String(userId);
+
+    // Remove actor from both arrays first and build new string lists
+    let changed = false;
+    let newLikesStr = likes.filter(id => id !== actorStr);
+    let newUnlikesStr = unlikes.filter(id => id !== actorStr);
+
+    // Conditionally add to target array
     if (reaction === 'like') {
-      update.$addToSet = { likes: userId };
+      if (!newLikesStr.includes(actorStr)) {
+        newLikesStr.push(actorStr);
+        changed = true;
+      }
     } else if (reaction === 'unlike') {
-      update.$addToSet = { unlikes: userId };
+      if (!newUnlikesStr.includes(actorStr)) {
+        newUnlikesStr.push(actorStr);
+        changed = true;
+      }
     }
 
-    // Apply update and fetch new document
-    const updated = await Review.findByIdAndUpdate(reviewId, update, { new: true, upsert: false });
-    if (!updated) return res.status(404).json({ error: 'Recenzie negăsită' });
+    // Normalize to unique ObjectId arrays
+    const toOid = (s) => {
+      try { return new mongoose.Types.ObjectId(String(s)); } catch (_) { return s; }
+    };
+    const uniq = (arr) => Array.from(new Set(arr.map(String)));
+    const normalizedLikes = uniq(newLikesStr).map(toOid);
+    const normalizedUnlikes = uniq(newUnlikesStr).map(toOid);
 
-    console.log('[setReaction] user', userId, 'reaction', reaction, 'for review', reviewId, '=>', {
-      likesCount: (updated.likes || []).length,
-      unlikesCount: (updated.unlikes || []).length,
-    });
+    // Assign back if changed or if normalization differs
+    if (
+      changed ||
+      uniq(likes).length !== normalizedLikes.length ||
+      uniq(unlikes).length !== normalizedUnlikes.length
+    ) {
+      review.likes = normalizedLikes;
+      review.unlikes = normalizedUnlikes;
+      await review.save();
+      changed = true;
+    } else {
+      console.log('[ReviewController] setReaction - no-op update', { reviewId, userId: actorStr, reaction });
+    }
 
-    return res.json({
-      reaction,
-      liked: reaction === 'like',
-      unliked: reaction === 'unlike',
-      likesCount: (updated.likes || []).length,
-      unlikesCount: (updated.unlikes || []).length,
-    });
+    // Recompute counts and user reaction from the saved review
+    const likesCount = Array.isArray(review.likes) ? review.likes.length : 0;
+    const unlikesCount = Array.isArray(review.unlikes) ? review.unlikes.length : 0;
+    const liked = (review.likes || []).map(x => String(x)).includes(actorStr);
+    const unliked = (review.unlikes || []).map(x => String(x)).includes(actorStr);
+    const userReaction = liked ? 'like' : (unliked ? 'unlike' : 'none');
+
+    console.log('[ReviewController] setReaction saved', { reviewId, userId: actorStr, reaction, userReaction, likesCount, unlikesCount });
+
+    return res.json({ likesCount, unlikesCount, userReaction });
   } catch (e) {
     console.error('Eroare setReaction:', e);
+    console.error('Stack:', e.stack);
     res.status(500).json({ error: 'Eroare server la setare reacție' });
   }
 };
@@ -235,6 +300,6 @@ const deleteReview = async (req, res) => {
   }
 };
 
-module.exports = { createReview, getReviewsForUser, setReaction, toggleLike, toggleUnlike, updateReview, deleteReview };
+module.exports = { createReview, getReviewsForUser, getReviewById, setReaction, toggleLike, toggleUnlike, updateReview, deleteReview };
 
 

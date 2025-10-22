@@ -15,6 +15,7 @@ export default function MobileHeader({
   onNotificationClick 
 }: MobileHeaderProps) {
   const { tokens } = useAppTheme();
+  const webBox = (tokens as any)?.shadow?.elev1?.boxShadow;
 
   return (
     <View style={[styles.header, { backgroundColor: tokens.colors.bg }]}>
@@ -25,8 +26,9 @@ export default function MobileHeader({
           { 
             backgroundColor: tokens.colors.surface,
             borderColor: tokens.colors.border,
-            shadowColor: tokens.colors.text,
-          }
+          },
+          // Use boxShadow on web to avoid deprecated RN shadow props being forwarded
+          (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : { shadowColor: tokens.colors.text }
         ]}>
           <TextInput
             style={[

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createMessage, deleteMessage, getConversations, getMessagesBetweenUsers, getMessages, markMessagesAsRead, markMessagesAsReadByConversation, reactToMessage } = require('../controllers/MessageController');
+const { createMessage, deleteMessage, getConversations, getMessagesBetweenUsers, getMessages, markMessagesAsRead, markMessagesAsReadByConversation, reactToMessage, getUnreadCount } = require('../controllers/MessageController');
 const auth = require('../middleware/auth');
 const upload = require('../config/cloudinaryMulter');
 
@@ -27,5 +27,8 @@ router.put('/mark-read/:userId/:otherUserId', auth, markMessagesAsRead);
 
 // Marchează mesajele ca citite pentru o conversație specifică (scoped)
 router.put('/conversation/:conversationId/mark-read', auth, markMessagesAsReadByConversation);
+
+// Obține numărul de mesaje necitite pentru un utilizator
+router.get('/unread-count/:userId', auth, getUnreadCount);
 
 module.exports = router;

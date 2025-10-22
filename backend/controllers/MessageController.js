@@ -417,7 +417,8 @@ const getConversations = async (req, res) => {
             announcementOwnerId,
             announcementTitle,
             announcementOwnerName,
-            unread: !!contributesUnread
+            unread: !!contributesUnread,
+            unreadCount: contributesUnread ? 1 : 0
           });
         }
       } catch (error) {
@@ -435,6 +436,7 @@ const getConversations = async (req, res) => {
       }
       if (contributesUnread) {
         existingConversation.unread = true;
+        existingConversation.unreadCount = (existingConversation.unreadCount || 0) + 1;
       }
     }
   }
@@ -693,6 +695,28 @@ const markMessagesAsRead = async (req, res) => {
   }
 };
 
+// Get unread message count for a user
+const getUnreadCount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'userId este necesar' });
+    }
+
+    // Numără toate mesajele necitite unde userId este destinatar
+    const unreadCount = await Message.countDocuments({
+      destinatarId: userId,
+      isRead: false
+    });
+
+    res.json({ unreadCount });
+  } catch (err) {
+    console.error('Error getting unread count:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createMessage,
   deleteMessage,
@@ -701,5 +725,6 @@ module.exports = {
   getMessages,
   markMessagesAsRead,
   markMessagesAsReadByConversation,
-  reactToMessage
+  reactToMessage,
+  getUnreadCount
 };

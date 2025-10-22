@@ -5,6 +5,7 @@ import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTabBar } from '../../src/context/TabBarContext';
+import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 
 // Map route name -> icon + label (adjust later as you add screens)
 const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolean }> = {
@@ -17,8 +18,10 @@ const TAB_CONFIG: Record<string, { icon: string; label: string; special?: boolea
 
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const { tokens, isDark } = useAppTheme();
+  const webBox = (tokens as any)?.shadow?.elev2?.boxShadow;
   const { isAuthenticated, loading, user } = useAuth();
   const { hidden } = useTabBar();
+  const { unreadCount } = useChatNotifications();
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
   const activeColor = isDark ? tokens.colors.primary : '#355070';
   const inactiveColor = tokens.colors.muted;
@@ -93,7 +96,9 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                 <View
                   style={config.special ? [
                     styles.publishCircle,
-                    { backgroundColor: activeColor, shadowColor: '#000' },
+                    { backgroundColor: activeColor },
+                    // apply boxShadow on web
+                    (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : undefined,
                   ] : undefined}
                 >
                   {route.name === 'account' && user?.avatar ? (
@@ -106,6 +111,14 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                     />
                   )}
                 </View>
+                {/* Badge pentru mesaje necitite pe tab-ul chat */}
+                {route.name === 'chat' && unreadCount > 0 && (
+                  <View style={[styles.badge, { backgroundColor: tokens.colors.primary }, (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : undefined]}>
+                    <Text style={[styles.badgeText, { color: tokens.colors.primaryContrast }]}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </Text>
+                  </View>
+                )}
               </View>
               <Text style={[styles.label, { color: isFocused ? activeColor : inactiveColor, fontWeight: isFocused ? '600' : '500' }]}>
                 {config.label}
@@ -163,6 +176,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
     elevation: 4,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
 });
 

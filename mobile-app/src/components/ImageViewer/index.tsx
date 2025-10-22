@@ -11,11 +11,12 @@ type Props = {
   onImageIndexChange?: (index: number) => void;
   HeaderComponent?: any;
   FooterComponent?: any;
+  showCounter?: boolean; // fallback-only: show X/Y indicator
   [key: string]: any;
 };
 
 export default function ImageViewer(props: Props) {
-  const { images = [], imageIndex = 0, visible, onRequestClose, onImageIndexChange, ...rest } = props;
+  const { images = [], imageIndex = 0, visible, onRequestClose, onImageIndexChange, showCounter = false, ...rest } = props;
 
   // Prefer native package on mobile platforms. Use dynamic require so bundlers on web
   // don't try to resolve the native-only package.
@@ -81,7 +82,9 @@ export default function ImageViewer(props: Props) {
           <TouchableOpacity disabled={index <= 0} onPress={() => setIndex(Math.max(0, index - 1))} style={styles.navBtn}>
             <Text style={[styles.navText, index <= 0 && styles.disabled]}>Prev</Text>
           </TouchableOpacity>
-          <Text style={styles.counter}>{index + 1}/{images.length}</Text>
+          {showCounter && (
+            <Text style={styles.counter}>{index + 1}/{images.length}</Text>
+          )}
           <TouchableOpacity disabled={index >= images.length - 1} onPress={() => setIndex(Math.min(images.length - 1, index + 1))} style={styles.navBtn}>
             <Text style={[styles.navText, index >= images.length - 1 && styles.disabled]}>Next</Text>
           </TouchableOpacity>

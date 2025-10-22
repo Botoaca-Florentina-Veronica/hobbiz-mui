@@ -15,8 +15,9 @@ export const lightTokens = {
   radius: { sm: 6, md: 8, lg: 12, pill: 999 },
   spacing: { xs:4, sm:8, md:12, lg:16, xl:24 },
   shadow: {
-    elev1: { shadowColor:'#000', shadowOpacity:0.06, shadowRadius:4, shadowOffset:{width:0,height:2}, elevation:2 },
-    elev2: { shadowColor:'#000', shadowOpacity:0.12, shadowRadius:8, shadowOffset:{width:0,height:4}, elevation:4 },
+    // Native shadow props for iOS/Android
+    elev1: { shadowColor:'#000', shadowOpacity:0.06, shadowRadius:4, shadowOffset:{width:0,height:2}, elevation:2, boxShadow: '0px 2px 4px rgba(0,0,0,0.06)' },
+    elev2: { shadowColor:'#000', shadowOpacity:0.12, shadowRadius:8, shadowOffset:{width:0,height:4}, elevation:4, boxShadow: '0px 4px 8px rgba(0,0,0,0.12)' },
   }
 };
 

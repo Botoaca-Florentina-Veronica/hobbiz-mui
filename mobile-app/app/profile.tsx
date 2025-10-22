@@ -48,7 +48,7 @@ interface ReviewStats {
 }
 
 export default function ProfileScreen() {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   // Page-level accent aligned with theme primary (dark: #f51866)
   const pageAccent = tokens.colors.primary;
   const router = useRouter();
@@ -377,14 +377,20 @@ export default function ProfileScreen() {
       const res = await api.post(`/api/reviews/${reviewId}/react`, { reaction: desired });
       const data = res?.data || {};
       console.log('[Profile] setReaction success', { reviewId, data });
+
+      // Normalize userReaction (new API returns userReaction, legacy returned reaction/liked/unliked)
+      const userReaction: 'like' | 'unlike' | 'none' = (data.userReaction as any) || data.reaction || (data.liked ? 'like' : (data.unliked ? 'unlike' : 'none'));
+
       setReviewLikeState(prev => ({
         ...prev,
-        [reviewId]: { liked: !!data.liked || data.reaction === 'like', unliked: !!data.unliked || data.reaction === 'unlike' },
+        [reviewId]: { liked: userReaction === 'like', unliked: userReaction === 'unlike' },
       }));
+
+      // Prefer authoritative counts from server when provided, otherwise keep the optimistic value
       setRecentReviews(prev => prev.map(r => r._id === reviewId ? {
         ...r,
-        likesCount: data.likesCount ?? r.likesCount ?? 0,
-        unlikesCount: data.unlikesCount ?? r.unlikesCount ?? 0,
+        likesCount: (typeof data.likesCount !== 'undefined') ? data.likesCount : (r.likesCount ?? 0),
+        unlikesCount: (typeof data.unlikesCount !== 'undefined') ? data.unlikesCount : (r.unlikesCount ?? 0),
       } : r));
     } catch (error: any) {
       console.error('Error setting reaction:', error);
@@ -486,7 +492,10 @@ export default function ProfileScreen() {
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
 
-          <View style={styles.titleWrapper} pointerEvents="none">
+          <View
+            style={[styles.titleWrapper, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
+            {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+          >
             <ThemedText style={[styles.titleText, { color: tokens.colors.text }]}>{publicProfile ? `${publicProfile.firstName || ''} ${publicProfile.lastName || ''}`.trim() || 'Profil' : 'Profilul meu'}</ThemedText>
           </View>
 
@@ -762,7 +771,7 @@ export default function ProfileScreen() {
                         key={star}
                         name={star <= Math.round(reviewStats.averageRating) ? 'star' : 'star-outline'}
                         size={16}
-                        color="#FFC107"
+                        color={isDark ? '#F51866' : '#FFC107'}
                       />
                     ))}
                   </View>
@@ -790,7 +799,7 @@ export default function ProfileScreen() {
                               styles.barFill, 
                               { 
                                 width: `${percentage}%`,
-                                backgroundColor: rating === 5 ? '#FFC107' : tokens.colors.border 
+                                backgroundColor: rating === 5 ? (isDark ? '#F51866' : '#FFC107') : tokens.colors.border 
                               }
                             ]} 
                           />
@@ -834,7 +843,7 @@ export default function ProfileScreen() {
                               </Text>
                             </View>
                           </View>
-                          <View style={styles.reviewRatingBadge}>
+                          <View style={[styles.reviewRatingBadge, isDark ? styles.reviewRatingBadgeDark : undefined]}>
                             <Text style={[styles.reviewRatingText, { color: tokens.colors.text }]}>
                               {review.rating.toFixed(1)}
                             </Text>
@@ -1494,6 +1503,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 6,
     backgroundColor: '#FFC107',
+  },
+  reviewRatingBadgeDark: {
+    backgroundColor: '#F51866',
   },
   reviewRatingText: {
     fontSize: 12,

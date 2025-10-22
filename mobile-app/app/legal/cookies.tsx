@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, findNodeHandle, UIManager, Animated, Easing } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, findNodeHandle, UIManager, Animated, Easing, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@/src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,7 +79,14 @@ export default function CookiesScreen() {
         {/* Hero */}
         {isDark ? (
           <View style={[styles.hero, { backgroundColor: '#282828', shadowColor: '#000', shadowOpacity: 0.35 }]}> 
-            <View style={[styles.heroBefore, { backgroundColor: 'rgba(245,24,102,0.18)' }]} pointerEvents="none" />
+            <View
+              style={[
+                styles.heroBefore,
+                { backgroundColor: 'rgba(245,24,102,0.18)' },
+                Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined,
+              ]}
+              {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+            />
             <View style={styles.heroBadgeWrap}>
               <View style={[styles.badgePill, { backgroundColor: 'rgba(245,24,102,0.15)', borderColor: 'rgba(245,24,102,0.3)' }]}>
                 <ThemedText style={styles.badgeEmoji}>🍪</ThemedText>
@@ -95,7 +102,10 @@ export default function CookiesScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.hero}
           >
-            <View style={styles.heroBefore} pointerEvents="none" />
+            <View
+              style={[styles.heroBefore, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
+              {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+            />
             <View style={styles.heroBadgeWrap}>
               <View style={[styles.badgePill, { backgroundColor: 'rgba(245,24,102,0.08)', borderColor: 'rgba(245,24,102,0.25)' }]}>
                 <ThemedText style={styles.badgeEmoji}>🍪</ThemedText>

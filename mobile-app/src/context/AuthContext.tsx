@@ -62,28 +62,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const stored = await storage.getItemAsync('userToken');
       if (stored) {
         setToken(stored);
-        await fetchProfile();
-        // After profile is available, register for push notifications
         try {
-          const { status: existingStatus } = await Notifications.getPermissionsAsync();
-          let finalStatus = existingStatus;
-          if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
-            finalStatus = status;
-          }
-          if (finalStatus === 'granted') {
-            const projectId = (Constants as any)?.expoConfig?.extra?.eas?.projectId || (Constants as any)?.easConfig?.projectId;
-            const pushTokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined as any);
-            const tokenValue = (pushTokenData as any)?.data || (pushTokenData as any)?.expoPushToken;
-            if (tokenValue) {
-              try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+          await fetchProfile();
+          // After profile is available, register for push notifications
+          try {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+              const { status } = await Notifications.requestPermissionsAsync();
+              finalStatus = status;
             }
+            if (finalStatus === 'granted') {
+              const projectId = (Constants as any)?.expoConfig?.extra?.eas?.projectId || (Constants as any)?.easConfig?.projectId;
+              const pushTokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined as any);
+              const tokenValue = (pushTokenData as any)?.data || (pushTokenData as any)?.expoPushToken;
+              if (tokenValue) {
+                try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+              }
+            }
+          } catch (e) {
+            // ignore push errors to not block auth
           }
-        } catch (e) {
-          // ignore push errors to not block auth
+        } catch (profileErr) {
+          // If profile fetch fails (e.g., expired token), clear token
+          console.warn('[Auth] Failed to fetch profile, clearing token');
+          setToken(null);
+          setUser(null);
+          await storage.deleteItemAsync('userToken');
         }
       } else {
         setUser(null);
+        setToken(null);
       }
     } finally {
       setLoading(false);

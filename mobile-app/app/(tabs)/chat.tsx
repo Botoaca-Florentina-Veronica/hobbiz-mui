@@ -37,6 +37,7 @@ import api from '../../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../../src/services/storage';
 import { useAuth } from '../../src/context/AuthContext';
+import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import ImageViewing from '../../src/components/ImageViewer';
 // NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
 // NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
@@ -63,6 +64,7 @@ interface Conversation {
   lastMessage: string;
   time: string;
   unread: boolean;
+  unreadCount?: number;
   otherParticipant: { id: string; firstName?: string; lastName?: string; avatar?: string; lastSeen?: string };
   lastSeen?: string;
   announcementOwnerId: string;
@@ -90,6 +92,7 @@ export default function ChatScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { hideTabBar, showTabBar } = useTabBar();
+  const { refreshUnreadCount, decrementUnreadCount, setUnreadCount } = useChatNotifications();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationFilter, setConversationFilter] = useState<'selling' | 'buying'>('buying');
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -241,6 +244,7 @@ export default function ChatScreen() {
             minute: '2-digit',
           }),
           unread: conv.unread,
+          unreadCount: conv.unreadCount || 0,
           otherParticipant: conv.otherParticipant,
           lastSeen: conv.otherParticipant.lastSeen,
           announcementOwnerId: conv.announcementOwnerId,
@@ -248,6 +252,11 @@ export default function ChatScreen() {
         };
       });
       setConversations(formattedConversations);
+      // Update global unread badge locally for instant feedback
+      try {
+        const localTotal = formattedConversations.reduce((acc: number, c: Conversation) => acc + (c.unreadCount ?? (c.unread ? 1 : 0)), 0);
+        setUnreadCount(localTotal);
+      } catch {}
     } catch (error) {
       console.error('Error loading conversations:', error);
       setConversations([]);
@@ -278,16 +287,23 @@ export default function ChatScreen() {
       });
       setMessages(normalized);
 
-      // Mark as read
-      try {
-        await api.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
-        setConversations((prev) =>
-          prev.map((c) =>
-            c.conversationId === selectedConversation.conversationId ? { ...c, unread: false } : c
-          )
-        );
-      } catch (e) {
-        console.error('Error marking as read:', e);
+      // Mark as read and update badge
+      if (selectedConversation.unread && selectedConversation.unreadCount) {
+        try {
+          await api.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
+          const unreadAmount = selectedConversation.unreadCount;
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.conversationId === selectedConversation.conversationId ? { ...c, unread: false, unreadCount: 0 } : c
+            )
+          );
+          // Actualizează badge-ul global
+          decrementUnreadCount(unreadAmount);
+          // Refresh count pentru siguranță
+          await refreshUnreadCount();
+        } catch (e) {
+          console.error('Error marking as read:', e);
+        }
       }
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -295,7 +311,7 @@ export default function ChatScreen() {
     } finally {
       setLoading(false);
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, userId, decrementUnreadCount, refreshUnreadCount]);
 
   useEffect(() => {
     if (selectedConversation) {
@@ -319,13 +335,17 @@ export default function ChatScreen() {
   // and restore the tab bar. This helps when the user navigates via tabs, deep links, or other screens.
   useFocusEffect(
     useCallback(() => {
+      // Refresh conversations and unread count when screen gains focus
+      fetchConversations();
+      refreshUnreadCount();
+      
       return () => {
         if (selectedConversation) {
           setSelectedConversation(null);
         }
         showTabBar();
       };
-    }, [selectedConversation, showTabBar])
+    }, [selectedConversation, showTabBar, fetchConversations, refreshUnreadCount])
   );
 
   // Handle Android hardware back button when inside a conversation: close it and show tab bar.
@@ -1106,12 +1126,12 @@ export default function ChatScreen() {
                   source={{ uri: selectedConversation.participantAvatar || getAvatarFallback(selectedConversation.participantName) }}
                   style={styles.headerAvatarClean}
                 />
-                <Text style={styles.headerNameClean}>{selectedConversation.participantName}</Text>
+                <Text style={[styles.headerNameClean, isDark ? styles.headerNameCleanDark : undefined]}>{selectedConversation.participantName}</Text>
               </TouchableOpacity>
             </View>
 
             {/* thin separator between title row and announcement preview */}
-            <View style={styles.headerSeparator} />
+            <View style={[styles.headerSeparator, isDark ? styles.headerSeparatorDark : undefined]} />
 
             <TouchableOpacity
               style={styles.announcementRow}
@@ -1127,9 +1147,9 @@ export default function ChatScreen() {
                 style={styles.announcementThumb}
               />
               <View style={styles.announcementInfo}>
-                <Text style={styles.announcementTitle} numberOfLines={1}>{selectedConversation.announcementTitle || 'Anunț'}</Text>
+                <Text style={[styles.announcementTitle, isDark ? styles.announcementTitleDark : undefined]} numberOfLines={1}>{selectedConversation.announcementTitle || 'Anunț'}</Text>
                 {selectedConversation.announcementId ? (
-                  <Text style={styles.announcementId}>ID: {selectedConversation.announcementId}</Text>
+                  <Text style={[styles.announcementId, isDark ? styles.announcementIdDark : undefined]}>ID: {selectedConversation.announcementId}</Text>
                 ) : null}
               </View>
             </TouchableOpacity>
@@ -1397,7 +1417,7 @@ export default function ChatScreen() {
             <Ionicons name="attach-outline" size={26} color={tokens.colors.muted} />
           </TouchableOpacity>
           <TextInput
-            style={styles.inputClean}
+            style={[styles.inputClean, isDark ? styles.inputCleanDark : undefined]}
             placeholder="Scrie mesajul tău..."
             placeholderTextColor={tokens.colors.placeholder}
             value={newMessage}
@@ -1409,7 +1429,7 @@ export default function ChatScreen() {
             disabled={!newMessage.trim()}
             style={[styles.sendBtnClean, { opacity: newMessage.trim() ? 1 : 0.4 }]}
           >
-            <Ionicons name="send" size={20} color={tokens.colors.primary} />
+            <Ionicons name="send" size={20} color={isDark ? '#F51866' : tokens.colors.primary} />
           </TouchableOpacity>
           </View>
 
@@ -1433,24 +1453,30 @@ export default function ChatScreen() {
               </TouchableOpacity>
             </View>
           )}
-          FooterComponent={({ imageIndex }: { imageIndex: number }) =>
-            imageViewerImages.length > 1 ? (
-              <View style={[styles.imageViewerFooter, { paddingBottom: insets.bottom + 20 }] }>
-                <Text style={styles.imageViewerFooterText}>{`${imageIndex + 1} / ${imageViewerImages.length}`}</Text>
-              </View>
-            ) : null
-          }
+          // No FooterComponent to avoid any index/count overlay
         />
 
         {/* Dynamic Context Menu Modal */}
   <Modal visible={contextMenuVisible} transparent animationType="none" onRequestClose={closeContextMenu}>
           <Pressable style={styles.modalOverlay} onPress={closeContextMenu}>
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
+            <BlurView
+              intensity={80}
+              tint="dark"
+              style={StyleSheet.absoluteFill}
+              {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : { style: [StyleSheet.absoluteFill, { pointerEvents: 'none' }] })}
+            />
             {selectedMessage && menuPosition && (
               <>
                 {/* Floating snapshot OR fallback clone (unblurred) */}
                 {floatingReady && floatingSnapshot ? (
-                  <View pointerEvents="none" style={[styles.floatingBubble, { top: menuPosition.y, left: menuPosition.x, width: menuPosition.width, height: menuPosition.height, zIndex: 30 }]}> 
+                  <View
+                    style={[
+                      styles.floatingBubble,
+                      { top: menuPosition.y, left: menuPosition.x, width: menuPosition.width, height: menuPosition.height, zIndex: 30 },
+                      Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined,
+                    ]}
+                    {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+                  >
                     <Image source={{ uri: floatingSnapshot }} style={{ width: menuPosition.width, height: menuPosition.height, borderRadius: 12 }} resizeMode="cover" />
                   </View>
                 ) : null}
@@ -1550,8 +1576,13 @@ export default function ChatScreen() {
                   , { backgroundColor: isDark ? tokens.colors.surface : '#ffffff', shadowOpacity: isDark ? 0.18 : 0.3 }
                   ]}
                 >
-                  <View style={[{ width: FIXED_MENU_WIDTH, height: '100%', overflow: 'hidden' }]}
-                    pointerEvents="box-none">
+                  <View
+                    style={[
+                      { width: FIXED_MENU_WIDTH, height: '100%', overflow: 'hidden' },
+                      Platform.OS === 'web' ? { pointerEvents: 'box-none' as any } : undefined,
+                    ]}
+                    {...(Platform.OS !== 'web' ? { pointerEvents: 'box-none' } : {})}
+                  >
                     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }}
                       keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                       <View style={[styles.contextMenu, { backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }] }>
@@ -1611,7 +1642,7 @@ export default function ChatScreen() {
       <LinearGradient
         colors={
           isDark
-            ? ['#f51866', '#ff7e95']
+            ? ['#f51866', 'rgba(0, 0, 0, 0)']
             : [
                 tokens.colors.primary || '#355070',
                 hexToRgba(tokens.colors.primary || '#355070', 0.75),
@@ -1679,13 +1710,16 @@ export default function ChatScreen() {
                 key={conv.conversationId}
                 activeOpacity={0.9}
                 onPress={async () => {
+                  const unreadAmount = conv.unreadCount || 0;
                   setSelectedConversation(conv);
                   setConversations((prev) =>
-                    prev.map((c) => (c.conversationId === conv.conversationId ? { ...c, unread: false } : c))
+                    prev.map((c) => (c.conversationId === conv.conversationId ? { ...c, unread: false, unreadCount: 0 } : c))
                   );
-                  if (conv.unread) {
+                  if (conv.unread && unreadAmount > 0) {
                     try {
                       await api.put(`/api/messages/conversation/${conv.conversationId}/mark-read`);
+                      decrementUnreadCount(unreadAmount);
+                      await refreshUnreadCount();
                     } catch (e) {
                       // ignore
                     }
@@ -1698,9 +1732,11 @@ export default function ChatScreen() {
                     source={{ uri: conv.avatar || conv.participantAvatar || getAvatarFallback(conv.participantName) }}
                     style={styles.conversationAvatar}
                   />
-                  {conv.unread && (
+                  {conv.unread && conv.unreadCount && conv.unreadCount > 0 && (
                     <View style={styles.conversationBadge}>
-                      <Text style={styles.conversationBadgeText}>•</Text>
+                      <Text style={styles.conversationBadgeText}>
+                        {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                      </Text>
                     </View>
                   )}
                 </View>
@@ -1825,8 +1861,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e6e6e6',
   },
   conversationCardUnread: {
-    borderWidth: 1.2,
-    borderColor: 'rgba(53, 80, 112, 0.25)',
+    backgroundColor: 'rgba(245, 24, 102, 0.04)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#F51866',
   },
   conversationAvatarWrapper: {
     position: 'relative',
@@ -1839,21 +1876,28 @@ const styles = StyleSheet.create({
   },
   conversationBadge: {
     position: 'absolute',
-    bottom: -3,
-    right: -3,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#355070',
+    top: -2,
+    right: -2,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#F51866',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 6,
     borderWidth: 2,
     borderColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
   },
   conversationBadgeText: {
     color: '#ffffff',
-    fontSize: 16,
-    marginTop: -4,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   conversationInfo: {
     flex: 1,
@@ -2115,13 +2159,14 @@ const styles = StyleSheet.create({
   headerTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 14,
     marginLeft: 0,
   },
   headerAvatarClean: {
     width: 44,
     height: 44,
     borderRadius: 22,
+    marginRight: 10,
   },
   headerSeparator: {
     height: 1,
@@ -2153,6 +2198,39 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999999', // overridden at runtime
     marginTop: 2,
+  },
+  // Dark mode overrides for one-to-one chat detail
+  headerNameCleanDark: {
+    color: '#ffffff',
+  },
+  headerSeparatorDark: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  announcementTitleDark: {
+    color: '#ffffff',
+  },
+  announcementIdDark: {
+    color: 'rgba(255,255,255,0.65)',
+  },
+  emptyTextDark: {
+    color: '#ffffff',
+  },
+  // Input dark text
+  inputCleanDark: {
+    color: '#ffffff',
+  },
+  // Message bubble dark variants
+  messageBubbleOwnDark: {
+    backgroundColor: '#F51866',
+  },
+  messageBubbleOtherDark: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  messageTextDark: {
+    color: '#ffffff',
+  },
+  messageTimeDark: {
+    color: 'rgba(255,255,255,0.75)',
   },
   dateSeparator: {
     flexDirection: 'row',
