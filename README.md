@@ -14,6 +14,42 @@ Hobbiz este o platformă unde utilizatorii își pot publica anunțuri pentru mo
 
 ---
 
+## 📱 Aplicația Mobilă
+
+Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** și **React Native**, optimizată pentru iOS și Android. Aplicația permite utilizatorilor să:
+
+- **Exploreze anunțuri** – Navighează prin categorii și descoperă hobby-uri și servicii locale
+- **Gestioneze favorite** – Salvează și accesează rapid anunțurile preferate
+- **Publice anunțuri** – Creează și editează anunțuri direct de pe dispozitiv cu upload de imagini
+- **Comunice în timp real** – Chat privat cu notificări și typing indicators
+- **Gestioneze contul** – Profil personalizat cu avatar, setări și autentificare Google OAuth
+
+### Capturi de Ecran
+
+<div style="display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:nowrap;">
+  <img src="./device-view_images/image.png" alt="Ecran principal" style="width:180px; height:340px; object-fit:cover; border-radius:8px; margin-right:-8px;" />
+  <img src="./device-view_images/image2.png" alt="Chat" style="width:160px; height:340px; object-fit:cover; border-radius:8px;" />
+  <img src="./device-view_images/image3.png" alt="Profil" style="width:190px; height:340px; object-fit:cover; border-radius:8px;" />
+</div>
+
+**Caracteristici Mobile:**
+- 🎨 **Dark Mode** complet funcțional cu tranziții fluide
+- 🔔 **Notificări push** pentru mesaje și activități
+- 📍 **Optimizare iOS** – Safe area pentru iPhone cu home indicator, tab bar adaptat
+- 🔐 **Autentificare securizată** – JWT + Google OAuth cu deep linking
+- 💬 **Chat avansat** – Reacții, preview reply, atașamente imagine
+- 🌐 **Offline-ready** – Token persistent în SecureStore
+
+### Tehnologii Mobile
+- **Expo SDK 54** + React Native 0.81
+- **expo-router** pentru navigație declarativă
+- **expo-secure-store** pentru stocare criptată
+- **axios** pentru comunicare API
+- **Socket.IO** pentru realtime updates
+- **react-native-safe-area-context** pentru layout adaptat
+
+---
+
 ## 🧱 Arhitectură (Monorepo)
 
 ```
@@ -187,24 +223,6 @@ Mobile (Expo):
 - Expo SDK 54, React Native 0.81
 - expo-router pentru navigație declarativă
 - axios pentru API, expo-secure-store pentru token
-
-## 📱 Capturi din aplicația mobilă
-
-Mai jos sunt câteva capturi din aplicația mobilă (client Expo / React Native). Ele arată interfața principală, fila de chat și butonul de publicare. Imaginile sunt folosite pentru demo și design feedback.
-
-<div align="center">
-
-![Ecran principal](./device-view_images/image.png)
-
-
-
-![Chat](./device-view_images/image2.png)
-
-
-![Postare / Vinde](./device-view_images/image3.png)
-
-
-</div>
 
 Dev / Tooling:
 - ESLint (web & mobile) + configurări dedicate
