@@ -443,9 +443,10 @@ export default function SellScreen() {
                   const orase = data?.orase?.map((o: any) => o.nume) || [];
                   const comune = data?.comune || [];
                   const localities = [...orase, ...comune];
-                  return localities.map((loc: string) => (
+                  // Some localities may repeat (same name in orase/comune). Use index-based keys or include county to guarantee uniqueness.
+                  return localities.map((loc: string, idx: number) => (
                     <TouchableOpacity
-                      key={loc}
+                      key={`${countyExpanded}-${loc}-${idx}`}
                       onPress={() => { setLocation(loc + ', ' + countyExpanded); setLocationModalOpen(false); setCountyExpanded(null); }}
                       activeOpacity={0.65}
                       style={[styles.categoryRow, { borderColor: tokens.colors.border }]}

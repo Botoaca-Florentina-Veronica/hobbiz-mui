@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../src/context/AuthContext';
 import api from '../src/services/api';
+import { Toast } from '../components/ui/Toast';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
@@ -50,6 +51,17 @@ export default function EditAnnouncementScreen() {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+
+  // Toast state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   const remainingTitle = 70 - title.length;
   const remainingDesc = 9000 - description.length;
@@ -212,12 +224,12 @@ export default function EditAnnouncementScreen() {
         },
       });
 
-      Alert.alert('Success', 'Anunțul a fost actualizat cu succes!', [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ]);
+      showToast('Anunțul a fost actualizat cu succes!', 'success');
+      
+      // Navigate back after a short delay to allow toast to be visible
+      setTimeout(() => {
+        router.back();
+      }, 2500);
     } catch (error: any) {
       console.error('Error updating announcement:', error);
       const errorMsg = error.response?.data?.error || 'Eroare la actualizarea anunțului.';
@@ -518,6 +530,15 @@ export default function EditAnnouncementScreen() {
           </View>
         </View>
       )}
+
+      {/* Custom Toast Notification */}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        duration={4000}
+        onHide={() => setToastVisible(false)}
+      />
     </ThemedView>
   );
 }

@@ -18,6 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
 import { useAppTheme } from '../src/context/ThemeContext';
 import api from '../src/services/api';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { Toast } from '../components/ui/Toast';
 
 // useWindowDimensions will be read inside the component to handle orientation/responsive layout
 
@@ -54,6 +56,21 @@ export default function MyAnnouncementsScreen() {
   // Track per-card content heights so the left image can match the card height exactly
   const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
   const [rowWidths, setRowWidths] = useState<Record<string, number>>({});
+
+  // Confirm dialog state for delete
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [announcementToDelete, setAnnouncementToDelete] = useState<string | null>(null);
+
+  // Toast state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -122,26 +139,30 @@ export default function MyAnnouncementsScreen() {
   }, [announcements, searchTerm, categoryFilter, sortFilter]);
 
   const handleDelete = (id: string) => {
-    Alert.alert(
-      'Șterge anunț',
-      'Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată.',
-      [
-        { text: 'Anulează', style: 'cancel' },
-        {
-          text: 'Șterge',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.delete(`/api/users/my-announcements/${id}`);
-              setAnnouncements(announcements.filter((a) => a._id !== id));
-              Alert.alert('Succes', 'Anunțul a fost șters.');
-            } catch (e) {
-              Alert.alert('Eroare', 'Nu s-a putut șterge anunțul.');
-            }
-          },
-        },
-      ]
-    );
+    setAnnouncementToDelete(id);
+    setDeleteDialogVisible(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!announcementToDelete) return;
+
+    try {
+      await api.delete(`/api/users/my-announcements/${announcementToDelete}`);
+      setAnnouncements(announcements.filter((a) => a._id !== announcementToDelete));
+      setDeleteDialogVisible(false);
+      setAnnouncementToDelete(null);
+      showToast('Anunțul a fost șters cu succes', 'success');
+    } catch (e) {
+      console.error('Delete error:', e);
+      setDeleteDialogVisible(false);
+      setAnnouncementToDelete(null);
+      showToast('Nu s-a putut șterge anunțul. Încearcă din nou', 'error');
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogVisible(false);
+    setAnnouncementToDelete(null);
   };
 
   const handleEdit = (announcement: Announcement) => {
@@ -558,6 +579,27 @@ export default function MyAnnouncementsScreen() {
           </TouchableOpacity>
         </TouchableOpacity>
       )}
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        visible={deleteDialogVisible}
+        title="Șterge anunț"
+        message="Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată."
+        confirmText="Șterge"
+        cancelText="Anulează"
+        icon="trash-outline"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        duration={3000}
+        onHide={() => setToastVisible(false)}
+      />
     </View>
   );
 }

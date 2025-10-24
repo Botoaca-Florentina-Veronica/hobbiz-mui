@@ -10,11 +10,11 @@ Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API
 ---
 
 ## 🧭 Descriere
-Hobbiz este o platformă unde utilizatorii își pot publica anunțuri pentru monetizarea hobby‑urilor. Aici pot discuta în chat privat, oferi/primi recenzii, salvează anunțurile lor favorite și primesc notificări în timp real.
+Hobbiz este o platformă unde utilizatorii își pot publica anunțuri în vederea monetizarii hobby‑urilor. De ce? Pentru că în ziua de azi nu mai e de ajuns o singură sursă de venit. Aici poți îmbina utilul cu plăcutul!
 
 ---
 
-## 📱 Aplicația Mobilă
+## 📱 Aplicația Mobilă (în lucru)
 
 Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** și **React Native**, optimizată pentru iOS și Android. Aplicația permite utilizatorilor să:
 
@@ -24,7 +24,7 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
 - **Comunice în timp real** – Chat privat cu notificări și typing indicators
 - **Gestioneze contul** – Profil personalizat cu avatar, setări și autentificare Google OAuth
 
-### Capturi de Ecran
+### Capturi de Ecran(da știu îmi place Gumball, ai vreo problemă?)
 
 <table align="center">
   <tr>
@@ -32,17 +32,9 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
     <td>&nbsp;&nbsp;</td>
   <td><img src="./device-view_images/image2.png" width="180" height="340" alt="Chat" /></td>
     <td>&nbsp;&nbsp;</td>
-  <td><img src="./device-view_images/image3.png" width="230" height="340" alt="Profil" /></td>
+  <td><img src="./device-view_images/image3.png" width="230" height="350" alt="Profil" /></td>
   </tr>
 </table>
-
-**Caracteristici Mobile:**
-- 🎨 **Dark Mode** complet funcțional cu tranziții fluide
-- 🔔 **Notificări push** pentru mesaje și activități
-- 📍 **Optimizare iOS** – Safe area pentru iPhone cu home indicator, tab bar adaptat
-- 🔐 **Autentificare securizată** – JWT + Google OAuth cu deep linking
-- 💬 **Chat avansat** – Reacții, preview reply, atașamente imagine
-- 🌐 **Offline-ready** – Token persistent în SecureStore
 
 ### Tehnologii Mobile
 - **Expo SDK 54** + React Native 0.81
@@ -296,31 +288,6 @@ npm start --prefix mobile-app
 
 ---
 
-## 🧹 Scripturi Uzuale
-Backend:
-- dev – nodemon server
-- start – producție
-
-Frontend:
-- dev / build / preview / lint
-
-Mobile:
-- start / android / ios / web / reset-project
-
----
-
-## 🔄 Actualizări Recente (Highlights)
-- Chat privat + reacții + typing indicator (Socket.IO)
-- Favorite persistente + sync realtime & counter în Announcement
-- Sistem notificări (CRUD + read)
-- Recenzii utilizatori cu like & editare
-- Filtru anunțuri + popular sort după favoritesCount
-- Upload avatar + multiple imagini anunț (Cloudinary)
-- Health endpoints + debug infrastructură
-- Integrare client mobil (Expo) structurată
-
----
-
 ## 🗺 Roadmap (Next)
 - Rate limiting (express-rate-limit) & helmet
 - Validare schemă request (Zod/Joi)
@@ -339,6 +306,7 @@ Mobile:
 - Socket.IO: https://socket.io/docs/v4
 - Expo: https://docs.expo.dev
 - Cloudinary: https://cloudinary.com/documentation
+- PixelCut.ai: https://www.pixelcut.ai/background-remover
 
 ---
 

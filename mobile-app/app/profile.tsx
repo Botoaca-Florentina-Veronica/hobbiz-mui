@@ -10,6 +10,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Constants from 'expo-constants';
 import api from '../src/services/api';
+import { Toast } from '../components/ui/Toast';
 
 interface UserAnnouncement {
   _id: string;
@@ -53,7 +54,7 @@ export default function ProfileScreen() {
   const pageAccent = tokens.colors.primary;
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { user, restore } = useAuth();
   const { userId } = useLocalSearchParams<{ userId?: string }>();
   const [publicProfile, setPublicProfile] = React.useState<any | null>(null);
   const [loadingPublic, setLoadingPublic] = React.useState(false);
@@ -75,6 +76,17 @@ export default function ProfileScreen() {
   const [editLastName, setEditLastName] = React.useState('');
   const [editPhone, setEditPhone] = React.useState('');
   const [isSaving, setIsSaving] = React.useState(false);
+
+  // Toast state for custom notifications
+  const [toastVisible, setToastVisible] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState('');
+  const [toastType, setToastType] = React.useState<'success' | 'error' | 'info'>('success');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   // If userId present in query, fetch public profile for that user
   React.useEffect(() => {
@@ -241,18 +253,27 @@ export default function ProfileScreen() {
               const form = new FormData();
               // @ts-ignore
               form.append('avatar', { uri, name: fileName, type: mimeType });
-              try {
+                try {
                 setAvatarUploading(true);
                 const res = await api.post('/api/users/avatar', form as any, { headers: { 'Content-Type': 'multipart/form-data' } });
                 // server should return the updated avatar URL; fall back to local uri
                 const newAvatar = res?.data?.avatar || res?.data?.url || uri;
                 setCurrentAvatar(newAvatar);
-                // If viewing a publicProfile (which should be oneself), update it too
-                if (publicProfile) setPublicProfile((p: any) => ({ ...(p || {}), avatar: newAvatar }));
-                Alert.alert('Actualizat', 'Poza de profil a fost actualizată');
+                // If viewing a publicProfile (e.g., viewing another user's profile) update it too
+                if (publicProfile) {
+                  setPublicProfile((p: any) => ({ ...(p || {}), avatar: newAvatar }));
+                } else {
+                  // If this is the logged-in user's own profile, refresh auth profile so UI reflects changes immediately
+                  try {
+                    if (typeof restore === 'function') await restore();
+                  } catch (e) {
+                    console.warn('[Profile] failed to restore auth after avatar upload', e);
+                  }
+                }
+                showToast('Poza de profil a fost actualizată', 'success');
               } catch (err) {
                 console.error('Avatar upload error:', err);
-                Alert.alert('Eroare', 'Nu s-a putut încărca poza. Încearcă din nou');
+                showToast('Nu s-a putut încărca poza. Încearcă din nou', 'error');
               } finally {
                 setAvatarUploading(false);
               }
@@ -312,23 +333,28 @@ export default function ProfileScreen() {
       };
       
       await api.put('/api/users/profile', updateData);
-      
-      // Update local user state if viewing own profile
+
+      // If editing own profile, refresh auth profile so changes appear immediately in the UI
       if (!userId && user) {
-        // Refetch or manually update - for simplicity, we'll show success and let next mount refresh
-        Alert.alert('Succes', 'Informațiile au fost actualizate');
+        try {
+          if (typeof restore === 'function') await restore();
+          showToast('Informațiile au fost actualizate', 'success');
+        } catch (e) {
+          console.warn('[Profile] restore failed after profile update', e);
+          showToast('Informațiile au fost actualizate', 'info');
+        }
       }
-      
+
       setIsEditingContact(false);
-      
-      // Refresh the profile data
+
+      // If viewing a public profile (not own), refresh that public profile data
       if (userId) {
         const res = await api.get(`/api/users/profile/${encodeURIComponent(String(userId))}`);
         setPublicProfile(res.data);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      Alert.alert('Eroare', 'Nu s-au putut actualiza informațiile. Încearcă din nou.');
+      showToast('Nu s-au putut actualiza informațiile. Încearcă din nou', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -1031,6 +1057,15 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
     </ThemedView>
+    
+    {/* Custom Toast Notification */}
+    <Toast
+      visible={toastVisible}
+      message={toastMessage}
+      type={toastType}
+      duration={3000}
+      onHide={() => setToastVisible(false)}
+    />
     </>
   );
 }
