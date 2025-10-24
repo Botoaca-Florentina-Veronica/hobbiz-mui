@@ -13,5 +13,17 @@ baza de date
 - nu uita sa pui functionalitate butoanelor de login cu facebook/apple cum ai la google
 - cumpara un domeniu pentru aplicatia web, sa nu mai scrie netlify in el
 - citeste despre login throtling
-- fa cumva sa retii si avatarul contului google/facebook pentru contul de hobbiz
 - ia in vedere adaugarea unei licente pentru acest proiect
+-in mobile nu se salveaza instant modificarile facute in pagina de profil la schimbarea 
+datelor personale ale utilizatorului
+-rezolva toate erorile ce apar in chat(dc apare 0 langa avatar?)
+-in pagina de profil nu poti adauga locatie daca nu ai una deja salvata in baza de date
+-lucreaza la aspectul din dark mode la pagina de cookie
+pentru a arata catre ce container a avut calea link-ul din cuprins apasat
+-rezolva problema de logica de la like/unlike la review-uri(e aproape gata)
+-rezolva problema in pagina de chat dintre 2 utilizatori fiindca dispare 
+bara de inserat mesaje atunci cand apare tastatura in expo go pe telefoane fizice
+-vezi ca nu merge sa te conectezi la google de pe aplicatia mobile, te redirectioneaza
+direct pe site-ul web
+-adauga buton de report la fiecare anunt postat
+-adauga categorie cu chestii hand-made

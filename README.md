@@ -5,7 +5,6 @@
 # Hobbiz
 https://hobbiz.netlify.app/
 Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API Node/Express + aplicație mobilă Expo/React Native
-
 </div>
 
 ---
@@ -188,6 +187,24 @@ Mobile (Expo):
 - Expo SDK 54, React Native 0.81
 - expo-router pentru navigație declarativă
 - axios pentru API, expo-secure-store pentru token
+
+## 📱 Capturi din aplicația mobilă
+
+Mai jos sunt câteva capturi din aplicația mobilă (client Expo / React Native). Ele arată interfața principală, fila de chat și butonul de publicare. Imaginile sunt folosite pentru demo și design feedback.
+
+<div align="center">
+
+![Ecran principal](./device-view_images/image.png)
+
+
+
+![Chat](./device-view_images/image2.png)
+
+
+![Postare / Vinde](./device-view_images/image3.png)
+
+
+</div>
 
 Dev / Tooling:
 - ESLint (web & mobile) + configurări dedicate

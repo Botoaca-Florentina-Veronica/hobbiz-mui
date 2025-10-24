@@ -85,9 +85,12 @@ export default function LoginScreen() {
   // Extract token from an oauth redirect URL and finalize login
   const handleOAuthRedirectUrl = async (url?: string) => {
     if (!url) return false;
+    console.log('[OAuth] Handling redirect URL:', url);
     const parsed = Linking.parse(url);
+    console.log('[OAuth] Parsed URL:', JSON.stringify(parsed));
     const token = (parsed?.queryParams as any)?.token as string | undefined;
     if (token) {
+      console.log('[OAuth] Token extracted successfully:', token.slice(0, 20) + '...');
       await saveToken(token);
       // update axios header for subsequent requests in this session
       (api.defaults.headers as any).Authorization = `Bearer ${token}`;
@@ -95,6 +98,7 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
       return true;
     }
+    console.log('[OAuth] No token found in URL');
     return false;
   };
 
@@ -103,8 +107,10 @@ export default function LoginScreen() {
     const handler = async (event: { url: string }) => {
       try {
         const url = event.url || '';
+        console.log('[OAuth] URL event received:', url);
         await handleOAuthRedirectUrl(url);
       } catch (e: any) {
+        console.error('[OAuth] Error in URL handler:', e);
         Alert.alert('Autentificare', e?.message || 'Eroare la procesarea autentificării');
       } finally {
         setSocialLoading(false);
@@ -122,12 +128,20 @@ export default function LoginScreen() {
       setSocialLoading(true);
       // Build backend URL for Google OAuth
       const baseURL = (api.defaults.baseURL as string) || '';
-  const authUrl = `${baseURL}/auth/google?state=mobile&mobile=1`;
+      const authUrl = `${baseURL}/auth/google?state=mobile&mobile=1`;
+      
+      console.log('[OAuth] Starting Google login...');
+      console.log('[OAuth] Base URL:', baseURL);
+      console.log('[OAuth] Auth URL:', authUrl);
 
       // Prepare redirect handler for iOS
       const redirectUrl = Linking.createURL('oauth'); // mobileapp://oauth
+      console.log('[OAuth] Redirect URL:', redirectUrl);
+      
       // Open browser session
       const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl, { showInRecents: true, createTask: true });
+      console.log('[OAuth] WebBrowser result:', JSON.stringify(result));
+      
       // On some platforms, openAuthSessionAsync returns the redirected URL
       if (result && 'url' in result && result.url) {
         const finished = await handleOAuthRedirectUrl(result.url);
@@ -135,6 +149,7 @@ export default function LoginScreen() {
       }
       // Note: On Android, the redirect event will be captured by the listener above
     } catch (e: any) {
+      console.error('[OAuth] Error during Google login:', e);
       setError(e?.message || 'Eroare la autentificarea cu Google');
       setSocialLoading(false);
     }

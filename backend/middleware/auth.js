@@ -3,7 +3,12 @@ const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Acces neautorizat' });
+    }
+    
+    const token = authHeader.replace('Bearer ', '');
     console.log('Token primit:', token);
     console.log('🔍 Verificare token în middleware auth:', token);
     console.log('🔍 JWT_SECRET utilizat:', process.env.JWT_SECRET);

@@ -25,6 +25,30 @@ export default function CookiesScreen() {
 
   const scrollToSection = (ref: React.RefObject<View | null>) => {
     if (!ref.current || !scrollRef.current) return;
+
+    // Web: avoid calling findNodeHandle (not supported). Use DOM scrollIntoView when available.
+    if (Platform.OS === 'web') {
+      try {
+        // Some RNW components expose the underlying DOM node via getNode()
+        const possibleNode: any = (ref.current as any)?.getNode ? (ref.current as any).getNode() : (ref.current as any);
+        if (possibleNode && typeof possibleNode.scrollIntoView === 'function') {
+          possibleNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
+        // Fallback: try scrolling the container element
+        const container: any = (scrollRef.current as any)?.getNode ? (scrollRef.current as any).getNode() : (scrollRef.current as any);
+        if (container && typeof container.scrollTo === 'function' && possibleNode && possibleNode.offsetTop != null) {
+          container.scrollTo({ top: Math.max(0, possibleNode.offsetTop - 12), behavior: 'smooth' });
+          return;
+        }
+      } catch (e) {
+        // ignore and fall back to native approach below if any
+      }
+      return;
+    }
+
+    // Native (iOS/Android): use findNodeHandle + UIManager.measureLayout to compute Y offset and animate.
     const node = findNodeHandle(ref.current);
     const scrollNode = findNodeHandle(scrollRef.current as any);
     if (!node || !scrollNode) return;
@@ -140,11 +164,11 @@ export default function CookiesScreen() {
         </View>
 
   <View ref={secTipuriRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
-          <ThemedText style={[styles.h2, { color: '#3f3f3f' }]}>Tipuri de cookie-uri pe care le folosim</ThemedText>
+          <ThemedText style={[styles.h2, { color: 'rgb(214, 214, 214)' }]}>Tipuri de cookie-uri pe care le folosim</ThemedText>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: '#3f3f3f' }]}>1. Cookie-uri strict necesare</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: '#575757' }]}>Aceste cookie-uri sunt esențiale pentru funcționarea platformei Hobbiz. Ele îți permit să navighezi pe site, să te autentifici în contul tău, să publici anunțuri, să salvezi favorite și să folosești sistemul de chat. Fără aceste cookie-uri, serviciile de bază ale platformei nu ar putea funcționa.</ThemedText>
+            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>1. Cookie-uri strict necesare</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>Aceste cookie-uri sunt esențiale pentru funcționarea platformei Hobbiz. Ele îți permit să navighezi pe site, să te autentifici în contul tău, să publici anunțuri, să salvezi favorite și să folosești sistemul de chat. Fără aceste cookie-uri, serviciile de bază ale platformei nu ar putea funcționa.</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>Autentificare</CookieTag>
               <CookieTag>Sesiune utilizator</CookieTag>
@@ -154,8 +178,8 @@ export default function CookiesScreen() {
           </View>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: '#3f3f3f' }]}>2. Cookie-uri de preferințe</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: '#575757' }]}>Aceste cookie-uri îți permit să personalizezi experiența pe Hobbiz prin salvarea preferințelor tale, cum ar fi tema preferată (modul întunecat/luminos), categoriile favorite de anunțuri, regiunea ta pentru afișarea anunțurilor locale și setările de notificare.</ThemedText>
+            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>2. Cookie-uri de preferințe</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>Aceste cookie-uri îți permit să personalizezi experiența pe Hobbiz prin salvarea preferințelor tale, cum ar fi tema preferată (modul întunecat/luminos), categoriile favorite de anunțuri, regiunea ta pentru afișarea anunțurilor locale și setările de notificare.</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>Tema (light/dark)</CookieTag>
               <CookieTag>Regiunea preferată</CookieTag>
@@ -165,8 +189,8 @@ export default function CookiesScreen() {
           </View>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: '#3f3f3f' }]}>3. Cookie-uri de analiză</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: '#575757' }]}>Aceste cookie-uri sunt folosite prin platforme precum Google Analytics și Umami pentru a colecta informații despre modul în care utilizezi site-ul nostru. Ele ne ajută să înțelegem care pagini sunt vizitate cel mai des și cum navighezi prin platforma Hobbiz. Datele sunt anonimizate și agregate.</ThemedText>
+            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>3. Cookie-uri de analiză</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>Aceste cookie-uri sunt folosite prin platforme precum Google Analytics și Umami pentru a colecta informații despre modul în care utilizezi site-ul nostru. Ele ne ajută să înțelegem care pagini sunt vizitate cel mai des și cum navighezi prin platforma Hobbiz. Datele sunt anonimizate și agregate.</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>Google Analytics</CookieTag>
               <CookieTag>Umami Analytics</CookieTag>
@@ -176,8 +200,8 @@ export default function CookiesScreen() {
           </View>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: '#3f3f3f' }]}>4. Cookie-uri de marketing</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: '#575757' }]}>Aceste cookie-uri ne ajută să îți afișăm anunțuri și recomandări relevante pe platforma Hobbiz. De exemplu, îți putem sugera anunțuri din categoriile care te interesează sau servicii similare cu cele pe care le-ai vizitat anterior. Nu împărtășim aceste informații cu terți pentru publicitate.</ThemedText>
+            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>4. Cookie-uri de marketing</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>Aceste cookie-uri ne ajută să îți afișăm anunțuri și recomandări relevante pe platforma Hobbiz. De exemplu, îți putem sugera anunțuri din categoriile care te interesează sau servicii similare cu cele pe care le-ai vizitat anterior. Nu împărtășim aceste informații cu terți pentru publicitate.</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>Recomandări anunțuri</CookieTag>
               <CookieTag>Categorii de interes</CookieTag>
@@ -276,7 +300,7 @@ const styles = StyleSheet.create({
   h2: { fontSize: 20, fontWeight: '700', marginBottom: 8 },
   h3: { fontSize: 16, fontWeight: '600', marginTop: 8, marginBottom: 6 },
   paragraph: { fontSize: 14, lineHeight: 20, marginBottom: 8 },
-  strong: { fontWeight: '700' },
+  strong: { fontWeight: '700', color: '#f51866' },
 
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
   tag: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 8, marginRight: 8, fontSize: 13 },
@@ -287,9 +311,9 @@ const styles = StyleSheet.create({
   reasonTitle: { fontSize: 15, fontWeight: '700', marginBottom: 6 },
   /* TOC and content styles */
   cookieToc: { borderRadius: 14, paddingVertical: 18, paddingHorizontal: 16, marginBottom: 20, shadowColor: '#3f3f3f', shadowOpacity: 0.08, shadowRadius: 6, elevation: 1 },
-  tocTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
+  tocTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8, color:'rgb(87, 87, 87)' },
   tocList: { gap: 6 },
-  tocItem: { fontWeight: '600', fontSize: 15, paddingVertical: 6 },
+  tocItem: { fontWeight: '600', fontSize: 15, paddingVertical: 6, color: 'rgb(87, 87, 87)'},
 
   cookieType: { borderRadius: 16, padding: 16, marginBottom: 16 },
   cookieExamples: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },

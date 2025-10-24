@@ -708,6 +708,6 @@ const styles = StyleSheet.create({
   ratingModalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, alignItems: 'center' },
   ratingCancelBtn: { paddingHorizontal: 12, paddingVertical: 8 },
   ratingCancelText: { fontSize: 15, fontWeight: '700' },
-  ratingSubmitBtn: { backgroundColor: '#355070', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
+  ratingSubmitBtn: { backgroundColor: '#f51866', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
   ratingSubmitText: { fontSize: 15, fontWeight: '700' },
 });

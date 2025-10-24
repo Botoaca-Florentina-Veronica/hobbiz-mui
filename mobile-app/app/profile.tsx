@@ -635,7 +635,7 @@ export default function ProfileScreen() {
             {isViewingOwnProfile && !isEditingContact && (
               <TouchableOpacity 
                 onPress={handleStartEdit}
-                style={[styles.editButton, { backgroundColor: '#fff', borderColor: tokens.colors.primary, borderWidth: 1 }]}
+                style={[styles.editButton, { backgroundColor:  'rgba(0, 0, 0, 0.00)', borderColor: tokens.colors.primary, borderWidth: 1 }]}
                 activeOpacity={0.8}
               >
                 <ThemedText style={[styles.editButtonText, { color: tokens.colors.primary }]}>Editează</ThemedText>

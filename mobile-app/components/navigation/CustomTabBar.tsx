@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated, Platform, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +23,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { isAuthenticated, loading, user } = useAuth();
   const { hidden } = useTabBar();
   const { unreadCount } = useChatNotifications();
+  const insets = useSafeAreaInsets();
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
   const activeColor = isDark ? tokens.colors.primary : '#355070';
   const inactiveColor = tokens.colors.muted;
@@ -52,8 +54,16 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
 
   if (hidden) return null;
 
+  // On iPhones with the home indicator, ensure extra bottom padding so the bar is not obscured
+  const baselinePad = Platform.select({ ios: 12, default: 6 }) || 6;
+  const extraForIos = Platform.OS === 'ios' ? 8 : 0; // a bit more space above the home pill
+  const bottomPad = Math.max(insets.bottom, baselinePad) + extraForIos;
+  // Increase baseHeight so icons/labels are more visible on devices with home indicator
+  const baseHeight = 78;
+  const barHeight = baseHeight + (bottomPad - baselinePad);
+
   return (
-    <View style={[styles.wrapper, { backgroundColor: tokens.colors.surface, borderTopColor: tokens.colors.border }]}>      
+    <View style={[styles.wrapper, { backgroundColor: tokens.colors.surface, borderTopColor: tokens.colors.border, paddingBottom: bottomPad, height: barHeight }]}>      
       <View style={styles.row}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
@@ -106,7 +116,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                   ) : (
                     <Ionicons
                       name={config.icon as any}
-                      size={config.special ? 22 : 23}
+                      size={config.special ? 26 : 26}
                       color={config.special ? tokens.colors.primaryContrast : isFocused ? activeColor : inactiveColor}
                     />
                   )}
@@ -120,7 +130,13 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                   </View>
                 )}
               </View>
-              <Text style={[styles.label, { color: isFocused ? activeColor : inactiveColor, fontWeight: isFocused ? '600' : '500' }]}>
+              <Text
+                style={[
+                  styles.label,
+                  config.special ? styles.labelSpecial : undefined,
+                  { color: isFocused ? activeColor : inactiveColor, fontWeight: isFocused ? '600' : '500' },
+                ]}
+              >
                 {config.label}
               </Text>
             </Pressable>
@@ -156,6 +172,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.2,
   },
+  labelSpecial: {
+    marginTop: -6,
+  },
   indicator: {
     position: 'absolute',
     height: 3,
@@ -167,9 +186,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   publishCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 32,
+    width: 40,
+    height: 40,
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
     shadowOpacity: 0.25,

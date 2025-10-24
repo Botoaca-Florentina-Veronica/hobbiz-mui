@@ -1642,7 +1642,7 @@ export default function ChatScreen() {
       <LinearGradient
         colors={
           isDark
-            ? ['#f51866', 'rgba(0, 0, 0, 0)']
+            ? ['#f51866', '#00000000']
             : [
                 tokens.colors.primary || '#355070',
                 hexToRgba(tokens.colors.primary || '#355070', 0.75),
