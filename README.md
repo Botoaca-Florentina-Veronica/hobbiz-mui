@@ -26,11 +26,15 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
 
 ### Capturi de Ecran
 
-<div style="display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:nowrap;">
-  <img src="./device-view_images/image.png" alt="Ecran principal" style="width:180px; height:340px; object-fit:cover; border-radius:8px; margin-right:-8px;" />
-  <img src="./device-view_images/image2.png" alt="Chat" style="width:160px; height:340px; object-fit:cover; border-radius:8px;" />
-  <img src="./device-view_images/image3.png" alt="Profil" style="width:190px; height:340px; object-fit:cover; border-radius:8px;" />
-</div>
+<table align="center">
+  <tr>
+  <td><img src="./device-view_images/image.png" width="190" height="340" alt="Ecran principal" /></td>
+    <td>&nbsp;&nbsp;</td>
+  <td><img src="./device-view_images/image2.png" width="180" height="340" alt="Chat" /></td>
+    <td>&nbsp;&nbsp;</td>
+  <td><img src="./device-view_images/image3.png" width="230" height="340" alt="Profil" /></td>
+  </tr>
+</table>
 
 **Caracteristici Mobile:**
 - 🎨 **Dark Mode** complet funcțional cu tranziții fluide
