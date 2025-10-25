@@ -42,7 +42,7 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
     <td>&nbsp;&nbsp;&nbsp;</td>
     <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image5.png" width="180" height="350" alt="Anunț" /></td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image6.png" width="190" height="350" alt="Notificări" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image7.png" width="190" height="350" alt="Notificări" /></td>
   </tr>
 </table>
 

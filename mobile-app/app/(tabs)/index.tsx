@@ -31,6 +31,11 @@ const categories = [
   { description: 'Meditații', color: '#82E0AA', image: require('../../assets/images/carte.png') },
 ];
 
+// Design colors
+const DESIGN_BLUE = '#034e84ff';
+// deep blue for announcement titles (matches mock)
+const TITLE_BLUE = '#1a3b7eff';
+
 export default function HomeScreen() {
   const { tokens, isDark } = useAppTheme();
   const { columnsForCategories, width: screenWidth } = useResponsive();
@@ -168,9 +173,21 @@ export default function HomeScreen() {
               const horizontalPadding = 32; // padding from container (16 + 16)
               const gap = 12; // marginRight between cards
               const cardWidth = Math.floor((Math.max(screenWidth || 360, 360) - horizontalPadding - (cols - 1) * gap) / cols);
+              const listData = (() => {
+                const arr = Array.isArray(popular) ? popular.slice(0) : [];
+                if (cols > 1) {
+                  const rem = arr.length % cols;
+                  if (rem !== 0) {
+                    const needed = cols - rem;
+                    for (let i = 0; i < needed; i++) arr.push({ _id: `placeholder-show-all-${i}`, placeholder: true });
+                  }
+                }
+                return arr;
+              })();
+
               return (
                 <FlatList
-                  data={popular}
+                  data={listData}
                   key={cols} // force re-render when cols change
                   numColumns={cols}
                   nestedScrollEnabled
@@ -180,16 +197,94 @@ export default function HomeScreen() {
                   keyExtractor={(it) => it._id}
                   renderItem={({ item, index }) => {
                     const isLastInRow = cols > 1 && ((index % cols) === (cols - 1));
-                    const itemStyle = [styles.popularCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border, width: cardWidth, marginRight: isLastInRow ? 0 : gap, marginBottom: 12 }];
-                    return (
-                      <TouchableOpacity activeOpacity={0.8} style={itemStyle} onPress={() => router.push(`/announcement-details?id=${item._id}`)}>
-                          <Image source={{ uri: item.images && item.images[0] ? item.images[0] : undefined }} style={styles.popularImage} />
-                          <Text numberOfLines={2} style={[styles.popularLabel, { color: tokens.colors.text }]}>{item.title || item.description || 'Anunț'}</Text>
-                          <View style={styles.popularMetaWrap}>
-                            <Text numberOfLines={1} style={[styles.popularMetaText, { color: tokens.colors.muted }]}>{item.location || ''}</Text>
-                            <Text numberOfLines={1} style={[styles.popularMetaText, { color: tokens.colors.muted }]}>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' }) : ''}</Text>
+                    // make the card border more subtle (like the 'cont' page): use themed border with low alpha
+                    const subtleBorder = (() => {
+                      try { return hexToRgba(tokens.colors.border || '#000000', 0.5); } catch { return tokens.colors.border; }
+                    })();
+
+                    const itemStyle = [
+                      styles.popularCard,
+                      {
+                        backgroundColor: tokens.colors.surface,
+                        borderColor: subtleBorder,
+                        width: cardWidth,
+                        marginRight: isLastInRow ? 0 : gap,
+                        marginBottom: 12,
+                        // soften the card shadow a bit so the contour looks more muted
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.04,
+                        shadowRadius: 6,
+                        elevation: 2,
+                      },
+                    ];
+                    // render placeholder card (fills empty slot) with a single informative text
+                    if (item && item.placeholder) {
+                      return (
+                        <View style={itemStyle}>
+                          <View style={styles.placeholderBox}>
+                            <Text style={[styles.placeholderText, { color: tokens.colors.primary }]}>Afișați toate anunțurile</Text>
                           </View>
+                        </View>
+                      );
+                    }
+
+                    return (
+                      <TouchableOpacity activeOpacity={0.9} style={itemStyle} onPress={() => router.push(`/announcement-details?id=${item._id}`)}>
+                        <View style={styles.popularImageWrap}>
+                          <Image
+                            source={{ uri: item.images && item.images[0] ? item.images[0] : undefined }}
+                            style={styles.popularImage}
+                          />
+                          {/* star button removed per request */}
+                        </View>
+
+                        <Text numberOfLines={2} style={[styles.popularLabel, { color: TITLE_BLUE }]}> 
+                          {item.title || item.description || 'Anunț'}
+                        </Text>
+
+                        <View style={styles.popularMetaRow}>
+                          {!!(item.location) && (
+                            <View
+                              style={[
+                                styles.metaPill,
+                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
+                              ]}
+                            >
+                              <Text numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
+                                {item.location}
+                              </Text>
+                            </View>
+                          )}
+                          <View
+                            style={[
+                              styles.metaPill,
+                              { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
+                            ]}
+                          >
+                            <Text numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
+                              {item.createdAt
+                                ? new Date(item.createdAt).toLocaleDateString('ro-RO', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                  })
+                                : ''}
+                            </Text>
+                          </View>
+                        </View>
+
+                        {/* details button at bottom of card */}
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={() => router.push(`/announcement-details?id=${item._id}`)}
+                          style={[
+                            styles.detailsButton,
+                            { backgroundColor: DESIGN_BLUE },
+                          ]}
+                        >
+                          <Text style={[styles.detailsButtonText]}>Vezi detalii  ›</Text>
                         </TouchableOpacity>
+                      </TouchableOpacity>
                     );
                   }}
                 />
@@ -387,42 +482,90 @@ const styles = StyleSheet.create({
   popularCard: {
     width: 140,
     marginRight: 12,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    overflow: 'hidden',
-    padding: 12,
-    paddingBottom: 44, // reserve extra space for the bottom-left meta
-    minHeight: 180,
-    // subtle elevation for a button-like look
+    overflow: 'visible',
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    paddingTop: 10,
+    // dynamic height: allow the card to grow only as needed
+    minHeight: 240,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    // cleaner elevation for card look
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
+  popularImageWrap: {
+    width: '100%',
+    height: 120,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 10,
+    backgroundColor: '#f2f2f2',
+    // subtle shadow for the image (iOS) and elevation on Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  /* star button removed */
   popularImage: {
     width: '100%',
-    height: 110,
-    borderRadius: 12,
+    height: '100%',
     backgroundColor: '#fafafa',
-    marginBottom: 10,
     resizeMode: 'cover' as any,
   },
   popularLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 26, // increased spacing between title and meta overlay
+    fontSize: 16,
+    fontWeight: '900',
+    marginBottom: 8,
   },
   popularMetaText: {
     fontSize: 12,
     lineHeight: 16,
   },
-  popularMetaWrap: {
-    position: 'absolute',
-    left: 8,
-    bottom: 8,
-    right: 8,
-    // Background semi-transparent to ensure readability on images
-    // backgroundColor: 'rgba(0,0,0,0.02)',
+  popularMetaRow: {
+    flexDirection: 'row',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  metaPill: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  metaPillText: {
+    fontSize: 11,
+    lineHeight: 14,
+  },
+  placeholderBox: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+  },
+  placeholderText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  detailsButton: {
+    marginTop: 10,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  detailsButtonText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 13,
   },
 });
