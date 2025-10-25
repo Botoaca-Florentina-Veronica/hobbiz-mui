@@ -97,7 +97,7 @@ export default function AccountScreen() {
             >            
               <Ionicons name="arrow-back" size={24} color={palette.headerText} />
             </TouchableOpacity>
-            <ThemedText style={styles.headerTitle}>Profile</ThemedText>
+            <ThemedText style={styles.headerTitle}>Profil</ThemedText>
           </View>
           {/* Greeting placed in the blue header. Name is pulled from user and colored yellow. */}
           <View style={styles.greetingContainer}>

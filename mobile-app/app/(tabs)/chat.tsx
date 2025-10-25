@@ -157,57 +157,111 @@ export default function ChatScreen() {
 
   useEffect(() => {
     if (!userId) return;
+
+    // New: support navigation from other screens using explicit conversationId and optional messageId
+    const routeConversationId = (routeParams as any)?.conversationId;
+    const routeMessageId = (routeParams as any)?.messageId;
+
+    // If explicit conversationId is provided, try to open it
+    if (routeConversationId) {
+      const expectedConversationId = String(routeConversationId);
+      if (handledRouteConversationIdRef.current === expectedConversationId) return;
+
+      const found = conversations.find((c) => c.conversationId === expectedConversationId);
+      if (found) {
+        setSelectedConversation(found);
+        handledRouteConversationIdRef.current = expectedConversationId;
+      } else {
+        // Create a lightweight temporary conversation so the UI opens
+        const tempConv: Conversation = {
+          id: expectedConversationId,
+          conversationId: expectedConversationId,
+          name: '(Conversatie)',
+          avatar: '',
+          participantName: 'Utilizator',
+          participantAvatar: '',
+          announcementTitle: '',
+          announcementOwnerName: 'Utilizator',
+          lastMessage: '',
+          time: new Date().toLocaleString('ro-RO'),
+          unread: false,
+          otherParticipant: { id: '', firstName: '', lastName: '', avatar: '' },
+          lastSeen: undefined,
+          announcementOwnerId: '',
+          announcementId: '',
+        };
+        setSelectedConversation(tempConv);
+        handledRouteConversationIdRef.current = expectedConversationId;
+      }
+      // We still allow the announcementOwnerId flow below to run if present
+    }
+
+    // Backward-compatible: support announcementOwnerId route
     const ownerId = (routeParams as any)?.announcementOwnerId;
     const announcementId = (routeParams as any)?.announcementId;
-    if (!ownerId) return;
+    if (ownerId) {
+      // Construct deterministic conversationId similar to backend logic.
+      let expectedConversationId = '';
+      if (announcementId) {
+        expectedConversationId = `${ownerId}-${userId}-${announcementId}`;
+      } else {
+        expectedConversationId = [String(ownerId), String(userId)].sort().join('-');
+      }
 
-    // Construct deterministic conversationId similar to backend logic.
-    let expectedConversationId = '';
-    if (announcementId) {
-      expectedConversationId = `${ownerId}-${userId}-${announcementId}`;
-    } else {
-      expectedConversationId = [String(ownerId), String(userId)].sort().join('-');
-    }
+      if (handledRouteConversationIdRef.current === expectedConversationId) return;
 
-    // If we've already handled this route, don't repeat
-    if (handledRouteConversationIdRef.current === expectedConversationId) return;
+      const found = conversations.find(
+        (c) => c.conversationId === expectedConversationId || (announcementId && c.announcementId === announcementId && c.announcementOwnerId === ownerId)
+      );
 
-    // Try to find an existing conversation
-    const found = conversations.find(
-      (c) => c.conversationId === expectedConversationId || (announcementId && c.announcementId === announcementId && c.announcementOwnerId === ownerId)
-    );
+      if (found) {
+        setSelectedConversation(found);
+        handledRouteConversationIdRef.current = expectedConversationId;
+        return;
+      }
 
-    if (found) {
-      setSelectedConversation(found);
+      // If not found, create a temporary conversation object so the UI opens a detail view
+      const tempConv: Conversation = {
+        id: ownerId,
+        conversationId: expectedConversationId,
+        name: (routeParams as any)?.announcementTitle || '(fără titlu)',
+        avatar: (routeParams as any)?.announcementOwnerAvatar || '',
+        participantName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
+        participantAvatar: (routeParams as any)?.announcementOwnerAvatar || '',
+        announcementTitle: (routeParams as any)?.announcementTitle || '',
+        announcementOwnerName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
+        lastMessage: '',
+        time: new Date().toLocaleString('ro-RO'),
+        unread: false,
+        otherParticipant: { id: ownerId, firstName: (routeParams as any)?.announcementOwnerFirstName, lastName: (routeParams as any)?.announcementOwnerLastName, avatar: (routeParams as any)?.announcementOwnerAvatar },
+        lastSeen: undefined,
+        announcementOwnerId: ownerId,
+        announcementId: announcementId || '',
+      };
+
+      // Open the temporary conversation but don't mutate the fetched conversations array.
+      setSelectedConversation(tempConv);
       handledRouteConversationIdRef.current = expectedConversationId;
-      return;
     }
-
-    // If not found, create a temporary conversation object so the UI opens a detail view
-    const tempConv: Conversation = {
-      id: ownerId,
-      conversationId: expectedConversationId,
-      name: (routeParams as any)?.announcementTitle || '(fără titlu)',
-      avatar: (routeParams as any)?.announcementOwnerAvatar || '',
-      participantName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
-      participantAvatar: (routeParams as any)?.announcementOwnerAvatar || '',
-      announcementTitle: (routeParams as any)?.announcementTitle || '',
-      announcementOwnerName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
-      lastMessage: '',
-      time: new Date().toLocaleString('ro-RO'),
-      unread: false,
-      otherParticipant: { id: ownerId, firstName: (routeParams as any)?.announcementOwnerFirstName, lastName: (routeParams as any)?.announcementOwnerLastName, avatar: (routeParams as any)?.announcementOwnerAvatar },
-      lastSeen: undefined,
-      announcementOwnerId: ownerId,
-      announcementId: announcementId || '',
-    };
-
-    // Open the temporary conversation but don't mutate the fetched conversations array.
-    setSelectedConversation(tempConv);
-    handledRouteConversationIdRef.current = expectedConversationId;
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeParams, userId, conversations]);
+
+  // If the route contained a messageId, scroll to it after messages load
+  useEffect(() => {
+    const routeMessageId = (routeParams as any)?.messageId;
+    if (!routeMessageId) return;
+    if (!messages || messages.length === 0) return;
+    const layout = bubbleLayoutsMap[routeMessageId];
+    if (layout && messagesEndRef.current && typeof messagesEndRef.current.scrollTo === 'function') {
+      // Scroll so the message is visible with some offset (20px)
+      try {
+        messagesEndRef.current.scrollTo({ y: Math.max(0, layout.y - 20), animated: true });
+        // Optionally, mark message as read on server side could be done here
+      } catch (e) {}
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, bubbleLayoutsMap, routeParams]);
 
   // Fetch conversations
   const fetchConversations = useCallback(async () => {

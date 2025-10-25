@@ -263,7 +263,8 @@ const createMessage = async (req, res) => {
     // Notificare – doar dacă avem un destinatar valid și diferit de expeditor
     if (isValidObjectId(destinatarId) && String(destinatarId) !== String(senderId)) {
       try {
-        const link = `/chat/${conversationId}`;
+        // Include message id so clients can deep-link to the exact message
+        const link = `/chat/${conversationId}/${message._id}`;
         const existingNotification = await Notification.findOne({
           userId: destinatarId,
           link,

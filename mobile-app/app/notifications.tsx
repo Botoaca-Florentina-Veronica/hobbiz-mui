@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -64,13 +64,45 @@ export default function NotificationsScreen() {
       setItems(prev => prev.map(it => it._id === id ? { ...it, read: true } : it));
       try { await api.patch(`/api/notifications/${id}/read`); } catch {}
     }
-    // Expected format: /chat/:conversationId
+    // Expected formats:
+    //  - /chat/:conversationId
+    //  - /chat/:conversationId/:messageId
     if (link.startsWith('/chat/')) {
-      const conversationId = link.replace('/chat/', '').trim();
-      // Navigate to chat tab and open the conversation by matching ID (handled by Chat screen list)
-      router.push('/(tabs)/chat');
-      // We rely on Chat list to auto-mark as read when user selects it; alternatively we could add a deep param context
-      // Minimal: emit a small delay then try to open; skipping for now due to scope
+      const parts = link.replace('/chat/', '').split('/').map(p => p.trim()).filter(Boolean);
+      const conversationId = parts[0];
+      const messageId = parts[1];
+      // try to read announcement metadata from the notification item if available
+      const notif = id ? items.find(it => it._id === id) : undefined as any;
+      const announcementId = notif?.announcementId;
+      const announcementOwnerId = notif?.announcementOwnerId;
+      const announcementTitle = notif?.announcementTitle;
+      try {
+        if (conversationId) {
+          // Pass conversationId and optional messageId as route params so Chat screen can open the exact message
+          const params: any = { conversationId };
+          if (messageId) params.messageId = messageId;
+          if (announcementOwnerId) params.announcementOwnerId = announcementOwnerId;
+          if (announcementId) params.announcementId = announcementId;
+          if (announcementTitle) params.announcementTitle = announcementTitle;
+          // @ts-ignore
+          router.push({ pathname: '/(tabs)/chat', params });
+        } else {
+          router.push('/(tabs)/chat');
+        }
+      } catch (e) {
+        // fallback
+        router.push('/(tabs)/chat');
+      }
+
+      // After navigating, remove the notification since user opened the message
+      if (id) {
+        try {
+          await api.delete(`/api/notifications/${id}`);
+          setItems(prev => prev.filter(it => it._id !== id));
+        } catch (e) {
+          // ignore deletion errors
+        }
+      }
     }
   }, [router]);
 
@@ -87,32 +119,69 @@ export default function NotificationsScreen() {
   const renderItem = ({ item }: { item: NotificationItem }) => {
     return (
       <View style={[styles.notificationItem, {
-        backgroundColor: item.read ? tokens.colors.surface : isDark ? 'rgba(245,24,102,0.08)' : 'rgba(53,80,112,0.06)',
-        borderColor: item.read ? tokens.colors.border : tokens.colors.primary + '55'
+        backgroundColor: isDark ? 'rgba(30, 30, 30, 0.98)' : 'rgba(255, 255, 255, 0.98)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        ...Platform.select({
+          ios: {
+            shadowColor: isDark ? '#000' : '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: isDark ? 0.4 : 0.15,
+            shadowRadius: 12,
+          },
+          android: {
+            elevation: 6,
+          },
+          web: {
+            boxShadow: isDark
+              ? '0 4px 20px rgba(0, 0, 0, 0.5)'
+              : '0 4px 20px rgba(0, 0, 0, 0.15)',
+          },
+        }),
       }]}>        
         <View style={styles.notificationMain}>
-          {!item.read && <View style={[styles.unreadIndicator, { backgroundColor: tokens.colors.primary }]} />}
-          {item.senderName ? (
-            <Text style={[styles.senderName, { color: isDark ? '#fe85a4' : tokens.colors.primary }]}>{item.senderName}</Text>
-          ) : null}
-          <View style={styles.messageRow}>
-            <View style={styles.avatarWrapper}>
+          <View style={styles.notificationHeader}>
+            <View style={[styles.avatarCircle, { 
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+            }]}>
               <Image
                 source={{ uri: resolveUrl(item.senderAvatar) || 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128' }}
-                style={styles.avatar}
+                style={styles.avatarImage}
               />
             </View>
-            <Text style={[styles.messageText, { color: tokens.colors.text }]} numberOfLines={3}>{item.preview || 'Nu există conținut.'}</Text>
+            <View style={styles.headerText}>
+              {item.senderName ? (
+                <Text style={[styles.senderName, { color: isDark ? '#fe85a4' : tokens.colors.primary }]}>{item.senderName}</Text>
+              ) : null}
+              <Text style={[styles.dateText, { color: tokens.colors.muted }]}>{item.createdAt ? new Date(item.createdAt).toLocaleString('ro-RO') : ''}</Text>
+            </View>
+            {!item.read && (
+              <View style={[styles.unreadBadge, { backgroundColor: tokens.colors.primary }]}>
+                <Text style={styles.unreadBadgeText}>Nou</Text>
+              </View>
+            )}
           </View>
-          <Text style={[styles.dateText, { color: tokens.colors.muted }]}>{item.createdAt ? new Date(item.createdAt).toLocaleString('ro-RO') : ''}</Text>
+          
+          <Text style={[styles.messageText, { color: isDark ? '#FFFFFF' : '#1A1A1A' }]} numberOfLines={3}>
+            {item.preview || 'Nu există conținut.'}
+          </Text>
+          
           {item.link && (
-            <TouchableOpacity style={[styles.chatButton, { borderColor: tokens.colors.primary + '55', backgroundColor: isDark ? 'rgba(245,24,102,0.12)' : 'rgba(53,80,112,0.06)' }]} onPress={() => openLink(item.link, item._id)}>
-              <Text style={[styles.chatButtonText, { color: isDark ? '#ffdbe6' : tokens.colors.primary }]}>Deschide chat</Text>
+            <TouchableOpacity 
+              style={[styles.chatButton, { 
+                backgroundColor: tokens.colors.primary,
+              }]} 
+              onPress={() => openLink(item.link, item._id)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="chatbubble-outline" size={16} color="#FFFFFF" />
+              <Text style={styles.chatButtonText}>Deschide chat</Text>
             </TouchableOpacity>
           )}
         </View>
-        <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item._id)}>
-          <Ionicons name="trash-outline" size={20} color={tokens.colors.muted} />
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item._id)} activeOpacity={0.6}>
+          <View style={[styles.deleteIconCircle, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.03)' }]}>
+            <Ionicons name="trash-outline" size={18} color={tokens.colors.muted} />
+          </View>
         </TouchableOpacity>
       </View>
     );
@@ -233,68 +302,84 @@ const styles = StyleSheet.create({
   },
   notificationItem: {
     flexDirection: 'row',
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
-    marginBottom:12,
+    marginBottom: 12,
   },
   notificationMain: {
     flex: 1,
+    gap: 12,
   },
-  unreadIndicator: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-  },
-  senderName: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 4,
-    letterSpacing: 0.5,
-  },
-  messageRow: {
+  notificationHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    marginBottom: 8,
+    alignItems: 'center',
+    gap: 12,
   },
-  avatarWrapper: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  avatarCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
     overflow: 'hidden',
   },
-  avatar: {
+  avatarImage: {
     width: '100%',
     height: '100%',
   },
-  messageText: {
+  headerText: {
     flex: 1,
-    fontSize: 14.5,
-    lineHeight: 19,
+    gap: 2,
+  },
+  senderName: {
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
   dateText: {
-    fontSize: 11,
-    marginBottom: 8,
+    fontSize: 12,
   },
-  chatButton: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  unreadBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 8,
   },
+  unreadBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  messageText: {
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: '500',
+  },
+  chatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    gap: 6,
+  },
   chatButtonText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
+    color: '#FFFFFF',
   },
   deleteBtn: {
-    width: 40,
+    width: 44,
     alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  deleteIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

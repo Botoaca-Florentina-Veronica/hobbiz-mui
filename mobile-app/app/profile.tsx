@@ -11,6 +11,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import Constants from 'expo-constants';
 import api from '../src/services/api';
 import { Toast } from '../components/ui/Toast';
+import { localitatiPeJudet } from '../assets/comunePeJudet';
 
 interface UserAnnouncement {
   _id: string;
@@ -86,6 +87,31 @@ export default function ProfileScreen() {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
+  };
+
+  // Location picker modal state (for setting own profile location)
+  const [locationModalOpen, setLocationModalOpen] = React.useState(false);
+  const [countyExpanded, setCountyExpanded] = React.useState<string | null>(null);
+
+  const handleSelectLocation = async (loc: string, county?: string) => {
+    const full = county ? `${loc}, ${county}` : loc;
+    try {
+      // update user profile localitate
+      await api.put('/api/users/profile', { localitate: full });
+      // refresh auth profile so UI shows new location
+      try {
+        if (typeof restore === 'function') await restore();
+      } catch (e) {
+        console.warn('[Profile] restore failed after location update', e);
+      }
+      showToast('Locația a fost actualizată', 'success');
+    } catch (err) {
+      console.error('Error updating location:', err);
+      showToast('Nu s-a putut actualiza locația. Încearcă din nou', 'error');
+    } finally {
+      setLocationModalOpen(false);
+      setCountyExpanded(null);
+    }
   };
 
   // If userId present in query, fetch public profile for that user
@@ -572,8 +598,8 @@ export default function ProfileScreen() {
         <View style={styles.locationSection}>
           <View style={styles.locationHeader}>
             <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Locația mea</ThemedText>
-            <TouchableOpacity>
-              <ThemedText style={[styles.specifyLink, { color: tokens.colors.muted }]}>Specificați locația</ThemedText>
+            <TouchableOpacity onPress={() => { if (isViewingOwnProfile) setLocationModalOpen(true); }} activeOpacity={isViewingOwnProfile ? 0.7 : 1}>
+              <ThemedText style={[styles.specifyLink, { color: isViewingOwnProfile ? tokens.colors.muted : 'rgba(128,128,128,0.6)' }]}>Schimbă locația</ThemedText>
             </TouchableOpacity>
           </View>
           
@@ -1059,6 +1085,70 @@ export default function ProfileScreen() {
     </ThemedView>
     
     {/* Custom Toast Notification */}
+    {locationModalOpen && (
+      <View style={[styles.categoryOverlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.4)' }]}>
+        <View style={[styles.categorySheet, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+          <View style={[styles.categoryHeader, { borderColor: tokens.colors.border }]}>
+            {countyExpanded ? (
+              <>
+                <TouchableOpacity onPress={() => setCountyExpanded(null)} style={[styles.closeBtn, { marginRight: 8 }]}> 
+                  <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
+                </TouchableOpacity>
+                <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{countyExpanded}</ThemedText>
+                <TouchableOpacity onPress={() => { setLocationModalOpen(false); setCountyExpanded(null); }} style={styles.closeBtn}>
+                  <Ionicons name="close" size={22} color={tokens.colors.text} />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege localitatea</ThemedText>
+                <TouchableOpacity onPress={() => setLocationModalOpen(false)} style={styles.closeBtn}>
+                  <Ionicons name="close" size={22} color={tokens.colors.text} />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+          <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
+            {countyExpanded ? (
+              (() => {
+                const data = (localitatiPeJudet as any)[countyExpanded];
+                const orase = data?.orase?.map((o: any) => o.nume) || [];
+                const comune = data?.comune || [];
+                const localities = [...orase, ...comune];
+                return localities.map((loc: string, idx: number) => (
+                  <TouchableOpacity
+                    key={`${countyExpanded}-${loc}-${idx}`}
+                    onPress={() => { handleSelectLocation(loc, countyExpanded); }}
+                    activeOpacity={0.65}
+                    style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
+                  >
+                    <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{loc}</ThemedText>
+                  </TouchableOpacity>
+                ));
+              })()
+            ) : (
+              ['Toată țara', ...Object.keys(localitatiPeJudet)].map((loc: string) => (
+                <TouchableOpacity
+                  key={loc}
+                  onPress={() => {
+                    if (loc === 'Toată țara') {
+                      handleSelectLocation('Toată țara');
+                    } else {
+                      setCountyExpanded(loc);
+                    }
+                  }}
+                  activeOpacity={0.65}
+                  style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
+                >
+                  <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{loc}</ThemedText>
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+        </View>
+      </View>
+    )}
+
     <Toast
       visible={toastVisible}
       message={toastMessage}
@@ -1589,4 +1679,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
+  // Location picker modal styles
+  categoryOverlay: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, justifyContent: 'flex-end' },
+  categorySheet: { maxHeight: '75%', borderTopLeftRadius: 18, borderTopRightRadius: 18, borderWidth: 1, overflow: 'hidden' },
+  categoryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
+  categoryHeaderTitle: { fontSize: 16, fontWeight: '600' },
+  closeBtn: { padding: 6, borderRadius: 8 },
+  categoryList: { },
+  categoryRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
+  categoryLabel: { fontSize: 15, fontWeight: '500' },
 });

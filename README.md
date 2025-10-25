@@ -18,21 +18,31 @@ Hobbiz este o platformă unde utilizatorii își pot publica anunțuri în veder
 
 Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** și **React Native**, optimizată pentru iOS și Android. Aplicația permite utilizatorilor să:
 
-- **Exploreze anunțuri** – Navighează prin categorii și descoperă hobby-uri și servicii locale
+- **Exploreze anunțuri** – Navighează prin categorii și descoperă hobby-uri și servicii locale pe care ai vrea să le soliciți
 - **Gestioneze favorite** – Salvează și accesează rapid anunțurile preferate
 - **Publice anunțuri** – Creează și editează anunțuri direct de pe dispozitiv cu upload de imagini
 - **Comunice în timp real** – Chat privat cu notificări și typing indicators
-- **Gestioneze contul** – Profil personalizat cu avatar, setări și autentificare Google OAuth
+- **Gestioneze contul** – Profil personalizat cu avatar, setări și autentificare Google OAuth(în viitor +Facebook, Apple)
 
-### Capturi de Ecran(da știu îmi place Gumball, ai vreo problemă?)
+### Capturi de Ecran (da știu îmi place Gumball, ai vreo problemă?)
 
 <table align="center">
   <tr>
-  <td><img src="./device-view_images/image.png" width="190" height="340" alt="Ecran principal" /></td>
-    <td>&nbsp;&nbsp;</td>
-  <td><img src="./device-view_images/image2.png" width="180" height="340" alt="Chat" /></td>
-    <td>&nbsp;&nbsp;</td>
-  <td><img src="./device-view_images/image3.png" width="230" height="350" alt="Profil" /></td>
+    <td><img src="./device-view_images/image.png" width="200" height="350" alt="Ecran principal" /></td>
+    <td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="./device-view_images/image2.png" width="190" height="350" alt="Chat" /></td>
+    <td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="./device-view_images/image3.png" width="250" height="350" alt="Profil" /></td>
+  </tr>
+  <tr>
+    <td style="height:18px"></td>
+  </tr>
+  <tr>
+    <td><img src="./device-view_images/image4.png" width="230" height="350" alt="Căutare" /></td>
+    <td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="./device-view_images/image5.png" width="190" height="350" alt="Anunț" /></td>
+    <td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="./device-view_images/image6.png" width="200" height="350" alt="Notificări" /></td>
   </tr>
 </table>
 
@@ -99,10 +109,13 @@ hobbiz-mui/
 ├─ mobile-app/                 # Client mobil (Expo + React Native + expo-router)
 │  ├─ app/                     # Rute (layout, login, profile, notifications, tabs, etc.)
 │  ├─ components/              # UI & layout reutilizabil
+│  │  ├─ ui/                   # Small UI primitives used across screens (Toast, ConfirmDialog, ThemedText/View, etc.)
+│  │  └─ navigation/           # Navigation wrappers / headers
 │  ├─ constants/theme.ts       # Temă / culori partajate
 │  ├─ hooks/                   # use-color-scheme, use-theme-color
-│  ├─ src/ (extensibil)        # Spațiu pentru servicii/context viitoare
-│  ├─ assets/                  # Imagini / fonturi
+│  ├─ src/ (extensibil)        # Spațiu pentru servicii/context viitoare (api, auth, storage wrappers)
+│  ├─ assets/                  # Imagini / fonturi (include `comunePeJudet.js` used by location picker)
+│  └─ comunePeJudet.js       # dataset localități pe județe (folosit în pickerul de locație)
 │  └─ package.json
 │
 └─ render.yaml / netlify.toml  # Config deploy (Render backend / Netlify frontend)
@@ -238,6 +251,8 @@ Dev / Tooling:
 - Dark mode + animații de tranziție temă
 - Filtrare anunțuri după categorie + popular
 - Health endpoints + debug LAN IP pentru testare pe device fizic
+- Profil mobil: picker de localitate integrat în pagina de profil (alegere județ → localitate) + reîncărcare automată a hărții după salvare
+- UI mobile: componente UI reutilizabile (Toast pentru notificări non-blocking, ConfirmDialog pentru confirmări) integrate în flow-ul de edit/ștergere/feedback
 
 ---
 
@@ -306,7 +321,7 @@ npm start --prefix mobile-app
 - Socket.IO: https://socket.io/docs/v4
 - Expo: https://docs.expo.dev
 - Cloudinary: https://cloudinary.com/documentation
-- PixelCut.ai: https://www.pixelcut.ai/background-remover
+- Adobe background remover: https://www.adobe.com/express/feature/image/remove-background
 
 ---
 

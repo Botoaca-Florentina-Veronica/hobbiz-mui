@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { Toast } from '../components/ui/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -23,26 +24,37 @@ export default function SettingsScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Toast state for notifications
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
+
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
-      Alert.alert('Eroare', 'Toate câmpurile sunt obligatorii');
+      showToast('Toate câmpurile sunt obligatorii', 'error');
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('Eroare', 'Parola nouă trebuie să aibă cel puțin 6 caractere');
+      showToast('Parola nouă trebuie să aibă cel puțin 6 caractere', 'error');
       return;
     }
 
     setIsLoading(true);
     try {
       await updatePassword(currentPassword, newPassword);
-      Alert.alert('Succes', 'Parola a fost schimbată cu succes!');
+  showToast('Parola a fost schimbată cu succes!', 'success');
       setCurrentPassword('');
       setNewPassword('');
       setExpandedSection(null);
     } catch (error: any) {
-      Alert.alert('Eroare', error.message || 'Nu s-a putut schimba parola');
+      showToast(error?.message || 'Nu s-a putut schimba parola', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -50,25 +62,25 @@ export default function SettingsScreen() {
 
   const handleChangeEmail = async () => {
     if (!newEmail || !confirmPassword) {
-      Alert.alert('Eroare', 'Toate câmpurile sunt obligatorii');
+      showToast('Toate câmpurile sunt obligatorii', 'error');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
-      Alert.alert('Eroare', 'Format email invalid');
+      showToast('Format email invalid', 'error');
       return;
     }
 
     setIsLoading(true);
     try {
       await updateEmail(newEmail, confirmPassword);
-      Alert.alert('Succes', 'Email-ul a fost actualizat cu succes!');
+  showToast('Email-ul a fost actualizat cu succes!', 'success');
       setNewEmail('');
       setConfirmPassword('');
       setExpandedSection(null);
     } catch (error: any) {
-      Alert.alert('Eroare', error.message || 'Nu s-a putut actualiza email-ul');
+      showToast(error?.message || 'Nu s-a putut actualiza email-ul', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -236,6 +248,14 @@ export default function SettingsScreen() {
           ))}
         </View>
       </ScrollView>
+      {/* Custom Toast Notification for this screen */}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        duration={3000}
+        onHide={() => setToastVisible(false)}
+      />
     </ThemedView>
   );
 }
