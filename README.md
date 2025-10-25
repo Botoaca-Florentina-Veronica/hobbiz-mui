@@ -28,21 +28,21 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
 
 <table align="center">
   <tr>
-    <td><img src="./device-view_images/image.png" width="200" height="350" alt="Ecran principal" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image.png" width="190" height="350" alt="Ecran principal" /></td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td><img src="./device-view_images/image2.png" width="190" height="350" alt="Chat" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image2.png" width="180" height="350" alt="Chat" /></td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td><img src="./device-view_images/image3.png" width="250" height="350" alt="Profil" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image3.png" width="220" height="350" alt="Profil" /></td>
   </tr>
   <tr>
     <td style="height:18px"></td>
   </tr>
   <tr>
-    <td><img src="./device-view_images/image4.png" width="230" height="350" alt="Căutare" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image4.png" width="220" height="350" alt="Căutare" /></td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td><img src="./device-view_images/image5.png" width="190" height="350" alt="Anunț" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image5.png" width="180" height="350" alt="Anunț" /></td>
     <td>&nbsp;&nbsp;&nbsp;</td>
-    <td><img src="./device-view_images/image6.png" width="200" height="350" alt="Notificări" /></td>
+    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image6.png" width="190" height="350" alt="Notificări" /></td>
   </tr>
 </table>
 

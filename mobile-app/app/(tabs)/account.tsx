@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image, Platform, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../../src/context/ThemeContext';
@@ -57,6 +57,11 @@ export default function AccountScreen() {
   }), [isDark, tokens]);
 
   const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : 'Utilizator';
+  const { width } = useWindowDimensions();
+  // Treat widths less than 768px as phone-sized devices
+  const isPhone = width < 768;
+  const firstName = user?.firstName || '';
+  const lastName = user?.lastName || '';
   // How much of the sun should remain visible when we push it into the status bar area.
   // Increase this value to show more of the sun (pixels). We use a modest default so it still overlaps but not too much.
   const sunOverlap = 28;
@@ -101,8 +106,21 @@ export default function AccountScreen() {
           </View>
           {/* Greeting placed in the blue header. Name is pulled from user and colored yellow. */}
           <View style={styles.greetingContainer}>
-            <ThemedText style={[styles.greetingText, { color: palette.headerText }]}>Ceau{' '}
-              <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{displayName}!</ThemedText>
+            {/* Render greeting differently on phones vs larger devices:
+                - On phones: "Ceau <Prenume>\n<Nume>!"
+                - On larger devices: "Ceau <Prenume> <Nume>!" all on one line
+            */}
+            <ThemedText style={[styles.greetingText, { color: palette.headerText }]}>
+              Ceau{' '}
+              {isPhone ? (
+                <>
+                  <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{firstName || 'Utilizator'}</ThemedText>
+                  {lastName ? <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{'\n'}{lastName}</ThemedText> : null}
+                  <ThemedText style={[styles.greetingText, { color: palette.headerText }]}>{'!'}</ThemedText>
+                </>
+              ) : (
+                <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{(firstName || lastName) ? `${firstName} ${lastName}`.trim() : 'Utilizator'}!</ThemedText>
+              )}
             </ThemedText>
           </View>
          </LinearGradient>
@@ -111,8 +129,8 @@ export default function AccountScreen() {
         <View style={[styles.profileCard, { backgroundColor: tokens.colors.surface }]}>
           <View style={styles.avatarContainer}>
               <View style={styles.avatarOuter}>
-              <View style={[styles.halfTop, { backgroundColor: isDark ? '#ffffff' : '#355070' }]} />
-              <View style={[styles.halfBottom, { backgroundColor: isDark ? '#ffffff' : '#355070' }]} />
+              <View style={[styles.halfTop, { backgroundColor: isDark ? 'rgb(40, 40, 40)' : '#ffffff' }]} />
+              <View style={[styles.halfBottom, { backgroundColor: isDark ? 'rgb(40, 40, 40)' : '#ffffff' }]} />
               <View style={[styles.avatarInner, { backgroundColor: tokens.colors.surface }]}> 
                 {user?.avatar ? (
                   <Image 
@@ -161,7 +179,7 @@ export default function AccountScreen() {
                     value={isDark}
                     onValueChange={(v) => setMode(v ? 'dark' : 'light')}
                     thumbColor={'#ffffff'}
-                    trackColor={{ false: tokens.colors.border, true: palette.emphasisBg }}
+                    trackColor={{ false: tokens.colors.border, true: '#f51866' }}
                   />
                 </View>
               );
