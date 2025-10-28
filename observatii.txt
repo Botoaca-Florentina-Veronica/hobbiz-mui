@@ -23,3 +23,4 @@ pentru a arata catre ce container a avut calea link-ul din cuprins apasat
 direct pe site-ul web
 - adauga buton de report la fiecare anunt postat
 - adauga categorie cu chestii hand-made
+- adauga un cos de gunoi pentru anunturi

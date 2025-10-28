@@ -203,13 +203,13 @@
 }
 
 .dark-mode .content {
-  background-color: var(--app-surface);
+  background-color: #121212;
   color: var(--app-text);
 }
 
 /* In dark mode ensure the popular container has a suitable surface color */
 .dark-mode .popular-announcements-container {
-  background: var(--app-surface) !important;
+  background: #121212 !important;
   border-radius: 12px !important;
 }
 

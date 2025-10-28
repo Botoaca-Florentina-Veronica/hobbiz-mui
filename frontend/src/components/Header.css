@@ -340,7 +340,7 @@
  * 8. DARK MODE STYLES
  * ================================ */
 .dark-mode .header {
-  background-color: var(--primary);
+  background-color: #121212 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 

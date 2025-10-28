@@ -402,13 +402,13 @@ const styles = StyleSheet.create({
   mainImagePlaceholder: {
     width: '100%',
     maxWidth: 280,
-    height: 200,
+    height: 300,
     borderRadius: 12,
     marginBottom: 24,
   },
   mainHeroImage: {
     width: '100%',
-    height: 280,
+    height: '100%',
     marginBottom: 24,
     // resizeMode is applied via Image component props/style in RN; use contain visually
   },

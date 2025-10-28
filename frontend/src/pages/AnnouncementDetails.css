@@ -330,6 +330,10 @@ html {
   --surface-a30: #575757;
   --surface-a40: #717171;
   --surface-a50: #8b8b8b;
+  /* Card / surface tokens used across this page - override light defaults in dark mode */
+  --pf-card-bg: linear-gradient(135deg, var(--surface-a10) 0%, var(--surface-a20) 100%);
+  --pf-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --pf-card-radius: 12px;
 }
 
 /* Ensure the background matches dark app background */
