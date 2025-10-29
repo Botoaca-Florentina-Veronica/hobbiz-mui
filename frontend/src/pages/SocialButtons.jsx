@@ -7,7 +7,8 @@ import '../pages/SocialButtons.css';
 export function GoogleLoginButton() {
   const handleGoogleLogin = () => {
     // Ensure we don't end up with a double slash if VITE_API_URL ends with '/'
-    const base = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    // Use Render backend as safe production fallback when VITE_API_URL is not provided at build time
+    const base = import.meta.env.VITE_API_URL || 'https://hobbiz-mui.onrender.com';
     const baseNoSlash = base.replace(/\/+$/, '');
     window.location.href = `${baseNoSlash}/auth/google`;
   };
