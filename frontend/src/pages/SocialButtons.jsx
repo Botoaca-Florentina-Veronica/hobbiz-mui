@@ -6,7 +6,10 @@ import '../pages/SocialButtons.css';
 // Buton Google
 export function GoogleLoginButton() {
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/auth/google`;
+    // Ensure we don't end up with a double slash if VITE_API_URL ends with '/'
+    const base = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const baseNoSlash = base.replace(/\/+$/, '');
+    window.location.href = `${baseNoSlash}/auth/google`;
   };
   return (
     <button className="social-btn google" onClick={handleGoogleLogin}>

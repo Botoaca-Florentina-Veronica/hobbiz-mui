@@ -150,12 +150,12 @@ function App() {
         } />
         <Route path="/" element={
           <div className="homepage">
-            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-            <Header />
-            <MainStage />
-            <Content />
-            <Categories />
-            <CallToAction />
+              <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+              <Header />
+              <MainStage />
+              <Content />
+              <Categories />
+              <CallToAction />
             <Footer />
             <CookieConsent />
           </div>

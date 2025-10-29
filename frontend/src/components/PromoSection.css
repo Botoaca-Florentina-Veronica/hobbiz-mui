@@ -1,0 +1,231 @@
+.promo-section {
+  padding: 40px 0px 40px 0px;
+  color: var(--app-text);
+  min-height: 500vh; /* Extend section height to allow scrolling through slides - longer scroll for slower transitions */
+  position: relative;
+}
+
+.promo-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 0 20px;
+  position: sticky;
+  top: 100px; /* Stick when scrolling */
+  min-height: 70vh;
+}
+
+.promo-image-sticky {
+  flex: 0 0 55%;
+  position: sticky;
+  top: 120px;
+  align-self: flex-start;
+}
+
+.promo-image-sticky img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* For the ss2 slide scale image up visually (keeps container size same) */
+.promo-section.image-large .promo-image-sticky img {
+  transform-origin: left center;
+  /* scale up so image looks larger without changing flex layout */
+  transform: scale(1.18) translateX(-8%);
+  transition: transform 700ms ease;
+}
+
+.promo-text-container {
+  flex: 1 1 45%;
+  position: relative;
+  min-height: 900px; /* increased to allow taller slide content */
+  display: flex;
+  flex-direction: column;
+  gap: 180px; /* space between slides - increased for more separation */
+  transition: transform 700ms ease;
+}
+
+.promo-section.image-large .promo-image-sticky {
+  /* For the ss2 slide we want the image smaller so the text has more room */
+  /* Match ss1 layout: image ~55% */
+  flex: 0 0 55%;
+  overflow: visible; /* allow scaled image to overflow visually without changing layout */
+  transition: flex-basis 1.2s ease, -webkit-flex-basis 1.2s ease, margin-left 0.6s ease;
+}
+
+.promo-section.image-large .promo-text-container {
+  /* Give the text container more width so slides expand horizontally */
+  /* Match ss1 layout: text ~45% */
+  flex: 1 1 45%;
+  transition: flex-basis 1.2s ease, -webkit-flex-basis 1.2s ease, transform 700ms ease;
+  transform: translateX(0); /* remove left shift so text is fully visible */
+}
+
+/* Reduce scaling on narrower screens so image doesn't overflow badly */
+@media (max-width: 900px) {
+  .promo-section.image-large .promo-image-sticky img {
+    transform: scale(1) translateX(0);
+  }
+}
+
+.promo-text-slide {
+  position: relative;
+  width: 100%;
+  padding: 30px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.promo-text-slide h3 {
+  margin: 0 0 16px 0;
+  font-size: 2rem;
+  color: #1a1a1a;
+  font-weight: bold;
+}
+
+.promo-text-slide p {
+  margin: 0;
+  color: #222;
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+/* Title styling matching Content.h2 */
+.promo-section .promo-title {
+  text-align: center;
+  color: var(--app-text);
+  font-size: 3.5rem;
+  font-weight: bolder;
+  padding: 50px 70px 70px 50px;
+  margin-top: -60px;
+}
+
+.dark-mode .promo-section {
+  color: var(--app-text);
+}
+
+.dark-mode .promo-section .promo-title {
+  color: var(--app-text);
+}
+
+.dark-mode .promo-text-slide {
+  background: rgba(20, 20, 20, 0.6);
+}
+
+.dark-mode .promo-text-slide h3,
+.dark-mode .promo-text-slide p {
+  color: var(--app-text);
+}
+
+@media (max-width: 700px) {
+  .promo-section {
+    padding: 60px 0 60px 0;
+    font-size: 1.2rem;
+    min-height: 400vh;
+  }
+  
+  .promo-section .promo-title {
+    font-size: 2rem;
+    padding: 20px 10px 30px 10px;
+    margin-top: 0;
+  }
+
+  .promo-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+    padding: 0 16px;
+    top: 80px;
+  }
+
+  .promo-image-sticky {
+    flex: 0 0 auto;
+    width: 100%;
+    position: static; /* Remove sticky on mobile for better UX */
+  }
+
+  .promo-text-container {
+    min-height: 500px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+  }
+
+  .promo-text-slide p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 900px) {
+  .promo-section {
+    padding: 80px 0 80px 0;
+    font-size: 1.3rem;
+    min-height: 450vh;
+  }
+  
+  .promo-section .promo-title {
+    font-size: 2.5rem;
+    padding: 30px 20px 40px 20px;
+  }
+
+  .promo-inner {
+    gap: 30px;
+    top: 90px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 1.6rem;
+  }
+
+  .promo-text-slide p {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1199px) {
+  .promo-section {
+    padding: 100px 0 100px 0;
+    font-size: 1.4rem;
+    min-height: 480vh;
+  }
+  
+  .promo-section .promo-title {
+    font-size: 3rem;
+    padding: 40px 30px 50px 30px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 1.8rem;
+  }
+
+  .promo-text-slide p {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .promo-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .promo-image {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .promo-text {
+    padding: 16px;
+    margin-top: 12px;
+  }
+}

@@ -126,9 +126,10 @@ export default function LoginScreen() {
     try {
       setError('');
       setSocialLoading(true);
-      // Build backend URL for Google OAuth
-      const baseURL = (api.defaults.baseURL as string) || '';
-      const authUrl = `${baseURL}/auth/google?state=mobile&mobile=1`;
+  // Build backend URL for Google OAuth. Ensure no trailing slash on base.
+  const rawBase = (api.defaults.baseURL as string) || '';
+  const baseURL = rawBase.replace(/\/+$/, '');
+  const authUrl = `${baseURL}/auth/google?state=mobile&mobile=1`;
       
       console.log('[OAuth] Starting Google login...');
       console.log('[OAuth] Base URL:', baseURL);

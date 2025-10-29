@@ -43,7 +43,8 @@
     font-size: 1.2rem;
     height: auto;
   }
-  .content h2 {
+  .content h2,
+  .promo-section .promo-title {
     font-size: 2rem;
     padding: 20px 10px 30px 10px;
     margin-top: 0;
@@ -106,7 +107,8 @@
     font-size: 1.3rem;
     height: auto;
   }
-  .content h2 {
+  .content h2,
+  .promo-section .promo-title {
     font-size: 2.5rem;
     padding: 30px 20px 40px 20px;
   }
@@ -153,7 +155,8 @@
     font-size: 1.4rem;
     height: auto;
   }
-  .content h2 {
+  .content h2,
+  .promo-section .promo-title {
     font-size: 3rem;
     padding: 40px 30px 50px 30px;
   }
@@ -193,7 +196,8 @@
   }
 }
 
-.content h2 {
+.content h2,
+.promo-section .promo-title {
   text-align: center;
   color: var(--app-text);
   font-size: 3.5rem;
@@ -213,7 +217,8 @@
   border-radius: 12px !important;
 }
 
-.dark-mode .content h2 {
+.dark-mode .content h2,
+.dark-mode .promo-section .promo-title {
   color: var(--app-text);
 }
 
