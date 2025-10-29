@@ -13,9 +13,9 @@ const useSocket = (userId) => {
     // Prefer explicit VITE_SOCKET_URL, else fallback to VITE_API_URL, else localhost in dev
     const mode = import.meta.env.MODE;
     const explicitUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL;
-    const serverUrl = explicitUrl || (mode === 'production'
-      ? 'https://hobbiz-app-kkull.ondigitalocean.app/' // In production, require explicit env to avoid wrong origin
-      : 'http://localhost:5000');
+    const serverUrl = explicitUrl || process.env.REACT_APP_API_URL || (mode === 'production' 
+    ? 'https://hobbiz-app-kkull.ondigitalocean.app/' 
+    : 'http://localhost:5000');
 
     if (!serverUrl) {
       console.warn('[useSocket] No Socket.IO server URL set. Define VITE_SOCKET_URL or VITE_API_URL.');
