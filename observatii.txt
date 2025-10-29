@@ -26,3 +26,5 @@ direct pe site-ul web
 - adauga un cos de gunoi pentru anunturi
 - fa butonul de 'ascunde' in loc de dezactiveaza
 - fa animatia de la promo section cu zoom pe imagini si scroll in jos dupa
+- nu uita sa pui in Google Cloud console si calea pt serverul de backend din digitalOcean
+fiindca incalca regulile oAuth daca nu o am
