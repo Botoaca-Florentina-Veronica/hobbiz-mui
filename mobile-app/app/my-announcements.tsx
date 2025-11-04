@@ -19,6 +19,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { useAppTheme } from '../src/context/ThemeContext';
 import api from '../src/services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { findCategoryByLabel } from '../src/constants/categories';
 import { Toast } from '../components/ui/Toast';
 
 // useWindowDimensions will be read inside the component to handle orientation/responsive layout
@@ -60,6 +61,9 @@ export default function MyAnnouncementsScreen() {
   // Confirm dialog state for delete
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [announcementToDelete, setAnnouncementToDelete] = useState<string | null>(null);
+  // Confirm dialog state for hide (ascunde)
+  const [hideDialogVisible, setHideDialogVisible] = useState(false);
+  const [announcementToHide, setAnnouncementToHide] = useState<string | null>(null);
 
   // Toast state
   const [toastVisible, setToastVisible] = useState(false);
@@ -180,7 +184,20 @@ export default function MyAnnouncementsScreen() {
   };
 
   const handleDeactivate = (announcement: Announcement) => {
-    Alert.alert('Dezactivează', `Dezactivare anunț: ${announcement.title}`);
+    // Open the hide/ascunde confirmation dialog
+    setAnnouncementToHide(announcement._id);
+    setHideDialogVisible(true);
+  };
+
+  const confirmHide = async () => {
+    // For now, the user choice doesn't perform any action (per spec)
+    setHideDialogVisible(false);
+    setAnnouncementToHide(null);
+  };
+
+  const cancelHide = () => {
+    setHideDialogVisible(false);
+    setAnnouncementToHide(null);
   };
 
   const getImageSrc = (img?: string) => {
@@ -420,7 +437,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Ascunde</Text>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -452,7 +469,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Dezactivează</Text>
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Ascunde</Text>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -479,6 +496,18 @@ export default function MyAnnouncementsScreen() {
         )}
       </ScrollView>
 
+      {/* Hide confirmation dialog */}
+      <ConfirmDialog
+        visible={hideDialogVisible}
+        title="Ascunde anunț"
+        message={"Ești sigur că vrei să ascunzi anunțul din profilul tău? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunturi arhivate'."}
+        confirmText="Da"
+        cancelText="Nu"
+        icon="eye-off-outline"
+        onConfirm={confirmHide}
+        onCancel={cancelHide}
+      />
+
       {/* Picker Modal Overlay */}
       {activePickerType && (
         <TouchableOpacity 
@@ -503,38 +532,43 @@ export default function MyAnnouncementsScreen() {
             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
               {activePickerType === 'category' ? (
                 // Category options
-                uniqueCategories.map((cat) => (
-                  <TouchableOpacity
-                    key={cat}
-                    style={[
-                      styles.modalOption,
-                      categoryFilter === cat && styles.modalOptionSelected,
-                    ]}
-                    onPress={() => {
-                      setCategoryFilter(cat);
-                      setActivePickerType(null);
-                    }}
-                  >
-                    <View style={styles.modalOptionLeft}>
-                      <Ionicons 
-                        name={cat === 'Toate' ? 'apps' : 'pricetag'} 
-                        size={20} 
-                        color={categoryFilter === cat ? tokens.colors.primary : tokens.colors.muted} 
-                      />
-                      <Text
-                        style={[
-                          styles.modalOptionText,
-                          categoryFilter === cat && styles.modalOptionTextSelected,
-                        ]}
-                      >
-                        {cat}
-                      </Text>
-                    </View>
-                    {categoryFilter === cat && (
-                      <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
-                    )}
-                  </TouchableOpacity>
-                ))
+                uniqueCategories.map((cat) => {
+                  const catDef = cat === 'Toate' ? undefined : findCategoryByLabel(cat);
+                  return (
+                    <TouchableOpacity
+                      key={cat}
+                      style={[
+                        styles.modalOption,
+                        categoryFilter === cat && styles.modalOptionSelected,
+                      ]}
+                      onPress={() => {
+                        setCategoryFilter(cat);
+                        setActivePickerType(null);
+                      }}
+                    >
+                      <View style={styles.modalOptionLeft}>
+                        {cat === 'Toate' ? (
+                          <Ionicons name="apps" size={20} color={categoryFilter === cat ? tokens.colors.primary : tokens.colors.muted} />
+                        ) : catDef?.image ? (
+                          <Image source={catDef.image} style={{ width: 20, height: 20, borderRadius: 4 }} resizeMode="contain" />
+                        ) : (
+                          <Ionicons name={(catDef && (catDef.icon as any)) || 'pricetag'} size={20} color={categoryFilter === cat ? tokens.colors.primary : (catDef?.color || tokens.colors.muted)} />
+                        )}
+                        <Text
+                          style={[
+                            styles.modalOptionText,
+                            categoryFilter === cat && styles.modalOptionTextSelected,
+                          ]}
+                        >
+                          {cat}
+                        </Text>
+                      </View>
+                      {categoryFilter === cat && (
+                        <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })
               ) : (
                 // Sort options
                 [

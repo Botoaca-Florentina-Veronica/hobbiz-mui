@@ -19,12 +19,16 @@ baza de date
 - lucreaza la aspectul din dark mode la pagina de cookie
 pentru a arata catre ce container a avut calea link-ul din cuprins apasat
 - rezolva problema de logica de la like/unlike la review-uri(e aproape gata)
-- vezi ca nu merge sa te conectezi la google de pe aplicatia mobile, te redirectioneaza
-direct pe site-ul web
+- vezi ca nu merge sa te conectezi la google de pe aplicatia mobile, acum ai fallback si
+te redirectioneaza direct pe site-ul web
 - adauga buton de report la fiecare anunt postat
 - adauga categorie cu chestii hand-made
-- adauga un cos de gunoi pentru anunturi
-- fa butonul de 'ascunde' in loc de dezactiveaza
 - fa animatia de la promo section cu zoom pe imagini si scroll in jos dupa
-- nu uita sa pui in Google Cloud console si calea pt serverul de backend din digitalOcean
-fiindca incalca regulile oAuth daca nu o am
+- fa o pagina in care sa salvezi anunturile arhivate de utilizatori
+- ai in vedere consistenta datelor, sa fie aceleasi texte si butoane atat pe aplicatia
+web cat si pe aplicatia mobile
+- repara butonul de 'filtru' de la butoanele din sectiunea 'exploreaza categorii'
+(daca ai vreodata erori la deployment si nu merge oAuth-ul de la google, pune pe 
+netlify VITE_API_URL=https://hobbiz-mui.onrender.com, si la fel si in .env)
+- ia in vedere sa ai callback-ul principal pe digitalOcean temporar
+- ai probleme la logica de editare a unui anunt (daca adaugi poze noi, se sterg cele vechi)

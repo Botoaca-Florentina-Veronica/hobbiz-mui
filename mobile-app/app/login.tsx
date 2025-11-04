@@ -127,20 +127,38 @@ export default function LoginScreen() {
       setError('');
       setSocialLoading(true);
   // Build backend URL for Google OAuth. Ensure no trailing slash on base.
-  const rawBase = (api.defaults.baseURL as string) || '';
-  const baseURL = rawBase.replace(/\/+$/, '');
-  const authUrl = `${baseURL}/auth/google?state=mobile&mobile=1`;
-      
+  let rawBase = '';
+  try {
+    rawBase = String((api && (api.defaults as any) && (api.defaults as any).baseURL) || '');
+  } catch (e) {
+    rawBase = '';
+  }
+  // Ensure we always have a usable base URL. Prefer the configured base, else public Render backend.
+  const baseURL = rawBase && typeof rawBase.replace === 'function'
+    ? rawBase.replace(/\/+$/, '')
+    : 'https://hobbiz-mui.onrender.com';
+
+      // Prepare redirect handler for iOS (fallback to explicit scheme if createURL not available)
+      const redirectUrl = (Linking.createURL && typeof Linking.createURL === 'function')
+        ? Linking.createURL('oauth')
+        : 'mobileapp://oauth'; // fallback
+      console.log('[OAuth] Redirect URL:', redirectUrl);
+
+  // Include the actual redirect URL when initiating the backend OAuth so the callback can redirect back to this app
+  const authUrl = `${baseURL.replace(/\/+$/, '')}/auth/google?state=mobile&mobile=1&redirect=${encodeURIComponent(redirectUrl)}`;
+
       console.log('[OAuth] Starting Google login...');
       console.log('[OAuth] Base URL:', baseURL);
       console.log('[OAuth] Auth URL:', authUrl);
 
-      // Prepare redirect handler for iOS
-      const redirectUrl = Linking.createURL('oauth'); // mobileapp://oauth
-      console.log('[OAuth] Redirect URL:', redirectUrl);
-      
-      // Open browser session
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl, { showInRecents: true, createTask: true });
+      // Open browser session (wrap to catch platform-specific errors)
+      let result;
+      try {
+        result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl, { showInRecents: true, createTask: true });
+      } catch (e) {
+        console.error('[OAuth] openAuthSessionAsync failed:', e);
+        throw e;
+      }
       console.log('[OAuth] WebBrowser result:', JSON.stringify(result));
       
       // On some platforms, openAuthSessionAsync returns the redirected URL

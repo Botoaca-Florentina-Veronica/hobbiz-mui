@@ -66,9 +66,32 @@ export default function TermsScreen() {
           </View>
   </View>
 
-        {/* Section 1 */}
+        {/* Section 1 - NEW: Agreement to Terms */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>1. Definiții și interpretare</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>1. Acord cu privire la termeni</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
+            Prin accesarea, crearea unui cont sau utilizarea în orice mod a platformei Hobbiz ("Platforma"), declarați că ați citit, ați înțeles și că sunteți de acord să respectați toți acești termeni și condiții ("Termeni"). Acest acord constituie un contract încheiat în format electronic între dumneavoastră și operatorul Platformei. Dacă nu sunteți de acord cu acești Termeni, atunci vă este interzis în mod expres să utilizați Platforma și, dacă ați creat deja un cont, să îl ștergeți.
+          </ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
+            În cazul în care utilizați Platforma în numele unei persoane juridice, declarați și garantați că aveți autoritatea legală de a accepta acești Termeni în numele respectivei entități, iar termenul "dumneavoastră" va include entitatea pe care o reprezentați. Sunteți responsabil(ă) de respectarea acestor Termeni atât personal, cât și pentru orice persoană care utilizează contul dumneavoastră.
+          </ThemedText>
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Documente parte integrantă</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
+            Termenii includ și fac trimitere la politicile noastre conexe, care reglementează aspecte specifice ale utilizării Platformei: Politica de Confidențialitate, Politica de Cookie-uri și orice reguli ale comunității sau proceduri publicate în aplicație/website. În măsura oricărei neconcordanțe, prevederile specifice serviciului utilizat pot prevala asupra prezentelor clauze generale.
+          </ThemedText>
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Actualizări ale Termenilor</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
+            Putem modifica periodic acești Termeni pentru a reflecta schimbări legislative sau ale serviciilor. Vom notifica utilizatorii în caz de modificări materiale, conform secțiunii „Modificări și încetarea serviciilor”. Continuarea utilizării Platformei după data intrării în vigoare a modificărilor constituie acceptarea fără rezerve a versiunii actualizate. Dacă nu sunteți de acord cu modificările, trebuie să încetați utilizarea serviciilor.
+          </ThemedText>
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Consimțământul explicit</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
+            Bifarea unei căsuțe de acceptare, apăsarea butonului „Creează cont”, respectiv utilizarea continuă a Platformei, reprezintă consimțământul dumneavoastră expres cu privire la respectarea acestor Termeni și a politicilor asociate. Vă recomandăm să salvați sau să tipăriți o copie a versiunii curente pentru arhiva personală.
+          </ThemedText>
+        </View>
+
+        {/* Section 2 */}
+        <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
+          <ThemedText style={[styles.h2, { color: headingColor }]}>2. Definiții și interpretare</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>
             În cadrul acestor termeni și condiții, următoarele definiții se aplică: <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Platforma&quot;</ThemedText> se referă la website-ul Hobbiz și toate aplicațiile mobile asociate; <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Servicii&quot;</ThemedText> include toate funcționalitățile oferite prin platformă, inclusiv publicarea anunțurilor, căutarea, comunicarea între utilizatori și procesarea plăților; <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Utilizator&quot;</ThemedText> desemnează orice persoană fizică sau juridică care accesează sau folosește platforma; <ThemedText style={[styles.strong, { color: strongColor }]}>&quot;Conținut&quot;</ThemedText> include texte, imagini, video, date și alte materiale încărcate pe platformă.
           </ThemedText>
@@ -77,9 +100,9 @@ export default function TermsScreen() {
           </ThemedText>
         </View>
 
-        {/* Section 2 */}
+        {/* Section 3 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>2. Eligibilitate și înregistrare</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>3. Eligibilitate și înregistrare</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Cerințe de vârstă și capacitate juridică</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru a utiliza serviciile Hobbiz, trebuie să aveți minimum 18 ani și să dețineți capacitatea juridică deplină conform legislației românești. Minorilor cu vârsta cuprinsă între 16-18 ani li se permite utilizarea platformei doar cu consimțământul explicit al părinților sau reprezentanților legali și sub supravegherea acestora.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Persoanele juridice pot utiliza platforma prin intermediul reprezentanților autorizați, care răspund pentru toate acțiunile întreprinse în numele organizației. Verificăm documentele de înregistrare pentru conturile business și ne rezervăm dreptul de a solicita documente suplimentare pentru validarea identității.</ThemedText>
@@ -89,9 +112,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Suportăm înregistrarea prin metode multiple: email și parolă, autentificare prin Google OAuth 2.0, sau prin alți furnizori de identitate autorizați. Fiecare utilizator poate deține un singur cont activ, iar crearea de conturi multiple pentru evitarea restricțiilor este strict interzisă.</ThemedText>
         </View>
 
-        {/* Section 3 */}
+        {/* Section 4 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>3. Utilizarea platformei și anunțuri</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>4. Utilizarea platformei și anunțuri</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Publicarea anunțurilor</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Utilizatorii pot publica anunțuri pentru vânzarea de produse noi sau second-hand, prestarea de servicii, închirierea de bunuri sau alte tranzacții comerciale legale. Fiecare anunț trebuie să conțină o descriere exactă și completă a produsului sau serviciului, fotografii reale și nemodificate și un preț corect și transparent.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Este strict interzisă publicarea de anunțuri pentru: produse contrafăcute sau piratate, substanțe interzise prin lege, arme și muniții, animale protejate sau obținute ilegal, servicii ilegale sau imorale, conținut pentru adulți sau materiale ce încalcă drepturile de autor. Monitorizăm activ conținutul prin algoritmi automatizați și moderare umană.</ThemedText>
@@ -101,9 +124,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Comunicarea între utilizatori trebuie să se desfășoare într-un mod respectuos și profesional. Hărțuirea, amenințările, limbajul vulgar sau discriminatoriu, spam-ul și tentativele de fraudă vor fi sancționate prin restricții temporare sau permanente ale contului.</ThemedText>
         </View>
 
-        {/* Section 4 */}
+        {/* Section 5 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>4. Tranzacții și plăți</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>5. Tranzacții și plăți</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Facilitarea tranzacțiilor</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Hobbiz acționează ca intermediar tehnologic între cumpărători și vânzători, fără a fi parte în tranzacțiile efectuate. Nu garantăm calitatea, autenticitatea sau conformitatea produselor vândute, acestea fiind responsabilitatea exclusivă a vânzătorilor. Recomandăm utilizatorilor să fie precauți și să verifice întotdeauna produsele înainte de finalizarea tranzacțiilor.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru anumite servicii premium, procesăm plăți prin intermediul procesatorilor certificați Stripe și PayPal, care respectă standardele PCI DSS pentru securitatea datelor financiare. Nu stocăm informații despre carduri de credit pe serverele noastre, toate datele sensibile fiind gestionate exclusiv de furnizorii specializați.</ThemedText>
@@ -113,9 +136,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Putem interveni prin suspendarea temporară a conturilor implicate în dispute repetate sau grave, dar nu avem obligația legală de a arbitra conflictele comerciale dintre utilizatori. Pentru situații care implică posibile infracțiuni, cooperăm cu autoritățile competente conform cerințelor legale.</ThemedText>
         </View>
 
-        {/* Section 5 */}
+        {/* Section 6 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>5. Proprietate intelectuală</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>6. Proprietate intelectuală</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Drepturile platformei</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Codul sursă, designul, logo-ul, mărcile comerciale și toate elementele tehnice ale platformei Hobbiz sunt protejate prin drepturi de autor și proprietate intelectuală. Utilizarea neautorizată a acestor elemente, inclusiv copierea codului sau replicarea designului, constituie o încălcare a drepturilor noastre și poate fi urmărită legal.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Tehnologiile folosite (React.js, Node.js, MongoDB) sunt open-source și utilizate conform licențelor respective, însă implementarea specifică și arhitectura sistemului nostru sunt proprietate exclusivă. Interzicerea reverse engineering-ului sau tentativelor de replicare a funcționalităților este strict aplicată.</ThemedText>
@@ -125,9 +148,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Este responsabilitatea utilizatorilor să se asigure că dețin toate drepturile necesare pentru conținutul publicat și că nu încalcă drepturile de autor ale terților. În cazul reclamațiilor DMCA valide, vom elimina prompt conținutul problematic și vom lua măsurile necesare împotriva conturilor care încalcă în mod repetat drepturile de autor.</ThemedText>
         </View>
 
-        {/* Section 6 */}
+        {/* Section 7 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>6. Securitate și protecția datelor</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>7. Securitate și protecția datelor</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Măsuri de securitate tehnice</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Implementăm măsuri avansate de securitate informatică: criptarea SSL/TLS pentru toate comunicațiile, hashing-ul securizat al parolelor cu algoritmi bcrypt, protecție împotriva atacurilor CSRF și XSS, firewall-uri configurate și monitorizare constantă pentru activități suspecte. Actualizăm regulat toate componentele software pentru a corecta vulnerabilitățile de securitate.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Datele sunt stocate în centre de date certificate SOC 2 Type II, cu backup-uri automate zilnice și sisteme de redundanță geografică. Accesul la sistemele de producție este strict controlat prin autentificare cu doi factori și jurnalizarea completă a activităților administrative.</ThemedText>
@@ -137,9 +160,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Activarea autentificării cu doi factori este puternic recomandată pentru toate conturile, în special pentru cele care gestionează tranzacții financiare frecvente. Oferim opțiuni multiple: SMS, aplicații TOTP (Google Authenticator, Authy) și chei hardware compatibile FIDO2.</ThemedText>
         </View>
 
-        {/* Section 7 */}
+        {/* Section 8 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>7. Limitări de răspundere</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>8. Limitări de răspundere</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Excluderi de răspundere</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Hobbiz nu este responsabil pentru: daunele rezultate din tranzacțiile între utilizatori, pierderea de date din cauza defecțiunilor hardware sau software, întreruperile temporare ale serviciilor din motive tehnice, acțiunile frauduloase ale utilizatorilor sau terților sau consecințele utilizării inadecvate a platformei.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>În niciun caz răspunderea noastră totală nu va depăși valoarea taxelor plătite de utilizator pentru serviciile premium în ultimele 12 luni. Această limitare se aplică indiferent de natura reclamației: contractuală, delictuală sau din orice altă cauză legală.</ThemedText>
@@ -149,9 +172,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>În astfel de situații, vom depune toate eforturile rezonabile pentru a minimiza impactul asupra utilizatorilor și pentru a restabili serviciile cât mai rapid posibil. Utilizatorii vor fi informați prompt despre orice întreruperi majore prin canalele noastre oficiale de comunicare.</ThemedText>
         </View>
 
-        {/* Section 8 */}
+        {/* Section 9 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>8. Modificări și încetarea serviciilor</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>9. Modificări și încetarea serviciilor</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Modificări ale termenilor</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Ne rezervăm dreptul de a modifica acești termeni și condiții pentru a reflecta schimbările în serviciile oferite, cerințele legale sau practicile comerciale. Utilizatorii vor fi notificați cu minimum 30 de zile înainte de intrarea în vigoare a modificărilor majore prin email și notificări în platformă.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Continuarea utilizării serviciilor după intrarea în vigoare a modificărilor constituie acceptarea noilor termeni. Utilizatorii care nu sunt de acord cu modificările pot închide conturile și înceta utilizarea platformei fără penalități suplimentare.</ThemedText>
@@ -161,9 +184,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Utilizatorii pot închide voluntar conturile oricând prin setările platformei. La închiderea contului, datele personale vor fi anonimizate sau șterse conform politicii noastre de confidențialitate, iar anunțurile active vor fi eliminate automat.</ThemedText>
         </View>
 
-        {/* Section 9 */}
+        {/* Section 10 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>9. Legea aplicabilă și jurisdicția</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>10. Legea aplicabilă și jurisdicția</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Cadrul legal</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Acești termeni și condiții sunt guvernați de legea română și se interpretează conform acesteia. Toate disputele rezultate din utilizarea platformei vor fi soluționate de instanțele competente din România, utilizatorii renunțând la orice pretenție de incompetență teritorială.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru utilizatorii din Uniunea Europeană, respectăm prevederile Regulamentului Digital Services Act (DSA) și ale Directivei privind Drepturile Consumatorilor. Consumatorii pot beneficia de proceduri alternative de soluționare a disputelor conform reglementărilor UE aplicabile.</ThemedText>
@@ -173,9 +196,9 @@ export default function TermsScreen() {
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru problemele specifice protecției consumatorilor, utilizatorii se pot adresa ANPC (Autoritatea Națională pentru Protecția Consumatorilor) sau pot folosi platforma europeană ODR pentru soluționarea online a disputelor comerciale.</ThemedText>
         </View>
 
-        {/* Section 10 */}
+        {/* Section 11 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>10. Contact și asistență</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>11. Contact și asistență</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>Informații de contact</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Pentru întrebări despre acești termeni și condiții, reclamații sau solicitări de asistență, ne puteți contacta prin următoarele modalități: email oficial la <ThemedText style={styles.strong}>legal@hobbiz.ro</ThemedText>, formularul de contact din platformă sau poșta tradițională la adresa sediului social înregistrat.</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>Echipa noastră de asistență răspunde în general în termen de 24-48 de ore pentru întrebările standard și în maximum 72 de ore pentru problemele complexe care necesită investigații tehnice sau legale. Pentru urgențe de securitate, oferim suport accelerat prin canale prioritare.</ThemedText>

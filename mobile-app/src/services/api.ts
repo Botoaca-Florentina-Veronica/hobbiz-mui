@@ -7,6 +7,17 @@ const getBaseUrl = () => {
   // 1) Allow explicit override from environment (recommended for production/tests)
   if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
 
+  // If we're running a production build (not __DEV__) and no env var provided,
+  // default to the public backend on Render so the installed app can reach API.
+  // This avoids the app trying to use emulator/localhost addresses in production.
+  try {
+    if (typeof __DEV__ !== 'undefined' && !__DEV__) {
+      return 'https://hobbiz-mui.onrender.com';
+    }
+  } catch (e) {
+    // ignore any reference errors
+  }
+
   // 2) If running in Expo Go or the dev server, try many places where the packager host may be present.
   //    e.g. debuggerHost = "192.168.1.10:19000" -> we want http://192.168.1.10:5000
   const manifestAny: any = (Constants as any).manifest || (Constants as any).expoConfig || {};

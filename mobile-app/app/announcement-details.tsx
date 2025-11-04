@@ -47,6 +47,10 @@ export default function AnnouncementDetailsScreen() {
   const [ratingScore, setRatingScore] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
   const [submittingRating, setSubmittingRating] = useState(false);
+  // Seller review stats (fetched separately because announcement.user may not include aggregated stats)
+  const [sellerRating, setSellerRating] = useState<number | null>(null);
+  const [sellerReviewCount, setSellerReviewCount] = useState<number>(0);
+  const [sellerReviewsLoading, setSellerReviewsLoading] = useState<boolean>(false);
 
   const width = Dimensions.get('window').width;
   const isLarge = width >= 768;
@@ -133,8 +137,50 @@ export default function AnnouncementDetailsScreen() {
     return (f + l || 'U').toUpperCase();
   };
 
-  const rating = (announcement as any)?.user?.rating ?? 0;
-  const reviewCount = (announcement as any)?.user?.reviewCount ?? 0;
+  // Prefer explicit seller stats fetched from /api/reviews/:userId, fallback to announcement.user values if present
+  const rating = sellerRating ?? (announcement as any)?.user?.rating ?? 0;
+  const reviewCount = sellerReviewCount ?? (announcement as any)?.user?.reviewCount ?? 0;
+
+  // Fetch seller's reviews/stats whenever the announcement's user id is available
+  useEffect(() => {
+    const uid = announcement?.user?._id;
+    if (!uid) {
+      setSellerRating(null);
+      setSellerReviewCount(0);
+      return;
+    }
+
+    let cancelled = false;
+    const fetchSellerReviews = async () => {
+      try {
+        setSellerReviewsLoading(true);
+        const res = await api.get(`/api/reviews/${encodeURIComponent(String(uid))}`);
+        const arr = Array.isArray(res.data) ? res.data : [];
+        if (cancelled) return;
+
+        if (arr.length > 0) {
+          const total = arr.reduce((sum: number, r: any) => sum + (r.score ?? r.rating ?? r.value ?? 0), 0);
+          const avg = total / arr.length;
+          setSellerRating(avg);
+          setSellerReviewCount(arr.length);
+        } else {
+          setSellerRating(null);
+          setSellerReviewCount(0);
+        }
+      } catch (err) {
+        console.warn('[AnnouncementDetails] Failed to load seller reviews', err);
+        if (!cancelled) {
+          setSellerRating(null);
+          setSellerReviewCount(0);
+        }
+      } finally {
+        if (!cancelled) setSellerReviewsLoading(false);
+      }
+    };
+
+    fetchSellerReviews();
+    return () => { cancelled = true; };
+  }, [announcement?.user?._id]);
 
   const goToChat = () => {
     try {
@@ -386,7 +432,14 @@ export default function AnnouncementDetailsScreen() {
                 <Text style={[styles.ratingCount, { color: tokens.colors.muted }]}>({reviewCount} recenzii)</Text>
               </View>
             ) : (
-              <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>nu există review-uri</Text>
+              sellerReviewsLoading ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <ActivityIndicator size="small" color={tokens.colors.primary} />
+                  <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>se încarcă recenziile...</Text>
+                </View>
+              ) : (
+                <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>nu există review-uri</Text>
+              )
             )}
           </View>
         </View>

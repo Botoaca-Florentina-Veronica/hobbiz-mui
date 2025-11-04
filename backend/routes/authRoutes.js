@@ -12,12 +12,24 @@ router.get('/google', (req, res, next) => {
   if (req.session) {
     req.session.oauthDestination = isMobile ? 'mobile' : 'web';
   }
+  // If a client provided an explicit redirect URI (mobile app deep link), store it in session
+  if (isMobile && typeof req.query.redirect === 'string' && req.session) {
+    try {
+      req.session.oauthRedirect = req.query.redirect;
+    } catch (e) { /* ignore session write errors */ }
+  }
   const options = { scope: ['profile', 'email'] };
 
   // Passport will use this state value to send to Google and validate on return. We prefix to know this is a mobile flow.
   if (isMobile) {
     const mobileState = `mobile_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-    options.state = mobileState;
+    // If the client sent a redirect URI, encode it into the state so it survives without session cookies
+    if (typeof req.query.redirect === 'string' && req.query.redirect) {
+      const encoded = encodeURIComponent(req.query.redirect);
+      options.state = `${mobileState}::redirect:${encoded}`;
+    } else {
+      options.state = mobileState;
+    }
   } else if (rawState) {
     options.state = rawState;
   }
@@ -54,9 +66,36 @@ router.get('/google/callback',
     const stateSaysMobile = returnedState.startsWith('mobile_');
     const isMobile = stateSaysMobile || sessionDest === 'mobile';
     if (isMobile) {
-      const scheme = process.env.MOBILE_APP_SCHEME || 'mobileapp';
-      const path = process.env.MOBILE_APP_REDIRECT_PATH || 'oauth';
-      const mobileRedirect = `${scheme}://${path}?token=${encodeURIComponent(token)}`;
+      // Try to extract redirect encoded in state (preferred) to avoid relying on session cookies
+      let stateRedirect;
+      try {
+        const st = typeof req.query.state === 'string' ? req.query.state : '';
+        const marker = '::redirect:';
+        const idx = st.indexOf(marker);
+        if (idx !== -1) {
+          const enc = st.slice(idx + marker.length);
+          stateRedirect = decodeURIComponent(enc);
+        }
+      } catch (e) {
+        stateRedirect = undefined;
+      }
+
+      let mobileRedirect;
+      if (stateRedirect) {
+        mobileRedirect = `${stateRedirect}${stateRedirect.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+      } else {
+        // Fallback to any session-stored redirect if present (older clients)
+        const sessionRedirect = req.session && req.session.oauthRedirect ? req.session.oauthRedirect : undefined;
+        if (sessionRedirect) {
+          mobileRedirect = `${sessionRedirect}${sessionRedirect.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+        } else {
+          const scheme = process.env.MOBILE_APP_SCHEME || 'mobileapp';
+          const path = process.env.MOBILE_APP_REDIRECT_PATH || 'oauth';
+          mobileRedirect = `${scheme}://${path}?token=${encodeURIComponent(token)}`;
+        }
+      }
+      // Clear session-stored redirect to avoid reuse
+      try { if (req.session) req.session.oauthRedirect = undefined; } catch (e) {}
         // Log headers and session (sanitized) to help debug why some clients fall back to web
         try {
           console.log('[Auth] Mobile OAuth detected. Trying to open app with URL:', mobileRedirect);

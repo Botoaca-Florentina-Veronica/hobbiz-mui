@@ -51,6 +51,11 @@ export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: b
 
   const sectionsToRender = legalSections.filter((s) => !(hideLegalSection && s.title === 'Legal'));
 
+  // Dacă toate secțiunile sunt ascunse (ex: pe pagina "Explorează"), nu randăm nimic
+  if (sectionsToRender.length === 0) {
+    return null;
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
       <View style={[styles.sectionsWrapper, isTabletOrLarger && styles.sectionsRow]}>

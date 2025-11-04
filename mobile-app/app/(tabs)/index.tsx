@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -36,9 +36,39 @@ const DESIGN_BLUE = '#034e84ff';
 // deep blue for announcement titles (matches mock)
 const TITLE_BLUE = '#1a3b7eff';
 
+// ==================== CONFIGURARE DIMENSIUNI IMAGINII HERO ====================
+// Editează aceste valori pentru a schimba rapid dimensiunea imaginii principale
+const HERO_IMAGE_CONFIG = {
+  // Aspect ratio (lățime / înălțime) al imaginii
+  aspectRatio: 1.5,
+  
+  // Înălțime minimă (px) - pentru telefoane mici
+  minHeight: 260,
+  
+  // Înălțime maximă (px) - pentru dispozitive foarte mari
+  maxHeight: 600,
+  
+  // Procent din înălțimea ecranului (0.34 = 34%)
+  screenHeightPercent: 0.34,
+  
+  // Border radius (colțuri rotunjite)
+  borderRadius: 16,
+  
+  // Padding orizontal (spațiu la margini)
+  horizontalPadding: 32,
+  // Suprascrieri specifice telefoanelor (opțional)
+  phoneOverrides: {
+    // Exemplu: face imaginea mai wide și mai înaltă pe telefoane
+    aspectRatio: 1.1,
+    minHeight: 320,
+    screenHeightPercent: 0.40,
+  },
+};
+// ============================================================================
+
 export default function HomeScreen() {
   const { tokens, isDark } = useAppTheme();
-  const { columnsForCategories, width: screenWidth } = useResponsive();
+  const { columnsForCategories, width: screenWidth, isPhone, isTablet, isLargeTablet, scale } = useResponsive();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
@@ -126,34 +156,85 @@ export default function HomeScreen() {
         onSearchFocus={() => console.log('Search focused')}
         onNotificationClick={() => router.push('/notifications')}
       />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+  <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={[styles.mainContent, { backgroundColor: tokens.colors.surface }]}>
-          <ThemedText style={[styles.mainText, { color: tokens.colors.text }]}>
-            Găsește-ți hobbyul perfect și conectează-te cu pasionați din toată țara!
-          </ThemedText>
+          {
+            (() => {
+              // Determină dimensiunea titlului în mod responsive
+              // Slightly smaller sizes to make the headline a bit less dominant
+              const titleSize = isPhone ? Math.round(scale(20)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(24));
+              return (
+                <ThemedText style={[styles.mainText, { color: tokens.colors.text, fontSize: titleSize, fontWeight: '800', lineHeight: Math.round(titleSize * 1.05) }]}> 
+                  Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!
+                </ThemedText>
+              );
+            })()
+          }
           {(() => {
-            const maxHeight = 640;
-            const computed = Math.round((screenWidth || 360) * 0.8);
-            const heroHeight = Math.min(Math.max(computed, 320), maxHeight);
-             // make the actual image narrower so it fits vertically (contain)
-             const heroImageWidth = Math.round((screenWidth || 360) * 0.85);
+            // Calculăm dimensiunile imaginii hero folosind configurația de mai sus
+            const window = Dimensions.get('window');
+            const screenH = window.height || 800;
+
+            // Aplicăm suprascrierile pentru telefoane dacă sunt definite
+            const cfg = isPhone && HERO_IMAGE_CONFIG.phoneOverrides && Object.keys(HERO_IMAGE_CONFIG.phoneOverrides).length
+              ? { ...HERO_IMAGE_CONFIG, ...HERO_IMAGE_CONFIG.phoneOverrides }
+              : HERO_IMAGE_CONFIG;
+
+            const availableWidth = Math.max(320, (screenWidth || 360) - cfg.horizontalPadding);
+
+            // Calculăm înălțimea pe baza lățimii și aspect ratio
+            const heightFromWidth = Math.round(availableWidth / cfg.aspectRatio);
+            // Calculăm înălțimea pe baza procentului din înălțimea ecranului
+            const heightFromScreen = Math.round(screenH * cfg.screenHeightPercent);
+
+            // Alegem înălțimea mai mare dintre cele două, apoi aplicăm limitele min/max
+            let calculatedHeight = Math.max(heightFromWidth, heightFromScreen);
+            calculatedHeight = Math.max(
+              cfg.minHeight,
+              Math.min(calculatedHeight, cfg.maxHeight)
+            );
+
+            // Calculăm lățimea finală păstrând aspect ratio-ul
+            let imageWidth = Math.min(availableWidth, Math.round(calculatedHeight * cfg.aspectRatio));
+            const imageHeight = Math.round(imageWidth / cfg.aspectRatio);
 
             return (
-                <View style={[styles.mainHeroWrap, { height: heroHeight, marginBottom: -22 }]}> 
-                  <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', borderRadius: 16, overflow: 'hidden' }}>
-                    <Image
-                      source={require('../../assets/images/hobby_img.jpg')}
-                      style={[styles.mainHeroImage, { width: heroImageWidth -20, height: heroHeight -32, borderRadius: 16 }]} 
-                      resizeMode="cover"
-                    />
-                  </View>
+              <View style={[styles.mainHeroWrap, { height: imageHeight + 20, marginBottom: -16 }]}>
+                <View style={{ 
+                  width: imageWidth, 
+                  height: imageHeight,
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  borderRadius: cfg.borderRadius, 
+                  overflow: 'hidden'
+                }}>
+                  <Image
+                    // Afișăm hobby_img.jpg pe telefoane și hobbiz-wide-1.png pe tablete
+                    source={isPhone 
+                      ? require('../../assets/images/hobby_img.jpg') 
+                      : require('../../assets/images/hobbiz-wide.png')
+                    }
+                    style={{ 
+                      width: imageWidth, 
+                      height: imageHeight, 
+                      borderRadius: cfg.borderRadius,
+                    }} 
+                    resizeMode="contain"
+                  />
                 </View>
+              </View>
             );
           })()}
-          <View style={[styles.callToAction, { backgroundColor: tokens.colors.surface }]}>
-            <ThemedText style={[styles.ctaText, { color: tokens.colors.text }]}>
-              Descoperă talente locale pentru pasiunile tale
-            </ThemedText>
+          <View style={[styles.callToAction, { backgroundColor: tokens.colors.surface }]}> 
+            {(() => {
+              // Use same bold style as the main title, slightly smaller
+              const ctaSize = isPhone ? Math.round(scale(18)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(22));
+              return (
+                <ThemedText style={[styles.ctaText, { color: tokens.colors.text, fontSize: ctaSize, fontWeight: '800', lineHeight: Math.round(ctaSize * 1.05) }]}> 
+                  Fă din pasiunea ta o sursă de venit!
+                </ThemedText>
+              );
+            })()}
           </View>
         </View>
 
@@ -202,6 +283,8 @@ export default function HomeScreen() {
                       try { return hexToRgba(tokens.colors.border || '#000000', 0.5); } catch { return tokens.colors.border; }
                     })();
 
+                    const computedImageHeight = Math.max(120, Math.round(cardWidth * 0.55));
+
                     const itemStyle = [
                       styles.popularCard,
                       {
@@ -230,31 +313,31 @@ export default function HomeScreen() {
 
                     return (
                       <TouchableOpacity activeOpacity={0.9} style={itemStyle} onPress={() => router.push(`/announcement-details?id=${item._id}`)}>
-                        <View style={styles.popularImageWrap}>
+                        <View style={[styles.popularImageWrap, { height: computedImageHeight }]}> 
                           <Image
                             source={{ uri: item.images && item.images[0] ? item.images[0] : undefined }}
-                            style={styles.popularImage}
+                            style={[styles.popularImage, { height: '100%' }]}
                           />
                           {/* star button removed per request */}
                         </View>
 
-                        <Text numberOfLines={2} style={[styles.popularLabel, { color: TITLE_BLUE }]}> 
+                        <Text numberOfLines={2} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}> 
                           {item.title || item.description || 'Anunț'}
                         </Text>
 
                         <View style={styles.popularMetaRow}>
-                          {!!(item.location) && (
+                          {item.location ? (
                             <View
                               style={[
                                 styles.metaPill,
                                 { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
                               ]}
                             >
-                              <Text numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
+                              <Text numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}> 
                                 {item.location}
                               </Text>
                             </View>
-                          )}
+                          ) : null}
                           <View
                             style={[
                               styles.metaPill,
@@ -279,7 +362,7 @@ export default function HomeScreen() {
                           onPress={() => router.push(`/announcement-details?id=${item._id}`)}
                           style={[
                             styles.detailsButton,
-                            { backgroundColor: DESIGN_BLUE },
+                            { backgroundColor: isDark ? '#f51866' : DESIGN_BLUE },
                           ]}
                         >
                           <Text style={[styles.detailsButtonText]}>Vezi detalii  ›</Text>
@@ -386,7 +469,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingBottom: 100 },
+  // Remove extra bottom spacing so the page ends right after the categories section
+  scrollContent: { paddingBottom: 0 },
   mainContent: {
     padding: 16,
     marginBottom: 16,
@@ -396,7 +480,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 26,
     fontWeight: '500',
-    marginBottom: 24,
+    marginBottom: 4,
     textAlign: 'center',
   },
   mainImagePlaceholder: {
@@ -409,17 +493,13 @@ const styles = StyleSheet.create({
   mainHeroImage: {
     width: '100%',
     height: '100%',
-    marginBottom: 24,
-    // resizeMode is applied via Image component props/style in RN; use contain visually
   },
   mainHeroWrap: {
     width: '100%',
-    borderRadius: 12,
-    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
-    height: 300,
+    paddingHorizontal: 0,
   },
   callToAction: {
     padding: 16,
@@ -432,7 +512,8 @@ const styles = StyleSheet.create({
   },
   categoriesSection: {
     padding: 16,
-    marginBottom: 16,
+    // No bottom margin: we want the page to end right after this section
+    marginBottom: 0,
   },
   categoriesTitle: {
     fontSize: 20,
