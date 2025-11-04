@@ -326,7 +326,7 @@ npm start --prefix mobile-app
 ---
 
 ## ⚖️ Licență
-Momentan proprietar (closed). Se poate adăuga o licență publică ulterior.
+Copyright (c) 2025 Hobbiz. All rights reserved.
 
 ---
 
