@@ -109,7 +109,8 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <ChatPage />
-            <Footer hideOnMobile />
+            {/* Hide legal section on chat page */}
+            <Footer hideOnMobile hideLegal />
           </>
         } />
         <Route path="/despre" element={

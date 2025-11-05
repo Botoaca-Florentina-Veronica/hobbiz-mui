@@ -7,6 +7,14 @@ const router = express.Router();
 // Inițiază autentificarea cu Google
 // Acceptă opțional parametri "state=mobile" sau "mobile=1" pentru a redirecționa către aplicația mobilă după login
 router.get('/google', (req, res, next) => {
+  // If Google strategy wasn't configured (missing env vars), return a helpful error
+  try {
+    const hasGoogle = typeof passport._strategy === 'function' ? !!passport._strategy('google') : false;
+    if (!hasGoogle) {
+      console.warn('[Auth] Google strategy not configured; aborting /auth/google');
+      return res.status(500).send('Google OAuth not configured on server. Please contact administrator.');
+    }
+  } catch (e) {}
   const rawState = typeof req.query.state === 'string' ? req.query.state : undefined;
   const isMobile = rawState === 'mobile' || req.query.mobile === '1';
   if (req.session) {
@@ -38,6 +46,17 @@ router.get('/google', (req, res, next) => {
 
 // Callback după autentificare
 router.get('/google/callback',
+  // If Google strategy wasn't configured, provide explicit error instead of generic 500
+  (req, res, next) => {
+    try {
+      const hasGoogle = typeof passport._strategy === 'function' ? !!passport._strategy('google') : false;
+      if (!hasGoogle) {
+        console.warn('[Auth] Google strategy not configured; aborting /auth/google/callback');
+        return res.status(500).send('Google OAuth not configured on server. Please contact administrator.');
+      }
+    } catch (e) {}
+    return next();
+  },
   passport.authenticate('google', {
     failureRedirect: '/login',
     session: true,

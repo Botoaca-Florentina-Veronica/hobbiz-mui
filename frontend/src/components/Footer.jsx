@@ -10,7 +10,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
-export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false }) {
+export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false, hideLegal = false }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -82,22 +82,27 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
 
 
   {/* Separator deasupra legal-section */}
-  <div className="footer-separator desktop-only" />
+  {!hideLegal && <div className="footer-separator desktop-only" />}
+
       {/* LegalSection desktop/tablet (component dedicat). Pe mobil folosim MobileLegal. */}
-      <div className="desktop-only">
-        <LegalSection />
-      </div>
+      {!hideLegal && (
+        <div className="desktop-only">
+          <LegalSection />
+        </div>
+      )}
 
   {/* Versiunea compactă pentru mobil */}
-  <MobileLegal />
+  {!hideLegal && <MobileLegal />}
 
       {/* Separator între legal-section și footer propriu-zis */}
-  <div className="footer-separator desktop-only" />
+  {!hideLegal && <div className="footer-separator desktop-only" />}
 
       {/* Footer propriu-zis: copyright și bara mobilă */}
-  <footer className="desktop-footer desktop-only">
-        <p>Copyright Hobbiz 2025. Toate drepturile rezervate</p>
-      </footer>
+      {!hideLegal && (
+        <footer className="desktop-footer desktop-only">
+          <p>Copyright (c) 2025 Hobbiz. All rights reserved.</p>
+        </footer>
+      )}
       
       {/* Mobile Footer - doar pe mobile */}
       <div className="footer-mobile-buttons">

@@ -1,6 +1,8 @@
 .promo-section {
   padding: 40px 0px 40px 0px;
   color: var(--app-text);
+  /* Section background set to requested pink */
+  background: #F8B195;
   min-height: 500vh; /* Extend section height to allow scrolling through slides - longer scroll for slower transitions */
   position: relative;
 }
@@ -10,7 +12,7 @@
   margin: 0 auto;
   display: flex;
   align-items: flex-start;
-  gap: 40px;
+  gap: 64px;
   padding: 0 20px;
   position: sticky;
   top: 100px; /* Stick when scrolling */
@@ -20,20 +22,73 @@
 .promo-image-sticky {
   flex: 0 0 55%;
   position: sticky;
-  top: 120px;
+  top: 120px; /* stays fixed at this distance from viewport top when scrolling */
   align-self: flex-start;
+  /* ensure sticky behavior is strong throughout scroll */
+  will-change: transform;
 }
 
-.promo-image-sticky img {
+/* Shift the image container slightly left on larger screens to align visually with the layout */
+@media (min-width: 901px) {
+  .promo-image-sticky {
+    margin-left: -6%;
+  }
+  /* when the image enters the 'large' state keep the shift but allow overflow for the scale effect */
+  /* Note: avoid changing the parent margin when image-large is active to keep the frame horizontally fixed.
+     The visual enlargement is handled by scaling the inner image (.promo-image-frame img) only. */
+}
+
+.promo-image-frame {
+  background: #ffffff; /* white container */
+  padding: 10px; /* slight inner padding to create a frame */
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  overflow: hidden;
+  /* Fixed visual size so the frame is always identical regardless of image */
   width: 100%;
+  height: 420px; /* default frame height on small desktop */
+  max-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* ensure frame itself is positioned correctly within sticky parent */
+  position: relative;
+}
+
+.promo-image-frame img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
   display: block;
-  border-radius: 12px;
-  object-fit: cover;
+  object-fit: contain; /* ensure the full image is visible without cropping */
+  border-radius: 8px; /* slight rounding inside the white frame */
+  background: #ffffff; /* keep white behind images when aspect ratios differ */
+}
+
+/* Larger desktop: make the frame taller so images are more prominent */
+@media (min-width: 901px) {
+  .promo-image-frame {
+    height: 520px;
+  }
+}
+
+/* Mid screens (tablet landscape) */
+@media (min-width: 701px) and (max-width: 900px) {
+  .promo-image-frame {
+    height: 460px;
+  }
+}
+
+/* Mobile: smaller fixed height but still consistent */
+@media (max-width: 700px) {
+  .promo-image-frame {
+    height: 320px;
+  }
 }
 
 /* For the ss2 slide scale image up visually (keeps container size same) */
-.promo-section.image-large .promo-image-sticky img {
+.promo-section.image-large .promo-image-sticky .promo-image-frame img {
   transform-origin: left center;
   /* scale up so image looks larger without changing flex layout */
   transform: scale(1.18) translateX(-8%);
@@ -46,7 +101,7 @@
   min-height: 900px; /* increased to allow taller slide content */
   display: flex;
   flex-direction: column;
-  gap: 180px; /* space between slides - increased for more separation */
+  gap: 120px; /* reduced gap for faster, more consistent scroll transitions */
   transition: transform 700ms ease;
 }
 
@@ -76,27 +131,92 @@
 .promo-text-slide {
   position: relative;
   width: 100%;
-  padding: 30px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 0;
+  background: #F8B195;
+  backdrop-filter: none;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+  box-shadow: none;
+}
+
+.slide-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.slide-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2d2d2d;
+}
+
+.slide-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.slide-titles {
+  flex: 1;
 }
 
 .promo-text-slide h3 {
-  margin: 0 0 16px 0;
-  font-size: 2rem;
+  margin: 0 0 8px 0;
+  font-size: 2.2rem;
   color: #1a1a1a;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-.promo-text-slide p {
+.slide-subtitle {
   margin: 0;
-  color: #222;
-  line-height: 1.7;
+  color: #333;
   font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #2d2d2d;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.benefits-list .checkmark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  color: #2d2d2d;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.benefits-list span {
+  flex: 1;
+  font-weight: 500;
 }
 
 /* Title styling matching Content.h2 */
@@ -113,17 +233,40 @@
   color: var(--app-text);
 }
 
+.dark-mode .promo-section {
+  /* keep the section background pink even in dark mode as requested */
+  background: #F8B195;
+}
+
 .dark-mode .promo-section .promo-title {
   color: var(--app-text);
 }
 
 .dark-mode .promo-text-slide {
-  background: rgba(20, 20, 20, 0.6);
+  background: #F8B195;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.dark-mode .promo-text-slide h3,
-.dark-mode .promo-text-slide p {
-  color: var(--app-text);
+.dark-mode .promo-text-slide h3 {
+  color: #1a1a1a;
+}
+
+.dark-mode .slide-subtitle {
+  color: #333;
+}
+
+.dark-mode .benefits-list li {
+  color: #2d2d2d;
+}
+
+.dark-mode .slide-icon {
+  background: rgba(255, 255, 255, 0.3);
+  color: #2d2d2d;
+}
+
+.dark-mode .benefits-list .checkmark {
+  color: #2d2d2d;
+  background: rgba(255, 255, 255, 0.4);
 }
 
 @media (max-width: 700px) {
@@ -155,16 +298,50 @@
 
   .promo-text-container {
     min-height: 500px;
+    gap: 100px; /* consistent gap for mobile */
+  }
+
+  .promo-text-slide {
+    padding: 28px;
+    border-radius: 0;
+  }
+
+  .slide-header {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .slide-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+  }
+
+  .slide-icon svg {
+    width: 26px;
+    height: 26px;
   }
 
   .promo-text-slide h3 {
-    font-size: 1.4rem;
-    margin-bottom: 12px;
+    font-size: 1.6rem;
+    margin-bottom: 6px;
   }
 
-  .promo-text-slide p {
+  .slide-subtitle {
     font-size: 0.95rem;
-    line-height: 1.6;
+  }
+
+  .benefits-list {
+    gap: 14px;
+  }
+
+  .benefits-list li {
+    font-size: 0.95rem;
+  }
+
+  .benefits-list .checkmark {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -181,16 +358,50 @@
   }
 
   .promo-inner {
-    gap: 30px;
+    gap: 48px;
     top: 90px;
   }
 
-  .promo-text-slide h3 {
-    font-size: 1.6rem;
+  .promo-text-slide {
+    padding: 34px;
+    border-radius: 0;
   }
 
-  .promo-text-slide p {
+  .slide-header {
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+
+  .slide-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+
+  .slide-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 1.9rem;
+  }
+
+  .slide-subtitle {
     font-size: 1rem;
+  }
+
+  .benefits-list {
+    gap: 15px;
+  }
+
+  .benefits-list li {
+    font-size: 1rem;
+  }
+
+  .benefits-list .checkmark {
+    width: 22px;
+    height: 22px;
   }
 }
 
@@ -206,12 +417,37 @@
     padding: 40px 30px 50px 30px;
   }
 
-  .promo-text-slide h3 {
-    font-size: 1.8rem;
+  .promo-text-slide {
+    padding: 36px;
+    border-radius: 0;
   }
 
-  .promo-text-slide p {
+  .slide-header {
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .slide-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 15px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 2rem;
+  }
+
+  .slide-subtitle {
     font-size: 1.05rem;
+  }
+
+  .benefits-list li {
+    font-size: 1.02rem;
+  }
+
+  /* add larger gap on mid-large screens to keep spacing consistent */
+  .promo-inner {
+    gap: 64px;
   }
 }
 

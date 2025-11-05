@@ -13,7 +13,6 @@ baza de date
 - nu uita sa pui functionalitate butoanelor de login cu facebook/apple cum ai la google
 - cumpara un domeniu pentru aplicatia web, sa nu mai scrie netlify in el
 - citeste despre login throtling
-- ia in vedere adaugarea unei licente pentru acest proiect
 - rezolva toate erorile ce apar in chat(dc apare 0 langa avatar?)
 - in pagina de profil nu poti adauga locatie daca nu ai una deja salvata in baza de date
 - lucreaza la aspectul din dark mode la pagina de cookie
@@ -32,3 +31,5 @@ web cat si pe aplicatia mobile
 netlify VITE_API_URL=https://hobbiz-mui.onrender.com, si la fel si in .env)
 - ia in vedere sa ai callback-ul principal pe digitalOcean temporar
 - ai probleme la logica de editare a unui anunt (daca adaugi poze noi, se sterg cele vechi)
+- DACA VREODATA NU MAI MERGE DIGITAL OCEAN SAU NU MAI AI BANI PE CONT, SCHIMBA IN ENV-urile
+DIN NETLIFY SI RENDER LA GOOGLE_CALLBACK_URL : https://hobbiz-mui.onrender.com/auth/google/callback
