@@ -39,6 +39,7 @@ import './mediaQueries.css';
 import './components/Content.css';
 import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
 import CookieConsent from './components/CookieConsent';
+import ClickSpark from './components/ClickSpark';
 
 function App() {
   // Automatically scroll to top on route changes
@@ -61,8 +62,8 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-  return (
-  <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
+  const appView = (
+    <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
       <Routes>
         {/* Rute de autentificare - fără Header/Footer */}
         <Route path="/login" element={<LoginPage />} />
@@ -242,8 +243,20 @@ function App() {
           </>
         } />
       </Routes>
-  <SyncFavoritesModal />
+      <SyncFavoritesModal />
     </div>
+  );
+
+  return (
+    <ClickSpark
+      sparkColor={darkMode ? '#f51866' : '#2a4059'}
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
+      {appView}
+    </ClickSpark>
   );
 }
 

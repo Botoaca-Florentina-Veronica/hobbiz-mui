@@ -104,7 +104,11 @@ export default function PromoSection() {
   }, []);
 
   return (
-    <section className={`promo-section ${(activeSlide === 2 || activeSlide === 3) ? 'image-large' : ''}`} ref={sectionRef}>
+    <section
+      className={`promo-section ${(activeSlide === 2 || activeSlide === 3) ? 'image-large' : ''}`}
+      ref={sectionRef}
+      style={{ '--slides': textSlides.length }}
+    >
       {/* Title positioned like in Content (top-level h2) */}
       <h2 className="promo-title">Posteaza oriunde, oricand de pe orice</h2>
 
@@ -124,7 +128,7 @@ export default function PromoSection() {
             <div
               key={slide.id}
               ref={el => slideRefs.current[index] = el}
-              className="promo-text-slide"
+              className={`promo-text-slide ${activeSlide === index ? 'active' : ''}`}
             >
               <div className="slide-header">
                 <div className="slide-icon">

@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../pages/LoginSignup.css';
 
 export default function SignupPage() {
+  useEffect(() => {
+    // Align background behavior with LoginPage to avoid white bars on dark mode
+    document.body.classList.add('login-page');
+    return () => document.body.classList.remove('login-page');
+  }, []);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -40,7 +45,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="login-container">
+    <div className="login-container signup-container">
       <h2>Creează cont nou</h2>
       
       {error && <div className="error-message">{error}</div>}

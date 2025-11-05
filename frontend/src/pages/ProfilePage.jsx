@@ -271,11 +271,31 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {/* Location Card */}
+      <div className="profile-location-card">
+        <div className="profile-location-header">
+          <h2 className="profile-info-main-title">Locația mea</h2>
+          <button className="profile-edit-button" onClick={() => setEditMode(true)}>
+            Schimbă locația
+          </button>
+        </div>
+        <div className="profile-location-map">
+          <div className="profile-location-map-frame">
+            <iframe
+              title="Harta locației"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(profile?.localitate || 'Romania')}&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Profile Information Card */}
       <div className="profile-info-main-card">
         <div className="profile-info-content">
           <div className="profile-info-header-section">
-            <h2 className="profile-info-main-title">INFORMAȚII DE BAZĂ</h2>
+            <h2 className="profile-info-main-title">Informații de Contact</h2>
             {!editMode && (
               <button className="profile-edit-button" onClick={handleEdit}>
                 <EditIcon className="profile-icon" />
@@ -285,16 +305,15 @@ export default function ProfilePage() {
           </div>
 
           <hr className="profile-divider" />
-
-          <div className="profile-form-grid">
-            <div className="profile-form-column">
-              {/* Nume */}
-              <div className="profile-field-container">
-                <div className="profile-field-label">
-                  <PersonIcon className="profile-icon" />
-                  Nume
-                </div>
-                {editMode ? (
+          {editMode ? (
+            <div className="profile-form-grid">
+              <div className="profile-form-column">
+                {/* Nume */}
+                <div className="profile-field-container">
+                  <div className="profile-field-label">
+                    <PersonIcon className="profile-icon" />
+                    Nume
+                  </div>
                   <input
                     className="profile-field-input"
                     name="lastName"
@@ -302,20 +321,14 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     placeholder="Introduceți numele"
                   />
-                ) : (
-                  <div className={`profile-field-value ${!profile?.lastName ? 'unspecified' : ''}`}>
-                    {profile?.lastName || 'Nespecificat'}
-                  </div>
-                )}
-              </div>
-
-              {/* Prenume */}
-              <div className="profile-field-container">
-                <div className="profile-field-label">
-                  <PersonIcon className="profile-icon" />
-                  Prenume
                 </div>
-                {editMode ? (
+
+                {/* Prenume */}
+                <div className="profile-field-container">
+                  <div className="profile-field-label">
+                    <PersonIcon className="profile-icon" />
+                    Prenume
+                  </div>
                   <input
                     className="profile-field-input"
                     name="firstName"
@@ -323,40 +336,16 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     placeholder="Introduceți prenumele"
                   />
-                ) : (
-                  <div className={`profile-field-value ${!profile?.firstName ? 'unspecified' : ''}`}>
-                    {profile?.firstName || 'Nespecificat'}
+                </div>
+              </div>
+
+              <div className="profile-form-column">
+                {/* Localitate */}
+                <div className="profile-field-container">
+                  <div className="profile-field-label">
+                    <LocationOnIcon className="profile-icon" />
+                    Localitate
                   </div>
-                )}
-              </div>
-
-              {/* Membru din (readonly) */}
-              <div className="profile-field-container">
-                <div className="profile-field-label">
-                  <CalendarMonthIcon className="profile-icon" />
-                  Membru din
-                </div>
-                <div className="profile-field-value">
-                  {profile?.createdAt 
-                    ? new Date(profile.createdAt).toLocaleDateString('ro-RO', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: '2-digit'
-                      })
-                    : 'Nespecificat'
-                  }
-                </div>
-              </div>
-            </div>
-
-            <div className="profile-form-column">
-              {/* Localitate */}
-              <div className="profile-field-container">
-                <div className="profile-field-label">
-                  <LocationOnIcon className="profile-icon" />
-                  Localitate
-                </div>
-                {editMode ? (
                   <input
                     className="profile-field-input"
                     name="localitate"
@@ -364,20 +353,14 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     placeholder="Introduceți localitatea"
                   />
-                ) : (
-                  <div className={`profile-field-value ${!profile?.localitate ? 'unspecified' : ''}`}>
-                    {profile?.localitate || 'Nespecificat'}
-                  </div>
-                )}
-              </div>
-
-              {/* Telefon */}
-              <div className="profile-field-container">
-                <div className="profile-field-label">
-                  <PhoneIcon className="profile-icon" />
-                  Număr de telefon
                 </div>
-                {editMode ? (
+
+                {/* Telefon */}
+                <div className="profile-field-container">
+                  <div className="profile-field-label">
+                    <PhoneIcon className="profile-icon" />
+                    Număr de telefon
+                  </div>
                   <input
                     className="profile-field-input"
                     name="phone"
@@ -385,25 +368,56 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     placeholder="Introduceți numărul de telefon"
                   />
-                ) : (
-                  <div className={`profile-field-value ${!profile?.phone ? 'unspecified' : ''}`}>
-                    {profile?.phone || 'Nespecificat'}
-                  </div>
-                )}
-              </div>
-
-              {/* Email (readonly) */}
-              <div className="profile-field-container">
-                <div className="profile-field-label">
-                  <EmailIcon className="profile-icon" />
-                  Email
-                </div>
-                <div className="profile-field-value unspecified">
-                  {profile?.email || 'Nespecificat'}
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="contact-list">
+              <div className="contact-row">
+                <div className="contact-icon"><PersonIcon /></div>
+                <div className="contact-field">
+                  <div className="contact-label">Nume</div>
+                  <div className={`contact-value ${!profile?.lastName ? 'unspecified' : ''}`}>{profile?.lastName || 'Nespecificat'}</div>
+                </div>
+              </div>
+
+              <div className="contact-row">
+                <div className="contact-icon"><PersonIcon /></div>
+                <div className="contact-field">
+                  <div className="contact-label">Prenume</div>
+                  <div className={`contact-value ${!profile?.firstName ? 'unspecified' : ''}`}>{profile?.firstName || 'Nespecificat'}</div>
+                </div>
+              </div>
+
+              <div className="contact-row">
+                <div className="contact-icon"><PhoneIcon /></div>
+                <div className="contact-field">
+                  <div className="contact-label">Telefon</div>
+                  <div className={`contact-value ${!profile?.phone ? 'unspecified' : ''}`}>{profile?.phone || 'Nespecificat'}</div>
+                </div>
+              </div>
+
+              <div className="contact-row">
+                <div className="contact-icon"><EmailIcon /></div>
+                <div className="contact-field">
+                  <div className="contact-label">Email</div>
+                  <div className={`contact-value ${!profile?.email ? 'unspecified' : ''}`}>{profile?.email || 'Nespecificat'}</div>
+                </div>
+              </div>
+
+              <div className="contact-row">
+                <div className="contact-icon"><CalendarMonthIcon /></div>
+                <div className="contact-field">
+                  <div className="contact-label">Membru din</div>
+                  <div className="contact-value">
+                    {profile?.createdAt
+                      ? new Date(profile.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: '2-digit' })
+                      : 'Nespecificat'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Secțiunea Anunțurile mele */}
           <>

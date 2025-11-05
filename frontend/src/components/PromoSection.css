@@ -1,9 +1,11 @@
 .promo-section {
   padding: 40px 0px 40px 0px;
   color: var(--app-text);
-  /* Section background set to requested pink */
+  /* Section background - light mode uses pink, dark mode uses app background */
   background: #F8B195;
-  min-height: 500vh; /* Extend section height to allow scrolling through slides - longer scroll for slower transitions */
+  /* Make section height proportional to number of slides instead of a huge fixed vh value.
+     --slides is set by the component (defaults to 4). Adjust multiplier to control scroll length. */
+  min-height: calc(var(--slides, 4) * 75vh);
   position: relative;
 }
 
@@ -14,8 +16,7 @@
   align-items: flex-start;
   gap: 64px;
   padding: 0 20px;
-  position: sticky;
-  top: 100px; /* Stick when scrolling */
+  position: relative; /* make parent relative so only the image column is sticky */
   min-height: 70vh;
 }
 
@@ -24,8 +25,7 @@
   position: sticky;
   top: 120px; /* stays fixed at this distance from viewport top when scrolling */
   align-self: flex-start;
-  /* ensure sticky behavior is strong throughout scroll */
-  will-change: transform;
+  /* ensure sticky behavior is stable; avoid will-change here to prevent subpixel jitter */
 }
 
 /* Shift the image container slightly left on larger screens to align visually with the layout */
@@ -39,7 +39,7 @@
 }
 
 .promo-image-frame {
-  background: #ffffff; /* white container */
+  background: var(--app-surface); /* adapts to light/dark mode */
   padding: 10px; /* slight inner padding to create a frame */
   border-radius: 14px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
@@ -56,14 +56,14 @@
 }
 
 .promo-image-frame img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  /* keep the image filling the frame exactly so it doesn't shift when sticky state changes */
+  width: 100%;
+  height: 100%;
   display: block;
-  object-fit: contain; /* ensure the full image is visible without cropping */
+  object-fit: contain; /* keep whole image visible while matching frame size */
   border-radius: 8px; /* slight rounding inside the white frame */
-  background: #ffffff; /* keep white behind images when aspect ratios differ */
+  background: var(--app-surface); /* adapts to light/dark mode */
+  transform: translateZ(0); /* promote to its own layer to reduce repaint jitter */
 }
 
 /* Larger desktop: make the frame taller so images are more prominent */
@@ -103,6 +103,8 @@
   flex-direction: column;
   gap: 120px; /* reduced gap for faster, more consistent scroll transitions */
   transition: transform 700ms ease;
+  justify-content: flex-start; /* ensure slides start at the top, aligning with image frame */
+  padding-top: 10px; /* small top offset to align with the white frame's inner padding */
 }
 
 .promo-section.image-large .promo-image-sticky {
@@ -133,12 +135,24 @@
   width: 100%;
   padding: 40px;
   border-radius: 0;
-  background: #F8B195;
+  background: transparent; /* inherit from section background */
   backdrop-filter: none;
-  opacity: 1;
+  opacity: 0.4;
+  filter: brightness(0.7);
   transform: translateY(0);
   pointer-events: auto;
   box-shadow: none;
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+
+.promo-text-slide.active {
+  opacity: 1;
+  filter: brightness(1);
+}
+
+/* Align first slide's content flush with the top of the image frame */
+.promo-text-container .promo-text-slide:first-child {
+  padding-top: 0;
 }
 
 .slide-header {
@@ -157,7 +171,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2d2d2d;
+  color: var(--app-text);
 }
 
 .slide-icon svg {
@@ -172,14 +186,14 @@
 .promo-text-slide h3 {
   margin: 0 0 8px 0;
   font-size: 2.2rem;
-  color: #1a1a1a;
+  color: var(--app-text);
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
 .slide-subtitle {
   margin: 0;
-  color: #333;
+  color: var(--app-muted);
   font-size: 1.1rem;
   font-weight: 400;
   opacity: 0.85;
@@ -198,7 +212,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  color: #2d2d2d;
+  color: var(--app-text);
   font-size: 1.05rem;
   line-height: 1.6;
 }
@@ -208,7 +222,7 @@
   width: 24px;
   height: 24px;
   margin-top: 2px;
-  color: #2d2d2d;
+  color: var(--app-text);
   background: rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   padding: 2px;
@@ -230,50 +244,29 @@
 }
 
 .dark-mode .promo-section {
-  color: var(--app-text);
+  /* Use app background instead of pink in dark mode */
+  background: var(--app-bg);
 }
 
-.dark-mode .promo-section {
-  /* keep the section background pink even in dark mode as requested */
-  background: #F8B195;
-}
-
-.dark-mode .promo-section .promo-title {
-  color: var(--app-text);
-}
-
-.dark-mode .promo-text-slide {
-  background: #F8B195;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .promo-text-slide h3 {
-  color: #1a1a1a;
-}
-
-.dark-mode .slide-subtitle {
-  color: #333;
-}
-
-.dark-mode .benefits-list li {
-  color: #2d2d2d;
+.dark-mode .promo-image-frame {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  border: 1px solid var(--app-border);
 }
 
 .dark-mode .slide-icon {
-  background: rgba(255, 255, 255, 0.3);
-  color: #2d2d2d;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--app-border);
 }
 
 .dark-mode .benefits-list .checkmark {
-  color: #2d2d2d;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 @media (max-width: 700px) {
   .promo-section {
     padding: 60px 0 60px 0;
     font-size: 1.2rem;
-    min-height: 400vh;
+    min-height: calc(var(--slides, 4) * 55vh);
   }
   
   .promo-section .promo-title {
@@ -349,7 +342,7 @@
   .promo-section {
     padding: 80px 0 80px 0;
     font-size: 1.3rem;
-    min-height: 450vh;
+    min-height: calc(var(--slides, 4) * 65vh);
   }
   
   .promo-section .promo-title {
