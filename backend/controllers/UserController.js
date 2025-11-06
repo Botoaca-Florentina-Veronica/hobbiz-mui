@@ -29,6 +29,56 @@ const uploadAvatar = async (req, res) => {
   }
 };
 
+// Upload cover (banner) image for profile
+const uploadCover = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ error: 'Nicio imagine încărcată.' });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+    user.coverImage = req.file.path;
+    await user.save();
+    res.json({ message: 'Coperta a fost actualizată cu succes!', coverImage: user.coverImage });
+  } catch (error) {
+    console.error('Eroare la upload cover:', error);
+    res.status(500).json({ error: 'Eroare server la upload cover.' });
+  }
+};
+
+// Delete current avatar reference (optional: keep image in Cloudinary to avoid API complexity)
+const deleteAvatar = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
+    user.avatar = undefined;
+    await user.save();
+    res.json({ message: 'Avatar eliminat.' });
+  } catch (e) {
+    console.error('Eroare la ștergerea avatarului:', e);
+    res.status(500).json({ error: 'Eroare server la ștergerea avatarului' });
+  }
+};
+
+// Delete current cover reference
+const deleteCover = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
+    user.coverImage = undefined;
+    await user.save();
+    res.json({ message: 'Coperta a fost ștearsă.' });
+  } catch (e) {
+    console.error('Eroare la ștergerea cover-ului:', e);
+    res.status(500).json({ error: 'Eroare server la ștergerea cover-ului' });
+  }
+};
+
 // Utilitare pentru email normalization & duplicate merge
 const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 const escapeRegex = (str='') => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -603,6 +653,9 @@ module.exports = {
   updateAnnouncement,
   updateProfile,
   uploadAvatar,
+  uploadCover,
+  deleteAvatar,
+  deleteCover,
   registerPushToken,
   removePushToken
 };

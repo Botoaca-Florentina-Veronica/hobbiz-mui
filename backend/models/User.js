@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
   phone: { type: String },
   googleId: { type: String, unique: true, sparse: true },
   avatar: { type: String },
+  // Optional profile cover (banner) image
+  coverImage: { type: String },
   // Expo/FCM push token for mobile notifications
   pushToken: { type: String },
   createdAt: { type: Date, default: Date.now },

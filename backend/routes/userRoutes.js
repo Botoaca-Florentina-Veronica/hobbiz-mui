@@ -3,9 +3,13 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
-const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, registerPushToken, removePushToken } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, uploadCover, deleteAvatar, deleteCover, registerPushToken, removePushToken } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
+router.delete('/avatar', auth, deleteAvatar);
+// Upload cover (banner) image
+router.post('/cover', auth, upload.single('cover'), uploadCover);
+router.delete('/cover', auth, deleteCover);
 // Șterge contul utilizatorului și toate anunțurile sale
 router.delete('/delete-account', auth, deleteAccount);
 

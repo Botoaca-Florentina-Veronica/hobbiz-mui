@@ -36,7 +36,9 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const fileInputRef = React.useRef(null);
+  const coverInputRef = React.useRef(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
   const [userAnnouncements, setUserAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -155,6 +157,10 @@ export default function ProfilePage() {
     if (fileInputRef.current) fileInputRef.current.click();
   };
 
+  const handleCoverClick = () => {
+    if (coverInputRef.current) coverInputRef.current.click();
+  };
+
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -168,18 +174,45 @@ export default function ProfilePage() {
       const res = await apiClient.post('/api/users/avatar', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
+
+      // Update UI immediately with the new avatar
+      setProfile({ ...profile, avatar: res.data.avatar });
+
+      // Best-effort removal of old avatar reference (ignore errors)
       if (profile?.avatar) {
-        await apiClient.delete('/api/users/avatar', { data: { url: profile.avatar } });
+        try {
+          await apiClient.delete('/api/users/avatar', { data: { url: profile.avatar } });
+        } catch (_) {}
       }
       
-      setProfile({ ...profile, avatar: res.data.avatar });
       setSuccess('Avatar actualizat cu succes!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Eroare la încărcarea imaginii');
     } finally {
       setAvatarUploading(false);
+    }
+  };
+
+  const handleCoverChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setCoverUploading(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('cover', file);
+      const res = await apiClient.post('/api/users/cover', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setProfile({ ...profile, coverImage: res.data.coverImage });
+      setSuccess('Coperta a fost actualizată cu succes!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Eroare la încărcarea imaginii de copertă');
+    } finally {
+      setCoverUploading(false);
     }
   };
 
@@ -224,50 +257,101 @@ export default function ProfilePage() {
         </Fade>
       )}
 
-      {/* Header Card */}
-      <div className="profile-header-card">
-        <div className="profile-header-grid">
-          <div className="profile-avatar-container">
-            <input
-              type="file"
-              accept="image/*"
-              className="profile-hidden-input"
-              ref={fileInputRef}
-              onChange={handleAvatarChange}
-            />
-            <div
-              className={`profile-avatar-main ${avatarUploading ? 'uploading' : ''}`}
-              onClick={handleAvatarClick}
-            >
-              {profile?.avatar ? (
-                <img 
-                  src={profile.avatar} 
-                  alt="Avatar" 
-                  className="profile-avatar-image"
-                />
-              ) : (
-                <PersonIcon className="profile-person-icon" />
-              )}
-            </div>
-            <button
-              className="profile-camera-button"
-              onClick={handleAvatarClick}
-              disabled={avatarUploading}
-            >
-              {avatarUploading ? (
-                <CircularProgress className="profile-loading-spinner-small" style={{color: 'white'}} />
-              ) : (
-                <PhotoCameraIcon className="profile-camera-icon" />
-              )}
-            </button>
+      {/* Full-width Cover (banner) section */}
+      <div
+        className={`profile-cover-bleed`}
+      >
+        <div
+          className={`profile-cover ${profile?.coverImage ? 'has-image' : ''}`}
+          style={{
+            backgroundImage: profile?.coverImage ? `url(${profile.coverImage})` : 'none'
+          }}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            className="profile-hidden-input"
+            ref={coverInputRef}
+            onChange={handleCoverChange}
+          />
+          <button
+            className="profile-cover-upload-btn"
+            onClick={handleCoverClick}
+            disabled={coverUploading}
+            aria-label="Încarcă copertă"
+            title="Încarcă copertă"
+          >
+            {coverUploading ? (
+              <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
+            ) : (
+              <>
+                <PhotoCameraIcon className="profile-icon" />
+                {profile?.coverImage ? 'Schimbă coperta' : 'Adaugă poză de copertă'}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Identity row overlapping cover */}
+      <div className="profile-identity">
+        <div className="profile-avatar-container profile-avatar-overlap">
+          <input
+            type="file"
+            accept="image/*"
+            className="profile-hidden-input"
+            ref={fileInputRef}
+            onChange={handleAvatarChange}
+          />
+          <div
+            className={`profile-avatar-main ${avatarUploading ? 'uploading' : ''}`}
+            onClick={handleAvatarClick}
+          >
+            {profile?.avatar ? (
+              <img
+                src={profile.avatar}
+                alt="Avatar"
+                className="profile-avatar-image"
+              />
+            ) : (
+              <PersonIcon className="profile-person-icon" />
+            )}
           </div>
-          <div className="profile-header-info">
-            <span className="profile-private-chip">CONT PRIVAT</span>
-            <h1 className="profile-main-title">Editează-ți profilul</h1>
-            <button className="profile-view-button">
-              <VisibilityIcon className="profile-icon" />
-              Vezi cum îți văd alții profilul
-            </button>
+          <button
+            className="profile-camera-button"
+            onClick={handleAvatarClick}
+            disabled={avatarUploading}
+          >
+            {avatarUploading ? (
+              <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
+            ) : (
+              <PhotoCameraIcon className="profile-camera-icon" />
+            )}
+          </button>
+        </div>
+        <div className="profile-identity-info">
+          <h1 className="profile-name-title">
+            {(profile?.firstName || '') + (profile?.lastName ? (' ' + profile.lastName) : '') || 'Profil utilizator'}
+          </h1>
+          <div className="profile-identity-details">
+            {profile?.localitate && (
+              <span className="pid-item">
+                <LocationOnIcon />
+                {profile.localitate}
+              </span>
+            )}
+            {profile?.email && (
+              <span className="pid-item">
+                <EmailIcon />
+                {profile.email}
+              </span>
+            )}
+            {profile?.createdAt && (
+              <span className="pid-item">
+                <CalendarMonthIcon />
+                Membru din {new Date(profile.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long' })}
+              </span>
+            )}
           </div>
         </div>
       </div>

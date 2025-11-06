@@ -150,6 +150,67 @@
   border: 1px solid var(--pf-divider, #e0e0e0);
 }
 
+/* === Cover (banner) full-bleed section === */
+.profile-cover-bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  /* pull it up so it sits right under the app header (container has margin-top) */
+  margin-top: -6rem;
+}
+
+.profile-cover {
+  position: relative;
+  height: clamp(160px, 32vw, 260px);
+  background-color: #eef1f5; /* default empty state, no mountains */
+  background-size: cover;
+  background-position: center;
+}
+
+.profile-cover-upload-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  background-color: var(--pf-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.profile-cover-upload-btn:hover { background-color: var(--pf-primary-hover); }
+
+/* Identity row overlapping the cover */
+.profile-identity {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+  /* Lift up to overlap the cover bottom */
+  margin-top: -52px;
+  margin-bottom: 16px;
+}
+
+.profile-avatar-overlap .profile-avatar-main {
+  width: 128px;
+  height: 128px;
+  border: 4px solid #ffffff; /* white ring over cover */
+  background-color: #ffffff;
+}
+
+.profile-identity-info { padding-bottom: 8px; }
+.profile-name-title { font-size: clamp(1.6rem, 3.6vw, 2.2rem); color: var(--pf-text); margin: 0 0 6px 0; }
+.profile-identity-details { display: flex; flex-wrap: wrap; gap: 12px; color: var(--pf-text-muted); }
+.pid-item { display: inline-flex; gap: 6px; align-items: center; font-size: 0.95rem; }
+
 .profile-header-grid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -482,6 +543,15 @@
 }
 
 @media (max-width: 768px) {
+  .profile-cover-bleed { margin-top: 0; }
+  .profile-identity {
+    grid-template-columns: 1fr;
+    align-items: center;
+    text-align: center;
+    margin-top: -40px;
+  }
+  .profile-identity-info { padding-bottom: 0; }
+  .pid-item { justify-content: center; }
   .profile-form-grid {
     grid-template-columns: 1fr;
   }
@@ -631,6 +701,11 @@ body.dark-mode .profile-page-container .profile-info-main-card {
   background: #282828;
   border: 1px solid #3f3f3f;
 }
+/* Dark mode cover */
+body.dark-mode .profile-cover { background-color: #2e2e2e; }
+body.dark-mode .profile-cover-upload-btn { background-color: #f51866; }
+body.dark-mode .profile-cover-upload-btn:hover { background-color: #fe6585; }
+body.dark-mode .profile-avatar-overlap .profile-avatar-main { border-color: #282828; background-color: #282828; }
 body.dark-mode .profile-page-container .profile-location-card {
   background: transparent;
   border: none;
