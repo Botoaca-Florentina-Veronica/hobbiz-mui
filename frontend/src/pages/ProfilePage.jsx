@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import apiClient from '../api/api';
+import ImageCropModal from '../components/ImageCropModal';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -43,6 +44,7 @@ export default function ProfilePage() {
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const carouselRef = useRef(null);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
 
   // Detectează dark mode
   useEffect(() => {
@@ -158,7 +160,46 @@ export default function ProfilePage() {
   };
 
   const handleCoverClick = () => {
-    if (coverInputRef.current) coverInputRef.current.click();
+    setCropModalOpen(true);
+  };
+
+  const handleCoverSave = async (file) => {
+    if (!file) return;
+
+    setCoverUploading(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('cover', file);
+      const res = await apiClient.post('/api/users/cover', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setProfile({ ...profile, coverImage: res.data.coverImage });
+      setSuccess('Coperta a fost actualizată cu succes!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Eroare la încărcarea imaginii de copertă');
+    } finally {
+      setCoverUploading(false);
+    }
+  };
+
+  const handleCoverDelete = async () => {
+    // delete cover on server and update UI
+    if (!profile?.coverImage) return;
+    setCoverUploading(true);
+    setError('');
+    try {
+      await apiClient.delete('/api/users/cover', { data: { url: profile.coverImage } });
+      setProfile({ ...profile, coverImage: null });
+      setSuccess('Coperta a fost ștearsă.');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      console.error('Eroare la ștergerea copertei:', err);
+      setError('Eroare la ștergerea copertei');
+    } finally {
+      setCoverUploading(false);
+    }
   };
 
   const handleAvatarChange = async (e) => {
@@ -191,28 +232,6 @@ export default function ProfilePage() {
       setError('Eroare la încărcarea imaginii');
     } finally {
       setAvatarUploading(false);
-    }
-  };
-
-  const handleCoverChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setCoverUploading(true);
-    setError('');
-    try {
-      const formData = new FormData();
-      formData.append('cover', file);
-      const res = await apiClient.post('/api/users/cover', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setProfile({ ...profile, coverImage: res.data.coverImage });
-      setSuccess('Coperta a fost actualizată cu succes!');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError('Eroare la încărcarea imaginii de copertă');
-    } finally {
-      setCoverUploading(false);
     }
   };
 
@@ -257,101 +276,83 @@ export default function ProfilePage() {
         </Fade>
       )}
 
-      {/* Full-width Cover (banner) section */}
-      <div
-        className={`profile-cover-bleed`}
-      >
-        <div
-          className={`profile-cover ${profile?.coverImage ? 'has-image' : ''}`}
-          style={{
-            backgroundImage: profile?.coverImage ? `url(${profile.coverImage})` : 'none'
-          }}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            className="profile-hidden-input"
-            ref={coverInputRef}
-            onChange={handleCoverChange}
-          />
-          <button
-            className="profile-cover-upload-btn"
-            onClick={handleCoverClick}
-            disabled={coverUploading}
-            aria-label="Încarcă copertă"
-            title="Încarcă copertă"
-          >
-            {coverUploading ? (
-              <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
-            ) : (
-              <>
-                <PhotoCameraIcon className="profile-icon" />
-                {profile?.coverImage ? 'Schimbă coperta' : 'Adaugă poză de copertă'}
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Identity row overlapping cover */}
-      <div className="profile-identity">
-        <div className="profile-avatar-container profile-avatar-overlap">
-          <input
-            type="file"
-            accept="image/*"
-            className="profile-hidden-input"
-            ref={fileInputRef}
-            onChange={handleAvatarChange}
-          />
+      <div className="profile-two-column-layout">
+        {/* Left column: profile content */}
+        <div className="profile-left-column">
+      
+  {/* unified profile header container */}
+      <div className="profile-header-unified">
+        {/* Cover image */}
+        <div className="profile-cover-container">
           <div
-            className={`profile-avatar-main ${avatarUploading ? 'uploading' : ''}`}
-            onClick={handleAvatarClick}
+            className={`profile-cover ${profile?.coverImage ? 'has-image' : ''}`}
+            style={{
+              backgroundImage: profile?.coverImage ? `url(${profile.coverImage})` : 'none'
+            }}
           >
-            {profile?.avatar ? (
-              <img
-                src={profile.avatar}
-                alt="Avatar"
-                className="profile-avatar-image"
-              />
-            ) : (
-              <PersonIcon className="profile-person-icon" />
-            )}
+            <button
+              className="profile-cover-upload-btn"
+              onClick={handleCoverClick}
+              disabled={coverUploading}
+              aria-label="Editează copertă"
+              title="Editează copertă"
+            >
+              {coverUploading ? (
+                <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
+              ) : (
+                <>
+                  <EditIcon className="profile-icon" />
+                  Editează
+                </>
+              )}
+            </button>
           </div>
-          <button
-            className="profile-camera-button"
-            onClick={handleAvatarClick}
-            disabled={avatarUploading}
-          >
-            {avatarUploading ? (
-              <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
-            ) : (
-              <PhotoCameraIcon className="profile-camera-icon" />
-            )}
-          </button>
         </div>
-        <div className="profile-identity-info">
-          <h1 className="profile-name-title">
-            {(profile?.firstName || '') + (profile?.lastName ? (' ' + profile.lastName) : '') || 'Profil utilizator'}
-          </h1>
-          <div className="profile-identity-details">
-            {profile?.localitate && (
-              <span className="pid-item">
-                <LocationOnIcon />
-                {profile.localitate}
-              </span>
-            )}
-            {profile?.email && (
-              <span className="pid-item">
-                <EmailIcon />
-                {profile.email}
-              </span>
-            )}
-            {profile?.createdAt && (
-              <span className="pid-item">
-                <CalendarMonthIcon />
-                Membru din {new Date(profile.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long' })}
-              </span>
-            )}
+
+        {/* White card below cover with avatar and name */}
+        <div className="profile-info-card">
+          {/* Avatar overlapping cover */}
+          <div className="profile-avatar-container-unified">
+            <input
+              type="file"
+              accept="image/*"
+              className="profile-hidden-input"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+            />
+            <div
+              className={`profile-avatar-unified ${avatarUploading ? 'uploading' : ''}`}
+              onClick={handleAvatarClick}
+            >
+              {profile?.avatar ? (
+                <img
+                  src={profile.avatar}
+                  alt="Avatar"
+                  className="profile-avatar-image"
+                />
+              ) : (
+                <PersonIcon className="profile-person-icon" />
+              )}
+            </div>
+            <button
+              className="profile-camera-button-unified"
+              onClick={handleAvatarClick}
+              disabled={avatarUploading}
+            >
+              {avatarUploading ? (
+                <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
+              ) : (
+                <PhotoCameraIcon className="profile-camera-icon" />
+              )}
+            </button>
+          </div>
+
+          {/* Name and info section */}
+          <div className="profile-name-section">
+            <h1 className="profile-name-title-unified">
+              {(profile?.firstName || '') + (profile?.lastName ? (' ' + profile.lastName) : '') || 'Profil utilizator'}
+            </h1>
+            {/* Location removed per request - location is shown in the separate Location Card below */}
           </div>
         </div>
       </div>
@@ -503,110 +504,6 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Secțiunea Anunțurile mele */}
-          <>
-            <hr className="profile-divider" />
-            <div style={{ marginTop: '24px' }}>
-              <h3 className="profile-section-title">
-                Anunțurile mele ({userAnnouncements.length})
-              </h3>
-              {announcementsLoading ? (
-                <Box className="profile-announcements-loading">
-                  <CircularProgress size={20} />
-                  <span className="profile-loading-inline-text">Se încarcă...</span>
-                </Box>
-              ) : userAnnouncements.length === 0 ? (
-                <Box className="profile-empty-state">
-                  Nu ai încă anunțuri.
-                </Box>
-              ) : (
-                <Box className="profile-announcements-container">
-                  {userAnnouncements.length > 3 && (
-                    <IconButton 
-                      onClick={() => handleScroll('left')}
-                      sx={{
-                        position: 'absolute',
-                        left: { xs: '0', sm: '-25px' },
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        zIndex: 1,
-                        backgroundColor: getPrimaryColor(),
-                        color: 'white',
-                        width: '40px',
-                        height: '40px',
-                        display: { xs: 'none', sm: 'inline-flex' },
-                        '&:hover': {
-                          backgroundColor: '#2a4a65'
-                        }
-                      }}
-                    >
-                      <ChevronLeft />
-                    </IconButton>
-                  )}
-
-                  <Box ref={carouselRef} className="profile-carousel">
-                    {userAnnouncements.map((announcement, index) => (
-                      <Box 
-                        key={announcement._id}
-                        onClick={() => handleAnnouncementClick(announcement._id)}
-                        className="profile-card-wrapper"
-                      >
-                        <Box className="announcement-card">
-                          {announcement.images && announcement.images.length > 0 ? (
-                            <img src={announcement.images[0]} alt={announcement.title} className="announcement-image" />
-                          ) : (
-                            <Box className="announcement-image-placeholder">
-                              Fără imagine
-                            </Box>
-                          )}
-                          
-                          <Box className="announcement-card-body">
-                            <h4 className="announcement-title">
-                              {announcement.title}
-                            </h4>
-                            
-                            {announcement.price && (
-                              <p className="announcement-price">
-                                {announcement.price} lei
-                              </p>
-                            )}
-                            
-                            <p className="announcement-location">
-                              {announcement.localitate}
-                            </p>
-                          </Box>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  {userAnnouncements.length > 3 && (
-                    <IconButton
-                      onClick={() => handleScroll('right')}
-                      sx={{
-                        position: 'absolute',
-                        right: { xs: '0', sm: '-25px' },
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        zIndex: 1,
-                        backgroundColor: getPrimaryColor(),
-                        color: 'white',
-                        width: '40px',
-                        height: '40px',
-                        display: { xs: 'none', sm: 'inline-flex' },
-                        '&:hover': {
-                          backgroundColor: '#2a4a65'
-                        }
-                      }}
-                    >
-                      <ChevronRight />
-                    </IconButton>
-                  )}
-                </Box>
-              )}
-            </div>
-          </>
-
           {editMode && (
             <>
               <hr className="profile-actions-divider" />
@@ -641,6 +538,72 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      </div> {/* end profile-left-column */}
+
+      {/* Right column: vertical announcements list */}
+      <div className="profile-right-column">
+        <div className="profile-announcements-sidebar">
+          <h3 className="profile-section-title">
+            Anunțurile mele ({userAnnouncements.length})
+          </h3>
+          {announcementsLoading ? (
+            <Box className="profile-announcements-loading">
+              <CircularProgress size={20} />
+              <span className="profile-loading-inline-text">Se încarcă...</span>
+            </Box>
+          ) : userAnnouncements.length === 0 ? (
+            <Box className="profile-empty-state">
+              Nu ai încă anunțuri.
+            </Box>
+          ) : (
+            <div className="profile-announcements-vertical">
+              {userAnnouncements.map((announcement) => (
+                <div
+                  key={announcement._id}
+                  onClick={() => handleAnnouncementClick(announcement._id)}
+                  className="announcement-card-vertical"
+                >
+                  {announcement.images && announcement.images.length > 0 ? (
+                    <img src={announcement.images[0]} alt={announcement.title} className="announcement-image" />
+                  ) : (
+                    <div className="announcement-image-placeholder">
+                      Fără imagine
+                    </div>
+                  )}
+                  
+                  <div className="announcement-card-body">
+                    <h4 className="announcement-title">
+                      {announcement.title}
+                    </h4>
+                    
+                    {announcement.price && (
+                      <p className="announcement-price">
+                        {announcement.price} lei
+                      </p>
+                    )}
+                    
+                    <p className="announcement-location">
+                      {announcement.localitate}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div> {/* end profile-right-column */}
+      
+      </div> {/* end profile-two-column-layout */}
+
+      {/* Image Crop Modal */}
+      <ImageCropModal
+        open={cropModalOpen}
+        onClose={() => setCropModalOpen(false)}
+        currentImage={profile?.coverImage}
+        onSave={handleCoverSave}
+        onDelete={handleCoverDelete}
+        uploading={coverUploading}
+      />
     </div>
   );
 }

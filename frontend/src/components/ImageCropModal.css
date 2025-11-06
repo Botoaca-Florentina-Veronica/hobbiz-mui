@@ -1,0 +1,327 @@
+/* Image Crop Modal Styles */
+.image-crop-modal {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  max-width: 800px !important;
+}
+
+.image-crop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #333;
+}
+
+.image-crop-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+}
+
+.image-crop-close-btn {
+  color: #ffffff !important;
+}
+
+.image-crop-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.image-crop-content {
+  padding: 24px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #1a1a1a !important;
+}
+
+/* Image preview container */
+.image-crop-preview-container {
+  width: 100%;
+  height: 400px;
+  background-color: #0a0a0a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.image-crop-preview-full {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+}
+
+.image-crop-preview-full img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.1s ease-out;
+  pointer-events: none;
+}
+
+/* Darkened overlay areas outside the crop zone */
+.crop-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.crop-overlay-top {
+  top: 0;
+  height: calc(50% - 100px); /* Half minus half of crop zone height (200px zone = 100px each side) */
+}
+
+.crop-overlay-bottom {
+  bottom: 0;
+  height: calc(50% - 100px);
+}
+
+/* Highlighted crop zone bars */
+.crop-zone-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #ffffff;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.crop-zone-bar-top {
+  top: calc(50% - 100px); /* Center minus half crop zone height */
+}
+
+.crop-zone-bar-bottom {
+  top: calc(50% + 100px); /* Center plus half crop zone height */
+}
+
+.image-crop-placeholder {
+  color: #666;
+  text-align: center;
+}
+
+/* Toolbar */
+.image-crop-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+}
+
+.image-crop-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 0.75rem;
+}
+
+.image-crop-tool-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.image-crop-tool-btn.active {
+  color: #4fc3f7;
+  background-color: rgba(79, 195, 247, 0.1);
+}
+
+.image-crop-tool-btn svg {
+  font-size: 24px;
+}
+
+/* Rotation controls */
+.image-crop-rotation-controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.rotation-btn {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.rotation-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Controls */
+.image-crop-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px 0;
+}
+
+.image-crop-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-label {
+  color: #ffffff !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.slider-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.image-crop-slider {
+  flex: 1;
+  color: #4fc3f7 !important;
+}
+
+.image-crop-slider .MuiSlider-thumb {
+  background-color: #4fc3f7 !important;
+}
+
+.image-crop-slider .MuiSlider-track {
+  background-color: #4fc3f7 !important;
+}
+
+.image-crop-slider .MuiSlider-rail {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Action buttons */
+.image-crop-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #333;
+}
+
+.image-crop-actions-right {
+  display: flex;
+  gap: 12px;
+}
+
+.image-crop-delete-btn {
+  color: #f44336 !important;
+  border-color: #f44336 !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+}
+
+.image-crop-delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1) !important;
+  border-color: #f44336 !important;
+}
+
+.image-crop-delete-btn:disabled {
+  color: rgba(244, 67, 54, 0.3) !important;
+  border-color: rgba(244, 67, 54, 0.3) !important;
+}
+
+.image-crop-change-btn {
+  color: #4fc3f7 !important;
+  border-color: #4fc3f7 !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+}
+
+.image-crop-change-btn:hover {
+  background-color: rgba(79, 195, 247, 0.1) !important;
+  border-color: #4fc3f7 !important;
+}
+
+.image-crop-apply-btn {
+  background-color: #4fc3f7 !important;
+  color: #000000 !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  min-width: 100px !important;
+}
+
+.image-crop-apply-btn:hover {
+  background-color: #6dd5fa !important;
+}
+
+.image-crop-apply-btn:disabled {
+  background-color: rgba(79, 195, 247, 0.3) !important;
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .image-crop-modal {
+    margin: 16px !important;
+  }
+
+  .image-crop-preview-container {
+    height: 300px;
+  }
+
+  .image-crop-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .image-crop-tool-btn {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+  }
+
+  .image-crop-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .image-crop-actions-right {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .image-crop-delete-btn,
+  .image-crop-change-btn,
+  .image-crop-apply-btn {
+    width: 100%;
+  }
+}

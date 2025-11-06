@@ -21,15 +21,131 @@
   --pf-card-gap: 1.25rem;
   --pf-card-shadow: 0 3px 10px rgba(0,0,0,0.1);
 
+  /* Maximum width for left-side containers to reduce visual clutter on wide screens */
+  --pf-left-max-width: 850px;
+  /* Horizontal offset from the very left of the page for left-column content
+    — increases whitespace to the left so left column appears closer to center. */
+  --pf-left-offset: 5rem;
+  /* Horizontal offset from the right edge to pull the right column toward center */
+  --pf-right-offset: 1rem;
+
   /* Spacing */
   --pf-gap: 1.5rem;
 
   margin-top: 6rem;
   margin-bottom: 2rem;
-  max-width: 850px;
+  max-width: 1400px; /* increased for two columns */
   margin-left: auto;
   margin-right: auto;
   padding: 0 1rem;
+}
+
+/* Two-column layout for profile */
+.profile-two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px; /* left content, right sidebar */
+  gap: 2rem;
+  align-items: start;
+}
+
+.profile-left-column {
+  min-width: 0; /* prevent overflow */
+  /* Use padding on the column so every child shares the same left baseline */
+  padding-left: var(--pf-left-offset);
+}
+
+/* Constrain direct child containers inside the left column so the left side
+   doesn't become too wide on large viewports. Keeps layout centered and less
+   crowded without changing the grid structure. */
+.profile-left-column > * {
+  max-width: var(--pf-left-max-width);
+  width: 100%;
+  box-sizing: border-box;
+  /* children use the column padding as the left baseline; ensure no extra left margin */
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* Ensure the cover inside the left column is constrained to the same
+   max-width as the other left-column containers and centered visually. */
+.profile-left-column .profile-cover-bleed,
+.profile-left-column .profile-cover {
+  max-width: var(--pf-left-max-width);
+  width: 100%;
+  margin-left: 0; /* aligned via column padding */
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+.profile-right-column {
+  position: sticky;
+  /* create extra space on the page right so right-column content appears
+     visually closer to the center (announcements move left) */
+  padding-right: var(--pf-right-offset);
+  /* Align the sticky top with the visual top of the cover container.
+     cover top = header space (6rem) + cover margin-top (2rem) => 8rem */
+  top: calc(6rem + 2rem);
+  /* note: overflow/max-height moved to the inner announcements container so
+    the scrollbar will be visually offset with the announcements list */
+}
+
+.profile-announcements-sidebar {
+  background: var(--pf-card-bg);
+  border: 1px solid var(--pf-divider);
+  border-radius: var(--pf-card-radius);
+  box-shadow: var(--pf-card-shadow);
+  padding: 1.5rem;
+  /* Keep scrollbar with the sidebar and shift it left by adding a right margin
+     equal to the page offset. This makes the visible list + scrollbar sit
+     closer to the page center. */
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  margin-right: var(--pf-right-offset);
+  box-sizing: border-box;
+  /* Ensure scrollbar is contained inside rounded corners */
+  overflow: clip;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar styling for announcements sidebar to match rounded container */
+.profile-announcements-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-announcements-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0; /* small margin to prevent scrollbar touching top/bottom rounded corners */
+}
+
+.profile-announcements-sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--pf-primary);
+  border-radius: 4px;
+}
+
+.profile-announcements-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--pf-primary-hover);
+}
+
+.profile-announcements-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.announcement-card-vertical {
+  border-radius: var(--pf-card-radius);
+  overflow: hidden;
+  background-color: var(--pf-card-bg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border: 1px solid var(--pf-divider);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.announcement-card-vertical:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .profile-loading-container {
@@ -150,67 +266,175 @@
   border: 1px solid var(--pf-divider, #e0e0e0);
 }
 
-/* === Cover (banner) full-bleed section === */
-.profile-cover-bleed {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  /* pull it up so it sits right under the app header (container has margin-top) */
-  margin-top: -6rem;
+/* === Unified profile header === */
+.profile-header-unified {
+  background: var(--pf-card-bg);
+  border-radius: var(--pf-card-radius);
+  box-shadow: var(--pf-card-shadow);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--pf-divider);
+}
+
+.profile-cover-container {
+  position: relative;
+  width: 100%;
 }
 
 .profile-cover {
   position: relative;
-  height: clamp(160px, 32vw, 260px);
-  background-color: #eef1f5; /* default empty state, no mountains */
+  width: 100%;
+  height: clamp(140px, 28vw, 200px);
+  background-color: #eef1f5;
   background-size: cover;
   background-position: center;
+  overflow: hidden;
 }
 
 .profile-cover-upload-btn {
   position: absolute;
   bottom: 12px;
   right: 16px;
-  background-color: var(--pf-primary);
+  background: linear-gradient(180deg, var(--pf-primary) 0%, rgba(53,80,112,0.92) 100%);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 9999px;
+  padding: 10px 16px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 24px rgba(53,80,112,0.18), inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
-.profile-cover-upload-btn:hover { background-color: var(--pf-primary-hover); }
-
-/* Identity row overlapping the cover */
-.profile-identity {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: end;
-  gap: 16px;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 16px;
-  /* Lift up to overlap the cover bottom */
-  margin-top: -52px;
-  margin-bottom: 16px;
+.profile-cover-upload-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(53,80,112,0.22), inset 0 1px 0 rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, var(--pf-primary-hover) 0%, rgba(30,58,78,0.92) 100%);
 }
 
-.profile-avatar-overlap .profile-avatar-main {
-  width: 128px;
-  height: 128px;
-  border: 4px solid #ffffff; /* white ring over cover */
-  background-color: #ffffff;
+/* Make buttons on the profile page more rounded for a softer look */
+.profile-page-container button,
+.profile-page-container .MuiButton-root,
+.profile-page-container .image-crop-delete-btn,
+.profile-page-container .image-crop-change-btn,
+.profile-page-container .image-crop-apply-btn,
+.profile-page-container .profile-cover-upload-btn {
+  border-radius: 20px !important;
 }
 
-.profile-identity-info { padding-bottom: 8px; }
-.profile-name-title { font-size: clamp(1.6rem, 3.6vw, 2.2rem); color: var(--pf-text); margin: 0 0 6px 0; }
-.profile-identity-details { display: flex; flex-wrap: wrap; gap: 12px; color: var(--pf-text-muted); }
-.pid-item { display: inline-flex; gap: 6px; align-items: center; font-size: 0.95rem; }
+/* Keep icon buttons circular */
+.profile-page-container .MuiIconButton-root {
+  border-radius: 50% !important;
+}
 
+/* Larger pill for primary actions if desired (override individual classes) */
+.profile-page-container .MuiButton-containedPrimary {
+  border-radius: 9999px !important;
+}
+
+/* Info card with overlapping avatar */
+.profile-info-card {
+  position: relative;
+  background: var(--pf-card-bg);
+  /* Reduced top padding so name sits closer under the cover image */
+  padding: 48px 24px 24px 24px; /* top padding for overlapping avatar */
+}
+
+.profile-avatar-container-unified {
+  position: absolute;
+  top: -70px; /* overlap the cover (slightly reduced to match the tighter padding) */
+  left: 24px;
+  z-index: 10;
+}
+
+
+.profile-avatar-unified {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 5px solid var(--pf-card-bg);
+  background: var(--pf-divider);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.profile-avatar-unified img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-unified .MuiSvgIcon-root {
+  font-size: 60px;
+  color: #999;
+}
+
+
+.profile-camera-button-unified {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--pf-card-bg);
+  border: 1px solid var(--pf-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+}
+
+.profile-camera-button-unified:hover {
+  background: var(--pf-hover);
+  transform: scale(1.05);
+}
+
+.profile-camera-button-unified .MuiSvgIcon-root {
+  font-size: 20px;
+  color: var(--pf-primary);
+}
+
+.profile-name-section {
+  margin-left: 190px; /* push the name to the right of the overlapping avatar on desktop */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* align name near the top of the info card */
+  margin-top: 8px; /* small margin so the name sits just under the cover */
+}
+
+
+.profile-name-title-unified {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--pf-text);
+  margin-top: -1rem;
+  line-height: 1.3;
+}
+
+.profile-location-text {
+  font-size: 0.9rem;
+  color: var(--pf-text-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-cover-upload-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(53,80,112,0.12), 0 8px 24px rgba(53,80,112,0.18);
+}
+
+/* === Avatar section (legacy, kept for edit mode) === */
 .profile-header-grid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -543,17 +767,81 @@
 }
 
 @media (max-width: 768px) {
-  .profile-cover-bleed { margin-top: 0; }
-  .profile-identity {
-    grid-template-columns: 1fr;
-    align-items: center;
-    text-align: center;
-    margin-top: -40px;
+  .profile-two-column-layout {
+    grid-template-columns: 1fr; /* single column on mobile */
+    gap: 1rem;
   }
-  .profile-identity-info { padding-bottom: 0; }
-  .pid-item { justify-content: center; }
+  
+  .profile-right-column {
+    position: static; /* no sticky on mobile */
+    max-height: none;
+    overflow-y: visible;
+  }
+  
+  /* Unified header mobile adjustments */
+  .profile-info-card {
+    padding: 60px 16px 20px 16px; /* reduced top padding for smaller avatar */
+  }
+  
+  .profile-avatar-container-unified {
+    top: -60px; /* less overlap on mobile */
+    left: 50%;
+    transform: translateX(-50%); /* center the avatar */
+  }
+  
+  .profile-avatar-unified {
+    width: 120px; /* smaller avatar on mobile */
+    height: 120px;
+  }
+  
+  .profile-camera-button-unified {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .profile-camera-button-unified .MuiSvgIcon-root {
+    font-size: 18px;
+  }
+  
+  .profile-name-section {
+    text-align: center; /* center name on mobile */
+  }
+  
+  .profile-name-title-unified {
+    font-size: 1.3rem; /* slightly smaller on mobile */
+  }
+  
+  .profile-location-text {
+    justify-content: center; /* center location on mobile */
+  }
+
+  /* Reset desktop left margin on mobile so name sits under avatar when centered */
+  .profile-name-section {
+    margin-left: 0;
+  }
+  
   .profile-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Remove left-column width constraint on mobile so content uses full width */
+  .profile-left-column > * {
+    max-width: none;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  /* On mobile remove the column padding so content continues to be full-bleed */
+  .profile-left-column { padding-left: 0; }
+
+  /* Reset right-column offset on mobile so the sidebar uses full available width */
+  .profile-right-column { padding-right: 0; }
+
+  /* Reset announcements scroller on mobile so it behaves full-width and no fixed max-height */
+  .profile-announcements-sidebar {
+    max-height: none;
+    overflow-y: visible;
+    margin-right: 0;
   }
   
   .profile-header-grid {
@@ -701,11 +989,63 @@ body.dark-mode .profile-page-container .profile-info-main-card {
   background: #282828;
   border: 1px solid #3f3f3f;
 }
-/* Dark mode cover */
+
+/* Dark mode cover & unified header */
 body.dark-mode .profile-cover { background-color: #2e2e2e; }
-body.dark-mode .profile-cover-upload-btn { background-color: #f51866; }
-body.dark-mode .profile-cover-upload-btn:hover { background-color: #fe6585; }
+body.dark-mode .profile-cover-upload-btn { background: linear-gradient(180deg, var(--pf-primary) 0%, var(--pf-primary-hover) 100%); }
+body.dark-mode .profile-cover-upload-btn:hover { background: linear-gradient(180deg, var(--pf-primary-hover) 0%, var(--pf-primary) 100%); }
 body.dark-mode .profile-avatar-overlap .profile-avatar-main { border-color: #282828; background-color: #282828; }
+
+/* Unified header dark mode */
+body.dark-mode .profile-header-unified {
+  background: #282828;
+  border-color: #3f3f3f;
+}
+
+body.dark-mode .profile-info-card {
+  background: #282828;
+}
+
+body.dark-mode .profile-avatar-unified {
+  border-color: #282828;
+  background: #3f3f3f;
+}
+
+body.dark-mode .profile-camera-button-unified {
+  background: #282828;
+  border-color: #3f3f3f;
+}
+
+body.dark-mode .profile-name-title-unified {
+  color: #e4e4e4;
+}
+
+body.dark-mode .profile-location-text {
+  color: #a0a0a0;
+}
+
+/* Force contact/info card icons to the requested accent color in dark mode */
+body.dark-mode .profile-page-container .profile-info-main-card .profile-icon,
+body.dark-mode .profile-page-container .profile-info-main-card .profile-camera-icon,
+body.dark-mode .profile-page-container .profile-info-main-card .profile-person-icon,
+body.dark-mode .profile-page-container .profile-info-main-card .MuiSvgIcon-root {
+  color: #f51866 !important;
+}
+
+/* Dark mode announcements sidebar */
+body.dark-mode .profile-announcements-sidebar {
+  background: #282828;
+  border-color: #3f3f3f;
+}
+
+body.dark-mode .announcement-card-vertical {
+  background: #282828;
+  border-color: #3f3f3f;
+}
+
+body.dark-mode .announcement-card-vertical:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
 body.dark-mode .profile-page-container .profile-location-card {
   background: transparent;
   border: none;
