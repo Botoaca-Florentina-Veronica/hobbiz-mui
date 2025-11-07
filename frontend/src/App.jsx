@@ -40,6 +40,7 @@ import './components/Content.css';
 import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
 import CookieConsent from './components/CookieConsent';
 import ClickSpark from './components/ClickSpark';
+import LoadingOverlay from './components/LoadingOverlay';
 
 function App() {
   // Automatically scroll to top on route changes
@@ -255,6 +256,7 @@ function App() {
       sparkCount={8}
       duration={400}
     >
+      <LoadingOverlay />
       {appView}
     </ClickSpark>
   );

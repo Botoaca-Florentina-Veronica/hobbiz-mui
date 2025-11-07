@@ -1,119 +1,145 @@
-/*
-  MyAnnouncements.css
-  Structure overview:
-  1) Layout containers and lists
-  2) Search header (compact) + chips
-  3) Card, image, info, meta, actions, buttons
-  4) Favorite (grid/list) view helpers
-  5) Dark mode variants (mirrors sections 1-4)
-  6) Mobile header helpers (page title/back)
-  7) Responsive overrides (grouped by breakpoints)
-*/
+/* ============================================
+   MY ANNOUNCEMENTS PAGE STYLES
+   ============================================
+   
+   Structură:
+   1. CSS Variables & Base Container
+   2. Page Header & Title
+   3. Search & Filter Section
+   4. Announcement Cards (Desktop)
+   5. Announcement Card Components
+   6. Card Actions & Buttons
+   7. Grid & List View Variants
+   8. Mobile Responsiveness
+   9. Dark Mode
+   ============================================ */
 
-/* 1) Layout containers and lists */
-/* Lista cardurilor pe verticală */
-.my-announcements-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  justify-content: flex-start;
-  align-items: stretch;
-  width: 100%;
-  /* Remove max-width to match search bar width exactly */
-  margin: 0 0 32px 0; /* Remove auto centering */
-  padding: 0; /* Remove padding to align with search bar */
-}
-
-@media (max-width: 900px) {
-  .my-announcements-list {
-    gap: 12px; /* reduced from 16px */
-    padding: 0; /* Remove padding to align with search bar */
-  }
-}
-
-@media (max-width: 600px) {
-  .my-announcements-list {
-    gap: 8px; /* further reduced for mobile */
-  }
-}
-
-@media (max-width: 400px) {
-  .my-announcements-list {
-    gap: 6px; /* ultra compact for very small screens */
-  }
-}
-
-/* Ensure single-column layout at all widths: always one announcement per row.
-   This overrides earlier two-column behavior between 500px and 1000px so the
-   page always shows exactly one .my-announcement-card per row. */
-@media (min-width: 500px) and (max-width: 1000px) {
-  .my-announcements-list {
-    /* keep it as a vertical list so each card takes the full row */
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* keep consistent spacing */
-    align-items: stretch;
-    width: 100%;
-  }
-
-  /* Ensure cards occupy the full row and size naturally */
-  .my-announcement-card {
-    width: 100%;
-    height: auto;
-  }
-}
-/* Permite mai multe carduri pe un rând */
+/* ============================================
+   1. CSS VARIABLES & BASE CONTAINER
+   ============================================ */
 .my-announcements-container {
+  /* === Color Palette === */
+  --ma-primary: #355070;
+  --ma-primary-hover: #2d4358;
+  --ma-accent: #F8B195;
+  --ma-danger: #dc3545;
+  --ma-secondary: #6c757d;
+  --ma-text: #2c3e50;
+  --ma-text-muted: #6c757d;
+  --ma-bg: var(--app-bg);
+  
+  /* === Card Styling === */
+  --ma-card-radius: 16px;
+  --ma-card-bg: #fff;
+  --ma-card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --ma-card-border: rgba(53, 80, 112, 0.1);
+  
+  /* === Container Properties === */
   max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px;
-  /* Use padding for top spacing to avoid margin-collapsing showing a different bg */
+  margin: 0 auto 16rem auto;
+  padding: 24px 80px;
   padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
-  margin-top: 0;
-  margin-bottom: 16rem;
-  /* Add same padding as categories page for consistency */
-  padding-left: 80px !important;
-  padding-right: 80px !important;
-  background: var(--app-bg);
+  background: var(--ma-bg);
 }
 
 @media (max-width: 900px) {
   .my-announcements-container {
-    padding: 12px;
-    /* Keep spacing via padding to maintain consistent background color */
+    padding: 12px 40px;
     padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
-    margin-top: 0;
     margin-bottom: 8rem;
-    /* Responsive padding for tablets */
-    padding-left: 40px !important;
-    padding-right: 40px !important;
   }
 }
 
 @media (max-width: 480px) {
   .my-announcements-container {
-    /* Normal padding on mobile */
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 
 @media (max-width: 360px) {
   .my-announcements-container {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
+
+/* ============================================
+   2. PAGE HEADER & TITLE
+   ============================================ */
+
+
+/* ============================================
+   2. PAGE HEADER & TITLE
+   ============================================ */
 
 .my-announcements-title {
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 24px;
-  color: #355070;
+  color: var(--ma-primary);
 }
 
-/* 2) Search header + chips (compact) */
-/* Stiluri pentru header-ul de căutare și filtrare - versiunea compactă */
+@media (max-width: 480px) {
+  .my-announcements-title {
+    margin-bottom: 16px;
+  }
+}
+
+/* Mobile header (shown < 900px) */
+@media (max-width: 899.98px) {
+  .mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    color: var(--chat-text) !important;
+  }
+
+  .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--chat-elev) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  }
+
+  .mobile-back-btn:hover {
+    background-color: var(--chat-surface) !important;
+  }
+
+  .mobile-header .MuiSvgIcon-root {
+    font-size: 24px !important;
+    color: var(--chat-text) !important;
+  }
+
+  .mobile-header-title {
+    font-weight: 600 !important;
+    color: var(--chat-text) !important;
+    font-size: 24px !important;
+    line-height: 1.334 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    margin-left: 4px !important;
+  }
+
+  .my-announcements-title {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   3. SEARCH & FILTER SECTION
+   ============================================ */
+
 .my-announcements-search-header {
   background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
   padding: 12px;
@@ -132,9 +158,10 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #355070 0%, #F8B195 100%);
+  background: linear-gradient(90deg, var(--ma-primary) 0%, var(--ma-accent) 100%);
 }
 
+/* TextField & Input styling */
 .my-announcements-search-header .MuiTextField-root {
   background: #fff;
   border-radius: 6px;
@@ -153,17 +180,14 @@
   box-shadow: 0 2px 8px rgba(53, 80, 112, 0.12);
 }
 
+/* Select styling */
 .my-announcements-search-header .MuiFormControl-root {
   background: #fff;
   border-radius: 6px;
 }
 
-/* Evită suprapunerea iconiței (săgeata) peste text în Select pe mobile:
-   - rezervăm spațiu suplimentar în partea dreaptă
-   - micșorăm fontul pe ecrane foarte înguste
-   - împiedicăm comprimarea svg-ului */
 .my-announcements-search-header .MuiFormControl-root .MuiSelect-select {
-  padding-right: 40px !important; /* mai mult spațiu pentru icon */
+  padding-right: 40px !important;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -172,24 +196,6 @@
 
 .my-announcements-search-header .MuiFormControl-root .MuiSelect-select .MuiSvgIcon-root {
   flex-shrink: 0;
-}
-
-/* Ajustări pe lățimi foarte mici */
-@media (max-width: 420px) {
-  .my-announcements-search-header .MuiFormControl-root .MuiSelect-select {
-    font-size: 0.82rem !important;
-    padding-right: 46px !important; /* și mai mult spațiu pe device-uri înguste */
-  }
-}
-
-@media (max-width: 360px) {
-  .my-announcements-search-header .MuiFormControl-root .MuiSelect-select {
-    font-size: 0.78rem !important;
-    line-height: 1.1;
-  }
-  .my-announcements-search-header .MuiFormControl-root .MuiSelect-icon {
-    right: 6px; /* adu iconul puțin mai aproape, dar rămâne liber de text */
-  }
 }
 
 .my-announcements-search-header .MuiSelect-root {
@@ -201,7 +207,7 @@
   box-shadow: 0 1px 4px rgba(53, 80, 112, 0.08);
 }
 
-/* Stiluri pentru Chip-urile de filtre active - versiunea compactă */
+/* Filter chips */
 .my-announcements-search-header .MuiChip-root {
   transition: all 0.2s ease;
   border-radius: 6px;
@@ -214,56 +220,58 @@
 }
 
 .my-announcements-search-header .MuiChip-colorPrimary {
-  background: linear-gradient(135deg, #355070 0%, #4a6b8a 100%);
+  background: linear-gradient(135deg, var(--ma-primary) 0%, #4a6b8a 100%);
   color: white;
   border: none;
 }
 
 .my-announcements-search-header .MuiChip-colorSecondary {
-  background: linear-gradient(135deg, #F8B195 0%, #fcc2a6 100%);
-  color: #355070;
+  background: linear-gradient(135deg, var(--ma-accent) 0%, #fcc2a6 100%);
+  color: var(--ma-primary);
   border: none;
 }
 
-/* Responsive design pentru versiunea compactă */
+/* Responsive adjustments for search header */
 @media (max-width: 900px) {
   .my-announcements-search-header {
     padding: 8px;
     border-radius: 8px;
     margin-bottom: 12px;
   }
-  /* Make filter row stack compactly */
+
   .my-announcements-search-header .search-filters-wrap {
     flex-direction: column !important;
     gap: 8px !important;
     align-items: stretch !important;
   }
-  /* Two-column compact selects */
+
   .my-announcements-search-header .search-filters-left {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     gap: 8px !important;
     width: 100% !important;
   }
+
   .my-announcements-search-header .search-filters-left .MuiFormControl-root {
     min-width: 0 !important;
     width: 100% !important;
   }
+
   .my-announcements-search-header .search-results-count {
     align-self: flex-end !important;
   }
-  
+
   .my-announcements-search-header .MuiTextField-root,
   .my-announcements-search-header .MuiFormControl-root {
     min-width: 100% !important;
     flex: none !important;
   }
-  
+
   .my-announcements-search-header .MuiStack-root {
     flex-wrap: wrap !important;
     justify-content: center !important;
   }
-  
+
   .my-announcements-search-header .MuiChip-root {
     font-size: 0.7rem !important;
     height: 26px !important;
@@ -271,31 +279,98 @@
 }
 
 @media (max-width: 480px) {
-  /* Reduce input vertical size visually */
   .my-announcements-search-header .MuiOutlinedInput-input {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
   }
-  .my-announcements-title {
-    margin-bottom: 16px;
+}
+
+@media (max-width: 420px) {
+  .my-announcements-search-header .MuiFormControl-root .MuiSelect-select {
+    font-size: 0.82rem !important;
+    padding-right: 46px !important;
   }
 }
 
-/* Carduri îmbunătățite pentru desktop */
+@media (max-width: 360px) {
+  .my-announcements-search-header .MuiFormControl-root .MuiSelect-select {
+    font-size: 0.78rem !important;
+    line-height: 1.1;
+  }
+
+  .my-announcements-search-header .MuiFormControl-root .MuiSelect-icon {
+    right: 6px;
+  }
+}
+
+/* ============================================
+   4. ANNOUNCEMENT CARDS LIST (DESKTOP)
+   ============================================ */
+
+.my-announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 100%;
+  margin: 0 0 32px 0;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .my-announcements-list {
+    gap: 12px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .my-announcements-list {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .my-announcements-list {
+    gap: 6px;
+  }
+}
+
+@media (min-width: 500px) and (max-width: 1000px) {
+  .my-announcements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .my-announcement-card {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* ============================================
+   5. ANNOUNCEMENT CARD COMPONENTS
+   ============================================ */
+
+/* Card container */
 .my-announcement-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  background: var(--ma-card-bg);
+  border-radius: var(--ma-card-radius);
+  box-shadow: var(--ma-card-shadow);
   display: flex;
   flex-direction: row;
   padding: 0;
   overflow: hidden;
   position: relative;
   width: 100%;
-  min-height: 200px; /* allow to grow with content in grid */
+  min-height: 200px;
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 1px solid rgba(53, 80, 112, 0.1);
+  border: 1px solid var(--ma-card-border);
 }
 
 .my-announcement-card:hover {
@@ -304,69 +379,7 @@
   border-color: rgba(53, 80, 112, 0.2);
 }
 
-@media (max-width: 768px) {
-  .my-announcement-card {
-    flex-direction: column;
-    height: auto; /* allow full content */
-    border-radius: 10px;
-  }
-  
-  .my-announcement-image {
-    width: 100%;
-    min-width: 100%;
-    height: 140px; /* reduced from 200px to 140px */
-  }
-  
-  .my-announcement-info {
-    padding: 12px 12px 50px 12px; /* reduced padding and bottom space */
-    height: auto;
-    min-height: unset;
-  }
-  
-  .my-announcement-title {
-    font-size: 16px; /* reduced from 18px */
-    max-width: 100%;
-    line-height: 1.3;
-    margin-bottom: 6px;
-  }
-  
-  .my-announcement-category {
-    margin: 2px 0; /* reduced from 4px */
-    font-size: 13px;
-    padding: 2px 8px; /* reduced padding */
-  }
-  
-  .my-announcement-location {
-    margin: 2px 0; /* reduced from 4px */
-    font-size: 13px;
-  }
-  
-  .my-announcement-actions {
-    gap: 4px; /* reduced from 6px */
-    margin-top: 6px; /* reduced from 10px */
-    flex-wrap: wrap;
-  }
-  
-  .my-announcement-btn {
-    padding: 4px 8px; /* more compact */
-    font-size: 10px; /* smaller text */
-    border-radius: 12px; /* smaller radius */
-  }
-}
-
-.favorite-heart {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  z-index: 2;
-}
-.favorite-heart:hover {
-  transform: scale(1.2);
-}
-
-/* Imagine îmbunătățită în stânga */
+/* Card image section */
 .my-announcement-image {
   width: 200px;
   min-width: 200px;
@@ -394,24 +407,7 @@
   transform: scale(1.05);
 }
 
-@media (max-width: 768px) {
-  .my-announcement-image {
-    width: 100%;
-    min-width: 100%;
-    height: 200px;
-  }
-}
-
-@media (max-width: 700px) {
-  .my-announcement-img {
-    width: 100%;
-    height: 160px;
-    margin: 0 auto;
-    display: block;
-    border-radius: 8px 8px 0 0;
-  }
-}
-
+/* Card info section */
 .my-announcement-info {
   flex: 1;
   padding: 20px 24px;
@@ -424,12 +420,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
-  .my-announcement-info {
-    padding: 20px;
-  }
-}
-
+/* Card header */
 .my-announcement-header {
   display: flex;
   align-items: flex-start;
@@ -437,11 +428,12 @@
   margin-bottom: 8px;
 }
 
+/* Card title */
 .my-announcement-title {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--ma-text);
   line-height: 1.4;
   max-width: 75%;
   display: -webkit-box;
@@ -451,8 +443,9 @@
   overflow: hidden;
 }
 
+/* Category badge */
 .my-announcement-category {
-  color: #355070;
+  color: var(--ma-primary);
   font-weight: 600;
   font-size: 14px;
   margin: 4px 0;
@@ -465,18 +458,20 @@
   width: fit-content;
 }
 
+/* Location */
 .my-announcement-location {
   display: flex;
   align-items: center;
-  color: #6c757d;
+  color: var(--ma-text-muted);
   font-weight: 500;
   font-size: 14px;
   margin: 4px 0;
   gap: 6px;
 }
 
+/* Description */
 .my-announcement-description {
-  color: #6c757d;
+  color: var(--ma-text-muted);
   font-size: 14px;
   margin: 6px 0;
   line-height: 1.5;
@@ -488,6 +483,7 @@
   -webkit-box-orient: vertical;
 }
 
+/* Price */
 .my-announcement-price {
   font-weight: 800;
   font-size: 22px;
@@ -496,11 +492,11 @@
   text-shadow: 0 1px 2px rgba(245, 24, 102, 0.1);
 }
 
+/* Announcement ID */
 .my-announcement-id {
   font-size: 12px;
   color: #adb5bd;
   position: absolute;
-  /* Ensure the ID sits top-right of the card by default */
   top: 12px !important;
   right: 16px !important;
   background: rgba(173, 181, 189, 0.1);
@@ -509,88 +505,106 @@
   z-index: 1;
 }
 
+/* Favorite heart icon */
+.favorite-heart {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+
+.favorite-heart:hover {
+  transform: scale(1.2);
+}
+
+/* ============================================
+   6. CARD ACTIONS & BUTTONS
+   ============================================ */
+
 .my-announcement-actions {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px; /* reduced gap for compactness */
+  gap: 8px;
   margin-top: 8px;
   flex-wrap: wrap;
 }
 
 .my-announcement-btn {
-  border: 2px solid #355070;
+  border: 2px solid var(--ma-primary);
   background: #fff;
-  color: #355070;
-  padding: 6px 12px; /* smaller padding for compact buttons */
+  color: var(--ma-primary);
+  padding: 6px 12px;
   font-weight: 600;
-  font-size: 12px; /* smaller font */
+  font-size: 12px;
   cursor: pointer;
-  border-radius: 18px; /* smaller border radius */
+  border-radius: 18px;
   transition: all 0.3s ease;
   text-decoration: none;
   display: inline-block;
   text-align: center;
   position: relative;
   overflow: hidden;
-  line-height: 1.2; /* tighter line height */
+  line-height: 1.2;
 }
 
 .my-announcement-btn:hover {
-  background: #355070;
+  background: var(--ma-primary);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(53, 80, 112, 0.3);
 }
 
 .my-announcement-btn.primary {
-  border-color: #355070;
-  background: #355070;
+  border-color: var(--ma-primary);
+  background: var(--ma-primary);
   color: #fff;
 }
 
 .my-announcement-btn.primary:hover {
-  background: #2d4358;
-  border-color: #2d4358;
+  background: var(--ma-primary-hover);
+  border-color: var(--ma-primary-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(53, 80, 112, 0.4);
 }
 
 .my-announcement-btn.danger {
-  border: 2px solid #dc3545;
+  border: 2px solid var(--ma-danger);
   background: #fff;
-  color: #dc3545;
-  border-radius: 18px; /* match compact style */
-  padding: 6px 12px; /* compact padding */
+  color: var(--ma-danger);
+  border-radius: 18px;
+  padding: 6px 12px;
   font-weight: 600;
-  font-size: 12px; /* smaller font */
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   line-height: 1.2;
 }
 
 .my-announcement-btn.danger:hover {
-  background: #dc3545;
+  background: var(--ma-danger);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
 }
 
 .my-announcement-btn.secondary {
-  border: 2px solid #6c757d;
+  border: 2px solid var(--ma-secondary);
   background: #fff;
-  color: #6c757d;
-  border-radius: 18px; /* match compact style */
-  padding: 6px 12px; /* compact padding */
+  color: var(--ma-secondary);
+  border-radius: 18px;
+  padding: 6px 12px;
   font-weight: 600;
-  font-size: 12px; /* smaller font */
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   line-height: 1.2;
 }
 
 .my-announcement-btn.secondary:hover {
-  background: #6c757d;
+  background: var(--ma-secondary);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
@@ -606,851 +620,464 @@
   }
 }
 
-/* Grid and List view styles */
-.favorite-announcements-list.grid-view {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+/* ============================================
+   7. GRID & LIST VIEW VARIANTS
+   ============================================ */
+
+/* Grid view (default above 900px) */
+@media (min-width: 901px) {
+  .my-announcements-list.grid-view {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    justify-items: stretch;
+    align-items: start;
+  }
+
+  .my-announcements-list.grid-view .my-announcement-card {
+    flex-direction: column !important;
+    height: 100%;
+    min-height: 360px;
+  }
+
+  .my-announcements-list.grid-view .my-announcement-image {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 180px !important;
+  }
+
+  .my-announcements-list.grid-view .my-announcement-info {
+    height: auto !important;
+    min-height: 180px;
+  }
+
+  .my-announcements-list.grid-view .my-announcement-title {
+    max-width: 100% !important;
+  }
+}
+
+/* List view (horizontal cards) */
+.my-announcements-list.list-view {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  width: 100%;
-  padding: 0; /* Remove padding to align with search bar */
-  margin: 0; /* Remove margin to align with search bar */
 }
 
-.favorite-announcements-list.list-view {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-  padding: 0; /* Remove padding to align with search bar */
-  margin: 0; /* Remove margin to align with search bar */
-}
-
-.favorite-announcements-list.list-view .my-announcement-card {
-  width: 100%;
-  /* Remove max-width limitation to match search bar width exactly */
+.my-announcements-list.list-view .my-announcement-card {
   flex-direction: row;
-  min-height: 180px; /* Mărim puțin înălțimea */
-  padding: 0;
-  align-items: stretch;
-}
-
-.favorite-announcements-list.list-view .my-announcement-image {
-  min-width: 260px; /* Mărim imaginile */
-  max-width: 260px;
-  height: auto;
-  margin-right: 0;
-  background: #f7f7f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.favorite-announcements-list.list-view .my-announcement-img {
-  width: 240px; /* Mărim imaginea */
-  height: 160px; /* Mărim înălțimea */
-  object-fit: cover;
-  border-radius: 8px;
-  margin: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.favorite-announcements-list.list-view .my-announcement-info {
-  flex: 1;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.favorite-announcements-list.list-view .my-announcement-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.favorite-announcements-list.list-view .my-announcement-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #283951;
-  margin: 0 0 8px 0;
-  line-height: 1.3;
-}
-
-.favorite-announcements-list.list-view .my-announcement-category {
-  color: #355070;
-  font-weight: 600;
-  font-size: 16px;
-  margin: 4px 0;
-}
-
-.favorite-announcements-list.list-view .my-announcement-location {
-  color: #666;
-  font-weight: 500;
-  font-size: 15px;
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-}
-
-.favorite-announcements-list.list-view .my-announcement-price {
-  color: #f51866 !important;
-  font-weight: bold !important;
-  font-size: 1.2rem !important;
-  margin-top: 8px !important;
-}
-
-.favorite-announcements-list.list-view .my-announcement-id {
-  color: #888;
-  font-size: 13px;
-  text-align: right;
-  align-self: flex-start;
-}
-
-.favorite-announcements-list.grid-view .my-announcement-card {
-  width: 100%;
-  max-width: 100%;
-  flex-direction: column;
-  min-height: 300px;
-}
-
-.favorite-announcements-list.grid-view .my-announcement-image {
-  min-width: 100%;
-  max-width: 100%;
-  height: 180px;
-  margin-right: 0;
-}
-
-.favorite-announcements-list.grid-view .my-announcement-img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-}
-
-@media (max-width: 768px) {
-  .favorite-announcements-list.grid-view {
-    grid-template-columns: 1fr;
-    padding: 0; /* Ensure no padding on tablet */
-  }
-  
-  .favorite-announcements-list.grid-view .my-announcement-card,
-  .favorite-announcements-list.list-view .my-announcement-card {
-    flex-direction: column;
-    min-height: unset;
-    margin: 0; /* Remove margin to align with search bar */
-  }
-  
-  .favorite-announcements-list.grid-view .my-announcement-image,
-  .favorite-announcements-list.list-view .my-announcement-image {
-    min-width: 100%;
-    max-width: 100%;
-    margin-right: 0;
-    height: 180px;
-  }
-
-  .favorite-announcements-list.list-view .my-announcement-img {
-    width: 100%;
-    height: 160px;
-    margin: 0;
-    border-radius: 8px 8px 0 0;
-  }
-
-  .favorite-announcements-list.list-view .my-announcement-info {
-    padding: 16px;
-  }
-
-  .favorite-announcements-list.list-view .my-announcement-header {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .favorite-announcements-list.list-view .my-announcement-title {
-    font-size: 1.2rem;
-  }
-
-  .favorite-announcements-list.list-view .my-announcement-id {
-    text-align: left;
-    align-self: stretch;
-  }
-}
-
-/* Dark Mode Styles pentru MyAnnouncements */
-.dark-mode .my-announcements-container {
-  background-color: #121212;
-  color: #ffffff;
-  /* Mirror the same top padding in dark mode */
-  padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
-  margin-top: 0;
-}
-
-.dark-mode .my-announcements-title {
-  color: #f51866;
-}
-
-/* Dark Mode pentru Search Header - versiune îmbunătățită */
-.dark-mode .my-announcements-search-header {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-  box-shadow: none;
-}
-
-.dark-mode .my-announcements-search-header::before {
-  background: #f51866;
-}
-
-/* Input Fields în Dark Mode */
-.dark-mode .my-announcements-search-header .MuiTextField-root {
-  background: #3f3f3f;
-}
-
-.dark-mode .my-announcements-search-header .MuiOutlinedInput-root {
-  background: #3f3f3f;
-  color: #ffffff;
-  border-color: #575757;
-}
-
-/* Ensure the actual input text and caret are visible in dark mode */
-.dark-mode .my-announcements-search-header .MuiInputBase-input {
-  color: #ffffff !important;
-  caret-color: #ffffff;
-}
-
-/* Placeholder color in dark mode */
-.dark-mode .my-announcements-search-header .MuiInputBase-input::placeholder {
-  color: #8b8b8b;
-  opacity: 1; /* for Firefox */
-}
-
-/* Start adornment/search icon color */
-.dark-mode .my-announcements-search-header .MuiInputAdornment-root .MuiSvgIcon-root {
-  color: #8b8b8b;
-}
-
-.dark-mode .my-announcements-search-header .MuiOutlinedInput-root:hover {
-  border-color: #fe6585;
-  box-shadow: none;
-}
-
-.dark-mode .my-announcements-search-header .MuiOutlinedInput-root.Mui-focused {
-  border-color: #f51866;
-  box-shadow: none;
-}
-
-.dark-mode .my-announcements-search-header .MuiInputLabel-root {
-  color: #8b8b8b;
-}
-
-.dark-mode .my-announcements-search-header .MuiInputLabel-root.Mui-focused {
-  color: #f51866;
-}
-
-/* Select Fields în Dark Mode */
-.dark-mode .my-announcements-search-header .MuiFormControl-root {
-  background: #3f3f3f;
-}
-
-.dark-mode .my-announcements-search-header .MuiSelect-root {
-  color: #ffffff;
-}
-
-.dark-mode .my-announcements-search-header .MuiSelect-icon {
-  color: #8b8b8b;
-}
-
-/* Icons rendered inside the closed Select's current value (e.g., clock) */
-.dark-mode .my-announcements-search-header .MuiSelect-select .MuiSvgIcon-root {
-  color: #8b8b8b;
-}
-
-/* Chip-uri în Dark Mode - design simplificat */
-.dark-mode .my-announcements-search-header .MuiChip-root {
-  background: #575757;
-  color: #ffffff;
-  border: 1px solid #717171;
-}
-
-.dark-mode .my-announcements-search-header .MuiChip-root:hover {
-  background: #ff7e95;
-  border-color: #fe6585;
-  box-shadow: none;
-  transform: translateY(-1px);
-}
-
-.dark-mode .my-announcements-search-header .MuiChip-colorPrimary {
-  background: #f51866;
-  color: #ffffff;
-  border: none;
-}
-
-.dark-mode .my-announcements-search-header .MuiChip-colorSecondary {
-  background: #fe6585;
-  color: #ffffff;
-  border: none;
-}
-
-.dark-mode .my-announcements-search-header .MuiChip-colorDefault {
-  background: #575757;
-  color: #ffffff;
-  border: 1px solid #717171;
-}
-
-.dark-mode .my-announcements-search-header .MuiChip-deleteIcon {
-  color: #8b8b8b;
-}
-
-.dark-mode .my-announcements-search-header .MuiChip-deleteIcon:hover {
-  color: #ffffff;
-}
-
-/* Dark Mode pentru Menu Dropdown - design simplificat */
-.dark-mode .MuiPaper-root.MuiMenu-paper {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-  box-shadow: none;
-}
-
-.dark-mode .MuiMenuItem-root {
-  color: #ffffff;
-  transition: all 0.2s ease;
-}
-
-.dark-mode .MuiMenuItem-root:hover {
-  background: #ff7e95;
-  color: #121212;
-}
-
-.dark-mode .MuiMenuItem-root .MuiSvgIcon-root {
-  color: #f51866;
-}
-
-.dark-mode .MuiMenuItem-root .MuiBox-root {
-  color: inherit;
-}
-
-.dark-mode .my-announcement-card {
-  background: #282828;
-  box-shadow: none;
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .my-announcement-card:hover {
-  border-color: #fe6585;
-  transform: translateY(-3px);
-}
-
-.dark-mode .my-announcement-info {
-  background: #282828;
+  min-height: 200px;
   height: 200px;
 }
 
-.dark-mode .my-announcement-image {
-  background: #3f3f3f;
+.my-announcements-list.list-view .my-announcement-image {
+  width: 200px;
+  min-width: 200px;
   height: 200px;
 }
 
-/* Dark mode mobile adjustments */
-@media (max-width: 768px) {
-  .dark-mode .my-announcement-image {
-    height: 140px; /* match the light mode reduction */
-  }
+.my-announcements-list.list-view .my-announcement-info {
+  height: 200px;
 }
 
-@media (max-width: 700px) {
-  .dark-mode .my-announcement-image {
-    height: 120px; /* match the light mode reduction */
-  }
-}
+/* ============================================
+   8. MOBILE RESPONSIVE LAYOUTS
+   ============================================ */
 
-@media (max-width: 500px) {
-  .dark-mode .my-announcement-image {
-    height: 100px; /* match the light mode reduction */
-  }
-}
-
-@media (max-width: 360px) {
-  .dark-mode .my-announcement-image {
-    height: 90px; /* match the light mode reduction */
-  }
-}
-
-/* =============================================================
- *  MOBILE HALF-SPLIT CARD LAYOUT (ONLY MOBILE)
- *  Cerinta: pe mobile cardul sa aiba 50% imagine / 50% informatii
- *  Nu afecteaza desktop-ul (se aplica doar sub 700px).
- *  Se suprascriu regulile anterioare care puneau imaginea deasupra.
- * ============================================================= */
-@media (max-width: 700px) {
+/* Tablet view (600px - 900px) */
+@media (max-width: 900px) and (min-width: 601px) {
   .my-announcement-card {
-  flex-direction: row !important; /* revenim la row doar pe mobile */
-  height: 210px !important; /* +10px pentru spatiu suplimentar sub ID */
-    align-items: stretch !important;
+    flex-direction: row;
+    min-height: 160px;
+    height: 160px;
   }
 
   .my-announcement-image {
-    width: 50% !important;
-    min-width: 50% !important;
-    height: 100% !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-  }
-  .my-announcement-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 0 !important;
+    width: 160px !important;
+    min-width: 160px !important;
+    height: 160px !important;
   }
 
   .my-announcement-info {
-    width: 50% !important;
-    padding: 24px 12px 12px 16px !important; /* crestere top padding (24px) pentru spatiu sub ID + usor mai mult left */
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    background: linear-gradient(135deg, #ffffff 0%, #f5f7f9 100%) !important;
-  }
-
-  .my-announcement-header {
-    margin-bottom: 4px !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 3px !important;
+    padding: 16px;
+    height: 160px !important;
   }
 
   .my-announcement-title {
-    font-size: 15px !important; /* putin mai mare pentru lizibilitate */
-    line-height: 1.3 !important;
-    margin: 0 0 4px 0 !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-    max-height: 2.8em !important; /* mai mult spatiu pentru 2 linii */
+    font-size: 18px;
+    max-width: 100%;
+  }
+
+  .my-announcement-price {
+    font-size: 20px;
+  }
+}
+
+/* Mobile view (below 600px) - Compact horizontal */
+@media (max-width: 600px) {
+  .my-announcement-card {
+    flex-direction: row;
+    min-height: 140px;
+    height: 140px;
+    border-radius: 12px;
+  }
+
+  .my-announcement-image {
+    width: 120px !important;
+    min-width: 120px !important;
+    height: 140px !important;
+  }
+
+  .my-announcement-info {
+    padding: 12px;
+    height: 140px !important;
+  }
+
+  .my-announcement-title {
+    font-size: 16px;
+    max-width: 100%;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
   }
 
   .my-announcement-category {
-    font-size: 11px !important;
-    padding: 2px 6px !important;
-    margin: 0 !important;
-    line-height: 1.1 !important;
+    font-size: 12px;
+    padding: 3px 8px;
   }
 
-  .my-announcement-location {
-    font-size: 11px !important;
-    margin: 2px 0 0 0 !important;
-    gap: 4px !important;
-  }
-  .my-announcement-location .MuiSvgIcon-root {
-    font-size: 16px !important;
+  .my-announcement-location,
+  .my-announcement-description {
+    font-size: 12px;
   }
 
-  /* ID mutat pe imagine (stanga sus) pentru a nu se confunda cu titlul */
-  .my-announcement-image { position: relative !important; }
-  /* Stil desktop pentru ID (pastila deschisa) adaptat pe mobile */
+  .my-announcement-description {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    max-height: 20px;
+  }
+
+  .my-announcement-price {
+    font-size: 18px;
+    margin: 4px 0;
+  }
+
   .my-announcement-id {
-    position: absolute !important;
+    font-size: 10px;
     top: 8px !important;
     right: 10px !important;
-    left: auto !important;
-    bottom: auto !important;
-    font-size: 11px !important;
-    font-weight: 500 !important;
-    padding: 4px 8px !important;
-    background: rgba(173,181,189,0.12) !important;
-    color: #6c757d !important;
-    border-radius: 8px !important;
-    letter-spacing: 0 !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-    z-index: 2 !important;
-    pointer-events: none !important; /* sa nu obstructioneze click pe imagine/text */
+    padding: 3px 6px;
   }
 
-  /* Actiuni organizate pe 2 coloane pentru economie de spatiu */
   .my-announcement-actions {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important; /* mai mult spatiu intre butoane */
-    margin-top: 8px !important;
-    width: 100% !important;
-    align-self: flex-end !important;
-  }
-
-  .my-announcement-btn {
-    width: 100% !important;
-  padding: 8px 12px !important; /* marim usor padding-ul */
-  font-size: 11px !important; /* redus pentru a incapea textul fara a mari butonul */
-  line-height: 1.15 !important;
-  border-radius: 14px !important;
-  border-width: 1.5px !important;
-  font-weight: 600 !important;
-  min-height: 32px !important; /* crestere inaltime minima */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .my-announcement-btn.danger { border-color: #dc3545 !important; }
-  .my-announcement-btn.secondary { border-color: #6c757d !important; }
-}
-
-/* Extra micro-optimizare sub 500px: reducere suplimentara */
-@media (max-width: 500px) {
-  .my-announcement-card { height: 200px !important; } /* +10px pentru spatiu suplimentar sub ID */
-  .my-announcement-title { font-size: 14px !important; }
-  .my-announcement-btn { font-size: 10px !important; padding: 6px 9px !important; min-height: 30px !important; }
-  .my-announcement-actions { gap: 5px !important; }
-  .my-announcement-id { font-size: 10px !important; padding: 4px 7px !important; top: 6px !important; right: 8px !important; }
-}
-
-/* Ultra narrow sub 360px */
-@media (max-width: 360px) {
-  .my-announcement-card { height: 190px !important; } /* +10px pentru spatiu suplimentar */
-  .my-announcement-title { font-size: 13px !important; }
-  .my-announcement-actions { gap: 4px !important; }
-  .my-announcement-btn { font-size: 9px !important; padding: 5px 7px !important; min-height: 26px !important; }
-  .my-announcement-id { top: 6px !important; right: 6px !important; font-size: 9px !important; padding: 3px 6px !important; }
-}
-
-/* Dark mode overrides for new layout */
-@media (max-width: 700px) {
-  .dark-mode .my-announcement-info {
-    background: linear-gradient(135deg, #282828 0%, #1f1f1f 100%) !important;
-  }
-  .dark-mode .my-announcement-card { height: 210px !important; } /* sincronizare cu light mode */
-  .dark-mode .my-announcement-btn { background: #121212 !important; }
-  .dark-mode .my-announcement-btn:hover { background: #2a2a2a !important; }
-  .dark-mode .my-announcement-id { background: rgba(255,255,255,0.15) !important; color: #d0d4d8 !important; }
-}
-
-.dark-mode .my-announcement-title {
-  color: #ffffff;
-}
-
-.dark-mode .my-announcement-category {
-  color: #ffabb7;
-  background: #3f3f3f;
-}
-
-.dark-mode .my-announcement-location {
-  color: #8b8b8b;
-}
-
-/* Ensure the location pin icon matches surface gray, not blue */
-.dark-mode .my-announcement-location .MuiSvgIcon-root {
-  color: #8b8b8b;
-}
-
-.dark-mode .my-announcement-description {
-  color: #8b8b8b;
-}
-
-.dark-mode .my-announcement-price {
-  color: #fe6585;
-  text-shadow: none;
-}
-
-.dark-mode .my-announcement-id {
-  color: #8b8b8b;
-  background: #3f3f3f;
-}
-
-.dark-mode .my-announcement-btn {
-  border-color: #fe6585;
-  background: #121212;
-  color: #fe6585;
-}
-
-.dark-mode .my-announcement-btn:hover {
-  background: #fe6585;
-  color: #121212;
-  border-color: #fe6585;
-  box-shadow: none;
-}
-
-.dark-mode .my-announcement-btn.primary {
-  border-color: #f51866;
-  background: #f51866;
-  color: #ffffff;
-}
-
-.dark-mode .my-announcement-btn.primary:hover {
-  background: #fa4875;
-  border-color: #fa4875;
-  color: #121212;
-  box-shadow: none;
-}
-
-.dark-mode .my-announcement-btn.danger {
-  border-color: #f51866;
-  background: #121212;
-  color: #f51866;
-}
-
-.dark-mode .my-announcement-btn.danger:hover {
-  background: #f51866;
-  color: #121212;
-  border-color: #f51866;
-  box-shadow: none;
-}
-
-.dark-mode .my-announcement-btn.secondary {
-  border-color: #8b8b8b;
-  background: #121212;
-  color: #8b8b8b;
-}
-
-.dark-mode .my-announcement-btn.secondary:hover {
-  background: #8b8b8b;
-  color: #121212;
-  border-color: #8b8b8b;
-  box-shadow: none;
-}
-
-/* Dark Mode pentru Grid și List View */
-.dark-mode .favorite-announcements-list.list-view .my-announcement-card {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .favorite-announcements-list.list-view .my-announcement-image {
-  background: #3f3f3f;
-}
-
-.dark-mode .favorite-announcements-list.list-view .my-announcement-title {
-  color: #ffffff;
-}
-
-.dark-mode .favorite-announcements-list.list-view .my-announcement-category {
-  color: #fe6585;
-}
-
-.dark-mode .favorite-announcements-list.list-view .my-announcement-location {
-  color: #ffffff;
-}
-
-.dark-mode .favorite-announcements-list.list-view .my-announcement-price {
-  color: #f51866 !important;
-}
-
-.dark-mode .favorite-announcements-list.list-view .my-announcement-id {
-  color: #8b8b8b;
-}
-
-.dark-mode .favorite-announcements-list.grid-view .my-announcement-card {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .favorite-announcements-list.grid-view .my-announcement-image {
-  background: #3f3f3f;
-}
-
-/* Mobile header styles (match other pages) */
-@media (max-width: 899.98px) {
-  .mobile-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    margin-bottom: 8px !important;
-    padding-top: clamp(8px, 3vh, 24px) !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    color: var(--chat-text) !important;
-  }
-
-  .mobile-back-btn {
-    width: 40px !important;
-    height: 40px !important;
-    padding: 8px !important;
-    border-radius: 50% !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--chat-elev) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  }
-
-  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
-
-  .mobile-header .MuiSvgIcon-root {
-    font-size: 24px !important;
-    color: var(--chat-text) !important;
-  }
-
-  .mobile-header-title {
-    font-weight: 600 !important;
-    color: var(--chat-text) !important;
-    font-size: 24px !important; /* MUI h5 on mobile */
-    line-height: 1.334 !important;
-    margin: 0 !important;
-    flex: 0 0 auto !important;
-    margin-left: 4px !important;
-  }
-
-  /* Hide desktop H1 on mobile to prevent double titles */
-  .my-announcements-title { display: none !important; }
-}
-
-/* 7) Responsive overrides (consolidated from MyAnnouncements.mediaQueries.css) */
-@media (max-width: 900px) {
-  /* Container spacing tuned for mobile */
-  .my-announcements-container {
-    padding: 12px;
-    /* keep spacing via padding to maintain consistent BG */
-    padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
-    margin-top: 0; /* prefer 0 to avoid two-tone gaps */
-    margin-bottom: 8rem;
-  }
-}
-
-@media (max-width: 700px) {
-  .my-announcement-card {
-    flex-direction: column;
-    min-height: unset;
-    align-items: flex-start;
-  }
-  .my-announcement-image {
-    min-width: 100%;
-    max-width: 100%;
-    margin-right: 0;
-    justify-content: stretch;
-    align-items: stretch;
-    padding: 0;
-    height: 120px; /* further reduced from 160px */
-  }
-  .my-announcement-img {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    display: block;
-    border-radius: 8px 8px 0 0;
-    object-fit: cover;
-    object-position: center;
-  }
-  .my-announcement-info {
-    padding: 10px 10px 45px 10px; /* reduced from 14px and bottom space */
-    position: relative;
-  }
-  
-  .my-announcement-title {
-    font-size: 15px; /* smaller title */
-    margin-bottom: 4px;
-  }
-  
-  .my-announcement-category {
-    font-size: 12px;
-    padding: 2px 6px;
-    margin: 1px 0;
-  }
-  
-  .my-announcement-location {
-    font-size: 12px;
-    margin: 1px 0;
-  }
-  
-  .my-announcement-actions {
+    gap: 6px;
     margin-top: 4px;
-    gap: 3px;
   }
-  
-  /* Pe mobile, ID-ul se mută în partea de jos a containerului */
-  .my-announcement-id {
-    position: absolute;
-    bottom: 10px; /* reduced from 14px */
-    right: 10px; /* reduced from 14px */
-    font-size: 10px; /* smaller text */
-    padding: 3px 6px; /* reduced padding */
+
+  .my-announcement-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 12px;
+  }
+
+  .favorite-heart {
+    right: 10px;
+    bottom: 10px;
   }
 }
 
-@media (max-width: 500px) {
-  .my-announcement-header {
-    flex-direction: column;
-    gap: 6px; /* reduced from 8px */
+/* Ultra compact mobile (below 480px) */
+@media (max-width: 480px) {
+  .my-announcements-title {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
   }
+
+  .my-announcement-card {
+    min-height: 120px;
+    height: 120px;
+    border-radius: 10px;
+  }
+
+  .my-announcement-image {
+    width: 100px !important;
+    min-width: 100px !important;
+    height: 120px !important;
+  }
+
+  .my-announcement-info {
+    padding: 10px;
+    height: 120px !important;
+  }
+
   .my-announcement-title {
-    font-size: 14px; /* smaller for very small screens */
-    line-height: 1.2;
+    font-size: 14px;
   }
-  .my-announcement-category {
-    font-size: 11px;
-    padding: 1px 4px; /* ultra compact */
-  }
+
+  .my-announcement-category,
   .my-announcement-location {
     font-size: 11px;
   }
+
   .my-announcement-description {
-    font-size: 11px;
+    display: none;
   }
-  .my-announcement-id {
-    font-size: 9px; /* very small */
-    min-width: 60px; /* reduced from 80px */
-    padding: 2px 4px;
+
+  .my-announcement-price {
+    font-size: 16px;
   }
-  .my-announcement-actions {
-    flex-direction: row; /* keep horizontal even on small screens */
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 2px; /* ultra compact gap */
-    width: 100%;
-    margin-top: 2px;
-  }
-  
+
   .my-announcement-btn {
-    padding: 3px 6px; /* ultra compact buttons */
-    font-size: 9px; /* very small text */
-    border-radius: 10px;
-    flex: 0 0 auto; /* don't grow/shrink */
-    border-width: 1px; /* thinner borders */
-  }
-  
-  .my-announcement-info {
-    padding: 8px 8px 35px 8px; /* ultra compact padding */
-  }
-  
-  .my-announcement-image {
-    height: 100px; /* very compact image on ultra small screens */
+    padding: 3px 8px;
+    font-size: 10px;
   }
 }
 
-/* Ultra-compact for very narrow screens */
+/* Extra compact mobile (below 360px) */
 @media (max-width: 360px) {
   .my-announcement-card {
-    border-radius: 8px;
+    min-height: 110px;
+    height: 110px;
   }
-  
+
   .my-announcement-image {
-    height: 90px; /* even smaller images */
+    width: 90px !important;
+    min-width: 90px !important;
+    height: 110px !important;
   }
-  
+
   .my-announcement-info {
-    padding: 6px 6px 30px 6px; /* minimal padding */
+    padding: 8px;
+    height: 110px !important;
   }
-  
+
   .my-announcement-title {
     font-size: 13px;
   }
-  
+
   .my-announcement-category,
   .my-announcement-location {
     font-size: 10px;
   }
-  
-  .my-announcement-btn {
-    padding: 2px 4px;
-    font-size: 8px;
-    border-radius: 8px;
+
+  .my-announcement-price {
+    font-size: 15px;
   }
-  
-  .my-announcement-id {
-    font-size: 8px;
-    padding: 1px 3px;
-    bottom: 6px;
-    right: 6px;
+}
+
+/* Split-card mobile layout (below 700px for certain contexts) */
+@media (max-width: 700px) {
+  .mobile-split-card .my-announcement-card {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: auto;
   }
+
+  .mobile-split-card .my-announcement-image {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 180px !important;
+  }
+
+  .mobile-split-card .my-announcement-info {
+    width: 100%;
+    height: auto !important;
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .mobile-split-card .my-announcement-title {
+    font-size: 18px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .mobile-split-card .my-announcement-description {
+    display: block;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .mobile-split-card .my-announcement-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .mobile-split-card .my-announcement-btn {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   9. DARK MODE OVERRIDES
+   ============================================ */
+
+.dark-mode .my-announcements-title {
+  color: #e8f1ff;
+}
+
+.dark-mode .my-announcements-search-header {
+  background: #121212;
+  border-color: rgba(232, 241, 255, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .my-announcements-search-header::before {
+  background: linear-gradient(90deg, #6ba3d8 0%, #8bbfe0 100%);
+}
+
+.dark-mode .my-announcements-search-header .MuiTextField-root,
+.dark-mode .my-announcements-search-header .MuiFormControl-root {
+  background: #2a3f56;
+}
+
+.dark-mode .my-announcements-search-header .MuiOutlinedInput-root,
+.dark-mode .my-announcements-search-header .MuiSelect-root {
+  background: #333333;
+  border-color: rgba(232, 241, 255, 0.15);
+}
+
+.dark-mode .my-announcements-search-header .MuiOutlinedInput-root:hover,
+.dark-mode .my-announcements-search-header .MuiSelect-root:hover {
+  box-shadow: 0 1px 4px rgba(107, 163, 216, 0.2);
+  border-color: rgba(232, 241, 255, 0.25);
+}
+
+.dark-mode .my-announcements-search-header .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 2px 8px rgba(107, 163, 216, 0.3);
+  border-color: #6ba3d8;
+}
+
+.dark-mode .my-announcements-search-header .MuiInputBase-input,
+.dark-mode .my-announcements-search-header .MuiSelect-select {
+  color: #e8f1ff;
+}
+
+.dark-mode .my-announcements-search-header .MuiInputLabel-root {
+  color: rgba(232, 241, 255, 0.7);
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-colorPrimary {
+  background: linear-gradient(135deg, #6ba3d8 0%, #4a8cc7 100%);
+  color: #1e2a3a;
+}
+
+.dark-mode .my-announcements-search-header .MuiChip-colorSecondary {
+  background: linear-gradient(135deg, #f9a875 0%, #e89561 100%);
+  color: #1e2a3a;
+}
+
+.dark-mode .my-announcement-card {
+  background: #121212;
+  border-color: rgba(232, 241, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.dark-mode .my-announcement-card:hover {
+  box-shadow: 0 8px 32px rgba(107, 163, 216, 0.25);
+  border-color: rgba(107, 163, 216, 0.3);
+}
+
+.dark-mode .my-announcement-image {
+  background: #121212;
+}
+
+.dark-mode .my-announcement-info {
+  background: #121212;
+}
+
+.dark-mode .my-announcement-title {
+  color: #e8f1ff;
+}
+
+.dark-mode .my-announcement-category {
+  color: #121212;
+  background: #ffabb7;
+}
+
+.dark-mode .my-announcement-location,
+.dark-mode .my-announcement-description {
+  color: rgba(232, 241, 255, 0.7);
+}
+
+.dark-mode .my-announcement-price {
+  color: #ff6b9d;
+  text-shadow: 0 1px 2px rgba(255, 107, 157, 0.2);
+}
+
+.dark-mode .my-announcement-id {
+  color: #8b9bb0;
+  background: rgba(139, 155, 176, 0.15);
+}
+
+.dark-mode .my-announcement-btn {
+  border-color: #6ba3d8;
+  background: #121212;
+  color: #6ba3d8;
+}
+
+.dark-mode .my-announcement-btn:hover {
+  background: #6ba3d8;
+  color: #1e2a3a;
+  box-shadow: 0 6px 20px rgba(107, 163, 216, 0.35);
+}
+
+.dark-mode .my-announcement-btn.primary {
+  background: #6ba3d8;
+  border-color: #6ba3d8;
+  color: #1e2a3a;
+}
+
+.dark-mode .my-announcement-btn.primary:hover {
+  background: #8bbfe0;
+  border-color: #8bbfe0;
+  box-shadow: 0 6px 20px rgba(139, 191, 224, 0.4);
+}
+
+.dark-mode .my-announcement-btn.danger {
+  border-color: #ff6b9d;
+  background: #121212;
+  color: #ff6b9d;
+}
+
+.dark-mode .my-announcement-btn.danger:hover {
+  background: #ff6b9d;
+  color: #1e2a3a;
+  box-shadow: 0 6px 20px rgba(255, 107, 157, 0.35);
+}
+
+.dark-mode .my-announcement-btn.secondary {
+  border-color: #8b9bb0;
+  background: #121212;
+  color: #8b9bb0;
+}
+
+.dark-mode .my-announcement-btn.secondary:hover {
+  background: #8b9bb0;
+  color: #1e2a3a;
+  box-shadow: 0 6px 20px rgba(139, 155, 176, 0.35);
+}
+
+.dark-mode .mobile-header {
+  color: #e8f1ff !important;
+}
+
+.dark-mode .mobile-back-btn {
+  background-color: #2a3f56 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+.dark-mode .mobile-back-btn:hover {
+  background-color: #334c6a !important;
+}
+
+.dark-mode .mobile-header .MuiSvgIcon-root {
+  color: #e8f1ff !important;
+}
+
+.dark-mode .mobile-header-title {
+  color: #e8f1ff !important;
 }

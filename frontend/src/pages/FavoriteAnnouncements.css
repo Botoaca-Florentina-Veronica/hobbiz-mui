@@ -434,7 +434,7 @@
 
 /* Dark Mode Styles */
 .dark-mode .favorite-announcement-card {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%) !important;
+  background: #121212 !important;
   border: 1px solid rgba(245, 24, 102, 0.3) !important;
   color: #ffffff !important;
 }

@@ -31,6 +31,19 @@ TOC (sumar rapid):
   --chat-seen-blue: #34B7F1;
 }
 
+/* Ensure the page background follows the chat theme so removing the footer
+   doesn't reveal a mismatched (white) page background in dark mode. */
+html, body {
+  background: var(--chat-bg) !important;
+  height: 100%;
+}
+
+/* Ensure dark-mode sets the root background as well (covers desktop and mobile).
+   This prevents a white strip below the chat container when footer is absent. */
+.dark-mode html, .dark-mode body {
+  background: var(--dm-bg) !important;
+}
+
 /* 2) Layout container */
 .chat-page-container {
   display: flex;
