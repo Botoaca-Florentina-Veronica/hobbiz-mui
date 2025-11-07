@@ -211,9 +211,7 @@ export default function ProfilePage() {
     try {
       const formData = new FormData();
       formData.append('avatar', file);
-      const res = await apiClient.post('/api/users/avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await apiClient.post('/api/users/avatar', formData);
 
       setProfile({ ...profile, avatar: res.data.avatar });
 
@@ -243,9 +241,7 @@ export default function ProfilePage() {
     try {
       const formData = new FormData();
       formData.append('cover', file);
-      const res = await apiClient.post('/api/users/cover', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await apiClient.post('/api/users/cover', formData);
       setProfile({ ...profile, coverImage: res.data.coverImage });
       setSuccess('Coperta a fost actualizată cu succes!');
       setTimeout(() => setSuccess(''), 3000);

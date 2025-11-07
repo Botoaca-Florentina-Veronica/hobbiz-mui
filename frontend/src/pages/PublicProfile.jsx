@@ -233,7 +233,8 @@ export default function PublicProfile() {
   }
 
   return (
-  <div className="profile-page-container public-profile-page-container">
+    <div className="profile-page-container">
+      {/* Mobile Header - identic cu ProfilePage */}
       <div className="mobile-header">
         <IconButton
           onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
@@ -247,534 +248,430 @@ export default function PublicProfile() {
         <Typography variant="h5" className="mobile-header-title">Profil</Typography>
       </div>
 
+      {/* Alerts */}
       {error && (
         <Fade in={!!error}>
           <Alert severity="error" className="profile-alert">{error}</Alert>
         </Fade>
       )}
 
-      {showReviewPosted && (
-        // Keep mounted while animating; CSS handles enter/leave
-        alertMounted && (
-          <div className={`profile-alert-wrapper ${alertLeaving ? 'alert-leaving' : 'alert-entering'}`}>
-            <Alert severity="success" className="profile-alert" onClose={() => {
-              // start graceful leave
-              if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
-              if (alertLeaveTimerRef.current) clearTimeout(alertLeaveTimerRef.current);
-              setAlertLeaving(true);
-              alertLeaveTimerRef.current = setTimeout(() => {
-                setAlertMounted(false);
-                setShowReviewPosted(false);
-                setAlertLeaving(false);
-              }, 420);
-            }}>
-              Recenzia a fost publicată. Mulțumim pentru feedback!
-            </Alert>
-          </div>
-        )
+      {showReviewPosted && alertMounted && (
+        <div className={`profile-alert-wrapper ${alertLeaving ? 'alert-leaving' : 'alert-entering'}`}>
+          <Alert severity="success" className="profile-alert" onClose={() => {
+            if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+            if (alertLeaveTimerRef.current) clearTimeout(alertLeaveTimerRef.current);
+            setAlertLeaving(true);
+            alertLeaveTimerRef.current = setTimeout(() => {
+              setAlertMounted(false);
+              setShowReviewPosted(false);
+              setAlertLeaving(false);
+            }, 420);
+          }}>
+            Recenzia a fost publicată. Mulțumim pentru feedback!
+          </Alert>
+        </div>
       )}
 
-      {/*
-        To override widths for this page only, add one of the utility classes to the Container:
-        - 'pp-container--wide'  -> makes the lg breakpoint wider (uses CSS var override)
-        - 'pp-container--narrow' -> makes the lg breakpoint narrower
-        Example: <Container maxWidth={false} className="public-profile-container pp-container--wide">
-      */}
-      <Container maxWidth={false} className="public-profile-container">
-  <Grid container spacing={4}>
-          {/* Left column: existing profile content */}
-          <Grid item xs={12} md={8}>
-            {/* Header Card (read-only) */}
-            <div className="profile-header-card">
-              <div className="profile-header-grid">
-                <div className="profile-avatar-container">
-                  <div className="profile-avatar-main">
-                    {profile?.avatar ? (
-                      <img src={profile.avatar} alt="Avatar" className="profile-avatar-image" />
-                    ) : (
-                      <PersonIcon className="profile-person-icon" />
-                    )}
-                  </div>
+      {/* Two column layout - identic cu ProfilePage */}
+      <div className="profile-two-column-layout">
+        {/* Left column - Main content */}
+        <div className="profile-left-column">
+          {/* Profile Header - IDENTIC cu ProfilePage dar read-only */}
+          <div className="profile-header-unified">
+            {/* Cover section - fără buton de editare */}
+            <div className="profile-cover-container">
+              <div
+                className={`profile-cover ${profile?.coverImage ? 'has-image' : ''}`}
+                style={{
+                  backgroundImage: profile?.coverImage ? `url(${profile.coverImage})` : 'none'
+                }}
+              />
+            </div>
+
+            {/* Info card cu avatar */}
+            <div className="profile-info-card">
+              {/* Avatar - fără buton de editare */}
+              <div className="profile-avatar-container-unified">
+                <div className="profile-avatar-unified">
+                  {profile?.avatar ? (
+                    <img src={profile.avatar} alt="Avatar" className="profile-avatar-image" />
+                  ) : (
+                    <PersonIcon className="profile-person-icon" />
+                  )}
                 </div>
-                <div className="profile-header-info">
-                  <span className="profile-private-chip">PROFIL PUBLIC</span>
-                  <h1 className="profile-main-title">
-                    {profile?.firstName || ''} {profile?.lastName || ''}
-                  </h1>
-                  {/* Review stars: show 5 empty stars if no reviews, otherwise color average */}
-                  <div className="profile-rating-row" style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+              </div>
+
+              {/* Name section */}
+              <div className="profile-name-section">
+                <h1 className="profile-name-title-unified">
+                  {(profile?.firstName || '') + (profile?.lastName ? ' ' + profile.lastName : '') || 'Profil utilizator'}
+                </h1>
+              </div>
+            </div>
+          </div>
+
+          {/* Reviews Card - NOUA SECȚIUNE deasupra locației */}
+          <div className="profile-info-main-card">
+            <div className="profile-info-content">
+              <div className="profile-info-header-section">
+                <h2 className="profile-info-main-title">Recenzii utilizator</h2>
+              </div>
+
+              <hr className="profile-divider" />
+
+              {/* Review summary header */}
+              <div className="public-profile-reviews-header" style={{ marginBottom: 16 }}>
+                <div className="public-profile-reviews-score">{avgRating ? avgRating.toFixed(1) : '0.0'}</div>
+                <div>
+                  <div className="public-profile-reviews-stars">
                     {(() => {
                       const filled = avgRating ? Math.round(avgRating) : 0;
                       const stars = [];
                       for (let i = 1; i <= 5; i++) {
-                        if (i <= filled) {
-                          stars.push(<StarIcon key={i} className="profile-star filled" sx={{ color: '#FFD24A' }} />);
-                        } else {
-                          stars.push(<StarBorderIcon key={i} className="profile-star" />);
-                        }
+                        if (i <= filled) stars.push(<StarIcon key={i} className="public-star filled" />);
+                        else stars.push(<StarBorderIcon key={i} className="public-star empty" />);
                       }
-                      return (
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            {stars}
-                          </div>
-                          <div style={{ color: 'var(--pf-text-muted)', fontWeight: 600 }}>
-                            {avgRating ? `(${avgRating.toFixed(1)})` : ''}
-                          </div>
-                        </>
-                      );
+                      return stars;
                     })()}
                   </div>
-                  {profile?.createdAt && (
-                    <div style={{ marginTop: 6, color: 'var(--pf-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <CalendarMonthIcon className="profile-icon" />
-                      <span>
-                        Membru din {new Date(profile.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Profile details (read-only) */}
-            <div className="profile-info-main-card">
-              <div className="profile-info-content">
-                <div className="profile-info-header-section">
-                  <h2 className="profile-info-main-title">INFORMAȚII DE BAZĂ</h2>
-                </div>
-                <hr className="profile-divider" />
-
-                <div className="profile-form-grid">
-                  <div className="profile-form-column">
-                    {/* Nume de familie */}
-                    <div className="profile-field-container">
-                      <div className="profile-field-label">
-                        <PersonIcon className="profile-icon" />
-                        <span>Nume</span>
-                      </div>
-                      <div className={`profile-field-value ${!profile?.lastName ? 'unspecified' : ''}`}>
-                        {profile?.lastName || 'Nespecificat'}
-                      </div>
-                    </div>
-
-                    {/* Prenume */}
-                    <div className="profile-field-container">
-                      <div className="profile-field-label">
-                        <PersonIcon className="profile-icon" />
-                        <span>Prenume</span>
-                      </div>
-                      <div className={`profile-field-value ${!profile?.firstName ? 'unspecified' : ''}`}>
-                        {profile?.firstName || 'Nespecificat'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="profile-form-column">
-                    {/* Localitate */}
-                    <div className="profile-field-container">
-                      <div className="profile-field-label">
-                        <LocationOnIcon className="profile-icon" />
-                        <span>Localitate</span>
-                      </div>
-                      <div className={`profile-field-value ${!profile?.localitate ? 'unspecified' : ''}`}>
-                        {profile?.localitate || 'Nespecificat'}
-                      </div>
-                    </div>
-
-                    {/* Telefon */}
-                    <div className="profile-field-container">
-                      <div className="profile-field-label">
-                        <PhoneIcon className="profile-icon" />
-                        <span>Telefon</span>
-                      </div>
-                      <div className={`profile-field-value ${!profile?.phone ? 'unspecified' : ''}`}>
-                        {profile?.phone || 'Nespecificat'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Email and Last Seen row */}
-                <div className="profile-form-grid" style={{ marginTop: 8 }}>
-                  <div className="profile-form-column">
-                    <div className="profile-field-container">
-                      <div className="profile-field-label">
-                        <EmailIcon className="profile-icon" />
-                        <span>Email</span>
-                      </div>
-                      <div className={`profile-field-value ${!profile?.email ? 'unspecified' : ''}`}>
-                        {profile?.email || 'Nespecificat'}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="profile-form-column">
-                    <div className="profile-field-container">
-                      <div className="profile-field-label">
-                        <CalendarMonthIcon className="profile-icon" />
-                        <span>Ultima activitate</span>
-                      </div>
-                      <div className="profile-field-value">
-                        {profile?.lastSeen 
-                          ? new Date(profile.lastSeen).toLocaleDateString('ro-RO', {
-                              day: '2-digit',
-                              month: 'long',
-                              year: 'numeric'
-                            })
-                          : 'Nespecificat'
-                        }
-                      </div>
-                    </div>
+                  <div className="public-profile-reviews-count">
+                    {Array.isArray(profile?.reviews) ? `${profile.reviews.length} review${profile.reviews.length !== 1 ? 's' : ''}` : ''}
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Anunțurile utilizatorului - identic cu ProfilePage.jsx */}
-            <div className="profile-info-main-card">
-              <div className="profile-info-content">
-                <div style={{ marginTop: '0px' }}>
-                  <h3 className="profile-section-title">
-                    Anunțurile utilizatorului ({announcements.length})
-                  </h3>
-                  {announcementsLoading ? (
-                    <Box className="profile-announcements-loading">
-                      <CircularProgress size={20} />
-                      <span className="profile-loading-inline-text">Se încarcă...</span>
-                    </Box>
-                  ) : announcements.length === 0 ? (
-                    <Box className="profile-empty-state">
-                      Acest utilizator nu are anunțuri publicate.
-                    </Box>
-                  ) : (
-                    <Box className="profile-announcements-container">
-                      {announcements.length > 3 && (
-                        <IconButton 
-                          onClick={() => handleScroll('left')}
-                          sx={{
-                            position: 'absolute',
-                            left: { xs: '0', sm: '-25px' },
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                            backgroundColor: getPrimaryColor(),
-                            color: 'white',
-                            width: '40px',
-                            height: '40px',
-                            display: { xs: 'none', sm: 'inline-flex' },
-                            '&:hover': {
-                              backgroundColor: '#2a4a65'
-                            }
-                          }}
-                        >
-                          <ChevronLeft />
-                        </IconButton>
-                      )}
-
-                      <Box ref={carouselRef} className="profile-carousel">
-                        {announcements.map((a) => (
-                          <Box 
-                            key={a._id}
-                            onClick={() => navigate(`/announcement/${a._id}`)}
-                            className="profile-card-wrapper"
-                          >
-                            <Box className="announcement-card">
-                              {a.images && a.images.length > 0 ? (
-                                <img src={a.images[0]} alt={a.title} className="announcement-image" />
-                              ) : (
-                                <Box className="announcement-image-placeholder">
-                                  Fără imagine
-                                </Box>
-                              )}
-                              
-                              <Box className="announcement-card-body">
-                                <h4 className="announcement-title">
-                                  {a.title}
-                                </h4>
-                                
-                                {a.price && (
-                                  <p className="announcement-price">
-                                    {a.price} lei
-                                  </p>
-                                )}
-                                
-                                <p className="announcement-location">
-                                  {a.location || a.localitate || ''}
-                                </p>
-                              </Box>
-                            </Box>
-                          </Box>
-                        ))}
-                      </Box>
-
-                      {announcements.length > 3 && (
-                        <IconButton
-                          onClick={() => handleScroll('right')}
-                          sx={{
-                            position: 'absolute',
-                            right: { xs: '0', sm: '-25px' },
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                            backgroundColor: getPrimaryColor(),
-                            color: 'white',
-                            width: '40px',
-                            height: '40px',
-                            display: { xs: 'none', sm: 'inline-flex' },
-                            '&:hover': {
-                              backgroundColor: '#2a4a65'
-                            }
-                          }}
-                        >
-                          <ChevronRight />
-                        </IconButton>
-                      )}
-                    </Box>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Grid>
-
-          {/* Right column: Reviews summary (sticky on desktop) */}
-          <Grid item xs={12} md={4}>
-            <div className="public-profile-reviews-wrap">
-              <Card className="public-profile-reviews-card">
-                <CardContent className="public-profile-reviews-content">
-                  <Typography variant="h6" className="public-profile-reviews-title">
-                    Rezumatul evaluării
-                  </Typography>
-
-                  <div className="public-profile-reviews-header">
-                    <div className="public-profile-reviews-score">{avgRating ? avgRating.toFixed(1) : '0.0'}</div>
-                    <div>
-                      <div className="public-profile-reviews-stars">
-                        {(() => {
-                          const filled = avgRating ? Math.round(avgRating) : 0;
-                          const stars = [];
-                          for (let i = 1; i <= 5; i++) {
-                            if (i <= filled) stars.push(<StarIcon key={i} className="public-star filled" />);
-                            else stars.push(<StarBorderIcon key={i} className="public-star empty" />);
-                          }
-                          return stars;
-                        })()}
-                      </div>
-                      <div className="public-profile-reviews-count">{Array.isArray(profile?.reviews) ? `${profile.reviews.length} review${profile.reviews.length !== 1 ? 's' : ''}` : ''}</div>
+              {/* Rating bars */}
+              {(() => {
+                const counts = [5,4,3,2,1].map(st => {
+                  const c = Array.isArray(profile?.reviews) ? profile.reviews.filter(r => Number(r.score || r.rating || r.value || 0) === st).length : 0;
+                  return { star: st, count: c };
+                });
+                const total = counts.reduce((s, x) => s + x.count, 0) || 0;
+                return counts.map(({ star, count }) => (
+                  <div key={star} className="public-profile-rating-row">
+                    <div className="public-profile-rating-star">{star} <span className="star-char">★</span></div>
+                    <div className="public-profile-rating-bar-outer">
+                      <div className="public-profile-rating-bar-inner" style={{ width: `${total ? (count/total*100) : 0}%` }} />
                     </div>
+                    <div className="public-profile-rating-count">{count}</div>
                   </div>
+                ));
+              })()}
 
-                  {/* Show summary info; 'Toate comentariile' moved below the individual reviews list */}
+              <hr className="profile-divider" style={{ marginTop: 16, marginBottom: 16 }} />
 
-                  <Divider className="public-profile-reviews-divider" />
-
-                  {/* Rating bars */}
-                  {(() => {
-                    const counts = [5,4,3,2,1].map(st => {
-                      const c = Array.isArray(profile?.reviews) ? profile.reviews.filter(r => Number(r.score || r.rating || r.value || 0) === st).length : 0;
-                      return { star: st, count: c };
-                    });
-                    const total = counts.reduce((s, x) => s + x.count, 0) || 0;
-                    return counts.map(({ star, count }) => (
-                      <div key={star} className="public-profile-rating-row">
-                        <div className="public-profile-rating-star">{star} <span className="star-char">★</span></div>
-                        <div className="public-profile-rating-bar-outer">
-                          <div className="public-profile-rating-bar-inner" style={{ width: `${total ? (count/total*100) : 0}%` }} />
-                        </div>
-                        <div className="public-profile-rating-count">{count}</div>
+              {/* Individual reviews list */}
+              <div className="public-profile-reviews-list-inner">
+                {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
+                  profile.reviews.map((r) => (
+                    <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="compact-review-item">
+                      <div className="compact-review-left">
+                        <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:44, height:44, fontSize:16 }}>
+                          {(r.authorName || r.name || 'U').charAt(0)}
+                        </Avatar>
                       </div>
-                    ));
-                  })()}
-                  
-                  {/* Placeholder: individual reviews are rendered in a separate section below */}
-                  <div className="public-profile-review-list-placeholder" />
-                </CardContent>
-              </Card>
-              {/* Compact reviews list nested under the summary card (shares the same column width) */}
-              <div style={{ marginTop: 16 }} className="public-profile-reviews-list-container">
-                <div className="public-profile-reviews-list-inner">
-                  {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
-                    profile.reviews.map((r) => (
-                      <div key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="compact-review-item">
-                        <div className="compact-review-left">
-                          <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} sx={{ width:44, height:44, fontSize:16 }}>
-                            {(r.authorName || r.name || 'U').charAt(0)}
-                          </Avatar>
-                        </div>
-                        <div className="compact-review-main">
-                          <div className="compact-review-top">
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <div className="compact-review-author">{r.authorName || r.name || 'Utilizator'}</div>
-                              <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
-                              {/* Announcement title (if resolvable) - appears under the date and is more pronounced */}
-                              { (() => {
-                                const at = getAnnouncementTitle(r);
-                                return at ? <div className="compact-review-ann-title">{at}</div> : null;
-                              })() }
-                            </div>
-                            {/* three-dots menu visible only to author */}
-                            {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
-                              <div className="review-actions-menu">
-                                <IconButton size="small" onClick={(e) => setMenuState({ anchorEl: e.currentTarget, reviewId: r._id })}>
-                                  <MoreVertIcon fontSize="small" />
-                                </IconButton>
-                              </div>
-                            )}
+                      <div className="compact-review-main">
+                        <div className="compact-review-top">
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div className="compact-review-author">{r.authorName || r.name || 'Utilizator'}</div>
+                            <div className="compact-review-date">{r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}</div>
+                            {(() => {
+                              const at = getAnnouncementTitle(r);
+                              return at ? <div className="compact-review-ann-title">{at}</div> : null;
+                            })()}
                           </div>
-                          <div className="compact-review-body">{r.comment}</div>
-                              <div className="compact-review-actions">
-                                <div className="compact-review-score">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={async () => {
-                                      try {
-                                        if (!user) { alert('Trebuie să fii autentificat pentru a da like'); return; }
-                                        // optimistic UI
-                                        const prev = likedState[r._id] || { liked: false, count: (r.likes || []).length };
-                                        const newLiked = !prev.liked;
-                                        setLikedState(s => ({ ...s, [r._id]: { liked: newLiked, count: prev.count + (newLiked ? 1 : -1) } }));
-                                        const resp = await apiClient.post(`/api/reviews/${r._id}/like`);
-                                        setLikedState(s => ({ ...s, [r._id]: { liked: resp.data.liked, count: resp.data.likesCount } }));
-                                      } catch (e) {
-                                        console.error('Like error', e);
-                                        alert('A apărut o eroare la like. Încearcă din nou.');
-                                      }
-                                    }}
-                                  >
-                                    <ThumbUpIcon fontSize="small" color={(likedState[r._id]?.liked || (r.likes || []).some(id=>String(id)===String(currentUserId))) ? 'primary' : 'action'} />
-                                  </IconButton>
-                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--pf-text-muted)' }}>{(likedState[r._id]?.count ?? (r.likes || []).length) || 0}</div>
-                                </div>
-                              </div>
+                          {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
+                            <div className="review-actions-menu">
+                              <IconButton size="small" onClick={(e) => setMenuState({ anchorEl: e.currentTarget, reviewId: r._id })}>
+                                <MoreVertIcon fontSize="small" />
+                              </IconButton>
+                            </div>
+                          )}
+                        </div>
+                        <div className="compact-review-body">{r.comment}</div>
+                        <div className="compact-review-actions">
+                          <div className="compact-review-score">{Number(r.score || r.rating || r.value || 0).toFixed(1)}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 12 }}>
+                            <IconButton
+                              size="small"
+                              onClick={async () => {
+                                try {
+                                  if (!user) { alert('Trebuie să fii autentificat pentru a da like'); return; }
+                                  const prev = likedState[r._id] || { liked: false, count: (r.likes || []).length };
+                                  const newLiked = !prev.liked;
+                                  setLikedState(s => ({ ...s, [r._id]: { liked: newLiked, count: prev.count + (newLiked ? 1 : -1) } }));
+                                  const resp = await apiClient.post(`/api/reviews/${r._id}/like`);
+                                  setLikedState(s => ({ ...s, [r._id]: { liked: resp.data.liked, count: resp.data.likesCount } }));
+                                } catch (e) {
+                                  console.error('Like error', e);
+                                  alert('A apărut o eroare la like. Încearcă din nou.');
+                                }
+                              }}
+                            >
+                              <ThumbUpIcon fontSize="small" color={(likedState[r._id]?.liked || (r.likes || []).some(id=>String(id)===String(currentUserId))) ? 'primary' : 'action'} />
+                            </IconButton>
+                            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--pf-text-muted)' }}>
+                              {(likedState[r._id]?.count ?? (r.likes || []).length) || 0}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
-                  )}
-                  {/* 'Toate comentariile' button appears under the individual reviews list */}
-                  {Array.isArray(profile?.reviews) && profile.reviews.length >= 2 && (
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-                      <Button size="small" variant="outlined" onClick={() => navigate(`/profil/${userId}/toate-recenziile`)}>
-                        Toate comentariile
-                      </Button>
                     </div>
-                  )}
-                  {/* Action menu for reviews (styled and positioned to the left of button) */}
-                  <Menu
-                    anchorEl={menuState.anchorEl}
-                    open={!!menuState.anchorEl}
-                    onClose={() => setMenuState({ anchorEl: null, reviewId: null })}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                    PaperProps={{
-                      sx: {
-                        borderRadius: 2,
-                        boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
-                        background: 'var(--pf-card-bg, #fff)',
-                        border: '1px solid var(--pf-divider, #e6eef6)',
-                        minWidth: 160,
-                        py: 0.5,
-                        // nudge left to sit closer to the button
-                        transform: 'translateX(-10px)'
-                      }
-                    }}
-                  >
-                    <MenuItem onClick={() => {
-                      const id = menuState.reviewId;
-                      if (!id) return;
-                      // open edit dialog with current values
-                      const current = profile.reviews.find(rr => rr._id === id) || {};
-                      setEditPayload({ reviewId: id, comment: current.comment || '', score: (current.score || current.rating || '') });
-                      setMenuState({ anchorEl: null, reviewId: null });
-                      setEditDialogOpen(true);
-                    }} sx={{ py: 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}><EditIcon fontSize="small" /></ListItemIcon>
-                      <ListItemText primary={'Editează'} />
-                    </MenuItem>
-                    <MenuItem onClick={() => {
-                      const id = menuState.reviewId;
-                      if (!id) return;
-                      setMenuState({ anchorEl: null, reviewId: null });
-                      setDeleteTargetId(id);
-                      setDeleteDialogOpen(true);
-                    }} sx={{ py: 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}><DeleteIcon fontSize="small" /></ListItemIcon>
-                      <ListItemText primary={'Șterge'} />
-                    </MenuItem>
-                  </Menu>
+                  ))
+                ) : (
+                  <div className="public-profile-no-reviews">Acest utilizator nu are recenzii încă.</div>
+                )}
+                {Array.isArray(profile?.reviews) && profile.reviews.length >= 2 && (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                    <Button size="small" variant="outlined" onClick={() => navigate(`/profil/${userId}/toate-recenziile`)}>
+                      Toate comentariile
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-                  {/* Edit dialog */}
-                  <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm">
-                    <DialogTitle>Editează recenzia</DialogTitle>
-                    <DialogContent dividers>
-                      <TextField
-                        label="Scor (0-5)"
-                        type="number"
-                        inputProps={{ min: 0, max: 5, step: 0.5 }}
-                        fullWidth
-                        margin="dense"
-                        value={editPayload.score}
-                        onChange={(e) => setEditPayload(p => ({ ...p, score: e.target.value }))}
-                      />
-                      <TextField
-                        label="Comentariu"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        margin="dense"
-                        value={editPayload.comment}
-                        onChange={(e) => setEditPayload(p => ({ ...p, comment: e.target.value }))}
-                      />
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={() => setEditDialogOpen(false)}>Anulează</Button>
-                      <Button variant="contained" onClick={async () => {
-                        try {
-                          const id = editPayload.reviewId;
-                          const body = { comment: editPayload.comment };
-                          if (editPayload.score !== '') body.score = editPayload.score;
-                          const resp = await apiClient.put(`/api/reviews/${id}`, body);
-                          // update profile state with returned review
-                          setProfile(prev => ({ ...prev, reviews: prev.reviews.map(rr => rr._id === id ? ({ ...rr, comment: resp.data.review.comment, score: resp.data.review.score }) : rr) }));
-                          setEditDialogOpen(false);
-                        } catch (e) {
-                          console.error('Edit review error', e);
-                          alert('A apărut o eroare la editare.');
-                        }
-                      }}>Salvează</Button>
-                    </DialogActions>
-                  </Dialog>
+          {/* Location Card - identic cu ProfilePage */}
+          <div className="profile-location-card">
+            <div className="profile-location-header">
+              <h2 className="profile-info-main-title">Locația utilizatorului</h2>
+            </div>
+            <div className="profile-location-map">
+              <div className="profile-location-map-frame">
+                <iframe
+                  title="Harta locației"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(profile?.localitate || 'Romania')}&output=embed`}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+          </div>
 
-                  {/* Delete confirmation dialog */}
-                  <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-                    <DialogTitle>Confirmare ștergere</DialogTitle>
-                    <DialogContent dividers>
-                      <Typography>Ești sigur(ă) că vrei să ștergi această recenzie? Această acțiune nu poate fi anulată.</Typography>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={() => setDeleteDialogOpen(false)}>Anulează</Button>
-                      <Button color="error" variant="contained" onClick={async () => {
-                        try {
-                          const id = deleteTargetId;
-                          await apiClient.delete(`/api/reviews/${id}`);
-                          setProfile(prev => ({ ...prev, reviews: prev.reviews.filter(rr => rr._id !== id) }));
-                        } catch (e) {
-                          console.error('Delete review error', e);
-                          alert('A apărut o eroare la ștergere.');
-                        } finally {
-                          setDeleteDialogOpen(false);
-                        }
-                      }}>Șterge</Button>
-                    </DialogActions>
-                  </Dialog>
+          {/* Contact Info Card - identic cu ProfilePage dar read-only */}
+          <div className="profile-info-main-card">
+            <div className="profile-info-content">
+              <div className="profile-info-header-section">
+                <h2 className="profile-info-main-title">Informații de Contact</h2>
+              </div>
+
+              <hr className="profile-divider" />
+
+              {/* Contact info in read-only mode */}
+              <div className="contact-list">
+                <div className="contact-row">
+                  <div className="contact-icon"><PersonIcon /></div>
+                  <div className="contact-field">
+                    <div className="contact-label">Nume</div>
+                    <div className={`contact-value ${!profile?.lastName ? 'unspecified' : ''}`}>
+                      {profile?.lastName || 'Nespecificat'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="contact-row">
+                  <div className="contact-icon"><PersonIcon /></div>
+                  <div className="contact-field">
+                    <div className="contact-label">Prenume</div>
+                    <div className={`contact-value ${!profile?.firstName ? 'unspecified' : ''}`}>
+                      {profile?.firstName || 'Nespecificat'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="contact-row">
+                  <div className="contact-icon"><PhoneIcon /></div>
+                  <div className="contact-field">
+                    <div className="contact-label">Telefon</div>
+                    <div className={`contact-value ${!profile?.phone ? 'unspecified' : ''}`}>
+                      {profile?.phone || 'Nespecificat'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="contact-row">
+                  <div className="contact-icon"><EmailIcon /></div>
+                  <div className="contact-field">
+                    <div className="contact-label">Email</div>
+                    <div className={`contact-value ${!profile?.email ? 'unspecified' : ''}`}>
+                      {profile?.email || 'Nespecificat'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="contact-row">
+                  <div className="contact-icon"><CalendarMonthIcon /></div>
+                  <div className="contact-field">
+                    <div className="contact-label">Membru din</div>
+                    <div className="contact-value">
+                      {profile?.createdAt
+                        ? new Date(profile.createdAt).toLocaleDateString('ro-RO', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: '2-digit'
+                          })
+                        : 'Nespecificat'}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </Grid>
-        </Grid>
-      </Container>
+          </div>
+        </div>
+
+        {/* Right column - Announcements sidebar - identic cu ProfilePage */}
+        <div className="profile-right-column">
+          <div className="profile-announcements-sidebar">
+            <h3 className="profile-section-title">
+              Anunțurile utilizatorului ({announcements.length})
+            </h3>
+
+            {announcementsLoading ? (
+              <Box className="profile-announcements-loading">
+                <CircularProgress size={20} />
+                <span className="profile-loading-inline-text">Se încarcă...</span>
+              </Box>
+            ) : announcements.length === 0 ? (
+              <Box className="profile-empty-state">Acest utilizator nu are anunțuri.</Box>
+            ) : (
+              <div className="profile-announcements-vertical">
+                {announcements.map((announcement) => (
+                  <div
+                    key={announcement._id}
+                    onClick={() => navigate(`/announcement/${announcement._id}`)}
+                    className="announcement-card-vertical"
+                  >
+                    {announcement.images && announcement.images.length > 0 ? (
+                      <img
+                        src={announcement.images[0]}
+                        alt={announcement.title}
+                        className="announcement-image"
+                      />
+                    ) : (
+                      <div className="announcement-image-placeholder">Fără imagine</div>
+                    )}
+
+                    <div className="announcement-card-body">
+                      <h4 className="announcement-title">{announcement.title}</h4>
+
+                      {announcement.price && (
+                        <p className="announcement-price">{announcement.price} lei</p>
+                      )}
+
+                      <p className="announcement-location">{announcement.localitate}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Review action dialogs */}
+      <Menu
+        anchorEl={menuState.anchorEl}
+        open={!!menuState.anchorEl}
+        onClose={() => setMenuState({ anchorEl: null, reviewId: null })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+            background: 'var(--pf-card-bg, #fff)',
+            border: '1px solid var(--pf-divider, #e6eef6)',
+            minWidth: 160,
+            py: 0.5,
+            transform: 'translateX(-10px)'
+          }
+        }}
+      >
+        <MenuItem onClick={() => {
+          const id = menuState.reviewId;
+          if (!id) return;
+          const current = profile.reviews.find(rr => rr._id === id) || {};
+          setEditPayload({ reviewId: id, comment: current.comment || '', score: (current.score || current.rating || '') });
+          setMenuState({ anchorEl: null, reviewId: null });
+          setEditDialogOpen(true);
+        }} sx={{ py: 1 }}>
+          <ListItemIcon sx={{ minWidth: 36 }}><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText primary={'Editează'} />
+        </MenuItem>
+        <MenuItem onClick={() => {
+          const id = menuState.reviewId;
+          if (!id) return;
+          setMenuState({ anchorEl: null, reviewId: null });
+          setDeleteTargetId(id);
+          setDeleteDialogOpen(true);
+        }} sx={{ py: 1 }}>
+          <ListItemIcon sx={{ minWidth: 36 }}><DeleteIcon fontSize="small" /></ListItemIcon>
+          <ListItemText primary={'Șterge'} />
+        </MenuItem>
+      </Menu>
+
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Editează recenzia</DialogTitle>
+        <DialogContent dividers>
+          <TextField
+            label="Scor (0-5)"
+            type="number"
+            inputProps={{ min: 0, max: 5, step: 0.5 }}
+            fullWidth
+            margin="dense"
+            value={editPayload.score}
+            onChange={(e) => setEditPayload(p => ({ ...p, score: e.target.value }))}
+          />
+          <TextField
+            label="Comentariu"
+            fullWidth
+            multiline
+            rows={4}
+            margin="dense"
+            value={editPayload.comment}
+            onChange={(e) => setEditPayload(p => ({ ...p, comment: e.target.value }))}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Anulează</Button>
+          <Button variant="contained" onClick={async () => {
+            try {
+              const id = editPayload.reviewId;
+              const body = { comment: editPayload.comment };
+              if (editPayload.score !== '') body.score = editPayload.score;
+              const resp = await apiClient.put(`/api/reviews/${id}`, body);
+              setProfile(prev => ({ ...prev, reviews: prev.reviews.map(rr => rr._id === id ? ({ ...rr, comment: resp.data.review.comment, score: resp.data.review.score }) : rr) }));
+              setEditDialogOpen(false);
+            } catch (e) {
+              console.error('Edit review error', e);
+              alert('A apărut o eroare la editare.');
+            }
+          }}>Salvează</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Confirmare ștergere</DialogTitle>
+        <DialogContent dividers>
+          <Typography>Ești sigur(ă) că vrei să ștergi această recenzie? Această acțiune nu poate fi anulată.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Anulează</Button>
+          <Button color="error" variant="contained" onClick={async () => {
+            try {
+              const id = deleteTargetId;
+              await apiClient.delete(`/api/reviews/${id}`);
+              setProfile(prev => ({ ...prev, reviews: prev.reviews.filter(rr => rr._id !== id) }));
+            } catch (e) {
+              console.error('Delete review error', e);
+              alert('A apărut o eroare la ștergere.');
+            } finally {
+              setDeleteDialogOpen(false);
+            }
+          }}>Șterge</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
