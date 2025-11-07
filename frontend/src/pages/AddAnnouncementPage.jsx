@@ -6,7 +6,9 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
@@ -82,6 +84,7 @@ export default function AddAnnouncementPage() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
@@ -472,6 +475,7 @@ export default function AddAnnouncementPage() {
 
   const handleClose = () => {
     setAnchorEl(null);
+    setLocationSearch("");
   };
 
   const handleLocationSelect = (judet, localitate) => {
@@ -497,6 +501,27 @@ export default function AddAnnouncementPage() {
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+  // Helpers for filtering with search
+  const filteredJudete = React.useMemo(() => {
+    if (!locationSearch.trim()) return judete;
+    const q = locationSearch.toLowerCase();
+    return judete.filter(j => j.toLowerCase().includes(q));
+  }, [locationSearch]);
+
+  const getLocalitatiForJudet = (jud) => {
+    const orase = localitatiPeJudet[jud]?.orase?.map(o => o.nume) || [];
+    const comune = localitatiPeJudet[jud]?.comune || [];
+    return [...orase, ...comune].sort((a, b) => a.localeCompare(b, 'ro'));
+  };
+
+  const filteredLocalitati = React.useMemo(() => {
+    if (!selectedJudet) return [];
+    const all = getLocalitatiForJudet(selectedJudet);
+    if (!locationSearch.trim()) return all;
+    const q = locationSearch.toLowerCase();
+    return all.filter(l => l.toLowerCase().includes(q));
+  }, [selectedJudet, locationSearch]);
 
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
@@ -780,69 +805,127 @@ export default function AddAnnouncementPage() {
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             PaperProps={{
               sx: {
-                minWidth: 260,
-                maxHeight: 400,
+                minWidth: 300,
+                width: { xs: 320, sm: 380 },
                 marginLeft: '60px',
-                marginTop: '15px',
+                marginTop: '12px',
                 backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
                 color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
-                border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb'
+                border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
+                borderRadius: 12,
+                boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+                p: 1,
+                overflow: 'hidden'
               }
             }}
           >
-            {!selectedJudet ? (
-              <>
-                <Typography sx={{ p: 2, fontWeight: 600 }}>Alege un județ</Typography>
-                <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                  {judete.map((judet) => (
+            <Box sx={{ maxHeight: 480, overflowY: 'auto', borderRadius: 10, backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white', color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit' }}>
+              {!selectedJudet ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>
+                  <Typography sx={{ fontWeight: 700, mb: 1 }}>Alege județul</Typography>
+                  <TextField
+                    value={locationSearch}
+                    onChange={(e) => setLocationSearch(e.target.value)}
+                    placeholder="Caută județ..."
+                    size="small"
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      )
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': { borderRadius: 9999, backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#fff' },
+                      '& .MuiInputBase-input': { color: (theme) => theme.palette.mode === 'dark' ? '#fff' : 'inherit' }
+                    }}
+                  />
+                </Box>
+                <Divider sx={{ borderColor: (theme) => theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb' }} />
+                <List sx={{ px: 1 }}>
+                  {filteredJudete.map((judet) => (
                     <ListItemButton
                       key={judet}
                       onClick={() => {
-                        if (judet === "Toată țara") {
+                        if (judet === 'Toată țara') {
                           setSelectedJudet(null);
-                          setSelectedLocalitate("");
-                          setAnchorEl(null);
+                          setSelectedLocalitate('');
+                          handleClose();
                         } else {
                           setSelectedJudet(judet);
+                          setLocationSearch('');
                         }
                       }}
-                      divider
+                      sx={{ 
+                        borderRadius: 2, 
+                        mb: 0.5,
+                        '&:hover': {
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#505050' : '#f5f5f5'
+                        }
+                      }}
                     >
                       <ListItemText
-                        primary={judet === "Toată țara" ? <span style={{ fontWeight: 'bold' }}>Toată țara</span> : judet}
+                        primary={judet === 'Toată țara' ? (
+                          <Chip label="Toată țara" color="primary" size="small" sx={{ borderRadius: 2 }} />
+                        ) : judet}
                       />
                     </ListItemButton>
                   ))}
                 </List>
-              </>
-            ) : (
-              <>
-                <Typography sx={{ p: 2, fontWeight: 600 }}>Alege localitatea</Typography>
-                {/* Mutăm butonul Înapoi la județe deasupra listei */}
-                <List sx={{ maxHeight: 320, overflow: 'auto' }}>
-                  <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                    <ListItemText primary={<span style={{ color: '#f51866' }}>Înapoi la județe</span>} />
-                  </ListItemButton>
-                  {/* Orase + Comune sortate alfabetic */}
-                  {(() => {
-                    const orase = localitatiPeJudet[selectedJudet]?.orase?.map(o => o.nume) || [];
-                    const comune = localitatiPeJudet[selectedJudet]?.comune || [];
-                    return [...orase, ...comune].sort((a, b) => a.localeCompare(b, 'ro')).map((localitate) => (
-                      <ListItemText
-                        key={localitate}
-                        primary={localitate}
-                        sx={{ px: 2, py: 1.5, cursor: 'pointer' }}
-                        onClick={() => {
-                          setSelectedLocalitate(localitate);
-                          setAnchorEl(null);
-                          setSelectedJudet(null);
-                        }}
-                      />
-                    ));
-                  })()}
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ px: 2, pt: 1, pb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <IconButton size="small" onClick={() => { setSelectedJudet(null); setLocationSearch(''); }}>
+                    <ArrowBackIosNewIcon fontSize="small" />
+                  </IconButton>
+                  <Typography sx={{ fontWeight: 700 }}>Alege localitatea</Typography>
+                </Box>
+                <Box sx={{ px: 2 }}>
+                  <TextField
+                    value={locationSearch}
+                    onChange={(e) => setLocationSearch(e.target.value)}
+                    placeholder={`Caută în ${selectedJudet}...`}
+                    size="small"
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      )
+                    }}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 9999, backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#fff' }, '& .MuiInputBase-input': { color: (theme) => theme.palette.mode === 'dark' ? '#fff' : 'inherit' } }}
+                  />
+                </Box>
+                <Divider sx={{ borderColor: (theme) => theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb' }} />
+                <List sx={{ px: 1 }}>
+                  {filteredLocalitati.map((localitate) => (
+                    <ListItemButton
+                      key={localitate}
+                      onClick={() => {
+                        setSelectedLocalitate(localitate);
+                        handleClose();
+                        setSelectedJudet(null);
+                        setLocationSearch('');
+                      }}
+                      sx={{ 
+                        borderRadius: 2, 
+                        mb: 0.5,
+                        '&:hover': {
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#505050' : '#f5f5f5'
+                        }
+                      }}
+                    >
+                      <ListItemText primary={localitate} />
+                    </ListItemButton>
+                  ))}
                 </List>
-              </>
-            )}
+                </Box>
+              )}
+            </Box>
           </Popover>
         </div>
         {locationError && (
