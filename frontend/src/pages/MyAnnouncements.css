@@ -926,7 +926,7 @@
 }
 
 .dark-mode .my-announcements-search-header::before {
-  background: linear-gradient(90deg, #6ba3d8 0%, #8bbfe0 100%);
+  background: linear-gradient(90deg, #f51866 0%, #ffffff 100%);
 }
 
 .dark-mode .my-announcements-search-header .MuiTextField-root,

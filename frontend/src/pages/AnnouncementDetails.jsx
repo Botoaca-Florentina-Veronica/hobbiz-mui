@@ -1,3 +1,18 @@
+/**
+ * AnnouncementDetails
+ * ------------------------------------------------------------
+ * Pagina de detalii pentru un anunț.
+ * Obiectiv: păstrăm comportamentul neschimbat și reorganizăm codul pentru lizibilitate.
+ *
+ * Structura logică a fișierului:
+ *  - Imports (React, 3rd-party, componente interne, stiluri)
+ *  - Componenta principală: state-uri, efecte, utilitare, handlere
+ *  - Render helpers (funcții pure de afișare)
+ *  - JSX (secțiuni clar marcate)
+ *  - Dialoguri/Popups (chat, rating, zoom)
+ *
+ * Notă: Modificările sunt doar de documentare/comentarii. Nu am schimbat logica sau JSX-ul funcțional.
+ */
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import ImageZoomModal from '../components/ImageZoomModal';
@@ -48,40 +63,46 @@ import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
 import ChatPopup from '../components/ChatPopup';
 
 export default function AnnouncementDetails() {
+  // ========== Routing & Navigation ==========
   const { id } = useParams();
   const locationHook = useLocation();
+
+  // ========== Local UI banners / loaders ==========
   const [showUpdatedBanner, setShowUpdatedBanner] = useState(false);
   const [bannerPhase, setBannerPhase] = useState('idle'); // idle | enter | shown | exit
   const navigate = useNavigate();
   const [announcement, setAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Favorite logic (migrated to AuthContext). Fallback to localStorage for guest.
+  // ========== Favorite ==========
+  // Favorite logic (migrated to AuthContext). Fallback la localStorage pentru guest.
   const { favorites, toggleFavorite, user } = useAuth() || {};
   const [isFavorite, setIsFavorite] = useState(false); // local UI state
   
-  // Carousel logic
+  // ========== Carousel ==========
   const [imgIndex, setImgIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const timeoutRef = useRef();
 
-  // Modal zoom logic
+  // ========== Modal Zoom ==========
   const [zoomOpen, setZoomOpen] = useState(false);
   const [zoomIndex, setZoomIndex] = useState(0);
   
-  // Chat and contact logic
+  // ========== Chat & Contact ==========
   const [showChat, setShowChat] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
 
-  // Rating dialog state
+  // ========== Rating dialog ==========
   const [rateOpen, setRateOpen] = useState(false);
   const [ratingValue, setRatingValue] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
 
-  // Seller profile & reviews (used to display a short review summary in the seller card)
+  // ========== Seller profile & reviews ==========
+  // Folosit pentru a afișa un scurt rezumat în cardul vânzătorului.
   const [sellerProfile, setSellerProfile] = useState(null);
   const [sellerReviewsLoading, setSellerReviewsLoading] = useState(false);
 
+  // ========== Rating handlers ==========
   const handleRateClick = (e) => {
     e?.stopPropagation();
     setRateOpen(true);
@@ -91,6 +112,10 @@ export default function AnnouncementDetails() {
     setRatingValue(5);
     setRatingComment('');
   };
+  /**
+   * Trimite evaluarea către backend și redirecționează către profilul public al vânzătorului.
+   * Nu alterează comportamentul existent; doar docstring.
+   */
   const handleRateSubmit = async () => {
     try {
       // Ensure we have the target user id
@@ -121,7 +146,7 @@ export default function AnnouncementDetails() {
     }
   };
 
-  // Fetch seller public profile (contains reviews) when announcement is loaded
+  // ========== Effects: load seller public profile (cu recenzii) ==========
   useEffect(() => {
     let mounted = true;
     async function fetchSellerProfile() {
@@ -142,6 +167,7 @@ export default function AnnouncementDetails() {
     return () => { mounted = false; };
   }, [announcement?.user?._id]);
 
+  // ========== Render helper: sumar recenzii vânzător ==========
   const renderSellerReviewsSummary = () => {
     const reviews = sellerProfile?.reviews;
     if (!Array.isArray(reviews) || reviews.length === 0) {
@@ -159,7 +185,7 @@ export default function AnnouncementDetails() {
     );
   };
 
-  // Dark mode helpers and accent palette
+  // ========== Dark mode helpers and accent palette ==========
   const [isDarkMode, setIsDarkMode] = useState(false);
   const getIsDarkMode = () => isDarkMode;
   const getAccentCss = () => (isDarkMode ? '#f51866' : '#355070');
@@ -183,7 +209,7 @@ export default function AnnouncementDetails() {
     }
   });
 
-  // Keep component in sync with global dark-mode class toggles
+  // ========== Effects: sincronizare cu clasa globală dark-mode ==========
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const body = document.body;
@@ -194,6 +220,7 @@ export default function AnnouncementDetails() {
     return () => observer.disconnect();
   }, []);
 
+  // ========== Effects: încărcarea anunțului + banner "updated" ==========
   useEffect(() => {
     async function fetchAnnouncement() {
       setLoading(true);
@@ -238,7 +265,7 @@ export default function AnnouncementDetails() {
     } catch { /* ignore */ }
   }, [id]);
 
-  // Sync local isFavorite with context when data changes
+  // ========== Effects: sincronizare favorite ==========
   useEffect(() => {
     if (!announcement?._id) return;
     if (user) {
@@ -261,6 +288,7 @@ export default function AnnouncementDetails() {
     }
   }, [announcement?._id, favorites, user]);
 
+  // ========== Action handlers ==========
   const handleToggleFavorite = () => {
     if (!announcement?._id) return;
     if (user) {
@@ -291,6 +319,9 @@ export default function AnnouncementDetails() {
     }
   };
 
+  /**
+   * Share: încearcă Web Share API, altfel copiază link-ul în clipboard.
+   */
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -308,6 +339,7 @@ export default function AnnouncementDetails() {
     }
   };
 
+  // ========== Utilitare de format ==========
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ro-RO', {
       day: '2-digit',
@@ -365,6 +397,7 @@ export default function AnnouncementDetails() {
 
   const images = announcement.images || [];
   const showArrows = images.length > 1;
+  /** Returnează src pentru imagine (acceptă http / uploads). */
   const getImageSrc = (img) =>
     img.startsWith('http') || img.startsWith('/uploads')
       ? img
@@ -430,6 +463,7 @@ export default function AnnouncementDetails() {
           pb: { xs: 'calc(96px + env(safe-area-inset-bottom))', md: 0 }
         }}
       >
+        {/* ========== Updated banner (apare după editare reușită) ========== */}
         {showUpdatedBanner && (
           <div
             className={`updated-banner ${bannerPhase === 'enter' || bannerPhase === 'shown' ? 'enter' : ''} ${bannerPhase === 'exit' ? 'exit' : ''}`}
@@ -478,7 +512,7 @@ export default function AnnouncementDetails() {
             >×</button>
           </div>
         )}
-        {/* Back Button */}
+        {/* ========== Back Button ========== */}
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate(-1)}
@@ -493,7 +527,7 @@ export default function AnnouncementDetails() {
         </Button>
 
         <Grid container spacing={4}>
-          {/* Main Content */}
+          {/* ========== Main Content ========== */}
           <Grid item xs={12} md={8} order={{ xs: 1, md: 1 }}>
             {/* Image Carousel */}
             <Card className="seller-card" elevation={3} sx={{ mb: 3, overflow: 'hidden', mt: { xs: 0, md: 4 } }}>
@@ -776,7 +810,7 @@ export default function AnnouncementDetails() {
             </Card>
           </Grid>
 
-          {/* Seller Information Sidebar + Location Map */}
+          {/* ========== Seller Information Sidebar + Location Map ========== */}
           <Grid item xs={12} md={4} order={{ xs: 2, md: 2 }}>
             <Box sx={{ position: { md: 'sticky' }, top: { md: 120 } }}>
             <Card className="seller-card" elevation={2} sx={{ mb: 3, mt: { xs: 0, md: 4 } }}>
@@ -927,7 +961,7 @@ export default function AnnouncementDetails() {
         </Grid>
       </Container>
 
-      {/* Chat Popup */}
+      {/* ========== Chat Popup ========== */}
       {showChat && !isOwnAnnouncement && (
         <ChatPopup
           open={showChat}
@@ -948,7 +982,7 @@ export default function AnnouncementDetails() {
         />
       )}
 
-      {/* Rating Dialog */}
+      {/* ========== Rating Dialog ========== */}
       <Dialog open={rateOpen} onClose={handleRateClose} fullWidth maxWidth="sm">
         <DialogTitle>Evaluează utilizatorul</DialogTitle>
         <DialogContent>
@@ -976,7 +1010,7 @@ export default function AnnouncementDetails() {
         </DialogActions>
       </Dialog>
 
-      {/* Image Zoom Modal */}
+      {/* ========== Image Zoom Modal ========== */}
       {zoomOpen && (
         <ImageZoomModal
           open={zoomOpen}
@@ -988,7 +1022,7 @@ export default function AnnouncementDetails() {
         />
       )}
 
-      {/* Debug info */}
+      {/* Debug info (păstrat pentru dezvoltare) */}
       {console.log('🎯 ChatPopup render conditions:', {
         showChat,
         loggedUserId: !!loggedUserId,

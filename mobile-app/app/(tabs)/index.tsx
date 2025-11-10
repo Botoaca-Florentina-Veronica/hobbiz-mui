@@ -68,6 +68,8 @@ const HERO_IMAGE_CONFIG = {
 
 export default function HomeScreen() {
   const { tokens, isDark } = useAppTheme();
+  // shared border style for inner container-like cards (used in popular cards)
+  const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
   const { columnsForCategories, width: screenWidth, isPhone, isTablet, isLargeTablet, scale } = useResponsive();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -157,7 +159,7 @@ export default function HomeScreen() {
         onNotificationClick={() => router.push('/notifications')}
       />
   <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.mainContent, { backgroundColor: tokens.colors.surface }]}>
+  <View style={[styles.mainContent, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}> 
           {
             (() => {
               // Determină dimensiunea titlului în mod responsive
@@ -238,8 +240,8 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Popular announcements */}
-        <View style={[styles.popularSection, { backgroundColor: tokens.colors.surface }]}>
+  {/* Popular announcements */}
+  <View style={[styles.popularSection, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <ThemedText style={[styles.popularTitle, { color: tokens.colors.text }]}>Anunțuri populare</ThemedText>
             <TouchableOpacity onPress={() => router.push('/announcement-details?sort=popular') }>
@@ -288,8 +290,8 @@ export default function HomeScreen() {
                     const itemStyle = [
                       styles.popularCard,
                       {
-                        backgroundColor: tokens.colors.surface,
-                        borderColor: subtleBorder,
+                        // Use dark-mode container token for inner cards; the outer popularSection remains unmodified (no border)
+                        backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface,
                         width: cardWidth,
                         marginRight: isLastInRow ? 0 : gap,
                         marginBottom: 12,
@@ -298,6 +300,7 @@ export default function HomeScreen() {
                         shadowOpacity: 0.04,
                         shadowRadius: 6,
                         elevation: 2,
+                        ...containerBorderStyle,
                       },
                     ];
                     // render placeholder card (fills empty slot) with a single informative text
@@ -376,7 +379,7 @@ export default function HomeScreen() {
           )}
         </View>
 
-        <View style={[styles.categoriesSection, { backgroundColor: tokens.colors.surface }]}>
+  <View style={[styles.categoriesSection, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}>
           <ThemedText style={[styles.categoriesTitle, { color: tokens.colors.text }]}>
             Explorează categorii
           </ThemedText>

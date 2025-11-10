@@ -46,6 +46,8 @@ export default function MyAnnouncementsScreen() {
   const { isDark, tokens } = useAppTheme();
   
   const styles = useMemo(() => createStyles(tokens), [tokens]);
+  // shared border style for container-like elements to match other pages
+  const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
   const insets = useSafeAreaInsets();
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -223,7 +225,8 @@ export default function MyAnnouncementsScreen() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Header (match 'Contul tău' layout: back button + title) -- placed inside ScrollView so it scrolls */}
-        <View style={[styles.header, { paddingTop: insets.top }]}> 
+  {/* Remove default header bottom border on this screen to avoid a visible line above the search container */}
+  <View style={[styles.header, { paddingTop: insets.top, borderBottomWidth: 0, borderBottomColor: 'transparent' }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
@@ -234,9 +237,18 @@ export default function MyAnnouncementsScreen() {
 
         {/* Search and Filter Section */}
         {announcements.length > 0 && (
-          <View style={styles.searchSection}>
+          <View style={[
+            styles.searchSection, 
+            { 
+              backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface,
+              borderWidth: isDark ? 1 : 0,
+              borderColor: isDark ? tokens.colors.borderNeutral : 'transparent',
+              borderRadius: 12,
+              overflow: 'hidden',
+            }
+          ]}> 
             {/* Search Bar */}
-            <View style={styles.searchBar}>
+            <View style={[styles.searchBar, { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' }]}>
               <Ionicons name="search" size={20} color={tokens.colors.muted} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
@@ -253,6 +265,7 @@ export default function MyAnnouncementsScreen() {
               <TouchableOpacity
                 style={[
                   styles.filterButton,
+                  { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' },
                   activePickerType === 'category' && styles.filterButtonActive,
                 ]}
                 onPress={() => setActivePickerType(activePickerType === 'category' ? null : 'category')}
@@ -275,6 +288,7 @@ export default function MyAnnouncementsScreen() {
               <TouchableOpacity
                 style={[
                   styles.filterButton,
+                  { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' },
                   activePickerType === 'sort' && styles.filterButtonActive,
                 ]}
                 onPress={() => setActivePickerType(activePickerType === 'sort' ? null : 'sort')}
@@ -351,7 +365,7 @@ export default function MyAnnouncementsScreen() {
             return (
               <View
                 key={announcement._id}
-                style={[styles.card, isLarge && styles.cardLarge]}
+                style={[styles.card, isLarge && styles.cardLarge, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}
               >
                 {/* Image - Left side */}
                 <TouchableOpacity
@@ -428,13 +442,13 @@ export default function MyAnnouncementsScreen() {
                       <>
                         <View style={styles.actionsRow}>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.equalButtonTwo, styles.primaryButton]}
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleEdit(announcement)}
                           >
                             <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton]}
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
                             <Text numberOfLines={1} style={styles.secondaryButtonText}>Ascunde</Text>
@@ -442,16 +456,21 @@ export default function MyAnnouncementsScreen() {
                         </View>
                         <View style={styles.actionsRow}>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.equalButtonTwo, styles.dangerButton]}
+                            style={[styles.actionButton, styles.equalButtonTwo, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDelete(announcement._id)}
                           >
                             <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton]}
+                            style={[
+                              styles.actionButton,
+                              styles.equalButtonTwo,
+                              styles.secondaryButton,
+                              isDark ? { backgroundColor: '#121212', borderColor: tokens.colors.turquoise, borderWidth: 1 } : {},
+                            ]}
                             onPress={() => handleReactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
+                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>Reactualizează</Text>
                           </TouchableOpacity>
                         </View>
                       </>
@@ -460,13 +479,13 @@ export default function MyAnnouncementsScreen() {
                       <>
                         <View style={styles.actionsRow}>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.fillButton, styles.primaryButton]}
+                            style={[styles.actionButton, styles.fillButton, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleEdit(announcement)}
                           >
                             <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
+                            style={[styles.actionButton, styles.secondaryButton, styles.compactButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
                             <Text numberOfLines={1} style={styles.secondaryButtonText}>Ascunde</Text>
@@ -474,16 +493,21 @@ export default function MyAnnouncementsScreen() {
                         </View>
                         <View style={styles.actionsRow}>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.fillButton, styles.dangerButton]}
+                            style={[styles.actionButton, styles.fillButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDelete(announcement._id)}
                           >
                             <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={[styles.actionButton, styles.secondaryButton, styles.compactButton]}
+                            style={[
+                              styles.actionButton,
+                              styles.secondaryButton,
+                              styles.compactButton,
+                              isDark ? { backgroundColor: '#121212', borderColor: tokens.colors.turquoise, borderWidth: 1 } : {},
+                            ]}
                             onPress={() => handleReactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Reactualizează</Text>
+                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>Reactualizează</Text>
                           </TouchableOpacity>
                         </View>
                       </>
@@ -516,7 +540,7 @@ export default function MyAnnouncementsScreen() {
           onPress={() => setActivePickerType(null)}
         >
           <TouchableOpacity 
-            style={styles.modalContent} 
+            style={[styles.modalContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]} 
             activeOpacity={1}
             onPress={(e) => e.stopPropagation()}
           >
@@ -539,6 +563,7 @@ export default function MyAnnouncementsScreen() {
                       key={cat}
                       style={[
                         styles.modalOption,
+                        { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' },
                         categoryFilter === cat && styles.modalOptionSelected,
                       ]}
                       onPress={() => {
@@ -684,19 +709,19 @@ const createStyles = (tokens: any) => StyleSheet.create({
     paddingBottom: 12,
   },
   searchSection: {
-    backgroundColor: tokens.colors.surface,
-    borderRadius: 12,
+    // Base styles; border, borderRadius, overflow applied inline for precise control in dark mode
     padding: 12,
     marginBottom: 16,
+    // Minimal shadow to avoid artifacts with overflow:hidden
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 4,
       },
       android: {
-        elevation: 3,
+        elevation: 1,
       },
     }),
   },

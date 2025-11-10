@@ -13,7 +13,7 @@ import { useAuth } from '../src/context/AuthContext';
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
 export default function SettingsScreen() {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const { logout } = useAuth();
   const insets = useSafeAreaInsets();
@@ -143,14 +143,14 @@ export default function SettingsScreen() {
         </View>
 
         {/* Settings List */}
-        <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+        <View style={[styles.card, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, borderColor: tokens.colors.borderNeutral }]}>
           {settings.map((item, index) => (
             <View key={item.key}>
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={[
                   styles.row,
-                  { backgroundColor: tokens.colors.surface },
+                  { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, borderBottomColor: tokens.colors.borderNeutral },
                   index === settings.length - 1 && !expandedSection && styles.lastRow,
                 ]}
                 onPress={() => {
@@ -170,7 +170,7 @@ export default function SettingsScreen() {
 
               {/* Expanded content for Change Password */}
               {expandedSection === 'change-password' && item.key === 'change-password' && (
-                <View style={[styles.expandedContent, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}>
+                <View style={[styles.expandedContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}> 
                   <View style={styles.formGroup}>
                     <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Parola curentă</ThemedText>
                     <TextInput
@@ -208,7 +208,7 @@ export default function SettingsScreen() {
 
               {/* Expanded content for Change Email */}
               {expandedSection === 'change-email' && item.key === 'change-email' && (
-                <View style={[styles.expandedContent, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.border }]}>
+                <View style={[styles.expandedContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}> 
                   <View style={styles.formGroup}>
                     <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Email nou</ThemedText>
                     <TextInput
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 24, fontWeight: '600' },
   card: {
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 12,
     gap: 12,
     borderWidth: 1,
@@ -301,7 +301,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  lastRow: { marginBottom: 0 },
+  // when lastRow is used we also hide the bottom separator so it doesn't show
+  // as an extra line beneath the last item (card already has an outer border)
+  lastRow: { marginBottom: 0, borderBottomWidth: 0, borderBottomColor: 'transparent' },
   rowLabel: { fontSize: 15, fontWeight: '500', flexShrink: 1 },
   expandedContent: {
     marginTop: 12,

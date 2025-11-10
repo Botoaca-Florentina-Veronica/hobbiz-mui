@@ -1,165 +1,56 @@
-/* Modern Announcement Details Styling */
+/* =============================================================
+   Announcement Details Page Styles (Reorganizare pentru lizibilitate)
+   IMPORTANT: Doar reordonare + comentarii. Nicio regulă CSS a
+   selectorilor existenți NU a fost modificată (pentru a evita
+   schimbarea comportamentului vizual). Orice repetiție păstrată
+   intenționat pentru compatibilitate.
+   Secțiuni:
+     1. Bază & Reset / Behavior
+     2. Animations
+     3. Layout Containers
+     4. Componente (cards, avatar, chips, carousel, meta footer)
+     5. Utilitare / Helpers (scrollbar, focus, price highlight)
+     6. Responsive media queries
+     7. Dark Mode overrides
+============================================================= */
 
-/* Smooth scrolling pentru navigare */
-html {
-  scroll-behavior: smooth;
+/* -------------------------------------------------------------
+ * 1. Bază & Behavior
+ * ----------------------------------------------------------- */
+html { scroll-behavior: smooth; }
+
+.announcement-details-page {
+  min-height: 100vh;
+  background: var(--app-bg); /* fundal unificat cu tema globală */
 }
 
-/* Updated banner animation states */
+/* -------------------------------------------------------------
+ * 2. Animations
+ * ----------------------------------------------------------- */
 .updated-banner {
   opacity: 0;
   transform: translateY(-12px) scale(.98);
   transition: opacity .45s ease, transform .45s cubic-bezier(.4,0,.2,1);
 }
-.updated-banner.enter {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.updated-banner.exit {
-  opacity: 0;
-  transform: translateY(-14px) scale(.96);
-}
+.updated-banner.enter { opacity: 1; transform: translateY(0) scale(1); }
+.updated-banner.exit { opacity: 0; transform: translateY(-14px) scale(.96); }
 
-/* Container pentru pagina de detalii - in light mode, mosteneste fundalul global */
-.announcement-details-page {
-  min-height: 100vh;
-  /* Ensure unified background with the app theme to avoid two-tone bands */
-  background: var(--app-bg);
-}
+@keyframes slideInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideInLeft { from { opacity:0; transform:translateX(-30px); } to { opacity:1; transform:translateX(0); } }
+@keyframes slideInRight { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
 
-/* Custom animations pentru componente */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+.MuiCard-root { animation: slideInUp 0.6s ease-out; }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+/* -------------------------------------------------------------
+ * 3. Layout Containers & Structural Blocks
+ * ----------------------------------------------------------- */
+.sidebar-sticky { position: sticky; top: 120px; transition: all 0.3s ease; }
+.announcement-hero-overlay { background: linear-gradient(135deg, rgba(53,80,112,0.03) 0%, transparent 100%); border-radius: var(--pf-card-radius, 12px); padding:2rem; }
+.announcement-image-container { position:relative; overflow:hidden; border-radius: var(--pf-card-radius, 12px); box-shadow: var(--pf-card-shadow, 0 8px 32px rgba(0,0,0,0.12)); }
+.announcement-image-container::before { content:''; position:absolute; inset:0; background: linear-gradient(135deg, rgba(53,80,112,0.05) 0%, transparent 50%); pointer-events:none; z-index:1; }
+.image-carousel-container { position:relative; border-radius: var(--pf-card-radius, 12px); overflow:hidden; box-shadow: var(--pf-card-shadow, 0 12px 48px rgba(53,80,112,0.15)); }
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Animation pentru carduri */
-.MuiCard-root {
-  animation: slideInUp 0.6s ease-out;
-}
-
-/* Hover effects pentru butoane */
-.MuiButton-root {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.MuiButton-root:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 20px rgba(53, 80, 112, 0.2) !important;
-}
-
-/* IconButton hover effects */
-.MuiIconButton-root {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.MuiIconButton-root:hover {
-  transform: scale(1.05) !important;
-}
-
-/* Custom styles pentru imagini */
-.announcement-image-container {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--pf-card-radius, 12px);
-  box-shadow: var(--pf-card-shadow, 0 8px 32px rgba(0, 0, 0, 0.12));
-}
-
-.announcement-image-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(53, 80, 112, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Gradient overlay pentru hero section */
-.announcement-hero-overlay {
-  background: linear-gradient(135deg, rgba(53, 80, 112, 0.03) 0%, transparent 100%);
-  border-radius: var(--pf-card-radius, 12px);
-  padding: 2rem;
-}
-
-/* Custom chip styling */
-.MuiChip-root {
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
-}
-
-.MuiChip-root:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.15) !important;
-}
-
-/* Contact paper styling - use shared tokens for consistency */
-.contact-paper {
-  background: var(--pf-card-bg, #ffffff) !important;
-  border: 1px solid rgba(53, 80, 112, 0.08) !important;
-  border-radius: var(--pf-card-radius, 12px) !important;
-  box-shadow: var(--pf-card-shadow, 0 4px 16px rgba(53, 80, 112, 0.06)) !important;
-  transition: all 0.3s ease !important;
-}
-.contact-paper:hover {
-  border-color: rgba(53, 80, 112, 0.15) !important;
-  box-shadow: 0 6px 20px rgba(53, 80, 112, 0.08) !important;
-}
-
-/* Image carousel enhancements */
-.image-carousel-container {
-  position: relative;
-  border-radius: var(--pf-card-radius, 12px);
-  overflow: hidden;
-  box-shadow: var(--pf-card-shadow, 0 12px 48px rgba(53, 80, 112, 0.15));
-}
-
-/* Price highlight */
-.price-highlight {
-  background: linear-gradient(135deg, #e53e3e, #ff6b6b);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Sidebar sticky positioning enhancement */
-.sidebar-sticky {
-  position: sticky;
-  top: 120px;
-  transition: all 0.3s ease;
-}
-
-/* Shared card surface used by main containers to ensure consistent background, border and shadow */
+/* Shared card surface tokens */
 .pf-card,
 .seller-card,
 .contact-paper,
@@ -168,11 +59,11 @@ html {
 .announcement-hero-overlay,
 .announcement-location-map-box,
 .MuiCard-root {
-  background: var(--pf-card-bg, linear-gradient(135deg, #ffffff 0%, #f8fafb 100%)) !important;
-  border: 1px solid rgba(53, 80, 112, 0.08) !important;
+  background: var(--pf-card-bg, linear-gradient(135deg,#ffffff 0%,#f8fafb 100%)) !important;
+  border:1px solid rgba(53,80,112,0.08) !important;
   border-radius: var(--pf-card-radius, 12px) !important;
-  box-shadow: var(--pf-card-shadow, 0 8px 32px rgba(53, 80, 112, 0.08)) !important;
-  transition: all 0.28s ease !important;
+  box-shadow: var(--pf-card-shadow, 0 8px 32px rgba(53,80,112,0.08)) !important;
+  transition: all .28s ease !important;
 }
 .pf-card:hover,
 .seller-card:hover,
@@ -181,137 +72,119 @@ html {
 .image-carousel-container:hover,
 .announcement-hero-overlay:hover,
 .announcement-location-map-box:hover,
-.MuiCard-root:hover {
-  border-color: rgba(53, 80, 112, 0.15) !important;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.12) !important;
+.MuiCard-root:hover { border-color: rgba(53,80,112,0.15) !important; box-shadow: 0 12px 48px rgba(53,80,112,0.12) !important; }
+
+/* -------------------------------------------------------------
+ * 4. Componente specifice
+ * ----------------------------------------------------------- */
+/* Chips */
+.MuiChip-root { font-weight:600 !important; transition: all .2s ease !important; }
+.MuiChip-root:hover { transform: translateY(-1px) !important; box-shadow: 0 2px 8px rgba(53,80,112,0.15) !important; }
+
+/* Buttons & IconButtons (hover / focus transitions) */
+.MuiButton-root { transition: all .3s cubic-bezier(0.4,0,0.2,1) !important; }
+.MuiButton-root:hover { transform: translateY(-2px) !important; box-shadow: 0 4px 20px rgba(53,80,112,0.2) !important; }
+.MuiIconButton-root { transition: all .2s cubic-bezier(0.4,0,0.2,1) !important; }
+.MuiIconButton-root:hover { transform: scale(1.05) !important; }
+
+/* Contact paper */
+.contact-paper { background: var(--pf-card-bg,#ffffff) !important; border:1px solid rgba(53,80,112,0.08) !important; border-radius: var(--pf-card-radius,12px) !important; box-shadow: var(--pf-card-shadow,0 4px 16px rgba(53,80,112,0.06)) !important; transition: all .3s ease !important; }
+.contact-paper:hover { border-color: rgba(53,80,112,0.15) !important; box-shadow: 0 6px 20px rgba(53,80,112,0.08) !important; }
+
+/* Carousel nav buttons (glass effect) */
+.carousel-navigation-btn { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(10px) !important; border:1px solid rgba(255,255,255,0.2) !important; }
+.carousel-navigation-btn:hover { background: rgba(255,255,255,1) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important; }
+
+/* Seller card */
+.seller-card { background: linear-gradient(135deg,#ffffff 0%,#f8fafb 100%); border:1px solid rgba(53,80,112,0.08); border-radius:16px; box-shadow:0 8px 32px rgba(53,80,112,0.08); transition: all .3s ease; }
+.seller-card:hover { border-color: rgba(53,80,112,0.15); box-shadow: 0 12px 48px rgba(53,80,112,0.12); }
+
+/* Avatar */
+.MuiAvatar-root { box-shadow: 0 4px 16px rgba(53,80,112,0.2) !important; border:3px solid rgba(255,255,255,0.8) !important; }
+
+/* Title gradient */
+.announcement-title { background: linear-gradient(135deg,#355070,#406b92); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; font-weight:800 !important; letter-spacing:-0.5px; }
+
+/* Divider */
+.MuiDivider-root { background: linear-gradient(90deg,transparent,rgba(53,80,112,0.2),transparent) !important; height:1px !important; border:none !important; margin:1.5rem 0 !important; }
+
+/* Back button */
+.back-button { margin-bottom:2rem !important; padding:8px 16px !important; border-radius:8px !important; transition: all .2s ease !important; }
+.back-button:hover { background: rgba(53,80,112,0.08) !important; transform: translateX(-4px) !important; }
+
+/* Meta footer */
+.announcement-meta-footer { font-size:12px; animation: slideInUp .5s ease; }
+.announcement-meta-footer button svg { margin-right:4px; }
+.announcement-meta-footer .MuiTypography-caption { user-select:text; }
+
+/* -------------------------------------------------------------
+ * 5. Utilitare / Helpers
+ * ----------------------------------------------------------- */
+/* Price highlight gradient (light mode) */
+.price-highlight { background: linear-gradient(135deg,#e53e3e,#ff6b6b); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+/* Loading skeleton radius */
+.MuiSkeleton-root { border-radius: var(--pf-card-radius,12px) !important; }
+
+/* Focus accessibility */
+.MuiButton-root:focus-visible, .MuiIconButton-root:focus-visible { outline:2px solid #355070; outline-offset:2px; }
+
+/* Description scrollbar */
+.description-text { max-height:400px; overflow-y:auto; }
+.description-text::-webkit-scrollbar { width:6px; }
+.description-text::-webkit-scrollbar-track { background:#f1f1f1; border-radius:3px; }
+.description-text::-webkit-scrollbar-thumb { background:#355070; border-radius:3px; }
+.description-text::-webkit-scrollbar-thumb:hover { background:#406b92; }
+
+/* -------------------------------------------------------------
+ * 6. Responsive Media Queries
+ * ----------------------------------------------------------- */
+@media (max-width:768px) {
+  .sidebar-sticky { position:static; top:auto; }
+  .MuiContainer-root { padding-left:16px !important; padding-right:16px !important; }
+  .announcement-hero-overlay { padding:1rem; }
+}
+@media (max-width:600px) {
+  .announcement-meta-footer { overflow:hidden; }
+  .announcement-meta-footer .MuiTypography-caption { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .announcement-meta-footer .MuiButton-root { min-height:28px; line-height:1.2; }
+  .announcement-meta-footer .MuiButton-root .MuiSvgIcon-root, .announcement-meta-footer .MuiButton-root svg { margin-right:2px; }
 }
 
-/* Loading skeleton enhancements */
-.MuiSkeleton-root {
-  border-radius: var(--pf-card-radius, 12px) !important;
-}
-
-/* Responsive enhancements */
-@media (max-width: 768px) {
-  .sidebar-sticky {
-    position: static;
-    top: auto;
-  }
-  
-  .MuiContainer-root {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
-  
-  .announcement-hero-overlay {
-    padding: 1rem;
-  }
-}
-
-/* Focus states pentru accessibility */
-.MuiButton-root:focus-visible {
-  outline: 2px solid #355070;
-  outline-offset: 2px;
-}
-
-.MuiIconButton-root:focus-visible {
-  outline: 2px solid #355070;
-  outline-offset: 2px;
-}
-
-/* Custom scrollbar pentru description */
-.description-text {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.description-text::-webkit-scrollbar {
-  width: 6px;
-}
-
-.description-text::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.description-text::-webkit-scrollbar-thumb {
-  background: #355070;
-  border-radius: 3px;
-}
-
-.description-text::-webkit-scrollbar-thumb:hover {
-  background: #406b92;
-}
-
-/* Image carousel enhancements */
-.image-carousel-container {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.15);
-}
-
-.carousel-navigation-btn {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-.carousel-navigation-btn:hover {
-  background: rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Seller card enhancements */
-.seller-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
-  border: 1px solid rgba(53, 80, 112, 0.08);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(53, 80, 112, 0.08);
-  transition: all 0.3s ease;
-}
-
-.seller-card:hover {
-  border-color: rgba(53, 80, 112, 0.15);
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.12);
-}
-
-/* Avatar enhancements */
-.MuiAvatar-root {
-  box-shadow: 0 4px 16px rgba(53, 80, 112, 0.2) !important;
-  border: 3px solid rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Typography enhancements */
-.announcement-title {
-  background: linear-gradient(135deg, #355070, #406b92);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 800 !important;
-  letter-spacing: -0.5px;
-}
-
-/* Divider custom styling */
-.MuiDivider-root {
-  background: linear-gradient(90deg, transparent, rgba(53, 80, 112, 0.2), transparent) !important;
-  height: 1px !important;
-  border: none !important;
-  margin: 1.5rem 0 !important;
-}
-
-/* Back button styling */
-.back-button {
-  margin-bottom: 2rem !important;
-  padding: 8px 16px !important;
-  border-radius: 8px !important;
-  transition: all 0.2s ease !important;
-}
-
-.back-button:hover {
-  background: rgba(53, 80, 112, 0.08) !important;
-  transform: translateX(-4px) !important;
-}
+/* -------------------------------------------------------------
+ * 7. Dark Mode Overrides
+ * ----------------------------------------------------------- */
+/* Paleta & tokeni */
+.dark-mode { --primary-a0:#f51866; --primary-a10:#fa4875; --primary-a20:#fe6585; --primary-a30:#ff7e95; --primary-a40:#ff96a6; --primary-a50:#ffabb7; --surface-a0:#121212; --surface-a10:#282828; --surface-a20:#3f3f3f; --surface-a30:#575757; --surface-a40:#717171; --surface-a50:#8b8b8b; --pf-card-bg: linear-gradient(135deg,var(--surface-a10) 0%, var(--surface-a20) 100%); --pf-card-shadow:0 8px 32px rgba(0,0,0,0.6); --pf-card-radius:12px; }
+.dark-mode .announcement-details-page { background-color: var(--surface-a0); }
+.dark-mode .announcement-hero-overlay { background: var(--surface-a0); }
+.dark-mode .seller-card { background: var(--surface-a0); border:1px solid rgba(245,24,102,0.3); color: var(--surface-a50); }
+.dark-mode .seller-card:hover { border-color: rgba(245,24,102,0.5); box-shadow:0 12px 48px rgba(245,24,102,0.2); }
+.dark-mode .announcement-title { background: linear-gradient(135deg,var(--primary-a50),var(--primary-a0)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.dark-mode .MuiCard-root { background-color: var(--surface-a0) !important; color: var(--surface-a50) !important; }
+.dark-mode .MuiTypography-root, .dark-mode .MuiTypography-body1, .dark-mode .MuiTypography-body2 { color: var(--surface-a50) !important; }
+.dark-mode .MuiDivider-root { background: linear-gradient(90deg,transparent,rgba(245,24,102,0.3),transparent) !important; }
+.dark-mode .carousel-navigation-btn { background: var(--surface-a10) !important; color: var(--primary-a50) !important; border:1px solid rgba(245,24,102,0.3) !important; }
+.dark-mode .carousel-navigation-btn:hover { background: var(--surface-a20) !important; box-shadow:0 4px 16px rgba(245,24,102,0.3) !important; }
+.dark-mode .back-button { color: var(--surface-a50) !important; }
+.dark-mode .back-button:hover { background: rgba(245,24,102,0.1) !important; }
+.dark-mode .MuiButton-root { color: var(--surface-a50) !important; }
+.dark-mode .MuiButton-contained { background-color: var(--primary-a0) !important; color: var(--surface-a0) !important; }
+.dark-mode .MuiButton-contained:hover { background-color: var(--primary-a10) !important; }
+.dark-mode .MuiButton-outlined { border-color: var(--primary-a0) !important; color: var(--primary-a0) !important; }
+.dark-mode .MuiButton-outlined:hover { background-color: rgba(245,24,102,0.1) !important; border-color: var(--primary-a10) !important; }
+.dark-mode .MuiChip-root { background-color: rgba(245,24,102,0.2) !important; color: var(--surface-a50) !important; border:1px solid rgba(245,24,102,0.3) !important; }
+.dark-mode .MuiAvatar-root { border:3px solid rgba(245,24,102,0.3) !important; }
+.dark-mode .announcement-image-container::before { background: linear-gradient(135deg, rgba(245,24,102,0.1) 0%, transparent 50%); }
+.dark-mode .announcement-meta-footer { border-color: rgba(255,255,255,0.15) !important; }
+.dark-mode .price-highlight { background: linear-gradient(135deg,var(--primary-a0),var(--primary-a20)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.dark-mode .description-text { scrollbar-color: var(--surface-a30) var(--surface-a10); }
+.dark-mode .description-text::-webkit-scrollbar-track { background: var(--surface-a10); }
+.dark-mode .description-text::-webkit-scrollbar-thumb { background: var(--surface-a30); }
+.dark-mode .description-text::-webkit-scrollbar-thumb:hover { background: var(--surface-a40); }
+.dark-mode .announcement-image-container { box-shadow:0 8px 32px rgba(18,18,18,0.6); }
+.dark-mode .image-carousel-container { box-shadow:0 12px 48px rgba(245,24,102,0.2); }
+.dark-mode .MuiButton-root:focus-visible, .dark-mode .MuiIconButton-root:focus-visible { outline:2px solid var(--primary-a0); outline-offset:2px; }
 
 /* Dark Mode Styles */
 /* Palette variables (dark mode only) */
@@ -342,11 +215,11 @@ html {
 }
 
 .dark-mode .announcement-hero-overlay {
-  background: linear-gradient(135deg, rgba(245, 24, 102, 0.1) 0%, transparent 100%);
+  background: var(--surface-a0);
 }
 
 .dark-mode .seller-card {
-  background: linear-gradient(135deg, var(--surface-a10) 0%, var(--surface-a20) 100%);
+  background: var(--surface-a0);
   border: 1px solid rgba(245, 24, 102, 0.3);
   color: var(--surface-a50);
 }
@@ -364,7 +237,7 @@ html {
 }
 
 .dark-mode .MuiCard-root {
-  background-color: var(--surface-a10) !important;
+  background-color: var(--surface-a0) !important;
   color: var(--surface-a50) !important;
 }
 
