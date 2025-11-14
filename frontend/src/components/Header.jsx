@@ -5,7 +5,7 @@ import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
 import puzzleLogo from '../assets/images/puzzle.png';
 import puzzle2 from '../assets/images/puzzle2.png';
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, startTransition } from "react";
 import { useAuth } from '../context/AuthContext.jsx';
 import axios from 'axios';
 import { Snackbar, Alert } from '@mui/material';
@@ -350,8 +350,10 @@ export default function Header() {
   };
 
   const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
     setShowLangDropdown(false);
+    i18n.changeLanguage(lng).then(() => {
+      window.location.reload();
+    });
   };
 
   const getCurrentLanguage = () => {

@@ -116,3 +116,11 @@
   color: transparent;
 }
 
+/* When changing language we briefly disable transitions/animations to avoid flicker */
+body.lang-changing *,
+body.lang-changing *::before,
+body.lang-changing *::after {
+  transition: none !important;
+  animation: none !important;
+}
+

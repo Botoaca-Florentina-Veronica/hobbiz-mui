@@ -20,6 +20,8 @@ i18n
   .init({
     resources,
     fallbackLng: 'ro',
+    preload: ['ro', 'en'],
+    load: 'languageOnly',
     debug: false,
     interpolation: {
       escapeValue: false
@@ -27,6 +29,14 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage']
+    },
+    react: {
+      useSuspense: false,
+      bindI18n: 'languageChanged loaded',
+      bindI18nStore: 'added removed',
+      transEmptyNodeValue: '',
+      transSupportBasicHtmlNodes: true,
+      transKeepBasicHtmlNodesFor: ['br', 'strong', 'i', 'p']
     }
   });
 

@@ -22,6 +22,7 @@
   align-items: center;
   position: relative; /* allow pseudo background to clip exactly to section */
   overflow: hidden;   /* ensure the patterned background doesn't spill */
+  min-height: 600px;
 }
 
 .main-content {
@@ -29,10 +30,12 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  flex: 1;
 }
 
 .main-text {
   flex: 1;
+  max-width: 680px;
   padding: 40px;
   background-color: var(--app-elev);
   border-radius: 20px;
@@ -562,6 +565,53 @@ body.dark-mode .main-stage > *,
   100% { 
     opacity: 1; 
     transform: translate3d(0, 0, 0) scale(1); 
+  }
+}
+
+/* Large Screen Optimizations */
+@media (min-width: 1600px) {
+  .main-stage {
+    min-height: 700px;
+    padding: 60px 120px 120px;
+  }
+  
+  .main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .main-stage-image img {
+    width: 550px;
+  }
+}
+
+@media (min-width: 1900px) {
+  .main-stage {
+    min-height: 800px;
+    padding: 80px 140px 140px;
+  }
+  
+  .main-content {
+    max-width: 1500px;
+  }
+  
+  .main-stage-image img {
+    width: 600px;
+  }
+}
+
+@media (min-width: 2200px) {
+  .main-stage {
+    min-height: 900px;
+    padding: 100px 160px 160px;
+  }
+  
+  .main-content {
+    max-width: 1600px;
+  }
+  
+  .main-stage-image img {
+    width: 650px;
   }
 }
 
