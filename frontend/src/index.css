@@ -1,41 +1,27 @@
 /* Import Google font - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-/* Global theme tokens */
+/* Import sistem centralizat de teme */
+@import './styles/theme.css';
+
+/* ============================================
+   VARIABILE LEGACY (pentru compatibilitate)
+   ============================================
+   Acestea mapează vechile variabile la noile variabile din theme.css
+   Poți șterge treptat aceste mapări pe măsură ce actualizezi componentele
+*/
 :root {
-  /* Surfaces & backgrounds */
-  --app-bg: #ffffff;
-  --app-surface: #ffffff;
-  --app-elev: #ffffff;
-  --app-border: #e0e0e0;
+  /* Legacy app variables -> new theme variables */
+  --app-bg: var(--bg-primary);
+  --app-surface: var(--bg-secondary);
+  --app-elev: var(--bg-elevated);
+  --app-border: var(--border-color);
+  --app-text: var(--text-primary);
+  --app-muted: var(--text-secondary);
+  --app-placeholder: var(--text-placeholder);
 
-  /* Text */
-  --app-text: #1f2937;
-  --app-muted: #666666;
-  --app-placeholder: #aaa;
-
-  /* Brand */
-  --primary: #355070;
-  --primary-contrast: #ffffff;
-  --primary-hover: #2a4059;
-
-  /* Special sections */
-  --hero-bg: #F8B195;
-
-  /* Chat theme tokens (global) */
-  --chat-bg: #ffffff;
-  --chat-elev: #ffffff;
-  --chat-surface: #f8fafb;
-  --chat-border: #e8ecef;
-  --chat-text: #1a1a1a;
-  --chat-muted: #6b7280;
-  --chat-accent: #355070;
-  --chat-accent-contrast: #ffffff;
-
-  /* PublicProfile layout tokens (centralized here so widths are global and editable) */
-  /* Adjust these to change PublicProfile container widths at breakpoints */
+  /* PublicProfile layout tokens (kept here for specific layout configs) */
   --pp-md-width: 96%;
-  /* Make the large breakpoint container wider so pages use more horizontal space */
   --pp-lg-width: min(99%, 1500px);
   --pp-xl-width: 94%;
   --pp-sticky-top: 120px;
@@ -45,32 +31,14 @@
 }
 
 .dark-mode {
-  /* Dark palette mapping */
-  --app-bg: #121212;
-  --app-surface: #282828;
-  --app-elev: #2e2e2e;
-  --app-border: #3f3f3f;
-
-  --app-text: #eceeef;
-  --app-muted: #8b8b8b;
-  --app-placeholder: #8b8b8b;
-
-  /* Brand in dark mode (pink accent already used across app) */
-  --primary: #f51866;
-  --primary-contrast: #ffffff;
-  --primary-hover: #fa4875;
-
-  --hero-bg: #121212;
-
-  /* Map chat tokens to dark mode tokens for automatic theming */
-  --chat-bg: var(--app-bg);
-  --chat-elev: var(--app-elev);
-  --chat-surface: #2a2a2a; /* soft bg */
-  --chat-border: var(--app-border);
-  --chat-text: var(--app-text);
-  --chat-muted: var(--app-muted);
-  --chat-accent: #f51866;
-  --chat-accent-contrast: #ffffff;
+  /* Legacy mappings for dark mode */
+  --app-bg: var(--bg-primary);
+  --app-surface: var(--bg-secondary);
+  --app-elev: var(--bg-elevated);
+  --app-border: var(--border-color);
+  --app-text: var(--text-primary);
+  --app-muted: var(--text-secondary);
+  --app-placeholder: var(--text-placeholder);
 }
 
 html {
@@ -79,7 +47,8 @@ html {
 
 body {
   display: flex;
-  background-color: var(--app-bg);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -90,7 +59,8 @@ body {
 
 /* Elimină orice spațiu alb provenit din stacking context/root container */
 html, body, #root {
-  background: var(--app-bg) !important; /* #f3f5f6 în light mode */
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;

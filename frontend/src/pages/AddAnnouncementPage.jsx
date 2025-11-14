@@ -555,7 +555,7 @@ export default function AddAnnouncementPage() {
         <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>Publică un anunț</Typography>
       </Box>
       <h1 className="add-announcement-title">Publică un anunț </h1>
-      <form className="add-announcement-form" onSubmit={e => e.preventDefault()} style={{marginBottom: 0}}>
+      <form className="add-announcement-form" onSubmit={e => e.preventDefault()}>
         {success && (
           <div className="add-announcement-message add-announcement-success">
             <div className="add-announcement-success-icon">
@@ -580,7 +580,7 @@ export default function AddAnnouncementPage() {
           <div className="add-announcement-charcount">{titleChars}/70</div>
         </div>
         {titleError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -598,7 +598,7 @@ export default function AddAnnouncementPage() {
           required
         />
         {categoryError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -696,7 +696,7 @@ export default function AddAnnouncementPage() {
       <div className="add-announcement-images-section">
         {/* Mesaj de eroare pentru imagini */}
         {imageError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginBottom: 16}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -705,7 +705,7 @@ export default function AddAnnouncementPage() {
         )}
         <h2 className="add-announcement-subtitle">Imagini</h2>
         <div className="add-announcement-images-helper">Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.</div>
-        <div className="add-announcement-images-grid" style={{display: 'flex', gap: 16, flexWrap: 'wrap'}}>
+        <div className="add-announcement-images-grid">
           <button
             type="button"
             className="add-announcement-image-upload add-announcement-image-upload-main"
@@ -728,27 +728,31 @@ export default function AddAnnouncementPage() {
             accept="image/jpeg,image/jpg"
             multiple
             ref={imageInputRef}
-            style={{ display: 'none' }}
+            className="visually-hidden"
             onChange={handleImageChange}
           />
           {/* Previews pentru toate imaginile */}
           {imagePreviews.map((preview, idx) => (
-            <div key={idx} style={{position: 'relative', display: 'inline-block'}}>
-              <img src={preview} alt={`preview-${idx}`} style={{width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: idx === 0 ? '2px solid #388e3c' : '1px solid #ccc'}} />
+            <div key={idx} className="image-preview">
+              <img
+                src={preview}
+                alt={`preview-${idx}`}
+                className={`image-preview-img ${idx === 0 ? 'main' : ''}`}
+              />
               <button
                 type="button"
-                style={{position: 'absolute', top: 4, right: 4, background: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', padding: 2}}
+                className="image-preview-remove"
                 onClick={() => {
-                  setImages(images.filter((_, i) => i !== idx));
-                  setImagePreviews(imagePreviews.filter((_, i) => i !== idx));
+                  setImages(prev => prev.filter((_, i) => i !== idx));
+                  setImagePreviews(prev => prev.filter((_, i) => i !== idx));
                   if (idx === 0 && imagePreviews.length > 1) setMainImagePreview(imagePreviews[1]);
                   if (imagePreviews.length === 1) setMainImagePreview(null);
                 }}
                 title="Șterge imaginea"
               >
-                <span style={{fontWeight: 'bold', color: '#d32f2f'}}>×</span>
+                <span className="remove-icon" aria-hidden>×</span>
               </button>
-              {idx === 0 && <div style={{position: 'absolute', bottom: 4, left: 4, background: '#388e3c', color: '#fff', fontSize: 12, borderRadius: 4, padding: '2px 6px'}}>Principală</div>}
+              {idx === 0 && <div className="image-preview-badge">Principală</div>}
             </div>
           ))}
         </div>
@@ -769,7 +773,7 @@ export default function AddAnnouncementPage() {
           <div className="add-announcement-charcount">{descriptionChars}/9000</div>
         </div>
         {descriptionError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -929,7 +933,7 @@ export default function AddAnnouncementPage() {
           </Popover>
         </div>
         {locationError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -954,7 +958,7 @@ export default function AddAnnouncementPage() {
           )}
         </div>
         {contactPersonError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -970,7 +974,7 @@ export default function AddAnnouncementPage() {
           onChange={handleContactEmailChange}
         />
         {contactEmailError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>
@@ -986,7 +990,7 @@ export default function AddAnnouncementPage() {
           onChange={handleContactPhoneChange}
         />
         {contactPhoneError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
+          <div className="add-announcement-message add-announcement-error">
             <div className="add-announcement-error-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             </div>

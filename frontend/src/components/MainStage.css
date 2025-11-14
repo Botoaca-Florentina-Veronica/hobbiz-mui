@@ -95,12 +95,11 @@
   box-shadow: 0 8px 24px rgba(53, 80, 112, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
-  position: relative;
   overflow: hidden;
   user-select: none;
   font-family: inherit;
   box-sizing: border-box;
-  z-index: 1000;
+  z-index: auto;
 }
 
 .categories-button.menu-open {

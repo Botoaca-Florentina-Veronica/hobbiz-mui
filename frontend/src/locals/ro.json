@@ -1,0 +1,83 @@
+{
+  "header": {
+    "addAnnouncement": "Adaugă un anunț",
+    "favorites": "Favorite",
+    "notifications": "Notificări",
+    "messages": "Mesaje",
+    "profile": "Profil",
+    "myAnnouncements": "Anunțurile mele",
+    "settings": "Setări cont",
+    "payments": "Plăți",
+    "logout": "Deconectează-te",
+    "login": "Autentificare",
+    "signup": "Înregistrare",
+    "account": "Contul tău"
+  },
+  "language": {
+    "select": "Alege limba",
+    "ro": "Română",
+    "en": "Engleză",
+    "change": "Schimbă limba"
+  },
+  "common": {
+    "search": "Caută",
+    "close": "Închide",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "edit": "Editează",
+    "loading": "Se încarcă...",
+    "error": "Eroare",
+    "success": "Succes",
+    "logoutMessage": "Ai fost deconectat din cont.",
+    "lightMode": "Luminos",
+    "darkMode": "Mod Întunecat"
+  },
+  "mobileHeader": {
+    "searchPlaceholder": "Ce anume cauți?",
+    "notifications": "Notificări"
+  },
+  "footer": {
+    "explore": "Explorează",
+    "favorites": "Favorite",
+    "chat": "Chat",
+    "account": "Cont",
+    "publish": "Vinde",
+    "publishLabel": "Publică un anunț",
+    "accountHub": "Contul tău",
+    "copyright": "Copyright (c) 2025 Hobbiz. Toate drepturile rezervate."
+  },
+  "cta": {
+    "tagline": "Locul unde pasiunea ta se poate transforma într-o afacere, un side-hustle sau chiar o a doua sursă de venit.",
+    "button": "Înregistrează-te"
+  },
+  "mainStage": {
+    "title": "Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!",
+    "subtitle": "Fă din pasiunea ta o sursă de venit!",
+    "signUp": "Sign up",
+    "searchPlaceholder": "Ce anume cauți?",
+    "locationPlaceholder": "Toată țara",
+    "searchButton": "Căutare",
+    "categoriesButton": "Categorii",
+    "backToCounties": "Înapoi la județe"
+  },
+  "content": {
+    "popularTitle": "Cele mai populare anunțuri",
+    "noAnnouncements": "Nu există anunțuri momentan"
+  },
+  "categories": {
+    "title": "Explorează categorii",
+    "photography": "Fotografie",
+    "pastries": "Prajituri",
+    "music": "Muzica",
+    "repairs": "Reparații",
+    "dance": "Dans",
+    "cleaning": "Curățenie",
+    "gardening": "Gradinarit",
+    "sports": "Sport",
+    "art": "Arta",
+    "technology": "Tehnologie",
+    "auto": "Auto",
+    "tutoring": "Meditații"
+  }
+}

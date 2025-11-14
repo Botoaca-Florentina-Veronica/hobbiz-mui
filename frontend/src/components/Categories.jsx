@@ -8,6 +8,7 @@ import {
   CardMedia,
   Container
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import reparatii from '../assets/images/pipe.png';
 import muzica from '../assets/images/guitar.png';
 import dancing from '../assets/images/salsa.png';
@@ -42,11 +43,12 @@ export const categories = [
 // Restore the default export of the Categories component
 export default function Categories() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="categories-container">
       <Container maxWidth="lg">
-        <h2 className="categories-title">Explorează categorii</h2>
+        <h2 className="categories-title">{t('categories.title')}</h2>
         
         {/* Categories Grid - compact on mobile */}
         <Grid 

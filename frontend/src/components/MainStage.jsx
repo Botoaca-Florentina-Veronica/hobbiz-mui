@@ -4,6 +4,7 @@ import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, Fa
 import hobby from '../assets/images/hobby_img.jpg';
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -179,6 +180,7 @@ function getLocalitatiForJudet(judet) {
 // Main Component
 export default function MainStage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -340,7 +342,7 @@ export default function MainStage() {
             ref={categoriesButtonRef}
           >
             <FaBars />
-            <span>Categorii</span>
+            <span>{t('mainStage.categoriesButton')}</span>
           </button>
         )}
 
@@ -348,22 +350,22 @@ export default function MainStage() {
           <div className="search-container mainstage-search-desktop">
             <input 
               type="text" 
-              placeholder="Ce anume cauți?" 
+              placeholder={t('mainStage.searchPlaceholder')} 
               className="search-input"
             />
             <div className="location-section">
               <FaMapMarkerAlt className="location-icon" />
               <input 
                 type="text" 
-                placeholder="Toată țara" 
+                placeholder={t('mainStage.locationPlaceholder')} 
                 className="location-input"
-                value={selectedLocalitate || selectedJudet || "Toată țara"}
+                value={selectedLocalitate || selectedJudet || t('mainStage.locationPlaceholder')}
                 readOnly
                 onClick={handleInputClick}
               />
             </div>
             <button className="search-button">
-              <span>Căutare</span>
+              <span>{t('mainStage.searchButton')}</span>
               <FaSearch className="search-icon" />
             </button>
           </div>
@@ -380,10 +382,10 @@ export default function MainStage() {
                 </IconButton>
                 <InputBase
                   className="mobile-search-input"
-                  placeholder="Ce anume cauți?"
-                  inputProps={{ 'aria-label': 'Căutare' }}
+                  placeholder={t('mainStage.searchPlaceholder')}
+                  inputProps={{ 'aria-label': t('mainStage.searchButton') }}
                 />
-                <IconButton color="primary" aria-label="Căutare">
+                <IconButton color="primary" aria-label={t('mainStage.searchButton')}>
                   <FaSearch />
                 </IconButton>
               </Paper>
@@ -445,7 +447,7 @@ export default function MainStage() {
               <List className="popover-list">
                 <ListItemButton onClick={() => setSelectedJudet(null)} divider>
                   <ListItemText 
-                    primary={<span className="back-to-judete">Înapoi la județe</span>} 
+                    primary={<span className="back-to-judete">{t('mainStage.backToCounties')}</span>} 
                   />
                 </ListItemButton>
                 {getLocalitatiForJudet(selectedJudet).map((localitate) => (
@@ -466,11 +468,11 @@ export default function MainStage() {
       <div className="main-content">
         <div className="main-text">
           <h1 id="main-title">
-            Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!
+            {t('mainStage.title')}
           </h1>
-          <p>Fă din pasiunea ta o sursă de venit!</p>
+          <p>{t('mainStage.subtitle')}</p>
           <button className="sign-up-button" onClick={() => navigate('/signup')}>
-            Sign up
+            {t('mainStage.signUp')}
           </button>
         </div>
         <div className="main-stage-image">

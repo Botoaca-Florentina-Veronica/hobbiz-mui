@@ -7,6 +7,7 @@ import App from "./App";
 import { AuthProvider } from './context/AuthContext.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import "./index.css";
+import './i18n';
 
 axios.defaults.baseURL = 'https://api.render.com/deploy/srv-d0fljpa4d50c73f1ia80?key=avPZG38IhSo';
 axios.interceptors.request.use((config) => {

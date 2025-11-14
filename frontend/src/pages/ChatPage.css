@@ -2,71 +2,115 @@
 ====================================================
  ChatPage.css — stiluri pentru pagina de Chat
 ====================================================
+Acum folosește sistemul centralizat de teme din theme.css
+Pentru a schimba culorile chat-ului, vezi variabilele --chat-* din theme.css
+
 TOC (sumar rapid):
-  1) Theme tokens (light) — :root
-  2) Layout container — .chat-page-container
-  3) Sidebar & tabs — .chat-sidebar, .chat-tabs, .chat-tab
-  4) Conversation list — .chat-conversation-*
-  5) Main area — .chat-main, header, messages container
-  6) Message bubble, ticks, images — .chat-message-*
-  7) Composer (input, butoane, emoji) — .chat-input-*
-  8) Separator (desktop resize) — .chat-separator
-   9) Responsive: mobile (<900px), intermediate (901–1199px)
- 10) Dark mode overrides — .dark-mode ...
+  1) Layout container — .chat-page-container
+  2) Sidebar & tabs — .chat-sidebar, .chat-tabs, .chat-tab
+  3) Conversation list — .chat-conversation-*
+  4) Main area — .chat-main, header, messages container
+  5) Message bubble, ticks, images — .chat-message-*
+  6) Composer (input, butoane, emoji) — .chat-input-*
+  7) Separator (desktop resize) — .chat-separator
+  8) Responsive: mobile (<900px), intermediate (901–1199px)
+  9) Dark mode - automat prin variabile CSS
 ====================================================
 */
-/* 1) Theme tokens (light) */
-.chat-theme,
-:root {
-  /* Light mode theme tokens for Chat (palette-based) */
+
+/* Light-mode defaults pentru chat (surface, bule, input-uri) */
+.chat-page-container {
   --chat-bg: #ffffff;
-  --chat-elev: #ffffff;
-  --chat-surface: #f8fafb;
-  --chat-border: #e8ecef;
-  --chat-text: #1a1a1a;
-  --chat-muted: #6b7280;
-  --chat-accent: #355070; /* primary */
-  --chat-accent-contrast: #ffffff;
-  /* Dedicated blue for seen ticks (familiar messenger shade, high contrast) */
-  --chat-seen-blue: #34B7F1;
+  --chat-sidebar-bg: #ffffff;
+  --chat-message-area-bg: #f8fafb;
+
+  --chat-bubble-received: #f3f5f6;
+  --chat-bubble-sent: #355070;
+  --chat-bubble-sent-text: #ffffff;
+
+  --chat-input-bg: #ffffff;
+  --chat-input-border: #e8ecef;
+
+  --chat-tab-bg: transparent;
+  --chat-tab-active-bg: #355070;
+  --chat-tab-border: #e8ecef;
 }
 
-/* Ensure the page background follows the chat theme so removing the footer
-   doesn't reveal a mismatched (white) page background in dark mode. */
+/* Dark-mode overrides are defined later (merged block) to avoid duplicates */
+
+/* Asigură fundal consistent pentru chat */
 html, body {
   background: var(--chat-bg) !important;
   height: 100%;
 }
 
-/* Ensure dark-mode sets the root background as well (covers desktop and mobile).
-   This prevents a white strip below the chat container when footer is absent. */
 .dark-mode html, .dark-mode body {
-  background: var(--dm-bg) !important;
+  background: var(--chat-bg) !important;
 }
 
-/* 2) Layout container */
+/* 1) Layout container */
 .chat-page-container {
   display: flex;
   height: 85vh;
-  background: var(--chat-elev);
+  background: var(--chat-bg);
   border-radius: 8px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-md);
   margin: 32px auto;
   max-width: 1300px;
   min-width: 320px;
   margin-top: 8rem;
-  overflow: hidden; /* va fi suprascris pe mobil */
+  overflow: hidden;
 }
 
-/* Mobile-only tweaks for dark mode pills */
+.dark-mode .chat-page-container {
+  /* Make chat surfaces dark (merged with theme values)
+     These mirror the chat-specific variables from src/styles/theme.css
+     but are scoped to the chat page for convenience. */
+  --chat-bg: #121212;
+  --bg-elevated: #121212;
+  --bg-secondary: #121212;
+  --chat-sidebar-bg: #121212;
+  --chat-message-area-bg: #121212;
+
+  --chat-bubble-received: #2a2a2a;
+  --chat-bubble-sent: #f51866;
+  --chat-bubble-sent-text: #ffffff;
+
+  --chat-input-bg: #2a2a2a;
+  --chat-input-border: #b0b0b0;
+
+  --chat-tab-bg: #2a2a2a;
+  --chat-tab-active-bg: #f51866;
+  --chat-tab-border: #b0b0b0;
+
+  /* Borders should be a light gray (contur gri deschis) inside chat */
+  --border-color: #b0b0b0;
+  --border-light: #b0b0b0;
+}
+
+/* Mobile-only tweaks */
 @media (max-width: 900px) {
-  .dark-mode .chat-mobile-title { color: var(--dm-text); }
-  .dark-mode .chat-tab { background: #3a3a3a; color: var(--dm-text); }
+  .dark-mode .chat-mobile-title { color: var(--text-primary); }
+  .dark-mode .chat-tab { 
+    background: var(--chat-tab-bg); 
+    color: var(--text-primary); 
+  }
   .dark-mode .chat-tab.active,
-  .dark-mode .chat-tab:hover { background: var(--dm-pink); color: #fff; }
-  .dark-mode .chat-section-label { color: var(--dm-text); border-bottom: 1px solid var(--dm-border); }
-  .dark-mode .chat-conversation-item { border-bottom: 1px solid var(--dm-border); }
-  .dark-mode .chat-back-btn { background: #3a3a3a; color: var(--dm-text); }
+  .dark-mode .chat-tab:hover { 
+    background: var(--chat-tab-active-bg); 
+    color: #fff; 
+  }
+  .dark-mode .chat-section-label { 
+    color: var(--text-primary); 
+    border-bottom: 1px solid var(--border-color); 
+  }
+  .dark-mode .chat-conversation-item { 
+    border-bottom: 1px solid var(--border-color); 
+  }
+  .dark-mode .chat-back-btn { 
+    background: var(--bg-elevated); 
+    color: var(--text-primary); 
+  }
 
   /* Mobile layout adjustments: remove large top spacing and allow full-height flow */
   .chat-page-container {
@@ -100,11 +144,11 @@ html, body {
   }
 }
 
-/* 3) Sidebar & tabs */
+/* 2) Sidebar & tabs */
 .chat-sidebar {
   width: 380px;
-  background: var(--chat-bg);
-  border-right: 1px solid var(--chat-border);
+  background: var(--chat-sidebar-bg);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -114,7 +158,7 @@ html, body {
   display: flex;
   gap: 4px;
   padding: 24px 24px 0 24px;
-  background: linear-gradient(135deg, var(--chat-surface) 0%, var(--chat-elev) 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-elevated) 100%);
 }
 
 /* Hide FAB on desktop/laptop */
@@ -125,12 +169,12 @@ html, body {
 
 .chat-tab {
   flex: 1;
-  background: transparent;
-  border: 2px solid var(--chat-border);
+  background: var(--chat-tab-bg);
+  border: 2px solid var(--chat-tab-border);
   border-radius: 6px;
   padding: 12px 16px;
   font-weight: 600;
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -145,7 +189,7 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--chat-accent);
+  background: var(--primary);
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 1;
@@ -158,10 +202,10 @@ html, body {
 
 .chat-tab.active,
 .chat-tab:hover {
-  border-color: var(--chat-accent);
-  color: var(--chat-accent-contrast);
+  border-color: var(--primary);
+  color: var(--primary-contrast);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(53, 80, 112, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .chat-tab.active::before,
@@ -171,13 +215,13 @@ html, body {
 
 .chat-section-label {
   font-weight: 700;
-  color: var(--chat-text);
+  color: var(--text-primary);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 20px 24px 12px 24px;
   padding-bottom: 8px;
-  border-bottom: 2px solid var(--chat-border);
+  border-bottom: 2px solid var(--border-color);
   position: relative;
 }
 
@@ -188,7 +232,7 @@ html, body {
   left: 0;
   width: 30px;
   height: 2px;
-  background: var(--chat-accent);
+  background: var(--primary);
 }
 
 .chat-empty-state {
@@ -196,13 +240,13 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 16px 24px;
   padding: 16px;
-  background: linear-gradient(135deg, var(--chat-surface) 0%, #f0f4f7 100%);
+  background: var(--bg-secondary);
   border-radius: 6px;
-  border: 1px solid var(--chat-border);
+  border: 1px solid var(--border-color);
 }
 
 /* Empty main area (no conversation selected) */
@@ -212,7 +256,7 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
-  color: var(--chat-muted);
+  color: var(--text-secondary);
 }
 
 .chat-empty-icon {
@@ -262,9 +306,9 @@ html, body {
   align-items: flex-start;
   gap: 16px;
   padding: 16px 24px;
-  border-bottom: 1px solid var(--chat-border);
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
-  background: var(--chat-elev);
+  background: var(--bg-elevated);
   transition: all 0.3s ease;
   position: relative;
   margin: 0 8px;
@@ -279,7 +323,7 @@ html, body {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--chat-accent);
+  background: var(--primary);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -293,14 +337,14 @@ html, body {
 }
 
 .chat-conversation-item:hover {
-  background: linear-gradient(135deg, var(--chat-surface) 0%, #f0f4f7 100%);
+  background: var(--bg-hover);
   transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .chat-conversation-item.selected {
-  background: var(--chat-accent);
-  color: var(--chat-accent-contrast);
+  background: var(--primary);
+  color: var(--primary-contrast);
 }
 
 /* Conversation item selected state */
@@ -309,7 +353,7 @@ html, body {
 .chat-conversation-item.selected .chat-conversation-title,
 .chat-conversation-item.selected .chat-conversation-message,
 .chat-conversation-item.selected .chat-conversation-time {
-  color: var(--chat-accent-contrast);
+  color: var(--primary-contrast);
 }
 
 .chat-avatar {
@@ -317,12 +361,12 @@ html, body {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--chat-border);
+  border: 2px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .chat-conversation-item:hover .chat-avatar {
-  border-color: var(--chat-accent);
+  border-color: var(--primary);
   transform: scale(1.05);
 }
 
@@ -333,13 +377,13 @@ html, body {
 
 .chat-conversation-owner {
   font-size: 12px;
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   line-height: 1.2;
 }
 
 .chat-conversation-title {
   font-weight: 700;
-  color: var(--chat-text);
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.3;
   margin-bottom: 2px;
@@ -359,13 +403,13 @@ html, body {
 
 .chat-conversation-name {
   font-weight: 600;
-  color: var(--chat-text);
+  color: var(--text-primary);
   font-size: 15px;
   margin-bottom: 4px;
 }
 
 .chat-conversation-message {
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.4;
   overflow: hidden;
@@ -376,11 +420,11 @@ html, body {
 /* Preview bold pentru conversațiile necitite */
 .chat-conversation-item:not(.read) .chat-conversation-message {
   font-weight: 700;
-  color: var(--chat-text); /* puțin mai închis pentru contrast */
+  color: var(--text-primary);
 }
 
 .chat-conversation-time {
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
   min-width: 48px;
@@ -403,7 +447,7 @@ html, body {
 /* 5) Main area */
 .chat-main {
   flex: 1;
-  background: linear-gradient(135deg, var(--chat-surface) 0%, var(--chat-elev) 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-elevated) 100%);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -440,7 +484,7 @@ html, body {
 }
 
 .chat-main-header {
-  background: var(--chat-elev);
+  background: var(--bg-elevated);
   border-bottom: 1px solid #e8ecef;
   padding: 20px 24px;
   display: flex;
@@ -454,19 +498,19 @@ html, body {
   height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--chat-accent);
+  border: 2px solid var(--primary);
 }
 
 .chat-main-user-info h3 {
   margin: 0;
-  color: var(--chat-text);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 600;
 }
 
 .chat-main-user-info p {
   margin: 2px 0 0 0;
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
@@ -529,12 +573,12 @@ html, body {
 .chat-message:not(.own) .chat-bubble-row { justify-content: flex-start; }
 
 .chat-message-bubble {
-  background: var(--chat-elev);
+  background: var(--bg-elevated);
   padding: 10px 14px; /* compact, fără rezervă pentru bife absolute */
   border-radius: 16px; /* ușor mai rotunjit */
   box-shadow: 0 4px 18px rgba(0,0,0,0.10);
   position: relative;
-  border: 1px solid var(--chat-border);
+  border: 1px solid var(--border-color);
   max-width: 70ch;
   word-wrap: break-word;
   display: grid; /* text + bife în aceeași linie */
@@ -673,7 +717,7 @@ html, body {
 }
 
 /* 6.1) Ticks — read/unread colors (light mode) */
-.chat-message-ticks.unread { color: var(--chat-muted); }
+.chat-message-ticks.unread { color: var(--text-secondary); }
 .chat-message-ticks.read { color: var(--chat-seen-blue); }
 
 /* bife la dimensiunea textului */
@@ -690,8 +734,8 @@ html, body {
 .chat-message-image { grid-column: 1 / -1; margin-bottom: 4px; }
 
 .chat-input-container {
-  background: var(--chat-elev);
-  border-top: 1px solid var(--chat-border);
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border-color);
   padding: 20px 24px;
   position: sticky; /* rămâne vizibilă pe mobil la scroll */
   bottom: 0;
@@ -713,10 +757,10 @@ html, body {
 .chat-input-button {
   width: 40px;
   height: 40px;
-  background: var(--chat-surface);
-  border: 1px solid var(--chat-border);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: var(--chat-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -725,35 +769,35 @@ html, body {
 }
 
 .chat-input-button:hover {
-  background: var(--chat-accent);
-  color: var(--chat-accent-contrast);
-  border-color: var(--chat-accent);
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border-color: var(--primary);
 }
 
 .chat-input {
   flex: 1;
-  border: 2px solid var(--chat-border);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 12px 20px;
   font-size: 14px;
   transition: all 0.3s ease;
-  background: var(--chat-surface);
+  background: var(--bg-secondary);
 }
 
 .chat-input:focus {
   outline: none;
-  border-color: var(--chat-accent);
-  background: var(--chat-elev);
+  border-color: var(--primary);
+  background: var(--bg-elevated);
   box-shadow: 0 0 0 3px rgba(53, 80, 112, 0.15);
 }
 
 .chat-send-button {
   width: 44px;
   height: 44px;
-  background: var(--chat-accent);
+  background: var(--primary);
   border: none;
   border-radius: 6px;
-  color: var(--chat-accent-contrast);
+  color: var(--primary-contrast);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -828,7 +872,7 @@ html, body {
     margin: 16px;
     border-radius: 6px;
     /* Fundal uniform și fără umbre pe mobil/tabletă */
-    background: var(--chat-elev) !important;
+    background: var(--bg-elevated) !important;
     box-shadow: none !important;
   }
   
@@ -841,7 +885,7 @@ html, body {
   
   .chat-main {
     min-height: 50vh;
-    background: var(--chat-elev) !important;
+    background: var(--bg-elevated) !important;
   }
   
   .chat-tabs {
@@ -859,7 +903,7 @@ html, body {
   
   .chat-messages-container {
     padding: 16px 20px;
-    background: var(--chat-elev) !important;
+    background: var(--bg-elevated) !important;
   }
   
   .chat-input-container {
@@ -922,8 +966,8 @@ html, body {
   }
 
   /* Fundal uniform pe mobil pentru zona de conversație (înlocuiește gradientul desktop) */
-  .chat-main { background: var(--chat-elev) !important; }
-  .chat-messages-container { background: var(--chat-elev) !important; }
+  .chat-main { background: var(--bg-elevated) !important; }
+  .chat-messages-container { background: var(--bg-elevated) !important; }
 
   /* Overlay pentru când drawer-ul este deschis */
   .chat-overlay { display: none !important; }
@@ -948,8 +992,8 @@ html, body {
     gap: 6px;
     padding: 8px 10px;
     border-radius: 9999px;
-    background: var(--chat-surface);
-    color: var(--chat-text);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     border: none;
   }
   .chat-back-btn:active { transform: translateY(0); }
@@ -959,7 +1003,7 @@ html, body {
     font-size: 28px;
     font-weight: 800;
     padding: 16px 16px 8px 16px;
-    color: var(--chat-text);
+    color: var(--text-primary);
   }
 
   /* Tab-uri tip pills */
@@ -985,14 +1029,14 @@ html, body {
     font-size: 13px;
     flex: 0 0 auto; /* lățime naturală pentru scroll orizontal */
     border: none;
-    background: var(--chat-surface);
+    background: var(--bg-secondary);
     border-radius: 9999px;
-    color: var(--chat-text);
+    color: var(--text-primary);
   }
   .chat-tab.active,
   .chat-tab:hover {
-    background: var(--chat-accent);
-    color: var(--chat-accent-contrast);
+    background: var(--primary);
+    color: var(--primary-contrast);
     border: none;
     box-shadow: none;
     transform: none;
@@ -1002,7 +1046,7 @@ html, body {
     margin: 16px 16px 8px 16px;
     font-size: 12px;
     font-weight: 800;
-    color: var(--chat-text);
+    color: var(--text-primary);
     border-bottom: 1px solid #e5e7eb;
   }
   
@@ -1016,7 +1060,7 @@ html, body {
     margin: 0;
     padding: 10px 14px; /* mai compact vertical */
     gap: 10px;
-    border-bottom: 1px solid var(--chat-border);
+    border-bottom: 1px solid var(--border-color);
     border-radius: 0;
   }
   .chat-conversation-item:hover { background: #fff; transform: none; box-shadow: none; }
@@ -1114,8 +1158,8 @@ html, body {
     bottom: var(--footer-height, 0px) !important; /* stă deasupra footer-ului mobil dacă e prezent */
     z-index: 10000 !important;
     padding-bottom: max(env(safe-area-inset-bottom), 12px) !important;
-    background: var(--chat-elev) !important; /* suprascrie eventuale transparențe */
-    border-top: 1px solid var(--chat-border) !important;
+    background: var(--bg-elevated) !important; /* suprascrie eventuale transparențe */
+    border-top: 1px solid var(--border-color) !important;
     /* aliniează înălțimea declarată la spațiul rezervat mai sus */
     min-height: var(--input-bar-height, 56px);
   }
@@ -1148,174 +1192,74 @@ html, body {
   }
 }
 
-/* Dark Mode Styles */
-.dark-mode {
-  /* Strict palette variables */
-  --dm-bg: #1e1e1e;
-  --dm-bg-elev: #232323;
-  --dm-bg-soft: #2a2a2a;
-  --dm-border: #333333;
-  --dm-text: #f5f5f5;
-  --dm-muted: #9ca3af;
-  --dm-pink: #f51866;
-  --dm-pink-soft: #fa4875;
-  /* Map chat tokens to dark mode tokens for automatic theming */
-  --chat-bg: var(--dm-bg);
-  --chat-elev: var(--dm-bg-elev);
-  --chat-surface: var(--dm-bg-soft);
-  --chat-border: var(--dm-border);
-  --chat-text: var(--dm-text);
-  --chat-muted: var(--dm-muted);
-  --chat-accent: var(--dm-pink);
-  --chat-accent-contrast: #ffffff;
-}
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================
+   Majoritatea culorilor dark mode se schimbă automat prin variabilele din theme.css
+   Aici păstrăm doar override-uri foarte specifice pentru chat
+   ============================================ */
 
+/* Container principal chat în dark mode */
 .dark-mode .chat-page-container {
-  background: var(--dm-bg-elev);
   box-shadow: 0 4px 24px rgba(245, 24, 102, 0.2);
 }
 
-/* Accente specifice pentru dark mode (roz) pentru elementele schimbate în light la albastru) */
-.dark-mode .chat-section-label::after { background: var(--dm-pink); }
-.dark-mode .chat-conversation-item::before { background: var(--dm-pink); }
-.dark-mode .chat-conversation-item.selected { background: var(--dm-pink); color: #ffffff; }
-.dark-mode .chat-conversation-item:hover .chat-avatar { border-color: var(--dm-pink); }
-.dark-mode .chat-main-avatar { border-color: var(--dm-pink); }
-.dark-mode .chat-reply-bar { background: var(--dm-pink); }
-.dark-mode .chat-image-remove { background: var(--dm-pink); }
-
-.dark-mode .chat-sidebar {
-  background: var(--dm-bg);
-  border-right: 1px solid var(--dm-border);
-}
-
-.dark-mode .chat-tabs {
-  background: var(--dm-bg-elev);
-}
-
-.dark-mode .chat-tab {
-  border: 2px solid var(--dm-border);
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-tab::before {
-  background: var(--dm-pink);
-}
-
-.dark-mode .chat-tab.active,
-.dark-mode .chat-tab:hover {
-  border-color: var(--dm-pink);
-  color: var(--dm-text);
-  box-shadow: 0 4px 12px rgba(245, 24, 102, 0.3);
-}
-
-.dark-mode .chat-section-label {
-  color: var(--dm-text);
-  border-bottom: 2px solid var(--dm-border);
-}
-
-.dark-mode .chat-section-label::after {
-  background: var(--dm-pink);
-}
-
-.dark-mode .chat-empty-state {
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-conversations {
-  background: var(--dm-bg);
-}
-
-.dark-mode .chat-conversation-item {
-  background: var(--dm-bg-soft);
-  border: 1px solid var(--dm-border);
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-conversation-item:hover {
-  background: var(--dm-bg-soft);
-  border-color: var(--dm-pink);
-}
-
-.dark-mode .chat-conversation-item.active {
-  background: var(--dm-bg-soft);
-  border-color: var(--dm-pink);
-}
-
-.dark-mode .chat-conversation-name {
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-conversation-preview {
-  color: var(--dm-muted);
-}
-
-.dark-mode .chat-conversation-time {
-  color: var(--dm-muted);
-}
-
-.dark-mode .chat-main {
-  background: var(--dm-bg);
-}
-
-/* Dark mode: și containerul de mesaje pe mobil are același fundal */
+/* Asigură fundal consistent pe mobil în dark mode */
 @media (max-width: 900px) {
-  .dark-mode html, .dark-mode body { background: var(--dm-bg) !important; }
+  .dark-mode html, .dark-mode body { 
+    background: var(--chat-bg) !important; 
+  }
   .dark-mode .chat-messages-container {
-    background: var(--dm-bg) !important;
+    background: var(--chat-message-area-bg) !important;
   }
 }
 
-.dark-mode .chat-header {
-  background: var(--dm-bg-elev);
-  border-bottom: 1px solid var(--dm-border);
-  color: var(--dm-text);
-}
-
-/* Dark mode: header din zona de mesaje (nu cel global) */
-.dark-mode .chat-main-header {
-  background: var(--dm-bg-elev);
-  border-bottom: 1px solid var(--dm-border);
-  color: var(--dm-text);
-  box-shadow: none; /* evită efectul luminos pe dark */
-}
-
-.dark-mode .chat-main-user-info h3 {
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-main-user-info p {
-  color: var(--dm-muted);
-}
-
-.dark-mode .chat-partner-name {
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-partner-status {
-  color: var(--dm-muted);
-}
-
-.dark-mode .chat-messages {
-  background: var(--dm-bg);
-}
-
-.dark-mode .chat-message {
-  color: var(--dm-text);
-}
-
-/* Dark mode styles pentru mesajele proprii */
+/* Mesaje proprii în dark mode */
 .dark-mode .chat-message.own .chat-message-bubble {
-  background: var(--dm-pink);
-  border: 1px solid var(--dm-pink);
-  color: #ffffff;
+  background: var(--chat-bubble-sent);
+  color: var(--chat-bubble-sent-text);
+  border: 1px solid var(--chat-bubble-sent);
 }
 
-/* Dark mode styles pentru mesajele primite */
+/* Mesaje primite în dark mode */
 .dark-mode .chat-message:not(.own) .chat-message-bubble {
-  background: var(--dm-bg-soft);
-  color: var(--dm-text);
-  border: 1px solid var(--dm-border);
+  background: var(--chat-bubble-received);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+/* Tail pentru mesajele proprii (dark) */
+.dark-mode .chat-message.own .chat-message-bubble::before {
+  border-left-color: rgba(255,255,255,0.15);
+}
+
+/* Tail pentru mesajele primite (dark) */
+.dark-mode .chat-message:not(.own) .chat-message-bubble::before {
+  border-right-color: rgba(255,255,255,0.15);
+}
+
+/* Tick-uri pentru mesaje citite în dark mode */
+.dark-mode .chat-message-ticks.unread { 
+  color: var(--text-muted); 
+}
+.dark-mode .chat-message-ticks.read { 
+  color: var(--seen-tick-color); 
+}
+
+/* Input focus în dark mode */
+.dark-mode .chat-input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(245, 24, 102, 0.25);
+}
+
+/* Buton de send în dark mode */
+.dark-mode .chat-send-button {
+  background: var(--primary);
+}
+
+.dark-mode .chat-send-button:hover {
+  background: var(--primary-hover);
 }
 
 /* =============================
@@ -1336,67 +1280,6 @@ html, body {
   /* Afișăm mereu sidebar-ul în această zonă pentru context mai bun */
   .chat-page-container.mobile-chatting .chat-sidebar { display: flex !important; }
   .chat-page-container.mobile-chatting .chat-main { width: auto !important; }
-}
-
-/* Dark mode: own tail outline + fill */
-.dark-mode .chat-message.own .chat-message-bubble::before {
-  border-left-color: rgba(255,255,255,0.15);
-}
-
-/* Dark mode: received tail outline + fill */
-.dark-mode .chat-message:not(.own) .chat-message-bubble::before {
-  border-right-color: rgba(255,255,255,0.15);
-}
-
-/* Tick colors (dark mode) */
-.dark-mode .chat-message-ticks.unread { color: var(--dm-muted); }
-.dark-mode .chat-message-ticks.read { color: var(--dm-pink); }
-
-.dark-mode .chat-message-time,
-.dark-mode .chat-message-meta { 
-  color: var(--dm-muted);
-}
-
-.dark-mode .chat-input-container {
-  background: var(--dm-bg-elev);
-  border-top: 1px solid var(--dm-border);
-}
-
-.dark-mode .chat-input {
-  background: var(--dm-bg-soft);
-  border: 1px solid var(--dm-border);
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-input:focus {
-  border-color: var(--dm-pink);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(245, 24, 102, 0.25);
-}
-
-.dark-mode .chat-input::placeholder {
-  color: var(--dm-muted);
-}
-
-.dark-mode .chat-send-button {
-  background: var(--dm-pink);
-  color: #ffffff;
-}
-
-.dark-mode .chat-send-button:hover {
-  background: var(--dm-pink-soft);
-}
-
-.dark-mode .chat-empty-main {
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-empty-text {
-  color: var(--dm-text);
-}
-
-.dark-mode .chat-empty-subtitle {
-  color: var(--dm-muted);
 }
 
 /* Stiluri pentru funcționalități noi */

@@ -204,9 +204,11 @@ html { scroll-behavior: smooth; }
   --surface-a40: #717171;
   --surface-a50: #8b8b8b;
   /* Card / surface tokens used across this page - override light defaults in dark mode */
-  --pf-card-bg: linear-gradient(135deg, var(--surface-a10) 0%, var(--surface-a20) 100%);
+  --pf-card-bg: #121212;
   --pf-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   --pf-card-radius: 12px;
+  /* Fixed card border color for announcement details in dark mode */
+  --pf-card-border: #8b8b8b;
 }
 
 /* Ensure the background matches dark app background */
@@ -381,6 +383,22 @@ html { scroll-behavior: smooth; }
 
 .dark-mode .image-carousel-container {
   box-shadow: 0 12px 48px rgba(245, 24, 102, 0.2);
+}
+
+/* Ensure the four main announcement containers keep a fixed gray border in dark mode */
+.dark-mode .pf-card,
+.dark-mode .seller-card,
+.dark-mode .contact-paper,
+.dark-mode .announcement-image-container {
+  border: 1px solid var(--pf-card-border, #8b8b8b) !important;
+}
+
+/* Prevent hover from changing the border color for these containers */
+.dark-mode .pf-card:hover,
+.dark-mode .seller-card:hover,
+.dark-mode .contact-paper:hover,
+.dark-mode .announcement-image-container:hover {
+  border-color: var(--pf-card-border, #8b8b8b) !important;
 }
 
 /* Focus states in dark mode using primary */

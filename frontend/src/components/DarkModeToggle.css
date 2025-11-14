@@ -1,19 +1,76 @@
-/* Container poziționare (desktop). Poți muta în header și face position:static dacă vrei aliniere în meniu. */
-.dark-mode-toggle { position: fixed; top: 14px; right: 20px; z-index: 1200; }
+/* Modern switch toggle - clean and fast */
+.dark-mode-toggle {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 1200;
+}
 
-/* Ajustări minore accesibilitate pentru switch (fallback dacă styled override nu se aplică) */
-.dark-mode-toggle .MuiSwitch-root { cursor: pointer; }
-.dark-mode-toggle .MuiSwitch-track { box-shadow: 0 0 0 1px rgba(0,0,0,0.06); }
-.dark-mode-toggle .MuiSwitch-thumb { outline: none; }
+.toggle-switch {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
 
-/* Wrapper & iconițe clar vizibile */
-.theme-switch-wrapper { position: relative; display: inline-flex; align-items: center; }
-/* Icon activ unic (sun sau moon) aliniază cu thumb-ul */
-.theme-switch-wrapper .single-mode-icon { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: left .35s cubic-bezier(.34,1.56,.64,1), color .4s ease, filter .4s ease; }
-.theme-switch-wrapper .single-mode-icon.light .MuiSvgIcon-root { color: #ff9d00; filter: drop-shadow(0 0 5px rgba(255,157,0,.6)); }
-.theme-switch-wrapper .single-mode-icon.dark .MuiSvgIcon-root { color: #f5f8fb; filter: drop-shadow(0 0 5px rgba(245,248,251,.55)); }
-body.dark-mode .theme-switch-wrapper .single-mode-icon.light .MuiSvgIcon-root { color: #ffb43b; }
-body.dark-mode .theme-switch-wrapper .single-mode-icon.dark .MuiSvgIcon-root { color: #ffffff; filter: drop-shadow(0 0 6px rgba(255,255,255,.55)); }
+.toggle-track {
+  position: relative;
+  width: 70px;
+  height: 34px;
+  border-radius: 20px;
+  transition: background-color 0.2s ease;
+  border: 2px solid #355070;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-track.dark {
+  background: rgba(40, 40, 40, 0.95);
+  border-color: #f51866;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #355070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #ffffff;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  will-change: transform;
+}
+
+.toggle-track.dark .toggle-thumb {
+  transform: translateX(36px);
+  background: #f51866;
+}
+
+.toggle-switch:hover .toggle-track {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-switch:hover .toggle-thumb {
+  background: #2a4a65;
+}
+
+.toggle-switch:hover .toggle-track.dark .toggle-thumb {
+  background: #fe6585;
+}
+
+.toggle-switch:active .toggle-thumb {
+  transform: scale(0.95);
+}
+
+.toggle-switch:active .toggle-track.dark .toggle-thumb {
+  transform: translateX(32px) scale(0.95);
+}
 
 
 /* --------- DARK MODE  --------- */

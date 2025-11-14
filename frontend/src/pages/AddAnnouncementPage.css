@@ -1,3 +1,14 @@
+/* Variables and global helpers for this page */
+:root {
+  --aa-bg: var(--app-bg);
+  --aa-surface: var(--app-surface);
+  --aa-primary: #355070;
+  --aa-accent: #fe6585;
+  --aa-success: #388e3c;
+  --aa-danger: #d32f2f;
+  --aa-muted: #5b7a88;
+}
+
 @media (min-width: 500px) {
   .category-title-popover {
     display: none !important;
@@ -534,7 +545,7 @@
 
 /* Dark Mode Base Styles - Using Palette Colors Only */
 .dark-mode .add-announcement-container {
-  background: #121212; /* Surface - a0 */
+  background: #121212 ;  /* Surface - a0 */
   color: #ffffff;
 }
 
@@ -543,7 +554,7 @@
 }
 
 .dark-mode .add-announcement-form {
-  background: #282828; /* Surface - a10 */
+  background: #121212; /* Surface - a0 */
   box-shadow: 0 2px 16px rgba(0,0,0,0.3);
   border: 1px solid #3f3f3f; /* Surface - a20 */
 }
@@ -556,7 +567,7 @@
 .dark-mode .add-announcement-title-input,
 .dark-mode .add-announcement-category-select,
 .dark-mode .add-announcement-description-input {
-  background: #3f3f3f; /* Surface - a20 */
+  background: #2c2c2c; 
   color: #ffffff;
   border: 1px solid #575757; /* Surface - a30 */
 }
@@ -574,7 +585,7 @@
 }
 
 .dark-mode .category-card-popover {
-  background: #3f3f3f; /* Surface - a20 */
+  background: #2c2c2c; /* Surface - a20 */
   border-color: #575757; /* Surface - a30 */
   color: #ffffff;
 }
@@ -632,7 +643,7 @@
 
 .dark-mode .add-announcement-location-input-wrapper,
 .dark-mode .add-announcement-contact-input-wrapper {
-  background: #3f3f3f; /* Surface - a20 */
+  background: #2c2c2c; /* Surface - a20 */
   border: 1px solid #575757; /* Surface - a30 */
 }
 
@@ -668,7 +679,7 @@
 
 /* Images section */
 .dark-mode .add-announcement-images-section {
-  background: #282828; /* Surface - a10 */
+  background: #121212; /* Surface - a0 */
   border: 1px solid #3f3f3f; /* Surface - a20 */
 }
 
@@ -677,7 +688,7 @@
 }
 
 .dark-mode .add-announcement-image-upload {
-  background: #3f3f3f; /* Surface - a20 */
+  background: #2c2c2c;
   color: #ffffff;
 }
 
@@ -687,7 +698,7 @@
 }
 
 .dark-mode .add-announcement-image-upload-main {
-  background: #3f3f3f; /* Surface - a20 */
+  background: #2c2c2c; 
   border-color: #3f3f3f; /* Surface - a20 */
 }
 
@@ -709,7 +720,7 @@
 .dark-mode .add-announcement-location-section,
 .dark-mode .add-announcement-contact-section,
 .dark-mode .add-announcement-actions-section {
-  background: #282828; /* Surface - a10 */
+  background: #121212; /* Surface - a0 */
   border: 1px solid #3f3f3f; /* Surface - a20 */
 }
 
@@ -720,14 +731,14 @@
 /* Contact Information Section - Enhanced Dark Mode */
 .dark-mode .add-announcement-contact-input[type="email"],
 .dark-mode .add-announcement-contact-input[type="tel"] {
-  background: #3f3f3f; /* Surface - a20 */
+  background: #2c2c2c;
   color: #ffffff;
   border: 1px solid #575757; /* Surface - a30 */
 }
 
 .dark-mode .add-announcement-contact-input[type="email"]:focus,
 .dark-mode .add-announcement-contact-input[type="tel"]:focus {
-  background: #575757; /* Surface - a30 */
+  background: #2c2c2c; 
   outline: 2px solid #fe6585; /* Primary - a20 */
   border-color: #fe6585; /* Primary - a20 */
 }
@@ -751,4 +762,83 @@
 .dark-mode .add-announcement-location-check {
   color: #fe6585; /* Primary - a20 */
   font-weight: bold;
+}
+
+/* Ensure the categories popover container uses the page dark background (not white) */
+.dark-mode .categories-grid-popover,
+.dark-mode .categories-list-mobile,
+.dark-mode .categories-popover-header-mobile {
+  background: #121212 !important;
+}
+
+/* Make sure the popover paper and inner containers blend with the page background */
+.dark-mode .categories-grid-popover .category-card-popover {
+  background: transparent !important;
+  border-color: rgba(255,255,255,0.04) !important;
+}
+
+/* Override MUI Popover/Paper when app uses body-level dark-mode class
+   MUI components read theme.palette.mode; if the project toggles dark
+   via a CSS class we need to override the Paper background/border here. */
+.dark-mode .MuiPopover-paper,
+.dark-mode .MuiPaper-root.MuiPopover-paper,
+.dark-mode #category-popover > .MuiPaper-root {
+  background: #121212 !important;
+  border: 1px solid #575757 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+}
+
+/* Also ensure mobile list drawer uses same paper background */
+.dark-mode .categories-list-mobile,
+.dark-mode .categories-grid-popover {
+  background: #121212 !important;
+}
+
+/* Image preview styles (used by AddAnnouncementPage.jsx) */
+.image-preview {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+}
+.image-preview-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  display: block;
+}
+.image-preview-img.main {
+  border: 2px solid var(--aa-success);
+}
+.image-preview-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+}
+.image-preview-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: var(--aa-success);
+  color: #fff;
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* Utility classes */
+.visually-hidden {
+  display: none;
+}
+.remove-icon {
+  font-weight: 700;
+  color: var(--aa-danger);
 }

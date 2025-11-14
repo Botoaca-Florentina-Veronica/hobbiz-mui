@@ -2,7 +2,8 @@
 
 /* Asigură același fundal pentru wrapper-ul aplicației */
 .app {
-  background: var(--app-bg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Spațiu pentru conținutul de sub header */
@@ -54,11 +55,12 @@
 .search-input {
   flex: 1;
   padding: 15px 20px;
-  border: 2px solid var(--app-border);
+  border: 2px solid var(--border-color);
   border-radius: 8px 0 0 8px;
   font-size: 1.1rem;
   outline: none;
-  color: var(--app-text);
+  color: var(--text-primary);
+  background: var(--bg-primary);
 }
 
 .search-button {
@@ -89,10 +91,10 @@
   justify-content: center;
   gap: 10px;
   padding: 0 15px;
-  border: 2px solid var(--app-border);
+  border: 2px solid var(--border-color);
   font-size: 1rem;
-  color: var(--app-text);
-  background-color: var(--app-surface);
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
   white-space: nowrap;
 }
 

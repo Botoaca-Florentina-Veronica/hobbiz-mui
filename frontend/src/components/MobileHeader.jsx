@@ -3,8 +3,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import Badge from '@mui/material/Badge';
 import './MobileHeader.css';
+import { useTranslation } from 'react-i18next';
 
 export default function MobileHeader({ notificationCount = 0, onSearchFocus, onNotificationClick }) {
+  const { t } = useTranslation();
+  
   return (
     <>
       <div className="mobile-header-spacer" aria-hidden="true" />
@@ -14,7 +17,7 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
           <input
             type="text"
             className="mobile-search-input"
-            placeholder="Ce anume cauți?"
+            placeholder={t('mobileHeader.searchPlaceholder')}
             onFocus={onSearchFocus}
           />
           <div className="mobile-search-btn">
@@ -25,7 +28,7 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
       <button 
         className="mobile-notification-btn"
         onClick={onNotificationClick}
-        aria-label="Notificări"
+        aria-label={t('mobileHeader.notifications')}
       >
         <Badge 
           badgeContent={notificationCount} 

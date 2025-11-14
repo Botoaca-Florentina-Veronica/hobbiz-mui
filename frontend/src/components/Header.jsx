@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { HiOutlineUser, HiOutlineHeart, HiOutlineBell, HiOutlineChat } from "react-icons/hi";
+import { IoLanguage } from "react-icons/io5";
 import logoLight from '../assets/images/logo.jpg';
 import logoDark from '../assets/images/logo-dark-mode.png';
 import puzzleLogo from '../assets/images/puzzle.png';
@@ -12,13 +13,16 @@ import apiClient from '../api/api';
 import './Header.css';
 import MobileHeader from './MobileHeader';
 import './MobileHeader.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [avatar, setAvatar] = useState(null); // Avatar personal sau Google
   const [unreadCount, setUnreadCount] = useState(0); // Număr notificări necitite
@@ -106,6 +110,18 @@ export default function Header() {
 
     return () => observer.disconnect();
   }, []);
+
+  // Închide dropdown-ul de limbă când se face click în afara lui
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showLangDropdown && !event.target.closest('.language-selector')) {
+        setShowLangDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showLangDropdown]);
 
   useEffect(() => {
     // Dacă nu există token, nu ești autentificat
@@ -333,6 +349,15 @@ export default function Header() {
     }
   };
 
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    setShowLangDropdown(false);
+  };
+
+  const getCurrentLanguage = () => {
+    return i18n.language || 'ro';
+  };
+
   return (
     <>
   {effectiveShowMobileHeader ? (
@@ -367,6 +392,37 @@ export default function Header() {
       ) : (
         <>
           <div className="header fixed-header">
+            {/* Language Selector Button - in stanga logo-ului */}
+            <div className="language-selector">
+              <button 
+                className="language-btn" 
+                onClick={() => setShowLangDropdown(!showLangDropdown)}
+                aria-label="Schimbă limba"
+              >
+                <IoLanguage className="language-icon" />
+                <span className="current-lang">{getCurrentLanguage().toUpperCase()}</span>
+              </button>
+              
+              {showLangDropdown && (
+                <div className="language-dropdown">
+                  <div 
+                    className={`language-option ${getCurrentLanguage() === 'ro' ? 'active' : ''}`}
+                    onClick={() => changeLanguage('ro')}
+                  >
+                    <span className="lang-flag">🇷🇴</span>
+                    <span>Română</span>
+                  </div>
+                  <div 
+                    className={`language-option ${getCurrentLanguage() === 'en' ? 'active' : ''}`}
+                    onClick={() => changeLanguage('en')}
+                  >
+                    <span className="lang-flag">🇬🇧</span>
+                    <span>English</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <ul className="logo" onClick={() => navigate("/")} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <li style={{display: 'flex', alignItems: 'center'}}>
                 <img src={isDarkMode ? puzzle2 : puzzleLogo} alt="Puzzle Logo" className="puzzle-logo" />
@@ -375,7 +431,7 @@ export default function Header() {
             </ul>
             <ul className="nav-right">
               <li>
-                <button className="add-button" onClick={handleAddAnnouncement}>Adaugă un anunț</button>
+                <button className="add-button" onClick={handleAddAnnouncement}>{t('header.addAnnouncement')}</button>
               </li>
               <li>
                 <button className="favorite-btn notification-btn" onClick={() => navigate('/favorite-announcements')}>
@@ -458,15 +514,15 @@ export default function Header() {
                     }
                     return <HiOutlineUser size={24} />;
                   })()}
-                  <span>Contul tău</span>
+                  <span>{isAuthenticated ? t('header.profile') : t('header.login')}</span>
                 </label>
                 {isAuthenticated && (
                   <div className="section-dropdown">
-                    <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>Setări</a>
-                    <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>Anunțurile mele</a>
-                    <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>Profil</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>{t('header.settings')}</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>{t('header.myAnnouncements')}</a>
+                    <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>{t('header.profile')}</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>
-                    <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>Deconectează-te</a>
+                    <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>{t('header.logout')}</a>
                   </div>
                 )}
               </li>

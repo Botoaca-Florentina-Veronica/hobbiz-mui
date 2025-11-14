@@ -10,6 +10,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { ChevronLeft, ChevronRight, FavoriteOutlined } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 // Content.css is imported in App.jsx to ensure it is loaded after global styles
 import apiClient from '../api/api';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +19,7 @@ export default function Content() {
   const carouselRef = useRef(null);
   const [popular, setPopular] = useState([]);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Format date in Romanian like "09 septembrie 2025"
   const formatRoDate = (date) => {
@@ -48,7 +50,7 @@ export default function Content() {
 
   return (
     <section className="content">
-      <h2>Anunțuri populare</h2>
+      <h2>{t('content.popularTitle')}</h2>
         <Box sx={{ 
         maxWidth: '1100px',
         margin: '0 auto',

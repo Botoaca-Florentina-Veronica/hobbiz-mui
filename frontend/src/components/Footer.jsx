@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import FooterPublishButton from './FooterPublishButton';
 import './Footer.css';
@@ -13,6 +14,7 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false, hideLegal = false }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [googleAvatar, setGoogleAvatar] = useState(null);
@@ -100,7 +102,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
       {/* Footer propriu-zis: copyright și bara mobilă */}
       {!hideLegal && (
         <footer className="desktop-footer desktop-only">
-          <p>Copyright (c) 2025 Hobbiz. All rights reserved.</p>
+          <p>{t('footer.copyright')}</p>
         </footer>
       )}
       
@@ -111,11 +113,11 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
           <div 
             className={`footer-icon ${location.pathname === '/' ? 'active' : ''}`}
             onClick={() => navigate('/')}
-            aria-label="Explorează"
+            aria-label={t('footer.explore')}
             role="button"
           >
             <TravelExploreOutlinedIcon />
-            <span>Explorează</span>
+            <span>{t('footer.explore')}</span>
           </div>
           
           <div 
@@ -129,7 +131,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
             }}
           >
             <FavoriteBorderOutlinedIcon />
-            <span>Favorite</span>
+            <span>{t('footer.favorites')}</span>
           </div>
           
           <FooterPublishButton 
@@ -154,14 +156,14 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
             }}
           >
             <ChatBubbleOutlineOutlinedIcon />
-            <span>Chat</span>
+            <span>{t('footer.chat')}</span>
           </div>
           
           <div 
             className={`footer-icon footer-account ${location.pathname.includes('/profil') || location.pathname.includes('/setari-cont') || location.pathname.includes('/cont') || location.pathname.includes('/anunturile-mele') ? 'active' : ''}`}
             onClick={handleAccountClick}
             style={{ position: 'relative' }}
-            aria-label="Cont"
+            aria-label={t('footer.account')}
             role="button"
           >
             {googleAvatar ? (
@@ -178,18 +180,18 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
             ) : (
               <AccountCircleOutlinedIcon />
             )}
-            <span>Cont</span>
+            <span>{t('footer.account')}</span>
             {showDropdown && isAuthenticated && (
               <div className="section-dropdown footer-dropdown" style={{ position: 'absolute', bottom: '60px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000 }}>
-                <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); setShowDropdown(false); }}>Setări</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); setShowDropdown(false); }}>Anunțurile mele</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/profil'); setShowDropdown(false); }}>Profil</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/plati'); setShowDropdown(false); }}>Plăți</a>
-                <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); setShowDropdown(false); }}>Contul tău</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); setShowDropdown(false); }}>{t('header.settings')}</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); setShowDropdown(false); }}>{t('header.myAnnouncements')}</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/profil'); setShowDropdown(false); }}>{t('header.profile')}</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/plati'); setShowDropdown(false); }}>{t('header.payments')}</a>
+                <a onClick={(e) => { e.preventDefault(); navigate('/contul-tau'); setShowDropdown(false); }}>{t('footer.accountHub')}</a>
                 <a onClick={(e) => { e.preventDefault(); toggleDarkMode(); }}>
-                  {isDarkMode ? 'Luminos' : 'Mod Întunecat'}
+                  {isDarkMode ? t('common.lightMode') : t('common.darkMode')}
                 </a>
-                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); navigate('/'); window.location.reload(); }}>Deconectează-te</a>
+                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); navigate('/'); window.location.reload(); }}>{t('header.logout')}</a>
               </div>
             )}
           </div>

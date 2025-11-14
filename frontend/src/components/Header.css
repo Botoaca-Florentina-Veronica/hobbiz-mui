@@ -81,6 +81,124 @@
 /* ================================
  * 3. LOGO & BRANDING
  * ================================ */
+
+/* Language Selector - pozitionat in stanga logo-ului */
+.language-selector {
+  position: absolute;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  /* Keep selector above categories overlay and menu */
+  z-index: 10500;
+  margin-right: 1rem;
+}
+
+.language-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin: auto;
+  background: transparent;
+  border: 2px solid #355070;
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #355070;
+}
+
+.language-btn:hover {
+  background: #355070;
+  color: #fff;
+  outline-color: #ffffff;
+}
+
+.language-icon {
+  font-size: 1.3rem;
+  color:#ffffff;
+}
+
+.current-lang {
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+.language-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  background: #fff;
+  border: 2px solid #355070;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 160px;
+  overflow: hidden;
+  /* Must be above categories overlay (9999) and dropdown (10000) */
+  z-index: 10500;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  color: #183642;
+}
+
+.language-option:hover {
+  background: #f3f5f6;
+}
+
+.language-option.active {
+  background: #355070;
+  color: #fff;
+  font-weight: 600;
+}
+
+.lang-flag {
+  font-size: 1.3rem;
+}
+
+/* Dark Mode pentru Language Selector */
+.dark-mode .language-btn {
+  border-color: #f51866;
+  color: #f51866;
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+.dark-mode .language-btn:hover {
+  background: #f51866;
+  color: #fff;
+  outline-color: #ffffff;
+}
+
+.dark-mode .language-dropdown {
+  background: #2c2c2c;
+  border-color: #f51866;
+}
+
+.dark-mode .language-option {
+  color: #ffffff;
+}
+
+.dark-mode .language-option:hover {
+  background: #3f3f3f;
+}
+
+.dark-mode .language-option.active {
+  background: #f51866;
+  color: #fff;
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -96,7 +214,7 @@
   height: 45px;
   width: auto;
   margin-right: 2px;
-  margin-left: -4rem;
+  margin-left: -2rem !important;
   transition: transform 0.2s ease;
 }
 
@@ -793,6 +911,28 @@
   .homepage .mobile-header-spacer {
     display: block !important;
   }
+
+  /* Ajustări pentru butonul de limbă pe mobile/tablet */
+  .language-selector {
+    left: 0.5rem;
+  }
+
+  .language-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .language-icon {
+    font-size: 1.1rem;
+  }
+
+  .current-lang {
+    font-size: 0.8rem;
+  }
+
+  .puzzle-logo {
+    margin-left: -1rem !important;
+  }
 }
 
 /* Asigurăm că pe homepage desktop header-ul este vizibil peste 1200px */
@@ -800,5 +940,44 @@
   .homepage .header,
   .homepage .fixed-header {
     display: flex !important;
+  }
+}
+
+/* Responsive pentru ecrane foarte mici */
+@media screen and (max-width: 768px) {
+  .language-selector {
+    left: 0.25rem;
+  }
+
+  .language-btn {
+    padding: 0.3rem 0.5rem;
+    border-width: 1.5px;
+  }
+
+  .language-icon {
+    font-size: 1rem;
+  }
+
+  .current-lang {
+    display: none; /* Ascunde textul pe ecrane foarte mici, doar iconița */
+  }
+
+  .language-dropdown {
+    min-width: 140px;
+  }
+
+  .language-option {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .puzzle-logo {
+    margin-left: 0 !important;
+    height: 40px;
+  }
+
+  .main-logo {
+    height: 180px;
+    width: 180px;
   }
 }

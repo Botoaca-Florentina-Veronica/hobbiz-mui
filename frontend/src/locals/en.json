@@ -1,0 +1,83 @@
+{
+  "header": {
+    "addAnnouncement": "Add Announcement",
+    "favorites": "Favorites",
+    "notifications": "Notifications",
+    "messages": "Messages",
+    "profile": "Profile",
+    "myAnnouncements": "My Announcements",
+    "settings": "Account Settings",
+    "payments": "Payments",
+    "logout": "Log Out",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "account": "Your Account"
+  },
+  "language": {
+    "select": "Choose Language",
+    "ro": "Romanian",
+    "en": "English",
+    "change": "Change language"
+  },
+  "common": {
+    "search": "Search",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "logoutMessage": "You have been signed out.",
+    "lightMode": "Light",
+    "darkMode": "Dark mode"
+  },
+  "mobileHeader": {
+    "searchPlaceholder": "What are you looking for?",
+    "notifications": "Notifications"
+  },
+  "footer": {
+    "explore": "Explore",
+    "favorites": "Favorites",
+    "chat": "Chat",
+    "account": "Account",
+    "publish": "Sell",
+    "publishLabel": "Post an ad",
+    "accountHub": "Your account",
+    "copyright": "Copyright (c) 2025 Hobbiz. All rights reserved."
+  },
+  "cta": {
+    "tagline": "The place where your passion becomes a business, a side hustle, or even a second income stream.",
+    "button": "Join now"
+  },
+  "mainStage": {
+    "title": "Got a cool hobby and think it's useless? Find people willing to pay for it!",
+    "subtitle": "Turn your passion into a source of income!",
+    "signUp": "Sign up",
+    "searchPlaceholder": "What are you looking for?",
+    "locationPlaceholder": "Entire country",
+    "searchButton": "Search",
+    "categoriesButton": "Categories",
+    "backToCounties": "Back to counties"
+  },
+  "content": {
+    "popularTitle": "Most popular announcements",
+    "noAnnouncements": "No announcements at the moment"
+  },
+  "categories": {
+    "title": "Explore categories",
+    "photography": "Photography",
+    "pastries": "Pastries",
+    "music": "Music",
+    "repairs": "Repairs",
+    "dance": "Dance",
+    "cleaning": "Cleaning",
+    "gardening": "Gardening",
+    "sports": "Sports",
+    "art": "Art",
+    "technology": "Technology",
+    "auto": "Auto",
+    "tutoring": "Tutoring"
+  }
+}

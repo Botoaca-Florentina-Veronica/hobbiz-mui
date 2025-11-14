@@ -1,0 +1,207 @@
+/**
+ * ============================================
+ * THEME.CSS - Sistem Centralizat Dark Mode
+ * ============================================
+ * 
+ * Acest fișier conține TOATE culorile aplicației.
+ * Pentru a schimba o culoare, caută variabila corespunzătoare aici.
+ * 
+ * Structură:
+ * 1. Culori de bază (light mode)
+ * 2. Culori dark mode
+ * 3. Componente specifice (chat, cards, etc.)
+ */
+
+/* ============================================
+   1. LIGHT MODE (Default)
+   ============================================ */
+:root {
+  /* --- FUNDAL & SUPRAFEȚE --- */
+  --bg-primary: #ffffff;           /* Fundal principal al paginii */
+  --bg-secondary: #f8fafb;         /* Fundal secundar (cards, sidebar) */
+  --bg-elevated: #ffffff;          /* Elemente ridicate (modals, dropdowns) */
+  --bg-hover: #f3f5f6;            /* Hover pe elemente */
+  
+  /* --- MARGINI & SEPARATOARE --- */
+  --border-color: #e8ecef;         /* Margini normale */
+  --border-light: #f0f0f0;         /* Margini subtile */
+  --divider: #e0e0e0;              /* Linii separatoare */
+  
+  /* --- TEXT --- */
+  --text-primary: #1a1a1a;         /* Text principal */
+  --text-secondary: #6b7280;       /* Text secundar/descriptiv */
+  --text-muted: #9ca3af;           /* Text foarte șters */
+  --text-placeholder: #aaaaaa;     /* Placeholdere în input-uri */
+  
+  /* --- CULORI BRAND --- */
+  --primary: #355070;              /* Culoare primară */
+  --primary-hover: #2a4059;        /* Primary la hover */
+  --primary-contrast: #ffffff;     /* Text pe primary */
+  
+  --accent: #f51866;               /* Accent (butoane importante, notificări) */
+  --accent-hover: #fa4875;         /* Accent la hover */
+  --accent-light: #fff1f5;         /* Fundal accent diluat */
+  
+  /* --- CHAT SPECIFIC --- */
+  --chat-bg: #ffffff;              /* Fundal container chat */
+  --chat-sidebar-bg: #ffffff;      /* Fundal sidebar conversații */
+  --chat-message-area-bg: #f8fafb; /* Fundal zonă mesaje */
+  
+  --chat-bubble-received: #f3f5f6; /* Bule mesaje primite */
+  --chat-bubble-sent: #355070;     /* Bule mesaje trimise */
+  --chat-bubble-sent-text: #ffffff; /* Text în bulele trimise */
+  
+  --chat-input-bg: #ffffff;        /* Fundal input mesaj */
+  --chat-input-border: #e8ecef;    /* Margine input mesaj */
+  
+  --chat-tab-bg: transparent;      /* Fundal tab-uri inactive */
+  --chat-tab-active-bg: #355070;   /* Fundal tab activ */
+  --chat-tab-border: #e8ecef;      /* Margine tab-uri */
+  
+  /* --- STĂRI & FEEDBACK --- */
+  --success: #10b981;              /* Verde pentru succes */
+  --error: #ef4444;                /* Roșu pentru erori */
+  --warning: #f59e0b;              /* Portocaliu pentru avertismente */
+  --info: #3b82f6;                 /* Albastru pentru info */
+  
+  /* --- SHADOWING --- */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+  
+  /* --- ALTELE --- */
+  --hero-bg: #F8B195;              /* Fundal secțiune hero */
+  --seen-tick-color: #34B7F1;      /* Culoare tick-uri văzute (messenger style) */
+}
+
+/* ============================================
+   2. DARK MODE
+   ============================================ */
+.dark-mode {
+  /* --- FUNDAL & SUPRAFEȚE --- */
+  --bg-primary: #121212;           /* Fundal principal întunecat */
+  --bg-secondary: #1e1e1e;         /* Fundal secundar (cards, sidebar) */
+  --bg-elevated: #2a2a2a;          /* Elemente ridicate */
+  --bg-hover: #333333;             /* Hover pe elemente */
+  
+  /* --- MARGINI & SEPARATOARE --- */
+  --border-color: #3f3f3f;         /* Margini normale */
+  --border-light: #2a2a2a;         /* Margini subtile */
+  --divider: #404040;              /* Linii separatoare */
+  
+  /* --- TEXT --- */
+  --text-primary: #eceeef;         /* Text principal */
+  --text-secondary: #b0b0b0;       /* Text secundar */
+  --text-muted: #8b8b8b;           /* Text foarte șters */
+  --text-placeholder: #6b6b6b;     /* Placeholdere în input-uri */
+  
+  /* --- CULORI BRAND (Dark Mode folosește accent pink) --- */
+  --primary: #f51866;              /* Culoare primară = accent în dark */
+  --primary-hover: #fa4875;        /* Primary la hover */
+  --primary-contrast: #ffffff;     /* Text pe primary */
+  
+  --accent: #f51866;               /* Accent rămâne consistent */
+  --accent-hover: #fa4875;         /* Accent la hover */
+  --accent-light: rgba(245, 24, 102, 0.15); /* Fundal accent diluat */
+  
+  /* --- CHAT SPECIFIC --- */
+  --chat-bg: #121212;              /* Fundal container chat DARK */
+  --chat-sidebar-bg: #1e1e1e;      /* Fundal sidebar conversații DARK */
+  --chat-message-area-bg: #1a1a1a; /* Fundal zonă mesaje DARK */
+  
+  --chat-bubble-received: #2a2a2a; /* Bule mesaje primite DARK */
+  --chat-bubble-sent: #f51866;     /* Bule mesaje trimise (accent pink) */
+  --chat-bubble-sent-text: #ffffff; /* Text în bulele trimise */
+  
+  --chat-input-bg: #2a2a2a;        /* Fundal input mesaj DARK */
+  --chat-input-border: #3f3f3f;    /* Margine input mesaj DARK */
+  
+  --chat-tab-bg: #2a2a2a;          /* Fundal tab-uri inactive DARK */
+  --chat-tab-active-bg: #f51866;   /* Fundal tab activ (accent) */
+  --chat-tab-border: #3f3f3f;      /* Margine tab-uri DARK */
+  
+  /* --- STĂRI & FEEDBACK (ajustate pentru dark) --- */
+  --success: #10b981;
+  --error: #f87171;                /* Roșu mai luminos pentru dark */
+  --warning: #fbbf24;              /* Portocaliu mai luminos */
+  --info: #60a5fa;                 /* Albastru mai luminos */
+  
+  /* --- SHADOWING (mai pronunțat în dark) --- */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  
+  /* --- ALTELE --- */
+  --hero-bg: #121212;
+  --seen-tick-color: #34B7F1;      /* Rămâne la fel */
+}
+
+/* ============================================
+   3. APLICARE GLOBALĂ
+   ============================================ */
+
+/* Asigură fundal consistent pe întreaga pagină */
+html,
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Tranziții smooth pentru schimbarea temei */
+* {
+  transition: background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              color 0.2s ease;
+}
+
+/* Override pentru elemente care nu trebuie să aibă tranziție */
+*:where(
+  input[type="range"],
+  input[type="checkbox"],
+  input[type="radio"],
+  img,
+  video,
+  canvas
+) {
+  transition: none;
+}
+
+/* ============================================
+   4. HELPER CLASSES (Optional)
+   ============================================ */
+
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-elevated { background-color: var(--bg-elevated); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+.border-color { border-color: var(--border-color); }
+.divider { border-color: var(--divider); }
+
+/* ============================================
+   GHID RAPID DE UTILIZARE:
+   ============================================
+   
+   1. Pentru a schimba culoarea de fundal a containerului de chat:
+      Modifică: --chat-bg (light) și --chat-bg (în .dark-mode)
+   
+   2. Pentru bulele de mesaje:
+      - Mesaje primite: --chat-bubble-received
+      - Mesaje trimise: --chat-bubble-sent
+   
+   3. Pentru sidebar-ul de conversații:
+      Modifică: --chat-sidebar-bg
+   
+   4. Pentru tab-uri:
+      - Inactive: --chat-tab-bg
+      - Active: --chat-tab-active-bg
+   
+   5. Pentru input-ul de mesaj:
+      - Fundal: --chat-input-bg
+      - Margine: --chat-input-border
+   
+   ============================================ */
