@@ -72,6 +72,11 @@
   max-width: 760px;
 }
 
+/* Increase left margin for the desktop title to visually offset it from the form */
+.add-announcement-title {
+  margin-left: clamp(48px, 8vw, 96px);
+}
+
 .add-announcement-subtitle {
   font-size: 1.5rem;
   font-weight: 600;

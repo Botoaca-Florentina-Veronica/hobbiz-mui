@@ -31,7 +31,8 @@
     "success": "Succes",
     "logoutMessage": "Ai fost deconectat din cont.",
     "lightMode": "Luminos",
-    "darkMode": "Mod Întunecat"
+    "darkMode": "Mod Întunecat",
+    "back": "Înapoi"
   },
   "mobileHeader": {
     "searchPlaceholder": "Ce anume cauți?",
@@ -79,5 +80,469 @@
     "technology": "Tehnologie",
     "auto": "Auto",
     "tutoring": "Meditații"
+  }
+  ,
+  "legal": {
+    "brand": "Hobbiz",
+    "description": "Descoperă, vinde și cumpără servicii sau produse de la pasionați ca tine.",
+    "downloadAppStore": "Descarcă din App Store",
+    "getOnGooglePlay": "Obține pe Google Play",
+    "usefulLinks": "Linkuri utile",
+    "about": "Despre noi",
+    "contact": "Contact",
+    "howItWorks": "Cum funcționează",
+    "legal": "Legal",
+    "terms": "Termeni și condiții",
+    "privacyPolicy": "Politică de Confidențialitate",
+    "cookiePolicy": "Cookie Policy",
+    "followUs": "Urmărește-ne"
+  }
+  ,
+  "about": {
+    "title": "Despre noi",
+    "mobileTitle": "Despre noi",
+    "hero": {
+      "badge": "Platforma pasionaților",
+      "title1": "Transformă-ți",
+      "highlight": "pasiunea",
+      "title2": "în oportunitate"
+    },
+    "mission": {
+      "title": "Misiunea noastră",
+      "subtitle": "Construim punți între talente și oportunități",
+      "description": "nu este doar o platformă - este o comunitate care celebrează autenticitatea și creativitatea. Ne-am născut din convingerea că fiecare pasiune merită să fie împărtășită și că fiecare talent merită să fie valorificat."
+    },
+    "pillars": {
+      "authenticity": { "title": "Autenticitate", "desc": "Promovăm produse și servicii unice, create cu pasiune și dedicare" },
+      "community": { "title": "Comunitate", "desc": "Creăm legături puternice între pasionați și utilizatori" },
+      "growth": { "title": "Creștere", "desc": "Oferim instrumentele necesare pentru dezvoltarea afacerilor creative" }
+    },
+    "features": {
+      "section1": {
+        "title": "Ce poți face pe Hobbiz?",
+        "items": [
+          "Descoperă o nouă sursă de venit",
+          "Publică anunțuri pentru serviciile sau produsele tale",
+          "Află despre ofertele locale sau naționale",
+          "Salvează anunțurile preferate și contactează direct vânzătorii",
+          "Cunoaște alți oameni cu aceleași pasiuni și colaborează sau conversează cu ei",
+          "Gestionează-ți contul și anunțurile rapid și intuitiv"
+        ]
+      },
+      "section2": {
+        "title": "De ce să alegi Hobbiz?",
+        "items": [
+          "Platformă modernă, ușor de folosit, cu design adaptat pentru mobil și desktop",
+          "Comunitate prietenoasă și suport rapid",
+          "Promovare gratuită pentru pasiunile tale",
+          "Interfață intuitivă și experiență de utilizare optimă",
+          "Securitate și confidențialitate garantate",
+          "Conectare directă între creatori și cumpărători"
+        ]
+      }
+    },
+    "how": {
+      "title": "Cum funcționează Hobbiz?",
+      "subtitle": "În doar 4 pași simpli poți începe să folosești platforma noastră",
+      "steps": {
+        "1": { "title": "Înregistrează-te", "desc": "Creează-ți un cont gratuit în doar câteva minute" },
+        "2": { "title": "Publică sau caută", "desc": "Publică anunțuri sau găsește ce îți dorești" },
+        "3": { "title": "Conectează-te", "desc": "Comunică direct prin mesagerie integrată" },
+        "4": { "title": "Colaborează", "desc": "Realizează tranzacții sigure în comunitate" }
+      }
+    },
+    "values": {
+      "title": "Valorile noastre",
+      "cards": {
+        "1": { "title": "Securitate", "desc": "Prioritizăm siguranța utilizatorilor prin măsuri avansate de protecție a datelor și verificare a identității." },
+        "2": { "title": "Comunitate", "desc": "Creăm un spațiu prietenos unde pasionații se pot conecta, colabora și se pot inspira reciproc." },
+        "3": { "title": "Inovație", "desc": "Dezvoltăm constant noi funcționalități pentru a îmbunătăți experiența utilizatorilor și a facilita colaborarea." }
+      }
+    },
+    "faqTitle": "Întrebări frecvente",
+    "faq": [
+      { "question": "Este gratuit să folosesc Hobbiz?", "answer": "Da, înregistrarea și utilizarea de bază a platformei Hobbiz sunt complet gratuite. Poți publica și răspunde la anunțuri și comunica cu alți utilizatori fără costuri." },
+      { "question": "Cum îmi protejez datele personale?", "answer": "Luăm în serios protecția datelor tale. Folosim criptare avansată și nu împărtășim informațiile tale personale cu terți fără consimțământul tău explicit." },
+      { "question": "Pot vinde atât produse cât și servicii?", "answer": "Absolut! Chiar dacă Hobbiz este conceput mai mult pentru servicii, poți vinde și produse handmade, obiecte, vechituri, mașini, alimente și multe altele." },
+      { "question": "Cum funcționează sistemul de mesagerie?", "answer": "Sistemul nostru de mesagerie îți permite să comunici direct cu alți utilizatori în timp real, să negociezi prețuri și să coordonezi livrări în siguranță." }
+    ],
+    "lastUpdated": "Ultima actualizare: 19 iulie 2025"
+  },
+  "terms": {
+    "title": "Termeni și condiții",
+    "lastUpdated": "Ultima actualizare: 5 septembrie 2025",
+    "intro": {
+      "title": "Acordul de utilizare a platformei Hobbiz",
+      "text": "Prin accesarea și utilizarea platformei Hobbiz, acceptați să respectați termenii și condițiile prezentate în acest document. Vă rugăm să citiți cu atenție aceste prevederi înainte de a crea un cont sau de a utiliza serviciile noastre."
+    },
+    "s1": {
+      "title": "1. Definiții și interpretare",
+      "p1": "În cadrul acestor termeni și condiții, următoarele definiții se aplică: \"Platforma\" se referă la website-ul Hobbiz și toate aplicațiile mobile asociate; \"Servicii\" include toate funcționalitățile oferite prin platformă, inclusiv publicarea anunțurilor, căutarea, comunicarea între utilizatori și procesarea plăților; \"Utilizator\" desemnează orice persoană fizică sau juridică care accesează sau folosește platforma; \"Conținut\" include texte, imagini, video, date și alte materiale încărcate pe platformă.",
+      "p2": "Platforma Hobbiz funcționează ca un marketplace digital care conectează persoane interesate să vândă sau să cumpere produse și servicii diverse. Nu suntem proprietarii sau vânzătorii produselor listate, ci facilităm interacțiunea între utilizatori prin intermediul tehnologiilor web moderne, inclusiv React.js, Node.js și baze de date MongoDB."
+    },
+    "s2": {
+      "title": "2. Eligibilitate și înregistrare",
+      "h1": "Cerințe de vârstă și capacitate juridică",
+      "p1": "Pentru a utiliza serviciile Hobbiz, trebuie să aveți minimum 18 ani și să dețineți capacitatea juridică deplină conform legislației românești. Minorilor cu vârsta cuprinsă între 16-18 ani li se permite utilizarea platformei doar cu consimțământul explicit al părinților sau reprezentanților legali și sub supravegherea acestora.",
+      "p2": "Persoanele juridice pot utiliza platforma prin intermediul reprezentanților autorizați, care răspund pentru toate acțiunile întreprinse în numele organizației. Verificăm documentele de înregistrare pentru conturile business și ne rezervăm dreptul de a solicita documente suplimentare pentru validarea identității.",
+      "h2": "Procesul de înregistrare",
+      "p3": "Crearea unui cont necesită furnizarea unor informații exacte și complete: nume real, adresă de email validă și număr de telefon functional. Informațiile false sau înșelătoare constituie o încălcare a acestor termeni și pot duce la suspendarea sau închiderea contului fără preaviz.",
+      "p4": "Suportăm înregistrarea prin metode multiple: email și parolă, autentificare prin Google OAuth 2.0, sau prin alte furnizori de identitate autorizați. Fiecare utilizator poate deține un singur cont activ, iar crearea de conturi multiple pentru evitarea restricțiilor este strict interzisă."
+    },
+    "s3": {
+      "title": "3. Utilizarea platformei și anunțuri",
+      "h1": "Publicarea anunțurilor",
+      "p1": "Utilizatorii pot publica anunțuri pentru vânzarea de produse noi sau second-hand, prestarea de servicii, închirierea de bunuri sau alte tranzacții comerciale legale. Fiecare anunț trebuie să conțină o descriere exactă și completă a produsului sau serviciului, fotografii reale și nemodificate și un preț corect și transparent.",
+      "p2": "Este strict interzisă publicarea de anunțuri pentru: produse contrafăcute sau piratate, substanțe interzise prin lege, arme și muniții, animale protejate sau obținute ilegal, servicii ilegale sau imorale, conținut pentru adulți sau materiale ce încalcă drepturile de autor. Monitorizăm activ conținutul prin algoritmi automatizați și moderare umană.",
+      "h2": "Responsabilitățile utilizatorilor",
+      "p3": "Utilizatorii sunt integral responsabili pentru conținutul publicat, exactitatea informațiilor furnizate și respectarea tuturor legilor aplicabile. Ne rezervăm dreptul de a elimina orice conținut care încalcă acești termeni sau legislația în vigoare, fără obligația de a oferi explicații detaliate.",
+      "p4": "Comunicarea între utilizatori trebuie să se desfășoare într-un mod respectuos și professional. Hărțuirea, amenințările, limbajul vulgar sau discriminatoriu, spam-ul și tentativele de fraudă vor fi sancționate prin restricții temporare sau permanente ale contului."
+    },
+    "s4": {
+      "title": "4. Tranzacții și plăți",
+      "h1": "Facilitarea tranzacțiilor",
+      "p1": "Hobbiz acționează ca intermediar tehnologic între cumpărători și vânzători, fără a fi parte în tranzacțiile efectuate. Nu garantăm calitatea, autenticitatea sau conformitatea produselor vândute, acestea fiind responsabilitatea exclusivă a vânzătorilor. Recomandăm utilizatorilor să fie precauți și să verifice întotdeauna produsele înainte de finalizarea tranzacțiilor.",
+      "p2": "Pentru anumite servicii premium, procesăm plăți prin intermediul procesatorilor certificați Stripe și PayPal, care respectă standardele PCI DSS pentru securitatea datelor financiare. Nu stocăm informații despre carduri de credit pe serverele noastre, toate datele sensibile fiind gestionate exclusiv de furnizorii specializați.",
+      "h2": "Dispute și rezolvarea conflictelor",
+      "p3": "În cazul disputelor între utilizatori, oferim un sistem intern de raportare și mediere, însă responsabilitatea finală pentru rezolvarea conflictelor revine părților implicate. Pentru tranzacții de valoare mare, recomandăm utilizarea de contracte scrise și metode de plată securizate care oferă protecție pentru ambele părți.",
+      "p4": "Putem interveni prin suspendarea temporară a conturilor implicate în dispute repetate sau grave, dar nu avem obligația legală de a arbitra conflictele comerciale dintre utilizatori. Pentru situații care implică posibile infracțiuni, cooperăm cu autoritățile competente conform cerințelor legale."
+    },
+    "s5": {
+      "title": "5. Proprietate intelectuală",
+      "h1": "Drepturile platformei",
+      "p1": "Codul sursă, designul, logo-ul, mărcile comerciale și toate elementele tehnice ale platformei Hobbiz sunt protejate prin drepturi de autor și proprietate intelectuală. Utilizarea neautorizată a acestor elemente, inclusiv copierea codului sau replicarea designului, constituie o încălcare a drepturilor noastre și poate fi urmărită legal.",
+      "p2": "Tehnologiile folosite (React.js, Node.js, MongoDB) sunt open-source și utilizate conform licențelor respective, însă implementarea specifică și arhitectura sistemului nostru sunt proprietate exclusivă. Interzicerea reverse engineering-ului sau tentativelor de replicare a funcționalităților este strict aplicată.",
+      "h2": "Conținutul utilizatorilor",
+      "p3": "Utilizatorii rămân proprietarii conținutului pe care îl publică (fotografii, descrieri, recenzii), dar acordă Hobbiz o licență neexclusivă, transferabilă și sub-licențiabilă pentru a afișa, modifica și distribui acest conținut în scopul furnizării serviciilor platformei.",
+      "p4": "Este responsabilitatea utilizatorilor să se asigure că dețin toate drepturile necesare pentru conținutul publicat și că nu încalcă drepturile de autor ale terților. În cazul reclamațiilor DMCA valide, vom elimina prompt conținutul problematic și vom lua măsurile necesare împotriva conturilor care încalcă în mod repetat drepturile de autor."
+    },
+    "s6": {
+      "title": "6. Securitate și protecția datelor",
+      "h1": "Măsuri de securitate tehnice",
+      "p1": "Implementăm măsuri avansate de securitate informatică: criptarea SSL/TLS pentru toate comunicațiile, hashing-ul securizat al parolelor cu algoritmi bcrypt, protecție împotriva atacurilor CSRF și XSS, firewall-uri configurate și monitorizare constantă pentru activități suspecte. Actualizăm regulat toate componentele software pentru a corecta vulnerabilitățile de securitate.",
+      "p2": "Datele sunt stocate în centre de date certificate SOC 2 Type II, cu backup-uri automate zilnice și sisteme de redundanță geografică. Accesul la sistemele de producție este strict controlat prin autentificare cu doi factori și jurnalizarea completă a activităților administrative.",
+      "h2": "Responsabilitățile utilizatorilor",
+      "p3": "Utilizatorii trebuie să păstreze confidențialitatea credențialelor de acces, să folosească parole complexe și unice și să ne notifice imediat în cazul suspiciunii că contul a fost compromis. Nu suntem responsabili pentru pierderi rezultate din neglijența utilizatorilor în păstrarea securității conturilor.",
+      "p4": "Activarea autentificării cu doi factori este puternic recomandată pentru toate conturile, în special pentru cele care gestionează tranzacții financiare frecvente. Oferim opțiuni multiple: SMS, aplicații TOTP (Google Authenticator, Authy) și chei hardware compatibile FIDO2."
+    },
+    "s7": {
+      "title": "7. Limitări de răspundere",
+      "h1": "Excluderi de răspundere",
+      "p1": "Hobbiz nu este responsabil pentru: daunele rezultate din tranzacțiile între utilizatori, pierderea de date din cauza defecțiunilor hardware sau software, întreruperile temporare ale serviciilor din motive tehnice, acțiunile frauduloase ale utilizatorilor sau terților sau consecințele utilizării inadecvate a platformei.",
+      "p2": "În niciun caz răspunderea noastră totală nu va depăși valoarea taxelor plătite de utilizator pentru serviciile premium în ultimele 12 luni. Această limitare se aplică indiferent de natura reclamației: contractuală, delictuală sau din orice altă cauză legală.",
+      "h2": "Forță majoră",
+      "p3": "Nu suntem responsabili pentru întârzieri sau imposibilitatea de a îndeplini obligațiile din cauza evenimentelor de forță majoră: dezastre naturale, războaie, atacuri cibernetice la scară largă, reglementări guvernamentale restrictive sau alte evenimente în afara controlului nostru rezonabil.",
+      "p4": "În astfel de situații, vom depune toate eforturile rezonabile pentru a minimiza impactul asupra utilizatorilor și pentru a restabili serviciile cât mai rapid posibil. Utilizatorii vor fi informați prompt despre orice întreruperi majore prin canalele noastre oficiale de comunicare."
+    },
+    "s8": {
+      "title": "8. Modificări și încetarea serviciilor",
+      "h1": "Modificări ale termenilor",
+      "p1": "Ne rezervăm dreptul de a modifica acești termeni și condiții pentru a reflecta schimbările în serviciile oferite, cerințele legale sau practicile comerciale. Utilizatorii vor fi notificați cu minimum 30 de zile înainte de intrarea în vigoare a modificărilor majore prin email și notificări în platformă.",
+      "p2": "Continuarea utilizării serviciilor după intrarea în vigoare a modificărilor constituie acceptarea noilor termeni. Utilizatorii care nu sunt de acord cu modificările pot închide conturile și înceta utilizarea platformei fără penalități suplimentare.",
+      "h2": "Suspendarea și închiderea conturilor",
+      "p3": "Putem suspenda sau închide conturile care încalcă acești termeni, participă la activități frauduloase, afectează negativ experiența altor utilizatori sau prezintă riscuri de securitate pentru platformă. În funcție de gravitatea încălcării, putem aplica avertismente, restricții temporare sau închiderea definitivă.",
+      "p4": "Utilizatorii pot închide voluntar conturile oricând prin setările platformei. La închiderea contului, datele personale vor fi anonimizate sau șterse conform politicii noastre de confidențialitate, iar anunțurile active vor fi eliminate automat."
+    },
+    "s9": {
+      "title": "9. Legea aplicabilă și jurisdicția",
+      "h1": "Cadrul legal",
+      "p1": "Acești termeni și condiții sunt guvernați de legea română și se interpretează conform acesteia. Toate disputele rezultate din utilizarea platformei vor fi soluționate de instanțele competente din România, utilizatorii renunțând la orice pretenție de incompetență teritorială.",
+      "p2": "Pentru utilizatorii din Uniunea Europeană, respectăm prevederile Regulamentului Digital Services Act (DSA) și ale Directivei privind Drepturile Consumatorilor. Consumatorii pot beneficia de proceduri alternative de soluționare a disputelor conform reglementărilor UE aplicabile.",
+      "h2": "Conformitate cu reglementările",
+      "p3": "Platforma respectă prevederile GDPR pentru protecția datelor, reglementările PSD2 pentru serviciile de plată, cerințele de e-commerce conform OUG 34/2014 și alte acte normative relevante din România și UE. Cooperăm cu autoritățile de reglementare și aplicăm prompt orice cerințe legale noi.",
+      "p4": "Pentru problemele specifice protecției consumatorilor, utilizatorii se pot adresa ANPC (Autoritatea Națională pentru Protecția Consumatorilor) sau pot folosi platforma europeană ODR pentru soluționarea online a disputelor comerciale."
+    },
+    "s10": {
+      "title": "10. Contact și asistență",
+      "h1": "Informații de contact",
+      "p1": "Pentru întrebări despre acești termeni și condiții, reclamații sau solicitări de asistență, ne puteți contacta prin următoarele modalități: email oficial la legal@hobbiz.ro, formularul de contact din platformă sau poșta tradițională la adresa sediului social înregistrat.",
+      "p2": "Echipa noastră de asistență răspunde în general în termen de 24-48 de ore pentru întrebările standard și în maximum 72 de ore pentru problemele complexe care necesită investigații tehnice sau legale. Pentru urgențe de securitate, oferim suport accelerat prin canalele prioritare.",
+      "h2": "Procedura de reclamații",
+      "p3": "Reclamațiile se pot depune prin sistemul integrat din platformă, care permite urmărirea statusului și primirea de notificări automate. Pentru situații grave, acceptăm și comunicarea directă prin email la adresa dedicată complaints@hobbiz.ro.",
+      "p4": "Investigăm toate reclamațiile într-un mod imparțial și transparent, respectând drepturile tuturor părților implicate. Rezultatele investigațiilor sunt comunicate în scris, iar pentru cazurile complexe oferim explicații detaliate despre măsurile luate."
+    },
+    "footer": "Documentul a fost actualizat la data de 5 septembrie 2025 și intră în vigoare imediat pentru toți utilizatorii platformei Hobbiz. Pentru versiunile anterioare ale acestor termeni, vă rugăm să ne contactați la adresa legal@hobbiz.ro."
+  },
+  "privacy": {
+    "title": "Politica de confidențialitate",
+    "lastUpdated": "Ultima actualizare: 19 iulie 2025",
+    "intro": {
+      "title": "Transparență și protecție a datelor",
+      "text": "La Hobbiz, considerăm protecția datelor personale o responsabilitate fundamentală. Acest document descrie în detaliu practicile noastre de gestionare a informațiilor, conform Regulamentului General privind Protecția Datelor (GDPR) și legislației românești aplicabile."
+    },
+    "s1": {
+      "title": "1. Scopul și domeniul de aplicare",
+      "p1": "Această politică se aplică tuturor informațiilor colectate prin intermediul platformei Hobbiz, inclusiv prin website, aplicații mobile și orice alte interfețe asociate. Documentul definește cadrul legal și operațional pentru prelucrarea datelor cu caracter personal, inclusiv scopurile de colectare, metodele de procesare, drepturile utilizatorilor și măsurile de securitate implementate.",
+      "p2": "Operatorul de date este SC Hobbiz SRL, înregistrată în România, care determină scopurile și mijloacele prelucrării datelor. Pentru orice nelămuriri referitoare la conținutul acestei politici, vă rugăm să ne contactați folosind detaliile furnizate în secțiunea finală."
+    },
+    "s2": {
+      "title": "2. Categorii de date prelucrate",
+      "h1": "Date furnizate voluntar",
+      "p1": "În procesul de creare a contului și utilizare a platformei, colectăm o serie de informații personale necesare pentru furnizarea serviciilor noastre. Acestea includ nume complet, adresă de email validă, număr de telefon verificat, date demografice opționale (vârstă, gen) și orice alte informații pe care le introduceți voluntar în profilul utilizatorului sau în conținutul generat (anunțuri, mesaje, recenzii).",
+      "p2": "Pentru utilizatorii care optează pentru servicii premium, colectăm și procesăm date de plată necesare procesării tranzacțiilor financiare. Aceste informații sunt prelucrate exclusiv prin intermediul procesatorilor de plăți certificați PCI DSS, fără a fi stocate pe serverele noastre.",
+      "h2": "Date colectate automat",
+      "p3": "Sistemul nostru înregistrează automat date tehnice despre dispozitivul și interacțiunile dumneavoastră cu platforma. Acestea includ adresa IP, identificatori unici de dispozitiv, tipul și versiunea browserului, sistemul de operare, date de utilizare (pagini accesate, timpul petrecut, acțiuni întreprinse) și date aproximative de localizare derivate din adresa IP sau setările dispozitivului.",
+      "p4": "Folosim cookie-uri și tehnologii similare pentru a îmbunătăți funcționalitatea platformei, analiza traficului și personalizarea experienței. Puteți gestiona preferințele pentru aceste tehnologii prin setările browserului sau prin sistemul nostru de consimțământ."
+    },
+    "s3": {
+      "title": "3. Scopurile și bazele juridice ale prelucrării",
+      "intro": "Prelucrăm datele dumneavoastră personale pe baza următoarelor fundamentări juridice și pentru următoarele scopuri specifice:",
+      "h1": "Executarea contractului",
+      "p1": "Pentru a vă oferi acces la platformă și serviciile solicitate, inclusiv gestionarea contului, publicarea anunțurilor, facilitarea comunicării între utilizatori și procesarea tranzacțiilor financiare. Această prelucrare este esențială pentru îndeplinirea obligațiilor noastre contractuale față de dumneavoastră.",
+      "h2": "Interese legitime",
+      "p2": "Pentru îmbunătățirea continuă a platformei, prevenirea fraudelor și activităților abuzive, analiza modului de utilizare a serviciilor noastre, dezvoltarea de noi funcționalități și asigurarea securității sistemului. Implementăm măsuri adecvate pentru a vă proteja drepturile și libertățile în aceste procese.",
+      "h3": "Consimțământ",
+      "p3": "Pentru activități de marketing direct, anumite tipuri de analize de date și utilizarea anumitor cookie-uri. Puteți retrage consimțământul oricând, fără a afecta legalitatea prelucrării efectuate anterior retragerii.",
+      "h4": "Conformitate legală",
+      "p4": "Pentru îndeplinirea obligațiilor legale, inclusiv în domeniul fiscal, al prevenirii spălării banilor și al altor reglementări aplicabile. Aceste prelucrări sunt efectuate numai în măsura cerută de legislația în vigoare."
+    },
+    "s4": {
+      "title": "4. Securitatea și confidențialitatea datelor",
+      "intro": "Am implementat un set complet de măsuri tehnice și organizatorice pentru protejarea datelor dumneavoastră împotriva accesului neautorizat, modificării, divulgării sau distrugerii neautorizate. Acestea includ:",
+      "encryption": {
+        "title": "Criptare avansată:",
+        "text": "Toate datele sunt criptate atât în tranzit (folosind protocoale TLS 1.2+), cât și la rest, cu algoritmi moderni. Datele sensibile suplimentare sunt criptate la nivel de câmp în baza noastră de date."
+      },
+      "access": {
+        "title": "Controlul accesului:",
+        "text": "Implementăm principiul privilegiilor minime, cu acces la date strict pe bază de necesitate funcțională. Toate accesurile sunt monitorizate și jurnalizate, cu revizuiri periodice ale permisiunilor."
+      },
+      "testing": {
+        "title": "Testări de securitate:",
+        "text": "Efectuăm teste de penetrare regulate și evaluări de vulnerabilitate, cu remedierea imediată a oricăror probleme identificate. Sistemul nostru este protejat împotriva principalelor vectori de atac precum SQL injection, XSS și CSRF."
+      },
+      "policies": {
+        "title": "Politici interne stricte:",
+        "text": "Personalul nostru este supus unor obligații stricte de confidențialitate și beneficiază de formare periodică în domeniul protecției datelor. Documentăm și raportăm orice incident de securitate conform cerințelor legale."
+      }
+    },
+    "s5": {
+      "title": "5. Securitatea informațiilor tale",
+      "intro": "Protejarea datelor dumneavoastră personale reprezintă o prioritate absolută pentru echipa noastră. Am implementat un sistem complex de măsuri de securitate care depășește cerințele legale minime, asigurându-ne că informațiile sunt protejate împotriva oricăror amenințări.",
+      "arch": {
+        "title": "Arhitectura noastră de securitate",
+        "intro": "Infrastructura noastră tehnică este găzduită în centre de date de nivel Tier III+, certificate ISO 27001, situate în Uniunea Europeană. Implementăm o strategie de securitate multi-nivel care include:",
+        "perimeter": {
+          "title": "Protecție perimetrală:",
+          "text": "Firewall-uri de ultimă generație, sisteme de prevenție a intruziunilor (IPS) și protecție DDoS care monitorizează și filtrează tot traficul în timp real. Aceste sisteme sunt configurate să detecteze și să blocheze automat orice activitate suspectă."
+        },
+        "app": {
+          "title": "Securitate aplicativă:",
+          "text": "Toate componentele software sunt dezvoltate conform principiilor \"secure by design\" și \"privacy by default\". Efectuăm revizuiri periodice ale codului și teste de penetrare pentru a identifica și remedia vulnerabilitățile în faza incipientă."
+        },
+        "access": {
+          "title": "Controlul accesului:",
+          "text": "Implementăm autentificare cu factori multipli (MFA) pentru toate conturile privilegiate și accesul la date sensibile. Sistemul nostru de gestionare a identității și accesului (IAM) asigură respectarea principiului privilegiilor minime, cu aprobări în trepte pentru operațiuni critice."
+        }
+      },
+      "storage": {
+        "title": "Protecția datelor în stocare și tranzit",
+        "encryption": {
+          "title": "Criptare avansată:",
+          "text": "Toate datele sunt criptate folosind algoritmi AES-256 pentru datele la rest și TLS 1.3 cu criptare end-to-end pentru datele în tranzit. Cheile de criptare sunt gestionate prin servicii dedicate HSM (Hardware Security Modules) și rotite periodic."
+        },
+        "backup": {
+          "title": "Backup-uri securizate:",
+          "text": "Efectuăm backup-uri zilnice incrementale și săptămânale complete, stocate geografic redundant și protejate prin criptare. Testăm periodic procesul de restaurare pentru a ne asigura că datele pot fi recuperate rapid și integral în caz de necesitate."
+        }
+      },
+      "management": {
+        "title": "Managementul vulnerabilităților și răspunsul la incidente",
+        "testing": {
+          "title": "Program continuu de testare:",
+          "text": "Efectuăm scanări automate zilnice pentru vulnerabilități și angajăm testere de penetrare externe trimestrial pentru a evalua securitatea sistemelor noastre. Prioritizăm remedierea vulnerabilităților critice în maximum 24 de ore de la detectare."
+        },
+        "response": {
+          "title": "Plan de răspuns la incidente:",
+          "text": "Avem un procedură detaliată de răspuns la incidente de securitate, care include notificarea autorităților și a utilizatorilor afectați în maxim 72 de ore de la confirmarea incidentului, conform cerințelor GDPR."
+        }
+      },
+      "awareness": {
+        "title": "Conștientizarea și formarea utilizatorilor",
+        "recommendations": {
+          "title": "Recomandări pentru utilizatori:",
+          "text": "Vă încurajăm să luați măsuri suplimentare pentru protejarea propriului cont:"
+        },
+        "list": [
+          "Folosiți parole complexe și unice pentru contul Hobbiz",
+          "Activați autentificarea cu doi factori în setările contului",
+          "Actualizați periodic adresa de email și numărul de telefon de recuperare",
+          "Evitați accesul contului din rețele Wi-Fi publice neprotejate",
+          "Verificați periodic activitatea contului în secțiunea de securitate"
+        ],
+        "team": {
+          "title": "Echipa noastră:",
+          "text": "Toți angajații care au acces la datele utilizatorilor completează programe anuale de formare în securitatea informației și protecția datelor, inclusiv simulări de atacuri de phishing și traininguri practice privind gestionarea corectă a datelor sensibile."
+        }
+      },
+      "certifications": {
+        "title": "Certificări și audituri externe",
+        "intro": "Sistemul nostru este supus periodic unor audituri externe independente pentru a verifica conformitatea cu standardele:",
+        "list": [
+          "ISO 27001 pentru managementul securitării informațiilor",
+          "SOC 2 Type II pentru controalele de securitate și confidențialitate",
+          "PCI DSS pentru procesarea plăților (nivel 1)",
+          "GDPR prin audituri regulate efectuate de firme de specialitate"
+        ],
+        "contact": "Pentru orice întrebări specifice legate de măsurile noastre de securitate sau pentru a raporta orice problemă de securitate pe care ați identificat-o, vă rugăm să ne contactați imediat la"
+      }
+    },
+    "s6": {
+      "title": "6. Drepturile utilizatorilor",
+      "intro": "Conform legislației privind protecția datelor, beneficiați de un set complet de drepturi pe care le puteți exercita în orice moment:",
+      "access": {
+        "title": "Dreptul de acces și portabilitate:",
+        "text": "Puteți solicita o copie a datelor dumneavoastră personale într-un format structurat, utilizat în mod obișnuit și care poate fi citit automat. Vă vom furniza toate informațiile pe care le deținem despre dumneavoastră, inclusiv sursele datelor, scopurile prelucrării și destinatarii acestora."
+      },
+      "rectification": {
+        "title": "Dreptul de rectificare:",
+        "text": "Puteți cere actualizarea oricăror date inexacte sau incomplete."
+      },
+      "erasure": {
+        "title": "Dreptul la ștergere:",
+        "text": "Puteți solicita ștergerea datelor personale, când acestea nu mai sunt necesare în raport cu scopurile pentru care au fost colectate sau prelucrate."
+      },
+      "restriction": {
+        "title": "Dreptul la restricționarea prelucrării:",
+        "text": "În anumite circumstanțe (cum ar fi contestarea exactității datelor sau obiectarea prelucrării), puteți cere limitarea temporară a prelucrării datelor dumneavoastră personale."
+      },
+      "objection": {
+        "title": "Dreptul de opoziție:",
+        "text": "Puteți vă opuneți prelucrării datelor dumneavoastră personale atunci când aceasta se bazează pe interes legitim sau este efectuată în scop de marketing direct."
+      },
+      "contact": "Pentru a exercita oricare dintre aceste drepturi sau pentru a obține informații suplimentare, vă rugăm să ne contactați prin email la",
+      "response": "Răspundem la toate solicitările în termen de 30 de zile și putem cere verificarea identității pentru protecția datelor dumneavoastră."
+    },
+    "s7": {
+      "title": "7. Contact și informații suplimentare",
+      "intro": "Dacă aveți întrebări sau nelămuriri referitoare la această politică de confidențialitate sau la practicile noastre de prelucrare a datelor, vă rugăm să ne contactați folosind următoarele detalii:",
+      "operator": {
+        "title": "Operator de date:",
+        "text": "SC Hobbiz SRL, înregistrată la Registrul Comerțului sub nr. J40/1234/2023, CUI 12345678, cu sediul în Strada Exemplu nr. 10, București, România."
+      },
+      "dpo": {
+        "title": "Responsabil cu protecția datelor:",
+        "text": "Puteți contacta responsabilul nostru cu protecția datelor la adresa",
+        "purpose": "pentru orice aspecte legate de prelucrarea datelor personale."
+      },
+      "authority": {
+        "title": "Autoritatea de supraveghere:",
+        "text": "Aveți dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal dacă considerați că prelucrarea datelor dumneavoastră personale încalcă legislația aplicabilă."
+      }
+    }
+  },
+  "cookies": {
+    "title": "Politica cookie-urilor",
+    "hero": {
+      "badge": "Politica Cookie-urilor",
+      "title1": "Înțelege cum folosim",
+      "highlight": "cookie-urile"
+    },
+    "toc": {
+      "aria": "Cuprins",
+      "title": "Cuprins",
+      "what": "Ce sunt cookie-urile?",
+      "types": "Tipuri de cookie-uri",
+      "why": "De ce folosim cookie-uri?",
+      "manage": "Cum să gestionezi cookie-urile",
+      "thirdParty": "Cookie-uri de la terți",
+      "consent": "Consimțământul tău",
+      "updates": "Actualizări",
+      "contact": "Contact"
+    },
+    "s1": {
+      "title": "Ce sunt cookie-urile?",
+      "p1": "Cookie-urile sunt fișiere text mici care sunt plasate pe dispozitivul tău (computer, telefon mobil sau tabletă) atunci când vizitezi un site web. Acestea sunt procesate și stocate de browser-ul tău web și ne ajută să îți oferim o experiență mai bună pe site-ul nostru.",
+      "p2": "Cookie-urile sunt inofensive în sine și servesc funcții cruciale pentru site-uri web. Ele pot fi vizualizate și șterse cu ușurință din setările browser-ului tău."
+    },
+    "s2": {
+      "title": "Tipuri de cookie-uri pe care le folosim",
+      "essential": {
+        "title": "1. Cookie-uri strict necesare",
+        "text": "Aceste cookie-uri sunt esențiale pentru funcționarea platformei Hobbiz. Ele îți permit să navighezi pe site, să te autentifici în contul tău, să publici anunțuri, să salvezi favorite și să folosești sistemul de chat. Fără aceste cookie-uri, serviciile de bază ale platformei nu ar putea funcționa.",
+        "tag1": "Autentificare",
+        "tag2": "Sesiune utilizator",
+        "tag3": "Coș favorite",
+        "tag4": "Chat securizat"
+      },
+      "preferences": {
+        "title": "2. Cookie-uri de preferințe",
+        "text": "Aceste cookie-uri îți permit să personalizezi experiența pe Hobbiz prin salvarea preferințelor tale, cum ar fi tema preferată (modul întunecat/luminos), categoriile favorite de anunțuri, regiunea ta pentru afișarea anunțurilor locale și setările de notificare.",
+        "tag1": "Tema (light/dark)",
+        "tag2": "Regiunea preferată",
+        "tag3": "Categorii favorite",
+        "tag4": "Setări notificări"
+      },
+      "analytics": {
+        "title": "3. Cookie-uri de analiză",
+        "text": "Aceste cookie-uri sunt folosite prin platforme precum Google Analytics și Umami pentru a colecta informații despre modul în care utilizezi site-ul nostru. Ele ne ajută să înțelegem care pagini sunt vizitate cel mai des și cum navighezi prin platforma Hobbiz. Datele sunt anonimizate și agregate.",
+        "tag1": "Google Analytics",
+        "tag2": "Umami Analytics",
+        "tag3": "Statistici vizite",
+        "tag4": "Comportament navigare"
+      },
+      "marketing": {
+        "title": "4. Cookie-uri de marketing",
+        "text": "Aceste cookie-uri ne ajută să îți afișăm anunțuri și recomandări relevante pe platforma Hobbiz. De exemplu, îți putem sugera anunțuri din categoriile care te interesează sau servicii similare cu cele pe care le-ai vizitat anterior. Nu împărtășim aceste informații cu terți pentru publicitate.",
+        "tag1": "Recomandări anunțuri",
+        "tag2": "Categorii de interes",
+        "tag3": "Servicii similare",
+        "tag4": "Experiență personalizată"
+      }
+    },
+    "s3": {
+      "title": "De ce folosim cookie-uri?",
+      "security": {
+        "title": "Securitate și autentificare",
+        "text": "Pentru a-ți menține contul securizat și pentru a-ți permite să publici anunțuri și să folosești chat-ul în siguranță."
+      },
+      "functionality": {
+        "title": "Funcționalitate și îmbunătățiri",
+        "text": "Pentru a salva preferințele tale (tema, regiunea, anunțurile favorite) și pentru a îmbunătăți platforma pe baza modului în care este folosită."
+      },
+      "recommendations": {
+        "title": "Recomandări relevante",
+        "text": "Pentru a-ți sugera anunțuri și servicii care te-ar putea interesa pe baza categoriilor pe care le explorezi."
+      }
+    },
+    "s4": {
+      "title": "Cum să gestionezi cookie-urile",
+      "intro": "Poți controla și/sau șterge cookie-urile după cum dorești. Poți șterge toate cookie-urile care sunt deja pe computerul tău și poți seta majoritatea browserelor să le împiedice să fie plasate.",
+      "guides": "Ghiduri pentru browsere populare:",
+      "chrome": "Setări → Confidențialitate și securitate → Cookie-uri și alte date ale site-urilor",
+      "firefox": "Opțiuni → Confidențialitate și securitate → Cookie-uri și date ale site-ului",
+      "safari": "Preferințe → Confidențialitate → Gestionarea datelor site-ului web",
+      "edge": "Setări → Cookie-uri și permisiuni site",
+      "noteTitle": "⚠️ Notă importantă",
+      "noteText": "Dacă dezactivezi anumite cookie-uri, este posibil ca unele funcții ale platformei Hobbiz să nu funcționeze corect. De exemplu, s-ar putea să nu poți rămâne autentificat, să-ți pierzi anunțurile favorite salvate, sau să nu primești notificări noi pentru mesajele din chat."
+    },
+    "s5": {
+      "title": "Cookie-uri de la terți",
+      "intro": "Pe platforma Hobbiz folosim servicii de la terți care pot plasa propriile cookie-uri pentru a îmbunătăți experiența ta:",
+      "cloudinary": "Pentru optimizarea și livrarea rapidă a imaginilor anunțurilor",
+      "analytics": "Folosite pentru a analiza traficul pe site și comportamentul utilizatorilor",
+      "maps": "Pentru afișarea locațiilor anunțurilor",
+      "policies": "Aceste servicii au propriile politici de confidențialitate și cookie-uri pe care te încurajăm să le citești."
+    },
+    "s6": {
+      "title": "Consimțământul tău",
+      "p1": "Prin utilizarea platformei Hobbiz, îți dai consimțământul pentru utilizarea cookie-urilor conform acestei politici. Pentru funcțiile esențiale (autentificare, publicare anunțuri, chat), cookie-urile sunt necesare pentru buna funcționare a serviciului.",
+      "p2": "Poți să-ți retragi consimțământul pentru cookie-urile non-esențiale oricând prin modificarea setărilor browser-ului tău sau prin contactarea echipei Hobbiz."
+    },
+    "s7": {
+      "title": "Actualizări ale acestei politici",
+      "text": "Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești această pagină din când în când.",
+      "lastUpdatedLabel": "Ultima actualizare:",
+      "lastUpdatedDate": "Septembrie 2025"
+    },
+    "s8": {
+      "title": "Contactează-ne",
+      "intro": "Dacă ai întrebări despre această politică de cookie-uri sau despre utilizarea datelor pe platforma Hobbiz, te rugăm să ne contactezi:",
+      "emailLabel": "Email:",
+      "supportLabel": "Suport:",
+      "supportText": "prin chat-ul de pe platformă",
+      "addressLabel": "Adresă:",
+      "addressText": "București, România"
+    }
   }
 }

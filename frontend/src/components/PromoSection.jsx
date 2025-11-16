@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import ss1 from '../assets/images/ss1.png';
 import ss2 from '../assets/images/ss2.png';
+import ss3 from '../assets/images/ss3.png';
+import ss4 from '../assets/images/ss4.png';
 import './PromoSection.css';
 
 const textSlides = [
@@ -67,6 +69,7 @@ export default function PromoSection() {
   const sectionRef = useRef(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const slideRefs = useRef([]);
+  const [visibleBullets, setVisibleBullets] = useState({});
 
   useEffect(() => {
     const observers = [];
@@ -78,18 +81,39 @@ export default function PromoSection() {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            // If this slide is more than 50% visible, set it as active with debouncing
-            if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            // If this slide is more than 65% visible, set it as active with debouncing
+            if (entry.isIntersecting && entry.intersectionRatio > 0.65) {
               clearTimeout(debounceTimer);
               debounceTimer = setTimeout(() => {
                 setActiveSlide(index);
+                // Trigger staggered bullet animations for this slide with initial delay
+                const benefitsCount = textSlides[index].benefits.length;
+                const initialDelay = 400; // wait 400ms before first bullet appears
+                for (let i = 0; i < benefitsCount; i++) {
+                  setTimeout(() => {
+                    setVisibleBullets(prev => ({
+                      ...prev,
+                      [`${index}-${i}`]: true
+                    }));
+                  }, initialDelay + (i * 140)); // 140ms delay between each bullet (slower)
+                }
               }, 100); // 100ms debounce to prevent rapid flickering
+            } else if (!entry.isIntersecting) {
+              // Reset bullets when slide leaves viewport
+              const benefitsCount = textSlides[index].benefits.length;
+              for (let i = 0; i < benefitsCount; i++) {
+                setVisibleBullets(prev => {
+                  const newState = { ...prev };
+                  delete newState[`${index}-${i}`];
+                  return newState;
+                });
+              }
             }
           });
         },
         {
-          threshold: [0.3, 0.5, 0.7],
-          rootMargin: '-15% 0px -15% 0px'
+          threshold: [0.4, 0.5, 0.65, 0.8],
+          rootMargin: '-10% 0px -10% 0px'
         }
       );
       
@@ -114,12 +138,19 @@ export default function PromoSection() {
 
       <div className="promo-inner">
         <div className="promo-image-sticky">
-          <div className="promo-image-frame">
-            <img
-              src={(activeSlide === 2 || activeSlide === 3) ? ss2 : ss1}
-              alt={(activeSlide === 2 || activeSlide === 3) ? 'promo ss2' : 'promo ss1'}
-              style={{ transition: 'opacity 0.8s ease', opacity: 1 }}
-            />
+          <div className={`promo-image-frame ${activeSlide === 0 ? 'pair' : ''}`}>
+            {activeSlide === 0 ? (
+              <>
+                <img src={ss4} alt="promo ss4" style={{ transition: 'opacity 0.8s ease', opacity: 1 }} />
+                <img src={ss3} alt="promo ss3" style={{ transition: 'opacity 0.8s ease', opacity: 1 }} />
+              </>
+            ) : (
+              <img
+                src={(activeSlide === 2 || activeSlide === 3) ? ss2 : ss1}
+                alt={(activeSlide === 2 || activeSlide === 3) ? 'promo ss2' : 'promo ss1'}
+                style={{ transition: 'opacity 0.8s ease', opacity: 1 }}
+              />
+            )}
           </div>
         </div>
 
@@ -166,7 +197,10 @@ export default function PromoSection() {
               
               <ul className="benefits-list">
                 {slide.benefits.map((benefit, i) => (
-                  <li key={i}>
+                  <li 
+                    key={i}
+                    className={`benefit-item ${visibleBullets[`${index}-${i}`] ? 'visible' : ''}`}
+                  >
                     <svg className="checkmark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>

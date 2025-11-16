@@ -66,6 +66,36 @@
   transform: translateZ(0); /* promote to its own layer to reduce repaint jitter */
 }
 
+/* When showing two images side-by-side for the phone slide */
+.promo-image-frame.pair {
+  display: flex;
+  gap: 8px; /* reduced gap per request */
+  align-items: center;
+  justify-content: center;
+}
+.promo-image-frame.pair img {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  /* account for frame padding (10px each side) and gap (8px) */
+  width: calc((100% - 20px - 8px) / 2);
+  height: calc(100% - 20px); /* subtract vertical padding */
+  object-fit: contain; /* ensure whole image fits without cropping */
+  border-radius: 8px;
+  transition: object-position 200ms ease, opacity 200ms ease;
+}
+
+@media (max-width: 700px) {
+  .promo-image-frame.pair {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .promo-image-frame.pair img {
+    width: 100%;
+    height: auto;
+    max-height: 48%;
+  }
+}
+
 /* Larger desktop: make the frame taller so images are more prominent */
 @media (min-width: 901px) {
   .promo-image-frame {
@@ -215,6 +245,18 @@
   color: var(--app-text);
   font-size: 1.05rem;
   line-height: 1.6;
+}
+
+/* Smooth animation for benefit bullets */
+.benefit-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.benefit-item.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .benefits-list .checkmark {

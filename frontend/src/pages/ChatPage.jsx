@@ -85,6 +85,13 @@ export default function ChatPage() {
   const isChattingOnMobile = isMobile && !!selectedConversation;
   const isDesktop = !isMobile;
 
+  const goToParticipantProfile = (participant) => {
+    const pid = participant?.id || participant?._id || selectedConversation?.id || selectedConversation?.otherParticipant?.id;
+    if (pid) {
+      navigate(`/profil/${pid}`);
+    }
+  };
+
   // Drag handlers: listen on window to support smooth dragging
   useEffect(() => {
     const onMove = (e) => {
@@ -921,7 +928,14 @@ export default function ChatPage() {
               >
                 <ArrowBack />
               </IconButton>
-              <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>
+              <Typography
+                variant="h5"
+                sx={{ fontWeight: 600, color: 'var(--chat-text)', cursor: selectedConversation ? 'pointer' : 'default' }}
+                onClick={() => selectedConversation && goToParticipantProfile(selectedConversation.otherParticipant)}
+                tabIndex={selectedConversation ? 0 : -1}
+                onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && selectedConversation) goToParticipantProfile(selectedConversation.otherParticipant); }}
+                aria-label={selectedConversation ? `Vezi profilul lui ${selectedConversation.participantName || selectedConversation.name}` : undefined}
+              >
                 {selectedConversation?.participantName || 'Chat'}
               </Typography>
             </Box>
@@ -944,8 +958,18 @@ export default function ChatPage() {
                   className="chat-main-avatar" 
                   src={selectedConversation.participantAvatar || selectedConversation.avatar}
                   alt={selectedConversation.participantName || selectedConversation.name}
+                  role="button"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => goToParticipantProfile(selectedConversation.otherParticipant)}
                 />
-                <div className="chat-main-user-info">
+                <div 
+                  className="chat-main-user-info"
+                  role={selectedConversation ? 'button' : undefined}
+                  tabIndex={selectedConversation ? 0 : -1}
+                  onClick={() => selectedConversation && goToParticipantProfile(selectedConversation.otherParticipant)}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && selectedConversation) goToParticipantProfile(selectedConversation.otherParticipant); }}
+                  aria-label={selectedConversation ? `Vezi profilul lui ${selectedConversation.participantName || selectedConversation.name}` : undefined}
+                >
                   <h3>{selectedConversation.participantName || selectedConversation.name}</h3>
                   <p>{formatLastSeen(selectedConversation.lastSeen)}</p>
                 </div>

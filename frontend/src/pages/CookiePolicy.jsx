@@ -2,12 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton, Typography } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './CookiePolicy.css';
 
 export default function CookiePolicy() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <>
       <Header />
@@ -20,214 +22,194 @@ export default function CookiePolicy() {
               className="mobile-back-btn"
               disableRipple
               disableFocusRipple
-              aria-label="Înapoi"
+              aria-label={t('common.back')}
             >
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h5" className="mobile-header-title">Politica cookie-urilor</Typography>
+            <Typography variant="h5" className="mobile-header-title">{t('cookies.title')}</Typography>
           </div>
           {/* Hero Section */}
           <div className="cookie-policy-hero">
             <div className="hero-badge">
               <span className="hero-badge-icon">🍪</span>
-              <span>Politica Cookie-urilor</span>
+              <span>{t('cookies.hero.badge')}</span>
             </div>
             <h1 className="hero-title">
-              Înțelege cum folosim <span className="highlight">cookie-urile</span>
+              {t('cookies.hero.title1')} <span className="highlight">{t('cookies.hero.highlight')}</span>
             </h1>
           </div>
 
           {/* Main Content */}
           <div className="cookie-policy-content">
             {/* Cuprins */}
-            <nav className="cookie-toc" aria-label="Cuprins">
-              <h2 className="toc-title">Cuprins</h2>
+            <nav className="cookie-toc" aria-label={t('cookies.toc.aria')}>
+              <h2 className="toc-title">{t('cookies.toc.title')}</h2>
               <ul>
-                <li><a href="#ce-sunt-cookieurile">Ce sunt cookie-urile?</a></li>
-                <li><a href="#tipuri-cookieuri">Tipuri de cookie-uri</a></li>
-                <li><a href="#de-ce-folosim">De ce folosim cookie-uri?</a></li>
-                <li><a href="#gestionare">Cum să gestionezi cookie-urile</a></li>
-                <li><a href="#terti">Cookie-uri de la terți</a></li>
-                <li><a href="#consimtamant">Consimțământul tău</a></li>
-                <li><a href="#actualizari">Actualizări</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#ce-sunt-cookieurile">{t('cookies.toc.what')}</a></li>
+                <li><a href="#tipuri-cookieuri">{t('cookies.toc.types')}</a></li>
+                <li><a href="#de-ce-folosim">{t('cookies.toc.why')}</a></li>
+                <li><a href="#gestionare">{t('cookies.toc.manage')}</a></li>
+                <li><a href="#terti">{t('cookies.toc.thirdParty')}</a></li>
+                <li><a href="#consimtamant">{t('cookies.toc.consent')}</a></li>
+                <li><a href="#actualizari">{t('cookies.toc.updates')}</a></li>
+                <li><a href="#contact">{t('cookies.toc.contact')}</a></li>
               </ul>
             </nav>
             <section id="ce-sunt-cookieurile" className="policy-section">
-              <h2>Ce sunt cookie-urile?</h2>
+              <h2>{t('cookies.s1.title')}</h2>
               <p>
-                Cookie-urile sunt fișiere text mici care sunt plasate pe dispozitivul tău (computer, telefon mobil sau tabletă) 
-                atunci când vizitezi un site web. Acestea sunt procesate și stocate de browser-ul tău web și ne ajută să îți 
-                oferim o experiență mai bună pe site-ul nostru.
+                {t('cookies.s1.p1')}
               </p>
               <p>
-                Cookie-urile sunt inofensive în sine și servesc funcții cruciale pentru site-uri web. Ele pot fi vizualizate 
-                și șterse cu ușurință din setările browser-ului tău.
+                {t('cookies.s1.p2')}
               </p>
             </section>
 
             <section id="tipuri-cookieuri" className="policy-section">
-              <h2>Tipuri de cookie-uri pe care le folosim</h2>
+              <h2>{t('cookies.s2.title')}</h2>
               
               <div className="cookie-type">
-                <h3>1. Cookie-uri strict necesare</h3>
+                <h3>{t('cookies.s2.essential.title')}</h3>
                 <p>
-                  Aceste cookie-uri sunt esențiale pentru funcționarea platformei Hobbiz. Ele îți permit să navighezi pe site, 
-                  să te autentifici în contul tău, să publici anunțuri, să salvezi favorite și să folosești sistemul de chat. 
-                  Fără aceste cookie-uri, serviciile de bază ale platformei nu ar putea funcționa.
+                  {t('cookies.s2.essential.text')}
                 </p>
                 <div className="cookie-examples">
-                  <span className="cookie-tag">Autentificare</span>
-                  <span className="cookie-tag">Sesiune utilizator</span>
-                  <span className="cookie-tag">Coș favorite</span>
-                  <span className="cookie-tag">Chat securizat</span>
+                  <span className="cookie-tag">{t('cookies.s2.essential.tag1')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.essential.tag2')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.essential.tag3')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.essential.tag4')}</span>
                 </div>
               </div>
 
               <div className="cookie-type">
-                <h3>2. Cookie-uri de preferințe</h3>
+                <h3>{t('cookies.s2.preferences.title')}</h3>
                 <p>
-                  Aceste cookie-uri îți permit să personalizezi experiența pe Hobbiz prin salvarea preferințelor tale, 
-                  cum ar fi tema preferată (modul întunecat/luminos), categoriile favorite de anunțuri, regiunea ta 
-                  pentru afișarea anunțurilor locale și setările de notificare.
+                  {t('cookies.s2.preferences.text')}
                 </p>
                 <div className="cookie-examples">
-                  <span className="cookie-tag">Tema (light/dark)</span>
-                  <span className="cookie-tag">Regiunea preferată</span>
-                  <span className="cookie-tag">Categorii favorite</span>
-                  <span className="cookie-tag">Setări notificări</span>
+                  <span className="cookie-tag">{t('cookies.s2.preferences.tag1')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.preferences.tag2')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.preferences.tag3')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.preferences.tag4')}</span>
                 </div>
               </div>
 
               <div className="cookie-type">
-                <h3>3. Cookie-uri de analiză</h3>
+                <h3>{t('cookies.s2.analytics.title')}</h3>
                 <p>
-                  Aceste cookie-uri sunt folosite prin platforme precum Google Analytics și Umami pentru a colecta 
-                  informații despre modul în care utilizezi site-ul nostru. Ele ne ajută să înțelegem care pagini 
-                  sunt vizitate cel mai des și cum navighezi prin platforma Hobbiz. Datele sunt anonimizate și agregate.
+                  {t('cookies.s2.analytics.text')}
                 </p>
                 <div className="cookie-examples">
-                  <span className="cookie-tag">Google Analytics</span>
-                  <span className="cookie-tag">Umami Analytics</span>
-                  <span className="cookie-tag">Statistici vizite</span>
-                  <span className="cookie-tag">Comportament navigare</span>
+                  <span className="cookie-tag">{t('cookies.s2.analytics.tag1')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.analytics.tag2')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.analytics.tag3')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.analytics.tag4')}</span>
                 </div>
               </div>
 
               <div className="cookie-type">
-                <h3>4. Cookie-uri de marketing</h3>
+                <h3>{t('cookies.s2.marketing.title')}</h3>
                 <p>
-                  Aceste cookie-uri ne ajută să îți afișăm anunțuri și recomandări relevante pe platforma Hobbiz. 
-                  De exemplu, îți putem sugera anunțuri din categoriile care te interesează sau servicii similare 
-                  cu cele pe care le-ai vizitat anterior. Nu împărtășim aceste informații cu terți pentru publicitate.
+                  {t('cookies.s2.marketing.text')}
                 </p>
                 <div className="cookie-examples">
-                  <span className="cookie-tag">Recomandări anunțuri</span>
-                  <span className="cookie-tag">Categorii de interes</span>
-                  <span className="cookie-tag">Servicii similare</span>
-                  <span className="cookie-tag">Experiență personalizată</span>
+                  <span className="cookie-tag">{t('cookies.s2.marketing.tag1')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.marketing.tag2')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.marketing.tag3')}</span>
+                  <span className="cookie-tag">{t('cookies.s2.marketing.tag4')}</span>
                 </div>
               </div>
             </section>
 
             <section id="de-ce-folosim" className="policy-section">
-              <h2>De ce folosim cookie-uri?</h2>
+              <h2>{t('cookies.s3.title')}</h2>
               <div className="reasons-grid">
                 <div className="reason-card">
                   <div className="reason-icon">🔐</div>
-                  <h4>Securitate și autentificare</h4>
-                  <p>Pentru a-ți menține contul securizat și pentru a-ți permite să publici anunțuri și să folosești chat-ul în siguranță.</p>
+                  <h4>{t('cookies.s3.security.title')}</h4>
+                  <p>{t('cookies.s3.security.text')}</p>
                 </div>
                 <div className="reason-card">
                   <div className="reason-icon">⚙️</div>
-                  <h4>Funcționalitate și îmbunătățiri</h4>
-                  <p>Pentru a salva preferințele tale (tema, regiunea, anunțurile favorite) și pentru a îmbunătăți platforma pe baza modului în care este folosită.</p>
+                  <h4>{t('cookies.s3.functionality.title')}</h4>
+                  <p>{t('cookies.s3.functionality.text')}</p>
                 </div>
                 <div className="reason-card">
                   <div className="reason-icon">🎯</div>
-                  <h4>Recomandări relevante</h4>
-                  <p>Pentru a-ți sugera anunțuri și servicii care te-ar putea interesa pe baza categoriilor pe care le explorezi.</p>
+                  <h4>{t('cookies.s3.recommendations.title')}</h4>
+                  <p>{t('cookies.s3.recommendations.text')}</p>
                 </div>
               </div>
             </section>
 
             <section id="gestionare" className="policy-section">
-              <h2>Cum să gestionezi cookie-urile</h2>
+              <h2>{t('cookies.s4.title')}</h2>
               <p>
-                Poți controla și/sau șterge cookie-urile după cum dorești. Poți șterge toate cookie-urile 
-                care sunt deja pe computerul tău și poți seta majoritatea browserelor să le împiedice să fie plasate.
+                {t('cookies.s4.intro')}
               </p>
               
               <div className="browser-guides">
-                <h4>Ghiduri pentru browsere populare:</h4>
+                <h4>{t('cookies.s4.guides')}</h4>
                 <ul>
-                  <li><strong>Chrome:</strong> Setări → Confidențialitate și securitate → Cookie-uri și alte date ale site-urilor</li>
-                  <li><strong>Firefox:</strong> Opțiuni → Confidențialitate și securitate → Cookie-uri și date ale site-ului</li>
-                  <li><strong>Safari:</strong> Preferințe → Confidențialitate → Gestionarea datelor site-ului web</li>
-                  <li><strong>Edge:</strong> Setări → Cookie-uri și permisiuni site</li>
+                  <li><strong>Chrome:</strong> {t('cookies.s4.chrome')}</li>
+                  <li><strong>Firefox:</strong> {t('cookies.s4.firefox')}</li>
+                  <li><strong>Safari:</strong> {t('cookies.s4.safari')}</li>
+                  <li><strong>Edge:</strong> {t('cookies.s4.edge')}</li>
                 </ul>
               </div>
 
               <div className="important-note">
-                <h4>⚠️ Notă importantă</h4>
+                <h4>{t('cookies.s4.noteTitle')}</h4>
                 <p>
-                  Dacă dezactivezi anumite cookie-uri, este posibil ca unele funcții ale platformei Hobbiz să nu 
-                  funcționeze corect. De exemplu, s-ar putea să nu poți rămâne autentificat, să-ți pierzi 
-                  anunțurile favorite salvate, sau să nu primești notificări noi pentru mesajele din chat.
+                  {t('cookies.s4.noteText')}
                 </p>
               </div>
             </section>
 
             <section id="terti" className="policy-section">
-              <h2>Cookie-uri de la terți</h2>
+              <h2>{t('cookies.s5.title')}</h2>
               <p>
-                Pe platforma Hobbiz folosim servicii de la terți care pot plasa propriile cookie-uri pentru a îmbunătăți experiența ta:
+                {t('cookies.s5.intro')}
               </p>
               <ul>
-                <li><strong>Cloudinary:</strong> Pentru optimizarea și livrarea rapidă a imaginilor anunțurilor</li>
-                <li><strong>Google Analytics/Umami</strong> Folosite pentru a analiza traficul pe site și comportamentul utilizatorilor</li>
-                <li><strong>Google Maps:</strong> Pentru afișarea locațiilor anunțurilor</li>
+                <li><strong>Cloudinary:</strong> {t('cookies.s5.cloudinary')}</li>
+                <li><strong>Google Analytics/Umami:</strong> {t('cookies.s5.analytics')}</li>
+                <li><strong>Google Maps:</strong> {t('cookies.s5.maps')}</li>
               </ul>
               <p>
-                Aceste servicii au propriile politici de confidențialitate și cookie-uri pe care te încurajăm să le citești.
+                {t('cookies.s5.policies')}
               </p>
             </section>
 
             <section id="consimtamant" className="policy-section">
-              <h2>Consimțământul tău</h2>
+              <h2>{t('cookies.s6.title')}</h2>
               <p>
-                Prin utilizarea platformei Hobbiz, îți dai consimțământul pentru utilizarea cookie-urilor 
-                conform acestei politici. Pentru funcțiile esențiale (autentificare, publicare anunțuri, chat), 
-                cookie-urile sunt necesare pentru buna funcționare a serviciului.
+                {t('cookies.s6.p1')}
               </p>
               <p>
-                Poți să-ți retragi consimțământul pentru cookie-urile non-esențiale oricând prin modificarea 
-                setărilor browser-ului tău sau prin contactarea echipei Hobbiz.
+                {t('cookies.s6.p2')}
               </p>
             </section>
 
             <section id="actualizari" className="policy-section">
-              <h2>Actualizări ale acestei politici</h2>
+              <h2>{t('cookies.s7.title')}</h2>
               <p>
-                Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările 
-                în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești 
-                această pagină din când în când.
+                {t('cookies.s7.text')}
               </p>
               <p className="last-updated">
-                <strong>Ultima actualizare:</strong> Septembrie 2025
+                <strong>{t('cookies.s7.lastUpdatedLabel')}</strong> {t('cookies.s7.lastUpdatedDate')}
               </p>
             </section>
 
             <section id="contact" className="policy-section contact-section">
-              <h2>Contactează-ne</h2>
+              <h2>{t('cookies.s8.title')}</h2>
               <p>
-                Dacă ai întrebări despre această politică de cookie-uri sau despre utilizarea datelor pe platforma Hobbiz, 
-                te rugăm să ne contactezi:
+                {t('cookies.s8.intro')}
               </p>
               <div className="contact-info">
-                <p><strong>Email:</strong> privacy@hobbiz.ro</p>
-                <p><strong>Suport:</strong> prin chat-ul de pe platformă</p>
-                <p><strong>Adresă:</strong> București, România</p>
+                <p><strong>{t('cookies.s8.emailLabel')}</strong> privacy@hobbiz.ro</p>
+                <p><strong>{t('cookies.s8.supportLabel')}</strong> {t('cookies.s8.supportText')}</p>
+                <p><strong>{t('cookies.s8.addressLabel')}</strong> {t('cookies.s8.addressText')}</p>
               </div>
             </section>
           </div>

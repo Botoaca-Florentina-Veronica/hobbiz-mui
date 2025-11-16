@@ -31,7 +31,8 @@
     "success": "Success",
     "logoutMessage": "You have been signed out.",
     "lightMode": "Light",
-    "darkMode": "Dark mode"
+    "darkMode": "Dark mode",
+    "back": "Back"
   },
   "mobileHeader": {
     "searchPlaceholder": "What are you looking for?",
@@ -79,5 +80,469 @@
     "technology": "Technology",
     "auto": "Auto",
     "tutoring": "Tutoring"
+  }
+  ,
+  "legal": {
+    "brand": "Hobbiz",
+    "description": "Discover, sell and buy services or products from passionate people like you.",
+    "downloadAppStore": "Download on the App Store",
+    "getOnGooglePlay": "Get it on Google Play",
+    "usefulLinks": "Useful links",
+    "about": "About us",
+    "contact": "Contact",
+    "howItWorks": "How it works",
+    "legal": "Legal",
+    "terms": "Terms & Conditions",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "followUs": "Follow us"
+  }
+  ,
+  "about": {
+    "title": "About us",
+    "mobileTitle": "About us",
+    "hero": {
+      "badge": "The makers' platform",
+      "title1": "Turn your",
+      "highlight": "passion",
+      "title2": "into opportunity"
+    },
+    "mission": {
+      "title": "Our mission",
+      "subtitle": "We build bridges between talent and opportunity",
+      "description": "is not just a platform - it's a community that celebrates authenticity and creativity. We were born from the belief that every passion deserves to be shared and every talent should be valued."
+    },
+    "pillars": {
+      "authenticity": { "title": "Authenticity", "desc": "We promote unique products and services created with passion and dedication" },
+      "community": { "title": "Community", "desc": "We create strong connections between enthusiasts and users" },
+      "growth": { "title": "Growth", "desc": "We provide tools needed to grow creative businesses" }
+    },
+    "features": {
+      "section1": {
+        "title": "What can you do on Hobbiz?",
+        "items": [
+          "Discover a new source of income",
+          "Post listings for your services or products",
+          "Learn about local or national offers",
+          "Save favorite listings and contact sellers directly",
+          "Meet other people with the same passions and collaborate or chat with them",
+          "Manage your account and listings quickly and intuitively"
+        ]
+      },
+      "section2": {
+        "title": "Why choose Hobbiz?",
+        "items": [
+          "Modern, easy-to-use platform with mobile and desktop-friendly design",
+          "Friendly community and fast support",
+          "Free promotion for your passions",
+          "Intuitive interface and optimal user experience",
+          "Security and privacy guaranteed",
+          "Direct connection between creators and buyers"
+        ]
+      }
+    },
+    "how": {
+      "title": "How Hobbiz works",
+      "subtitle": "In just 4 simple steps you can start using our platform",
+      "steps": {
+        "1": { "title": "Sign up", "desc": "Create a free account in just a few minutes" },
+        "2": { "title": "Post or search", "desc": "Post listings or find what you need" },
+        "3": { "title": "Connect", "desc": "Communicate directly via integrated messaging" },
+        "4": { "title": "Collaborate", "desc": "Complete safe transactions within the community" }
+      }
+    },
+    "values": {
+      "title": "Our values",
+      "cards": {
+        "1": { "title": "Security", "desc": "We prioritize user safety with advanced data protection measures and identity verification." },
+        "2": { "title": "Community", "desc": "We create a friendly space where enthusiasts can connect, collaborate and inspire each other." },
+        "3": { "title": "Innovation", "desc": "We continuously develop new features to improve user experience and facilitate collaboration." }
+      }
+    },
+    "faqTitle": "Frequently Asked Questions",
+    "faq": [
+      { "question": "Is Hobbiz free to use?", "answer": "Yes — basic registration and use of the Hobbiz platform are completely free. You can post and respond to listings and communicate with other users at no cost." },
+      { "question": "How do you protect my personal data?", "answer": "We take your data protection seriously. We use strong encryption and do not share your personal information with third parties without your explicit consent." },
+      { "question": "Can I sell both products and services?", "answer": "Absolutely! While Hobbiz is primarily designed for services, you can also sell handmade products, items, vintage goods, vehicles, food and more." },
+      { "question": "How does the messaging system work?", "answer": "Our messaging system allows you to communicate directly with other users in real time, negotiate prices and coordinate deliveries securely." }
+    ],
+    "lastUpdated": "Last updated: July 19, 2025"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "lastUpdated": "Last updated: September 5, 2025",
+    "intro": {
+      "title": "Hobbiz Platform Usage Agreement",
+      "text": "By accessing and using the Hobbiz platform, you agree to comply with the terms and conditions presented in this document. Please read these provisions carefully before creating an account or using our services."
+    },
+    "s1": {
+      "title": "1. Definitions and interpretation",
+      "p1": "Within these terms and conditions, the following definitions apply: \"Platform\" refers to the Hobbiz website and all associated mobile applications; \"Services\" includes all functionalities offered through the platform, including posting listings, searching, user communication and payment processing; \"User\" designates any individual or legal entity that accesses or uses the platform; \"Content\" includes text, images, video, data and other materials uploaded to the platform.",
+      "p2": "The Hobbiz platform operates as a digital marketplace connecting people interested in selling or buying various products and services. We are not the owners or sellers of listed products, but facilitate interaction between users through modern web technologies, including React.js, Node.js and MongoDB databases."
+    },
+    "s2": {
+      "title": "2. Eligibility and registration",
+      "h1": "Age and legal capacity requirements",
+      "p1": "To use Hobbiz services, you must be at least 18 years old and have full legal capacity under Romanian law. Minors aged 16-18 are allowed to use the platform only with explicit consent from parents or legal guardians and under their supervision.",
+      "p2": "Legal entities may use the platform through authorized representatives who are responsible for all actions taken on behalf of the organization. We verify registration documents for business accounts and reserve the right to request additional documents for identity validation.",
+      "h2": "Registration process",
+      "p3": "Creating an account requires providing accurate and complete information: real name, valid email address and working phone number. False or misleading information constitutes a breach of these terms and may lead to account suspension or closure without notice.",
+      "p4": "We support registration through multiple methods: email and password, Google OAuth 2.0 authentication, or through other authorized identity providers. Each user may hold only one active account, and creating multiple accounts to evade restrictions is strictly prohibited."
+    },
+    "s3": {
+      "title": "3. Platform use and listings",
+      "h1": "Posting listings",
+      "p1": "Users can post listings for the sale of new or second-hand products, provision of services, rental of goods or other legal commercial transactions. Each listing must contain an accurate and complete description of the product or service, real and unmodified photos and a correct and transparent price.",
+      "p2": "Posting listings for the following is strictly prohibited: counterfeit or pirated products, substances prohibited by law, weapons and ammunition, protected or illegally obtained animals, illegal or immoral services, adult content or materials that violate copyright. We actively monitor content through automated algorithms and human moderation.",
+      "h2": "User responsibilities",
+      "p3": "Users are fully responsible for the content posted, the accuracy of information provided and compliance with all applicable laws. We reserve the right to remove any content that violates these terms or current legislation, without the obligation to provide detailed explanations.",
+      "p4": "Communication between users must be conducted in a respectful and professional manner. Harassment, threats, vulgar or discriminatory language, spam and fraud attempts will be sanctioned through temporary or permanent account restrictions."
+    },
+    "s4": {
+      "title": "4. Transactions and payments",
+      "h1": "Facilitating transactions",
+      "p1": "Hobbiz acts as a technological intermediary between buyers and sellers, without being a party to the transactions carried out. We do not guarantee the quality, authenticity or conformity of products sold, these being the sole responsibility of sellers. We recommend users to be cautious and always verify products before completing transactions.",
+      "p2": "For certain premium services, we process payments through certified processors Stripe and PayPal, which comply with PCI DSS standards for financial data security. We do not store credit card information on our servers, all sensitive data being managed exclusively by specialized providers.",
+      "h2": "Disputes and conflict resolution",
+      "p3": "In case of disputes between users, we offer an internal reporting and mediation system, but the final responsibility for resolving conflicts lies with the parties involved. For high-value transactions, we recommend using written contracts and secure payment methods that offer protection for both parties.",
+      "p4": "We may intervene through temporary suspension of accounts involved in repeated or serious disputes, but we have no legal obligation to arbitrate commercial conflicts between users. For situations involving possible crimes, we cooperate with competent authorities according to legal requirements."
+    },
+    "s5": {
+      "title": "5. Intellectual property",
+      "h1": "Platform rights",
+      "p1": "The source code, design, logo, trademarks and all technical elements of the Hobbiz platform are protected by copyright and intellectual property. Unauthorized use of these elements, including copying code or replicating design, constitutes a violation of our rights and may be pursued legally.",
+      "p2": "The technologies used (React.js, Node.js, MongoDB) are open-source and used according to their respective licenses, but the specific implementation and architecture of our system are exclusive property. Prohibition of reverse engineering or attempts to replicate functionalities is strictly enforced.",
+      "h2": "User content",
+      "p3": "Users remain owners of the content they publish (photos, descriptions, reviews), but grant Hobbiz a non-exclusive, transferable and sub-licensable license to display, modify and distribute this content for the purpose of providing platform services.",
+      "p4": "It is the users' responsibility to ensure they hold all necessary rights for published content and that they do not violate third-party copyrights. In case of valid DMCA complaints, we will promptly remove problematic content and take necessary measures against accounts that repeatedly violate copyrights."
+    },
+    "s6": {
+      "title": "6. Security and data protection",
+      "h1": "Technical security measures",
+      "p1": "We implement advanced IT security measures: SSL/TLS encryption for all communications, secure password hashing with bcrypt algorithms, protection against CSRF and XSS attacks, configured firewalls and constant monitoring for suspicious activities. We regularly update all software components to correct security vulnerabilities.",
+      "p2": "Data is stored in SOC 2 Type II certified data centers, with daily automatic backups and geographic redundancy systems. Access to production systems is strictly controlled through two-factor authentication and complete logging of administrative activities.",
+      "h2": "User responsibilities",
+      "p3": "Users must maintain confidentiality of access credentials, use complex and unique passwords and notify us immediately if they suspect the account has been compromised. We are not responsible for losses resulting from user negligence in maintaining account security.",
+      "p4": "Enabling two-factor authentication is strongly recommended for all accounts, especially for those managing frequent financial transactions. We offer multiple options: SMS, TOTP applications (Google Authenticator, Authy) and FIDO2-compatible hardware keys."
+    },
+    "s7": {
+      "title": "7. Limitations of liability",
+      "h1": "Liability exclusions",
+      "p1": "Hobbiz is not responsible for: damages resulting from transactions between users, data loss due to hardware or software failures, temporary service interruptions for technical reasons, fraudulent actions by users or third parties, or consequences of improper use of the platform.",
+      "p2": "In no case will our total liability exceed the value of fees paid by the user for premium services in the last 12 months. This limitation applies regardless of the nature of the claim: contractual, tort or any other legal cause.",
+      "h2": "Force majeure",
+      "p3": "We are not responsible for delays or inability to fulfill obligations due to force majeure events: natural disasters, wars, large-scale cyber attacks, restrictive government regulations or other events beyond our reasonable control.",
+      "p4": "In such situations, we will make all reasonable efforts to minimize the impact on users and restore services as quickly as possible. Users will be promptly informed about any major interruptions through our official communication channels."
+    },
+    "s8": {
+      "title": "8. Modifications and service termination",
+      "h1": "Changes to terms",
+      "p1": "We reserve the right to modify these terms and conditions to reflect changes in services offered, legal requirements or business practices. Users will be notified at least 30 days before major changes take effect via email and platform notifications.",
+      "p2": "Continued use of services after changes take effect constitutes acceptance of the new terms. Users who do not agree with the changes may close their accounts and cease using the platform without additional penalties.",
+      "h2": "Account suspension and closure",
+      "p3": "We may suspend or close accounts that violate these terms, participate in fraudulent activities, negatively affect the experience of other users or pose security risks to the platform. Depending on the severity of the violation, we may apply warnings, temporary restrictions or permanent closure.",
+      "p4": "Users may voluntarily close accounts at any time through platform settings. Upon account closure, personal data will be anonymized or deleted according to our privacy policy, and active listings will be automatically removed."
+    },
+    "s9": {
+      "title": "9. Applicable law and jurisdiction",
+      "h1": "Legal framework",
+      "p1": "These terms and conditions are governed by Romanian law and interpreted in accordance with it. All disputes resulting from use of the platform will be resolved by competent courts in Romania, with users waiving any claim of territorial incompetence.",
+      "p2": "For users in the European Union, we comply with the provisions of the Digital Services Act (DSA) Regulation and the Consumer Rights Directive. Consumers can benefit from alternative dispute resolution procedures according to applicable EU regulations.",
+      "h2": "Regulatory compliance",
+      "p3": "The platform complies with GDPR provisions for data protection, PSD2 regulations for payment services, e-commerce requirements according to OUG 34/2014 and other relevant regulations from Romania and the EU. We cooperate with regulatory authorities and promptly implement any new legal requirements.",
+      "p4": "For consumer protection specific issues, users can contact ANPC (National Authority for Consumer Protection) or use the European ODR platform for online resolution of commercial disputes."
+    },
+    "s10": {
+      "title": "10. Contact and support",
+      "h1": "Contact information",
+      "p1": "For questions about these terms and conditions, complaints or support requests, you can contact us through the following methods: official email at legal@hobbiz.ro, contact form on the platform or traditional mail at the registered office address.",
+      "p2": "Our support team generally responds within 24-48 hours for standard questions and within a maximum of 72 hours for complex issues requiring technical or legal investigations. For security emergencies, we offer accelerated support through priority channels.",
+      "h2": "Complaint Procedure",
+      "p3": "Complaints can be submitted through the integrated platform system, which allows status tracking and automatic notifications. For serious situations, we also accept direct communication via email at the dedicated address complaints@hobbiz.ro.",
+      "p4": "We investigate all complaints in an impartial and transparent manner, respecting the rights of all parties involved. Investigation results are communicated in writing, and for complex cases, we provide detailed explanations of the measures taken."
+    },
+    "footer": "This document was last updated on September 5, 2025 and takes effect immediately for all Hobbiz platform users. For previous versions of these terms, please contact us at legal@hobbiz.ro."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: July 19, 2025",
+    "intro": {
+      "title": "Transparency and data protection",
+      "text": "At Hobbiz, we consider the protection of personal data a fundamental responsibility. This document describes in detail our information management practices, in accordance with the General Data Protection Regulation (GDPR) and applicable Romanian legislation."
+    },
+    "s1": {
+      "title": "1. Purpose and scope",
+      "p1": "This policy applies to all information collected through the Hobbiz platform, including through the website, mobile applications and any other associated interfaces. The document defines the legal and operational framework for the processing of personal data, including the purposes of collection, processing methods, user rights and security measures implemented.",
+      "p2": "The data controller is SC Hobbiz SRL, registered in Romania, which determines the purposes and means of data processing. For any questions regarding the content of this policy, please contact us using the details provided in the final section."
+    },
+    "s2": {
+      "title": "2. Categories of data processed",
+      "h1": "Voluntarily provided data",
+      "p1": "In the process of creating an account and using the platform, we collect a range of personal information necessary to provide our services. These include full name, valid email address, verified phone number, optional demographic data (age, gender) and any other information you voluntarily enter into your user profile or generated content (ads, messages, reviews).",
+      "p2": "For users who opt for premium services, we also collect and process payment data necessary to process financial transactions. This information is processed exclusively through PCI DSS certified payment processors, without being stored on our servers.",
+      "h2": "Automatically collected data",
+      "p3": "Our system automatically records technical data about your device and interactions with the platform. These include IP address, unique device identifiers, browser type and version, operating system, usage data (pages accessed, time spent, actions taken) and approximate location data derived from IP address or device settings.",
+      "p4": "We use cookies and similar technologies to improve platform functionality, analyze traffic and personalize the experience. You can manage preferences for these technologies through your browser settings or through our consent system."
+    },
+    "s3": {
+      "title": "3. Purposes and legal bases of processing",
+      "intro": "We process your personal data on the following legal bases and for the following specific purposes:",
+      "h1": "Contract execution",
+      "p1": "To provide you with access to the platform and requested services, including account management, posting ads, facilitating communication between users and processing financial transactions. This processing is essential to fulfill our contractual obligations to you.",
+      "h2": "Legitimate interests",
+      "p2": "For the continuous improvement of the platform, prevention of fraud and abusive activities, analysis of how our services are used, development of new features and ensuring system security. We implement appropriate measures to protect your rights and freedoms in these processes.",
+      "h3": "Consent",
+      "p3": "For direct marketing activities, certain types of data analysis and use of certain cookies. You can withdraw consent at any time, without affecting the legality of processing carried out before the withdrawal.",
+      "h4": "Legal compliance",
+      "p4": "To fulfill legal obligations, including in the areas of taxation, anti-money laundering and other applicable regulations. These processes are carried out only to the extent required by legislation in force."
+    },
+    "s4": {
+      "title": "4. Data security and confidentiality",
+      "intro": "We have implemented a comprehensive set of technical and organizational measures to protect your data against unauthorized access, modification, disclosure or destruction. These include:",
+      "encryption": {
+        "title": "Advanced encryption:",
+        "text": "All data is encrypted both in transit (using TLS 1.2+ protocols) and at rest, with modern algorithms. Additional sensitive data is encrypted at field level in our database."
+      },
+      "access": {
+        "title": "Access control:",
+        "text": "We implement the principle of least privilege, with data access strictly on a functional need basis. All accesses are monitored and logged, with periodic reviews of permissions."
+      },
+      "testing": {
+        "title": "Security testing:",
+        "text": "We conduct regular penetration tests and vulnerability assessments, with immediate remediation of any identified issues. Our system is protected against major attack vectors such as SQL injection, XSS and CSRF."
+      },
+      "policies": {
+        "title": "Strict internal policies:",
+        "text": "Our staff is subject to strict confidentiality obligations and receives periodic training in data protection. We document and report any security incident in accordance with legal requirements."
+      }
+    },
+    "s5": {
+      "title": "5. Security of your information",
+      "intro": "Protecting your personal data is an absolute priority for our team. We have implemented a complex system of security measures that exceeds minimum legal requirements, ensuring that information is protected against any threats.",
+      "arch": {
+        "title": "Our security architecture",
+        "intro": "Our technical infrastructure is hosted in Tier III+ level data centers, ISO 27001 certified, located in the European Union. We implement a multi-level security strategy that includes:",
+        "perimeter": {
+          "title": "Perimeter protection:",
+          "text": "Next-generation firewalls, intrusion prevention systems (IPS) and DDoS protection that monitor and filter all traffic in real time. These systems are configured to automatically detect and block any suspicious activity."
+        },
+        "app": {
+          "title": "Application security:",
+          "text": "All software components are developed according to \"secure by design\" and \"privacy by default\" principles. We conduct periodic code reviews and penetration tests to identify and remediate vulnerabilities in the early stages."
+        },
+        "access": {
+          "title": "Access control:",
+          "text": "We implement multi-factor authentication (MFA) for all privileged accounts and access to sensitive data. Our identity and access management (IAM) system ensures compliance with the principle of least privilege, with multi-stage approvals for critical operations."
+        }
+      },
+      "storage": {
+        "title": "Data protection in storage and transit",
+        "encryption": {
+          "title": "Advanced encryption:",
+          "text": "All data is encrypted using AES-256 algorithms for data at rest and TLS 1.3 with end-to-end encryption for data in transit. Encryption keys are managed through dedicated HSM (Hardware Security Modules) services and rotated periodically."
+        },
+        "backup": {
+          "title": "Secure backups:",
+          "text": "We perform daily incremental and weekly full backups, stored geographically redundantly and protected by encryption. We periodically test the restoration process to ensure that data can be recovered quickly and fully if necessary."
+        }
+      },
+      "management": {
+        "title": "Vulnerability management and incident response",
+        "testing": {
+          "title": "Continuous testing program:",
+          "text": "We conduct daily automated vulnerability scans and engage external penetration testers quarterly to assess the security of our systems. We prioritize the remediation of critical vulnerabilities within a maximum of 24 hours of detection."
+        },
+        "response": {
+          "title": "Incident response plan:",
+          "text": "We have a detailed procedure for responding to security incidents, which includes notifying authorities and affected users within a maximum of 72 hours of confirming the incident, in accordance with GDPR requirements."
+        }
+      },
+      "awareness": {
+        "title": "User awareness and training",
+        "recommendations": {
+          "title": "Recommendations for users:",
+          "text": "We encourage you to take additional measures to protect your own account:"
+        },
+        "list": [
+          "Use complex and unique passwords for your Hobbiz account",
+          "Enable two-factor authentication in account settings",
+          "Periodically update your recovery email address and phone number",
+          "Avoid accessing your account from unprotected public Wi-Fi networks",
+          "Periodically check account activity in the security section"
+        ],
+        "team": {
+          "title": "Our team:",
+          "text": "All employees who have access to user data complete annual training programs in information security and data protection, including phishing attack simulations and practical training on proper handling of sensitive data."
+        }
+      },
+      "certifications": {
+        "title": "External certifications and audits",
+        "intro": "Our system is periodically subject to independent external audits to verify compliance with the standards:",
+        "list": [
+          "ISO 27001 for information security management",
+          "SOC 2 Type II for security and confidentiality controls",
+          "PCI DSS for payment processing (level 1)",
+          "GDPR through regular audits conducted by specialized firms"
+        ],
+        "contact": "For any specific questions related to our security measures or to report any security issues you have identified, please contact us immediately at"
+      }
+    },
+    "s6": {
+      "title": "6. User rights",
+      "intro": "Under data protection legislation, you have a complete set of rights that you can exercise at any time:",
+      "access": {
+        "title": "Right of access and portability:",
+        "text": "You can request a copy of your personal data in a structured, commonly used and machine-readable format. We will provide you with all the information we hold about you, including data sources, processing purposes and recipients."
+      },
+      "rectification": {
+        "title": "Right to rectification:",
+        "text": "You can request the update of any inaccurate or incomplete data."
+      },
+      "erasure": {
+        "title": "Right to erasure:",
+        "text": "You can request the deletion of personal data when it is no longer necessary in relation to the purposes for which it was collected or processed."
+      },
+      "restriction": {
+        "title": "Right to restriction of processing:",
+        "text": "In certain circumstances (such as contesting the accuracy of the data or objecting to processing), you can request temporary limitation of the processing of your personal data."
+      },
+      "objection": {
+        "title": "Right to object:",
+        "text": "You can object to the processing of your personal data when it is based on legitimate interest or is carried out for direct marketing purposes."
+      },
+      "contact": "To exercise any of these rights or to obtain additional information, please contact us by email at",
+      "response": "We respond to all requests within 30 days and may request identity verification for the protection of your data."
+    },
+    "s7": {
+      "title": "7. Contact and additional information",
+      "intro": "If you have any questions or concerns regarding this privacy policy or our data processing practices, please contact us using the following details:",
+      "operator": {
+        "title": "Data controller:",
+        "text": "SC Hobbiz SRL, registered at the Trade Register under no. J40/1234/2023, CUI 12345678, with its headquarters at Strada Exemplu no. 10, Bucharest, Romania."
+      },
+      "dpo": {
+        "title": "Data protection officer:",
+        "text": "You can contact our data protection officer at",
+        "purpose": "for any matters related to personal data processing."
+      },
+      "authority": {
+        "title": "Supervisory authority:",
+        "text": "You have the right to file a complaint with the National Supervisory Authority for Personal Data Processing if you believe that the processing of your personal data violates applicable legislation."
+      }
+    }
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "hero": {
+      "badge": "Cookie Policy",
+      "title1": "Understand how we use",
+      "highlight": "cookies"
+    },
+    "toc": {
+      "aria": "Table of contents",
+      "title": "Table of Contents",
+      "what": "What are cookies?",
+      "types": "Types of cookies",
+      "why": "Why we use cookies",
+      "manage": "How to manage cookies",
+      "thirdParty": "Third-party cookies",
+      "consent": "Your consent",
+      "updates": "Updates",
+      "contact": "Contact"
+    },
+    "s1": {
+      "title": "What are cookies?",
+      "p1": "Cookies are small text files that are placed on your device (computer, mobile phone or tablet) when you visit a website. They are processed and stored by your web browser and help us provide you with a better experience on our site.",
+      "p2": "Cookies are harmless in themselves and serve crucial functions for websites. They can be easily viewed and deleted from your browser settings."
+    },
+    "s2": {
+      "title": "Types of cookies we use",
+      "essential": {
+        "title": "1. Strictly necessary cookies",
+        "text": "These cookies are essential for the Hobbiz platform to function. They allow you to navigate the site, authenticate to your account, post ads, save favorites and use the chat system. Without these cookies, the platform's basic services could not function.",
+        "tag1": "Authentication",
+        "tag2": "User session",
+        "tag3": "Favorites basket",
+        "tag4": "Secure chat"
+      },
+      "preferences": {
+        "title": "2. Preference cookies",
+        "text": "These cookies allow you to personalize your experience on Hobbiz by saving your preferences, such as your preferred theme (dark/light mode), favorite ad categories, your region for displaying local ads and notification settings.",
+        "tag1": "Theme (light/dark)",
+        "tag2": "Preferred region",
+        "tag3": "Favorite categories",
+        "tag4": "Notification settings"
+      },
+      "analytics": {
+        "title": "3. Analytics cookies",
+        "text": "These cookies are used through platforms like Google Analytics and Umami to collect information about how you use our site. They help us understand which pages are visited most often and how you navigate through the Hobbiz platform. Data is anonymized and aggregated.",
+        "tag1": "Google Analytics",
+        "tag2": "Umami Analytics",
+        "tag3": "Visit statistics",
+        "tag4": "Browsing behavior"
+      },
+      "marketing": {
+        "title": "4. Marketing cookies",
+        "text": "These cookies help us show you relevant ads and recommendations on the Hobbiz platform. For example, we can suggest ads from categories that interest you or services similar to those you have previously visited. We do not share this information with third parties for advertising.",
+        "tag1": "Ad recommendations",
+        "tag2": "Interest categories",
+        "tag3": "Similar services",
+        "tag4": "Personalized experience"
+      }
+    },
+    "s3": {
+      "title": "Why we use cookies",
+      "security": {
+        "title": "Security and authentication",
+        "text": "To keep your account secure and allow you to post ads and use the chat safely."
+      },
+      "functionality": {
+        "title": "Functionality and improvements",
+        "text": "To save your preferences (theme, region, favorite ads) and to improve the platform based on how it is used."
+      },
+      "recommendations": {
+        "title": "Relevant recommendations",
+        "text": "To suggest ads and services that might interest you based on the categories you explore."
+      }
+    },
+    "s4": {
+      "title": "How to manage cookies",
+      "intro": "You can control and/or delete cookies as you wish. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed.",
+      "guides": "Guides for popular browsers:",
+      "chrome": "Settings → Privacy and security → Cookies and other site data",
+      "firefox": "Options → Privacy and security → Cookies and site data",
+      "safari": "Preferences → Privacy → Manage website data",
+      "edge": "Settings → Cookies and site permissions",
+      "noteTitle": "⚠️ Important note",
+      "noteText": "If you disable certain cookies, some features of the Hobbiz platform may not work properly. For example, you may not be able to stay logged in, you may lose your saved favorite ads, or you may not receive new notifications for chat messages."
+    },
+    "s5": {
+      "title": "Third-party cookies",
+      "intro": "On the Hobbiz platform we use third-party services that may place their own cookies to improve your experience:",
+      "cloudinary": "For optimization and fast delivery of ad images",
+      "analytics": "Used to analyze site traffic and user behavior",
+      "maps": "For displaying ad locations",
+      "policies": "These services have their own privacy and cookie policies that we encourage you to read."
+    },
+    "s6": {
+      "title": "Your consent",
+      "p1": "By using the Hobbiz platform, you consent to the use of cookies in accordance with this policy. For essential functions (authentication, posting ads, chat), cookies are necessary for the proper functioning of the service.",
+      "p2": "You can withdraw your consent for non-essential cookies at any time by changing your browser settings or by contacting the Hobbiz team."
+    },
+    "s7": {
+      "title": "Updates to this policy",
+      "text": "This cookie policy may be updated periodically to reflect changes in our practices or for legal and regulatory reasons. We encourage you to review this page from time to time.",
+      "lastUpdatedLabel": "Last updated:",
+      "lastUpdatedDate": "September 2025"
+    },
+    "s8": {
+      "title": "Contact us",
+      "intro": "If you have questions about this cookie policy or about the use of data on the Hobbiz platform, please contact us:",
+      "emailLabel": "Email:",
+      "supportLabel": "Support:",
+      "supportText": "through the platform chat",
+      "addressLabel": "Address:",
+      "addressText": "Bucharest, Romania"
+    }
   }
 }

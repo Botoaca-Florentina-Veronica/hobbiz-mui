@@ -2,10 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton, Typography } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import './PrivacyPolicy.css';
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
   <div className="privacy-policy">
     <div className="privacy-policy__container">
@@ -16,25 +18,25 @@ const PrivacyPolicy = () => {
           className="mobile-back-btn"
           disableRipple
           disableFocusRipple
-          aria-label="Înapoi"
+          aria-label={t('common.back')}
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" className="mobile-header-title">Politica de confidențialitate</Typography>
+        <Typography variant="h5" className="mobile-header-title">{t('privacy.title')}</Typography>
       </div>
       <div className="privacy-policy__header">
         <span className="privacy-policy__icon" role="img" aria-label="shield">🛡️</span>
-        <h1>Politica de confidențialitate</h1>
-        <p className="privacy-policy__date">Ultima actualizare: 19 iulie 2025</p>
+        <h1>{t('privacy.title')}</h1>
+        <p className="privacy-policy__date">{t('privacy.lastUpdated')}</p>
       </div>
 
       <div className="privacy-policy__intro">
         <div className="privacy-policy__intro-content">
           <span className="privacy-policy__intro-icon" role="img" aria-label="info">ℹ️</span>
           <div>
-            <strong>Transparență și protecție a datelor</strong>
+            <strong>{t('privacy.intro.title')}</strong>
             <p>
-              La Hobbiz, considerăm protecția datelor personale o responsabilitate fundamentală. Acest document descrie în detaliu practicile noastre de gestionare a informațiilor, conform Regulamentului General privind Protecția Datelor (GDPR) și legislației românești aplicabile.
+              {t('privacy.intro.text')}
             </p>
           </div>
         </div>
@@ -42,220 +44,217 @@ const PrivacyPolicy = () => {
 
       <div className="privacy-policy__content">
         <section>
-          <h2>1. Scopul și domeniul de aplicare</h2>
+          <h2>{t('privacy.s1.title')}</h2>
           <p>
-            Această politică se aplică tuturor informațiilor colectate prin intermediul platformei Hobbiz, inclusiv prin website, aplicații mobile și orice alte interfețe asociate. Documentul definește cadrul legal și operațional pentru prelucrarea datelor cu caracter personal, inclusiv scopurile de colectare, metodele de procesare, drepturile utilizatorilor și măsurile de securitate implementate.
+            {t('privacy.s1.p1')}
           </p>
           <p>
-            Operatorul de date este SC Hobbiz SRL, înregistrată în România, care determină scopurile și mijloacele prelucrării datelor. Pentru orice nelămuriri referitoare la conținutul acestei politici, vă rugăm să ne contactați folosind detaliile furnizate în secțiunea finală.
-          </p>
-        </section>
-      </div>
-
-      <div className="privacy-policy__content">
-        <section>
-          <h2>2. Categorii de date prelucrate</h2>
-          
-          <h3> Date furnizate voluntar</h3>
-          <p>
-            În procesul de creare a contului și utilizare a platformei, colectăm o serie de informații personale necesare pentru furnizarea serviciilor noastre. Acestea includ nume complet, adresă de email validă, număr de telefon verificat, date demografice opționale (vârstă, gen) și orice alte informații pe care le introduceți voluntar în profilul utilizatorului sau în conținutul generat (anunțuri, mesaje, recenzii).
-          </p>
-          <p>
-            Pentru utilizatorii care optează pentru servicii premium, colectăm și procesăm date de plată necesare procesării tranzacțiilor financiare. Aceste informații sunt prelucrate exclusiv prin intermediul procesatorilor de plăți certificați PCI DSS, fără a fi stocate pe serverele noastre.
-          </p>
-          
-          <h3> Date colectate automat</h3>
-          <p>
-            Sistemul nostru înregistrează automat date tehnice despre dispozitivul și interacțiunile dumneavoastră cu platforma. Acestea includ adresa IP, identificatori unici de dispozitiv, tipul și versiunea browserului, sistemul de operare, date de utilizare (pagini accesate, timpul petrecut, acțiuni întreprinse) și date aproximative de localizare derivate din adresa IP sau setările dispozitivului.
-          </p>
-          <p>
-            Folosim cookie-uri și tehnologii similare pentru a îmbunătăți funcționalitatea platformei, analiza traficului și personalizarea experienței. Puteți gestiona preferințele pentru aceste tehnologii prin setările browserului sau prin sistemul nostru de consimțământ.
+            {t('privacy.s1.p2')}
           </p>
         </section>
       </div>
 
       <div className="privacy-policy__content">
         <section>
-          <h2>3. Scopurile și bazele juridice ale prelucrării</h2>
+          <h2>{t('privacy.s2.title')}</h2>
+          
+          <h3>{t('privacy.s2.h1')}</h3>
           <p>
-            Prelucrăm datele dumneavoastră personale pe baza următoarelor fundamentări juridice și pentru următoarele scopuri specifice:
+            {t('privacy.s2.p1')}
+          </p>
+          <p>
+            {t('privacy.s2.p2')}
           </p>
           
-          <h3> Executarea contractului</h3>
+          <h3>{t('privacy.s2.h2')}</h3>
           <p>
-            Pentru a vă oferi acces la platformă și serviciile solicitate, inclusiv gestionarea contului, publicarea anunțurilor, facilitarea comunicării între utilizatori și procesarea tranzacțiilor financiare. Această prelucrare este esențială pentru îndeplinirea obligațiilor noastre contractuale față de dumneavoastră.
+            {t('privacy.s2.p3')}
           </p>
-          
-          <h3> Interese legitime</h3>
           <p>
-            Pentru îmbunătățirea continuă a platformei, prevenirea fraudelor și activităților abuzive, analiza modului de utilizare a serviciilor noastre, dezvoltarea de noi funcționalități și asigurarea securității sistemului. Implementăm măsuri adecvate pentru a vă proteja drepturile și libertățile în aceste procese.
-          </p>
-          
-          <h3> Consimțământ</h3>
-          <p>
-            Pentru activități de marketing direct, anumite tipuri de analize de date și utilizarea anumitor cookie-uri. Puteți retrage consimțământul oricând, fără a afecta legalitatea prelucrării efectuate anterior retragerii.
-          </p>
-          
-          <h3> Conformitate legală</h3>
-          <p>
-            Pentru îndeplinirea obligațiilor legale, inclusiv în domeniul fiscal, al prevenirii spălării banilor și al altor reglementări aplicabile. Aceste prelucrări sunt efectuate numai în măsura cerută de legislația în vigoare.
+            {t('privacy.s2.p4')}
           </p>
         </section>
       </div>
 
       <div className="privacy-policy__content">
         <section>
-          <h2>4. Securitatea și confidențialitatea datelor</h2>
+          <h2>{t('privacy.s3.title')}</h2>
           <p>
-            Am implementat un set complet de măsuri tehnice și organizatorice pentru protejarea datelor dumneavoastră împotriva accesului neautorizat, modificării, divulgării sau distrugerii neautorizate. Acestea includ:
+            {t('privacy.s3.intro')}
           </p>
           
+          <h3>{t('privacy.s3.h1')}</h3>
           <p>
-            <strong>Criptare avansată:</strong> Toate datele sunt criptate atât în tranzit (folosind protocoale TLS 1.2+), cât și la rest, cu algoritmi moderni. Datele sensibile suplimentare sunt criptate la nivel de câmp în baza noastră de date.
+            {t('privacy.s3.p1')}
           </p>
           
+          <h3>{t('privacy.s3.h2')}</h3>
           <p>
-            <strong>Controlul accesului:</strong> Implementăm principiul privilegiilor minime, cu acces la date strict pe bază de necesitate funcțională. Toate accesurile sunt monitorizate și jurnalizate, cu revizuiri periodice ale permisiunilor.
+            {t('privacy.s3.p2')}
           </p>
           
+          <h3>{t('privacy.s3.h3')}</h3>
           <p>
-            <strong>Testări de securitate:</strong> Efectuăm teste de penetrare regulate și evaluări de vulnerabilitate, cu remedierea imediată a oricăror probleme identificate. Sistemul nostru este protejat împotriva principalelor vectori de atac precum SQL injection, XSS și CSRF.
+            {t('privacy.s3.p3')}
           </p>
           
+          <h3>{t('privacy.s3.h4')}</h3>
           <p>
-            <strong>Politici interne stricte:</strong> Personalul nostru este supus unor obligații stricte de confidențialitate și beneficiază de formare periodică în domeniul protecției datelor. Documentăm și raportăm orice incident de securitate conform cerințelor legale.
+            {t('privacy.s3.p4')}
           </p>
         </section>
       </div>
 
       <div className="privacy-policy__content">
         <section>
-          <h2>5. Securitatea informațiilor tale</h2>
+          <h2>{t('privacy.s4.title')}</h2>
+          <p>
+            {t('privacy.s4.intro')}
+          </p>
           
           <p>
-              Protejarea datelor dumneavoastră personale reprezintă o prioritate absolută pentru echipa noastră. Am implementat un sistem complex de măsuri de securitate care depășește cerințele legale minime, asigurându-ne că informațiile sunt protejate împotriva oricăror amenințări.
+            <strong>{t('privacy.s4.encryption.title')}</strong> {t('privacy.s4.encryption.text')}
           </p>
-
-          <h3>Arhitectura noastră de securitate</h3>
+          
           <p>
-              Infrastructura noastră tehnică este găzduită în centre de date de nivel Tier III+, certificate ISO 27001, situate în Uniunea Europeană. Implementăm o strategie de securitate multi-nivel care include:
+            <strong>{t('privacy.s4.access.title')}</strong> {t('privacy.s4.access.text')}
+          </p>
+          
+          <p>
+            <strong>{t('privacy.s4.testing.title')}</strong> {t('privacy.s4.testing.text')}
+          </p>
+          
+          <p>
+            <strong>{t('privacy.s4.policies.title')}</strong> {t('privacy.s4.policies.text')}
+          </p>
+        </section>
+      </div>
+
+      <div className="privacy-policy__content">
+        <section>
+          <h2>{t('privacy.s5.title')}</h2>
+          
+          <p>
+              {t('privacy.s5.intro')}
+          </p>
+
+          <h3>{t('privacy.s5.arch.title')}</h3>
+          <p>
+              {t('privacy.s5.arch.intro')}
           </p>
         
         <p>
-            <strong>Protecție perimetrală:</strong> Firewall-uri de ultimă generație, sisteme de prevenție a intruziunilor (IPS) și protecție DDoS care monitorizează și filtrează tot traficul în timp real. Aceste sisteme sunt configurate să detecteze și să blocheze automat orice activitate suspectă.
+            <strong>{t('privacy.s5.arch.perimeter.title')}</strong> {t('privacy.s5.arch.perimeter.text')}
         </p>
         
         <p>
-            <strong>Securitate aplicativă:</strong> Toate componentele software sunt dezvoltate conform principiilor "secure by design" și "privacy by default". Efectuăm revizuiri periodice ale codului și teste de penetrare pentru a identifica și remedia vulnerabilitățile în faza incipientă.
+            <strong>{t('privacy.s5.arch.app.title')}</strong> {t('privacy.s5.arch.app.text')}
         </p>
         
         <p>
-            <strong>Controlul accesului:</strong> Implementăm autentificare cu factori multipli (MFA) pentru toate conturile privilegiate și accesul la date sensibile. Sistemul nostru de gestionare a identității și accesului (IAM) asigură respectarea principiului privilegiilor minime, cu aprobări în trepte pentru operațiuni critice.
+            <strong>{t('privacy.s5.arch.access.title')}</strong> {t('privacy.s5.arch.access.text')}
         </p>
 
-        <h3>Protecția datelor în stocare și tranzit</h3>
+        <h3>{t('privacy.s5.storage.title')}</h3>
         <p>
-            <strong>Criptare avansată:</strong> Toate datele sunt criptate folosind algoritmi AES-256 pentru datele la rest și TLS 1.3 cu criptare end-to-end pentru datele în tranzit. Cheile de criptare sunt gestionate prin servicii dedicate HSM (Hardware Security Modules) și rotite periodic.
+            <strong>{t('privacy.s5.storage.encryption.title')}</strong> {t('privacy.s5.storage.encryption.text')}
         </p>
         
         <p>
-            <strong>Backup-uri securizate:</strong> Efectuăm backup-uri zilnice incrementale și săptămânale complete, stocate geografic redundant și protejate prin criptare. Testăm periodic procesul de restaurare pentru a ne asigura că datele pot fi recuperate rapid și integral în caz de necesitate.
+            <strong>{t('privacy.s5.storage.backup.title')}</strong> {t('privacy.s5.storage.backup.text')}
         </p>
 
-        <h3>Managementul vulnerabilităților și răspunsul la incidente</h3>
+        <h3>{t('privacy.s5.management.title')}</h3>
         <p>
-            <strong>Program continuu de testare:</strong> Efectuăm scanări automate zilnice pentru vulnerabilități și angajăm testere de penetrare externe trimestrial pentru a evalua securitatea sistemelor noastre. Prioritizăm remedierea vulnerabilităților critice în maximum 24 de ore de la detectare.
+            <strong>{t('privacy.s5.management.testing.title')}</strong> {t('privacy.s5.management.testing.text')}
         </p>
         
         <p>
-            <strong>Plan de răspuns la incidente:</strong> Avem un procedură detaliată de răspuns la incidente de securitate, care include notificarea autorităților și a utilizatorilor afectați în maxim 72 de ore de la confirmarea incidentului, conform cerințelor GDPR.
+            <strong>{t('privacy.s5.management.response.title')}</strong> {t('privacy.s5.management.response.text')}
         </p>
 
-        <h3>Conștientizarea și formarea utilizatorilor</h3>
+        <h3>{t('privacy.s5.awareness.title')}</h3>
         <p>
-            <strong>Recomandări pentru utilizatori:</strong> Vă încurajăm să luați măsuri suplimentare pentru protejarea propriului cont:
+            <strong>{t('privacy.s5.awareness.recommendations.title')}</strong> {t('privacy.s5.awareness.recommendations.text')}
         </p>
         
         <ul>
-            <li>Folosiți parole complexe și unice pentru contul Hobbiz</li>
-            <li>Activați autentificarea cu doi factori în setările contului</li>
-            <li>Actualizați periodic adresa de email și numărul de telefon de recuperare</li>
-            <li>Evitați accesul contului din rețele Wi-Fi publice neprotejate</li>
-            <li>Verificați periodic activitatea contului în secțiunea de securitate</li>
+            {t('privacy.s5.awareness.list', { returnObjects: true }).map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
         </ul>
         
         <p>
-            <strong>Echipa noastră:</strong> Toți angajații care au acces la datele utilizatorilor completează programe anuale de formare în securitatea informației și protecția datelor, inclusiv simulări de atacuri de phishing și traininguri practice privind gestionarea corectă a datelor sensibile.
+            <strong>{t('privacy.s5.awareness.team.title')}</strong> {t('privacy.s5.awareness.team.text')}
         </p>
 
-        <h3>Certificări și audituri externe</h3>
+        <h3>{t('privacy.s5.certifications.title')}</h3>
         <p>
-            Sistemul nostru este supus periodic unor audituri externe independente pentru a verifica conformitatea cu standardele:
+            {t('privacy.s5.certifications.intro')}
         </p>
         
         <ul>
-            <li>ISO 27001 pentru managementul securitării informațiilor</li>
-            <li>SOC 2 Type II pentru controalele de securitate și confidențialitate</li>
-            <li>PCI DSS pentru procesarea plăților (nivel 1)</li>
-            <li>GDPR prin audituri regulate efectuate de firme de specialitate</li>
+            {t('privacy.s5.certifications.list', { returnObjects: true }).map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
         </ul>
         
         <p>
-            Pentru orice întrebări specifice legate de măsurile noastre de securitate sau pentru a raporta orice problemă de securitate pe care ați identificat-o, vă rugăm să ne contactați imediat la <a href="mailto:security@hobbiz.ro">security@hobbiz.ro</a>.
+            {t('privacy.s5.certifications.contact')} <a href="mailto:security@hobbiz.ro">security@hobbiz.ro</a>.
         </p>
         </section>
       </div>
 
       <div className="privacy-policy__content">
         <section>
-          <h2>6. Drepturile utilizatorilor</h2>
+          <h2>{t('privacy.s6.title')}</h2>
           <p>
-            Conform legislației privind protecția datelor, beneficiați de un set complet de drepturi pe care le puteți exercita în orice moment:
+            {t('privacy.s6.intro')}
           </p>
           
           <p>
-            <strong>Dreptul de acces și portabilitate:</strong> Puteți solicita o copie a datelor dumneavoastră personale într-un format structurat, utilizat în mod obișnuit și care poate fi citit automat. Vă vom furniza toate informațiile pe care le deținem despre dumneavoastră, inclusiv sursele datelor, scopurile prelucrării și destinatarii acestora.
+            <strong>{t('privacy.s6.access.title')}</strong> {t('privacy.s6.access.text')}
           </p>
           
           <p>
-            <strong>Dreptul de rectificare:</strong> Puteți cere actualizarea oricăror date inexacte sau incomplete.
+            <strong>{t('privacy.s6.rectification.title')}</strong> {t('privacy.s6.rectification.text')}
           </p>
 
           <p>
-            <strong>Dreptul la ștergere:</strong> Puteți solicita ștergerea datelor personale, când acestea nu mai sunt necesare în raport cu scopurile pentru care au fost colectate sau prelucrate.
+            <strong>{t('privacy.s6.erasure.title')}</strong> {t('privacy.s6.erasure.text')}
           </p>
           
           <p>
-            <strong>Dreptul la restricționarea prelucrării:</strong> În anumite circumstanțe (cum ar fi contestarea exactității datelor sau obiectarea prelucrării), puteți cere limitarea temporară a prelucrării datelor dumneavoastră personale.
+            <strong>{t('privacy.s6.restriction.title')}</strong> {t('privacy.s6.restriction.text')}
           </p>
           
           <p>
-            <strong>Dreptul de opoziție:</strong> Puteți vă opuneți prelucrării datelor dumneavoastră personale atunci când aceasta se bazează pe interes legitim sau este efectuată în scop de marketing direct.
+            <strong>{t('privacy.s6.objection.title')}</strong> {t('privacy.s6.objection.text')}
           </p>
           
           <p>
-            Pentru a exercita oricare dintre aceste drepturi sau pentru a obține informații suplimentare, vă rugăm să ne contactați prin email la <a href="mailto:protectiadatelor@hobbiz.ro">protectiadatelor@hobbiz.ro</a>. Răspundem la toate solicitările în termen de 30 de zile și putem cere verificarea identității pentru protecția datelor dumneavoastră.
+            {t('privacy.s6.contact')} <a href="mailto:protectiadatelor@hobbiz.ro">protectiadatelor@hobbiz.ro</a>. {t('privacy.s6.response')}
           </p>
         </section>
       </div>
 
       <div className="privacy-policy__content">
         <section>
-          <h2>7. Contact și informații suplimentare</h2>
+          <h2>{t('privacy.s7.title')}</h2>
           <p>
-            Dacă aveți întrebări sau nelămuriri referitoare la această politică de confidențialitate sau la practicile noastre de prelucrare a datelor, vă rugăm să ne contactați folosind următoarele detalii:
+            {t('privacy.s7.intro')}
           </p>
           
           <p>
-            <strong>Operator de date:</strong> SC Hobbiz SRL, înregistrată la Registrul Comerțului sub nr. J40/1234/2023, CUI 12345678, cu sediul în Strada Exemplu nr. 10, București, România.
+            <strong>{t('privacy.s7.operator.title')}</strong> {t('privacy.s7.operator.text')}
           </p>
           
           <p>
-            <strong>Responsabil cu protecția datelor:</strong> Puteți contacta responsabilul nostru cu protecția datelor la adresa <a href="mailto:dpo@hobbiz.ro">dpo@hobbiz.ro</a> pentru orice aspecte legate de prelucrarea datelor personale.
+            <strong>{t('privacy.s7.dpo.title')}</strong> {t('privacy.s7.dpo.text')} <a href="mailto:dpo@hobbiz.ro">dpo@hobbiz.ro</a> {t('privacy.s7.dpo.purpose')}
           </p>
           
           <p>
-            <strong>Autoritatea de supraveghere:</strong> Aveți dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal dacă considerați că prelucrarea datelor dumneavoastră personale încalcă legislația aplicabilă.
+            <strong>{t('privacy.s7.authority.title')}</strong> {t('privacy.s7.authority.text')}
           </p>
         </section>
       </div>

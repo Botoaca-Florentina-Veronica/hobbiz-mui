@@ -35,6 +35,11 @@ export default function ImageCropModal({ open, onClose, currentImage, onSave, up
   useEffect(() => {
     if (open && currentImage) {
       setPreviewUrl(currentImage);
+      // Reset zoom, rotation, and offset when opening with existing image
+      // so user always sees the full image and can re-select crop area
+      setZoom(1);
+      setRotation(0);
+      setOffsetY(0);
     }
   }, [open, currentImage]);
 

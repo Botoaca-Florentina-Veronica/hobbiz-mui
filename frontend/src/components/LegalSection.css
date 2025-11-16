@@ -99,7 +99,6 @@
 /* Dark Mode Styles pentru Legal Section */
 .dark-mode .legal-section {
   background: #121212;
-  border-top: 1px solid #3f3f3f;
 }
 
 .dark-mode .legal-section__brand {

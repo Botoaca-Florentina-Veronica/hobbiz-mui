@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import './LegalSection.css';
 import appStoreImg from '../assets/images/appStore.png';
 import googlePlayImg from '../assets/images/googlePlay.png';
+import { useTranslation } from 'react-i18next';
 
 const LegalSection = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLinkClick = (e, to) => {
     e.preventDefault();
@@ -17,36 +19,36 @@ const LegalSection = () => {
       <div className="legal-section__column">
         <div className="legal-section__logo">
           <span role="img" aria-label="chip" className="legal-section__icon">🧩</span>
-          <span className="legal-section__brand">Hobbiz</span>
+          <span className="legal-section__brand">{t('legal.brand')}</span>
         </div>
-        <p className="legal-section__desc">Descoperă, vinde și cumpără servicii sau produse de la pasionați ca tine.</p>
+        <p className="legal-section__desc">{t('legal.description')}</p>
         <div className="app-store-buttons">
-          <a href="#" className="app-store-button" aria-label="Download on the App Store">
-            <img src={appStoreImg} alt="Download on the App Store" />
+          <a href="#" className="app-store-button" aria-label={t('legal.downloadAppStore')}>
+            <img src={appStoreImg} alt={t('legal.downloadAppStore')} />
           </a>
-          <a href="#" className="app-store-button" aria-label="Get it on Google Play">
-            <img src={googlePlayImg} alt="Get it on Google Play" />
+          <a href="#" className="app-store-button" aria-label={t('legal.getOnGooglePlay')}>
+            <img src={googlePlayImg} alt={t('legal.getOnGooglePlay')} />
           </a>
         </div>
       </div>
       <div className="legal-section__column">
-        <h4>Linkuri utile</h4>
+        <h4>{t('legal.usefulLinks')}</h4>
         <ul>
-          <li><a href="/despre" onClick={(e) => handleLinkClick(e, '/despre')}>Despre noi</a></li>
-          <li><a href="/contact" onClick={(e) => handleLinkClick(e, '/contact')}>Contact</a></li>
-          <li><a href="/cum-functioneaza" onClick={(e) => handleLinkClick(e, '/cum-functioneaza')}>Cum funcționează</a></li>
+          <li><a href="/despre" onClick={(e) => handleLinkClick(e, '/despre')}>{t('legal.about')}</a></li>
+          <li><a href="/contact" onClick={(e) => handleLinkClick(e, '/contact')}>{t('legal.contact')}</a></li>
+          <li><a href="/cum-functioneaza" onClick={(e) => handleLinkClick(e, '/cum-functioneaza')}>{t('legal.howItWorks')}</a></li>
         </ul>
       </div>
       <div className="legal-section__column">
-        <h4>Legal</h4>
+        <h4>{t('legal.legal')}</h4>
         <ul>
-          <li><a href="/termeni" onClick={(e) => handleLinkClick(e, '/termeni')}>Termeni și condiții</a></li>
-          <li><a href="/confidentialitate" onClick={(e) => handleLinkClick(e, '/confidentialitate')}>Politică de Confidențialitate</a></li>
-          <li><a href="/cookie" onClick={(e) => handleLinkClick(e, '/cookie')}>Cookie Policy</a></li>
+          <li><a href="/termeni" onClick={(e) => handleLinkClick(e, '/termeni')}>{t('legal.terms')}</a></li>
+          <li><a href="/confidentialitate" onClick={(e) => handleLinkClick(e, '/confidentialitate')}>{t('legal.privacyPolicy')}</a></li>
+          <li><a href="/cookie" onClick={(e) => handleLinkClick(e, '/cookie')}>{t('legal.cookiePolicy')}</a></li>
         </ul>
       </div>
       <div className="legal-section__column legal-section__socials">
-        <h4>Urmărește-ne</h4>
+        <h4>{t('legal.followUs')}</h4>
         <div className="legal-section__icons">
           <a href="#" aria-label="Facebook"><i className="fa-brands fa-facebook-f"></i></a>
           <a href="#" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>

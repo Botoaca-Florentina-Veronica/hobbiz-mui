@@ -6,40 +6,25 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './About.css';
+import { useTranslation } from 'react-i18next';
 
 export default function About() {
   const [openFAQ, setOpenFAQ] = useState(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const toggleFAQ = (index) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
 
-  const faqData = [
-    {
-      question: "Este gratuit să folosesc Hobbiz?",
-      answer: "Da, înregistrarea și utilizarea de bază a platformei Hobbiz sunt complet gratuite. Poți publica și răspunde la anunțuri și comunica cu alți utilizatori fără costuri."
-    },
-    {
-      question: "Cum îmi protejez datele personale?",
-      answer: "Luăm în serios protecția datelor tale. Folosim criptare avansată și nu împărtășim informațiile tale personale cu terți fără consimțământul tău explicit."
-    },
-    {
-      question: "Pot vinde atât produse cât și servicii?",
-      answer: "Absolut! Chiar dacă Hobbiz este conceput mai mult pentru servicii, poți vinde și produse handmade, obiecte, vechituri, mașini, alimente și multe altele."
-    },
-    {
-      question: "Cum funcționează sistemul de mesagerie?",
-      answer: "Sistemul nostru de mesagerie îți permite să comunici direct cu alți utilizatori în timp real, să negociezi prețuri și să coordonezi livrări în siguranță."
-    }
-  ];
+  const faqData = t('about.faq', { returnObjects: true });
   return (
     <>
       <Header />
       <div className="about-page">
         <div className="about-container">
           {/* Mobile header: back + title for Despre noi */}
-          <div className="mobile-header">
+            <div className="mobile-header">
             <IconButton
               onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
               className="mobile-back-btn"
@@ -49,16 +34,16 @@ export default function About() {
             >
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h5" className="mobile-header-title">Despre noi</Typography>
+            <Typography variant="h5" className="mobile-header-title">{t('about.title')}</Typography>
           </div>
           {/* Hero Section */}
           <div className="about-hero">
             <div className="hero-badge">
               <span className="hero-badge-icon">✨</span>
-              <span>Platforma pasionaților</span>
+              <span>{t('about.hero.badge')}</span>
             </div>
             <h1 className="hero-title">
-              Transformă-ți <span className="highlight">pasiunea</span> în oportunitate
+              {t('about.hero.title1')} <span className="highlight">{t('about.hero.highlight')}</span> {t('about.hero.title2')}
             </h1>
           </div>
 
@@ -70,39 +55,38 @@ export default function About() {
                   <span>🎯</span>
                 </div>
                 <div className="mission-text">
-                  <h2 className="mission-title">Misiunea noastră</h2>
-                  <p className="mission-subtitle">Construim punți între talente și oportunități</p>
+                  <h2 className="mission-title">{t('about.mission.title')}</h2>
+                  <p className="mission-subtitle">{t('about.mission.subtitle')}</p>
                 </div>
               </div>
               
               <div className="mission-body">
                 <p className="mission-description">
-                  <strong>Hobbiz</strong> nu este doar o platformă - este o comunitate care celebrează autenticitatea și creativitatea. 
-                  Ne-am născut din convingerea că fiecare pasiune merită să fie împărtășită și că fiecare talent merită să fie valorificat.
+                  <strong>Hobbiz</strong> {t('about.mission.description')}
                 </p>
                 
                 <div className="mission-pillars">
                   <div className="pillar-item">
                     <div className="pillar-icon">🌟</div>
                     <div className="pillar-content">
-                      <h4>Autenticitate</h4>
-                      <p>Promovăm produse și servicii unice, create cu pasiune și dedicare</p>
+                      <h4>{t('about.pillars.authenticity.title')}</h4>
+                      <p>{t('about.pillars.authenticity.desc')}</p>
                     </div>
                   </div>
                   
                   <div className="pillar-item">
                     <div className="pillar-icon">🤝</div>
                     <div className="pillar-content">
-                      <h4>Comunitate</h4>
-                      <p>Creăm legături puternice între pasionați și utilizatori</p>
+                      <h4>{t('about.pillars.community.title')}</h4>
+                      <p>{t('about.pillars.community.desc')}</p>
                     </div>
                   </div>
                   
                   <div className="pillar-item">
                     <div className="pillar-icon">🚀</div>
                     <div className="pillar-content">
-                      <h4>Creștere</h4>
-                      <p>Oferim instrumentele necesare pentru dezvoltarea afacerilor creative</p>
+                      <h4>{t('about.pillars.growth.title')}</h4>
+                      <p>{t('about.pillars.growth.desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -115,39 +99,33 @@ export default function About() {
             <div className="feature-card">
               <h3>
                 <span className="feature-icon">🚀</span>
-                Ce poți face pe Hobbiz?
+                {t('about.features.section1.title')}
               </h3>
               <ul className="feature-list">
-                <li>Descoperă o nouă sursă de venit</li>
-                <li>Publică anunțuri pentru serviciile sau produsele tale</li>
-                <li>Află despre ofertele locale sau naționale</li>
-                <li>Salvează anunțurile preferate și contactează direct vânzătorii</li>
-                <li>Cunoaște alți oameni cu aceleași pasiuni și colaborează sau conversează cu ei</li>
-                <li>Gestionează-ți contul și anunțurile rapid și intuitiv</li>
+                {t('about.features.section1.items', { returnObjects: true }).map((it, i) => (
+                  <li key={i}>{it}</li>
+                ))}
               </ul>
             </div>
 
             <div className="feature-card">
               <h3>
                 <span className="feature-icon">⭐</span>
-                De ce să alegi Hobbiz?
+                {t('about.features.section2.title')}
               </h3>
               <ul className="feature-list">
-                <li>Platformă modernă, ușor de folosit, cu design adaptat pentru mobil și desktop</li>
-                <li>Comunitate prietenoasă și suport rapid</li>
-                <li>Promovare gratuită pentru pasiunile tale</li>
-                <li>Interfață intuitivă și experiență de utilizare optimă</li>
-                <li>Securitate și confidențialitate garantate</li>
-                <li>Conectare directă între creatori și cumpărători</li>
+                {t('about.features.section2.items', { returnObjects: true }).map((it, i) => (
+                  <li key={i}>{it}</li>
+                ))}
               </ul>
             </div>
           </div>
 
           {/* How It Works Section */}
           <div className="how-it-works">
-            <h2>Cum funcționează Hobbiz?</h2>
+            <h2>{t('about.how.title')}</h2>
             <p className="how-it-works-subtitle">
-              În doar 4 pași simpli poți începe să folosești platforma noastră
+              {t('about.how.subtitle')}
             </p>
             <div className="steps-timeline">
               <div className="timeline-line"></div>
@@ -158,8 +136,8 @@ export default function About() {
                   <div className="step-icon">👤</div>
                 </div>
                 <div className="step-content">
-                  <h3 className="step-title">Înregistrează-te</h3>
-                  <p className="step-description">Creează-ți un cont gratuit în doar câteva minute</p>
+                  <h3 className="step-title">{t('about.how.steps.1.title')}</h3>
+                  <p className="step-description">{t('about.how.steps.1.desc')}</p>
                 </div>
               </div>
               
@@ -169,8 +147,8 @@ export default function About() {
                   <div className="step-icon">📝</div>
                 </div>
                 <div className="step-content">
-                  <h3 className="step-title">Publică sau caută</h3>
-                  <p className="step-description">Publică anunțuri sau găsește ce îți dorești</p>
+                  <h3 className="step-title">{t('about.how.steps.2.title')}</h3>
+                  <p className="step-description">{t('about.how.steps.2.desc')}</p>
                 </div>
               </div>
               
@@ -180,8 +158,8 @@ export default function About() {
                   <div className="step-icon">💬</div>
                 </div>
                 <div className="step-content">
-                  <h3 className="step-title">Conectează-te</h3>
-                  <p className="step-description">Comunică direct prin mesagerie integrată</p>
+                  <h3 className="step-title">{t('about.how.steps.3.title')}</h3>
+                  <p className="step-description">{t('about.how.steps.3.desc')}</p>
                 </div>
               </div>
               
@@ -191,8 +169,8 @@ export default function About() {
                   <div className="step-icon">🤝</div>
                 </div>
                 <div className="step-content">
-                  <h3 className="step-title">Colaborează</h3>
-                  <p className="step-description">Realizează tranzacții sigure în comunitate</p>
+                  <h3 className="step-title">{t('about.how.steps.4.title')}</h3>
+                  <p className="step-description">{t('about.how.steps.4.desc')}</p>
                 </div>
               </div>
             </div>
@@ -200,29 +178,29 @@ export default function About() {
 
           {/* Values Section */}
           <div className="values-section">
-            <h2>Valorile noastre</h2>
+            <h2>{t('about.values.title')}</h2>
             <div className="values-grid">
               <div className="value-card">
                 <div className="value-icon">🛡️</div>
-                <h3>Securitate</h3>
-                <p>Prioritizăm siguranța utilizatorilor prin măsuri avansate de protecție a datelor și verificare a identității.</p>
+                <h3>{t('about.values.cards.1.title')}</h3>
+                <p>{t('about.values.cards.1.desc')}</p>
               </div>
               <div className="value-card">
                 <div className="value-icon">🤝</div>
-                <h3>Comunitate</h3>
-                <p>Creăm un spațiu prietenos unde pasionații se pot conecta, colabora și se pot inspira reciproc.</p>
+                <h3>{t('about.values.cards.2.title')}</h3>
+                <p>{t('about.values.cards.2.desc')}</p>
               </div>
               <div className="value-card">
                 <div className="value-icon">⚡</div>
-                <h3>Inovație</h3>
-                <p>Dezvoltăm constant noi funcționalități pentru a îmbunătăți experiența utilizatorilor și a facilita colaborarea.</p>
+                <h3>{t('about.values.cards.3.title')}</h3>
+                <p>{t('about.values.cards.3.desc')}</p>
               </div>
             </div>
           </div>
 
           {/* FAQ Section */}
           <div className="faq-section">
-            <h2>Întrebări frecvente</h2>
+            <h2>{t('about.faqTitle')}</h2>
             <div className="faq-container">
               {faqData.map((faq, index) => (
                 <div key={index} className="faq-item">
@@ -243,7 +221,7 @@ export default function About() {
           </div>
 
           <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.9rem', marginTop: '30px' }}>
-            Ultima actualizare: 19 iulie 2025
+            {t('about.lastUpdated')}
           </p>
         </div>
       </div>

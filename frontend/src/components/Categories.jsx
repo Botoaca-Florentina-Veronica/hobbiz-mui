@@ -26,18 +26,18 @@ import { useNavigate } from 'react-router-dom';
 
 // Export the categories array
 export const categories = [
-  { description: "Fotografie", image: camera, color: "#FF6B6B" },
-  { description: "Prajituri", image: prajituri, color: "#4ECDC4" },
-  { description: "Muzica", image: muzica, color: "#45B7D1" },
-  { description: "Reparații", image: reparatii, color: "#96CEB4" },
-  { description: "Dans", image: dancing, color: "#FFEAA7" },
-  { description: "Curățenie", image: curatenie, color: "#DDA0DD" },
-  { description: "Gradinarit", image: gardening, color: "#98D8C8" },
-  { description: "Sport", image: tennis, color: "#F7DC6F" },
-  { description: "Arta", image: arta, color: "#BB8FCE" },
-  { description: "Tehnologie", image: it, color: "#85C1E9" },
-  { description: "Auto", image: masina, color: "#F8C471" },
-  { description: "Meditații", image: carte, color: "#82E0AA" },
+  { key: 'photography', description: "Fotografie", image: camera, color: "#FF6B6B" },
+  { key: 'pastries', description: "Prajituri", image: prajituri, color: "#4ECDC4" },
+  { key: 'music', description: "Muzica", image: muzica, color: "#45B7D1" },
+  { key: 'repairs', description: "Reparații", image: reparatii, color: "#96CEB4" },
+  { key: 'dance', description: "Dans", image: dancing, color: "#FFEAA7" },
+  { key: 'cleaning', description: "Curățenie", image: curatenie, color: "#DDA0DD" },
+  { key: 'gardening', description: "Gradinarit", image: gardening, color: "#98D8C8" },
+  { key: 'sports', description: "Sport", image: tennis, color: "#F7DC6F" },
+  { key: 'art', description: "Arta", image: arta, color: "#BB8FCE" },
+  { key: 'technology', description: "Tehnologie", image: it, color: "#85C1E9" },
+  { key: 'auto', description: "Auto", image: masina, color: "#F8C471" },
+  { key: 'tutoring', description: "Meditații", image: carte, color: "#82E0AA" },
 ];
 
 // Restore the default export of the Categories component
@@ -85,7 +85,7 @@ export default function Categories() {
                 }}>
                   <img
                     src={category.image}
-                    alt={category.description}
+                    alt={t(`categories.${category.key}`)}
                     loading="lazy"
                     style={{
                       maxWidth: '100%',
@@ -107,7 +107,7 @@ export default function Categories() {
                       mb: 0
                     }}
                   >
-                    {category.description}
+                    {t(`categories.${category.key}`)}
                   </Typography>
                 </CardContent>
               </Card>
