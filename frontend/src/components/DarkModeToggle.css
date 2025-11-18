@@ -237,7 +237,7 @@ body.dark-mode {
   background-color: #F8B195;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .dark-mode-toggle {
     display: none !important;
   }

@@ -730,7 +730,7 @@ body.dark-mode .main-stage > *,
   
 }
 
-@media (max-width: 900px) and (min-width: 769px) {
+@media (max-width: 1024px) and (min-width: 769px) {
   .category-details {
     width: calc(100vw - 460px) !important;
     min-width: 350px !important;
@@ -955,7 +955,7 @@ body.dark-mode .main-stage > *,
 }
 
 /* Dark Mode Mobile Search */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .dark-mode .main-stage {
     background-color: var(--app-bg);
   }

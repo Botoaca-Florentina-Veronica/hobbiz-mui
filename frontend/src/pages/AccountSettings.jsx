@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, Typography } from '@mui/material';
 import ConfirmDialog from './ConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function AccountSettings() {
+  const { t } = useTranslation();
   const [showEmailChange, setShowEmailChange] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [newEmail, setNewEmail] = useState('');
@@ -35,7 +37,7 @@ export default function AccountSettings() {
       }, 1500);
     } catch (error) {
       setShowDeleteDialog(false);
-      setMessage({ type: 'error', text: 'Eroare la ștergerea contului.' });
+      setMessage({ type: 'error', text: t('accountSettings.messages.deleteError') });
     }
   };
 
@@ -57,7 +59,7 @@ export default function AccountSettings() {
   const handleSaveEmail = async () => {
     setMessage(null); // Clear previous messages
     if (!newEmail) {
-      setMessage({ type: 'error', text: 'Introduceți noua adresă de e-mail.' });
+      setMessage({ type: 'error', text: t('accountSettings.messages.enterEmail') });
       return;
     }
 
@@ -69,7 +71,7 @@ export default function AccountSettings() {
       // setTimeout(() => setShowEmailChange(false), 3000);
     } catch (error) {
       console.error('Error updating email:', error);
-      const errorMessage = error.response?.data?.error || 'Eroare la actualizarea emailului.';
+      const errorMessage = error.response?.data?.error || t('accountSettings.messages.updateEmailError');
       setMessage({ type: 'error', text: errorMessage });
     }
   };
@@ -77,7 +79,7 @@ export default function AccountSettings() {
   const handleSavePassword = async () => {
     setMessage(null);
     if (!passwords.currentPassword || !passwords.newPassword) {
-      setMessage({ type: 'error', text: 'Introduceți ambele parole.' });
+      setMessage({ type: 'error', text: t('accountSettings.messages.enterPasswords') });
       return;
     }
     try {
@@ -85,7 +87,7 @@ export default function AccountSettings() {
       setMessage({ type: 'success', text: response.data.message });
       setPasswords({ currentPassword: '', newPassword: '' });
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Eroare la schimbarea parolei.';
+      const errorMessage = error.response?.data?.error || t('accountSettings.messages.updatePasswordError');
       setMessage({ type: 'error', text: errorMessage });
     }
   };
@@ -97,7 +99,7 @@ export default function AccountSettings() {
       const response = await detectMitm();
       setMitmResult(response.data.output);
     } catch (error) {
-      setMitmResult('Eroare la detectarea MITM: ' + (error.response?.data?.error || error.message));
+      setMitmResult(t('accountSettings.messages.mitmError') + (error.response?.data?.error || error.message));
     } finally {
       setMitmLoading(false);
     }
@@ -116,66 +118,66 @@ export default function AccountSettings() {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" className="mobile-header-title">Setări</Typography>
+        <Typography variant="h5" className="mobile-header-title">{t('accountSettings.mobileHeaderTitle')}</Typography>
       </div>
-      <h1 className="settings-title">Setări</h1>
+      <h1 className="settings-title">{t('accountSettings.pageTitle')}</h1>
       <div className="settings-menu">
-        <div className="settings-item" onClick={handlePasswordChangeClick}>Schimbă parola</div>
+        <div className="settings-item" onClick={handlePasswordChangeClick}>{t('accountSettings.menu.changePassword')}</div>
         {showPasswordChange && (
           <div className="email-change-section">
             {message && (
               <div className={`message ${message.type}`}>{message.text}</div>
             )}
-            <label htmlFor="current-password">Parola curentă</label>
+            <label htmlFor="current-password">{t('accountSettings.labels.currentPassword')}</label>
             <input
               type="password"
               id="current-password"
               value={passwords.currentPassword}
               onChange={e => setPasswords(p => ({ ...p, currentPassword: e.target.value }))}
-              placeholder="Introduceți parola curentă"
+              placeholder={t('accountSettings.placeholders.currentPassword')}
             />
-            <label htmlFor="new-password">Parola nouă</label>
+            <label htmlFor="new-password">{t('accountSettings.labels.newPassword')}</label>
             <input
               type="password"
               id="new-password"
               value={passwords.newPassword}
               onChange={e => setPasswords(p => ({ ...p, newPassword: e.target.value }))}
-              placeholder="Introduceți noua parolă"
+              placeholder={t('accountSettings.placeholders.newPassword')}
             />
-            <button onClick={handleSavePassword}>Salvează</button>
+            <button onClick={handleSavePassword}>{t('accountSettings.buttons.save')}</button>
           </div>
         )}
-        <div className="settings-item" onClick={handleEmailChangeClick}>Schimbă email-ul</div>
+        <div className="settings-item" onClick={handleEmailChangeClick}>{t('accountSettings.menu.changeEmail')}</div>
         {showEmailChange && (
           <div className="email-change-section">
             {message && (
               <div className={`message ${message.type}`}>{message.text}</div>
             )}
-            <label htmlFor="new-email">Noua ta adresă de e-mail</label>
+            <label htmlFor="new-email">{t('accountSettings.labels.newEmail')}</label>
             <input
               type="email"
               id="new-email"
               value={newEmail}
               onChange={e => setNewEmail(e.target.value)}
-              placeholder="Introduceți noua adresă de e-mail"
+              placeholder={t('accountSettings.placeholders.newEmail')}
             />
-            <button onClick={handleSaveEmail}>Salvează</button>
+            <button onClick={handleSaveEmail}>{t('accountSettings.buttons.save')}</button>
           </div>
         )}
-        <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>Anunțuri</div>
-        <div className="settings-item">Setează notificările</div>
-        <div className="settings-item">Date de facturare</div>
-        <div className="settings-item">Ieși din cont de pe toate dispozitivele</div>
-        <div className="settings-item" onClick={() => setShowDeleteDialog(true)}>Șterge contul</div>
+        <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>{t('accountSettings.menu.myAnnouncements')}</div>
+        <div className="settings-item">{t('accountSettings.menu.notifications')}</div>
+        <div className="settings-item">{t('accountSettings.menu.billing')}</div>
+        <div className="settings-item">{t('accountSettings.menu.logoutAll')}</div>
+        <div className="settings-item" onClick={() => setShowDeleteDialog(true)}>{t('accountSettings.menu.deleteAccount')}</div>
         <ConfirmDialog
           open={showDeleteDialog}
           onClose={() => setShowDeleteDialog(false)}
           onConfirm={handleDeleteAccount}
-          title="Sigur vrei să ștergi contul?"
-          description="Această acțiune este ireversibilă. Toate anunțurile tale vor fi șterse."
+          title={t('accountSettings.confirm.deleteTitle')}
+          description={t('accountSettings.confirm.deleteDescription')}
         />
         {successDelete && (
-          <div className="message success" style={{textAlign:'center',marginTop:20}}>Contul tău a fost șters cu succes!</div>
+          <div className="message success" style={{textAlign:'center',marginTop:20}}>{t('accountSettings.messages.deleteSuccess')}</div>
         )}
       </div>
     </div>

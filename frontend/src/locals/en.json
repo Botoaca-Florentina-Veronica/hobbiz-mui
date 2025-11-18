@@ -82,6 +82,73 @@
     "tutoring": "Tutoring"
   }
   ,
+  "addAnnouncement": {
+    "pageTitle": "Post an announcement",
+    "categoryHints": {
+      "photography": "Photography services, courses, equipment",
+      "pastries": "Baking services, cakes, pastry courses",
+      "music": "Lessons, instruments, musical events",
+      "repairs": "Repair services, maintenance, installations",
+      "dance": "Classes, events, choreographies",
+      "cleaning": "Housekeeping, professional cleaning services",
+      "gardening": "Landscaping, maintenance, plants",
+      "sports": "Equipment, training, events",
+      "art": "Painting, sculpture, visual arts",
+      "technology": "IT, electronics, gadgets",
+      "auto": "Cars, parts, service",
+      "tutoring": "Private lessons and tutoring"
+    },
+    "mobileHeaderTitle": "Post an announcement",
+    "subtitle": "Describe your announcement with lots of details!",
+    "titleLabel": "Add a clear title*",
+    "titlePlaceholder": "e.g.: I teach physics lessons, online",
+    "titleHelper": "Enter at least 16 characters",
+    "categoryLabel": "Category*",
+    "categoryPlaceholder": "Choose a category",
+    "chooseCategory": "Choose category",
+    "imagesSubtitle": "Images",
+    "imagesHelper": "You can add multiple images. The first will be the main image of your ad.",
+    "addImages": "Add images",
+    "descriptionLabel": "Description*",
+    "descriptionPlaceholder": "Try to write what you would want to know if you looked at this ad",
+    "descriptionHelper": "Enter at least 40 characters",
+    "locationLabel": "Location*",
+    "locationPlaceholder": "Entire country",
+    "contactSubtitle": "Contact information",
+    "contactPersonLabel": "Contact person*",
+    "contactPersonPlaceholder": "First and last name",
+    "contactEmailLabel": "Email address",
+    "contactEmailPlaceholder": "e.g.: example@gmail.com",
+    "contactPhoneLabel": "Phone number",
+    "contactPhonePlaceholder": "e.g.: 07xxxxxxxx",
+    "previewButton": "Preview announcement",
+    "submitButton": { "create": "Publish announcement", "update": "Update announcement" },
+    "imagePrimaryBadge": "Main",
+    "imageRemoveTitle": "Delete image",
+    "errors": {
+      "maxImages": "You can add up to 10 images per announcement",
+      "imageFormat": "Only JPG/JPEG images are allowed",
+      "imageSize": "Each image must be smaller than 5MB",
+      "titleMin": "Title must have at least 16 characters",
+      "titleMax": "Title cannot exceed 70 characters",
+      "categoryRequired": "You must select a category",
+      "descriptionMin": "Description must have at least 40 characters",
+      "descriptionMax": "Description cannot exceed 9000 characters",
+      "locationRequired": "You must select a location",
+      "contactPersonRequired": "Contact person's name is required",
+      "invalidEmail": "Email address is not valid",
+      "invalidPhone": "Phone number must start with 0 and have 10 digits",
+      "emailOrPhoneRequired": "You must fill at least email or phone",
+      "fixErrors": "Please fix the errors above before publishing",
+      "authRequired": "You must be authenticated to publish an announcement",
+      "sessionExpired": "Session expired. Please log in again.",
+      "submitError": "Error publishing the announcement. Please try again!"
+    },
+    "success": { "updated": "Announcement updated successfully!", "created": "Announcement published successfully!" },
+    "labels": { "entireCountry": "Entire country", "mainImage": "Main" },
+    "popover": { "close": "Close", "title": "Choose category", "chooseCountyTitle": "Choose county", "chooseLocalityTitle": "Choose locality", "closeAria": "Close" }
+  }
+  ,
   "legal": {
     "brand": "Hobbiz",
     "description": "Discover, sell and buy services or products from passionate people like you.",
@@ -543,6 +610,48 @@
       "supportText": "through the platform chat",
       "addressLabel": "Address:",
       "addressText": "Bucharest, Romania"
+    }
+  }
+  ,
+  "accountSettings": {
+    "pageTitle": "Settings",
+    "mobileHeaderTitle": "Settings",
+    "menu": {
+      "changePassword": "Change password",
+      "changeEmail": "Change email",
+      "myAnnouncements": "My announcements",
+      "notifications": "Notification settings",
+      "billing": "Billing details",
+      "logoutAll": "Log out from all devices",
+      "deleteAccount": "Delete account"
+    },
+    "labels": {
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "newEmail": "Your new email address"
+    },
+    "placeholders": {
+      "currentPassword": "Enter current password",
+      "newPassword": "Enter new password",
+      "newEmail": "Enter the new email address"
+    },
+    "buttons": {
+      "save": "Save",
+      "confirmDelete": "Yes, delete account",
+      "cancel": "Cancel"
+    },
+    "confirm": {
+      "deleteTitle": "Are you sure you want to delete your account?",
+      "deleteDescription": "This action is irreversible. All your announcements will be deleted."
+    },
+    "messages": {
+      "deleteSuccess": "Your account was deleted successfully!",
+      "deleteError": "Error deleting account.",
+      "enterEmail": "Please enter the new email address.",
+      "enterPasswords": "Please enter both passwords.",
+      "updateEmailError": "Error updating email.",
+      "updatePasswordError": "Error changing password.",
+      "mitmError": "Error detecting MITM: "
     }
   }
 }

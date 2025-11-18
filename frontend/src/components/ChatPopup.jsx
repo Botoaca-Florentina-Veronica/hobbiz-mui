@@ -110,7 +110,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   // Enable/disable resizable mode based on viewport width
   useEffect(() => {
     const check = () => {
-      const enable = window.innerWidth >= 1200;
+      const enable = window.innerWidth > 1024;
       setIsResizable(enable);
       if (enable) {
         // Ensure box fits viewport height

@@ -512,7 +512,7 @@
 }
 
 /* Mobile header (back button + title) */
-@media (max-width: 899.98px) {
+@media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
     align-items: center !important;

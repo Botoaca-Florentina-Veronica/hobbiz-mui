@@ -42,7 +42,7 @@
   background: var(--ma-bg);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .my-announcements-container {
     padding: 12px 40px;
     padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
@@ -86,8 +86,8 @@
   }
 }
 
-/* Mobile header (shown < 900px) */
-@media (max-width: 899.98px) {
+/* Mobile header (shown <= 1024px) */
+@media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
     align-items: center !important;
@@ -232,7 +232,7 @@
 }
 
 /* Responsive adjustments for search header */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .my-announcements-search-header {
     padding: 8px;
     border-radius: 8px;
@@ -318,7 +318,7 @@
   padding: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .my-announcements-list {
     gap: 12px;
     padding: 0;
@@ -624,7 +624,7 @@
    7. GRID & LIST VIEW VARIANTS
    ============================================ */
 
-/* Grid view (default above 900px) */
+/* Grid view (default above 1024px) */
 @media (min-width: 901px) {
   .my-announcements-list.grid-view {
     display: grid !important;
@@ -683,8 +683,8 @@
    8. MOBILE RESPONSIVE LAYOUTS
    ============================================ */
 
-/* Tablet view (600px - 900px) */
-@media (max-width: 900px) and (min-width: 601px) {
+/* Tablet view (600px - 1024px) */
+@media (max-width: 1024px) and (min-width: 601px) {
   .my-announcement-card {
     flex-direction: row;
     min-height: 160px;

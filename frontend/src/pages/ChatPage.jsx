@@ -47,8 +47,8 @@ export default function ChatPage() {
   // Long-press timer for mobile to open reactions
   const longPressTimerRef = useRef(null);
   // Drawer mobil pentru lista de conversații (deschis implicit pe mobil)
-  // Aliniem breakpoint-ul la 900px: <=900 => mobile layout, >900 => desktop layout
-  const MOBILE_BREAKPOINT = 900; // schimbat din 870 -> 900
+  // Aliniem breakpoint-ul la 1024px: <=1024 => mobile layout, >1024 => desktop layout
+  const MOBILE_BREAKPOINT = 1024;
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth <= MOBILE_BREAKPOINT;

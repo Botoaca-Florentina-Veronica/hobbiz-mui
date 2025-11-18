@@ -104,7 +104,7 @@
 }
 
 /* Mid screens (tablet landscape) */
-@media (min-width: 701px) and (max-width: 900px) {
+@media (min-width: 701px) and (max-width: 1024px) {
   .promo-image-frame {
     height: 460px;
   }
@@ -154,7 +154,7 @@
 }
 
 /* Reduce scaling on narrower screens so image doesn't overflow badly */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .promo-section.image-large .promo-image-sticky img {
     transform: scale(1) translateX(0);
   }
@@ -380,7 +380,7 @@
   }
 }
 
-@media (min-width: 701px) and (max-width: 900px) {
+@media (min-width: 701px) and (max-width: 1024px) {
   .promo-section {
     padding: 80px 0 80px 0;
     font-size: 1.3rem;
@@ -486,7 +486,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .promo-inner {
     flex-direction: column;
     align-items: stretch;

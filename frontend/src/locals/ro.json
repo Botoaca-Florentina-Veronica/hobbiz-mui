@@ -82,6 +82,73 @@
     "tutoring": "Meditații"
   }
   ,
+  "addAnnouncement": {
+    "pageTitle": "Publică un anunț",
+    "categoryHints": {
+      "photography": "Servicii foto, cursuri, echipamente",
+      "pastries": "Cofetărie, patiserie, cursuri de coacere",
+      "music": "Lecții, instrumente, evenimente muzicale",
+      "repairs": "Service-uri, mentenanță, instalări",
+      "dance": "Cursuri, evenimente, coregrafii",
+      "cleaning": "Servicii de menaj, curățenie profesională",
+      "gardening": "Amenajări, întreținere, plante",
+      "sports": "Echipamente, antrenamente, evenimente",
+      "art": "Pictură, sculptură, arte vizuale",
+      "technology": "IT, electronice, gadget-uri",
+      "auto": "Mașini, piese, service",
+      "tutoring": "Lecții particulare, pregătire"
+    },
+    "mobileHeaderTitle": "Publică un anunț",
+    "subtitle": "Descrie-ți anunțul cu lux de detalii!",
+    "titleLabel": "Adaugă un titlu clar*",
+    "titlePlaceholder": "ex: Predau lecții de fizică, online",
+    "titleHelper": "Introdu cel puțin 16 caractere",
+    "categoryLabel": "Categoria*",
+    "categoryPlaceholder": "Alege categoria",
+    "chooseCategory": "Alege categoria",
+    "imagesSubtitle": "Imagini",
+    "imagesHelper": "Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.",
+    "addImages": "Adaugă imagini",
+    "descriptionLabel": "Descriere*",
+    "descriptionPlaceholder": "Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț",
+    "descriptionHelper": "Introdu cel puțin 40 caractere",
+    "locationLabel": "Localitate*",
+    "locationPlaceholder": "Toată țara",
+    "contactSubtitle": "Informații de contact",
+    "contactPersonLabel": "Persoana de contact*",
+    "contactPersonPlaceholder": "Nume și prenume",
+    "contactEmailLabel": "Adresa de email",
+    "contactEmailPlaceholder": "ex: exemplu@gmail.com",
+    "contactPhoneLabel": "Numărul de telefon",
+    "contactPhonePlaceholder": "ex: 07xxxxxxxx",
+    "previewButton": "Previzualizează anunțul",
+    "submitButton": { "create": "Publică un anunț", "update": "Actualizează anunțul" },
+    "imagePrimaryBadge": "Principală",
+    "imageRemoveTitle": "Șterge imaginea",
+    "errors": {
+      "maxImages": "Poți adăuga maxim 10 imagini per anunț",
+      "imageFormat": "Poți încărca doar imagini în format JPG/JPEG",
+      "imageSize": "Fiecare imagine trebuie să fie mai mică de 5MB",
+      "titleMin": "Titlul trebuie să aibă cel puțin 16 caractere",
+      "titleMax": "Titlul nu poate depăși 70 de caractere",
+      "categoryRequired": "Trebuie să selectezi o categorie",
+      "descriptionMin": "Descrierea trebuie să aibă cel puțin 40 de caractere",
+      "descriptionMax": "Descrierea nu poate depăși 9000 de caractere",
+      "locationRequired": "Trebuie să selectezi o locație",
+      "contactPersonRequired": "Numele persoanei de contact este obligatoriu",
+      "invalidEmail": "Adresa de email nu este validă",
+      "invalidPhone": "Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre",
+      "emailOrPhoneRequired": "Trebuie să completezi cel puțin email-ul sau telefonul",
+      "fixErrors": "Te rugăm să corectezi erorile de mai sus înainte de a publica anunțul",
+      "authRequired": "Trebuie să fii autentificat pentru a publica un anunț!",
+      "sessionExpired": "Sesiunea a expirat. Te rugăm să te autentifici din nou.",
+      "submitError": "Eroare la publicarea anunțului. Încearcă din nou!"
+    },
+    "success": { "updated": "Anunț actualizat cu succes!", "created": "Anunțul a fost publicat cu succes!" },
+    "labels": { "entireCountry": "Toată țara", "mainImage": "Principală" },
+    "popover": { "close": "Închide", "title": "Alege categoria", "chooseCountyTitle": "Alege județul", "chooseLocalityTitle": "Alege localitatea", "closeAria": "Închide" }
+  }
+  ,
   "legal": {
     "brand": "Hobbiz",
     "description": "Descoperă, vinde și cumpără servicii sau produse de la pasionați ca tine.",
@@ -543,6 +610,48 @@
       "supportText": "prin chat-ul de pe platformă",
       "addressLabel": "Adresă:",
       "addressText": "București, România"
+    }
+  }
+  ,
+  "accountSettings": {
+    "pageTitle": "Setări",
+    "mobileHeaderTitle": "Setări",
+    "menu": {
+      "changePassword": "Schimbă parola",
+      "changeEmail": "Schimbă email-ul",
+      "myAnnouncements": "Anunțuri",
+      "notifications": "Setează notificările",
+      "billing": "Date de facturare",
+      "logoutAll": "Ieși din cont de pe toate dispozitivele",
+      "deleteAccount": "Șterge contul"
+    },
+    "labels": {
+      "currentPassword": "Parola curentă",
+      "newPassword": "Parola nouă",
+      "newEmail": "Noua ta adresă de e-mail"
+    },
+    "placeholders": {
+      "currentPassword": "Introduceți parola curentă",
+      "newPassword": "Introduceți noua parolă",
+      "newEmail": "Introduceți noua adresă de e-mail"
+    },
+    "buttons": {
+      "save": "Salvează",
+      "confirmDelete": "Da, șterge contul",
+      "cancel": "Anulează"
+    },
+    "confirm": {
+      "deleteTitle": "Sigur vrei să ștergi contul?",
+      "deleteDescription": "Această acțiune este ireversibilă. Toate anunțurile tale vor fi șterse."
+    },
+    "messages": {
+      "deleteSuccess": "Contul tău a fost șters cu succes!",
+      "deleteError": "Eroare la ștergerea contului.",
+      "enterEmail": "Introduceți noua adresă de e-mail.",
+      "enterPasswords": "Introduceți ambele parole.",
+      "updateEmailError": "Eroare la actualizarea emailului.",
+      "updatePasswordError": "Eroare la schimbarea parolei.",
+      "mitmError": "Eroare la detectarea MITM: "
     }
   }
 }

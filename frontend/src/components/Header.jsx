@@ -15,6 +15,8 @@ import MobileHeader from './MobileHeader';
 import './MobileHeader.css';
 import { useTranslation } from 'react-i18next';
 
+const MOBILE_BREAKPOINT = 1024;
+
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -260,14 +262,14 @@ export default function Header() {
 
   // Detectare mobil + width pentru regula specială doar pe homepage
   const [isMobile, setIsMobile] = useState(
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 1200px)').matches
+    typeof window !== 'undefined' && window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
   );
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1920
   );
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(max-width: 1200px)');
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
     const handler = (e) => setIsMobile(e.matches);
     if (mq.addEventListener) {
       mq.addEventListener('change', handler);
@@ -287,11 +289,11 @@ export default function Header() {
     };
   }, []);
   const isHomepage = location.pathname === '/' || location.pathname === '';
-  const showMobileHeader = isHomepage ? windowWidth < 1200 : isMobile;
+  const showMobileHeader = isHomepage ? windowWidth <= MOBILE_BREAKPOINT : isMobile;
 
-  // Asigură că pe pagina de chat, când trecem în layout-ul "desktop" al chat-ului ( > 900px ),
-  // afișăm întotdeauna header-ul de desktop chiar dacă încă suntem sub 1200px (interval 871-1199px).
-  const CHAT_DESKTOP_BREAKPOINT = 900; // folosit și în ChatPage.jsx (aliniat la 900px)
+  // Asigură că pe pagina de chat, când trecem în layout-ul "desktop" al chat-ului (> 1024px),
+  // afișăm întotdeauna header-ul de desktop chiar dacă încă suntem sub pragul desktopului general.
+  const CHAT_DESKTOP_BREAKPOINT = MOBILE_BREAKPOINT; // folosit și în ChatPage.jsx
   const isChatRoute = location.pathname.startsWith('/chat');
   const effectiveShowMobileHeader = (isChatRoute && windowWidth > CHAT_DESKTOP_BREAKPOINT)
     ? false

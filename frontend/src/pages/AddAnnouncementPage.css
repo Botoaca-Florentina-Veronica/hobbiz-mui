@@ -241,7 +241,7 @@
 }
 
 /* Avoid hover scale on smaller desktop/tablet to preserve gaps */
-@media (max-width: 899px) {
+@media (max-width: 1024px) {
   .category-card-popover:hover {
     transform: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);

@@ -453,7 +453,7 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
 }
 
 /* Tablet & small landscape */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .chat-popup-box { width: min(440px, 100vw - 12px); }
 }
 

@@ -136,7 +136,7 @@
 
 /* Utility to hide on mobile */
 .desktop-only { display: block; }
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .desktop-only { display: none !important; }
 }
 
@@ -149,7 +149,7 @@
 
 /* Mobile Legal (compact list) */
 .mobile-legal { display: none; }
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .mobile-legal {
     display: block;
     width: 100%;
@@ -200,7 +200,7 @@
   .mobile-legal__list a:hover { color: var(--primary); text-decoration: underline; }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   /* Hide desktop footer on small screens to avoid overlap with fixed mobile bar */
   .desktop-footer {
     display: none !important;
@@ -544,8 +544,8 @@
   }
 }
 
-/* Make desktop footer compact up to 900px without changing text sizes */
-@media (max-width: 900px) {
+/* Make desktop footer compact up to tablet width without changing text sizes */
+@media (max-width: 1024px) {
   .desktop-footer {
     padding: 6px 0 !important;
     margin-top: 6px !important;
@@ -634,7 +634,7 @@
 }
 
 /* Hide desktop footer parts on pages that opt-in via hide-on-mobile (mobile only) */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .footer.hide-on-mobile .legal-section,
   .footer.hide-on-mobile .footer-separator,
   .footer.hide-on-mobile .desktop-footer,
@@ -643,8 +643,8 @@
   }
 }
 
-/* Ascunde legal + desktop footer pe paginile care cer acest lucru (ex: detalii anunț) până la 1200px */
-@media (max-width: 1200px) {
+/* Ascunde legal + desktop footer pe paginile care cer acest lucru (ex: detalii anunț) până la pragul desktopului */
+@media (max-width: 1024px) {
   .footer.hide-legal-upto-1200 .legal-section,
   .footer.hide-legal-upto-1200 .footer-separator,
   .footer.hide-legal-upto-1200 .desktop-footer,
@@ -653,8 +653,8 @@
   }
 }
 
-/* Hard override: ensure mobile footer is visible up to 900px regardless of import order */
-@media (max-width: 900px) {
+/* Hard override: ensure mobile footer is visible up to 1024px regardless of import order */
+@media (max-width: 1024px) {
   .footer-mobile-buttons { display: flex !important; }
   .desktop-footer { display: none !important; }
 }

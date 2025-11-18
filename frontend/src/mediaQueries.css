@@ -1,5 +1,5 @@
-/* =============== Dispozitive Mobile (până la 900px) =============== */
-@media (max-width: 900px) {
+/* =============== Dispozitive Mobile & Tabletă (până la 1024px) =============== */
+@media (max-width: 1024px) {
   /* ----------------- Header Principal - Ascuns pe Mobile ----------------- */
   .header {
     display: none !important;
@@ -121,7 +121,7 @@
     position: relative; /* Nu schimbăm structura footer-ului de desktop */
   }
 
-  /* Footer mobile - doar pe mobile */
+  /* Footer mobile - doar pe mobile/tabletă */
   .footer-mobile-buttons {
     position: fixed !important;
     bottom: 0;
@@ -340,35 +340,16 @@
     min-width: 44px;
   }
 
-  /* Search container - hidden on mobile since we use MobileHeader */
+  /* Search container - hidden on mobile/tablet since we use MobileHeader */
   .search-container {
     display: none !important;
   }
 }
 
-/* =============== Tabletă (901px - 1024px) =============== */
-@media (min-width: 901px) and (max-width: 1024px) {
-  /* Folosim doar MobileHeader pe tabletă */
-  .header,
-  .fixed-header {
-    display: none !important;
-  }
-
-  .mobile-header {
-    display: flex !important;
-  }
-
-  /* Ascunde containerul de search din headerul clasic */
-  .search-container {
-    display: none !important;
-    width: 100%;
-    margin: 0;
-    order: initial;
-  }
-
-  /* Categories grid pentru tabletă */
+/* =============== Ajustări pentru tablete late (768px - 1024px) =============== */
+@media (min-width: 768px) and (max-width: 1024px) {
   .categories-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 1.5rem;
   }
 
@@ -386,37 +367,7 @@
     width: 55px;
     height: 55px;
   }
-
-  /* Footer pentru tabletă - păstrăm aspectul de desktop */
-  .footer {
-    position: relative;
-    height: auto;
-    background: #f3f5f6;
-    box-shadow: none;
-    border-top: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .footer-mobile-buttons {
-    display: none !important;
-  }
-
-  .desktop-footer {
-    display: block !important;
-  }
-
-  .legal-section {
-    display: grid !important;
-  }
-
-  .footer-separator {
-    display: block !important;
-  }
-
-  body {
-    padding-bottom: 0;
-  }
 }
 
+
+/* =============== Tabletă (901px - 1024px) =============== */

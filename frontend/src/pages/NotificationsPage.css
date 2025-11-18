@@ -315,7 +315,7 @@
   margin-top: -3rem;
 }
 
-@media (max-width: 899.98px) {
+@media (max-width: 1024px) {
   /* On mobile show a smaller version of the empty image */
   .notifications-empty-icon img { display: block; width: 120px; height: 120px; border-radius: 10px; }
   .notifications-empty { padding: 20px 12px; gap: 8px; }
@@ -333,7 +333,7 @@
   display: none !important;
 }
 
-@media (max-width: 899.98px) {
+@media (max-width: 1024px) {
   /* Hide desktop H1 on mobile because mobile header shows title */
   .notifications-title {
     display: none !important;

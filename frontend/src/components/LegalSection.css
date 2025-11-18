@@ -85,7 +85,7 @@
 .legal-section__icons a:hover {
   color: #ff6a00;
 }
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .legal-section {
     flex-direction: column;
     gap: 1.5rem;
@@ -222,7 +222,7 @@
   pointer-events: all;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .app-store-buttons {
     flex-direction: row;
     justify-content: center;

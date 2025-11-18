@@ -71,7 +71,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
       navigate('/login');
       return;
     }
-    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches;
     if (isMobile) {
       navigate('/cont');
     } else {

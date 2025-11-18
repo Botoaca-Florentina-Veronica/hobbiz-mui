@@ -28,29 +28,15 @@ const CATEGORIES = [
   'Other'
 ];
 
-// Helper function for category hints
-const getCategoryHint = (category) => {
-  const hints = {
-    "Fotografie": "Servicii foto, cursuri, echipamente",
-    "Prajituri": "Cofetărie, patiserie, cursuri de coacere",
-    "Muzica": "Lecții, instrumente, evenimente muzicale",
-    "Reparații": "Service-uri, mentenanță, instalări",
-    "Dans": "Cursuri, evenimente, coregrafii",
-    "Curățenie": "Servicii de menaj, curățenie profesională",
-    "Gradinarit": "Amenajări, întreținere, plante",
-    "Sport": "Echipamente, antrenamente, evenimente",
-    "Arta": "Pictură, sculptură, arte vizuale",
-    "Tehnologie": "IT, electronice, gadget-uri",
-    "Auto": "Mașini, piese, service",
-    "Meditații": "Lecții particulare, pregătire"
-  };
-  return hints[category] || "Servicii și produse din această categorie";
-};
+// category hints are provided via i18n keys (addAnnouncement.categoryHints)
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 const judete = ["Toată țara", ...Object.keys(localitatiPeJudet)];
 
+import { useTranslation } from 'react-i18next';
+
 export default function AddAnnouncementPage() {
+  const { t } = useTranslation();
   // Șterge draftul de anunț la deconectare și resetează complet starea formularului
   useEffect(() => {
     const handleLogout = () => {
@@ -232,21 +218,21 @@ export default function AddAnnouncementPage() {
     
     // Verifică dacă utilizatorul încearcă să adauge prea multe imagini
     if (images.length + files.length > 10) {
-      setImageError('Poți adăuga maxim 10 imagini per anunț');
+      setImageError(t('addAnnouncement.errors.maxImages'));
       return;
     }
     
     // Acceptă doar imagini jpg/jpeg
     const validFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
     if (validFiles.length !== files.length) {
-      setImageError('Poți încărca doar imagini în format JPG/JPEG');
+      setImageError(t('addAnnouncement.errors.imageFormat'));
       return;
     }
 
     // Verifică dimensiunea fiecărui fișier (max 5MB)
     const oversizedFiles = validFiles.filter(file => file.size > 5 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      setImageError('Fiecare imagine trebuie să fie mai mică de 5MB');
+      setImageError(t('addAnnouncement.errors.imageSize'));
       return;
     }
 
@@ -272,9 +258,9 @@ export default function AddAnnouncementPage() {
     
     // Validare în timp real pentru titlu
     if (value.length < 16) {
-      setTitleError("Titlul trebuie să aibă cel puțin 16 caractere");
+      setTitleError(t('addAnnouncement.errors.titleMin'));
     } else if (value.length > 70) {
-      setTitleError("Titlul nu poate depăși 70 de caractere");
+      setTitleError(t('addAnnouncement.errors.titleMax'));
     } else {
       setTitleError("");
     }
@@ -299,9 +285,9 @@ export default function AddAnnouncementPage() {
     setDescriptionChars(value.length);
     
     if (value.length < 40) {
-      setDescriptionError("Descrierea trebuie să aibă cel puțin 40 de caractere");
+      setDescriptionError(t('addAnnouncement.errors.descriptionMin'));
     } else if (value.length > 9000) {
-      setDescriptionError("Descrierea nu poate depăși 9000 de caractere");
+      setDescriptionError(t('addAnnouncement.errors.descriptionMax'));
     } else {
       setDescriptionError("");
     }
@@ -313,9 +299,9 @@ export default function AddAnnouncementPage() {
     setContactPerson(value);
     
     if (value.trim().length < 2) {
-      setContactPersonError("Numele trebuie să aibă cel puțin 2 caractere");
+      setContactPersonError(t('addAnnouncement.errors.contactPersonRequired'));
     } else if (value.trim().length > 50) {
-      setContactPersonError("Numele nu poate depăși 50 de caractere");
+      setContactPersonError(t('addAnnouncement.errors.contactPersonRequired'));
     } else {
       setContactPersonError("");
     }
@@ -327,7 +313,7 @@ export default function AddAnnouncementPage() {
     setContactEmail(value);
     
     if (value && !validateEmail(value)) {
-      setContactEmailError("Adresa de email nu este validă");
+      setContactEmailError(t('addAnnouncement.errors.invalidEmail'));
     } else {
       setContactEmailError("");
     }
@@ -339,7 +325,7 @@ export default function AddAnnouncementPage() {
     setContactPhone(value);
     
     if (value && !validatePhone(value)) {
-      setContactPhoneError("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
+      setContactPhoneError(t('addAnnouncement.errors.invalidPhone'));
     } else {
       setContactPhoneError("");
     }
@@ -352,7 +338,7 @@ export default function AddAnnouncementPage() {
     // Check if user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
-      setError("Trebuie să fii autentificat pentru a publica un anunț!");
+      setError(t('addAnnouncement.errors.authRequired'));
       return;
     }
 
@@ -361,16 +347,16 @@ export default function AddAnnouncementPage() {
 
     // Validare titlu
     if (!title || title.length < 16) {
-      setTitleError("Titlul trebuie să aibă cel puțin 16 caractere");
+      setTitleError(t('addAnnouncement.errors.titleMin'));
       hasErrors = true;
     } else if (title.length > 70) {
-      setTitleError("Titlul nu poate depăși 70 de caractere");
+      setTitleError(t('addAnnouncement.errors.titleMax'));
       hasErrors = true;
     }
 
     // Validare categorie
     if (!category) {
-      setCategoryError("Trebuie să selectezi o categorie");
+      setCategoryError(t('addAnnouncement.errors.categoryRequired'));
       hasErrors = true;
     } else {
       setCategoryError("");
@@ -378,16 +364,16 @@ export default function AddAnnouncementPage() {
 
     // Validare descriere
     if (!description || description.length < 40) {
-      setDescriptionError("Descrierea trebuie să aibă cel puțin 40 de caractere");
+      setDescriptionError(t('addAnnouncement.errors.descriptionMin'));
       hasErrors = true;
     } else if (description.length > 9000) {
-      setDescriptionError("Descrierea nu poate depăși 9000 de caractere");
+      setDescriptionError(t('addAnnouncement.errors.descriptionMax'));
       hasErrors = true;
     }
 
     // Validare locație
     if (!selectedJudet && !selectedLocalitate) {
-      setLocationError("Trebuie să selectezi o locație");
+      setLocationError(t('addAnnouncement.errors.locationRequired'));
       hasErrors = true;
     } else {
       setLocationError("");
@@ -395,31 +381,31 @@ export default function AddAnnouncementPage() {
 
     // Validare persoană de contact
     if (!contactPerson || contactPerson.trim().length < 2) {
-      setContactPersonError("Numele persoanei de contact este obligatoriu");
+      setContactPersonError(t('addAnnouncement.errors.contactPersonRequired'));
       hasErrors = true;
     }
 
     // Validare email (dacă este completat)
     if (contactEmail && !validateEmail(contactEmail)) {
-      setContactEmailError("Adresa de email nu este validă");
+      setContactEmailError(t('addAnnouncement.errors.invalidEmail'));
       hasErrors = true;
     }
 
     // Validare telefon (dacă este completat)
     if (contactPhone && !validatePhone(contactPhone)) {
-      setContactPhoneError("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
+      setContactPhoneError(t('addAnnouncement.errors.invalidPhone'));
       hasErrors = true;
     }
 
     // Dacă nu există nici email nici telefon
     if (!contactEmail && !contactPhone) {
-      setContactEmailError("Trebuie să completezi cel puțin email-ul sau telefonul");
-      setContactPhoneError("Trebuie să completezi cel puțin email-ul sau telefonul");
+      setContactEmailError(t('addAnnouncement.errors.emailOrPhoneRequired'));
+      setContactPhoneError(t('addAnnouncement.errors.emailOrPhoneRequired'));
       hasErrors = true;
     }
 
     if (hasErrors) {
-      setError("Te rugăm să corectezi erorile de mai sus înainte de a publica anunțul");
+      setError(t('addAnnouncement.errors.fixErrors'));
       return;
     }
 
@@ -443,7 +429,7 @@ export default function AddAnnouncementPage() {
             'Authorization': `Bearer ${token}`
           }
         });
-        setSuccess('Anunț actualizat cu succes!');
+        setSuccess(t('addAnnouncement.success.updated'));
         navigate('/adauga-anunt');
       } else {
         const response = await apiClient.post('/api/users/my-announcements', formData, {
@@ -454,17 +440,17 @@ export default function AddAnnouncementPage() {
         });
         localStorage.removeItem('addAnnouncementDraft');
         localStorage.removeItem('addAnnouncementMainImagePreview');
-        setSuccess('Anunțul a fost publicat cu succes!');
+        setSuccess(t('addAnnouncement.success.created'));
         setTimeout(() => navigate('/anunturile-mele'), 1200);
       }
     } catch (e) {
       console.error('Error submitting announcement:', e);
       if (e.response?.status === 401) {
-        setError('Sesiunea a expirat. Te rugăm să te autentifici din nou.');
+        setError(t('addAnnouncement.errors.sessionExpired'));
       } else if (e.response?.data?.error) {
         setError(e.response.data.error);
       } else {
-        setError('Eroare la publicarea anunțului. Încearcă din nou!');
+        setError(t('addAnnouncement.errors.submitError'));
       }
     }
   };
@@ -552,9 +538,9 @@ export default function AddAnnouncementPage() {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>Publică un anunț</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>{t('addAnnouncement.mobileHeaderTitle')}</Typography>
       </Box>
-      <h1 className="add-announcement-title">Publică un anunț </h1>
+      <h1 className="add-announcement-title">{t('addAnnouncement.pageTitle')}</h1>
       <form className="add-announcement-form" onSubmit={e => e.preventDefault()}>
         {success && (
           <div className="add-announcement-message add-announcement-success">
@@ -564,11 +550,11 @@ export default function AddAnnouncementPage() {
             {success}
           </div>
         )}
-        <h2 className="add-announcement-subtitle">Descrie-ți anunțul cu lux de detalii!</h2>
-        <label className="add-announcement-label">Adaugă un titlu clar*</label>
+        <h2 className="add-announcement-subtitle">{t('addAnnouncement.subtitle')}</h2>
+        <label className="add-announcement-label">{t('addAnnouncement.titleLabel')}</label>
         <textarea
           className="add-announcement-title-input"
-          placeholder="ex: Predau lecții de fizică, online"
+          placeholder={t('addAnnouncement.titlePlaceholder')}
           value={title}
           onChange={handleTitleChange}
           minLength={16}
@@ -576,7 +562,7 @@ export default function AddAnnouncementPage() {
           required
         />
         <div className="add-announcement-char-helper-row">
-          <div className="add-announcement-helper">Introdu cel puțin 16 caractere</div>
+          <div className="add-announcement-helper">{t('addAnnouncement.titleHelper')}</div>
           <div className="add-announcement-charcount">{titleChars}/70</div>
         </div>
         {titleError && (
@@ -587,11 +573,11 @@ export default function AddAnnouncementPage() {
             {titleError}
           </div>
         )}
-        <label className="add-announcement-label">Categoria*</label>
+        <label className="add-announcement-label">{t('addAnnouncement.categoryLabel')}</label>
         <input
           className="add-announcement-category-select"
           type="text"
-          placeholder="Alege categoria"
+          placeholder={t('addAnnouncement.categoryPlaceholder')}
           value={category}
           readOnly
           onClick={handleCategoryClick}
@@ -644,10 +630,10 @@ export default function AddAnnouncementPage() {
           }}
         >
           <div className="categories-popover-header-mobile">
-            <span className="categories-popover-title">Alege categoria</span>
-            <button type="button" className="categories-popover-close" onClick={handleCategoryClose} aria-label="Închide">✕</button>
+            <span className="categories-popover-title">{t('addAnnouncement.popover.title')}</span>
+            <button type="button" className="categories-popover-close" onClick={handleCategoryClose} aria-label={t('addAnnouncement.popover.closeAria')}>✕</button>
           </div>
-          {isMobile ? (
+              {isMobile ? (
             <List className="categories-list-mobile">
               {categories.map((cat, index) => (
                 <ListItemButton
@@ -659,7 +645,7 @@ export default function AddAnnouncementPage() {
                     <img src={cat.image} alt="" className="category-row-icon" />
                   )}
                   <ListItemText
-                    primary={cat.title || cat.description}
+                    primary={t(`categories.${cat.key}`)}
                     primaryTypographyProps={{ noWrap: true }}
                   />
                 </ListItemButton>
@@ -677,16 +663,16 @@ export default function AddAnnouncementPage() {
                     {cat.image ? (
                       <img
                         src={cat.image}
-                        alt={cat.description}
+                        alt={t(`categories.${cat.key}`)}
                         className="category-image-popover"
                       />
                     ) : (
                       <div className="image-placeholder" />
                     )}
                   </div>
-                  <div className="category-title-popover">{cat.title || cat.description}</div>
-                  <div className="category-description-popover">{cat.description}</div>
-                  <p className="category-hint-popover">{getCategoryHint(cat.description)}</p>
+                  <div className="category-title-popover">{t(`categories.${cat.key}`)}</div>
+                  <div className="category-description-popover">{t(`categories.${cat.key}`)}</div>
+                  <p className="category-hint-popover">{t(`addAnnouncement.categoryHints.${cat.key}`)}</p>
                 </div>
               ))}
             </div>
@@ -703,15 +689,15 @@ export default function AddAnnouncementPage() {
             {imageError}
           </div>
         )}
-        <h2 className="add-announcement-subtitle">Imagini</h2>
-        <div className="add-announcement-images-helper">Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.</div>
+        <h2 className="add-announcement-subtitle">{t('addAnnouncement.imagesSubtitle')}</h2>
+        <div className="add-announcement-images-helper">{t('addAnnouncement.imagesHelper')}</div>
         <div className="add-announcement-images-grid">
           <button
             type="button"
             className="add-announcement-image-upload add-announcement-image-upload-main"
             onClick={() => imageInputRef.current.click()}
           >
-            <span className="add-announcement-image-upload-text">Adaugă imagini</span>
+            <span className="add-announcement-image-upload-text">{t('addAnnouncement.addImages')}</span>
             <span className="add-announcement-image-upload-underline"></span>
           </button>
           <button
@@ -748,20 +734,20 @@ export default function AddAnnouncementPage() {
                   if (idx === 0 && imagePreviews.length > 1) setMainImagePreview(imagePreviews[1]);
                   if (imagePreviews.length === 1) setMainImagePreview(null);
                 }}
-                title="Șterge imaginea"
+                title={t('addAnnouncement.imageRemoveTitle')}
               >
                 <span className="remove-icon" aria-hidden>×</span>
               </button>
-              {idx === 0 && <div className="image-preview-badge">Principală</div>}
+              {idx === 0 && <div className="image-preview-badge">{t('addAnnouncement.imagePrimaryBadge')}</div>}
             </div>
           ))}
         </div>
       </div>
       <div className="add-announcement-description-section">
-        <label className="add-announcement-label">Descriere*</label>
+        <label className="add-announcement-label">{t('addAnnouncement.descriptionLabel')}</label>
         <textarea
           className="add-announcement-description-input"
-          placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
+          placeholder={t('addAnnouncement.descriptionPlaceholder')}
           minLength={40}
           maxLength={9000}
           required
@@ -769,7 +755,7 @@ export default function AddAnnouncementPage() {
           onChange={handleDescriptionChange}
         />
         <div className="add-announcement-char-helper-row">
-          <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
+          <div className="add-announcement-helper">{t('addAnnouncement.descriptionHelper')}</div>
           <div className="add-announcement-charcount">{descriptionChars}/9000</div>
         </div>
         {descriptionError && (
@@ -782,7 +768,7 @@ export default function AddAnnouncementPage() {
         )}
       </div>
       <div className="add-announcement-location-section">
-        <label className="add-announcement-label">Localitate*</label>
+        <label className="add-announcement-label">{t('addAnnouncement.locationLabel')}</label>
         <div className="add-announcement-location-input-wrapper">
           <FaMapMarkerAlt className="location-icon" />
           <input
@@ -791,8 +777,8 @@ export default function AddAnnouncementPage() {
               (!(selectedJudet || selectedLocalitate) ? " add-announcement-location-placeholder" : "")
             }
             type="text"
-            placeholder="Toată țara"
-            value={selectedLocalitate || selectedJudet || "Toată țara"}
+            placeholder={t('addAnnouncement.labels.entireCountry')}
+            value={selectedLocalitate || selectedJudet || t('addAnnouncement.labels.entireCountry')}
             readOnly
             onClick={e => setAnchorEl(e.currentTarget)}
             required
@@ -827,11 +813,11 @@ export default function AddAnnouncementPage() {
               {!selectedJudet ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>
-                  <Typography sx={{ fontWeight: 700, mb: 1 }}>Alege județul</Typography>
+                  <Typography sx={{ fontWeight: 700, mb: 1 }}>{t('addAnnouncement.popover.chooseCountyTitle')}</Typography>
                   <TextField
                     value={locationSearch}
                     onChange={(e) => setLocationSearch(e.target.value)}
-                    placeholder="Caută județ..."
+                    placeholder={t('common.search')}
                     size="small"
                     fullWidth
                     InputProps={{
@@ -871,8 +857,8 @@ export default function AddAnnouncementPage() {
                       }}
                     >
                       <ListItemText
-                        primary={judet === 'Toată țara' ? (
-                          <Chip label="Toată țara" color="primary" size="small" sx={{ borderRadius: 2 }} />
+                          primary={judet === 'Toată țara' ? (
+                          <Chip label={t('addAnnouncement.labels.entireCountry')} color="primary" size="small" sx={{ borderRadius: 2 }} />
                         ) : judet}
                       />
                     </ListItemButton>
@@ -885,13 +871,13 @@ export default function AddAnnouncementPage() {
                   <IconButton size="small" onClick={() => { setSelectedJudet(null); setLocationSearch(''); }}>
                     <ArrowBackIosNewIcon fontSize="small" />
                   </IconButton>
-                  <Typography sx={{ fontWeight: 700 }}>Alege localitatea</Typography>
+                  <Typography sx={{ fontWeight: 700 }}>{t('addAnnouncement.popover.chooseLocalityTitle')}</Typography>
                 </Box>
                 <Box sx={{ px: 2 }}>
                   <TextField
                     value={locationSearch}
                     onChange={(e) => setLocationSearch(e.target.value)}
-                    placeholder={`Caută în ${selectedJudet}...`}
+                    placeholder={t('common.search')}
                     size="small"
                     fullWidth
                     InputProps={{
@@ -942,13 +928,13 @@ export default function AddAnnouncementPage() {
         )}
       </div>
       <div className="add-announcement-contact-section">
-        <h2 className="add-announcement-subtitle">Informații de contact</h2>
-        <label className="add-announcement-label">Persoana de contact*</label>
+        <h2 className="add-announcement-subtitle">{t('addAnnouncement.contactSubtitle')}</h2>
+        <label className="add-announcement-label">{t('addAnnouncement.contactPersonLabel')}</label>
         <div className="add-announcement-contact-input-wrapper">
           <input
             className="add-announcement-contact-input"
             type="text"
-            placeholder="Nume și prenume"
+            placeholder={t('addAnnouncement.contactPersonPlaceholder')}
             value={contactPerson || ''}
             onChange={handleContactPersonChange}
             required
@@ -965,11 +951,11 @@ export default function AddAnnouncementPage() {
             {contactPersonError}
           </div>
         )}
-        <label className="add-announcement-label">Adresa de email</label>
+        <label className="add-announcement-label">{t('addAnnouncement.contactEmailLabel')}</label>
         <input
           className="add-announcement-contact-input"
           type="email"
-          placeholder="ex: exemplu@gmail.com"
+          placeholder={t('addAnnouncement.contactEmailPlaceholder')}
           value={contactEmail || ''}
           onChange={handleContactEmailChange}
         />
@@ -981,11 +967,11 @@ export default function AddAnnouncementPage() {
             {contactEmailError}
           </div>
         )}
-        <label className="add-announcement-label">Numărul de telefon</label>
+        <label className="add-announcement-label">{t('addAnnouncement.contactPhoneLabel')}</label>
         <input
           className="add-announcement-contact-input"
           type="tel"
-          placeholder="ex: 07xxxxxxxx"
+          placeholder={t('addAnnouncement.contactPhonePlaceholder')}
           value={contactPhone || ''}
           onChange={handleContactPhoneChange}
         />
@@ -1001,8 +987,8 @@ export default function AddAnnouncementPage() {
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
-          <button type="button" className="add-announcement-preview">Previzualizați anunțul</button>
-          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>{isEdit ? 'Actualizează anunțul' : 'Publică un anunț'}</button>
+          <button type="button" className="add-announcement-preview">{t('addAnnouncement.previewButton')}</button>
+          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>{isEdit ? t('addAnnouncement.submitButton.update') : t('addAnnouncement.submitButton.create')}</button>
         </div>
       </div>
     </div>

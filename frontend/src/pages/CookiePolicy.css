@@ -589,7 +589,7 @@
 .dark-mode .cookie-policy-content a:hover { color: #ff7e95 !important; }
 
 /* Mobile header (back button + title) */
-@media (max-width: 899.98px) {
+@media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
     align-items: center !important;

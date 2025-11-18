@@ -516,8 +516,8 @@
   }
 }
 
-/* Tablet (768px - 900px) */
-@media (max-width: 900px) {
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
   .announcements-by-category.my-announcements-container {
     padding-left: 30px;
     padding-right: 30px;

@@ -236,7 +236,7 @@
 }
 
 /* Small tweaks for mobile */
-@media (max-width: 899px) {
+@media (max-width: 1024px) {
   .public-profile-reviews-content {
     padding: 14px;
   }

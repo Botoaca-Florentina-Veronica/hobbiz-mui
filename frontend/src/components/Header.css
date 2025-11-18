@@ -884,26 +884,26 @@
  * ================================ */
 
 /* Reguli specifice pentru pagina principală (/) */
-/* Pe homepage: sub 1200px = DOAR mobile header, peste 1200px = DOAR desktop header */
+/* Pe homepage: sub 1025px = DOAR mobile header, peste 1024px = DOAR desktop header */
 
-/* Desktop header - ascuns pe homepage sub 1200px */
-@media screen and (max-width: 1199px) {
+/* Desktop header - ascuns pe homepage sub pragul desktopului */
+@media screen and (max-width: 1024px) {
   .homepage .header,
   .homepage .fixed-header {
     display: none !important;
   }
 }
 
-/* Mobile header - ascuns pe homepage peste 1200px */
-@media screen and (min-width: 1200px) {
+/* Mobile header - ascuns pe homepage peste pragul desktopului */
+@media screen and (min-width: 1025px) {
   .homepage .mobile-header,
   .homepage .mobile-header-spacer {
     display: none !important;
   }
 }
 
-/* Asigurăm că pe homepage mobile header-ul este vizibil sub 1200px */
-@media screen and (max-width: 1199px) {
+/* Asigurăm că pe homepage mobile header-ul este vizibil sub pragul desktopului */
+@media screen and (max-width: 1024px) {
   .homepage .mobile-header {
     display: flex !important;
   }
@@ -935,8 +935,8 @@
   }
 }
 
-/* Asigurăm că pe homepage desktop header-ul este vizibil peste 1200px */
-@media screen and (min-width: 1200px) {
+/* Asigurăm că pe homepage desktop header-ul este vizibil peste pragul desktopului */
+@media screen and (min-width: 1025px) {
   .homepage .header,
   .homepage .fixed-header {
     display: flex !important;

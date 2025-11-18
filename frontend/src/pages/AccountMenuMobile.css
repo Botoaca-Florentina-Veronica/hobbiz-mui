@@ -69,7 +69,7 @@
 }
 
 /* Hide the specific "Contul tău" menu card on mobile devices */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .mobile-account-menu__list [data-menu-key="/contul-tau"] {
     display: none !important;
   }

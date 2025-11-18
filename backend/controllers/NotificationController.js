@@ -113,10 +113,37 @@ const getNotifications = async (req, res) => {
 };
 
 // Creează o notificare nouă
+const PushService = require('../services/PushService');
+
 const createNotification = async (req, res) => {
   try {
-    const { userId, message, link } = req.body;
-    const notif = await Notification.create({ userId, message, link });
+    const { userId, message, link, title } = req.body;
+    const notif = await Notification.create({ userId, message, link, title });
+
+    // Try to send push notification if user has a registered push token
+    try {
+      const user = await User.findById(userId).select('pushToken');
+      if (user && user.pushToken) {
+        // Prefer provided title, fallback to generic
+        const notifTitle = title || 'Hobbiz';
+        await PushService.sendToDevice(user.pushToken, notifTitle, message || '', { link: link || '' });
+      }
+    } catch (pushErr) {
+      console.warn('⚠️ Could not send push for notification:', pushErr?.message || pushErr);
+    }
+
+    // Emit real-time notification via Socket.IO if the user is connected
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers && activeUsers.has(String(userId))) {
+        const socketId = activeUsers.get(String(userId));
+        io.to(socketId).emit('notification', notif);
+      }
+    } catch (emitErr) {
+      console.warn('⚠️ Could not emit socket notification:', emitErr?.message || emitErr);
+    }
+
     res.status(201).json(notif);
   } catch (err) {
     res.status(500).json({ error: err.message });

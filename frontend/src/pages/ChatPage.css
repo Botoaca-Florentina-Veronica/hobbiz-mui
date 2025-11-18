@@ -13,7 +13,7 @@ TOC (sumar rapid):
   5) Message bubble, ticks, images — .chat-message-*
   6) Composer (input, butoane, emoji) — .chat-input-*
   7) Separator (desktop resize) — .chat-separator
-  8) Responsive: mobile (<900px), intermediate (901–1199px)
+  8) Responsive: mobile (≤1024px), intermediate (1025–1199px)
   9) Dark mode - automat prin variabile CSS
 ====================================================
 */
@@ -89,7 +89,7 @@ html, body {
 }
 
 /* Mobile-only tweaks */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .dark-mode .chat-mobile-title { color: var(--text-primary); }
   .dark-mode .chat-tab { 
     background: var(--chat-tab-bg); 
@@ -271,7 +271,7 @@ html, body {
 }
 
 /* On mobile hide the decorative image (keeps layout light) */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .chat-empty-icon img.chat-empty-img { display: none; }
 }
 
@@ -479,7 +479,7 @@ html, body {
 }
 
 /* Hide separator on small screens (mobile) */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .chat-separator { display: none; }
 }
 
@@ -863,7 +863,7 @@ html, body {
 }
 
 /* Responsive Design */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   html, body { background: var(--chat-bg) !important; }
   .chat-page-container {
     flex-direction: column;
@@ -911,7 +911,7 @@ html, body {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   html, body { overflow-x: hidden; background: var(--chat-bg) !important; }
   
   .chat-page-container {
@@ -1205,7 +1205,7 @@ html, body {
 }
 
 /* Asigură fundal consistent pe mobil în dark mode */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .dark-mode html, .dark-mode body { 
     background: var(--chat-bg) !important; 
   }
@@ -1380,7 +1380,7 @@ html, body {
 }
 
 /* Responsive pentru noile funcționalități */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .chat-input-buttons {
     gap: 4px;
   }

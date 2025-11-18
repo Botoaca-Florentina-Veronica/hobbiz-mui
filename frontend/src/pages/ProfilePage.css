@@ -696,8 +696,8 @@
    8. MOBILE RESPONSIVENESS
    ============================================ */
 
-/* Mobile header (shown < 900px) */
-@media (max-width: 899.98px) {
+/* Mobile header (shown <= 1024px) */
+@media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
     align-items: center !important;

@@ -48,7 +48,7 @@
   color: #e2e2e2;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .announcement-location-map-box .alm-location-label {
     font-size: 0.95rem;
   }
