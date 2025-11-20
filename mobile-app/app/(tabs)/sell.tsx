@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/context/AuthContext';
 import api from '../../src/services/api';
 import { localitatiPeJudet } from '../../assets/comunePeJudet';
+import storage from '../../src/services/storage';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
@@ -45,23 +46,146 @@ const CATEGORY_IMAGES: Record<string, any> = {
   meditatii: require('../../assets/images/carte.png'),
 };
 
+const TRANSLATIONS = {
+  ro: {
+    pageTitle: 'Publică un anunț',
+    describeSection: 'Descrie-ți anunțul cu lux de detalii!',
+    titleLabel: 'Adaugă un titlu clar*',
+    titlePlaceholder: 'ex: Predau lecții de fizică, online',
+    titleHelper: 'Introdu cel puțin 16 caractere',
+    categoryLabel: 'Categoria*',
+    categoryPlaceholder: 'Alege categoria',
+    imagesSection: 'Imagini',
+    imagesHelper: 'Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.',
+    addImages: 'Adaugă imagini',
+    descriptionLabel: 'Descriere*',
+    descriptionPlaceholder: 'Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț',
+    descriptionHelper: 'Introdu cel puțin 40 caractere',
+    locationLabel: 'Localitate*',
+    contactSection: 'Informații de contact',
+    contactNameLabel: 'Persoana de contact*',
+    contactNamePlaceholder: 'Nume și prenume',
+    emailLabel: 'Adresa de email',
+    emailPlaceholder: 'ex: exemplu@gmail.com',
+    phoneLabel: 'Numărul de telefon',
+    phonePlaceholder: 'ex: 07xxxxxxx',
+    previewButton: 'Previzualizați anunțul',
+    publishButton: 'Publică un anunț',
+    chooseCategoryTitle: 'Alege categoria',
+    chooseLocationTitle: 'Alege localitatea',
+    allCountry: 'Toată țara',
+    authError: 'Trebuie să fii autentificat pentru a posta un anunț.',
+    titleValidation: 'Titlul trebuie să aibă minim 16 caractere.',
+    categoryValidation: 'Te rugăm să alegi o categorie.',
+    descriptionValidation: 'Descrierea trebuie să aibă minim 40 caractere.',
+    locationValidation: 'Te rugăm să alegi o localitate.',
+    contactNameValidation: 'Te rugăm să introduci numele persoanei de contact.',
+    imageFormatError: 'Format imagine invalid',
+    imageFormatMessage: 'Doar fișiere JPG sau JPEG.',
+    postError: 'Eroare la postare',
+    postErrorMessage: 'A intervenit o eroare. Te rugăm să încerci din nou.',
+  },
+  en: {
+    pageTitle: 'Post an Announcement',
+    describeSection: 'Describe your announcement in detail!',
+    titleLabel: 'Add a clear title*',
+    titlePlaceholder: 'e.g.: Physics lessons, online',
+    titleHelper: 'Enter at least 16 characters',
+    categoryLabel: 'Category*',
+    categoryPlaceholder: 'Choose category',
+    imagesSection: 'Images',
+    imagesHelper: 'You can add multiple images. The first one will be the main image of your announcement.',
+    addImages: 'Add images',
+    descriptionLabel: 'Description*',
+    descriptionPlaceholder: 'Try to write what you would like to know if you were looking at this announcement',
+    descriptionHelper: 'Enter at least 40 characters',
+    locationLabel: 'Location*',
+    contactSection: 'Contact Information',
+    contactNameLabel: 'Contact person*',
+    contactNamePlaceholder: 'First and last name',
+    emailLabel: 'Email address',
+    emailPlaceholder: 'e.g.: example@gmail.com',
+    phoneLabel: 'Phone number',
+    phonePlaceholder: 'e.g.: 07xxxxxxx',
+    previewButton: 'Preview announcement',
+    publishButton: 'Post an announcement',
+    chooseCategoryTitle: 'Choose category',
+    chooseLocationTitle: 'Choose location',
+    allCountry: 'Entire country',
+    authError: 'You must be authenticated to post an announcement.',
+    titleValidation: 'The title must be at least 16 characters.',
+    categoryValidation: 'Please choose a category.',
+    descriptionValidation: 'The description must be at least 40 characters.',
+    locationValidation: 'Please choose a location.',
+    contactNameValidation: 'Please enter the contact person name.',
+    imageFormatError: 'Invalid image format',
+    imageFormatMessage: 'Only JPG or JPEG files.',
+    postError: 'Post error',
+    postErrorMessage: 'An error occurred. Please try again.',
+  },
+};
+
+// Category translation keys
+const CATEGORY_LABELS: Record<string, { ro: string; en: string }> = {
+  fotografie: { ro: 'Fotografie', en: 'Photography' },
+  prajituri: { ro: 'Prăjituri', en: 'Baking' },
+  muzica: { ro: 'Muzică', en: 'Music' },
+  reparatii: { ro: 'Reparații', en: 'Repairs' },
+  dans: { ro: 'Dans', en: 'Dance' },
+  curatenie: { ro: 'Curățenie', en: 'Cleaning' },
+  gradinarit: { ro: 'Grădinărit', en: 'Gardening' },
+  sport: { ro: 'Sport', en: 'Sports' },
+  arta: { ro: 'Artă', en: 'Art' },
+  tehnologie: { ro: 'Tehnologie', en: 'Technology' },
+  auto: { ro: 'Auto', en: 'Cars' },
+  meditatii: { ro: 'Meditații', en: 'Tutoring' },
+};
+
 export default function SellScreen() {
   const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [locale, setLocale] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<string | null>(null);
+  const [categoryKey, setCategoryKey] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [contactName, setContactName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('Toată țara');
+  const [location, setLocation] = useState('');
   const [images, setImages] = useState<ImageItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [countyExpanded, setCountyExpanded] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    const loadLocale = async () => {
+      try {
+        const storedLocale = await storage.getItemAsync('locale');
+        if (storedLocale) setLocale(storedLocale);
+        else setLocale('ro');
+      } catch (error) {
+        console.error('Failed to load locale:', error);
+      }
+    };
+    loadLocale();
+  }, []);
+
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+
+  const selectedCategoryLabel = categoryKey
+    ? (CATEGORY_LABELS[categoryKey] ? (locale === 'en' ? CATEGORY_LABELS[categoryKey].en : CATEGORY_LABELS[categoryKey].ro) : (category || t.categoryPlaceholder))
+    : (category || t.categoryPlaceholder);
+
+  // Initialize location with translated text
+  useEffect(() => {
+    if (!location) {
+      setLocation(t.allCountry);
+    }
+  }, [t]);
 
   const remainingTitle = 70 - title.length;
   const remainingDesc = 9000 - description.length;
@@ -98,7 +222,7 @@ export default function SellScreen() {
       });
 
       if (jpgAssets.length === 0) {
-        Alert.alert('Format neacceptat', 'Te rog selectează fișiere JPG (jpeg).');
+        Alert.alert(t.imageFormatError, t.imageFormatMessage);
         return;
       }
 
@@ -117,23 +241,23 @@ export default function SellScreen() {
   const handleSubmit = async () => {
     // Validations (mirror edit flow)
     if (!isAuthenticated) {
-      Alert.alert('Eroare', 'Trebuie să fii autentificat pentru a publica un anunț.');
+      Alert.alert(t.authError, t.authError);
       return;
     }
     if (title.length < 16) {
-      Alert.alert('Validare', 'Titlul trebuie să aibă cel puțin 16 caractere.');
+      Alert.alert('Validare', t.titleValidation);
       return;
     }
     if (!category) {
-      Alert.alert('Validare', 'Trebuie să selectezi o categorie.');
+      Alert.alert('Validare', t.categoryValidation);
       return;
     }
     if (description.length < 40) {
-      Alert.alert('Validare', 'Descrierea trebuie să aibă cel puțin 40 de caractere.');
+      Alert.alert('Validare', t.descriptionValidation);
       return;
     }
     if (!contactName.trim()) {
-      Alert.alert('Validare', 'Numele persoanei de contact este obligatoriu.');
+      Alert.alert('Validare', t.contactNameValidation);
       return;
     }
     if (!email.trim() && !phone.trim()) {
@@ -177,11 +301,12 @@ export default function SellScreen() {
       const resetForm = () => {
         setTitle('');
         setCategory(null);
+        setCategoryKey(null);
         setDescription('');
         setContactName('');
         setEmail('');
         setPhone('');
-        setLocation('Toată țara');
+        setLocation(t.allCountry);
         setImages([]);
         setCategoryModalOpen(false);
         setLocationModalOpen(false);
@@ -192,8 +317,8 @@ export default function SellScreen() {
   router.replace({ pathname: '/post-success', params: { title: submittedTitle } });
     } catch (error: any) {
       console.error('Error publishing announcement:', error);
-      const errMsg = error?.response?.data?.error || 'Eroare la publicarea anunțului. Încearcă din nou.';
-      Alert.alert('Eroare', errMsg);
+      const errMsg = error?.response?.data?.error || t.postErrorMessage;
+      Alert.alert(t.postError, errMsg);
     } finally {
       setSubmitting(false);
     }
@@ -211,35 +336,35 @@ export default function SellScreen() {
           >
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Publică un anunț</ThemedText>
+          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.pageTitle}</ThemedText>
         </View>
 
         {/* Section: Descrie-ti anuntul */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Descrie-ți anunțul cu lux de detalii!</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.describeSection}</ThemedText>
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Adaugă un titlu clar*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.titleLabel}</ThemedText>
             <TextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="ex: Predau lecții de fizică, online"
+              placeholder={t.titlePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={title}
               onChangeText={setTitle}
               maxLength={70}
             />
             <View style={styles.helperRow}>
-              <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>Introdu cel puțin 16 caractere</ThemedText>
+              <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>{t.titleHelper}</ThemedText>
               <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{title.length}/70</ThemedText>
             </View>
           </View>
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Categoria*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.categoryLabel}</ThemedText>
             <TouchableOpacity 
               activeOpacity={0.7} 
               onPress={() => setCategoryModalOpen(true)}
               style={[styles.input, styles.selectLike, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}
             >
-              <ThemedText style={{ color: category ? tokens.colors.text : tokens.colors.muted }}>{category || 'Alege categoria'}</ThemedText>
+              <ThemedText style={{ color: (categoryKey || category) ? tokens.colors.text : tokens.colors.muted }}>{selectedCategoryLabel}</ThemedText>
               <Ionicons name="chevron-down" size={18} color={tokens.colors.muted} />
             </TouchableOpacity>
           </View>
@@ -247,11 +372,11 @@ export default function SellScreen() {
 
         {/* Section: Imagini */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Imagini</ThemedText>
-          <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.imagesSection}</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>{t.imagesHelper}</ThemedText>
           <View style={styles.imagesRow}>
             <TouchableOpacity onPress={addImagePlaceholder} activeOpacity={0.8} style={[styles.addImageCard, { backgroundColor: isDark ? tokens.colors.elev : '#fff8ea', borderColor: isDark ? tokens.colors.border : '#ffe7b3' }]}>              
-              <ThemedText style={[styles.addImageText, { color: tokens.colors.text }]}>Adaugă imagini</ThemedText>
+              <ThemedText style={[styles.addImageText, { color: tokens.colors.text }]}>{t.addImages}</ThemedText>
               <View style={[styles.addUnderline, { backgroundColor: isDark ? tokens.colors.primary : '#e0b400' }]} />
             </TouchableOpacity>
             {images.map(img => (
@@ -272,10 +397,10 @@ export default function SellScreen() {
 
         {/* Section: Descriere mare */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>Descriere*</ThemedText>
+          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>{t.descriptionLabel}</ThemedText>
           <TextInput
             style={[styles.textarea, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-            placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
+            placeholder={t.descriptionPlaceholder}
             placeholderTextColor={tokens.colors.muted}
             multiline
             value={description}
@@ -283,14 +408,14 @@ export default function SellScreen() {
             onChangeText={setDescription}
           />
           <View style={styles.helperRow}>
-            <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>Introdu cel puțin 40 caractere</ThemedText>
+            <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>{t.descriptionHelper}</ThemedText>
             <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{description.length}/9000</ThemedText>
           </View>
         </View>
 
         {/* Section: Localitate */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>Localitate*</ThemedText>
+          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>{t.locationLabel}</ThemedText>
           <TouchableOpacity 
             activeOpacity={0.7} 
             onPress={() => setLocationModalOpen(true)}
@@ -306,22 +431,22 @@ export default function SellScreen() {
 
         {/* Section: Informații de contact */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Informații de contact</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.contactSection}</ThemedText>
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Persoana de contact*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.contactNameLabel}</ThemedText>
             <TextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="Nume și prenume"
+              placeholder={t.contactNamePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={contactName}
               onChangeText={setContactName}
             />
           </View>
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Adresa de email</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.emailLabel}</ThemedText>
             <TextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="ex: exemplu@gmail.com"
+              placeholder={t.emailPlaceholder}
               placeholderTextColor={tokens.colors.muted}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -330,10 +455,10 @@ export default function SellScreen() {
             />
           </View>
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Numărul de telefon</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.phoneLabel}</ThemedText>
             <TextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="ex: 07xxxxxxx"
+              placeholder={t.phonePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               keyboardType="phone-pad"
               value={phone}
@@ -348,7 +473,7 @@ export default function SellScreen() {
             activeOpacity={0.8}
             style={[styles.previewBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
           >            
-            <ThemedText style={[styles.previewText, { color: tokens.colors.primary }]}>Previzualizați anunțul</ThemedText>
+            <ThemedText style={[styles.previewText, { color: tokens.colors.primary }]}>{t.previewButton}</ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.85}
@@ -369,7 +494,7 @@ export default function SellScreen() {
             {submitting ? (
               <ActivityIndicator size="small" color={isDark ? '#ffffff' : tokens.colors.primaryContrast} />
             ) : (
-              <ThemedText style={[styles.publishText, { color: isDark ? '#ffffff' : tokens.colors.primaryContrast }]}>Publică un anunț</ThemedText>
+              <ThemedText style={[styles.publishText, { color: isDark ? '#ffffff' : tokens.colors.primaryContrast }]}>{t.publishButton}</ThemedText>
             )}
           </TouchableOpacity>
         </View>
@@ -379,7 +504,7 @@ export default function SellScreen() {
         <View style={[styles.categoryOverlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.4)' }]}>          
           <View style={[styles.categorySheet, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
             <View style={[styles.categoryHeader, { borderColor: tokens.colors.border }]}>              
-              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege categoria</ThemedText>
+              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{t.chooseCategoryTitle}</ThemedText>
               <TouchableOpacity onPress={() => setCategoryModalOpen(false)} style={styles.closeBtn}>
                 <Ionicons name="close" size={22} color={tokens.colors.text} />
               </TouchableOpacity>
@@ -388,7 +513,7 @@ export default function SellScreen() {
               {CATEGORIES.map(cat => (
                 <TouchableOpacity
                   key={cat.key}
-                  onPress={() => { setCategory(cat.label); setCategoryModalOpen(false); }}
+                  onPress={() => { setCategory(cat.label); setCategoryKey(cat.key); setCategoryModalOpen(false); }}
                   activeOpacity={0.65}
                   style={[styles.categoryRow, { borderColor: tokens.colors.border }]}
                 >
@@ -399,8 +524,10 @@ export default function SellScreen() {
                       <Ionicons name={cat.icon as any} size={22} color={cat.color} />
                     )}
                   </View>
-                  <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>{cat.label}</ThemedText>
-                  {category === cat.label && (
+                  <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>
+                    {(CATEGORY_LABELS as any)[cat.key] ? (locale === 'en' ? (CATEGORY_LABELS as any)[cat.key].en : (CATEGORY_LABELS as any)[cat.key].ro) : cat.label}
+                  </ThemedText>
+                  {categoryKey === cat.key && (
                     <Ionicons name="checkmark" size={18} color={tokens.colors.primary} style={{ marginLeft:'auto' }} />
                   )}
                 </TouchableOpacity>
@@ -427,7 +554,7 @@ export default function SellScreen() {
                 </>
               ) : (
                 <>
-                  <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege localitatea</ThemedText>
+                  <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{t.chooseLocationTitle}</ThemedText>
                   <TouchableOpacity onPress={() => setLocationModalOpen(false)} style={styles.closeBtn}>
                     <Ionicons name="close" size={22} color={tokens.colors.text} />
                   </TouchableOpacity>
@@ -457,12 +584,12 @@ export default function SellScreen() {
                 })()
               ) : (
                 // show counties list
-                ['Toată țara', ...Object.keys(localitatiPeJudet)].map((loc: string) => (
+                [t.allCountry, ...Object.keys(localitatiPeJudet)].map((loc: string) => (
                   <TouchableOpacity
                     key={loc}
                     onPress={() => {
-                      if (loc === 'Toată țara') {
-                        setLocation(loc);
+                      if (loc === t.allCountry || loc === 'Toată țara' || loc === 'Entire country') {
+                        setLocation(t.allCountry);
                         setLocationModalOpen(false);
                         setCountyExpanded(null);
                       } else {

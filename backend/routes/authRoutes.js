@@ -168,10 +168,24 @@ router.get('/google/callback',
               setTimeout(function(){ try{ document.body.removeChild(iframe); }catch(e){} }, 1500);
             }catch(e){}
           }
+          // On Android, try intent:// fallback if custom scheme is blocked
+          function openAndroidIntent(){
+            try {
+              var m = openUrl.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/(.*)$/);
+              if (m) {
+                var scheme = m[1];
+                var rest = m[2];
+                var intentUrl = 'intent://' + rest + '#Intent;scheme=' + scheme + ';end';
+                window.location = intentUrl;
+              }
+            } catch(e) {}
+          }
           try { openApp(); } catch(e) {}
-          setTimeout(function(){ try { openViaIframe(); } catch(e) {} }, 200);
-          // After 1800ms if app didn't open, redirect user to web fallback automatically
-          setTimeout(function(){ window.location = '${webFallback}'; }, 1800);
+          setTimeout(function(){ try { openViaIframe(); } catch(e) {} }, 150);
+          // Try Android intent after 600ms
+          setTimeout(function(){ try { openAndroidIntent(); } catch(e) {} }, 600);
+          // After 3000ms if app didn't open, redirect user to web fallback automatically
+          setTimeout(function(){ window.location = '${webFallback}'; }, 3000);
         })();
       </script>
     </body>

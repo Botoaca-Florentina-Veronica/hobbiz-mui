@@ -77,11 +77,6 @@ export const ChatNotificationProvider: React.FC<{ children: React.ReactNode }> =
       socket.emit('join', String(user.id));
     });
 
-    socket.on('notification', (notif: any) => {
-      // increment unread and optionally refresh list
-      setUnreadCount((prev) => prev + 1);
-    });
-
     socket.on('newMessage', (payload: any) => {
       // payload might contain conversationId and unread delta
       setUnreadCount((prev) => prev + 1);

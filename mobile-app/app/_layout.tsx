@@ -8,7 +8,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
 import { ChatNotificationProvider } from '../src/context/ChatNotificationContext';
-import PushManager from '../src/components/PushManager';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -36,7 +35,6 @@ export default function RootLayout() {
                 <Stack.Screen name="post-success" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
               </Stack>
-              <PushManager />
               <StatusBar style="auto" />
             </NavThemeProvider>
           </SafeAreaProvider>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
@@ -6,6 +6,7 @@ import { Toast } from '../components/ui/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
+import storage from '../src/services/storage';
 import { useRouter } from 'expo-router';
 import { updateEmail, updatePassword, deleteAccount } from '../src/services/auth';
 import { useAuth } from '../src/context/AuthContext';
@@ -29,6 +30,98 @@ export default function SettingsScreen() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
+  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const stored = await storage.getItemAsync('locale');
+        if (mounted && stored) setLocale(stored === 'en' ? 'en' : 'ro');
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const TRANSLATIONS: Record<string, any> = {
+    ro: {
+      title: 'Setări',
+      settings: {
+        'change-password': 'Schimbă parola',
+        'change-email': 'Schimbă email-ul',
+        announcements: 'Anunțuri',
+        notifications: 'Setează notificările',
+        billing: 'Date de facturare',
+        'logout-devices': 'Ieși din cont de pe toate dispozitivele',
+        'delete-account': 'Șterge contul',
+      },
+      allFieldsRequired: 'Toate câmpurile sunt obligatorii',
+      passwordMinLength: 'Parola nouă trebuie să aibă cel puțin 6 caractere',
+      passwordChangedSuccess: 'Parola a fost schimbată cu succes!',
+      cannotChangePassword: 'Nu s-a putut schimba parola',
+      emailInvalid: 'Format email invalid',
+      emailUpdatedSuccess: 'Email-ul a fost actualizat cu succes!',
+      cannotUpdateEmail: 'Nu s-a putut actualiza email-ul',
+      currentPasswordLabel: 'Parola curentă',
+      newPasswordLabel: 'Parola nouă',
+      currentPasswordPlaceholder: 'Introduceți parola curentă',
+      newPasswordPlaceholder: 'Introduceți noua parolă',
+      saving: 'Se salvează...',
+      save: 'Salvează',
+      newEmailLabel: 'Email nou',
+      newEmailPlaceholder: 'Introduceți noul email',
+      confirmPasswordLabel: 'Confirmă parola',
+      confirmPasswordPlaceholder: 'Introduceți parola pentru confirmare',
+      deleteAccountTitle: 'Ștergere cont',
+      deleteAccountMessage: 'Această acțiune este permanentă. Ești sigur(ă) că vrei să-ți ștergi contul și toate anunțurile asociate?',
+      cancel: 'Anulează',
+      delete: 'Șterge',
+      accountDeletedTitle: 'Cont șters',
+      accountDeletedMessage: 'Contul tău a fost șters cu succes.',
+      error: 'Eroare',
+    },
+    en: {
+      title: 'Settings',
+      settings: {
+        'change-password': 'Change password',
+        'change-email': 'Change email',
+        announcements: 'Announcements',
+        notifications: 'Notifications',
+        billing: 'Billing',
+        'logout-devices': 'Log out from all devices',
+        'delete-account': 'Delete account',
+      },
+      allFieldsRequired: 'All fields are required',
+      passwordMinLength: 'New password must be at least 6 characters',
+      passwordChangedSuccess: 'Password changed successfully!',
+      cannotChangePassword: 'Could not change password',
+      emailInvalid: 'Invalid email format',
+      emailUpdatedSuccess: 'Email updated successfully!',
+      cannotUpdateEmail: 'Could not update email',
+      currentPasswordLabel: 'Current password',
+      newPasswordLabel: 'New password',
+      currentPasswordPlaceholder: 'Enter current password',
+      newPasswordPlaceholder: 'Enter new password',
+      saving: 'Saving...',
+      save: 'Save',
+      newEmailLabel: 'New email',
+      newEmailPlaceholder: 'Enter new email',
+      confirmPasswordLabel: 'Confirm password',
+      confirmPasswordPlaceholder: 'Enter password to confirm',
+      deleteAccountTitle: 'Delete account',
+      deleteAccountMessage: 'This action is permanent. Are you sure you want to delete your account and all associated announcements?',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      accountDeletedTitle: 'Account deleted',
+      accountDeletedMessage: 'Your account has been deleted successfully.',
+      error: 'Error',
+    }
+  };
+
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMessage(message);
     setToastType(type);
@@ -37,24 +130,24 @@ export default function SettingsScreen() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
-      showToast('Toate câmpurile sunt obligatorii', 'error');
+      showToast(t.allFieldsRequired, 'error');
       return;
     }
 
     if (newPassword.length < 6) {
-      showToast('Parola nouă trebuie să aibă cel puțin 6 caractere', 'error');
+      showToast(t.passwordMinLength, 'error');
       return;
     }
 
     setIsLoading(true);
     try {
       await updatePassword(currentPassword, newPassword);
-  showToast('Parola a fost schimbată cu succes!', 'success');
+      showToast(t.passwordChangedSuccess, 'success');
       setCurrentPassword('');
       setNewPassword('');
       setExpandedSection(null);
     } catch (error: any) {
-      showToast(error?.message || 'Nu s-a putut schimba parola', 'error');
+      showToast(error?.message || t.cannotChangePassword, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -62,25 +155,25 @@ export default function SettingsScreen() {
 
   const handleChangeEmail = async () => {
     if (!newEmail || !confirmPassword) {
-      showToast('Toate câmpurile sunt obligatorii', 'error');
+      showToast(t.allFieldsRequired, 'error');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
-      showToast('Format email invalid', 'error');
+      showToast(t.emailInvalid, 'error');
       return;
     }
 
     setIsLoading(true);
     try {
       await updateEmail(newEmail, confirmPassword);
-  showToast('Email-ul a fost actualizat cu succes!', 'success');
+      showToast(t.emailUpdatedSuccess, 'success');
       setNewEmail('');
       setConfirmPassword('');
       setExpandedSection(null);
     } catch (error: any) {
-      showToast(error?.message || 'Nu s-a putut actualiza email-ul', 'error');
+      showToast(error?.message || t.cannotUpdateEmail, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -96,28 +189,32 @@ export default function SettingsScreen() {
     { key: 'delete-account', label: 'Șterge contul', icon: 'trash-outline' },
   ];
 
+  const getSettingLabel = (key: string, defaultLabel: string) => {
+    return (t && t.settings && t.settings[key]) ? t.settings[key] : defaultLabel;
+  };
+
   const toggleSection = (key: string) => {
     setExpandedSection(expandedSection === key ? null : key);
   };
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Ștergere cont',
-      'Această acțiune este permanentă. Ești sigur(ă) că vrei să-ți ștergi contul și toate anunțurile asociate?',
+      t.deleteAccountTitle,
+      t.deleteAccountMessage,
       [
-        { text: 'Anulează', style: 'cancel' },
+        { text: t.cancel, style: 'cancel' },
         {
-          text: 'Șterge',
+          text: t.delete,
           style: 'destructive',
           onPress: async () => {
             setIsLoading(true);
             try {
               await deleteAccount();
               await logout();
-              Alert.alert('Cont șters', 'Contul tău a fost șters cu succes.');
+              Alert.alert(t.accountDeletedTitle, t.accountDeletedMessage);
               router.replace('/login');
             } catch (e: any) {
-              Alert.alert('Eroare', e?.message || 'Nu s-a putut șterge contul');
+              Alert.alert(t.error, e?.message || t.error);
             } finally {
               setIsLoading(false);
             }
@@ -139,7 +236,7 @@ export default function SettingsScreen() {
           >
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>Setări</ThemedText>
+          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{t.title}</ThemedText>
         </View>
 
         {/* Settings List */}
@@ -164,7 +261,7 @@ export default function SettingsScreen() {
                   <View style={[styles.iconCircle, { backgroundColor: tokens.colors.elev }]}> 
                     <Ionicons name={item.icon as any} size={20} color={tokens.colors.text} />
                   </View>
-                  <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{item.label}</ThemedText>
+                  <ThemedText style={[styles.rowLabel, { color: tokens.colors.text }]}>{getSettingLabel(item.key, item.label)}</ThemedText>
                 </View>
               </TouchableOpacity>
 
@@ -172,10 +269,10 @@ export default function SettingsScreen() {
               {expandedSection === 'change-password' && item.key === 'change-password' && (
                 <View style={[styles.expandedContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}> 
                   <View style={styles.formGroup}>
-                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Parola curentă</ThemedText>
+                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.currentPasswordLabel}</ThemedText>
                     <TextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-                      placeholder="Introduceți parola curentă"
+                      placeholder={t.currentPasswordPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
                       secureTextEntry
                       value={currentPassword}
@@ -183,10 +280,10 @@ export default function SettingsScreen() {
                     />
                   </View>
                   <View style={styles.formGroup}>
-                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Parola nouă</ThemedText>
+                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.newPasswordLabel}</ThemedText>
                     <TextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-                      placeholder="Introduceți noua parolă"
+                      placeholder={t.newPasswordPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
                       secureTextEntry
                       value={newPassword}
@@ -199,9 +296,7 @@ export default function SettingsScreen() {
                     onPress={handleChangePassword}
                     disabled={isLoading}
                   >
-                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>
-                      {isLoading ? 'Se salvează...' : 'Salvează'}
-                    </ThemedText>
+                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}> {isLoading ? t.saving : t.save}</ThemedText>
                   </TouchableOpacity>
                 </View>
               )}
@@ -210,10 +305,10 @@ export default function SettingsScreen() {
               {expandedSection === 'change-email' && item.key === 'change-email' && (
                 <View style={[styles.expandedContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}> 
                   <View style={styles.formGroup}>
-                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Email nou</ThemedText>
+                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.newEmailLabel}</ThemedText>
                     <TextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-                      placeholder="Introduceți noul email"
+                      placeholder={t.newEmailPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
                       keyboardType="email-address"
                       autoCapitalize="none"
@@ -222,10 +317,10 @@ export default function SettingsScreen() {
                     />
                   </View>
                   <View style={styles.formGroup}>
-                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Confirmă parola</ThemedText>
+                    <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.confirmPasswordLabel}</ThemedText>
                     <TextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-                      placeholder="Introduceți parola pentru confirmare"
+                      placeholder={t.confirmPasswordPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
                       secureTextEntry
                       value={confirmPassword}
@@ -238,9 +333,7 @@ export default function SettingsScreen() {
                     onPress={handleChangeEmail}
                     disabled={isLoading}
                   >
-                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>
-                      {isLoading ? 'Se salvează...' : 'Salvează'}
-                    </ThemedText>
+                    <ThemedText style={[styles.saveButtonText, { color: tokens.colors.primaryContrast }]}>{isLoading ? t.saving : t.save}</ThemedText>
                   </TouchableOpacity>
                 </View>
               )}

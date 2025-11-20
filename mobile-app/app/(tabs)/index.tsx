@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import * as Notifications from 'expo-notifications';
 import { Platform, Dimensions } from 'react-native';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +14,34 @@ import api from '../../src/services/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import storage from '../../src/services/storage';
+
+const TRANSLATIONS = {
+  ro: {
+    mainTitle: 'Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!',
+    ctaText: 'Fă din pasiunea ta o sursă de venit!',
+    popularTitle: 'Anunțuri populare',
+    seeAll: 'Vezi tot',
+    loading: 'Se încarcă...',
+    showAllAnnouncements: 'Afișați toate anunțurile',
+    announcement: 'Anunț',
+    seeDetails: 'Vezi detalii  ›',
+    exploreCategories: 'Explorează categorii',
+    categories: ['Fotografie','Prajituri','Muzica','Reparații','Dans','Curățenie','Gradinarit','Sport','Arta','Tehnologie','Auto','Meditații'],
+  },
+  en: {
+    mainTitle: 'Got a cool hobby and think it is useless? Find people willing to pay for it!',
+    ctaText: 'Turn your passion into a source of income!',
+    popularTitle: 'Popular Announcements',
+    seeAll: 'See all',
+    loading: 'Loading...',
+    showAllAnnouncements: 'Show all announcements',
+    announcement: 'Announcement',
+    seeDetails: 'See details  ›',
+    exploreCategories: 'Explore Categories',
+    categories: ['Photography','Cakes','Music','Repairs','Dance','Cleaning','Gardening','Sport','Art','Technology','Auto','Tutoring'],
+  },
+};
 
 const categories = [
   { description: 'Fotografie', color: '#FF6B6B', image: require('../../assets/images/camera.png') },
@@ -77,6 +104,25 @@ export default function HomeScreen() {
   const [notifCount, setNotifCount] = useState(0);
   const [popular, setPopular] = useState<any[]>([]);
   const [popularLoading, setPopularLoading] = useState(false);
+  const [locale, setLocale] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const s = await storage.getItemAsync('locale');
+        if (!mounted) return;
+        if (s) setLocale(s);
+        else setLocale('ro');
+      } catch (e) {
+        if (!mounted) return;
+        setLocale('ro');
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
   // helper: convert hex #RRGGBB to rgba(r,g,b,a)
   const hexToRgba = useCallback((hex: string, alpha: number) => {
@@ -91,18 +137,7 @@ export default function HomeScreen() {
     }
   }, []);
 
-  // Configure notifications behavior and Android channel once
-  useEffect(() => {
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: false, shouldSetBadge: false })
-    });
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'General',
-        importance: Notifications.AndroidImportance.DEFAULT,
-      }).catch(() => {});
-    }
-  }, []);
+
 
   const loadCount = useCallback(async () => {
     try {
@@ -167,7 +202,7 @@ export default function HomeScreen() {
               const titleSize = isPhone ? Math.round(scale(20)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(24));
               return (
                 <ThemedText style={[styles.mainText, { color: tokens.colors.text, fontSize: titleSize, fontWeight: '800', lineHeight: Math.round(titleSize * 1.05) }]}> 
-                  Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!
+                  {t.mainTitle}
                 </ThemedText>
               );
             })()
@@ -233,7 +268,7 @@ export default function HomeScreen() {
               const ctaSize = isPhone ? Math.round(scale(18)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(22));
               return (
                 <ThemedText style={[styles.ctaText, { color: tokens.colors.text, fontSize: ctaSize, fontWeight: '800', lineHeight: Math.round(ctaSize * 1.05) }]}> 
-                  Fă din pasiunea ta o sursă de venit!
+                  {t.ctaText}
                 </ThemedText>
               );
             })()}
@@ -243,13 +278,13 @@ export default function HomeScreen() {
   {/* Popular announcements */}
   <View style={[styles.popularSection, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <ThemedText style={[styles.popularTitle, { color: tokens.colors.text }]}>Anunțuri populare</ThemedText>
+            <ThemedText style={[styles.popularTitle, { color: tokens.colors.text }]}>{t.popularTitle}</ThemedText>
             <TouchableOpacity onPress={() => router.push('/announcement-details?sort=popular') }>
-              <Text style={{ color: tokens.colors.primary }}>Vezi tot</Text>
+              <Text style={{ color: tokens.colors.primary }}>{t.seeAll}</Text>
             </TouchableOpacity>
           </View>
           {popularLoading ? (
-            <Text style={{ color: tokens.colors.muted }}>Se încarcă...</Text>
+            <Text style={{ color: tokens.colors.muted }}>{t.loading}</Text>
           ) : (
             (() => {
               const cols = screenWidth && screenWidth < 360 ? 1 : 2;
@@ -308,7 +343,7 @@ export default function HomeScreen() {
                       return (
                         <View style={itemStyle}>
                           <View style={styles.placeholderBox}>
-                            <Text style={[styles.placeholderText, { color: tokens.colors.primary }]}>Afișați toate anunțurile</Text>
+                            <Text style={[styles.placeholderText, { color: tokens.colors.primary }]}>{t.showAllAnnouncements}</Text>
                           </View>
                         </View>
                       );
@@ -325,7 +360,7 @@ export default function HomeScreen() {
                         </View>
 
                         <Text numberOfLines={2} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}> 
-                          {item.title || item.description || 'Anunț'}
+                          {item.title || item.description || t.announcement}
                         </Text>
 
                         <View style={styles.popularMetaRow}>
@@ -368,7 +403,7 @@ export default function HomeScreen() {
                             { backgroundColor: isDark ? '#f51866' : DESIGN_BLUE },
                           ]}
                         >
-                          <Text style={[styles.detailsButtonText]}>Vezi detalii  ›</Text>
+                          <Text style={[styles.detailsButtonText]}>{t.seeDetails}</Text>
                         </TouchableOpacity>
                       </TouchableOpacity>
                     );
@@ -381,7 +416,7 @@ export default function HomeScreen() {
 
   <View style={[styles.categoriesSection, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}>
           <ThemedText style={[styles.categoriesTitle, { color: tokens.colors.text }]}>
-            Explorează categorii
+            {t.exploreCategories}
           </ThemedText>
           {(() => {
             const minCardWidth = 140;
@@ -454,7 +489,7 @@ export default function HomeScreen() {
                       />
                     </View>
                     <ThemedText style={[styles.categoryLabel, { color: tokens.colors.muted }]}>
-                      {category.description}
+                      {t && (t.categories && t.categories[index]) ? t.categories[index] : category.description}
                     </ThemedText>
                   </TouchableOpacity>
                 ))}

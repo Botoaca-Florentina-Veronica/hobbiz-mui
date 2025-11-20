@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Linking } from 'react-native';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useRouter } from 'expo-router';
+import storage from '../src/services/storage';
 
 interface LegalLink {
   label: string;
@@ -13,21 +14,39 @@ interface LegalSection {
   links: LegalLink[];
 }
 
-const legalSections: LegalSection[] = [
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Termeni și condiții', url: '/termeni' },
-      { label: 'Politică de Confidențialitate', url: '/confidentialitate' },
-      { label: 'Cookie Policy', url: '/cookie' },
-    ],
-  },
-];
+// Move labels into the component so they can depend on locale
 
 export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: boolean }) {
   const { tokens } = useAppTheme();
   const { width } = useWindowDimensions();
   const router = useRouter();
+  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const s = await storage.getItemAsync('locale');
+        if (!mounted) return;
+        setLocale(s === 'en' ? 'en' : 'ro');
+      } catch (e) {
+        if (!mounted) return;
+        setLocale('ro');
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const legalSections: LegalSection[] = [
+    {
+      title: locale === 'en' ? 'Legal' : 'Legal',
+      links: [
+        { label: locale === 'en' ? 'Terms and Conditions' : 'Termeni și condiții', url: '/termeni' },
+        { label: locale === 'en' ? 'Privacy Policy' : 'Politică de Confidențialitate', url: '/confidentialitate' },
+        { label: locale === 'en' ? 'Cookie Policy' : 'Cookie Policy', url: '/cookie' },
+      ],
+    },
+  ];
 
   // Breakpoint pentru tablete și dispozitive mari (similar cu media query 900px)
   const isTabletOrLarger = width >= 768;
