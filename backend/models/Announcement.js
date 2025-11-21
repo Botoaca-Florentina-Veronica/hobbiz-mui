@@ -13,6 +13,8 @@ const announcementSchema = new mongoose.Schema({
   favoritesCount: { type: Number, default: 0 },
   // Track number of views for displaying in announcement footer
   views: { type: Number, default: 0 },
+  // Track if announcement is archived (hidden from main listings)
+  archived: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

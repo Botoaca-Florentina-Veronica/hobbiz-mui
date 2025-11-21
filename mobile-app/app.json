@@ -25,7 +25,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.verabotoaca.hobbiz"
+      "package": "com.verabotoaca.hobbiz",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "output": "static",

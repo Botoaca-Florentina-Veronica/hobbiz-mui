@@ -9,6 +9,7 @@ import { useTabBar } from '../../src/context/TabBarContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
+import { useRouter } from 'expo-router';
 
 // Static icon config; labels will be provided via translations below
 const TAB_CONFIG: Record<string, { icon: string; label?: string; special?: boolean }> = {
@@ -35,6 +36,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { unreadCount } = useChatNotifications();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
+  const router = useRouter();
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
   const activeColor = isDark ? tokens.colors.primary : '#355070';
   const inactiveColor = tokens.colors.muted;
@@ -82,9 +84,14 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
           const base = TAB_CONFIG[route.name] || { icon: 'ellipse' };
           const config = { ...base, label: (TAB_LABELS as any)[route.name]?.[locale] ?? route.name } as any;
           const onPress = () => {
-            // Dacă nu e autentificat și nu este tab-ul Explorează (index), redirecționează la login
+            // Dacă nu e autentificat și nu este tab-ul Explorează (index), redirecționează la login (folosim router.push pentru ruta absolută)
             if (!loading && !isAuthenticated && route.name !== 'index') {
-              navigation.navigate('login' as any);
+              try {
+                router.push('/login');
+              } catch (e) {
+                // fallback la navigation în caz că router nu funcționează (rare)
+                navigation.navigate('login' as any);
+              }
               return;
             }
             const event = navigation.emit({

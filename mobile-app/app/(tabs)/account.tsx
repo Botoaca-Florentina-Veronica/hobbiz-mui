@@ -338,7 +338,6 @@ export default function AccountScreen() {
                 <Ionicons name="close" size={20} color={tokens.colors.muted} />
               </TouchableOpacity>
               <ThemedText style={[styles.modalTitle, { color: tokens.colors.text }]}>{t.selectLanguage}</ThemedText>
-              <ThemedText style={[styles.modalMessage, { color: tokens.colors.muted }]}>{t.selectLanguageMessage}</ThemedText>
                 <View style={{ marginTop: 8 }}>
                   <TouchableOpacity
                     style={[styles.modalBtn, { marginBottom: 8 }]}

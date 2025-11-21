@@ -63,7 +63,7 @@ export default function MyAnnouncementsScreen() {
   // Confirm dialog state for delete
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [announcementToDelete, setAnnouncementToDelete] = useState<string | null>(null);
-  // Confirm dialog state for hide (ascunde)
+  // Confirm dialog state for archive
   const [hideDialogVisible, setHideDialogVisible] = useState(false);
   const [announcementToHide, setAnnouncementToHide] = useState<string | null>(null);
 
@@ -192,9 +192,21 @@ export default function MyAnnouncementsScreen() {
   };
 
   const confirmHide = async () => {
-    // For now, the user choice doesn't perform any action (per spec)
-    setHideDialogVisible(false);
-    setAnnouncementToHide(null);
+    if (!announcementToHide) return;
+
+    try {
+      await api.put(`/api/users/my-announcements/${announcementToHide}/archive`);
+      // Remove from the current list since it's now archived
+      setAnnouncements(announcements.filter((a) => a._id !== announcementToHide));
+      setHideDialogVisible(false);
+      setAnnouncementToHide(null);
+      showToast('Anunțul a fost arhivat cu succes', 'success');
+    } catch (e) {
+      console.error('Archive error:', e);
+      setHideDialogVisible(false);
+      setAnnouncementToHide(null);
+      showToast('Nu s-a putut arhiva anunțul. Încearcă din nou', 'error');
+    }
   };
 
   const cancelHide = () => {
@@ -270,7 +282,7 @@ export default function MyAnnouncementsScreen() {
                 ]}
                 onPress={() => setActivePickerType(activePickerType === 'category' ? null : 'category')}
               >
-                <Ionicons name="apps-outline" size={16} color={activePickerType === 'category' ? '#fff' : '#355070'} />
+                <Ionicons name="apps-outline" size={16} color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
                 <Text style={[
                   styles.filterButtonText,
                   activePickerType === 'category' && styles.filterButtonTextActive,
@@ -280,7 +292,7 @@ export default function MyAnnouncementsScreen() {
                 <Ionicons 
                   name={activePickerType === 'category' ? 'chevron-up' : 'chevron-down'} 
                   size={16} 
-                  color={activePickerType === 'category' ? '#fff' : '#355070'} 
+                  color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} 
                 />
               </TouchableOpacity>
 
@@ -293,7 +305,7 @@ export default function MyAnnouncementsScreen() {
                 ]}
                 onPress={() => setActivePickerType(activePickerType === 'sort' ? null : 'sort')}
               >
-                <Ionicons name="swap-vertical" size={16} color={activePickerType === 'sort' ? '#fff' : '#355070'} />
+                <Ionicons name="swap-vertical" size={16} color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
                 <Text style={[
                   styles.filterButtonText,
                   activePickerType === 'sort' && styles.filterButtonTextActive,
@@ -303,7 +315,7 @@ export default function MyAnnouncementsScreen() {
                 <Ionicons 
                   name={activePickerType === 'sort' ? 'chevron-up' : 'chevron-down'} 
                   size={16} 
-                  color={activePickerType === 'sort' ? '#fff' : '#355070'} 
+                  color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} 
                 />
               </TouchableOpacity>
 
@@ -451,7 +463,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Ascunde</Text>
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Arhivează</Text>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -488,7 +500,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.secondaryButton, styles.compactButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Ascunde</Text>
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Arhivează</Text>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -520,14 +532,14 @@ export default function MyAnnouncementsScreen() {
         )}
       </ScrollView>
 
-      {/* Hide confirmation dialog */}
+      {/* Archive confirmation dialog */}
       <ConfirmDialog
         visible={hideDialogVisible}
-        title="Ascunde anunț"
-        message={"Ești sigur că vrei să ascunzi anunțul din profilul tău? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunturi arhivate'."}
+        title="Arhivează anunț"
+        message={"Ești sigur că vrei să arhivezi acest anunț? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunțuri arhivate'."}
         confirmText="Da"
         cancelText="Nu"
-        icon="eye-off-outline"
+        icon="archive-outline"
         onConfirm={confirmHide}
         onCancel={cancelHide}
       />

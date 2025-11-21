@@ -454,11 +454,11 @@ const addAnnouncement = async (req, res) => {
   }
 };
 
-// Returnează toate anunțurile utilizatorului autentificat
+// Returnează toate anunțurile utilizatorului autentificat (exclude cele arhivate implicit)
 const getMyAnnouncements = async (req, res) => {
   try {
     const userId = req.userId;
-    const announcements = await Announcement.find({ user: userId }).sort({ createdAt: -1 });
+    const announcements = await Announcement.find({ user: userId, archived: { $ne: true } }).sort({ createdAt: -1 });
     res.json(announcements);
   } catch (error) {
     console.error('Eroare la listare anunțuri:', error);
@@ -482,12 +482,12 @@ const getMyAnnouncementById = async (req, res) => {
   }
 };
 
-// Returnează anunțurile publice pentru un utilizator specific (vizualizare publică)
+// Returnează anunțurile publice pentru un utilizator specific (vizualizare publică) - exclude arhivate
 const getUserAnnouncementsPublic = async (req, res) => {
   try {
     const { userId } = req.params;
     if (!userId) return res.status(400).json({ error: 'Lipsește userId' });
-    const announcements = await Announcement.find({ user: userId }).sort({ createdAt: -1 });
+    const announcements = await Announcement.find({ user: userId, archived: { $ne: true } }).sort({ createdAt: -1 });
     res.json(announcements);
   } catch (error) {
     console.error('Eroare la listare anunțuri publice:', error);
@@ -604,6 +604,54 @@ const updateProfile = async (req, res) => {
   }
 };
 
+// Arhivează un anunț (setează archived = true)
+const archiveAnnouncement = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const announcementId = req.params.id;
+    const announcement = await Announcement.findOne({ _id: announcementId, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit sau nu îți aparține.' });
+    }
+    announcement.archived = true;
+    await announcement.save();
+    res.json({ message: 'Anunț arhivat cu succes!', announcement });
+  } catch (error) {
+    console.error('Eroare la arhivarea anunțului:', error);
+    res.status(500).json({ error: 'Eroare server la arhivarea anunțului' });
+  }
+};
+
+// Returnează anunțurile arhivate ale utilizatorului
+const getArchivedAnnouncements = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const announcements = await Announcement.find({ user: userId, archived: true }).sort({ createdAt: -1 });
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la listare anunțuri arhivate:', error);
+    res.status(500).json({ error: 'Eroare server la listare anunțuri arhivate' });
+  }
+};
+
+// Dezarhivează un anunț (setează archived = false)
+const unarchiveAnnouncement = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const announcementId = req.params.id;
+    const announcement = await Announcement.findOne({ _id: announcementId, user: userId });
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit sau nu îți aparține.' });
+    }
+    announcement.archived = false;
+    await announcement.save();
+    res.json({ message: 'Anunț dezarhivat cu succes!', announcement });
+  } catch (error) {
+    console.error('Eroare la dezarhivarea anunțului:', error);
+    res.status(500).json({ error: 'Eroare server la dezarhivarea anunțului' });
+  }
+};
+
 module.exports = {
   deleteAccount,
   register,
@@ -621,5 +669,8 @@ module.exports = {
   uploadAvatar,
   uploadCover,
   deleteAvatar,
-  deleteCover
+  deleteCover,
+  archiveAnnouncement,
+  getArchivedAnnouncements,
+  unarchiveAnnouncement
 };

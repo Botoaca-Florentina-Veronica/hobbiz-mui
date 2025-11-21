@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
-const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, uploadCover, deleteAvatar, deleteCover } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
 router.delete('/avatar', auth, deleteAvatar);
@@ -24,6 +24,11 @@ router.put('/update-email', auth, updateEmail); // Noua rută pentru actualizare
 router.put('/update-password', auth, updatePassword); // Rută pentru schimbarea parolei
 router.post('/my-announcements', auth, upload.array('images', 10), addAnnouncement);
 router.get('/my-announcements', auth, getMyAnnouncements);
+// IMPORTANT: Rutele cu path-uri specifice trebuie să fie ÎNAINTE de rutele cu parametri dinamici (:id)
+router.get('/my-announcements/archived', auth, getArchivedAnnouncements);
+router.put('/my-announcements/:id/archive', auth, archiveAnnouncement);
+router.put('/my-announcements/:id/unarchive', auth, unarchiveAnnouncement);
+// Rutele cu :id dinamice vin la final
 router.get('/my-announcements/:id', auth, getMyAnnouncementById);
 router.delete('/my-announcements/:id', auth, deleteAnnouncement);
 router.put('/my-announcements/:id', auth, upload.array('images', 10), updateAnnouncement);

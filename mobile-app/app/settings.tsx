@@ -39,7 +39,7 @@ export default function SettingsScreen() {
       settings: {
         'change-password': 'Schimbă parola',
         'change-email': 'Schimbă email-ul',
-        announcements: 'Anunțuri',
+        'archived-announcements': 'Anunțuri arhivate',
         notifications: 'Setează notificările',
         billing: 'Date de facturare',
         'logout-devices': 'Ieși din cont de pe toate dispozitivele',
@@ -75,7 +75,7 @@ export default function SettingsScreen() {
       settings: {
         'change-password': 'Change password',
         'change-email': 'Change email',
-        announcements: 'Announcements',
+        'archived-announcements': 'Archived announcements',
         notifications: 'Notifications',
         billing: 'Billing',
         'logout-devices': 'Log out from all devices',
@@ -170,7 +170,7 @@ export default function SettingsScreen() {
   const settings: SettingRow[] = [
     { key: 'change-password', label: 'Schimbă parola', icon: 'key-outline', expandable: true },
     { key: 'change-email', label: 'Schimbă email-ul', icon: 'mail-outline', expandable: true },
-    { key: 'announcements', label: 'Anunțuri', icon: 'megaphone-outline' },
+    { key: 'archived-announcements', label: 'Anunțuri arhivate', icon: 'archive-outline' },
     { key: 'notifications', label: 'Setează notificările', icon: 'notifications-outline' },
     { key: 'billing', label: 'Date de facturare', icon: 'document-text-outline' },
     { key: 'logout-devices', label: 'Ieși din cont de pe toate dispozitivele', icon: 'phone-portrait-outline' },
@@ -241,6 +241,7 @@ export default function SettingsScreen() {
                 onPress={() => {
                   if (item.expandable) return toggleSection(item.key);
                   if (item.key === 'delete-account') return handleDeleteAccount();
+                  if (item.key === 'archived-announcements') return router.push('/archived-announcements');
                   // Aici poți adăuga alte acțiuni simple non-expandable
                   return null;
                 }}
