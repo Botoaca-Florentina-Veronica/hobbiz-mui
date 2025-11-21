@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../../src/services/storage';
+import { useLocale } from '../../src/context/LocaleContext';
 
 const TRANSLATIONS = {
   ro: {
@@ -104,23 +105,7 @@ export default function HomeScreen() {
   const [notifCount, setNotifCount] = useState(0);
   const [popular, setPopular] = useState<any[]>([]);
   const [popularLoading, setPopularLoading] = useState(false);
-  const [locale, setLocale] = useState<string | null>(null);
-
-  React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        if (!mounted) return;
-        if (s) setLocale(s);
-        else setLocale('ro');
-      } catch (e) {
-        if (!mounted) return;
-        setLocale('ro');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 

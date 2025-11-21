@@ -7,6 +7,7 @@ import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
+import { useLocale } from '../../src/context/LocaleContext';
 
 // App palette per user request
 const WEB_PRIMARY = '#100e9aff';
@@ -20,20 +21,7 @@ export default function TermsScreen() {
   const { tokens, isDark } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-
-  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const stored = await storage.getItemAsync('locale');
-        if (mounted && stored) setLocale(stored === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const isDarkMode = isDark;
   const surface = isDarkMode ? '#1e1e1e' : tokens.colors.surface;

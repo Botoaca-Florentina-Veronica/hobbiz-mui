@@ -794,6 +794,135 @@
   box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
 }
 
+/* Location Popover - Dark Mode Enhanced */
+.dark-mode #location-popover.MuiPopover-root .MuiPaper-root {
+  background: #282828 !important;
+  border: 1px solid #575757 !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+}
+
+/* Backdrop blur pentru location popover */
+.dark-mode #location-popover .MuiBackdrop-root {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+#location-popover .MuiBackdrop-root {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode #location-popover .MuiBox-root {
+  background: #282828 !important;
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiTypography-root {
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiDivider-root {
+  border-color: #575757 !important;
+}
+
+.dark-mode #location-popover .MuiListItemButton-root {
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiListItemButton-root:hover {
+  background: rgba(254, 101, 133, 0.12) !important;
+}
+
+.dark-mode #location-popover .MuiListItemText-primary {
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root {
+  background: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-notchedOutline {
+  border-color: #575757 !important;
+}
+
+.dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #fe6585 !important;
+}
+
+.dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #fe6585 !important;
+}
+
+.dark-mode #location-popover .MuiInputBase-input {
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiInputBase-input::placeholder {
+  color: #8b8b8b !important;
+  opacity: 1 !important;
+}
+
+.dark-mode #location-popover .MuiInputAdornment-root svg {
+  color: #fe6585 !important;
+}
+
+.dark-mode #location-popover .MuiIconButton-root {
+  color: #fe6585 !important;
+}
+
+.dark-mode #location-popover .MuiIconButton-root:hover {
+  background: rgba(254, 101, 133, 0.12) !important;
+}
+
+.dark-mode #location-popover .MuiChip-root {
+  background: #f51866 !important;
+  color: #ffffff !important;
+  border-color: #f51866 !important;
+}
+
+.dark-mode #location-popover .MuiChip-root:hover {
+  background: #fe6585 !important;
+}
+
+/* Scrollbar pentru popover location în dark mode */
+.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb {
+  background: #575757;
+  border-radius: 3px;
+}
+
+.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover {
+  background: #fe6585;
+}
+
+/* Scrollbar light mode */
+#location-popover .MuiBox-root::-webkit-scrollbar {
+  width: 6px;
+}
+
+#location-popover .MuiBox-root::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+#location-popover .MuiBox-root::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 3px;
+}
+
+#location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover {
+  background: #f51866;
+}
+
 /* Also ensure mobile list drawer uses same paper background */
 .dark-mode .categories-list-mobile,
 .dark-mode .categories-grid-popover {

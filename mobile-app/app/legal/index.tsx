@@ -7,27 +7,13 @@ import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
+import { useLocale } from '../../src/context/LocaleContext';
 
 export default function LegalMenu() {
   const { tokens } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-
-  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        if (!mounted) return;
-        setLocale(s === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        if (!mounted) return;
-        setLocale('ro');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const items = [
     { key: 'terms', label: locale === 'en' ? 'Terms and Conditions' : 'Termeni și condiții', route: '/legal/terms', icon: 'document-text-outline' },

@@ -1,0 +1,242 @@
+/* LocationSelector.css */
+
+.location-selector-dialog .MuiBackdrop-root {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.location-selector-dialog .MuiDialog-paper {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.location-selector-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  padding: 24px 24px 16px;
+  background: linear-gradient(135deg, #f51866 0%, #fe6585 100%);
+  color: #ffffff !important;
+  border-radius: 16px 16px 0 0;
+}
+
+.location-selector-title * {
+  color: #ffffff !important;
+}
+
+.location-selector-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.location-selector-content {
+  padding: 24px 24px 20px;
+  background: #fafafa;
+}
+
+.location-selector-actions {
+  padding: 16px 24px;
+  background: #f5f5f5;
+  border-radius: 0 0 16px 16px;
+  gap: 12px;
+}
+
+.location-type {
+  color: #666;
+  font-size: 0.85em;
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+/* Enhanced select styling */
+.location-selector-content .MuiFormControl-root {
+  background: white;
+  border-radius: 8px;
+}
+
+.location-selector-content .MuiOutlinedInput-root {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.location-selector-content .MuiOutlinedInput-root:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.location-selector-content .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 4px 12px rgba(245, 24, 102, 0.15);
+}
+
+.location-selector-content .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #fe6585;
+}
+
+/* Dark mode support */
+body.dark-mode .location-selector-dialog .MuiBackdrop-root {
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+body.dark-mode .location-selector-dialog .MuiDialog-paper {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .location-selector-title {
+  background: linear-gradient(135deg, #f51866 0%, #fe6585 100%);
+  color: white;
+}
+
+body.dark-mode .location-selector-content {
+  background: #282828;
+}
+
+body.dark-mode .location-selector-actions {
+  background: #252525;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .location-type {
+  color: #aaa;
+}
+
+body.dark-mode .location-selector-content .MuiFormControl-root {
+  background: #1e1e1e;
+}
+
+body.dark-mode .location-selector-content .MuiOutlinedInput-root {
+  background: #282828;
+}
+
+body.dark-mode .location-selector-content .MuiOutlinedInput-root:hover {
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .location-selector-content .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 4px 12px rgba(254, 101, 133, 0.25);
+}
+
+body.dark-mode .location-selector-content .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #fe6585;
+}
+
+body.dark-mode .location-selector-content .MuiInputLabel-root {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark-mode .location-selector-content .MuiInputLabel-root.Mui-focused {
+  color: #fe6585;
+}
+
+body.dark-mode .location-selector-content .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .location-selector-content .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+body.dark-mode .location-selector-content .MuiSelect-select {
+  color: white;
+}
+
+body.dark-mode .location-selector-content .MuiSelect-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Dropdown menu dark mode */
+body.dark-mode .MuiPaper-root.MuiMenu-paper {
+  background: #2d2d2d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .MuiMenuItem-root {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .MuiMenuItem-root:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .MuiMenuItem-root.Mui-selected {
+  background: rgba(254, 101, 133, 0.16);
+}
+
+body.dark-mode .MuiMenuItem-root.Mui-selected:hover {
+  background: rgba(254, 101, 133, 0.24);
+}
+
+/* Typography dark mode */
+body.dark-mode .MuiTypography-root {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+body.dark-mode .MuiTypography-colorTextSecondary {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Button styling */
+.location-selector-actions .MuiButton-root {
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 500;
+  text-transform: none;
+  font-size: 0.95rem;
+}
+
+body.dark-mode .location-selector-actions .MuiButton-root {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+body.dark-mode .location-selector-actions .MuiButton-contained {
+  background: #f51866;
+  color: white;
+}
+
+body.dark-mode .location-selector-actions .MuiButton-contained:hover {
+  background: #fe6585;
+}
+
+body.dark-mode .location-selector-actions .MuiButton-root:disabled {
+  color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Light mode button */
+.location-selector-actions .MuiButton-contained {
+  background: #f51866;
+  color: white;
+}
+
+.location-selector-actions .MuiButton-contained:hover {
+  background: #fe6585;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .location-selector-dialog .MuiDialog-paper {
+    margin: 16px;
+    max-width: calc(100% - 32px);
+  }
+
+  .location-selector-title {
+    padding: 20px 16px 12px;
+    font-size: 1.25rem;
+  }
+
+  .location-selector-content {
+    padding: 20px 16px 16px;
+  }
+
+  .location-selector-actions {
+    padding: 12px 16px;
+    flex-direction: row;
+  }
+
+  .location-selector-actions .MuiButton-root {
+    flex: 1;
+    min-width: auto;
+  }
+}
+

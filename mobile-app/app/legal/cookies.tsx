@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import storage from '@/src/services/storage';
+import { useLocale } from '@/src/context/LocaleContext';
 
 const TRANSLATIONS = {
   ro: {
@@ -156,25 +157,9 @@ export default function CookiesScreen() {
   const { tokens, isDark } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [locale, setLocale] = React.useState<string | null>(null);
+  const { locale } = useLocale();
   const scrollRef = useRef<any>(null);
   const scrollAnim = useRef(new Animated.Value(0)).current;
-
-  React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        if (!mounted) return;
-        if (s) setLocale(s);
-        else setLocale('ro');
-      } catch (e) {
-        if (!mounted) return;
-        setLocale('ro');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 

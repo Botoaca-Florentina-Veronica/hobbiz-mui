@@ -4,6 +4,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import CustomTabBar from '@/components/navigation/CustomTabBar';
 import { TabBarProvider } from '@/src/context/TabBarContext';
 import storage from '@/src/services/storage';
+import { useLocale } from '@/src/context/LocaleContext';
 
 const TAB_TITLES: Record<string, { ro: string; en: string }> = {
   index: { ro: 'Explorează', en: 'Explore' },
@@ -15,18 +16,7 @@ const TAB_TITLES: Record<string, { ro: string; en: string }> = {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const [locale, setLocale] = useState<string>('ro');
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        setLocale(s === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        setLocale('ro');
-      }
-    })();
-  }, []);
+  const { locale } = useLocale();
 
   return (
     <TabBarProvider>

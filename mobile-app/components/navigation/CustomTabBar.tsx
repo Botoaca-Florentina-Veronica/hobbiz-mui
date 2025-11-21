@@ -8,6 +8,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useTabBar } from '../../src/context/TabBarContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import storage from '../../src/services/storage';
+import { useLocale } from '../../src/context/LocaleContext';
 
 // Static icon config; labels will be provided via translations below
 const TAB_CONFIG: Record<string, { icon: string; label?: string; special?: boolean }> = {
@@ -33,18 +34,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { hidden } = useTabBar();
   const { unreadCount } = useChatNotifications();
   const insets = useSafeAreaInsets();
-  const [locale, setLocale] = useState<string>('ro');
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        setLocale(s === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        setLocale('ro');
-      }
-    })();
-  }, []);
+  const { locale } = useLocale();
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
   const activeColor = isDark ? tokens.colors.primary : '#355070';
   const inactiveColor = tokens.colors.muted;

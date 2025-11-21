@@ -8,6 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
 import { ChatNotificationProvider } from '../src/context/ChatNotificationContext';
+import { LocaleProvider } from '../src/context/LocaleContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -18,10 +19,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <ChatNotificationProvider>
-          <SafeAreaProvider>
-            <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <LocaleProvider>
+        <AuthProvider>
+          <ChatNotificationProvider>
+            <SafeAreaProvider>
+              <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="login" options={{ headerShown: false }} />
@@ -40,6 +42,7 @@ export default function RootLayout() {
           </SafeAreaProvider>
         </ChatNotificationProvider>
       </AuthProvider>
+      </LocaleProvider>
     </ThemeProvider>
   );
 }

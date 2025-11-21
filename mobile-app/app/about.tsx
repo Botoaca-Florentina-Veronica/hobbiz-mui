@@ -7,6 +7,7 @@ import { useAppTheme } from '../src/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import storage from '../src/services/storage';
+import { useLocale } from '../src/context/LocaleContext';
 
 interface FAQ { question: string; answer: string; }
 const TRANSLATIONS: Record<string, any> = {
@@ -127,21 +128,7 @@ export default function AboutScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [open, setOpen] = useState<number | null>(null);
-  const [locale, setLocale] = useState<string | null>(null);
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        if (!mounted) return;
-        setLocale(s || 'ro');
-      } catch (e) {
-        if (!mounted) return;
-        setLocale('ro');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
   const t = TRANSLATIONS[locale || 'ro'];
   const { width } = useWindowDimensions();
   // Use a conservative breakpoint: >=350dp -> 2 coloane, altfel 1 coloană

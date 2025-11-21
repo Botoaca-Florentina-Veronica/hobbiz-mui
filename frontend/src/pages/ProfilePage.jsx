@@ -33,6 +33,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import apiClient from '../api/api';
 import ImageCropModal from '../components/ImageCropModal';
+import LocationSelector from '../components/LocationSelector';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -73,6 +74,7 @@ export default function ProfilePage() {
   // UI preferences
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
   
   // Refs
   const fileInputRef = useRef(null);
@@ -154,6 +156,26 @@ export default function ProfilePage() {
     setEditMode(true);
     setError('');
     setSuccess('');
+  };
+
+  const handleLocationEdit = () => {
+    setLocationModalOpen(true);
+  };
+
+  const handleLocationSave = async (newLocation) => {
+    try {
+      setSaving(true);
+      setError('');
+      await apiClient.put('/api/users/profile', { localitate: newLocation });
+      setProfile({ ...profile, localitate: newLocation });
+      setLocationModalOpen(false);
+      setSuccess('Locația a fost actualizată cu succes!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (e) {
+      setError('Eroare la salvarea locației');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -441,7 +463,7 @@ export default function ProfilePage() {
     <div className="profile-location-card">
       <div className="profile-location-header">
         <h2 className="profile-info-main-title">Locația mea</h2>
-        <button className="profile-edit-button" onClick={handleEdit}>
+        <button className="profile-edit-button" onClick={handleLocationEdit}>
           Schimbă locația
         </button>
       </div>
@@ -699,6 +721,15 @@ export default function ProfilePage() {
         onSave={handleCoverSave}
         onDelete={handleCoverDelete}
         uploading={coverUploading}
+      />
+
+      {/* Location Selector Modal */}
+      <LocationSelector
+        open={locationModalOpen}
+        onClose={() => setLocationModalOpen(false)}
+        currentLocation={profile?.localitate}
+        onSave={handleLocationSave}
+        saving={saving}
       />
     </div>
   );

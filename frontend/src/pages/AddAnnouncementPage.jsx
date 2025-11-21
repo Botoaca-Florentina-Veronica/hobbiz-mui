@@ -802,14 +802,14 @@ export default function AddAnnouncementPage() {
                 backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
                 color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
                 border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
-                borderRadius: 12,
+                borderRadius: 10,
                 boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
                 p: 1,
                 overflow: 'hidden'
               }
             }}
           >
-            <Box sx={{ maxHeight: 480, overflowY: 'auto', borderRadius: 10, backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white', color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit' }}>
+            <Box sx={{ maxHeight: 480, overflowY: 'auto', borderRadius: '8px', backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white', color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit', pr: 1.5 }}>
               {!selectedJudet ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>

@@ -11,6 +11,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import api from '../../src/services/api';
 import { localitatiPeJudet } from '../../assets/comunePeJudet';
 import storage from '../../src/services/storage';
+import { useLocale } from '../../src/context/LocaleContext';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
@@ -57,6 +58,10 @@ const TRANSLATIONS = {
     categoryPlaceholder: 'Alege categoria',
     imagesSection: 'Imagini',
     imagesHelper: 'Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.',
+    duplicateImageTitle: 'Imagine duplicată',
+    duplicateImageMessage: 'Această fotografie este deja adăugată. Te rugăm să alegi o altă imagine.',
+    duplicateImageDismiss: 'Am înțeles',
+    coverBadge: 'Copertă',
     addImages: 'Adaugă imagini',
     descriptionLabel: 'Descriere*',
     descriptionPlaceholder: 'Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț',
@@ -95,6 +100,10 @@ const TRANSLATIONS = {
     categoryPlaceholder: 'Choose category',
     imagesSection: 'Images',
     imagesHelper: 'You can add multiple images. The first one will be the main image of your announcement.',
+    duplicateImageTitle: 'Duplicate image',
+    duplicateImageMessage: 'This photo is already added. Please choose a different one.',
+    duplicateImageDismiss: 'Got it',
+    coverBadge: 'Cover',
     addImages: 'Add images',
     descriptionLabel: 'Description*',
     descriptionPlaceholder: 'Try to write what you would like to know if you were looking at this announcement',
@@ -145,7 +154,7 @@ export default function SellScreen() {
   const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [locale, setLocale] = useState<string | null>(null);
+  const { locale } = useLocale();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<string | null>(null);
   const [categoryKey, setCategoryKey] = useState<string | null>(null);
@@ -159,20 +168,8 @@ export default function SellScreen() {
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [countyExpanded, setCountyExpanded] = useState<string | null>(null);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const { isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    const loadLocale = async () => {
-      try {
-        const storedLocale = await storage.getItemAsync('locale');
-        if (storedLocale) setLocale(storedLocale);
-        else setLocale('ro');
-      } catch (error) {
-        console.error('Failed to load locale:', error);
-      }
-    };
-    loadLocale();
-  }, []);
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
@@ -226,8 +223,39 @@ export default function SellScreen() {
         return;
       }
 
-      const newImages = jpgAssets.map((a: any, idx: number) => ({ id: Date.now().toString() + '_' + idx, uri: a.uri }));
-      setImages(prev => [...prev, ...newImages]);
+      let duplicatesFound = false;
+      const timestampBase = Date.now();
+
+      setImages(prev => {
+        const existingUris = new Set<string>();
+        prev.forEach(item => {
+          if (item.uri) existingUris.add(item.uri);
+        });
+
+        const batchUris = new Set<string>();
+        const additions: ImageItem[] = [];
+
+        jpgAssets.forEach((asset: any, idx: number) => {
+          const uri = asset.uri;
+          if (!uri) return;
+          if (existingUris.has(uri) || batchUris.has(uri)) {
+            duplicatesFound = true;
+            return;
+          }
+          batchUris.add(uri);
+          additions.push({ id: `${timestampBase}_${idx}`, uri });
+        });
+
+        if (additions.length === 0) {
+          return prev;
+        }
+
+        return [...prev, ...additions];
+      });
+
+      if (duplicatesFound) {
+        setShowDuplicateModal(true);
+      }
     } catch (e) {
       console.error('pickImages error', e);
       Alert.alert('Eroare', 'Nu am putut selecta imaginile.');
@@ -379,15 +407,33 @@ export default function SellScreen() {
               <ThemedText style={[styles.addImageText, { color: tokens.colors.text }]}>{t.addImages}</ThemedText>
               <View style={[styles.addUnderline, { backgroundColor: isDark ? tokens.colors.primary : '#e0b400' }]} />
             </TouchableOpacity>
-            {images.map(img => (
-              <View key={img.id} style={[styles.imageCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}> 
-                {img.uri ? (
-                  <Image source={{ uri: img.uri }} style={styles.imageThumb} resizeMode="cover" />
-                ) : (
-                  <Ionicons name="camera" size={28} color={tokens.colors.text} />
-                )}
-              </View>
-            ))}
+            {images.map((img, index) => {
+              const isCover = index === 0;
+              return (
+                <View
+                  key={img.id}
+                  style={[
+                    styles.imageCard,
+                    {
+                      backgroundColor: tokens.colors.elev,
+                      borderColor: isCover ? tokens.colors.primary : tokens.colors.border,
+                      borderWidth: isCover ? 2 : 1,
+                    },
+                  ]}
+                >
+                  {isCover && (
+                    <View style={[styles.coverBadge, { backgroundColor: tokens.colors.primary }]}>
+                      <ThemedText style={[styles.coverBadgeText, { color: tokens.colors.primaryContrast }]}>{t.coverBadge}</ThemedText>
+                    </View>
+                  )}
+                  {img.uri ? (
+                    <Image source={{ uri: img.uri }} style={styles.imageThumb} resizeMode="cover" />
+                  ) : (
+                    <Ionicons name="camera" size={28} color={tokens.colors.text} />
+                  )}
+                </View>
+              );
+            })}
             {/* Placeholder extra slot */}
             <View style={[styles.imageCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}>              
               <Ionicons name="camera" size={28} color={tokens.colors.text} />
@@ -609,6 +655,23 @@ export default function SellScreen() {
           </View>
         </View>
       )}
+
+          {showDuplicateModal && (
+            <View style={[styles.errorOverlay, { backgroundColor: isDark ? tokens.colors.overlayDark : tokens.colors.overlayLight }]}>          
+              <View style={[styles.errorModal, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
+                <Ionicons name="alert-circle" size={32} color={tokens.colors.primary} style={{ marginBottom: 12 }} />
+                <ThemedText style={[styles.errorTitle, { color: tokens.colors.text }]}>{t.duplicateImageTitle}</ThemedText>
+                <ThemedText style={[styles.errorMessage, { color: tokens.colors.muted }]}>{t.duplicateImageMessage}</ThemedText>
+                <TouchableOpacity
+                  onPress={() => setShowDuplicateModal(false)}
+                  activeOpacity={0.8}
+                  style={[styles.errorButton, { backgroundColor: tokens.colors.primary }]}
+                >
+                  <ThemedText style={[styles.errorButtonText, { color: tokens.colors.primaryContrast }]}>{t.duplicateImageDismiss}</ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
       
     </ThemedView>
   );
@@ -636,8 +699,10 @@ const styles = StyleSheet.create({
   addImageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center', padding:12, gap:8 },
   addImageText:{ fontSize:14, fontWeight:'600', textAlign:'center' },
   addUnderline:{ height:2, width:38, backgroundColor:'#e0b400' },
-  imageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center', overflow:'hidden' },
+  imageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center', overflow:'hidden', position:'relative' },
   imageThumb:{ width:'100%', height:'100%' },
+  coverBadge:{ position:'absolute', top:8, left:8, paddingHorizontal:8, paddingVertical:4, borderRadius:999 },
+  coverBadgeText:{ fontSize:12, fontWeight:'600' },
   bottomButtonsWrapper:{ flexDirection:'row', gap:12, marginTop:8 },
   previewBtn:{ flex:1, paddingVertical:14, paddingHorizontal:18, borderRadius:24, borderWidth:1, alignItems:'center', justifyContent:'center' },
   publishBtn:{ flex:1, paddingVertical:14, paddingHorizontal:18, borderRadius:24, alignItems:'center', justifyContent:'center' },
@@ -665,5 +730,11 @@ const styles = StyleSheet.create({
     shadowOpacity:0.12,
     shadowRadius:12,
   },
+  errorOverlay:{ position:'absolute', top:0, left:0, right:0, bottom:0, alignItems:'center', justifyContent:'center', padding:24 },
+  errorModal:{ width:'100%', maxWidth:320, borderRadius:20, borderWidth:1, padding:24, alignItems:'center', gap:12 },
+  errorTitle:{ fontSize:18, fontWeight:'700', textAlign:'center' },
+  errorMessage:{ fontSize:14, textAlign:'center', lineHeight:20 },
+  errorButton:{ marginTop:4, borderRadius:16, paddingHorizontal:20, paddingVertical:10 },
+  errorButtonText:{ fontSize:14, fontWeight:'600' },
 });
 

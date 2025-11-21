@@ -10,6 +10,7 @@ import storage from '../src/services/storage';
 import { useRouter } from 'expo-router';
 import { updateEmail, updatePassword, deleteAccount } from '../src/services/auth';
 import { useAuth } from '../src/context/AuthContext';
+import { useLocale } from '../src/context/LocaleContext';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
@@ -30,20 +31,7 @@ export default function SettingsScreen() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
-  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const stored = await storage.getItemAsync('locale');
-        if (mounted && stored) setLocale(stored === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const TRANSLATIONS: Record<string, any> = {
     ro: {

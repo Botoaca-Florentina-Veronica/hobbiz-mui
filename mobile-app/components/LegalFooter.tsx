@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Linking 
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useRouter } from 'expo-router';
 import storage from '../src/services/storage';
+import { useLocale } from '../src/context/LocaleContext';
 
 interface LegalLink {
   label: string;
@@ -20,22 +21,7 @@ export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: b
   const { tokens } = useAppTheme();
   const { width } = useWindowDimensions();
   const router = useRouter();
-  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        if (!mounted) return;
-        setLocale(s === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        if (!mounted) return;
-        setLocale('ro');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const legalSections: LegalSection[] = [
     {

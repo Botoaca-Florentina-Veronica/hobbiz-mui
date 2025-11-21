@@ -7,6 +7,7 @@ import { useAppTheme } from '@/src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
+import { useLocale } from '../../src/context/LocaleContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // App palette per user request
@@ -22,20 +23,7 @@ export default function PrivacyScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const isDark = tokens.colors.bg === '#121212';
-
-  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const stored = await storage.getItemAsync('locale');
-        if (mounted && stored) setLocale(stored === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const openMail = (addr: string) => Linking.openURL(`mailto:${addr}`);
 

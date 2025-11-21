@@ -403,8 +403,14 @@ export default function AnnouncementDetailsScreen() {
       <View style={[styles.sellerCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
         <Text style={[styles.sellerHeading, { color: tokens.colors.text }]}>Informații vânzător</Text>
 
-        {/* Avatar + Name + Rating */}
-        <View style={styles.sellerTopRow}>
+        {/* Avatar + Name + Rating (tap to open seller profile) */}
+        <TouchableOpacity
+          onPress={goToProfile}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Deschide profilul vânzătorului"
+          style={styles.sellerTopRow}
+        >
           <View style={[styles.avatar, { backgroundColor: tokens.colors.elev, overflow: 'hidden' }]}>            
             {announcement.user?.avatar ? (
               <Image
@@ -442,7 +448,7 @@ export default function AnnouncementDetailsScreen() {
               )
             )}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Contact label + Evaluate button */}
         <View style={styles.contactTopRow}>

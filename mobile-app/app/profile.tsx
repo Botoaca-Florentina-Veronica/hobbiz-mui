@@ -11,6 +11,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Constants from 'expo-constants';
 import api from '../src/services/api';
+import { useLocale } from '../src/context/LocaleContext';
 import { Toast } from '../components/ui/Toast';
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
@@ -60,19 +61,7 @@ export default function ProfileScreen() {
   const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
   const { user, restore } = useAuth();
   const { userId } = useLocalSearchParams<{ userId?: string }>();
-  const [locale, setLocale] = useState<'ro' | 'en'>('ro');
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const stored = await storage.getItemAsync('locale');
-        if (mounted && stored) setLocale(stored === 'en' ? 'en' : 'ro');
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { locale } = useLocale();
 
   const TRANSLATIONS: Record<string, any> = {
     ro: {
@@ -682,9 +671,11 @@ export default function ProfileScreen() {
         <View style={styles.locationSection}>
           <View style={styles.locationHeader}>
             <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.myLocation}</ThemedText>
-            <TouchableOpacity onPress={() => { if (isViewingOwnProfile) setLocationModalOpen(true); }} activeOpacity={isViewingOwnProfile ? 0.7 : 1}>
-              <ThemedText style={[styles.specifyLink, { color: isViewingOwnProfile ? tokens.colors.muted : tokens.colors.muted }]}>{t.changeLocation}</ThemedText>
-            </TouchableOpacity>
+            {isViewingOwnProfile && (
+              <TouchableOpacity onPress={() => setLocationModalOpen(true)} activeOpacity={0.7}>
+                <ThemedText style={[styles.specifyLink, { color: tokens.colors.muted }]}>{t.changeLocation}</ThemedText>
+              </TouchableOpacity>
+            )}
           </View>
           
           <View style={[styles.mapContainer, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.borderNeutral }]}>

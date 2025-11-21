@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
+import { useLocale } from '../../src/context/LocaleContext';
 import { Modal, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
@@ -56,29 +57,13 @@ type RowSpec = { key: string; label: string; icon: string; action?: () => void; 
 
 export default function AccountScreen() {
   const { isDark, setMode, tokens } = useAppTheme();
+  const { locale, setLocale: setGlobalLocale } = useLocale();
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { logout, user } = useAuth();
   const [confirmVisible, setConfirmVisible] = React.useState(false);
   const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
-  const [locale, setLocale] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const s = await storage.getItemAsync('locale');
-        if (!mounted) return;
-        if (s) setLocale(s);
-        else setLocale('ro');
-      } catch (e) {
-        if (!mounted) return;
-        setLocale('ro');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
@@ -358,11 +343,8 @@ export default function AccountScreen() {
                   <TouchableOpacity
                     style={[styles.modalBtn, { marginBottom: 8 }]}
                     onPress={async () => {
-                      try {
-                        await storage.setItemAsync('locale', 'ro');
-                        setLocale('ro');
-                        setLanguageModalOpen(false);
-                      } catch (e) { console.warn('Failed to save locale', e); }
+                      await setGlobalLocale('ro');
+                      setLanguageModalOpen(false);
                     }}
                   >
                     <Text style={{ color: tokens.colors.text, fontSize: 16 }}>Română</Text>
@@ -370,11 +352,8 @@ export default function AccountScreen() {
                   <TouchableOpacity
                     style={[styles.modalBtn, { marginBottom: 8 }]}
                     onPress={async () => {
-                      try {
-                        await storage.setItemAsync('locale', 'en');
-                        setLocale('en');
-                        setLanguageModalOpen(false);
-                      } catch (e) { console.warn('Failed to save locale', e); }
+                      await setGlobalLocale('en');
+                      setLanguageModalOpen(false);
                     }}
                   >
                     <Text style={{ color: tokens.colors.text, fontSize: 16 }}>English</Text>
