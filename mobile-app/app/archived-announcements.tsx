@@ -50,6 +50,7 @@ export default function ArchivedAnnouncementsScreen() {
   const [categoryFilter, setCategoryFilter] = useState('Toate');
   const [sortFilter, setSortFilter] = useState('cea mai recenta');
   const [activePickerType, setActivePickerType] = useState<'category' | 'sort' | null>(null);
+  // Track per-card content heights so the left image can match the card height exactly
   const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
   const [rowWidths, setRowWidths] = useState<Record<string, number>>({});
 
@@ -320,122 +321,108 @@ export default function ArchivedAnnouncementsScreen() {
 
         {/* Announcements List */}
         {filteredAndSortedAnnouncements.map((announcement) => {
-          const cardHeight = rowHeights[announcement._id] || 0;
-          const cardWidth = rowWidths[announcement._id] || 0;
-          const firstImage = announcement.images && announcement.images.length > 0 ? announcement.images[0] : null;
-          const imageSrc = getImageSrc(firstImage || undefined);
+          const imageUri = announcement.images?.[0]
+            ? getImageSrc(announcement.images[0])
+            : null;
+          const measuredContentHeight = rowHeights[announcement._id];
+          const baseMobileHeight = 170;
+          const imageTargetHeight = isLarge
+            ? undefined
+            : Math.max(baseMobileHeight, measuredContentHeight || 0);
 
           return (
-            <View key={announcement._id} style={styles.announcementWrapper}>
-              <View
+            <View
+              key={announcement._id}
+              style={[styles.card, isLarge && styles.cardLarge, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}
+            >
+              {/* Image - Left side */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
                 style={[
-                  styles.announcementCard,
-                  {
-                    backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface,
-                    ...containerBorderStyle,
-                  },
+                  styles.cardImage,
+                  isLarge ? (isNarrowTablet ? styles.cardImageNarrowTablet : styles.cardImageLarge) : null,
+                  !isLarge && imageTargetHeight ? { height: imageTargetHeight } : null,
                 ]}
-                onLayout={(e) => {
-                  const { width: w, height: h } = e.nativeEvent.layout;
-                  setRowHeights((prev) => ({ ...prev, [announcement._id]: h }));
-                  setRowWidths((prev) => ({ ...prev, [announcement._id]: w }));
-                }}
               >
-                {/* Left Image Column */}
-                {imageSrc && (
-                  <View style={[styles.imageColumn, cardHeight > 0 ? { height: cardHeight } : undefined]}>
-                    <Image
-                      source={{ uri: imageSrc }}
-                      style={[
-                        styles.announcementImage,
-                        isNarrowTablet && { width: 140 },
-                        cardHeight > 0 && { height: cardHeight },
-                      ]}
-                      resizeMode="cover"
-                    />
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={[styles.image, isLarge ? styles.imageLarge : null]}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={[styles.image, styles.placeholderImage]}>
+                    <Ionicons name="image-outline" size={40} color={tokens.colors.placeholder} />
                   </View>
                 )}
+              </TouchableOpacity>
 
-                {/* Right Content Column */}
-                <View style={[styles.contentColumn, !imageSrc && styles.contentColumnNoImage]}>
-                  {/* Header: Title + Category Icon */}
-                  <View style={styles.cardHeader}>
-                    <Text style={[styles.announcementTitle, { color: tokens.colors.text }]} numberOfLines={2}>
+              {/* Content - Right side */}
+              <View
+                style={[
+                  styles.cardContent,
+                  isLarge ? (isNarrowTablet ? styles.cardContentNarrowTablet : styles.cardContentLarge) : null,
+                ]}
+                onLayout={(e) => {
+                  const h = e.nativeEvent.layout.height;
+                  const w = e.nativeEvent.layout.width;
+                  setRowHeights((prev) => {
+                    const curr = prev[announcement._id];
+                    // Avoid unnecessary re-renders
+                    if (curr && Math.abs(curr - h) < 1) return prev;
+                    return { ...prev, [announcement._id]: h };
+                  });
+                  setRowWidths((prev) => {
+                    const currW = prev[announcement._id];
+                    if (currW && Math.abs(currW - w) < 1) return prev;
+                    return { ...prev, [announcement._id]: w };
+                  });
+                }}
+              >
+                {/* Top section: Title + ID */}
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
+                >
+                  <View style={styles.cardTopRow}>
+                    <Text style={styles.cardTitle}>
                       {announcement.title}
                     </Text>
-                    <View style={styles.categoryIconWrapper}>
-                      {(() => {
-                        const catDef = findCategoryByLabel(announcement.category);
-                        return catDef ? (
-                          <Ionicons name={catDef.icon as any} size={22} color={isDark ? tokens.colors.primary : '#355070'} />
-                        ) : null;
-                      })()}
+                    <View style={styles.idBadge}>
+                      <Text style={styles.idText}>ID: {announcement._id?.slice(-8) || ''}</Text>
                     </View>
                   </View>
 
-                  {/* Metadata Row */}
-                  <View style={styles.metadataRow}>
-                    <View style={styles.metadataItem}>
-                      <Ionicons name="location-outline" size={14} color={tokens.colors.muted} />
-                      <Text style={[styles.metadataText, { color: tokens.colors.muted }]} numberOfLines={1}>
-                        {announcement.location}
-                      </Text>
-                    </View>
-                    <View style={styles.metadataItem}>
-                      <Ionicons name="calendar-outline" size={14} color={tokens.colors.muted} />
-                      <Text style={[styles.metadataText, { color: tokens.colors.muted }]}>
-                        {new Date(announcement.createdAt).toLocaleDateString('ro-RO')}
-                      </Text>
-                    </View>
+                  {/* Category badge */}
+                  <View style={styles.categoryBadge}>
+                    <Text style={styles.categoryText}>{announcement.category}</Text>
                   </View>
 
-                  {/* ID Badge */}
-                  <View style={styles.idBadgeRow}>
-                    <View style={[styles.idBadge, { backgroundColor: isDark ? tokens.colors.elev : '#f0f0f0' }]}>
-                      <Text style={[styles.idBadgeText, { color: tokens.colors.muted }]}>
-                        ID: {announcement._id.slice(-6)}
-                      </Text>
-                    </View>
-                  </View>
+                  {/* Location placeholder spacing so buttons stay at bottom */}
+                  <View style={styles.locationPlaceholder} />
+                </TouchableOpacity>
 
-                  {/* Action Buttons */}
-                  <View style={styles.actionsContainer}>
-                    {isLarge ? (
-                      <>
-                        <View style={styles.actionsRow}>
-                          <TouchableOpacity
-                            style={[styles.actionButton, styles.equalButtonTwo, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
-                            onPress={() => handleUnarchive(announcement)}
-                          >
-                            <Text numberOfLines={1} style={styles.primaryButtonText}>Dezarhivează</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[styles.actionButton, styles.equalButtonTwo, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
-                            onPress={() => handleDelete(announcement._id)}
-                          >
-                            <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </>
-                    ) : (
-                      <>
-                        <View style={styles.actionsRow}>
-                          <TouchableOpacity
-                            style={[styles.actionButton, styles.fillButton, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
-                            onPress={() => handleUnarchive(announcement)}
-                          >
-                            <Text numberOfLines={1} style={styles.primaryButtonText}>Dezarhivează</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[styles.actionButton, styles.dangerButton, styles.compactButton, isDark ? { backgroundColor: '#121212' } : {}]}
-                            onPress={() => handleDelete(announcement._id)}
-                          >
-                            <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </>
-                    )}
-                  </View>
+                {/* Action buttons - Stacked vertically */}
+                <View style={styles.actionsContainer}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.fullWidthButton, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleUnarchive(announcement);
+                    }}
+                  >
+                    <Text numberOfLines={1} style={styles.primaryButtonText}>Dezarhivează</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.fullWidthButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleDelete(announcement._id);
+                    }}
+                  >
+                    <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -563,7 +550,8 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    padding: 12,
+    paddingBottom: 12,
   },
   loadingContainer: {
     flex: 1,
@@ -594,9 +582,21 @@ const createStyles = (tokens: any) => StyleSheet.create({
     fontWeight: '700',
   },
   searchSection: {
-    marginHorizontal: 20,
+    // Base styles; border, borderRadius, overflow applied inline for precise control in dark mode
+    padding: 12,
     marginBottom: 16,
-    padding: 16,
+    // Minimal shadow to avoid artifacts with overflow:hidden
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
   },
   searchBarContainer: {
     flexDirection: 'row',
@@ -606,36 +606,56 @@ const createStyles = (tokens: any) => StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 12,
   },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: tokens.colors.bg,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
   searchIcon: {
     marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    height: 44,
-    fontSize: 15,
+    fontSize: 14,
+    color: tokens.colors.text,
   },
   clearButton: {
     padding: 4,
   },
   filterRow: {
     flexDirection: 'row',
-    gap: 12,
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
   },
   filterButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    backgroundColor: tokens.colors.bg,
     borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 4,
+    flex: 1,
     borderWidth: 1,
-    borderColor: tokens.colors.border,
+    borderColor: 'transparent',
+  },
+  filterButtonActive: {
+    backgroundColor: tokens.colors.primary,
+    borderColor: tokens.colors.primary,
   },
   filterButtonText: {
-    fontSize: 14,
+    fontSize: 13,
+    color: tokens.colors.primary,
     fontWeight: '600',
+    flex: 1,
+  },
+  filterButtonTextActive: {
+    color: '#ffffff',
   },
   activeFiltersRow: {
     marginTop: 12,
@@ -665,6 +685,13 @@ const createStyles = (tokens: any) => StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
+  resultsCount: {
+    paddingHorizontal: 8,
+  },
+  resultsText: {
+    fontSize: 12,
+    color: tokens.colors.muted,
+  },
   resultsCountContainer: {
     paddingHorizontal: 20,
     marginBottom: 12,
@@ -680,6 +707,11 @@ const createStyles = (tokens: any) => StyleSheet.create({
     paddingVertical: 60,
     paddingHorizontal: 40,
   },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
   emptyTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -691,6 +723,344 @@ const createStyles = (tokens: any) => StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: tokens.colors.muted,
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: tokens.colors.surface,
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  // Large screen variants (tablet / desktop)
+  cardLarge: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    // Remove forced minHeight & stretch so card wraps its content naturally on tablets
+  },
+  cardImageLarge: {
+    width: 300,
+    minWidth: 300,
+    height: 180, // fixed height so it doesn't stretch full screen
+  },
+  cardImageNarrowTablet: {
+    width: 180,
+    minWidth: 180,
+    height: 160,
+  },
+  imageLarge: {
+    width: '100%',
+    height: '100%', // matches fixed parent height (180)
+  },
+  cardContentLarge: {
+    padding: 20,
+    flex: 1,
+    justifyContent: 'space-between',
+    // Remove height: '100%' to prevent card from expanding to viewport height
+  },
+  cardContentNarrowTablet: {
+    padding: 14,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  cardImage: {
+    width: '42%',
+    height: 170,
+    backgroundColor: tokens.colors.border,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  placeholderImage: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: tokens.colors.elev,
+  },
+  cardContent: {
+    flex: 1,
+    padding: 8,
+    paddingTop: 10,
+    justifyContent: 'space-between',
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  cardHeaderLeft: {
+    flex: 1,
+    marginRight: 8,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: tokens.colors.text,
+    marginBottom: 0,
+    marginRight: 8,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+  },
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: tokens.colors.elev,
+    borderRadius: 12,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    marginBottom: 4,
+    marginTop: 2,
+  },
+  categoryText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: tokens.colors.primary,
+  },
+  locationPlaceholder: {
+    height: 18,
+    marginBottom: 6,
+  },
+  idBadge: {
+    backgroundColor: tokens.colors.bg,
+    borderRadius: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    alignSelf: 'flex-start',
+  },
+  idBadgeRow: {
+    marginBottom: 12,
+  },
+  idBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  idText: {
+    fontSize: 10,
+    color: tokens.colors.placeholder,
+  },
+  actions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  actionsLarge: {
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
+    width: '100%',
+  },
+  actionsRowWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
+    width: '100%',
+    flexWrap: 'nowrap',
+  },
+  actionsContainer: {
+    gap: 8,
+  },
+  fillButton: {
+    flex: 1,
+    marginRight: 6,
+  },
+  equalButton: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: 6,
+  },
+  equalButtonTwo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  equalButtonFour: {
+    flex: 1,
+    minWidth: 0,
+  },
+  compactButton: {
+    flexShrink: 0,
+    minWidth: 100,
+  },
+  fullWidthButton: {
+    width: '100%',
+  },
+  actionButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+    borderWidth: 2,
+    // Let each button size to its content; rows will manage spacing
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryButton: {
+    borderColor: tokens.colors.primary,
+    backgroundColor: tokens.colors.surface,
+  },
+  primaryButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: tokens.colors.primary,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  secondaryButton: {
+    borderColor: tokens.colors.muted,
+    backgroundColor: tokens.colors.surface,
+  },
+  secondaryButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: tokens.colors.muted,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  dangerButton: {
+    borderColor: '#dc3545',
+    backgroundColor: tokens.colors.surface,
+  },
+  dangerButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#dc3545',
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  // Modal Overlay & Content
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+    zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: tokens.colors.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.border,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: tokens.colors.text,
+  },
+  modalCloseButton: {
+    padding: 4,
+  },
+  modalScroll: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginVertical: 4,
+    borderRadius: 12,
+    backgroundColor: tokens.colors.bg,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  modalOptionSelected: {
+    backgroundColor: tokens.colors.elev,
+    borderColor: tokens.colors.primary,
+  },
+  modalOptionActive: {
+    backgroundColor: tokens.colors.elev,
+  },
+  modalOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  modalOptionText: {
+    fontSize: 15,
+    color: tokens.colors.text,
+    fontWeight: '500',
+  },
+  modalOptionTextSelected: {
+    color: tokens.colors.primary,
+    fontWeight: '600',
+  },
+  activeFilters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: tokens.colors.elev,
+    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    gap: 6,
+  },
+  chipText: {
+    fontSize: 12,
+    color: tokens.colors.primary,
+    fontWeight: '600',
+  },
   announcementWrapper: {
     paddingHorizontal: 20,
     marginBottom: 16,
@@ -699,13 +1069,16 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 12,
     overflow: 'hidden',
+    minHeight: 200,
   },
   imageColumn: {
     width: 160,
+    alignSelf: 'stretch',
   },
   announcementImage: {
     width: '100%',
     height: '100%',
+    minHeight: 200,
   },
   contentColumn: {
     flex: 1,
@@ -714,19 +1087,6 @@ const createStyles = (tokens: any) => StyleSheet.create({
   },
   contentColumnNoImage: {
     paddingHorizontal: 20,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  announcementTitle: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '700',
-    lineHeight: 24,
-    marginRight: 12,
   },
   categoryIconWrapper: {
     width: 32,
@@ -749,118 +1109,5 @@ const createStyles = (tokens: any) => StyleSheet.create({
   },
   metadataText: {
     fontSize: 13,
-  },
-  idBadgeRow: {
-    marginBottom: 12,
-  },
-  idBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  idBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  actionsContainer: {
-    gap: 8,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  fillButton: {
-    flex: 1,
-  },
-  compactButton: {
-    minWidth: 100,
-  },
-  equalButtonTwo: {
-    flex: 1,
-  },
-  primaryButton: {
-    backgroundColor: tokens.colors.primary,
-    borderColor: tokens.colors.primary,
-  },
-  primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderColor: tokens.colors.border,
-  },
-  secondaryButtonText: {
-    color: tokens.colors.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  dangerButton: {
-    backgroundColor: 'transparent',
-    borderColor: '#ff4444',
-  },
-  dangerButtonText: {
-    color: '#ff4444',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '85%',
-    maxHeight: '70%',
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: tokens.colors.border,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: tokens.colors.text,
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  modalScroll: {
-    maxHeight: 400,
-  },
-  modalOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: tokens.colors.border,
-  },
-  modalOptionActive: {
-    backgroundColor: tokens.colors.elev,
-  },
-  modalOptionText: {
-    fontSize: 16,
-    fontWeight: '500',
   },
 });

@@ -176,7 +176,10 @@ const register = async (req, res) => {
     
     // Generează token
     const token = jwt.sign(
-      { userId: user._id },
+      { 
+        userId: user._id,
+        tokenVersion: user.tokenVersion || 0
+      },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -242,7 +245,10 @@ const login = async (req, res) => {
 
     // Generează token
     const token = jwt.sign(
-      { userId: user._id },
+      { 
+        userId: user._id,
+        tokenVersion: user.tokenVersion || 0
+      },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );

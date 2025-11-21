@@ -238,10 +238,19 @@ export default function SellScreen() {
         jpgAssets.forEach((asset: any, idx: number) => {
           const uri = asset.uri;
           if (!uri) return;
-          if (existingUris.has(uri) || batchUris.has(uri)) {
+          
+          // Check if image already exists in current images
+          if (existingUris.has(uri)) {
             duplicatesFound = true;
             return;
           }
+          
+          // Check if image is duplicate within the current batch
+          if (batchUris.has(uri)) {
+            duplicatesFound = true;
+            return;
+          }
+          
           batchUris.add(uri);
           additions.push({ id: `${timestampBase}_${idx}`, uri });
         });
@@ -263,6 +272,42 @@ export default function SellScreen() {
   }
 
   const disabledPublish = title.length < 16 || description.length < 40 || !contactName || submitting;
+
+  const handlePreview = () => {
+    // Validate required fields before preview
+    if (title.length < 16) {
+      Alert.alert('Validare', t.titleValidation);
+      return;
+    }
+    if (!category) {
+      Alert.alert('Validare', t.categoryValidation);
+      return;
+    }
+    if (description.length < 40) {
+      Alert.alert('Validare', t.descriptionValidation);
+      return;
+    }
+    if (!contactName.trim()) {
+      Alert.alert('Validare', t.contactNameValidation);
+      return;
+    }
+    
+    // Navigate to preview with all data
+    const imageUris = images.filter(img => img.uri).map(img => img.uri);
+    router.push({
+      pathname: '/announcement-preview',
+      params: {
+        title,
+        category: selectedCategoryLabel,
+        description,
+        location,
+        contactPerson: contactName,
+        contactEmail: email,
+        contactPhone: phone,
+        images: JSON.stringify(imageUris),
+      },
+    });
+  };
 
   
 
@@ -517,6 +562,7 @@ export default function SellScreen() {
         <View style={styles.bottomButtonsWrapper}>
           <TouchableOpacity
             activeOpacity={0.8}
+            onPress={handlePreview}
             style={[styles.previewBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
           >            
             <ThemedText style={[styles.previewText, { color: tokens.colors.primary }]}>{t.previewButton}</ThemedText>

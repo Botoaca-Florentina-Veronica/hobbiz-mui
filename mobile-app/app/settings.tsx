@@ -185,6 +185,52 @@ export default function SettingsScreen() {
     setExpandedSection(expandedSection === key ? null : key);
   };
 
+  const handleLogoutAllDevices = () => {
+    Alert.alert(
+      locale === 'ro' ? 'Ieși de pe toate dispozitivele' : 'Logout from all devices',
+      locale === 'ro' 
+        ? 'Această acțiune va deconecta contul tău de pe toate dispozitivele pe care ești autentificat. Continui?' 
+        : 'This action will log out your account from all devices where you are logged in. Continue?',
+      [
+        { text: t.cancel, style: 'cancel' },
+        {
+          text: locale === 'ro' ? 'Ieși' : 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/logout-all-devices`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${await storage.getToken()}`,
+                },
+              });
+
+              if (!response.ok) {
+                throw new Error('Failed to logout from all devices');
+              }
+
+              await logout();
+              showToast(
+                locale === 'ro' ? 'Ai fost deconectat de pe toate dispozitivele' : 'Logged out from all devices successfully',
+                'success'
+              );
+              router.replace('/login');
+            } catch (e: any) {
+              showToast(
+                e?.message || (locale === 'ro' ? 'Nu s-a putut efectua deconectarea' : 'Could not logout'),
+                'error'
+              );
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const handleDeleteAccount = () => {
     Alert.alert(
       t.deleteAccountTitle,
@@ -242,6 +288,7 @@ export default function SettingsScreen() {
                   if (item.expandable) return toggleSection(item.key);
                   if (item.key === 'delete-account') return handleDeleteAccount();
                   if (item.key === 'archived-announcements') return router.push('/archived-announcements');
+                  if (item.key === 'logout-devices') return handleLogoutAllDevices();
                   // Aici poți adăuga alte acțiuni simple non-expandable
                   return null;
                 }}

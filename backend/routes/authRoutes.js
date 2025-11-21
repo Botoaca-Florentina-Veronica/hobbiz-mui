@@ -70,7 +70,8 @@ router.get('/google/callback',
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        avatar: user.avatar
+        avatar: user.avatar,
+        tokenVersion: user.tokenVersion || 0
       },
       process.env.JWT_SECRET || 'jwt_secret',
       { expiresIn: '7d' }
@@ -215,6 +216,35 @@ router.get('/logout', (req, res) => {
   });
 });
 
+// Logout from all devices - invalidates all tokens by incrementing tokenVersion
+router.post('/logout-all-devices', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwt_secret');
+    
+    const User = require('../models/User');
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Increment tokenVersion to invalidate all existing tokens
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
+    await user.save();
+
+    res.json({ message: 'Logged out from all devices successfully', tokenVersion: user.tokenVersion });
+  } catch (error) {
+    console.error('Logout all devices error:', error);
+    res.status(500).json({ message: 'Failed to logout from all devices' });
+  }
+});
+
 module.exports = router;
 
 
@@ -237,7 +267,8 @@ router.get('/facebook/callback',
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        avatar: user.avatar
+        avatar: user.avatar,
+        tokenVersion: user.tokenVersion || 0
       },
       process.env.JWT_SECRET || 'jwt_secret',
       { expiresIn: '7d' }

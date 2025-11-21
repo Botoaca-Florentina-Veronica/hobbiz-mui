@@ -160,7 +160,7 @@ export default function FavoritesScreen() {
             ];
             const palette = palettes[index % palettes.length];
             // For dark mode: all cards identical (same bg + pink gradient accent)
-            const cardBg = isDark ? colors.surface : palette.bg;
+            const cardBg = isDark ? '#121212' : palette.bg;
             const gradientColors: [string, string] = isDark 
               ? [colors.primary as string, (colors as any).pink4 as string]  // pink gradient (#f51866 → #ff7e95)
               : [palette.g1, palette.g2];
@@ -176,16 +176,20 @@ export default function FavoritesScreen() {
                   {
                     backgroundColor: cardBg,
                     opacity: pressed ? 0.92 : 1,
+                    borderWidth: isDark ? 1 : 0,
+                    borderColor: isDark ? 'rgb(139, 139, 139)' : 'transparent',
                   },
                 ]}
               >
-                <LinearGradient
-                  colors={gradientColors}
-                  style={styles.leftAccent}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0, y: 1 }}
-                />
-                <View style={styles.squareImageWrapper}>
+                {!isDark && (
+                  <LinearGradient
+                    colors={gradientColors}
+                    style={styles.leftAccent}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                  />
+                )}
+                <View style={[styles.squareImageWrapper, { marginLeft: isDark ? 0 : 22 }]}>
                   {firstImage ? (
                     <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
                   ) : (

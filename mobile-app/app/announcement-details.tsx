@@ -503,12 +503,11 @@ export default function AnnouncementDetailsScreen() {
 
       {/* Rating Modal */}
       <Modal visible={ratingModalVisible} transparent animationType="fade" onRequestClose={() => setRatingModalVisible(false)}>
-        <View style={styles.ratingModalOverlay}>
-          <BlurView 
-            intensity={80} 
-            tint={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFill}
-          />
+        <BlurView 
+          intensity={80} 
+          tint={isDark ? 'dark' : 'light'}
+          style={styles.ratingModalOverlay}
+        >
           <View style={[styles.ratingModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
             <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
             <View style={styles.ratingStarsRow}>
@@ -564,7 +563,7 @@ export default function AnnouncementDetailsScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </BlurView>
       </Modal>
 
       {/* Location Card */}

@@ -536,7 +536,7 @@ export default function MyAnnouncementsScreen() {
       <ConfirmDialog
         visible={hideDialogVisible}
         title="Arhivează anunț"
-        message={"Ești sigur că vrei să arhivezi acest anunț? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunțuri arhivate'."}
+        message={"Ești sigur(ă) că vrei să arhivezi acest anunț? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunțuri arhivate'."}
         confirmText="Da"
         cancelText="Nu"
         icon="archive-outline"

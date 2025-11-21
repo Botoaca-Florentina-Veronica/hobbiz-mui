@@ -17,6 +17,8 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   localitate: { type: String }, // Adăugat câmpul localitate
   lastSeen: { type: Date, default: Date.now }, // Adăugat câmpul pentru ultima activitate
+  // Token version for invalidating all sessions when user logs out from all devices
+  tokenVersion: { type: Number, default: 0 },
   // Persistență pentru anunțurile favorite ale utilizatorului (cross-device)
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Announcement' }]
   ,
