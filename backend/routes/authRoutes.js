@@ -118,7 +118,7 @@ router.get('/google/callback',
       try { if (req.session) req.session.oauthRedirect = undefined; } catch (e) {}
         // Log headers and session (sanitized) to help debug why some clients fall back to web
         try {
-          console.log('[Auth] Mobile OAuth detected. Trying to open app with URL:', mobileRedirect);
+          console.log('[Auth] Mobile OAuth detected. Redirecting directly to app with URL:', mobileRedirect);
           console.log('[Auth] Headers snippet:', {
             ua: (req.headers['user-agent'] || '').slice(0, 200),
             referer: req.headers.referer || req.headers.referrer || null
@@ -127,73 +127,8 @@ router.get('/google/callback',
           console.log('[Auth] Session dest:', sessionDest ? 'mobile' : 'web');
         } catch (e) { /* ignore logging errors */ }
 
-        // Serve an HTML page that attempts to open the app and after a short timeout redirects to web as fallback.
-        const webFallback = process.env.NODE_ENV === 'production' ? 'https://hobbiz.netlify.app' : 'http://localhost:5173';
-        const maskedToken = token ? token.slice(0, 8) + '...' : '';
-        const html = `
-  <!doctype html>
-  <html>
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <title>Open app</title>
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f6f7fb }
-        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); max-width: 640px; text-align:center }
-        a { color: #2563eb; text-decoration:none; font-weight:600 }
-        pre { text-align:left; background:#f3f4f6; padding:12px; border-radius:8px; overflow:auto }
-      </style>
-    </head>
-    <body>
-      <div class="card">
-        <h2>Se deschide aplicația...</h2>
-        <p>Dacă aplicația nu pornește automat, atinge butonul de mai jos.</p>
-        <p><a id="open-link" href="${mobileRedirect}">Deschide aplicația Hobbiz</a></p>
-        <p style="margin-top:12px"><a id="web-link" href="${webFallback}">Continuă pe web</a></p>
-        <hr style="margin:16px 0" />
-        <div style="text-align:left">
-          <strong>Debug:</strong>
-          <pre>token=${maskedToken}\nstate=${returnedState}\nsessionDest=${sessionDest || 'none'}\nuserAgent=${(req.headers['user-agent']||'').slice(0,200)}</pre>
-        </div>
-      </div>
-      <script>
-        (function() {
-          var openUrl = '${mobileRedirect}';
-          function openApp(){ try{ window.location = openUrl; } catch(e){} }
-          function openViaIframe(){
-            try{
-              var iframe = document.createElement('iframe');
-              iframe.style.display = 'none';
-              iframe.src = openUrl;
-              document.body.appendChild(iframe);
-              setTimeout(function(){ try{ document.body.removeChild(iframe); }catch(e){} }, 1500);
-            }catch(e){}
-          }
-          // On Android, try intent:// fallback if custom scheme is blocked
-          function openAndroidIntent(){
-            try {
-              var m = openUrl.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/(.*)$/);
-              if (m) {
-                var scheme = m[1];
-                var rest = m[2];
-                var intentUrl = 'intent://' + rest + '#Intent;scheme=' + scheme + ';end';
-                window.location = intentUrl;
-              }
-            } catch(e) {}
-          }
-          try { openApp(); } catch(e) {}
-          setTimeout(function(){ try { openViaIframe(); } catch(e) {} }, 150);
-          // Try Android intent after 600ms
-          setTimeout(function(){ try { openAndroidIntent(); } catch(e) {} }, 600);
-          // After 3000ms if app didn't open, redirect user to web fallback automatically
-          setTimeout(function(){ window.location = '${webFallback}'; }, 3000);
-        })();
-      </script>
-    </body>
-  </html>
-  `;
-        res.set('Content-Type', 'text/html; charset=utf-8');
-        return res.send(html);
+        // Direct redirect to mobile app (no intermediate HTML page)
+        return res.redirect(mobileRedirect);
     }
 
     // Redirecționează către frontend web cu tokenul în query string

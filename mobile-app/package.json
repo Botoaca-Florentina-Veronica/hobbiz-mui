@@ -55,10 +55,13 @@
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
+    "@react-native-community/cli": "^20.0.2",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "expo-module-scripts": "^5.0.7",
+    "jimp": "^0.16.1",
+    "react-native-make": "^1.0.1",
     "typescript": "~5.9.2"
   },
   "private": true

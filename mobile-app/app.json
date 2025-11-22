@@ -2,9 +2,9 @@
   "expo": {
     "name": "Hobbiz",
     "slug": "hobbiz-mui-monorepo",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
-    "icon": "./assets/images/puzzle.png",
+    "icon": "./assets/images/puzzle_safe.png",
     "scheme": "mobileapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -21,7 +21,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/images/puzzle.png"
+        "foregroundImage": "./assets/images/puzzle_safe.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,

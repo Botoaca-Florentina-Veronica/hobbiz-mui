@@ -1142,13 +1142,10 @@ export default function ChatScreen() {
   // If conversation is selected, show chat view
   if (selectedConversation) {
     return (
-      // IMPORTANT: KeyboardAvoidingView cu behavior="padding" este CRITIC pentru ambele platforme (iOS și Android)
-      // NU modifica behavior sau keyboardVerticalOffset - bara de input va dispărea când apare tastatura!
-      // Asigură-te că app.json -> android.softwareKeyboardLayoutMode = "pan" este setat.
       <KeyboardAvoidingView
         style={[styles.container, { backgroundColor: tokens.colors.bg }]}
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         {/* Clean header with back button, seller avatar + name, and announcement preview below */}
         <View style={[
