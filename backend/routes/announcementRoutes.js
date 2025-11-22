@@ -6,7 +6,7 @@ const Announcement = require('../models/Announcement');
 router.get('/', async (req, res) => {
   try {
     const { category } = req.query;
-    let filter = {};
+    let filter = { archived: { $ne: true } };
     if (category) {
       // Caută insensibil la majuscule/minuscule și ignoră spațiile
       filter.category = { $regex: `^${category.trim()}$`, $options: 'i' };
@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 router.get('/popular', async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 10, 50);
-    const announcements = await Announcement.find({})
+    const announcements = await Announcement.find({ archived: { $ne: true } })
       .sort({ favoritesCount: -1, createdAt: -1 })
       .limit(limit);
     res.json(announcements);

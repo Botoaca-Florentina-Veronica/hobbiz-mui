@@ -39,6 +39,7 @@ import storage from '../../src/services/storage';
 import { useAuth } from '../../src/context/AuthContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import ImageViewing from '../../src/components/ImageViewer';
+import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 // NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
 // NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
 // Dacă vrei snapshot real pentru web mai târziu, putem introduce o implementare fallback bazată pe canvas.
@@ -1142,6 +1143,7 @@ export default function ChatScreen() {
   // If conversation is selected, show chat view
   if (selectedConversation) {
     return (
+      <ProtectedRoute>
       <KeyboardAvoidingView
         style={[styles.container, { backgroundColor: tokens.colors.bg }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -1688,11 +1690,13 @@ export default function ChatScreen() {
           </Pressable>
         </Modal>
       </KeyboardAvoidingView>
+      </ProtectedRoute>
     );
   }
 
   // Conversation list view
   return (
+    <ProtectedRoute>
     <View style={[styles.listContainer, { backgroundColor: tokens.colors.bg }]}> 
       <LinearGradient
         colors={
@@ -1827,6 +1831,7 @@ export default function ChatScreen() {
         </ScrollView>
       </View>
     </View>
+    </ProtectedRoute>
   );
 }
 

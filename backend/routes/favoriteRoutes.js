@@ -7,9 +7,14 @@ const Announcement = require('../models/Announcement');
 // GET /api/favorites - lista completă a anunțurilor favorite (cu populate opțional)
 router.get('/', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).populate('favorites');
+    const user = await User.findById(req.userId).populate({
+      path: 'favorites',
+      match: { archived: { $ne: true } }
+    });
     if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
-    res.json({ favoriteIds: user.favorites.map(a => a._id), favorites: user.favorites });
+    // Filter out null entries (archived announcements that were matched out)
+    const activeFavorites = user.favorites.filter(f => f != null);
+    res.json({ favoriteIds: activeFavorites.map(a => a._id), favorites: activeFavorites });
   } catch (e) {
     console.error('Eroare GET /favorites:', e);
     res.status(500).json({ error: 'Eroare server la preluarea listei de favorite' });

@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -21,6 +21,7 @@ import api from '../src/services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { findCategoryByLabel } from '../src/constants/categories';
 import { Toast } from '../components/ui/Toast';
+import { ProtectedRoute } from '../src/components/ProtectedRoute';
 
 interface Announcement {
   _id: string;
@@ -212,8 +213,21 @@ export default function ArchivedAnnouncementsScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Header (match 'Anunțurile mele' layout: back button + title) -- placed inside ScrollView so it scrolls */}
+        {/* Remove default header bottom border on this screen to avoid a visible line above the search container */}
+        <View style={[styles.header, { paddingTop: insets.top, borderBottomWidth: 0, borderBottomColor: 'transparent' }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+              <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Anunțuri arhivate</Text>
+          </View>
+        </View>
+
         {/* Search and Filter Section */}
         {announcements.length > 0 && (
           <View style={[
@@ -227,108 +241,119 @@ export default function ArchivedAnnouncementsScreen() {
             }
           ]}> 
             {/* Search Bar */}
-            <View style={styles.searchBarContainer}>
+            <View style={[styles.searchBar, { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' }]}>
               <Ionicons name="search" size={20} color={tokens.colors.muted} style={styles.searchIcon} />
               <TextInput
-                style={[styles.searchInput, { color: tokens.colors.text }]}
+                style={styles.searchInput}
                 placeholder="Caută după titlu, ID sau locație..."
                 placeholderTextColor={tokens.colors.placeholder}
                 value={searchTerm}
                 onChangeText={setSearchTerm}
               />
-              {searchTerm.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchTerm('')} style={styles.clearButton}>
-                  <Ionicons name="close-circle" size={20} color={tokens.colors.muted} />
-                </TouchableOpacity>
-              )}
             </View>
 
-            {/* Filter Buttons */}
+            {/* Filter Row */}
             <View style={styles.filterRow}>
+              {/* Category Filter */}
               <TouchableOpacity
-                style={[styles.filterButton, { backgroundColor: isDark ? '#121212' : tokens.colors.bg }]}
-                onPress={() => setActivePickerType('category')}
+                style={[
+                  styles.filterButton,
+                  { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' },
+                  activePickerType === 'category' && styles.filterButtonActive,
+                ]}
+                onPress={() => setActivePickerType(activePickerType === 'category' ? null : 'category')}
               >
-                <Ionicons name="apps-outline" size={18} color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
-                <Text style={[styles.filterButtonText, { color: activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070') }]} numberOfLines={1}>
-                  Categorie
+                <Ionicons name="apps-outline" size={16} color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
+                <Text style={[
+                  styles.filterButtonText,
+                  activePickerType === 'category' && styles.filterButtonTextActive,
+                ]} numberOfLines={1}>
+                  {categoryFilter === 'Toate' ? 'Categorie' : categoryFilter}
                 </Text>
-                <Ionicons name={activePickerType === 'category' ? 'chevron-up' : 'chevron-down'} size={16} color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
+                <Ionicons 
+                  name={activePickerType === 'category' ? 'chevron-up' : 'chevron-down'} 
+                  size={16} 
+                  color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} 
+                />
               </TouchableOpacity>
 
+              {/* Sort Filter */}
               <TouchableOpacity
-                style={[styles.filterButton, { backgroundColor: isDark ? '#121212' : tokens.colors.bg }]}
-                onPress={() => setActivePickerType('sort')}
+                style={[
+                  styles.filterButton,
+                  { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' },
+                  activePickerType === 'sort' && styles.filterButtonActive,
+                ]}
+                onPress={() => setActivePickerType(activePickerType === 'sort' ? null : 'sort')}
               >
-                <Ionicons name="swap-vertical" size={18} color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
-                <Text style={[styles.filterButtonText, { color: activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070') }]} numberOfLines={1}>
+                <Ionicons name="swap-vertical" size={16} color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
+                <Text style={[
+                  styles.filterButtonText,
+                  activePickerType === 'sort' && styles.filterButtonTextActive,
+                ]} numberOfLines={1}>
                   Sortare
                 </Text>
-                <Ionicons name={activePickerType === 'sort' ? 'chevron-up' : 'chevron-down'} size={16} color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
+                <Ionicons 
+                  name={activePickerType === 'sort' ? 'chevron-up' : 'chevron-down'} 
+                  size={16} 
+                  color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} 
+                />
               </TouchableOpacity>
+
+              {/* Results Count */}
+              <View style={styles.resultsCount}>
+                <Text style={styles.resultsText}>{filteredAndSortedAnnouncements.length} rezultate</Text>
+              </View>
             </View>
 
-            {/* Active filters display */}
-            {(categoryFilter !== 'Toate' || sortFilter !== 'cea mai recenta') && (
-              <View style={styles.activeFiltersRow}>
-                <Text style={[styles.activeFiltersLabel, { color: tokens.colors.muted }]}>Filtre active:</Text>
-                <View style={styles.activeFilterChips}>
-                  {categoryFilter !== 'Toate' && (
-                    <View style={[styles.filterChip, { backgroundColor: isDark ? tokens.colors.elev : '#f0f0f0' }]}>
-                      <Text style={[styles.filterChipText, { color: tokens.colors.text }]}>{categoryFilter}</Text>
-                      <TouchableOpacity onPress={() => setCategoryFilter('Toate')}>
-                        <Ionicons name="close-circle" size={16} color={tokens.colors.muted} />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                  {sortFilter !== 'cea mai recenta' && (
-                    <View style={[styles.filterChip, { backgroundColor: isDark ? tokens.colors.elev : '#f0f0f0' }]}>
-                      <Text style={[styles.filterChipText, { color: tokens.colors.text }]}>
-                        {sortFilter === 'cea mai veche' ? 'Cea mai veche' :
-                         sortFilter === 'titlu_a_z' ? 'A-Z' :
-                         sortFilter === 'titlu_z_a' ? 'Z-A' : sortFilter}
-                      </Text>
-                      <TouchableOpacity onPress={() => setSortFilter('cea mai recenta')}>
-                        <Ionicons name="close-circle" size={16} color={tokens.colors.muted} />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
+
+
+            {/* Active Filters */}
+            {(searchTerm || categoryFilter !== 'Toate') && (
+              <View style={styles.activeFilters}>
+                {searchTerm && (
+                  <View style={styles.chip}>
+                    <Text style={styles.chipText}>
+                      Căutare: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
+                    </Text>
+                    <TouchableOpacity onPress={() => setSearchTerm('')}>
+                      <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
+                    </TouchableOpacity>
+                  </View>
+                )}
+                {categoryFilter !== 'Toate' && (
+                  <View style={styles.chip}>
+                    <Text style={styles.chipText}>Categorie: {categoryFilter}</Text>
+                    <TouchableOpacity onPress={() => setCategoryFilter('Toate')}>
+                      <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
           </View>
         )}
 
-        {/* Results count */}
-        {announcements.length > 0 && (
-          <View style={styles.resultsCountContainer}>
-            <Text style={[styles.resultsCountText, { color: tokens.colors.muted }]}>
-              {filteredAndSortedAnnouncements.length} {filteredAndSortedAnnouncements.length === 1 ? 'anunț arhivat' : 'anunțuri arhivate'}
-            </Text>
-          </View>
-        )}
-
-        {/* Empty state */}
-        {announcements.length === 0 && (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="archive-outline" size={80} color={tokens.colors.border} />
-            <Text style={[styles.emptyTitle, { color: tokens.colors.text }]}>Niciun anunț arhivat</Text>
-            <Text style={[styles.emptySubtitle, { color: tokens.colors.muted }]}>
-              Anunțurile pe care le arhivezi vor apărea aici
-            </Text>
-          </View>
-        )}
-
         {/* Announcements List */}
-        {filteredAndSortedAnnouncements.map((announcement) => {
-          const imageUri = announcement.images?.[0]
-            ? getImageSrc(announcement.images[0])
-            : null;
-          const measuredContentHeight = rowHeights[announcement._id];
-          const baseMobileHeight = 170;
-          const imageTargetHeight = isLarge
-            ? undefined
-            : Math.max(baseMobileHeight, measuredContentHeight || 0);
+        {filteredAndSortedAnnouncements.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="albums-outline" size={64} color={tokens.colors.placeholder} />
+            <Text style={styles.emptyText}>
+              {searchTerm || categoryFilter !== 'Toate'
+                ? 'Nu au fost găsite anunțuri cu criteriile selectate'
+                : 'Nu ai încă niciun anunț arhivat'}
+            </Text>
+          </View>
+        ) : (
+          filteredAndSortedAnnouncements.map((announcement) => {
+            const imageUri = announcement.images?.[0]
+              ? getImageSrc(announcement.images[0])
+              : null;
+            const measuredContentHeight = rowHeights[announcement._id];
+            const baseMobileHeight = 170;
+            const imageTargetHeight = isLarge
+              ? undefined
+              : Math.max(baseMobileHeight, measuredContentHeight || 0);
 
           return (
             <View
@@ -427,7 +452,8 @@ export default function ArchivedAnnouncementsScreen() {
               </View>
             </View>
           );
-        })}
+          })
+        )}
       </ScrollView>
 
       {/* Delete confirmation dialog */}
@@ -477,6 +503,7 @@ export default function ArchivedAnnouncementsScreen() {
             
             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
               {activePickerType === 'category' ? (
+                // Category options
                 uniqueCategories.map((cat) => {
                   const catDef = cat === 'Toate' ? undefined : findCategoryByLabel(cat);
                   return (
@@ -484,42 +511,73 @@ export default function ArchivedAnnouncementsScreen() {
                       key={cat}
                       style={[
                         styles.modalOption,
-                        categoryFilter === cat && styles.modalOptionActive,
+                        { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' },
+                        categoryFilter === cat && styles.modalOptionSelected,
                       ]}
                       onPress={() => {
                         setCategoryFilter(cat);
                         setActivePickerType(null);
                       }}
                     >
-                      {catDef && <Ionicons name={catDef.icon as any} size={20} color={tokens.colors.text} style={{ marginRight: 12 }} />}
-                      <Text style={[styles.modalOptionText, { color: tokens.colors.text }]}>{cat}</Text>
+                      <View style={styles.modalOptionLeft}>
+                        {cat === 'Toate' ? (
+                          <Ionicons name="apps" size={20} color={categoryFilter === cat ? tokens.colors.primary : tokens.colors.muted} />
+                        ) : catDef?.image ? (
+                          <Image source={catDef.image} style={{ width: 20, height: 20, borderRadius: 4 }} resizeMode="contain" />
+                        ) : (
+                          <Ionicons name={(catDef && (catDef.icon as any)) || 'pricetag'} size={20} color={categoryFilter === cat ? tokens.colors.primary : (catDef?.color || tokens.colors.muted)} />
+                        )}
+                        <Text
+                          style={[
+                            styles.modalOptionText,
+                            categoryFilter === cat && styles.modalOptionTextSelected,
+                          ]}
+                        >
+                          {cat}
+                        </Text>
+                      </View>
                       {categoryFilter === cat && (
-                        <Ionicons name="checkmark" size={20} color={tokens.colors.primary} style={{ marginLeft: 'auto' }} />
+                        <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
                       )}
                     </TouchableOpacity>
                   );
                 })
               ) : (
-                ['cea mai recenta', 'cea mai veche', 'titlu_a_z', 'titlu_z_a'].map((sort) => (
+                // Sort options
+                [
+                  { value: 'cea mai recenta', label: 'Cele mai recente', icon: 'arrow-down' },
+                  { value: 'cea mai veche', label: 'Cele mai vechi', icon: 'arrow-up' },
+                  { value: 'titlu_a_z', label: 'Titlu A-Z', icon: 'text' },
+                  { value: 'titlu_z_a', label: 'Titlu Z-A', icon: 'text' },
+                ].map((option) => (
                   <TouchableOpacity
-                    key={sort}
+                    key={option.value}
                     style={[
                       styles.modalOption,
-                      sortFilter === sort && styles.modalOptionActive,
+                      sortFilter === option.value && styles.modalOptionSelected,
                     ]}
                     onPress={() => {
-                      setSortFilter(sort);
+                      setSortFilter(option.value);
                       setActivePickerType(null);
                     }}
                   >
-                    <Text style={[styles.modalOptionText, { color: tokens.colors.text }]}>
-                      {sort === 'cea mai recenta' ? 'Cea mai recentă' :
-                       sort === 'cea mai veche' ? 'Cea mai veche' :
-                       sort === 'titlu_a_z' ? 'Titlu (A-Z)' :
-                       sort === 'titlu_z_a' ? 'Titlu (Z-A)' : sort}
-                    </Text>
-                    {sortFilter === sort && (
-                      <Ionicons name="checkmark" size={20} color={tokens.colors.primary} style={{ marginLeft: 'auto' }} />
+                    <View style={styles.modalOptionLeft}>
+                      <Ionicons 
+                        name={option.icon as any} 
+                        size={20} 
+                        color={sortFilter === option.value ? tokens.colors.primary : tokens.colors.muted} 
+                      />
+                      <Text
+                        style={[
+                          styles.modalOptionText,
+                          sortFilter === option.value && styles.modalOptionTextSelected,
+                        ]}
+                      >
+                        {option.label}
+                      </Text>
+                    </View>
+                    {sortFilter === option.value && (
+                      <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
                     )}
                   </TouchableOpacity>
                 ))
@@ -537,6 +595,7 @@ export default function ArchivedAnnouncementsScreen() {
         onHide={() => setToastVisible(false)}
       />
     </View>
+    </>
   );
 }
 
@@ -546,12 +605,27 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flex: 1,
     backgroundColor: tokens.colors.bg,
   },
-  scrollView: {
-    flex: 1,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: tokens.colors.bg,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.border,
   },
-  scrollContent: {
-    padding: 12,
-    paddingBottom: 12,
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    marginLeft: -10,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
   },
   loadingContainer: {
     flex: 1,
@@ -560,26 +634,16 @@ const createStyles = (tokens: any) => StyleSheet.create({
     backgroundColor: tokens.colors.bg,
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: 12,
     fontSize: 16,
     color: tokens.colors.muted,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: tokens.colors.bg,
+  scrollView: {
+    flex: 1,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+  scrollContent: {
+    padding: 12,
+    paddingBottom: 12,
   },
   searchSection: {
     // Base styles; border, borderRadius, overflow applied inline for precise control in dark mode
@@ -598,14 +662,6 @@ const createStyles = (tokens: any) => StyleSheet.create({
       },
     }),
   },
-  searchBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: tokens.colors.bg,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -622,9 +678,6 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: tokens.colors.text,
-  },
-  clearButton: {
-    padding: 4,
   },
   filterRow: {
     flexDirection: 'row',
@@ -657,34 +710,6 @@ const createStyles = (tokens: any) => StyleSheet.create({
   filterButtonTextActive: {
     color: '#ffffff',
   },
-  activeFiltersRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  activeFiltersLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  activeFilterChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
   resultsCount: {
     paddingHorizontal: 8,
   },
@@ -692,36 +717,110 @@ const createStyles = (tokens: any) => StyleSheet.create({
     fontSize: 12,
     color: tokens.colors.muted,
   },
-  resultsCountContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 12,
+  // Modal Overlay & Content
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+    zIndex: 1000,
   },
-  resultsCountText: {
-    fontSize: 14,
+  modalContent: {
+    backgroundColor: tokens.colors.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.border,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: tokens.colors.text,
+  },
+  modalCloseButton: {
+    padding: 4,
+  },
+  modalScroll: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginVertical: 4,
+    borderRadius: 12,
+    backgroundColor: tokens.colors.bg,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  modalOptionSelected: {
+    backgroundColor: tokens.colors.elev,
+    borderColor: tokens.colors.primary,
+  },
+  modalOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  modalOptionText: {
+    fontSize: 15,
+    color: tokens.colors.text,
     fontWeight: '500',
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  modalOptionTextSelected: {
+    color: tokens.colors.primary,
+    fontWeight: '600',
+  },
+  activeFilters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  chip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 40,
+    backgroundColor: tokens.colors.elev,
+    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    gap: 6,
+  },
+  chipText: {
+    fontSize: 12,
+    color: tokens.colors.primary,
+    fontWeight: '600',
   },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginTop: 20,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 22,
   },
   emptyText: {
     marginTop: 16,
@@ -837,6 +936,7 @@ const createStyles = (tokens: any) => StyleSheet.create({
     fontWeight: '600',
     color: tokens.colors.primary,
   },
+  // locationRow and locationText removed — location not shown in list cards anymore
   locationPlaceholder: {
     height: 18,
     marginBottom: 6,
@@ -847,13 +947,6 @@ const createStyles = (tokens: any) => StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 6,
     alignSelf: 'flex-start',
-  },
-  idBadgeRow: {
-    marginBottom: 12,
-  },
-  idBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
   },
   idText: {
     fontSize: 10,
@@ -914,6 +1007,9 @@ const createStyles = (tokens: any) => StyleSheet.create({
   },
   fullWidthButton: {
     width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
   },
   actionButton: {
     paddingVertical: 5,
@@ -957,157 +1053,5 @@ const createStyles = (tokens: any) => StyleSheet.create({
     color: '#dc3545',
     textAlign: 'center',
     includeFontPadding: false,
-  },
-  // Modal Overlay & Content
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-    zIndex: 1000,
-  },
-  modalContent: {
-    backgroundColor: tokens.colors.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: tokens.colors.border,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: tokens.colors.text,
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  modalScroll: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-  },
-  modalOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginVertical: 4,
-    borderRadius: 12,
-    backgroundColor: tokens.colors.bg,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  modalOptionSelected: {
-    backgroundColor: tokens.colors.elev,
-    borderColor: tokens.colors.primary,
-  },
-  modalOptionActive: {
-    backgroundColor: tokens.colors.elev,
-  },
-  modalOptionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  modalOptionText: {
-    fontSize: 15,
-    color: tokens.colors.text,
-    fontWeight: '500',
-  },
-  modalOptionTextSelected: {
-    color: tokens.colors.primary,
-    fontWeight: '600',
-  },
-  activeFilters: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 8,
-  },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: tokens.colors.elev,
-    borderRadius: 16,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    gap: 6,
-  },
-  chipText: {
-    fontSize: 12,
-    color: tokens.colors.primary,
-    fontWeight: '600',
-  },
-  announcementWrapper: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  announcementCard: {
-    flexDirection: 'row',
-    borderRadius: 12,
-    overflow: 'hidden',
-    minHeight: 200,
-  },
-  imageColumn: {
-    width: 160,
-    alignSelf: 'stretch',
-  },
-  announcementImage: {
-    width: '100%',
-    height: '100%',
-    minHeight: 200,
-  },
-  contentColumn: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
-  contentColumnNoImage: {
-    paddingHorizontal: 20,
-  },
-  categoryIconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.03)',
-  },
-  metadataRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 8,
-  },
-  metadataItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metadataText: {
-    fontSize: 13,
   },
 });

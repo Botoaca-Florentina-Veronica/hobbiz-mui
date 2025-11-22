@@ -11,6 +11,7 @@ import { Modal, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 
 const TRANSLATIONS = {
   ro: {
@@ -122,6 +123,7 @@ export default function AccountScreen() {
     : -insets.top + sunOverlap - (sunTopNudge as number);
 
   return (
+    <ProtectedRoute>
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
       <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
         {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
@@ -363,6 +365,7 @@ export default function AccountScreen() {
         </Modal>
       </ScrollView>
     </ThemedView>
+    </ProtectedRoute>
   );
 }
 

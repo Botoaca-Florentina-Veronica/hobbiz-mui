@@ -7,16 +7,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import storage from '../src/services/storage';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { updateEmail, updatePassword, deleteAccount } from '../src/services/auth';
 import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
+import { ProtectedRoute } from '../src/components/ProtectedRoute';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
 export default function SettingsScreen() {
   const { tokens, isDark } = useAppTheme();
-  const router = useRouter();
   const { logout } = useAuth();
   const insets = useSafeAreaInsets();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);

@@ -10,6 +10,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../src/context/AuthContext';
 import api from '../src/services/api';
 import { Toast } from '../components/ui/Toast';
+import { ProtectedRoute } from '../src/components/ProtectedRoute';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }

@@ -21,6 +21,7 @@ import api from '../src/services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { findCategoryByLabel } from '../src/constants/categories';
 import { Toast } from '../components/ui/Toast';
+import { ProtectedRoute } from '../src/components/ProtectedRoute';
 
 // useWindowDimensions will be read inside the component to handle orientation/responsive layout
 
@@ -201,6 +202,10 @@ export default function MyAnnouncementsScreen() {
       setHideDialogVisible(false);
       setAnnouncementToHide(null);
       showToast('Anunțul a fost arhivat cu succes', 'success');
+      // Navigate to archived announcements page after toast is visible
+      setTimeout(() => {
+        router.push('/archived-announcements');
+      }, 1800);
     } catch (e) {
       console.error('Archive error:', e);
       setHideDialogVisible(false);

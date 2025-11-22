@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'expo-router';
 import api from '../src/services/api';
+import { ProtectedRoute } from '../src/components/ProtectedRoute';
 
 interface NotificationItem {
   _id: string;

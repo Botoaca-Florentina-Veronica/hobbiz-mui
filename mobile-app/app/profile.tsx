@@ -1048,8 +1048,10 @@ export default function ProfileScreen() {
                     <TouchableOpacity 
                       style={[styles.viewAllButton, { borderColor: tokens.colors.primary }]}
                       onPress={() => {
-                        // TODO: Navigate to all reviews page
-                        Alert.alert('Info', 'Navigare către toate review-urile');
+                        router.push({ 
+                          pathname: '/all-reviews', 
+                          params: { userId: userId || user?.id } 
+                        });
                       }}
                     >
                       <Text style={[styles.viewAllText, { color: tokens.colors.primary }]}>

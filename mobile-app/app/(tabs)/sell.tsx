@@ -12,6 +12,7 @@ import api from '../../src/services/api';
 import { localitatiPeJudet } from '../../assets/comunePeJudet';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
+import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
@@ -57,11 +58,11 @@ const TRANSLATIONS = {
     categoryLabel: 'Categoria*',
     categoryPlaceholder: 'Alege categoria',
     imagesSection: 'Imagini',
-    imagesHelper: 'Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.',
+    imagesHelper: 'Prima imagine va fi coperta anunțului! Poți adăuga mai multe imagini.',
     duplicateImageTitle: 'Imagine duplicată',
-    duplicateImageMessage: 'Această fotografie este deja adăugată. Te rugăm să alegi o altă imagine.',
+    duplicateImageMessage: 'Această imagine a fost deja adăugată. Te rugăm să alegi o imagine diferită.',
     duplicateImageDismiss: 'Am înțeles',
-    coverBadge: 'Copertă',
+    coverBadge: '⭐ Copertă',
     addImages: 'Adaugă imagini',
     descriptionLabel: 'Descriere*',
     descriptionPlaceholder: 'Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț',
@@ -99,11 +100,11 @@ const TRANSLATIONS = {
     categoryLabel: 'Category*',
     categoryPlaceholder: 'Choose category',
     imagesSection: 'Images',
-    imagesHelper: 'You can add multiple images. The first one will be the main image of your announcement.',
+    imagesHelper: '⭐ The first image will be the cover! You can add multiple images.',
     duplicateImageTitle: 'Duplicate image',
-    duplicateImageMessage: 'This photo is already added. Please choose a different one.',
+    duplicateImageMessage: 'This image has already been added. Please choose a different image.',
     duplicateImageDismiss: 'Got it',
-    coverBadge: 'Cover',
+    coverBadge: '⭐ Cover',
     addImages: 'Add images',
     descriptionLabel: 'Description*',
     descriptionPlaceholder: 'Try to write what you would like to know if you were looking at this announcement',
@@ -398,6 +399,7 @@ export default function SellScreen() {
   };
 
   return (
+  <ProtectedRoute>
   <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
@@ -720,6 +722,7 @@ export default function SellScreen() {
           )}
       
     </ThemedView>
+    </ProtectedRoute>
   );
 }
 
@@ -747,8 +750,20 @@ const styles = StyleSheet.create({
   addUnderline:{ height:2, width:38, backgroundColor:'#e0b400' },
   imageCard:{ width:120, height:120, borderRadius:14, borderWidth:1, alignItems:'center', justifyContent:'center', overflow:'hidden', position:'relative' },
   imageThumb:{ width:'100%', height:'100%' },
-  coverBadge:{ position:'absolute', top:8, left:8, paddingHorizontal:8, paddingVertical:4, borderRadius:999 },
-  coverBadgeText:{ fontSize:12, fontWeight:'600' },
+  coverBadge:{ 
+    position:'absolute', 
+    top:6, 
+    left:6, 
+    paddingHorizontal:10, 
+    paddingVertical:5, 
+    borderRadius:999,
+    shadowColor:'#000',
+    shadowOffset:{ width:0, height:2 },
+    shadowOpacity:0.25,
+    shadowRadius:3.84,
+    elevation:5,
+  },
+  coverBadgeText:{ fontSize:11, fontWeight:'700', letterSpacing:0.3 },
   bottomButtonsWrapper:{ flexDirection:'row', gap:12, marginTop:8 },
   previewBtn:{ flex:1, paddingVertical:14, paddingHorizontal:18, borderRadius:24, borderWidth:1, alignItems:'center', justifyContent:'center' },
   publishBtn:{ flex:1, paddingVertical:14, paddingHorizontal:18, borderRadius:24, alignItems:'center', justifyContent:'center' },

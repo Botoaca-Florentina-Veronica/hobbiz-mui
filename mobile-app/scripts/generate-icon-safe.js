@@ -17,8 +17,9 @@ const path = require('path');
 
     const srcImage = await Jimp.read(srcPath);
 
-    // Resize source image to fit within 70% of canvas while preserving aspect
-    const maxContent = Math.floor(size * 0.7);
+    // Resize source image to fit within 60% of canvas while preserving aspect
+    // Reduced from 70% to 60% so the foreground appears smaller and avoids being visually cut
+    const maxContent = Math.floor(size * 0.5);
     srcImage.contain(maxContent, maxContent, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE);
 
     // Create canvas

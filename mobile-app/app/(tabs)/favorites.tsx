@@ -7,6 +7,7 @@ import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import api from '../../src/services/api';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 
 interface Announcement {
   _id: string;
@@ -118,6 +119,7 @@ export default function FavoritesScreen() {
   }
 
   return (
+    <ProtectedRoute>
     <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border }]}>
@@ -223,6 +225,7 @@ export default function FavoritesScreen() {
         )}
       </ScrollView>
     </View>
+    </ProtectedRoute>
   );
 }
 
