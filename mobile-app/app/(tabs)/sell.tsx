@@ -13,8 +13,18 @@ import { localitatiPeJudet } from '../../assets/comunePeJudet';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
+import { Toast } from '../../components/ui/Toast';
 
-interface ImageItem { id: string; uri?: string; }
+interface ImageItem { 
+  id: string; 
+  uri?: string; 
+  assetId?: string | null;
+  width?: number;
+  height?: number;
+  type?: string;
+  fileName?: string | null;
+  fileSize?: number;
+}
 interface Category { key: string; label: string; icon: string; color: string; }
 
 const CATEGORIES: Category[] = [
@@ -71,9 +81,9 @@ const TRANSLATIONS = {
     contactSection: 'Informații de contact',
     contactNameLabel: 'Persoana de contact*',
     contactNamePlaceholder: 'Nume și prenume',
-    emailLabel: 'Adresa de email',
+    emailLabel: 'Adresa de email*',
     emailPlaceholder: 'ex: exemplu@gmail.com',
-    phoneLabel: 'Numărul de telefon',
+    phoneLabel: 'Numărul de telefon*',
     phonePlaceholder: 'ex: 07xxxxxxx',
     previewButton: 'Previzualizați anunțul',
     publishButton: 'Publică un anunț',
@@ -86,6 +96,10 @@ const TRANSLATIONS = {
     descriptionValidation: 'Descrierea trebuie să aibă minim 40 caractere.',
     locationValidation: 'Te rugăm să alegi o localitate.',
     contactNameValidation: 'Te rugăm să introduci numele persoanei de contact.',
+    emailValidation: 'Te rugăm să introduci o adresă de email.',
+    emailFormatError: 'Adresa de email nu este validă.',
+    phoneValidation: 'Te rugăm să introduci un număr de telefon.',
+    phoneFormatError: 'Numărul de telefon nu este valid (ex: 07xxxxxxxx).',
     imageFormatError: 'Format imagine invalid',
     imageFormatMessage: 'Doar fișiere JPG sau JPEG.',
     postError: 'Eroare la postare',
@@ -113,9 +127,9 @@ const TRANSLATIONS = {
     contactSection: 'Contact Information',
     contactNameLabel: 'Contact person*',
     contactNamePlaceholder: 'First and last name',
-    emailLabel: 'Email address',
+    emailLabel: 'Email address*',
     emailPlaceholder: 'e.g.: example@gmail.com',
-    phoneLabel: 'Phone number',
+    phoneLabel: 'Phone number*',
     phonePlaceholder: 'e.g.: 07xxxxxxx',
     previewButton: 'Preview announcement',
     publishButton: 'Post an announcement',
@@ -128,6 +142,10 @@ const TRANSLATIONS = {
     descriptionValidation: 'The description must be at least 40 characters.',
     locationValidation: 'Please choose a location.',
     contactNameValidation: 'Please enter the contact person name.',
+    emailValidation: 'Please enter an email address.',
+    emailFormatError: 'The email address is invalid.',
+    phoneValidation: 'Please enter a phone number.',
+    phoneFormatError: 'The phone number is invalid (e.g. 07xxxxxxxx).',
     imageFormatError: 'Invalid image format',
     imageFormatMessage: 'Only JPG or JPEG files.',
     postError: 'Post error',
@@ -171,6 +189,16 @@ export default function SellScreen() {
   const [countyExpanded, setCountyExpanded] = useState<string | null>(null);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const { isAuthenticated } = useAuth();
+
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
@@ -220,55 +248,78 @@ export default function SellScreen() {
       });
 
       if (jpgAssets.length === 0) {
-        Alert.alert(t.imageFormatError, t.imageFormatMessage);
+        showToast(t.imageFormatMessage, 'error');
         return;
       }
 
       let duplicatesFound = false;
       const timestampBase = Date.now();
 
-      setImages(prev => {
-        const existingUris = new Set<string>();
-        prev.forEach(item => {
-          if (item.uri) existingUris.add(item.uri);
-        });
-
-        const batchUris = new Set<string>();
-        const additions: ImageItem[] = [];
-
-        jpgAssets.forEach((asset: any, idx: number) => {
-          const uri = asset.uri;
-          if (!uri) return;
-          
-          // Check if image already exists in current images
-          if (existingUris.has(uri)) {
-            duplicatesFound = true;
-            return;
-          }
-          
-          // Check if image is duplicate within the current batch
-          if (batchUris.has(uri)) {
-            duplicatesFound = true;
-            return;
-          }
-          
-          batchUris.add(uri);
-          additions.push({ id: `${timestampBase}_${idx}`, uri });
-        });
-
-        if (additions.length === 0) {
-          return prev;
+      // Calculate existing signatures from current state 'images'
+      const existingSignatures = new Set<string>();
+      images.forEach(item => {
+        if (item.uri) existingSignatures.add(item.uri);
+        if (item.assetId) existingSignatures.add(item.assetId);
+        if (item.width && item.height && item.fileSize) {
+          existingSignatures.add(`${item.width}-${item.height}-${item.fileSize}`);
         }
-
-        return [...prev, ...additions];
       });
+
+      const batchSignatures = new Set<string>();
+      const additions: ImageItem[] = [];
+
+      jpgAssets.forEach((asset: any, idx: number) => {
+        const uri = asset.uri;
+        if (!uri) return;
+        
+        const assetId = asset.assetId;
+        const width = asset.width;
+        const height = asset.height;
+        const fileSize = asset.fileSize;
+        
+        const compositeSig = (width && height && fileSize) ? `${width}-${height}-${fileSize}` : null;
+
+        let isDuplicate = false;
+        
+        if (existingSignatures.has(uri)) isDuplicate = true;
+        if (assetId && existingSignatures.has(assetId)) isDuplicate = true;
+        if (compositeSig && existingSignatures.has(compositeSig)) isDuplicate = true;
+        
+        if (batchSignatures.has(uri)) isDuplicate = true;
+        if (assetId && batchSignatures.has(assetId)) isDuplicate = true;
+        if (compositeSig && batchSignatures.has(compositeSig)) isDuplicate = true;
+
+        if (isDuplicate) {
+          duplicatesFound = true;
+          return;
+        }
+        
+        batchSignatures.add(uri);
+        if (assetId) batchSignatures.add(assetId);
+        if (compositeSig) batchSignatures.add(compositeSig);
+        
+        additions.push({ 
+          id: `${timestampBase}_${idx}`, 
+          uri,
+          assetId,
+          width,
+          height,
+          type: asset.type,
+          fileName: asset.fileName,
+          fileSize
+        });
+      });
+
+      if (additions.length > 0) {
+        setImages(prev => [...prev, ...additions]);
+      }
 
       if (duplicatesFound) {
         setShowDuplicateModal(true);
       }
     } catch (e) {
       console.error('pickImages error', e);
-      Alert.alert('Eroare', 'Nu am putut selecta imaginile.');
+      showToast('Nu am putut selecta imaginile.', 'error');
     }
   }
 
@@ -277,19 +328,38 @@ export default function SellScreen() {
   const handlePreview = () => {
     // Validate required fields before preview
     if (title.length < 16) {
-      Alert.alert('Validare', t.titleValidation);
+      showToast(t.titleValidation, 'error');
       return;
     }
     if (!category) {
-      Alert.alert('Validare', t.categoryValidation);
+      showToast(t.categoryValidation, 'error');
       return;
     }
     if (description.length < 40) {
-      Alert.alert('Validare', t.descriptionValidation);
+      showToast(t.descriptionValidation, 'error');
       return;
     }
     if (!contactName.trim()) {
-      Alert.alert('Validare', t.contactNameValidation);
+      showToast(t.contactNameValidation, 'error');
+      return;
+    }
+    if (!email.trim()) {
+      showToast(t.emailValidation, 'error');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      showToast(t.emailFormatError, 'error');
+      return;
+    }
+
+    if (!phone.trim()) {
+      showToast(t.phoneValidation, 'error');
+      return;
+    }
+    const phoneRegex = /^0[0-9]{9}$/;
+    if (!phoneRegex.test(phone.trim())) {
+      showToast(t.phoneFormatError, 'error');
       return;
     }
     
@@ -315,27 +385,42 @@ export default function SellScreen() {
   const handleSubmit = async () => {
     // Validations (mirror edit flow)
     if (!isAuthenticated) {
-      Alert.alert(t.authError, t.authError);
+      showToast(t.authError, 'error');
       return;
     }
     if (title.length < 16) {
-      Alert.alert('Validare', t.titleValidation);
+      showToast(t.titleValidation, 'error');
       return;
     }
     if (!category) {
-      Alert.alert('Validare', t.categoryValidation);
+      showToast(t.categoryValidation, 'error');
       return;
     }
     if (description.length < 40) {
-      Alert.alert('Validare', t.descriptionValidation);
+      showToast(t.descriptionValidation, 'error');
       return;
     }
     if (!contactName.trim()) {
-      Alert.alert('Validare', t.contactNameValidation);
+      showToast(t.contactNameValidation, 'error');
       return;
     }
-    if (!email.trim() && !phone.trim()) {
-      Alert.alert('Validare', 'Trebuie să completezi cel puțin email-ul sau telefonul.');
+    if (!email.trim()) {
+      showToast(t.emailValidation, 'error');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      showToast(t.emailFormatError, 'error');
+      return;
+    }
+
+    if (!phone.trim()) {
+      showToast(t.phoneValidation, 'error');
+      return;
+    }
+    const phoneRegex = /^0[0-9]{9}$/;
+    if (!phoneRegex.test(phone.trim())) {
+      showToast(t.phoneFormatError, 'error');
       return;
     }
 
@@ -392,7 +477,7 @@ export default function SellScreen() {
     } catch (error: any) {
       console.error('Error publishing announcement:', error);
       const errMsg = error?.response?.data?.error || t.postErrorMessage;
-      Alert.alert(t.postError, errMsg);
+      showToast(errMsg, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -720,6 +805,13 @@ export default function SellScreen() {
               </View>
             </View>
           )}
+
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
+      />
       
     </ThemedView>
     </ProtectedRoute>
@@ -791,8 +883,8 @@ const styles = StyleSheet.create({
     shadowOpacity:0.12,
     shadowRadius:12,
   },
-  errorOverlay:{ position:'absolute', top:0, left:0, right:0, bottom:0, alignItems:'center', justifyContent:'center', padding:24 },
-  errorModal:{ width:'100%', maxWidth:320, borderRadius:20, borderWidth:1, padding:24, alignItems:'center', gap:12 },
+  errorOverlay:{ position:'absolute', top:0, left:0, right:0, bottom:0, alignItems:'center', justifyContent:'center', padding:24, zIndex: 2000, elevation: 2000 },
+  errorModal:{ width:'100%', maxWidth:320, borderRadius:20, borderWidth:1, padding:24, alignItems:'center', gap:12, elevation: 2001, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 },
   errorTitle:{ fontSize:18, fontWeight:'700', textAlign:'center' },
   errorMessage:{ fontSize:14, textAlign:'center', lineHeight:20 },
   errorButton:{ marginTop:4, borderRadius:16, paddingHorizontal:20, paddingVertical:10 },

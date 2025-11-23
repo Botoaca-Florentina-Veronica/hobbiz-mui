@@ -246,6 +246,17 @@ export default function AllReviewsScreen() {
     return `${base}/uploads/${avatar.replace(/^.*[\\\\/]/, '')}`;
   };
 
+  const getAuthorId = (r: any) => {
+    if (!r) return null;
+    if (r.author) {
+      if (typeof r.author === 'string') return String(r.author);
+      if (typeof r.author === 'object') return r.author._id || r.author.id || null;
+    }
+    if (r.authorId) return String(r.authorId);
+    if (r.user) return String(r.user);
+    return null;
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
@@ -346,28 +357,39 @@ export default function AllReviewsScreen() {
               const avatarUri = getImageSrc(review.authorAvatar);
               const likeState = reviewLikeState[review._id] || { liked: false, unliked: false };
               
+              const authorId = getAuthorId(review);
               return (
                 <View key={review._id} style={[styles.reviewCard, { borderColor: tokens.colors.borderNeutral, backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface }]}> 
                   <View style={styles.reviewItem}>
                     <View style={styles.reviewHeader}>
-                      {avatarUri ? (
-                        <Image source={{ uri: avatarUri }} style={styles.reviewerAvatar} />
-                      ) : (
-                        <View style={[styles.reviewerAvatarPlaceholder, { backgroundColor: tokens.colors.elev }]}> 
-                          <Ionicons name="person" size={20} color={tokens.colors.muted} />
-                        </View>
-                      )}
-                      <View style={styles.reviewerInfo}>
-                        <Text style={[styles.reviewerName, { color: tokens.colors.text }]}> 
-                          {review.authorName}
-                        </Text>
-                        <View style={styles.ratingRow}>
-                          {renderStars(review.score)}
-                          <Text style={[styles.reviewDate, { color: tokens.colors.muted }]}> 
-                            {new Date(review.createdAt).toLocaleDateString('ro-RO')}
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          if (authorId) {
+                            try { router.push(`/profile?userId=${encodeURIComponent(String(authorId))}`); } catch (e) { /* ignore */ }
+                          }
+                        }}
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        {avatarUri ? (
+                          <Image source={{ uri: avatarUri }} style={styles.reviewerAvatar} />
+                        ) : (
+                          <View style={[styles.reviewerAvatarPlaceholder, { backgroundColor: tokens.colors.elev }]}> 
+                            <Ionicons name="person" size={20} color={tokens.colors.muted} />
+                          </View>
+                        )}
+                        <View style={styles.reviewerInfo}>
+                          <Text style={[styles.reviewerName, { color: tokens.colors.text }]}> 
+                            {review.authorName}
                           </Text>
+                          <View style={styles.ratingRow}>
+                            {renderStars(review.score)}
+                            <Text style={[styles.reviewDate, { color: tokens.colors.muted }]}> 
+                              {new Date(review.createdAt).toLocaleDateString('ro-RO')}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                     </View>
 
                     <Text style={[styles.reviewComment, { color: tokens.colors.text }]}> 

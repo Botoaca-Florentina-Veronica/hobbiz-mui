@@ -163,7 +163,8 @@ router.post('/logout-all-devices', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwt_secret');
     
     const User = require('../models/User');
-    const user = await User.findById(decoded.id);
+    const userId = decoded.userId || decoded.id;
+    const user = await User.findById(userId);
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

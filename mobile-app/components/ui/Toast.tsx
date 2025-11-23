@@ -159,7 +159,6 @@ export const Toast: React.FC<ToastProps> = ({
               color: isDark ? '#FFFFFF' : '#1A1A1A',
             },
           ]}
-          numberOfLines={2}
         >
           {message}
         </Text>
@@ -200,5 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     lineHeight: 20,
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
 });

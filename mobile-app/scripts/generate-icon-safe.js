@@ -17,9 +17,9 @@ const path = require('path');
 
     const srcImage = await Jimp.read(srcPath);
 
-    // Resize source image to fit within 60% of canvas while preserving aspect
-    // Reduced from 70% to 60% so the foreground appears smaller and avoids being visually cut
-    const maxContent = Math.floor(size * 0.5);
+    // Resize source image to fit within ~42% of canvas while preserving aspect
+    // Smaller than before so the foreground is clearly framed and avoids being visually cut
+    const maxContent = Math.floor(size * 0.42);
     srcImage.contain(maxContent, maxContent, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE);
 
     // Create canvas
@@ -35,6 +35,12 @@ const path = require('path');
     });
 
     // Optionally add subtle padding/shadow (skipped to keep icon clean)
+
+    // Backup previous generated icon if exists
+    if (fs.existsSync(destPath)) {
+      const bak = path.join(assetsDir, 'puzzle_safe.bak.png');
+      try { fs.copyFileSync(destPath, bak); console.log('Backed up previous icon to', bak); } catch (e) { /* ignore */ }
+    }
 
     await canvas.writeAsync(destPath);
     console.log('Generated', destPath);

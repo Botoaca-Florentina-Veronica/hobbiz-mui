@@ -32,6 +32,7 @@ interface UserReview {
   comment: string;
   reviewerName: string;
   reviewerAvatar?: string;
+  reviewerId?: string;
   createdAt: string;
   likes?: any[]; // array of user IDs who liked
   unlikes?: any[]; // array of user IDs who unliked
@@ -278,6 +279,10 @@ export default function ProfileScreen() {
             comment: r.comment || '',
             reviewerName: r.authorName || 'Utilizator',
             reviewerAvatar: r.authorAvatar,
+            reviewerId: (
+              (r.author && (typeof r.author === 'string' ? r.author : (r.author._id || r.author.id)))
+              || r.authorId || r.user || undefined
+            ) as any,
             createdAt: r.createdAt,
             likes: r.likes || [],
             unlikes: r.unlikes || [],
@@ -762,7 +767,7 @@ export default function ProfileScreen() {
             {isViewingOwnProfile && !isEditingContact && (
               <TouchableOpacity 
                 onPress={handleStartEdit}
-                style={[styles.editButton, { backgroundColor:  'rgba(0, 0, 0, 0.00)', borderColor: tokens.colors.primary, borderWidth: 1 }]}
+                style={[styles.editButton, { backgroundColor: 'rgba(0,0,0,0)', borderColor: tokens.colors.primary, borderWidth: 1, marginLeft: 'auto' }]}
                 activeOpacity={0.8}
               >
                 <ThemedText style={[styles.editButtonText, { color: tokens.colors.primary }]}>{t.edit}</ThemedText>
@@ -961,14 +966,22 @@ export default function ProfileScreen() {
                                 <Ionicons name="person" size={20} color={tokens.colors.primary} />
                               </View>
                             )}
-                            <View style={styles.reviewerDetails}>
-                              <Text style={[styles.reviewerName, { color: tokens.colors.text }]}>
+                            <TouchableOpacity
+                              activeOpacity={0.8}
+                              onPress={() => {
+                                if (review.reviewerId) {
+                                  try { router.push(`/profile?userId=${encodeURIComponent(String(review.reviewerId))}`); } catch (e) { /* ignore */ }
+                                }
+                              }}
+                              style={styles.reviewerDetails}
+                            >
+                              <Text style={[styles.reviewerName, { color: tokens.colors.text }]}> 
                                 {review.reviewerName}
                               </Text>
                               <Text style={[styles.reviewDate, { color: tokens.colors.muted }]}>
                                 {formattedDate}
                               </Text>
-                            </View>
+                            </TouchableOpacity>
                           </View>
                           <View style={[styles.reviewRatingBadge, { backgroundColor: tokens.colors.rating }]}>
                             <Text style={[styles.reviewRatingText, { color: tokens.colors.text }]}>
@@ -1075,8 +1088,12 @@ export default function ProfileScreen() {
         {/* Announcements Dashboard */}
   <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
           <View style={styles.dashboardHeader}>
-            <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>Anunțurile Mele</ThemedText>
-            <TouchableOpacity onPress={() => router.push('/my-announcements')}>
+            <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>
+              {isViewingOwnProfile
+                ? 'Anunțurile Mele'
+                : `Anunțurile postate de ${((publicProfile?.firstName || '') + ' ' + (publicProfile?.lastName || '')).trim() || 'utilizator'}`}
+            </ThemedText>
+            <TouchableOpacity onPress={() => router.push('/my-announcements')} style={{ marginLeft: 'auto', padding: 6 }}>
               <Ionicons name="arrow-forward" size={20} color={tokens.colors.muted} />
             </TouchableOpacity>
           </View>
@@ -1415,13 +1432,14 @@ const styles = StyleSheet.create({
   },
   dashboardHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     marginBottom: 16,
   },
   dashboardTitle: {
     fontSize: 16,
     fontWeight: '700',
+    flexShrink: 1,
   },
   
   // Info Grid

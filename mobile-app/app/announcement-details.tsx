@@ -55,7 +55,8 @@ export default function AnnouncementDetailsScreen() {
   const width = Dimensions.get('window').width;
   const isLarge = width >= 768;
   const imageScrollRef = useRef<ScrollView | null>(null);
-  const containerWidth = Math.max(0, width - 32); // account for imageCardWrapper marginHorizontal:16
+  // Use full screen width for the image carousel to match preview page
+  const containerWidth = width;
 
   // Memoize the viewer header to prevent recreating it on every render (which causes page reload effect)
   const viewerHeaderComponent = useCallback(() => (
@@ -298,45 +299,37 @@ export default function AnnouncementDetailsScreen() {
 
         {/* Left / Right nav buttons positioned near image edges (overlay) */}
         {images.length > 1 && (
-          <>
-            <TouchableOpacity
-              onPress={() => {
-                const newIndex = imgIndex > 0 ? imgIndex - 1 : images.length - 1;
-                setImgIndex(newIndex);
-                imageScrollRef.current?.scrollTo({ x: newIndex * width, animated: true });
-              }}
-              style={[
-                styles.navBtnLeft,
-                { borderColor: tokens.colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)'}
-              ]}
-            >
-              <Ionicons name="chevron-back" size={22} color={tokens.colors.text} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                const newIndex = imgIndex < images.length - 1 ? imgIndex + 1 : 0;
-                setImgIndex(newIndex);
-                imageScrollRef.current?.scrollTo({ x: newIndex * width, animated: true });
-              }}
-              style={[
-                styles.navBtnRight,
-                { borderColor: tokens.colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)'}
-              ]}
-            >
-              <Ionicons name="chevron-forward" size={22} color={tokens.colors.text} />
-            </TouchableOpacity>
-
-            <View
-              style={[styles.carouselCounter, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
-              {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
-            >
-              <View style={[styles.carouselCounterBubble, { backgroundColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.9)' }]}>
-                <Text style={[styles.counter, { color: isDark ? '#000' : '#000' }]}>{imgIndex + 1} / {images.length}</Text>
-              </View>
+          <View
+            style={[styles.carouselCounter, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
+            {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+          >
+            <View style={styles.paginationDotsRow}>
+              {images.map((_: any, i: number) => (
+                <View
+                  key={`dot-${i}`}
+                  style={{
+                    height: 8,
+                    borderRadius: 4,
+                    marginHorizontal: 4,
+                    backgroundColor: i === imgIndex ? tokens.colors.primary : 'rgba(255,255,255,0.5)',
+                    width: i === imgIndex ? 24 : 8,
+                  }}
+                />
+              ))}
             </View>
-          </>
+          </View>
         )}
+      </View>
+
+      {/* Title placed above the main card to match preview layout */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+        <Text style={[styles.title, { color: tokens.colors.text }]}>{announcement.title}</Text>
+      </View>
+
+      <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+        <View style={[styles.categoryBadge, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.surface }]}>            
+          <Text style={[styles.categoryText, { color: tokens.colors.primary }]}>{announcement.category}</Text>
+        </View>
       </View>
 
       {/* Main Card */}
@@ -385,12 +378,7 @@ export default function AnnouncementDetailsScreen() {
           </TouchableOpacity>
         </View>
         <Text style={[styles.postedAt, { color: tokens.colors.muted }]}>Postat {new Date(announcement.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
-        <Text style={[styles.title, { color: tokens.colors.text }]}>{announcement.title}</Text>
-        <View style={styles.badgeRow}>          
-          <View style={[styles.categoryBadge, { backgroundColor: tokens.colors.elev }]}>            
-            <Text style={[styles.categoryText, { color: tokens.colors.primary }]}>{announcement.category}</Text>
-          </View>
-        </View>
+        
         <Text style={[styles.sectionHeading, { color: tokens.colors.text }]}>Descriere</Text>
         <Text style={[styles.description, { color: tokens.colors.muted }]}>{announcement.description}</Text>
         <View style={[styles.divider, { borderBottomColor: tokens.colors.border }]} />
@@ -504,11 +492,23 @@ export default function AnnouncementDetailsScreen() {
 
       {/* Rating Modal removed - moved to absolute overlay */}
 
-      {/* Location Card */}
-      <View style={[styles.locationCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
-        <Text style={[styles.locationHeading, { color: tokens.colors.text }]}>Locație</Text>
+      {/* Location Section */}
+      <View style={styles.locationSection}>
+        <View style={styles.locationHeader}>
+          <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>Locație</Text>
+          <TouchableOpacity
+            onPress={() => {
+              if (!announcement.location) return;
+              const q = encodeURIComponent(announcement.location);
+              const url = `https://www.google.com/maps/search/?api=1&query=${q}`;
+              Linking.openURL(url);
+            }}
+          >
+            <Text style={{ color: tokens.colors.primary, fontSize: 13, fontWeight: '600' }}>Deschide Harta</Text>
+          </TouchableOpacity>
+        </View>
         {/* Map embed: iframe pe web, WebView pe mobile (funcționează în Expo Go) */}
-        <View style={[styles.mapWrapper, { backgroundColor: tokens.colors.elev }]}>          
+        <View style={[styles.mapContainer, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
           {announcement.location ? (
             (() => {
               const encoded = encodeURIComponent(announcement.location);
@@ -586,17 +586,6 @@ export default function AnnouncementDetailsScreen() {
         <View style={styles.locationRow}>
           <Ionicons name="pin" size={16} color={tokens.colors.primary} />
           <Text style={[styles.locationText, { color: tokens.colors.text, flex: 1 }]}>{announcement.location}</Text>
-          <TouchableOpacity
-            onPress={() => {
-              if (!announcement.location) return;
-              const q = encodeURIComponent(announcement.location);
-              const url = `https://www.google.com/maps/search/?api=1&query=${q}`;
-              Linking.openURL(url);
-            }}
-            style={{ marginLeft: 8 }}
-          >
-            <Ionicons name="open-outline" size={20} color={tokens.colors.primary} />
-          </TouchableOpacity>
         </View>
       </View>
       {/* Image Viewer: reuse shared component that handles native pinch/zoom and swiping */}
@@ -691,11 +680,12 @@ const styles = StyleSheet.create({
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   backText: { marginLeft: 8, fontSize: 18, fontWeight: '700' },
   headerTitle: { fontSize: 18, fontWeight: '700' },
-  imageCardWrapper: { marginHorizontal: 16, marginBottom: 20, position: 'relative', overflow: 'visible' },
-  imageCard: { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 0 },
-  heroImage: { width: '100%', height: 320, backgroundColor: 'transparent' },
-  heroImageLarge: { width: '100%', height: 480, backgroundColor: 'transparent' },
-  heroPlaceholder: { width: '100%', height: 320, justifyContent: 'center', alignItems: 'center' },
+  // Align image container/styling with the preview carousel
+  imageCardWrapper: { marginBottom: 12, position: 'relative', overflow: 'visible' },
+  imageCard: { borderRadius: 0, borderWidth: 0, overflow: 'hidden', padding: 0 },
+  heroImage: { width: '100%', height: 280, backgroundColor: '#f0f0f0' },
+  heroImageLarge: { width: '100%', height: 480, backgroundColor: '#f0f0f0' },
+  heroPlaceholder: { width: '100%', height: 280, justifyContent: 'center', alignItems: 'center' },
   viewerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center' },
   viewerHeader: { position: 'absolute', top: 28, right: 16, zIndex: 20 },
   viewerCloseBtn: { width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
@@ -707,10 +697,12 @@ const styles = StyleSheet.create({
   carouselControls: { position: 'absolute', left: 0, right: 0, top: '50%', transform: [{ translateY: -24 }], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, zIndex: 20 },
   navBtn: { width: 48, height: 48, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1, backgroundColor: 'transparent' },
   // smaller side buttons placed close to image edges
-  navBtnLeft: { position: 'absolute', left: -12, top: '50%', transform: [{ translateY: -28 }], width: 50, height: 50, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 1, zIndex: 30, elevation: 6 },
-  navBtnRight: { position: 'absolute', right: -12, top: '50%', transform: [{ translateY: -28 }], width: 50, height: 50, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 1, zIndex: 30, elevation: 6 },
-  carouselCounter: { position: 'absolute', left: 0, right: 0, bottom: 12, alignItems: 'center', justifyContent: 'center', zIndex: 15 },
-  carouselCounterBubble: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, alignItems: 'center', justifyContent: 'center', minWidth: 48 },
+  navBtnLeft: { position: 'absolute', left: 8, top: '50%', transform: [{ translateY: -24 }], width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, zIndex: 30, elevation: 6 },
+  navBtnRight: { position: 'absolute', right: 8, top: '50%', transform: [{ translateY: -24 }], width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, zIndex: 30, elevation: 6 },
+  // Pagination similar to preview: centered dots near bottom
+  carouselCounter: { position: 'absolute', left: 0, right: 0, bottom: 16, alignItems: 'center', justifyContent: 'center', zIndex: 15 },
+  carouselCounterBubble: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 999, alignItems: 'center', justifyContent: 'center', minWidth: 0 },
+  paginationDotsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   counter: { fontSize: 13, fontWeight: '600' },
   cardActions: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', gap: 12 },
   actionCircle: { width: 52, height: 52, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 0, backgroundColor: 'transparent' },
@@ -718,8 +710,8 @@ const styles = StyleSheet.create({
   postedAt: { fontSize: 12, fontWeight: '600' },
   title: { fontSize: 24, fontWeight: '700' },
   badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  categoryBadge: { borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6 },
-  categoryText: { fontSize: 13, fontWeight: '600' },
+  categoryBadge: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginBottom: 4 },
+  categoryText: { fontSize: 14, fontWeight: '600' },
   sectionHeading: { fontSize: 16, fontWeight: '700', marginTop: 4 },
   description: { fontSize: 14, lineHeight: 20 },
   divider: { borderBottomWidth: 1, marginVertical: 8 },
@@ -749,10 +741,11 @@ const styles = StyleSheet.create({
   showPhoneLink: { fontSize: 13, fontWeight: '800', letterSpacing: 0.3 },
   outlineBtn: { marginTop: 6, borderWidth: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center', justifyContent: 'center' },
   outlineBtnText: { fontSize: 14, fontWeight: '700' },
-  locationCard: { marginHorizontal: 16, borderWidth: 1, borderRadius: 18, padding: 20, marginBottom: 40, gap: 16 },
-  locationHeading: { fontSize: 18, fontWeight: '700' },
-  locationMapPlaceholder: { width: '100%', height: 180, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  mapWrapper: { width: '100%', height: 180, borderRadius: 14, overflow: 'hidden' },
+  locationSection: { marginHorizontal: 16, marginBottom: 40 },
+  locationHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '700' },
+  mapContainer: { height: 160, borderRadius: 16, overflow: 'hidden', borderWidth: 1, position: 'relative' },
+  locationMapPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   mapInnerWrapper: { flex: 1, overflow: 'hidden' },
   mapWebview: { flex: 1, backgroundColor: 'transparent' },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },

@@ -26,6 +26,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { PermissionsAndroid } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BackHandler } from 'react-native';
@@ -616,87 +617,13 @@ export default function ChatScreen() {
         }
       }
 
-      let DocumentPicker: any = null;
-      try {
-        // dynamic import to avoid build-time errors if not installed
-        // @ts-ignore
-        DocumentPicker = await import('expo-document-picker');
-      } catch (e) {
-        // If the package isn't installed, offer the user to open the gallery as a fallback
-        Alert.alert(
-          'Selector fișiere lipsă',
-          'Pentru a selecta orice tip de fișier instalează pachetul expo-document-picker. Vrei să deschizi galeria ca alternativă?',
-          [
-            { text: 'Anulează', style: 'cancel' },
-            {
-              text: 'Deschide galerie',
-              onPress: async () => {
-                try {
-                  const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.All, quality: 0.8 });
-                  if ((res as any).canceled) return;
-                  const asset: any = (res as any).assets ? (res as any).assets[0] : res;
-                  if (!asset || !asset.uri) return;
-                  // Reuse the upload flow for files (image) picked from gallery
-                  const uri = asset.uri;
-                  const fileName = asset.name || asset.fileName || uri.split('/').pop() || `file_${Date.now()}`;
-                  const mimeType = asset.type ? `${asset.type}/${(fileName.split('.').pop() || 'jpg')}` : asset.mimeType || 'application/octet-stream';
-
-                  // Capture replyTo and clear it from the composer immediately
-                  const capturedReplyForFallback = replyTo;
-                  const tempMessage: Message = {
-                    _id: Date.now().toString(),
-                    conversationId: selectedConversation!.conversationId,
-                    senderId: userId!,
-                    image: uri,
-                    createdAt: new Date().toISOString(),
-                    senderInfo: { firstName: 'Tu', lastName: '' },
-                    ...(capturedReplyForFallback ? { replyTo: capturedReplyForFallback } : {}),
-                  };
-                  setMessages((prev) => [...prev, tempMessage]);
-                  setReplyTo(null);
-
-                  const form = new FormData();
-                  // @ts-ignore
-                  form.append('image', { uri, name: fileName, type: mimeType });
-                  form.append('conversationId', selectedConversation!.conversationId);
-                  form.append('destinatarId', selectedConversation!.otherParticipant.id);
-                  form.append('senderRole', 'cumparator');
-                  if (selectedConversation!.announcementId) {
-                    form.append('announcementId', selectedConversation!.announcementId);
-                  }
-                  if (capturedReplyForFallback) form.append('replyTo', JSON.stringify(capturedReplyForFallback));
-
-                  const r = await api.post('/api/messages', form as any, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                  });
-                  if (r?.data) {
-                    setMessages((prev) => prev.map((m) => {
-                      if (m._id !== tempMessage._id) return m;
-                      const server = r.data;
-                      return {
-                        ...server,
-                        senderInfo: tempMessage.senderInfo,
-                        replyTo: server.replyTo || tempMessage.replyTo,
-                      };
-                    }));
-                  }
-                } catch (err) {
-                  console.error('Fallback gallery upload failed', err);
-                  Alert.alert('Eroare', 'Nu s-a putut încărca fișierul din galerie.');
-                }
-              },
-            },
-          ]
-        );
-        return;
-      }
-
       const res = await DocumentPicker.getDocumentAsync({ type: '*/*' });
-      if (!res || res.type !== 'success') return;
+      if (res.canceled) return;
 
-      const uri = res.uri;
-      const fileName = res.name || uri.split('/').pop() || `file_${Date.now()}`;
-      const mimeType = res.mimeType || 'application/octet-stream';
+      const asset = res.assets[0];
+      const uri = asset.uri;
+      const fileName = asset.name;
+      const mimeType = asset.mimeType || 'application/octet-stream';
 
       // Capture replyTo and clear the preview in composer
       const capturedReplyForFile = replyTo;
@@ -1348,19 +1275,19 @@ export default function ChatScreen() {
                               {message.replyTo && message.replyTo.messageId && (
                                 <View style={[styles.replyInBubble, { 
                                   backgroundColor: isOwn 
-                                    ? (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)') 
+                                    ? (isDark ? '#ffffff' : 'rgba(0,0,0,0.08)') 
                                     : 'rgba(0,0,0,0.05)',
-                                  borderLeftColor: tokens.colors.primary 
-                                }]}>
+                                  borderLeftColor: isDark ? '#000000' : tokens.colors.primary 
+                                }]}> 
                                   <Text style={[styles.replyInBubbleName, { 
-                                    color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.primary 
+                                    color: isOwn && isDark ? '#000000' : tokens.colors.primary 
                                   }]}>
                                     {message.replyTo.senderName}
                                   </Text>
                                   {message.replyTo.text && (
                                     <Text 
                                       style={[styles.replyInBubbleText, { 
-                                        color: isOwn && isDark ? 'rgba(255,255,255,0.7)' : tokens.colors.muted 
+                                        color: isOwn && isDark ? '#000000' : tokens.colors.muted 
                                       }]} 
                                       numberOfLines={1}
                                     >
@@ -1372,11 +1299,11 @@ export default function ChatScreen() {
                                       <Ionicons 
                                         name="image-outline" 
                                         size={14} 
-                                        color={isOwn && isDark ? 'rgba(255,255,255,0.7)' : tokens.colors.muted} 
+                                        color={isOwn && isDark ? '#000000' : tokens.colors.muted} 
                                       />
                                       <Text 
                                         style={[styles.replyInBubbleText, { 
-                                          color: isOwn && isDark ? 'rgba(255,255,255,0.7)' : tokens.colors.muted,
+                                          color: isOwn && isDark ? '#000000' : tokens.colors.muted,
                                           marginLeft: 4 
                                         }]}
                                       >
@@ -1435,8 +1362,8 @@ export default function ChatScreen() {
 
     {/* Reply Preview (only when replying to a real message) */}
     {replyTo && replyTo.messageId && (
-            <View style={[styles.replyPreviewContainer, { backgroundColor: tokens.colors.elev, borderTopColor: tokens.colors.border }]}>
-              <View style={[styles.replyPreviewBar, { backgroundColor: tokens.colors.primary }]} />
+            <View style={[styles.replyPreviewContainer, { backgroundColor: tokens.colors.elev, borderTopColor: tokens.colors.border }]}> 
+              <View style={[styles.replyPreviewBar, { backgroundColor: isDark ? '#000000' : tokens.colors.primary }]} />
               <View style={styles.replyPreviewContent}>
                 <Text style={[styles.replyPreviewName, { color: tokens.colors.primary }]}>
                   {replyTo.senderName}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, Platform } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -32,6 +32,7 @@ export default function AnnouncementPreviewScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
+      <Stack.Screen options={{ headerShown: false }} />
       {/* Header with back button */}
       <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: tokens.colors.bg, borderBottomColor: tokens.colors.border }]}>
         <TouchableOpacity
