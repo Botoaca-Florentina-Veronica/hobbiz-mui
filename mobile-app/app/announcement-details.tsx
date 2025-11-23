@@ -246,7 +246,8 @@ export default function AnnouncementDetailsScreen() {
   }
 
   return (
-    <ScrollView style={{ backgroundColor: tokens.colors.bg }} contentContainerStyle={{ paddingBottom: 16 }}>
+    <View style={{ flex: 1, backgroundColor: tokens.colors.bg }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
       {/* Header: circular back button + 'înapoi' text on left, placeholder right for balance */}
       <View style={[styles.headerSpacer, { paddingTop: insets.top + 12 }]}>        
         <View style={[styles.headerRow, { alignItems: 'center' }]}>
@@ -501,70 +502,7 @@ export default function AnnouncementDetailsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Rating Modal */}
-      <Modal visible={ratingModalVisible} transparent animationType="fade" onRequestClose={() => setRatingModalVisible(false)}>
-        <BlurView 
-          intensity={80} 
-          tint={isDark ? 'dark' : 'light'}
-          style={styles.ratingModalOverlay}
-        >
-          <View style={[styles.ratingModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
-            <View style={styles.ratingStarsRow}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <TouchableOpacity key={i} onPress={() => setRatingScore(i + 1)} activeOpacity={0.8}>
-                  <Ionicons name={i < ratingScore ? 'star' : 'star-outline'} size={36} color="#FFC107" style={{ marginRight: 6 }} />
-                </TouchableOpacity>
-              ))}
-              <Text style={[styles.ratingNumeric, { color: tokens.colors.text }]}>{Number(ratingScore).toFixed(1)}</Text>
-            </View>
-
-            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}> 
-              <TextInput
-                multiline
-                numberOfLines={4}
-                onChangeText={setRatingComment}
-                value={ratingComment}
-                style={[styles.ratingInput, { color: tokens.colors.text }]}
-                placeholder="Comentariu (opțional)"
-                placeholderTextColor={tokens.colors.placeholder}
-              />
-            </View>
-
-            <View style={styles.ratingModalActions}>
-              <TouchableOpacity onPress={() => setRatingModalVisible(false)} style={styles.ratingCancelBtn}>
-                <Text style={[styles.ratingCancelText, { color: tokens.colors.primary }]}>ANULEAZĂ</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={async () => {
-                  if (!announcement?.user?._id) return;
-                  setSubmittingRating(true);
-                  try {
-                    await api.post('/api/reviews', {
-                      user: announcement.user._id,
-                      score: ratingScore,
-                      comment: ratingComment || undefined,
-                    });
-                    setRatingModalVisible(false);
-                    setRatingComment('');
-                    // optimistic UI: increase reviewCount and average - simplified
-                    // Could re-fetch seller profile for accurate numbers
-                  } catch (err) {
-                    console.warn('Failed to submit review', err);
-                    alert('Nu am putut trimite recenzia. Încearcă din nou mai târziu.');
-                  } finally {
-                    setSubmittingRating(false);
-                  }
-                }}
-                style={styles.ratingSubmitBtn}
-                activeOpacity={0.9}
-              >
-                <Text style={[styles.ratingSubmitText, { color: '#ffffff' }]}>{submittingRating ? 'TRIMITE...' : 'TRIMITE'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </BlurView>
-      </Modal>
+      {/* Rating Modal removed - moved to absolute overlay */}
 
       {/* Location Card */}
       <View style={[styles.locationCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>        
@@ -670,6 +608,73 @@ export default function AnnouncementDetailsScreen() {
         HeaderComponent={viewerHeaderComponent}
       />
     </ScrollView>
+
+    {/* Rating Modal Overlay */}
+    {ratingModalVisible && (
+        <BlurView 
+          intensity={80} 
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.ratingModalOverlay, { zIndex: 1000 }]}
+        >
+          <View style={[styles.ratingModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
+            <View style={styles.ratingStarsRow}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TouchableOpacity key={i} onPress={() => setRatingScore(i + 1)} activeOpacity={0.8}>
+                  <Ionicons name={i < ratingScore ? 'star' : 'star-outline'} size={36} color="#FFC107" style={{ marginRight: 6 }} />
+                </TouchableOpacity>
+              ))}
+              <Text style={[styles.ratingNumeric, { color: tokens.colors.text }]}>{Number(ratingScore).toFixed(1)}</Text>
+            </View>
+
+            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}> 
+              <TextInput
+                multiline
+                numberOfLines={4}
+                onChangeText={setRatingComment}
+                value={ratingComment}
+                style={[styles.ratingInput, { color: tokens.colors.text }]}
+                placeholder="Comentariu (opțional)"
+                placeholderTextColor={tokens.colors.placeholder}
+              />
+            </View>
+
+            <View style={styles.ratingModalActions}>
+              <TouchableOpacity onPress={() => setRatingModalVisible(false)} style={styles.ratingCancelBtn}>
+                <Text style={[styles.ratingCancelText, { color: tokens.colors.primary }]}>ANULEAZĂ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (!announcement?.user?._id) return;
+                  setSubmittingRating(true);
+                  try {
+                    await api.post('/api/reviews', {
+                      user: announcement.user._id,
+                      score: ratingScore,
+                      comment: ratingComment || undefined,
+                    });
+                    setRatingModalVisible(false);
+                    setRatingComment('');
+                    // optimistic UI: increase reviewCount and average - simplified
+                    // Could re-fetch seller profile for accurate numbers
+                  } catch (err) {
+                    console.warn('Failed to submit review', err);
+                    alert('Nu am putut trimite recenzia. Încearcă din nou mai târziu.');
+                  } finally {
+                    setSubmittingRating(false);
+                  }
+                }}
+                style={styles.ratingSubmitBtn}
+                activeOpacity={0.9}
+              >
+                <Text style={[styles.ratingSubmitText, { color: '#ffffff' }]}>{submittingRating ? 'TRIMITE...' : 'TRIMITE'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BlurView>
+    )}
+    </View>
   );
 }
 

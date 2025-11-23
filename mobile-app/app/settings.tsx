@@ -203,7 +203,7 @@ export default function SettingsScreen() {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${await storage.getToken()}`,
+                  'Authorization': `Bearer ${await storage.getItemAsync('userToken')}`,
                 },
               });
 

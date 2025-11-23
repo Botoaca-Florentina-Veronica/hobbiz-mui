@@ -1146,7 +1146,7 @@ export default function ChatScreen() {
       <ProtectedRoute>
       <KeyboardAvoidingView
         style={[styles.container, { backgroundColor: tokens.colors.bg }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         {/* Clean header with back button, seller avatar + name, and announcement preview below */}

@@ -658,6 +658,41 @@ const unarchiveAnnouncement = async (req, res) => {
   }
 };
 
+// Setează token-ul Expo Push pentru utilizatorul autentificat
+const setPushToken = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'Lipsește tokenul' });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
+
+    user.pushToken = token;
+    await user.save();
+    res.json({ message: 'Push token salvat cu succes' });
+  } catch (error) {
+    console.error('Eroare la setarea push token:', error);
+    res.status(500).json({ error: 'Eroare server la setarea push token' });
+  }
+};
+
+// Șterge token-ul Expo Push pentru utilizatorul autentificat
+const deletePushToken = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
+
+    user.pushToken = undefined;
+    await user.save();
+    res.json({ message: 'Push token eliminat cu succes' });
+  } catch (error) {
+    console.error('Eroare la ștergerea push token:', error);
+    res.status(500).json({ error: 'Eroare server la ștergerea push token' });
+  }
+};
+
 module.exports = {
   deleteAccount,
   register,
@@ -679,4 +714,6 @@ module.exports = {
   archiveAnnouncement,
   getArchivedAnnouncements,
   unarchiveAnnouncement
+  ,setPushToken,
+  deletePushToken
 };
