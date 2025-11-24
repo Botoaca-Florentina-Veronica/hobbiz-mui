@@ -39,6 +39,39 @@ const createReview = async (req, res) => {
       console.warn('Nu am putut actualiza câmpul reviews al user-ului:', pushErr.message);
     }
 
+    // Send notification
+    try {
+      const Notification = require('../models/Notification');
+      await Notification.create({
+        userId: reviewedUserId,
+        message: `Ai primit o recenzie nouă (${parsedScore}/5)`,
+        link: `/users/${reviewedUserId}/reviews`,
+      });
+
+      if (reviewed.pushToken && /^ExponentPushToken\[.+\]$/.test(reviewed.pushToken)) {
+        const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
+        
+        let authorName = 'Cineva';
+        if (authorId) {
+             const author = await User.findById(authorId).select('firstName lastName');
+             if (author) authorName = `${author.firstName || ''} ${author.lastName || ''}`.trim() || 'Cineva';
+        }
+
+        await doFetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: reviewed.pushToken,
+            title: 'Recenzie nouă',
+            body: `${authorName} ți-a lăsat o recenzie de ${parsedScore} stele.`,
+            data: { link: `/users/${reviewedUserId}/reviews` },
+          }),
+        });
+      }
+    } catch (notifErr) {
+      console.warn('Eroare trimitere notificare recenzie:', notifErr);
+    }
+
     // Return populated review (author basic info) for frontend convenience
     try {
       const populated = await Review.findById(review._id).populate('author', 'firstName lastName avatar').lean();
