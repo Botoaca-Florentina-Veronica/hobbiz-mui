@@ -23,11 +23,9 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes'); // Importă rutele de autentificare
 const session = require('express-session'); // Import express-session
 const passport = require('passport'); // Import passport
-const mitmRoutes = require('./routes/mitmRoutes'); // Importă rutele pentru mitm
 const announcementRoutes = require('./routes/announcementRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
 const { execFile } = require('child_process');
-const Alert = require('./models/Alert');
 const path = require('path');
 const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
@@ -225,7 +223,6 @@ connectDB(); // Apelează funcția exportată
 // Rute
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes); // Adaugă rutele de autentificare
-app.use('/api/mitm', mitmRoutes); // Adaugă rutele pentru mitm
 
 app.use('/api/announcements', announcementRoutes); // Rute pentru anunturi publice
 app.use('/api/favorites', favoriteRoutes); // Rute pentru favorite persistente
@@ -263,32 +260,8 @@ app.get('/health/db', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  // Folosește calea corectă către mitm_detector.exe și interfața de rețea "Ethernet"
-  execFile('../mitm-detector.exe', ['Ethernet'], (error, stdout, stderr) => {
-    if (error) {
-      console.error('Eroare la rularea detectorului:', error);
-      return res.status(500).json({ error: 'Eroare internă la detecție MITM' });
-    }
-
-    let alerts = [];
-    try {
-      alerts = JSON.parse(stdout); // dacă output-ul Rust e JSON
-    } catch (e) {
-      alerts = stdout.split('\n').filter(Boolean);
-    }
-
-    if (alerts.length > 0) {
-      Alert.create({
-        username,
-        alert: alerts.join('; '),
-        timestamp: new Date()
-      });
-      return res.status(403).json({ error: 'Sesiune suspectă: posibil atac MITM detectat!' });
-    }
-
-    // Continuă login-ul normal (aici pui logica ta de autentificare)
-    res.json({ success: true });
-  });
+  // Continuă login-ul normal (aici pui logica ta de autentificare)
+  res.json({ success: true });
 });
 
 // Pornire server

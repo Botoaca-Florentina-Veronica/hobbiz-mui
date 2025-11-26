@@ -2,7 +2,6 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { execFile } = require('child_process');
-const Alert = require('../models/Alert');
 const Announcement = require('../models/Announcement');
 const multer = require('multer');
 const path = require('path');
@@ -219,29 +218,6 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: 'Date de autentificare invalide' });
     }
-
-    // === MITM DETECTION ===
-  execFile('../mitm-detector.exe', ['Ethernet'], (error, stdout, stderr) => {
-      let alerts = [];
-      if (error) {
-        console.error('Eroare la rularea detectorului:', error);
-        // Nu bloca login-ul dacă detectorul dă eroare, doar loghează
-      } else {
-        try {
-          alerts = JSON.parse(stdout);
-        } catch (e) {
-          alerts = stdout.split('\n').filter(Boolean);
-        }
-        if (alerts.length > 0) {
-          Alert.create({
-            username: email,
-            alert: alerts.join('; '),
-            timestamp: new Date()
-          });
-        }
-      }
-    });
-    // === END MITM DETECTION ===
 
     // Generează token
     const token = jwt.sign(
@@ -593,7 +569,7 @@ const updateAnnouncement = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.userId;
-    const { firstName, lastName, localitate, phone } = req.body;
+    const { firstName, lastName, localitate, phone, notificationSettings } = req.body;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit' });
@@ -602,6 +578,7 @@ const updateProfile = async (req, res) => {
     if (lastName !== undefined) user.lastName = lastName;
     if (localitate !== undefined) user.localitate = localitate;
     if (phone !== undefined) user.phone = phone;
+    if (notificationSettings !== undefined) user.notificationSettings = notificationSettings;
     await user.save();
     res.json({ message: 'Profil actualizat cu succes!' });
   } catch (error) {

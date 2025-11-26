@@ -353,10 +353,9 @@ export default function ChatScreen() {
               c.conversationId === selectedConversation.conversationId ? { ...c, unread: false, unreadCount: 0 } : c
             )
           );
-          // Actualizează badge-ul global
+          // Actualizează badge-ul global - call directly without adding to dependencies
           decrementUnreadCount(unreadAmount);
-          // Refresh count pentru siguranță
-          await refreshUnreadCount();
+          // Skip refresh to avoid circular updates
         } catch (e) {
           console.error('Error marking as read:', e);
         }
@@ -367,7 +366,7 @@ export default function ChatScreen() {
     } finally {
       setLoading(false);
     }
-  }, [selectedConversation, userId, decrementUnreadCount, refreshUnreadCount]);
+  }, [selectedConversation, userId]);
 
   useEffect(() => {
     if (selectedConversation) {
@@ -391,17 +390,20 @@ export default function ChatScreen() {
   // and restore the tab bar. This helps when the user navigates via tabs, deep links, or other screens.
   useFocusEffect(
     useCallback(() => {
-      // Refresh conversations and unread count when screen gains focus
-      fetchConversations();
-      refreshUnreadCount();
+      // Only fetch if we don't have a selected conversation from route params
+      // This prevents clearing the conversation when navigating from notifications
+      const hasRouteConversation = !!(routeParams as any)?.conversationId || !!(routeParams as any)?.announcementOwnerId;
+      if (!hasRouteConversation) {
+        // Refresh conversations and unread count when screen gains focus naturally
+        fetchConversations();
+        refreshUnreadCount();
+      }
       
       return () => {
-        if (selectedConversation) {
-          setSelectedConversation(null);
-        }
+        // Don't auto-close conversation on blur - let user navigate back explicitly
         showTabBar();
       };
-    }, [selectedConversation, showTabBar, fetchConversations, refreshUnreadCount])
+    }, [showTabBar])
   );
 
   // Handle Android hardware back button when inside a conversation: close it and show tab bar.
@@ -1089,7 +1091,17 @@ export default function ChatScreen() {
           {/* Center block: avatar + name (centered), announcement preview below */}
           <View style={styles.headerCenter}>
             <View style={styles.headerTitleRow}>
-              <TouchableOpacity onPress={() => setSelectedConversation(null)} style={styles.backBtnClean}>
+              <TouchableOpacity 
+                onPress={() => {
+                  setSelectedConversation(null);
+                  showTabBar();
+                  // If we came from notifications or another screen, navigate back
+                  if (router.canGoBack()) {
+                    router.back();
+                  }
+                }} 
+                style={styles.backBtnClean}
+              >
                 <Ionicons name="arrow-back" size={26} color={tokens.colors.text} />
               </TouchableOpacity>
               <TouchableOpacity

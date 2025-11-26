@@ -9,6 +9,10 @@ Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API
 
 ---
 
+<p align="center"><img src="./mobile-app/assets/images/poster.png" alt="Hobbiz Poster" width="720" style="max-width:100%;height:auto"/></p>
+
+---
+
 ## 🧭 Descriere
 Hobbiz este o platformă unde utilizatorii își pot publica anunțuri în vederea monetizarii hobby‑urilor. De ce? Pentru că în ziua de azi nu mai e de ajuns o singură sursă de venit. Aici poți îmbina utilul cu plăcutul!
 
@@ -19,12 +23,12 @@ Hobbiz este o platformă unde utilizatorii își pot publica anunțuri în veder
 Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** și **React Native**, optimizată pentru iOS și Android. Aplicația permite utilizatorilor să:
 
 - **Exploreze anunțuri** – Navighează prin categorii și descoperă hobby-uri și servicii locale pe care ai vrea să le soliciți
-- **Gestioneze favorite** – Salvează și accesează rapid anunțurile preferate
-- **Publice anunțuri** – Creează și editează anunțuri direct de pe dispozitiv cu upload de imagini
+- **Gestioneze favorite** – Salvează și accesezi rapid anunțurile preferate
+- **Publice anunțuri** – Creează și editezi anunțuri direct de pe dispozitiv cu upload de imagini
 - **Comunice în timp real** – Chat privat cu notificări și typing indicators
 - **Gestioneze contul** – Profil personalizat cu avatar, setări și autentificare Google OAuth(în viitor +Facebook, Apple)
 
-### Capturi de Ecran (da știu îmi place Gumball, ai vreo problemă?)
+### Capturi de Ecran
 
 <table align="center">
   <tr>
@@ -46,80 +50,73 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
   </tr>
 </table>
 
-### Tehnologii Mobile
-- **Expo SDK 54** + React Native 0.81
-- **expo-router** pentru navigație declarativă
-- **expo-secure-store** pentru stocare criptată
-- **axios** pentru comunicare API
-- **Socket.IO** pentru realtime updates
-- **react-native-safe-area-context** pentru layout adaptat
-
 ---
 
 ## 🧱 Arhitectură (Monorepo)
 
+Proiectul este organizat ca un monorepo cu trei subproiecte principale (frontend, backend, mobile) și câteva utilitare/support files la rădăcină. Structura relevantă (rezumat):
+
 ```
 hobbiz-mui/
-│  hobbiz-mui.sln               # (pentru integrare eventuală cu tooling extern)
-│  netlify.toml / render.yaml   # Config deploy frontend / backend
 │  README.md
-│  schiță-db.md                 # Note despre modelarea datelor
-│  observatii.txt               # Observații / TODO istoric
+│  app.json
+│  eas.json
+│  hobbiz-mui.sln
+│  netlify.toml
+│  render.yaml
+│  LICENSE
+│  observatii.txt
+│  schiță-db.md
+│  package.json
+│  README.md
 │
-├─ frontend/                    # Client web (React + Vite + MUI)
-│  ├─ index.html
+├─ backend/                      # API REST + WebSocket (Express + Socket.IO)
+│  ├─ server.js                  # bootstrap server
+│  ├─ package.json
+│  ├─ build.sh
+│  ├─ config/                    # config (db, cloudinary, multer, passport)
+│  │  ├─ db.js
+│  │  ├─ cloudinary.js
+│  │  └─ cloudinaryMulter.js
+│  ├─ controllers/               # controller logic (User, Message, Notification, Review, ...)
+│  ├─ models/                    # Mongoose schemas (User, Announcement, Message, Notification, Review...)
+│  ├─ routes/                    # express routes (userRoutes, messageRoutes, notificationRoutes, ...)
+│  ├─ middleware/                # auth, optionalAuth etc.
+│  ├─ services/                  # backend helper/services
+│  └─ scripts/                   # seed & maintenance scripts
+│
+├─ frontend/                     # Web client (React + Vite + MUI)
 │  ├─ package.json
 │  ├─ vite.config.js
-│  ├─ public/
-│  │  └─ uploads/              # Imagini persistente servite și de backend
+│  ├─ index.html
+│  ├─ public/                     # static assets served by web (uploads used at runtime)
 │  └─ src/
-│     ├─ api/api.js            # Config Axios & interceptori
-│     ├─ assets/               # Date statice (ex: comunePeJudet.js)
-│     ├─ components/           # Componente UI reutilizabile (CallToAction, Categories, ChatPopup,
-│     │                        # DarkModeToggle, Footer, Header, AnnouncementLocationMap, etc.)
-│     ├─ context/AuthContext.jsx
-│     ├─ pages/                # Pagini routate (Login, Signup, ProfilePage, Add/Edit Announcement,
-│     │                        # Favorites, ChatPage, NotificationsPage, Reviews, OAuthSuccess, Legal, etc.)
-│     ├─ services/             # (în curs – pentru extragerea logicii de API)
-│     ├─ App.jsx / main.jsx    # Bootstrap aplicație
-│     ├─ themeTransition.*     # Efecte de tranziție temă/dark-mode
-│     ├─ mediaQueries.css      # Breakpoints și adaptări
-│     └─ App.css / index.css
+│     ├─ api/                    # axios instances & API helpers
+│     ├─ assets/                 # site images / static data
+│     ├─ components/             # UI components
+│     ├─ context/                # React contexts
+│     ├─ pages/                  # routed pages
+│     └─ styles/
 │
-├─ backend/                     # API REST + WebSocket (Socket.IO)
-│  ├─ server.js                # Bootstrap Express + Socket.IO + CORS + sesiuni + endpoints health
-│  ├─ build.sh
+├─ mobile-app/                   # Mobile client (Expo + React Native + expo-router)
 │  ├─ package.json
-│  ├─ config/
-│  │  ├─ db.js                 # Conectare MongoDB
-│  │  ├─ passport.js           # Google OAuth via Passport
-│  │  ├─ cloudinary.js         # Config Cloudinary
-│  │  └─ cloudinaryMulter.js   # Multer storage adaptor
-│  ├─ middleware/
-│  │  ├─ auth.js               # Verificare JWT obligatorie
-│  │  └─ optionalAuth.js       # JWT opțional (ex: recenzii publice)
-│  ├─ models/                  # Mongoose Schemas (User, Announcement, Review,
-│  │  │                          Message, Notification, Alert)
-│  ├─ controllers/             # Logică business (User, Message, Notification, Review)
-│  ├─ routes/                  # Layer routing REST (vezi secțiunea Rute)
-│  ├─ services/                # (extensibil pentru logică suplimentară)
-│  ├─ scripts/                 # Seed / utilitare (ex: seedReview.js)
-│  └─ mitm-detector.exe        # Executabil detecție MITM (rulat la login)
-│
-├─ mobile-app/                 # Client mobil (Expo + React Native + expo-router)
-│  ├─ app/                     # Rute (layout, login, profile, notifications, tabs, etc.)
-│  ├─ components/              # UI & layout reutilizabil
-│  │  ├─ ui/                   # Small UI primitives used across screens (Toast, ConfirmDialog, ThemedText/View, etc.)
-│  │  └─ navigation/           # Navigation wrappers / headers
-│  ├─ constants/theme.ts       # Temă / culori partajate
-│  ├─ hooks/                   # use-color-scheme, use-theme-color
-│  ├─ src/ (extensibil)        # Spațiu pentru servicii/context viitoare (api, auth, storage wrappers)
-│  ├─ assets/                  # Imagini / fonturi (include `comunePeJudet.js` used by location picker)
-│  └─ comunePeJudet.js       # dataset localități pe județe (folosit în pickerul de locație)
-│  └─ package.json
-│
-└─ render.yaml / netlify.toml  # Config deploy (Render backend / Netlify frontend)
-```
+│  ├─ app/                       # expo-router routes (settings, notifications, chat, profile, tabs, etc.)
+│  │  ├─ _layout.tsx
+│  │  ├─ settings.tsx
+│  │  ├─ notifications.tsx
+│  │  ├─ (tabs)/                 # tabbed routes (chat under (tabs)/chat.tsx)
+│  │  └─ ...                     # many route files used by the mobile app
+│  ├─ src/                       # mobile-specific services, context, hooks
+│  ├─ components/                # mobile UI primitives (Toast, ThemedView/Text, ImageViewer ...)
+│  ├─ assets/                    # images, poster.png, fonts
+│  └─ android_old/               # legacy Android build files (kept for reference)
+
+├─ device-view_images/           # screenshots used in README
+├─ scripts/                      # misc scripts (listReviews.js, test-reaction.js)
+
+``` 
+
+Notă: secțiunile mai detaliate (subfolderele controllers, models, routes etc.) reflectă modul în care backend-ul este structurat pentru a păstra separarea responsabilităților (business logic în controllers, schema în models, rutare în routes). Mobilul folosește `expo-router` pentru a păstra rutele într-un folder `app/`, iar web-ul este un proiect Vite + React separat în folderul `frontend/`.
 
 ---
 
@@ -132,14 +129,6 @@ Elemente notabile:
 - Message: suport reacții + imagine (upload) + conversation scoping.
 - Review: like-uri + author vs. targetUser + optional auth la creare.
 - Notification: tip (ex: message, review, favorite), read/unread.
-
----
-
-## 🔐 Autentificare & Securitate
-- JWT (Bearer) + refresh prin re-login (expirare 7d).
-- Google OAuth 2.0 (Passport) – redirect către /oauth-success cu token.
-- express-session pentru sesiunea Passport (Google flow).
-- CORS dinamic cu whitelist + suport pentru subdomenii Netlify.
 
 ---
 
@@ -217,7 +206,6 @@ Frontend:
 - Material UI 5 + Emotion
 - Axios, jwt-decode
 - Socket.IO client (chat & notificări)
-- anime.js (efecte UI), react-slick (carusele)
 
 Backend:
 - Node.js 18+, Express 4
@@ -226,7 +214,6 @@ Backend:
 - Passport + passport-google-oauth20 + express-session
 - Multer + Cloudinary (multer-storage-cloudinary)
 - Socket.IO 4
-- CORS, dotenv
 
 Mobile (Expo):
 - Expo SDK 54, React Native 0.81
@@ -236,70 +223,6 @@ Mobile (Expo):
 Dev / Tooling:
 - ESLint (web & mobile) + configurări dedicate
 - Nodemon (backend dev)
-- Netlify (frontend deploy), Render (backend), MongoDB Atlas
-
----
-
-## ✨ Funcționalități Cheie
-- Autentificare JWT + Google OAuth
-- Gestionare anunțuri (CRUD + imagini multiple + views + favorite count)
-- Favorite persistente sincronizate în timp real
-- Chat privat cu reacții, typing indicator, atașamente imagine
-- Sistem notificări (citire, ștergere, real-time push)
-- Recenzii utilizatori (like, edit, delete, anonymous/guest allowed)
-- Profil public + avatar + update email / parolă / date personale
-- Dark mode + animații de tranziție temă
-- Filtrare anunțuri după categorie + popular
-- Health endpoints + debug LAN IP pentru testare pe device fizic
-- Profil mobil: picker de localitate integrat în pagina de profil (alegere județ → localitate) + reîncărcare automată a hărții după salvare
-- UI mobile: componente UI reutilizabile (Toast pentru notificări non-blocking, ConfirmDialog pentru confirmări) integrate în flow-ul de edit/ștergere/feedback
-
----
-
-## 🛡 Securitate & Considerații
-- CORS restrictiv cu fallback pentru subdomenii Netlify
-- Limită body JSON 5MB (imagini base64 mici)
-- Increment atomic views & favoritesCount controlat
-- Validări minime în controllers (posibilă extindere cu JOI/Zod)
-- Plan: rate limiting, helmet, sanitizare input, refresh token flow.
-
----
-
-## 🚀 Pornire Locală
-
-Prerechizite: Node >= 18, npm >= 8, cont MongoDB + variabile mediu.
-
-1. Clonează repo & instalează dependențe:
-```
-npm install --prefix backend
-npm install --prefix frontend
-npm install --prefix mobile-app
-```
-2. Creează fișier `backend/.env`:
-```
-PORT=5000
-MONGODB_URI=mongodb+srv://...
-JWT_SECRET=schimba_me
-SESSION_SECRET=alt_secret
-FRONTEND_URL=http://localhost:5173
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-```
-3. Rulează backend:
-```
-npm run dev --prefix backend
-```
-4. Rulează frontend:
-```
-npm run dev --prefix frontend
-```
-5. Rulează aplicația mobilă (Expo):
-```
-npm start --prefix mobile-app
-```
-6. Accesează:
-- Web: http://localhost:5173
-- API: http://localhost:5000/api/health
 
 ---
 

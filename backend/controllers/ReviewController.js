@@ -65,7 +65,13 @@ const createReview = async (req, res) => {
             title: 'Recenzie nouă',
             body: `${authorName} ți-a lăsat o recenzie de ${parsedScore} stele.`,
             data: { link: `/users/${reviewedUserId}/reviews` },
+            priority: 'high',
+            sound: 'default',
+            channelId: 'default',
+            ttl: 86400 // 24 hours
           }),
+        }).catch((err) => {
+          console.warn('⚠️ Push notification fetch error (review):', err);
         });
       }
     } catch (notifErr) {

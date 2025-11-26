@@ -2,8 +2,8 @@
   "expo": {
     "name": "Hobbiz",
     "slug": "hobbiz-mui-monorepo",
-    "version": "1.0.6",
-    "orientation": "portrait",
+    "version": "1.0.7",
+    "orientation": "default",
     "icon": "./assets/images/puzzle_safe.png",
     "scheme": "mobileapp",
     "userInterfaceStyle": "automatic",
@@ -38,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/puzzle.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -46,7 +46,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

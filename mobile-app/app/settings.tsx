@@ -289,6 +289,7 @@ export default function SettingsScreen() {
                   if (item.key === 'delete-account') return handleDeleteAccount();
                   if (item.key === 'archived-announcements') return router.push('/archived-announcements');
                   if (item.key === 'logout-devices') return handleLogoutAllDevices();
+                  if (item.key === 'notifications') return router.push('/notification-settings');
                   // Aici poți adăuga alte acțiuni simple non-expandable
                   return null;
                 }}

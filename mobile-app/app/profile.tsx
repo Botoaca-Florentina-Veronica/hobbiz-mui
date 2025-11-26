@@ -1093,7 +1093,19 @@ export default function ProfileScreen() {
                 ? 'Anunțurile Mele'
                 : `Anunțurile postate de ${((publicProfile?.firstName || '') + ' ' + (publicProfile?.lastName || '')).trim() || 'utilizator'}`}
             </ThemedText>
-            <TouchableOpacity onPress={() => router.push('/my-announcements')} style={{ marginLeft: 'auto', padding: 6 }}>
+            <TouchableOpacity 
+              onPress={() => {
+                if (isViewingOwnProfile) {
+                  router.push('/my-announcements');
+                } else {
+                  router.push({
+                    pathname: '/user-announcements',
+                    params: { userId: userId }
+                  });
+                }
+              }}
+              style={{ marginLeft: 'auto', padding: 6 }}
+            >
               <Ionicons name="arrow-forward" size={20} color={tokens.colors.muted} />
             </TouchableOpacity>
           </View>

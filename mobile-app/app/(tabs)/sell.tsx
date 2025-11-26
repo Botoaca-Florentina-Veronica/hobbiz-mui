@@ -450,7 +450,7 @@ export default function SellScreen() {
         }
       });
 
-      await api.post('/api/users/my-announcements', formData, {
+      const res = await api.post('/api/users/my-announcements', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -473,7 +473,21 @@ export default function SellScreen() {
       };
 
       resetForm();
-  router.replace({ pathname: '/post-success', params: { title: submittedTitle } });
+
+      // Try to extract the created announcement ID from server response
+      const createdId = res?.data?._id || res?.data?.id || res?.data?.announcementId || null;
+      if (createdId) {
+        // Redirect directly to the announcement details page
+        try {
+          router.replace(`/announcement-details?id=${encodeURIComponent(String(createdId))}`);
+        } catch (e) {
+          // Fallback to post-success if navigation fails
+          router.replace({ pathname: '/post-success', params: { title: submittedTitle } });
+        }
+      } else {
+        // If server didn't return an ID, keep the existing success screen
+        router.replace({ pathname: '/post-success', params: { title: submittedTitle } });
+      }
     } catch (error: any) {
       console.error('Error publishing announcement:', error);
       const errMsg = error?.response?.data?.error || t.postErrorMessage;

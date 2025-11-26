@@ -72,7 +72,6 @@ export default function AccountScreen() {
     { key: 'settings', label: t.settings, icon: 'settings-outline', action: () => router.push('/settings') },
     { key: 'my-ads', label: t.myAds, icon: 'megaphone-outline', action: () => router.push('/my-announcements') },
     { key: 'profile', label: t.profile, icon: 'person-outline', action: () => router.push('/profile') },
-    { key: 'notifications', label: t.notifications, icon: 'notifications-outline' },
     { key: 'darkmode', label: t.darkMode, icon: 'moon-outline', type: 'switch' },
     { key: 'language', label: t.language, icon: 'language-outline', action: () => setLanguageModalOpen(true) },
   ];

@@ -23,7 +23,14 @@ const userSchema = new mongoose.Schema({
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Announcement' }]
   ,
   // Reviews left for this user - stored as references to Review documents for clarity and fast lookup
-  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }]
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+  notificationSettings: {
+    email: { type: Boolean, default: true },
+    push: { type: Boolean, default: true },
+    messages: { type: Boolean, default: true },
+    reviews: { type: Boolean, default: true },
+    promotions: { type: Boolean, default: false }
+  }
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

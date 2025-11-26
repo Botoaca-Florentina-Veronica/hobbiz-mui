@@ -285,7 +285,19 @@ const createMessage = async (req, res) => {
           let sender = null;
           try { sender = await User.findById(senderId).select('firstName lastName'); } catch (_) {}
           const title = sender ? `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Mesaj nou' : 'Mesaj nou';
-          const body = hasText ? String(text).slice(0, 120) : (messageData.image ? 'Imagine nouă' : 'Mesaj nou');
+          const bodyPreview = hasText ? String(text).slice(0, 120) : (messageData.image ? 'Imagine nouă' : 'Mesaj nou');
+          // If this message belongs to an announcement, try to include announcement title in the push
+          let announcementTitle = null;
+          if (messageData.announcementId) {
+            try {
+              const Announcement = require('../models/Announcement');
+              const ann = await Announcement.findById(String(messageData.announcementId)).select('title');
+              if (ann) announcementTitle = ann.title || null;
+            } catch (e) {
+              // ignore
+            }
+          }
+          const body = announcementTitle ? `${announcementTitle}: ${bodyPreview}` : bodyPreview;
           if (recipient && recipient.pushToken && /^ExponentPushToken\[.+\]$/.test(recipient.pushToken)) {
             // Folosim fetch global (Node 18+) cu fallback la node-fetch dacă e necesar
             const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
@@ -296,11 +308,15 @@ const createMessage = async (req, res) => {
                 to: recipient.pushToken,
                 title,
                 body,
-                data: { link },
+                data: { link, announcementId: messageData.announcementId, announcementTitle },
                 priority: 'high',
-                sound: 'default'
+                sound: 'default',
+                channelId: 'default',
+                ttl: 86400 // 24 hours
               })
-            }).catch(() => {});
+            }).catch((err) => {
+              console.warn('⚠️ Push notification fetch error:', err);
+            });
           }
         } catch (e) {
           console.warn('⚠️ Eroare trimitere push notification:', e.message);
