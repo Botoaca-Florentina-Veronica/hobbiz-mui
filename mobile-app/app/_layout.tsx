@@ -68,6 +68,7 @@ export default function RootLayout() {
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="oauth" options={{ headerShown: false }} />
                 <Stack.Screen name="settings" options={{ headerShown: false }} />
                 <Stack.Screen name="notification-settings" options={{ headerShown: false }} />
                 <Stack.Screen name="about" options={{ headerShown: false }} />

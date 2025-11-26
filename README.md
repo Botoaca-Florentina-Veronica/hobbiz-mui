@@ -9,12 +9,42 @@ Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API
 
 ---
 
-<p align="center"><img src="./mobile-app/assets/images/poster.png" alt="Hobbiz Poster" width="720" style="max-width:100%;height:auto"/></p>
-
----
+<table>
+<tr>
+<td width="50%" valign="top">
 
 ## 🧭 Descriere
+
 Hobbiz este o platformă unde utilizatorii își pot publica anunțuri în vederea monetizarii hobby‑urilor. De ce? Pentru că în ziua de azi nu mai e de ajuns o singură sursă de venit. Aici poți îmbina utilul cu plăcutul!
+
+Nu ai hobby-uri? Nu e problemă, aici îți poți găsi pasiunile! Te poți conecta cu oameni cu aceleași interese ca tine și să învățați împreună lucruri noi prin intermediul unei comunități vaste și prietenoase. Apoi cine știe, înveți și pe alții!
+
+
+### 🛠️ Tech Stack
+
+<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px;">
+  <a href="https://react.dev" target="_blank"><img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" /></a>
+  <a href="https://vitejs.dev" target="_blank"><img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" /></a>
+  <a href="https://mui.com" target="_blank"><img src="https://img.shields.io/badge/Material_UI-5-007FFF?style=for-the-badge&logo=mui&logoColor=white" alt="Material UI" /></a>
+  <a href="https://nodejs.org" target="_blank"><img src="https://img.shields.io/badge/Node.js-18-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" /></a>
+  <a href="https://expressjs.com" target="_blank"><img src="https://img.shields.io/badge/Express-4-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" /></a>
+  <a href="https://www.mongodb.com" target="_blank"><img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" /></a>
+  <a href="https://expo.dev" target="_blank"><img src="https://img.shields.io/badge/Expo-54-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" /></a>
+  <a href="https://reactnative.dev" target="_blank"><img src="https://img.shields.io/badge/React_Native-0.81-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React Native" /></a>
+  <a href="https://socket.io" target="_blank"><img src="https://img.shields.io/badge/Socket.IO-4-010101?style=for-the-badge&logo=socket.io&logoColor=white" alt="Socket.IO" /></a>
+  <a href="https://jwt.io" target="_blank"><img src="https://img.shields.io/badge/JWT-jsonwebtoken-FF9900?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT" /></a>
+</div>
+
+</td>
+<td width="50%" valign="top">
+
+<p align="center">
+  <img src="./mobile-app/assets/images/poster.png" alt="Hobbiz Poster" width="560" />
+</p>
+
+</td>
+</tr>
+</table>
 
 ---
 

@@ -12,8 +12,8 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String },
   // Optional profile cover (banner) image
   coverImage: { type: String },
-  // Expo/FCM push token for mobile notifications
-  pushToken: { type: String },
+  // Expo/FCM push token for mobile notifications - changed to array to support multiple devices
+  pushToken: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
   localitate: { type: String }, // Adăugat câmpul localitate
   lastSeen: { type: Date, default: Date.now }, // Adăugat câmpul pentru ultima activitate

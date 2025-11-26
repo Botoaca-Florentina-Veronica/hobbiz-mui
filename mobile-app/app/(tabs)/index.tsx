@@ -122,6 +122,53 @@ export default function HomeScreen() {
     }
   }, []);
 
+  // Checkered background grid component for dark mode
+  const CheckeredBackground = () => {
+    if (!isDark) return null;
+    
+    return (
+      <View 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+        }}
+        pointerEvents="none"
+      >
+        {/* Create grid pattern using semi-transparent lines */}
+        {Array.from({ length: 50 }).map((_, i) => (
+          <View
+            key={`h-${i}`}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: i * 32,
+              height: 1,
+              backgroundColor: 'rgba(79, 79, 79, 0.18)',
+            }}
+          />
+        ))}
+        {Array.from({ length: 50 }).map((_, i) => (
+          <View
+            key={`v-${i}`}
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: i * 32,
+              width: 1,
+              backgroundColor: 'rgba(79, 79, 79, 0.18)',
+            }}
+          />
+        ))}
+      </View>
+    );
+  };
+
 
 
   const loadCount = useCallback(async () => {
@@ -172,14 +219,15 @@ export default function HomeScreen() {
   }, []);
 
   return (
-  <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}> 
+  <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
+      <CheckeredBackground />
       <MobileHeader 
         notificationCount={notifCount}
         onSearchFocus={() => console.log('Search focused')}
         onNotificationClick={() => router.push('/notifications')}
       />
   <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-  <View style={[styles.mainContent, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}> 
+  <View style={[styles.mainContent, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}> 
           {
             (() => {
               // Determină dimensiunea titlului în mod responsive
@@ -261,7 +309,7 @@ export default function HomeScreen() {
         </View>
 
   {/* Popular announcements */}
-  <View style={[styles.popularSection, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}>
+  <View style={[styles.popularSection, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <ThemedText style={[styles.popularTitle, { color: tokens.colors.text }]}>{t.popularTitle}</ThemedText>
             <TouchableOpacity onPress={() => router.push('/announcement-details?sort=popular') }>
@@ -399,7 +447,7 @@ export default function HomeScreen() {
           )}
         </View>
 
-  <View style={[styles.categoriesSection, { backgroundColor: isDark ? '#121212' : tokens.colors.surface }]}>
+  <View style={[styles.categoriesSection, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}>
           <ThemedText style={[styles.categoriesTitle, { color: tokens.colors.text }]}>
             {t.exploreCategories}
           </ThemedText>

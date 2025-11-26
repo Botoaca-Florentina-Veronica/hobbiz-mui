@@ -9,12 +9,14 @@ import { useRouter } from 'expo-router';
 import api from '../src/services/api';
 import { Toast } from '../components/ui/Toast';
 import { useLocale } from '../src/context/LocaleContext';
+import { useAuth } from '../src/context/AuthContext';
 
 export default function NotificationSettingsScreen() {
   const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
+  const { user } = useAuth();
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -67,22 +69,29 @@ export default function NotificationSettingsScreen() {
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
+  // Initialize settings from user context or fetch if not available
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    if (user?.notificationSettings) {
+      setSettings(user.notificationSettings);
+      setLoading(false);
+    } else {
+      fetchSettings();
+    }
+  }, [user]);
 
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      // Try to fetch user settings from backend
-      // If backend doesn't support it yet, we'll just use defaults or local storage
-      // For now, let's assume we might get them from user profile
       const res = await api.get('/api/users/profile');
       if (res.data && res.data.notificationSettings) {
         setSettings(res.data.notificationSettings);
+      } else {
+        // If no settings exist on backend, keep defaults
+        console.log('No notification settings found, using defaults');
       }
     } catch (error) {
-      console.log('Error fetching notification settings, using defaults', error);
+      console.error('Error fetching notification settings:', error);
+      showToast(t.saveError, 'error');
     } finally {
       setLoading(false);
     }
@@ -95,9 +104,10 @@ export default function NotificationSettingsScreen() {
     // Auto-save on toggle
     try {
       setSaving(true);
-      // We'll need to implement this endpoint or add the field to profile update
       await api.put('/api/users/profile', { notificationSettings: newSettings });
-      // showToast(t.saveSuccess, 'success'); // Optional: show toast on every toggle might be annoying
+      console.log('✓ Notification settings saved successfully');
+      // Optionally show a subtle success indicator
+      // showToast(t.saveSuccess, 'success');
     } catch (error) {
       console.error('Error saving settings:', error);
       showToast(t.saveError, 'error');

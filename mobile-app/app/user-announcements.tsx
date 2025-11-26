@@ -220,13 +220,13 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    gap: 16,
+    gap: 8,
   },
   card: {
     borderRadius: 12,
     borderWidth: 1,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,

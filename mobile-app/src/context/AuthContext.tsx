@@ -15,6 +15,13 @@ interface UserProfile {
   phone?: string;
   localitate?: string;
   createdAt?: string;
+  notificationSettings?: {
+    email: boolean;
+    push: boolean;
+    messages: boolean;
+    reviews: boolean;
+    promotions: boolean;
+  };
 }
 
 interface AuthContextType {
@@ -48,6 +55,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           phone: res.data.phone,
           localitate: res.data.localitate,
           createdAt: res.data.createdAt,
+          notificationSettings: res.data.notificationSettings || {
+            email: true,
+            push: true,
+            messages: true,
+            reviews: true,
+            promotions: false
+          },
         });
       } else {
         setUser(null);
@@ -129,7 +143,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      try { await api.delete('/api/users/push-token'); } catch (_) {}
+      // Try to get current push token to remove only this device
+      let tokenValue;
+      try {
+        tokenValue = await registerForPushNotificationsAsync();
+      } catch (_) {}
+
+      try { 
+        if (tokenValue) {
+          await api.delete('/api/users/push-token', { data: { token: tokenValue } }); 
+        } else {
+          await api.delete('/api/users/push-token'); 
+        }
+      } catch (_) {}
+
       await doLogout();
       setUser(null);
       setToken(null);

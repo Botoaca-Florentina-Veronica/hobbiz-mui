@@ -2,7 +2,7 @@
   "expo": {
     "name": "Hobbiz",
     "slug": "hobbiz-mui-monorepo",
-    "version": "1.0.7",
+    "version": "1.0.9",
     "orientation": "default",
     "icon": "./assets/images/puzzle_safe.png",
     "scheme": "mobileapp",
@@ -43,7 +43,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#ffffff"
           }
         }
       ],

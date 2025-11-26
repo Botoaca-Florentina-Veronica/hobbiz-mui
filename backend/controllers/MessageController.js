@@ -298,25 +298,37 @@ const createMessage = async (req, res) => {
             }
           }
           const body = announcementTitle ? `${announcementTitle}: ${bodyPreview}` : bodyPreview;
-          if (recipient && recipient.pushToken && /^ExponentPushToken\[.+\]$/.test(recipient.pushToken)) {
-            // Folosim fetch global (Node 18+) cu fallback la node-fetch dacă e necesar
-            const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
-            await doFetch('https://exp.host/--/api/v2/push/send', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: recipient.pushToken,
-                title,
-                body,
-                data: { link, announcementId: messageData.announcementId, announcementTitle },
-                priority: 'high',
-                sound: 'default',
-                channelId: 'default',
-                ttl: 86400 // 24 hours
-              })
-            }).catch((err) => {
-              console.warn('⚠️ Push notification fetch error:', err);
-            });
+          
+          if (recipient && recipient.pushToken) {
+            let tokens = [];
+            if (Array.isArray(recipient.pushToken)) {
+              tokens = recipient.pushToken;
+            } else if (typeof recipient.pushToken === 'string') {
+              tokens = [recipient.pushToken];
+            }
+            // Filter valid tokens
+            tokens = tokens.filter(t => /^ExponentPushToken\[.+\]$/.test(t));
+
+            if (tokens.length > 0) {
+              // Folosim fetch global (Node 18+) cu fallback la node-fetch dacă e necesar
+              const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
+              await doFetch('https://exp.host/--/api/v2/push/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  to: tokens,
+                  title,
+                  body,
+                  data: { link, announcementId: messageData.announcementId, announcementTitle },
+                  priority: 'high',
+                  sound: 'default',
+                  channelId: 'default',
+                  ttl: 86400 // 24 hours
+                })
+              }).catch((err) => {
+                console.warn('⚠️ Push notification fetch error:', err);
+              });
+            }
           }
         } catch (e) {
           console.warn('⚠️ Eroare trimitere push notification:', e.message);

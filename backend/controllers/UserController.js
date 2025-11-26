@@ -578,8 +578,12 @@ const updateProfile = async (req, res) => {
     if (lastName !== undefined) user.lastName = lastName;
     if (localitate !== undefined) user.localitate = localitate;
     if (phone !== undefined) user.phone = phone;
-    if (notificationSettings !== undefined) user.notificationSettings = notificationSettings;
+    if (notificationSettings !== undefined) {
+      console.log('📢 Updating notification settings:', notificationSettings);
+      user.notificationSettings = notificationSettings;
+    }
     await user.save();
+    console.log('✓ Profile updated for user:', userId);
     res.json({ message: 'Profil actualizat cu succes!' });
   } catch (error) {
     console.error('Eroare la actualizarea profilului:', error);
@@ -645,8 +649,20 @@ const setPushToken = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
 
-    user.pushToken = token;
-    await user.save();
+    // Migration check: if pushToken is a string, convert to array
+    if (user.pushToken && typeof user.pushToken === 'string') {
+      user.pushToken = [user.pushToken];
+    }
+    // Ensure it is an array
+    if (!Array.isArray(user.pushToken)) {
+      user.pushToken = [];
+    }
+
+    // Add token if not already present
+    if (!user.pushToken.includes(token)) {
+      user.pushToken.push(token);
+      await user.save();
+    }
     res.json({ message: 'Push token salvat cu succes' });
   } catch (error) {
     console.error('Eroare la setarea push token:', error);
@@ -658,10 +674,24 @@ const setPushToken = async (req, res) => {
 const deletePushToken = async (req, res) => {
   try {
     const userId = req.userId;
+    const { token } = req.body; // Optional: specific token to remove
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
 
-    user.pushToken = undefined;
+    if (token) {
+      // Remove specific token
+      if (Array.isArray(user.pushToken)) {
+        user.pushToken = user.pushToken.filter(t => t !== token);
+      } else if (user.pushToken === token) {
+        // Legacy string case
+        user.pushToken = [];
+      }
+    } else {
+      // No token specified: clear all (legacy behavior)
+      user.pushToken = [];
+    }
+
     await user.save();
     res.json({ message: 'Push token eliminat cu succes' });
   } catch (error) {

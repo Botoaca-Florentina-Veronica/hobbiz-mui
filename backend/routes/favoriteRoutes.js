@@ -63,18 +63,28 @@ router.post('/:announcementId', auth, async (req, res) => {
           link: `/announcements/${ann._id}`,
         });
 
-        if (owner && owner.pushToken && /^ExponentPushToken\[.+\]$/.test(owner.pushToken)) {
-           const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
-           await doFetch('https://exp.host/--/api/v2/push/send', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({
-               to: owner.pushToken,
-               title: 'Anunț apreciat',
-               body: `Cineva a adăugat anunțul "${ann.title}" la favorite!`,
-               data: { link: `/announcements/${ann._id}` },
-             }),
-           });
+        if (owner && owner.pushToken) {
+           let tokens = [];
+           if (Array.isArray(owner.pushToken)) {
+             tokens = owner.pushToken;
+           } else if (typeof owner.pushToken === 'string') {
+             tokens = [owner.pushToken];
+           }
+           tokens = tokens.filter(t => /^ExponentPushToken\[.+\]$/.test(t));
+
+           if (tokens.length > 0) {
+             const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
+             await doFetch('https://exp.host/--/api/v2/push/send', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 to: tokens,
+                 title: 'Anunț apreciat',
+                 body: `Cineva a adăugat anunțul "${ann.title}" la favorite!`,
+                 data: { link: `/announcements/${ann._id}` },
+               }),
+             });
+           }
         }
       } catch (e) {
         console.warn('Failed to notify owner about favorite:', e);

@@ -48,31 +48,41 @@ const createReview = async (req, res) => {
         link: `/users/${reviewedUserId}/reviews`,
       });
 
-      if (reviewed.pushToken && /^ExponentPushToken\[.+\]$/.test(reviewed.pushToken)) {
-        const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
-        
-        let authorName = 'Cineva';
-        if (authorId) {
-             const author = await User.findById(authorId).select('firstName lastName');
-             if (author) authorName = `${author.firstName || ''} ${author.lastName || ''}`.trim() || 'Cineva';
+      if (reviewed.pushToken) {
+        let tokens = [];
+        if (Array.isArray(reviewed.pushToken)) {
+          tokens = reviewed.pushToken;
+        } else if (typeof reviewed.pushToken === 'string') {
+          tokens = [reviewed.pushToken];
         }
+        tokens = tokens.filter(t => /^ExponentPushToken\[.+\]$/.test(t));
 
-        await doFetch('https://exp.host/--/api/v2/push/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: reviewed.pushToken,
-            title: 'Recenzie nouă',
-            body: `${authorName} ți-a lăsat o recenzie de ${parsedScore} stele.`,
-            data: { link: `/users/${reviewedUserId}/reviews` },
-            priority: 'high',
-            sound: 'default',
-            channelId: 'default',
-            ttl: 86400 // 24 hours
-          }),
-        }).catch((err) => {
-          console.warn('⚠️ Push notification fetch error (review):', err);
-        });
+        if (tokens.length > 0) {
+          const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
+          
+          let authorName = 'Cineva';
+          if (authorId) {
+               const author = await User.findById(authorId).select('firstName lastName');
+               if (author) authorName = `${author.firstName || ''} ${author.lastName || ''}`.trim() || 'Cineva';
+          }
+  
+          await doFetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: tokens,
+              title: 'Recenzie nouă',
+              body: `${authorName} ți-a lăsat o recenzie de ${parsedScore} stele.`,
+              data: { link: `/users/${reviewedUserId}/reviews` },
+              priority: 'high',
+              sound: 'default',
+              channelId: 'default',
+              ttl: 86400 // 24 hours
+            }),
+          }).catch((err) => {
+            console.warn('⚠️ Push notification fetch error (review):', err);
+          });
+        }
       }
     } catch (notifErr) {
       console.warn('Eroare trimitere notificare recenzie:', notifErr);
