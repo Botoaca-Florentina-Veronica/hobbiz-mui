@@ -17,6 +17,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
 import { useAppTheme } from '../src/context/ThemeContext';
+import { useLocale } from '../src/context/LocaleContext';
 import api from '../src/services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { findCategoryByLabel } from '../src/constants/categories';
@@ -35,6 +36,83 @@ interface Announcement {
   createdAt: string;
 }
 
+const TRANSLATIONS = {
+  ro: {
+    title: 'Anunțurile mele',
+    loading: 'Se încarcă anunțurile...',
+    searchPlaceholder: 'Caută după titlu, ID sau locație...',
+    category: 'Categorie',
+    sort: 'Sortare',
+    results: 'rezultate',
+    searchLabel: 'Căutare',
+    categoryLabel: 'Categorie',
+    all: 'Toate',
+    selectCategory: 'Selectează categoria',
+    sortBy: 'Sortează după',
+    mostRecent: 'Cele mai recente',
+    oldest: 'Cele mai vechi',
+    titleAZ: 'Titlu A-Z',
+    titleZA: 'Titlu Z-A',
+    noResults: 'Nu au fost găsite anunțuri cu criteriile selectate',
+    noAnnouncements: 'Nu ai încă niciun anunț publicat',
+    edit: 'Editează',
+    archive: 'Arhivează',
+    delete: 'Șterge',
+    refresh: 'Reactualizează',
+    archiveTitle: 'Arhivează anunț',
+    archiveMessage: "Ești sigur(ă) că vrei să arhivezi acest anunț? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunțuri arhivate'.",
+    yes: 'Da',
+    no: 'Nu',
+    deleteTitle: 'Șterge anunț',
+    deleteMessage: 'Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată.',
+    deleteBtn: 'Șterge',
+    cancel: 'Anulează',
+    deleteSuccess: 'Anunțul a fost șters cu succes',
+    deleteError: 'Nu s-a putut șterge anunțul. Încearcă din nou',
+    archiveSuccess: 'Anunțul a fost arhivat cu succes',
+    archiveError: 'Nu s-a putut arhiva anunțul. Încearcă din nou',
+    navigationError: 'Nu s-a putut naviga la pagina de editare.',
+    errorTitle: 'Eroare',
+  },
+  en: {
+    title: 'My Announcements',
+    loading: 'Loading announcements...',
+    searchPlaceholder: 'Search by title, ID, or location...',
+    category: 'Category',
+    sort: 'Sort',
+    results: 'results',
+    searchLabel: 'Search',
+    categoryLabel: 'Category',
+    all: 'All',
+    selectCategory: 'Select category',
+    sortBy: 'Sort by',
+    mostRecent: 'Most Recent',
+    oldest: 'Oldest',
+    titleAZ: 'Title A-Z',
+    titleZA: 'Title Z-A',
+    noResults: 'No announcements found with the selected criteria',
+    noAnnouncements: "You don't have any published announcements yet",
+    edit: 'Edit',
+    archive: 'Archive',
+    delete: 'Delete',
+    refresh: 'Refresh',
+    archiveTitle: 'Archive Announcement',
+    archiveMessage: "Are you sure you want to archive this announcement? No one will be able to access it. You can find it in the 'Archived Announcements' page.",
+    yes: 'Yes',
+    no: 'No',
+    deleteTitle: 'Delete Announcement',
+    deleteMessage: 'Are you sure you want to delete this announcement? This action cannot be undone.',
+    deleteBtn: 'Delete',
+    cancel: 'Cancel',
+    deleteSuccess: 'Announcement deleted successfully',
+    deleteError: 'Could not delete the announcement. Please try again',
+    archiveSuccess: 'Announcement archived successfully',
+    archiveError: 'Could not archive the announcement. Please try again',
+    navigationError: 'Could not navigate to the edit page.',
+    errorTitle: 'Error',
+  },
+};
+
 export default function MyAnnouncementsScreen() {
   const { width, height } = useWindowDimensions();
   // Consider a device "large" (tablet / landscape) if the shortest side is >= 600
@@ -45,6 +123,32 @@ export default function MyAnnouncementsScreen() {
   const isNarrowTablet = isLarge && width >= 600 && width < 750;
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { isDark, tokens } = useAppTheme();
+  const { locale } = useLocale();
+  const t = TRANSLATIONS[locale] || TRANSLATIONS.ro;
+  
+  // English labels for categories keyed by category key from CATEGORY_DEFS
+  const CATEGORY_LABELS_EN: Record<string, string> = {
+    fotografie: 'Photography',
+    prajituri: 'Cakes',
+    muzica: 'Music',
+    reparatii: 'Repairs',
+    dans: 'Dance',
+    curatenie: 'Cleaning',
+    gradinarit: 'Gardening',
+    sport: 'Sports',
+    arta: 'Art',
+    tehnologie: 'Technology',
+    auto: 'Auto',
+    meditatii: 'Tutoring',
+  };
+
+  const getCategoryLabel = (label?: string) => {
+    if (!label) return '';
+    if (label === t.all) return t.all;
+    const def = findCategoryByLabel(label);
+    if (!def) return label;
+    return locale === 'en' ? (CATEGORY_LABELS_EN[def.key] || def.label) : def.label;
+  };
   
   const styles = useMemo(() => createStyles(tokens), [tokens]);
   // shared border style for container-like elements to match other pages
@@ -54,8 +158,8 @@ export default function MyAnnouncementsScreen() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('Toate');
-  const [sortFilter, setSortFilter] = useState('cea mai recenta');
+  const [categoryFilter, setCategoryFilter] = useState(locale === 'en' ? 'All' : 'Toate');
+  const [sortFilter, setSortFilter] = useState(locale === 'en' ? 'mostRecent' : 'cea mai recenta');
   const [activePickerType, setActivePickerType] = useState<'category' | 'sort' | null>(null);
   // Track per-card content heights so the left image can match the card height exactly
   const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
@@ -104,7 +208,7 @@ export default function MyAnnouncementsScreen() {
 
   const uniqueCategories = useMemo(() => {
     const categories = announcements.map((a) => a.category).filter(Boolean);
-    return ['Toate', ...Array.from(new Set(categories))];
+    return [t.all, ...Array.from(new Set(categories))];
   }, [announcements]);
 
   const filteredAndSortedAnnouncements = useMemo(() => {
@@ -122,21 +226,25 @@ export default function MyAnnouncementsScreen() {
         );
       }
 
-      const matchesCategory = categoryFilter === 'Toate' || a.category === categoryFilter;
+      const matchesCategory = categoryFilter === t.all || a.category === categoryFilter;
 
       return matchesSearch && matchesCategory;
     });
 
     filtered.sort((a, b) => {
       switch (sortFilter) {
+        case 'oldest':
         case 'cea mai veche':
           return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'mostRecent':
         case 'cea mai recenta':
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'titleAZ':
         case 'titlu_a_z':
-          return a.title.localeCompare(b.title, 'ro');
+          return a.title.localeCompare(b.title, locale === 'en' ? 'en' : 'ro');
+        case 'titleZA':
         case 'titlu_z_a':
-          return b.title.localeCompare(a.title, 'ro');
+          return b.title.localeCompare(a.title, locale === 'en' ? 'en' : 'ro');
         default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
@@ -158,12 +266,12 @@ export default function MyAnnouncementsScreen() {
       setAnnouncements(announcements.filter((a) => a._id !== announcementToDelete));
       setDeleteDialogVisible(false);
       setAnnouncementToDelete(null);
-      showToast('Anunțul a fost șters cu succes', 'success');
+      showToast(t.deleteSuccess, 'success');
     } catch (e) {
       console.error('Delete error:', e);
       setDeleteDialogVisible(false);
       setAnnouncementToDelete(null);
-      showToast('Nu s-a putut șterge anunțul. Încearcă din nou', 'error');
+      showToast(t.deleteError, 'error');
     }
   };
 
@@ -178,7 +286,7 @@ export default function MyAnnouncementsScreen() {
       router.push(`/edit-announcement?id=${announcement._id}`);
     } catch (error) {
       console.error('Navigation error:', error);
-      Alert.alert('Eroare', 'Nu s-a putut naviga la pagina de editare.');
+      Alert.alert(t.errorTitle, t.navigationError);
     }
   };
 
@@ -201,7 +309,7 @@ export default function MyAnnouncementsScreen() {
       setAnnouncements(announcements.filter((a) => a._id !== announcementToHide));
       setHideDialogVisible(false);
       setAnnouncementToHide(null);
-      showToast('Anunțul a fost arhivat cu succes', 'success');
+      showToast(t.archiveSuccess, 'success');
       // Navigate to archived announcements page after toast is visible
       setTimeout(() => {
         router.push('/archived-announcements');
@@ -210,7 +318,7 @@ export default function MyAnnouncementsScreen() {
       console.error('Archive error:', e);
       setHideDialogVisible(false);
       setAnnouncementToHide(null);
-      showToast('Nu s-a putut arhiva anunțul. Încearcă din nou', 'error');
+      showToast(t.archiveError, 'error');
     }
   };
 
@@ -233,7 +341,7 @@ export default function MyAnnouncementsScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={tokens.colors.primary} />
-        <Text style={styles.loadingText}>Se încarcă anunțurile...</Text>
+        <Text style={styles.loadingText}>{t.loading}</Text>
       </View>
     );
   }
@@ -248,7 +356,7 @@ export default function MyAnnouncementsScreen() {
             <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
             </TouchableOpacity>
-            <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Anunțurile mele</Text>
+            <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.title}</Text>
           </View>
         </View>
 
@@ -269,7 +377,7 @@ export default function MyAnnouncementsScreen() {
               <Ionicons name="search" size={20} color={tokens.colors.muted} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
-                placeholder="Caută după titlu, ID sau locație..."
+                placeholder={t.searchPlaceholder}
                 placeholderTextColor={tokens.colors.placeholder}
                 value={searchTerm}
                 onChangeText={setSearchTerm}
@@ -291,8 +399,8 @@ export default function MyAnnouncementsScreen() {
                 <Text style={[
                   styles.filterButtonText,
                   activePickerType === 'category' && styles.filterButtonTextActive,
-                ]} numberOfLines={1}>
-                  {categoryFilter === 'Toate' ? 'Categorie' : categoryFilter}
+                ]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+                  {categoryFilter === t.all ? t.category : getCategoryLabel(categoryFilter)}
                 </Text>
                 <Ionicons 
                   name={activePickerType === 'category' ? 'chevron-up' : 'chevron-down'} 
@@ -315,7 +423,7 @@ export default function MyAnnouncementsScreen() {
                   styles.filterButtonText,
                   activePickerType === 'sort' && styles.filterButtonTextActive,
                 ]} numberOfLines={1}>
-                  Sortare
+                  {t.sort}
                 </Text>
                 <Ionicons 
                   name={activePickerType === 'sort' ? 'chevron-up' : 'chevron-down'} 
@@ -326,29 +434,29 @@ export default function MyAnnouncementsScreen() {
 
               {/* Results Count */}
               <View style={styles.resultsCount}>
-                <Text style={styles.resultsText}>{filteredAndSortedAnnouncements.length} rezultate</Text>
+                <Text style={styles.resultsText}>{filteredAndSortedAnnouncements.length} {t.results}</Text>
               </View>
             </View>
 
 
 
             {/* Active Filters */}
-            {(searchTerm || categoryFilter !== 'Toate') && (
+            {(searchTerm || categoryFilter !== t.all) && (
               <View style={styles.activeFilters}>
                 {searchTerm && (
                   <View style={styles.chip}>
                     <Text style={styles.chipText}>
-                      Căutare: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
+                      {t.searchLabel}: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
                     </Text>
                     <TouchableOpacity onPress={() => setSearchTerm('')}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
                     </TouchableOpacity>
                   </View>
                 )}
-                {categoryFilter !== 'Toate' && (
+                {categoryFilter !== t.all && (
                   <View style={styles.chip}>
-                    <Text style={styles.chipText}>Categorie: {categoryFilter}</Text>
-                    <TouchableOpacity onPress={() => setCategoryFilter('Toate')}>
+                    <Text style={styles.chipText}>{t.categoryLabel}: {getCategoryLabel(categoryFilter)}</Text>
+                    <TouchableOpacity onPress={() => setCategoryFilter(t.all)}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
                     </TouchableOpacity>
                   </View>
@@ -363,9 +471,9 @@ export default function MyAnnouncementsScreen() {
           <View style={styles.emptyState}>
             <Ionicons name="albums-outline" size={64} color={tokens.colors.placeholder} />
             <Text style={styles.emptyText}>
-              {searchTerm || categoryFilter !== 'Toate'
-                ? 'Nu au fost găsite anunțuri cu criteriile selectate'
-                : 'Nu ai încă niciun anunț publicat'}
+              {searchTerm || categoryFilter !== t.all
+                ? t.noResults
+                : t.noAnnouncements}
             </Text>
           </View>
         ) : (
@@ -445,7 +553,7 @@ export default function MyAnnouncementsScreen() {
 
                     {/* Category badge */}
                     <View style={styles.categoryBadge}>
-                      <Text style={styles.categoryText}>{announcement.category}</Text>
+                      <Text style={styles.categoryText}>{getCategoryLabel(announcement.category)}</Text>
                     </View>
 
                     {/* Location removed as requested - keep placeholder spacing so buttons stay at bottom */}
@@ -462,13 +570,13 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.equalButtonTwo, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleEdit(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
+                            <Text numberOfLines={1} style={styles.primaryButtonText}>{t.edit}</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Arhivează</Text>
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>{t.archive}</Text>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -476,7 +584,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.equalButtonTwo, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDelete(announcement._id)}
                           >
-                            <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                            <Text numberOfLines={1} style={styles.dangerButtonText}>{t.delete}</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[
@@ -487,7 +595,7 @@ export default function MyAnnouncementsScreen() {
                             ]}
                             onPress={() => handleReactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>Reactualizează</Text>
+                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>{t.refresh}</Text>
                           </TouchableOpacity>
                         </View>
                       </>
@@ -499,13 +607,13 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.fillButton, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleEdit(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.primaryButtonText}>Editează</Text>
+                            <Text numberOfLines={1} style={styles.primaryButtonText}>{t.edit}</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[styles.actionButton, styles.secondaryButton, styles.compactButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>Arhivează</Text>
+                            <Text numberOfLines={1} style={styles.secondaryButtonText}>{t.archive}</Text>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -513,7 +621,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.fillButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDelete(announcement._id)}
                           >
-                            <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                            <Text numberOfLines={1} style={styles.dangerButtonText}>{t.delete}</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[
@@ -524,7 +632,7 @@ export default function MyAnnouncementsScreen() {
                             ]}
                             onPress={() => handleReactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>Reactualizează</Text>
+                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>{t.refresh}</Text>
                           </TouchableOpacity>
                         </View>
                       </>
@@ -540,10 +648,10 @@ export default function MyAnnouncementsScreen() {
       {/* Archive confirmation dialog */}
       <ConfirmDialog
         visible={hideDialogVisible}
-        title="Arhivează anunț"
-        message={"Ești sigur(ă) că vrei să arhivezi acest anunț? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunțuri arhivate'."}
-        confirmText="Da"
-        cancelText="Nu"
+        title={t.archiveTitle}
+        message={t.archiveMessage}
+        confirmText={t.yes}
+        cancelText={t.no}
         icon="archive-outline"
         onConfirm={confirmHide}
         onCancel={cancelHide}
@@ -563,7 +671,7 @@ export default function MyAnnouncementsScreen() {
           >
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {activePickerType === 'category' ? 'Selectează categoria' : 'Sortează după'}
+                {activePickerType === 'category' ? t.selectCategory : t.sortBy}
               </Text>
               <TouchableOpacity onPress={() => setActivePickerType(null)} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color={tokens.colors.muted} />
@@ -574,7 +682,7 @@ export default function MyAnnouncementsScreen() {
               {activePickerType === 'category' ? (
                 // Category options
                 uniqueCategories.map((cat) => {
-                  const catDef = cat === 'Toate' ? undefined : findCategoryByLabel(cat);
+                  const catDef = cat === t.all ? undefined : findCategoryByLabel(cat);
                   return (
                     <TouchableOpacity
                       key={cat}
@@ -589,7 +697,7 @@ export default function MyAnnouncementsScreen() {
                       }}
                     >
                       <View style={styles.modalOptionLeft}>
-                        {cat === 'Toate' ? (
+                        {cat === t.all ? (
                           <Ionicons name="apps" size={20} color={categoryFilter === cat ? tokens.colors.primary : tokens.colors.muted} />
                         ) : catDef?.image ? (
                           <Image source={catDef.image} style={{ width: 20, height: 20, borderRadius: 4 }} resizeMode="contain" />
@@ -602,7 +710,7 @@ export default function MyAnnouncementsScreen() {
                             categoryFilter === cat && styles.modalOptionTextSelected,
                           ]}
                         >
-                          {cat}
+                          {getCategoryLabel(cat)}
                         </Text>
                       </View>
                       {categoryFilter === cat && (
@@ -614,10 +722,10 @@ export default function MyAnnouncementsScreen() {
               ) : (
                 // Sort options
                 [
-                  { value: 'cea mai recenta', label: 'Cele mai recente', icon: 'arrow-down' },
-                  { value: 'cea mai veche', label: 'Cele mai vechi', icon: 'arrow-up' },
-                  { value: 'titlu_a_z', label: 'Titlu A-Z', icon: 'text' },
-                  { value: 'titlu_z_a', label: 'Titlu Z-A', icon: 'text' },
+                  { value: locale === 'en' ? 'mostRecent' : 'cea mai recenta', label: t.mostRecent, icon: 'arrow-down' },
+                  { value: locale === 'en' ? 'oldest' : 'cea mai veche', label: t.oldest, icon: 'arrow-up' },
+                  { value: locale === 'en' ? 'titleAZ' : 'titlu_a_z', label: t.titleAZ, icon: 'text' },
+                  { value: locale === 'en' ? 'titleZA' : 'titlu_z_a', label: t.titleZA, icon: 'text' },
                 ].map((option) => (
                   <TouchableOpacity
                     key={option.value}
@@ -659,10 +767,10 @@ export default function MyAnnouncementsScreen() {
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         visible={deleteDialogVisible}
-        title="Șterge anunț"
-        message="Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată."
-        confirmText="Șterge"
-        cancelText="Anulează"
+        title={t.deleteTitle}
+        message={t.deleteMessage}
+        confirmText={t.deleteBtn}
+        cancelText={t.cancel}
         icon="trash-outline"
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
@@ -776,13 +884,14 @@ const createStyles = (tokens: any) => StyleSheet.create({
     flex: 1,
     borderWidth: 1,
     borderColor: 'transparent',
+    minHeight: 36,
   },
   filterButtonActive: {
     backgroundColor: tokens.colors.primary,
     borderColor: tokens.colors.primary,
   },
   filterButtonText: {
-    fontSize: 13,
+    fontSize: 11,
     color: tokens.colors.primary,
     fontWeight: '600',
     flex: 1,

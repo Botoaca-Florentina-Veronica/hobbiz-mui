@@ -281,7 +281,7 @@ const createMessage = async (req, res) => {
 
         // Trimite push notification dacă destinatarul are pushToken
         try {
-          const recipient = await User.findById(destinatarId).select('pushToken');
+          const recipient = await User.findById(destinatarId).select('pushToken notificationSettings');
           let sender = null;
           try { sender = await User.findById(senderId).select('firstName lastName'); } catch (_) {}
           const title = sender ? `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Mesaj nou' : 'Mesaj nou';
@@ -299,7 +299,12 @@ const createMessage = async (req, res) => {
           }
           const body = announcementTitle ? `${announcementTitle}: ${bodyPreview}` : bodyPreview;
           
-          if (recipient && recipient.pushToken) {
+          // Check notification settings
+          const settings = recipient ? recipient.notificationSettings : {};
+          const allowPush = settings.push !== false; // default true
+          const allowMessages = settings.messages !== false; // default true
+
+          if (recipient && recipient.pushToken && allowPush && allowMessages) {
             let tokens = [];
             if (Array.isArray(recipient.pushToken)) {
               tokens = recipient.pushToken;

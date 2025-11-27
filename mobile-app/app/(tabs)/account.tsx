@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
+import { Toast } from '../../components/ui/Toast';
 
 const TRANSLATIONS = {
   ro: {
@@ -32,6 +33,7 @@ const TRANSLATIONS = {
     confirmLogout: 'Deconectează-te',
     selectLanguage: 'Selectează limba',
     selectLanguageMessage: 'Alege între Română și English.',
+    languageChanged: 'Limba a fost schimbată în Română',
   },
   en: {
     profile: 'Profile',
@@ -51,6 +53,7 @@ const TRANSLATIONS = {
     confirmLogout: 'Log Out',
     selectLanguage: 'Select Language',
     selectLanguageMessage: 'Choose between Română and English.',
+    languageChanged: 'Language changed to English',
   },
 };
 
@@ -65,6 +68,8 @@ export default function AccountScreen() {
   const { logout, user } = useAuth();
   const [confirmVisible, setConfirmVisible] = React.useState(false);
   const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
+  const [toastVisible, setToastVisible] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState('');
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
@@ -345,6 +350,11 @@ export default function AccountScreen() {
                     onPress={async () => {
                       await setGlobalLocale('ro');
                       setLanguageModalOpen(false);
+                      // Wait for modal close animation to complete before showing toast
+                      setTimeout(() => {
+                        setToastMessage(TRANSLATIONS.ro.languageChanged);
+                        setToastVisible(true);
+                      }, 300);
                     }}
                   >
                     <Text style={{ color: tokens.colors.text, fontSize: 16 }}>Română</Text>
@@ -354,6 +364,11 @@ export default function AccountScreen() {
                     onPress={async () => {
                       await setGlobalLocale('en');
                       setLanguageModalOpen(false);
+                      // Wait for modal close animation to complete before showing toast
+                      setTimeout(() => {
+                        setToastMessage(TRANSLATIONS.en.languageChanged);
+                        setToastVisible(true);
+                      }, 300);
                     }}
                   >
                     <Text style={{ color: tokens.colors.text, fontSize: 16 }}>English</Text>
@@ -363,6 +378,15 @@ export default function AccountScreen() {
           </View>
         </Modal>
       </ScrollView>
+      
+      {/* Toast notification */}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type="success"
+        duration={3000}
+        onHide={() => setToastVisible(false)}
+      />
     </ThemedView>
     </ProtectedRoute>
   );

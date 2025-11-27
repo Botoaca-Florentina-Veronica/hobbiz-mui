@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert, Modal, Platform } from 'react-native';
 import { Toast } from '../components/ui/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { updateEmail, updatePassword, deleteAccount } from '../src/services/auth
 import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
@@ -30,6 +32,7 @@ export default function SettingsScreen() {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const { locale } = useLocale();
 
@@ -41,7 +44,7 @@ export default function SettingsScreen() {
         'change-email': 'Schimbă email-ul',
         'archived-announcements': 'Anunțuri arhivate',
         notifications: 'Setează notificările',
-        billing: 'Date de facturare',
+        billing: 'Descarcă datele mele',
         'logout-devices': 'Ieși din cont de pe toate dispozitivele',
         'delete-account': 'Șterge contul',
       },
@@ -69,6 +72,10 @@ export default function SettingsScreen() {
       accountDeletedTitle: 'Cont șters',
       accountDeletedMessage: 'Contul tău a fost șters cu succes.',
       error: 'Eroare',
+      downloadingData: 'Se descarcă datele...',
+      dataDownloadSuccess: 'Datele tale au fost descărcate cu succes!',
+      dataDownloadError: 'Nu s-a putut descărca datele. Încearcă din nou.',
+      sharingNotAvailable: 'Partajarea nu este disponibilă pe acest dispozitiv.',
     },
     en: {
       title: 'Settings',
@@ -77,7 +84,7 @@ export default function SettingsScreen() {
         'change-email': 'Change email',
         'archived-announcements': 'Archived announcements',
         notifications: 'Notifications',
-        billing: 'Billing',
+        billing: 'Download my data',
         'logout-devices': 'Log out from all devices',
         'delete-account': 'Delete account',
       },
@@ -105,6 +112,10 @@ export default function SettingsScreen() {
       accountDeletedTitle: 'Account deleted',
       accountDeletedMessage: 'Your account has been deleted successfully.',
       error: 'Error',
+      downloadingData: 'Downloading data...',
+      dataDownloadSuccess: 'Your data has been downloaded successfully!',
+      dataDownloadError: 'Could not download data. Please try again.',
+      sharingNotAvailable: 'Sharing is not available on this device.',
     }
   };
 
@@ -172,7 +183,7 @@ export default function SettingsScreen() {
     { key: 'change-email', label: 'Schimbă email-ul', icon: 'mail-outline', expandable: true },
     { key: 'archived-announcements', label: 'Anunțuri arhivate', icon: 'archive-outline' },
     { key: 'notifications', label: 'Setează notificările', icon: 'notifications-outline' },
-    { key: 'billing', label: 'Date de facturare', icon: 'document-text-outline' },
+    { key: 'billing', label: 'Descarcă datele mele', icon: 'download-outline' },
     { key: 'logout-devices', label: 'Ieși din cont de pe toate dispozitivele', icon: 'phone-portrait-outline' },
     { key: 'delete-account', label: 'Șterge contul', icon: 'trash-outline' },
   ];
@@ -186,20 +197,14 @@ export default function SettingsScreen() {
   };
 
   const handleLogoutAllDevices = () => {
-    Alert.alert(
-      locale === 'ro' ? 'Ieși de pe toate dispozitivele' : 'Logout from all devices',
-      locale === 'ro' 
-        ? 'Această acțiune va deconecta contul tău de pe toate dispozitivele pe care ești autentificat. Continui?' 
-        : 'This action will log out your account from all devices where you are logged in. Continue?',
-      [
-        { text: t.cancel, style: 'cancel' },
-        {
-          text: locale === 'ro' ? 'Ieși' : 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/logout-all-devices`, {
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogoutAllDevices = async () => {
+    setLogoutModalVisible(false);
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/logout-all-devices`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -207,28 +212,24 @@ export default function SettingsScreen() {
                 },
               });
 
-              if (!response.ok) {
-                throw new Error('Failed to logout from all devices');
-              }
+      if (!response.ok) {
+        throw new Error('Failed to logout from all devices');
+      }
 
-              await logout();
-              showToast(
-                locale === 'ro' ? 'Ai fost deconectat de pe toate dispozitivele' : 'Logged out from all devices successfully',
-                'success'
-              );
-              router.replace('/login');
-            } catch (e: any) {
-              showToast(
-                e?.message || (locale === 'ro' ? 'Nu s-a putut efectua deconectarea' : 'Could not logout'),
-                'error'
-              );
-            } finally {
-              setIsLoading(false);
-            }
-          }
-        }
-      ]
-    );
+      await logout();
+      showToast(
+        locale === 'ro' ? 'Ai fost deconectat de pe toate dispozitivele' : 'Logged out from all devices successfully',
+        'success'
+      );
+      router.replace('/login');
+    } catch (e: any) {
+      showToast(
+        e?.message || (locale === 'ro' ? 'Nu s-a putut efectua deconectarea' : 'Could not logout'),
+        'error'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -256,6 +257,71 @@ export default function SettingsScreen() {
         }
       ]
     );
+  };
+
+  const handleDownloadData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch user data from API
+      const token = await storage.getItemAsync('userToken');
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000'}/api/users/profile`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const userData = await response.json();
+
+      // Create the JSON object with required fields
+      const exportData = {
+        nume: `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A',
+        email: userData.email || 'N/A',
+        telefon: userData.phone || 'N/A',
+        locatie: userData.localitate || 'N/A',
+        dataInregistrarii: userData.createdAt 
+          ? new Date(userData.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : 'ro-RO', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : 'N/A',
+        exportatLa: new Date().toISOString(),
+      };
+
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const fileName = `datele_mele_${new Date().toISOString().split('T')[0]}.json`;
+      
+      // Use the new expo-file-system API
+      const file = new FileSystem.File(FileSystem.Paths.cache, fileName);
+      file.create();
+      await file.write(jsonString);
+
+      // Check if sharing is available
+      const isSharingAvailable = await Sharing.isAvailableAsync();
+      
+      if (isSharingAvailable) {
+        await Sharing.shareAsync(file.uri, {
+          mimeType: 'application/json',
+          dialogTitle: locale === 'ro' ? 'Descarcă datele mele' : 'Download my data',
+        });
+        showToast(t.dataDownloadSuccess, 'success');
+      } else {
+        showToast(t.sharingNotAvailable, 'error');
+      }
+    } catch (e: any) {
+      console.error('Download data error:', e);
+      showToast(t.dataDownloadError, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -290,6 +356,7 @@ export default function SettingsScreen() {
                   if (item.key === 'archived-announcements') return router.push('/archived-announcements');
                   if (item.key === 'logout-devices') return handleLogoutAllDevices();
                   if (item.key === 'notifications') return router.push('/notification-settings');
+                  if (item.key === 'billing') return handleDownloadData();
                   // Aici poți adăuga alte acțiuni simple non-expandable
                   return null;
                 }}
@@ -386,6 +453,55 @@ export default function SettingsScreen() {
         duration={3000}
         onHide={() => setToastVisible(false)}
       />
+
+      {/* Custom Logout All Devices Modal */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.logoutModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            {/* Icon and Title */}
+            <View style={[styles.modalIconContainer, { backgroundColor: isDark ? 'rgba(245, 24, 102, 0.15)' : 'rgba(245, 24, 102, 0.1)' }]}>
+              <Ionicons name="phone-portrait-outline" size={32} color="#F51866" />
+            </View>
+            
+            <ThemedText style={[styles.modalTitle, { color: tokens.colors.text }]}>
+              {locale === 'ro' ? 'Ieși de pe toate dispozitivele' : 'Logout from all devices'}
+            </ThemedText>
+            
+            <ThemedText style={[styles.modalMessage, { color: tokens.colors.muted }]}>
+              {locale === 'ro' 
+                ? 'Această acțiune va deconecta contul tău de pe toate dispozitivele pe care ești autentificat. Continui?' 
+                : 'This action will log out your account from all devices where you are logged in. Continue?'}
+            </ThemedText>
+
+            {/* Action Buttons */}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg, borderColor: tokens.colors.border }]}
+                onPress={() => setLogoutModalVisible(false)}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.modalButtonText, { color: tokens.colors.text }]}>{t.cancel}</ThemedText>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm, { backgroundColor: '#F51866' }]}
+                onPress={confirmLogoutAllDevices}
+                activeOpacity={0.8}
+                disabled={isLoading}
+              >
+                <ThemedText style={[styles.modalButtonText, { color: '#ffffff', fontWeight: '700' }]}>
+                  {isLoading ? (locale === 'ro' ? 'Se procesează...' : 'Processing...') : (locale === 'ro' ? 'Ieși' : 'Logout')}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ThemedView>
   );
 }
@@ -467,5 +583,75 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  // Custom Logout Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  logoutModalCard: {
+    width: '100%',
+    maxWidth: 420,
+    borderRadius: 24,
+    padding: 28,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 10,
+    alignItems: 'center',
+  },
+  modalIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 12,
+    letterSpacing: 0.3,
+  },
+  modalMessage: {
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 28,
+    paddingHorizontal: 8,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonCancel: {
+    borderWidth: 1.5,
+  },
+  modalButtonConfirm: {
+    shadowColor: '#F51866',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 });

@@ -197,6 +197,7 @@ export default function AnnouncementDetailsScreen() {
         announcementOwnerFirstName: announcement?.user?.firstName || '',
         announcementOwnerLastName: announcement?.user?.lastName || '',
         announcementOwnerAvatar: announcement?.user?.avatar || '',
+        announcementImage: getImageSrc(images[0]) || null,
         announcementId: String(announcement._id),
         announcementTitle: announcement.title || '',
       } as any;

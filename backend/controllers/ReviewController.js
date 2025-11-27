@@ -48,7 +48,11 @@ const createReview = async (req, res) => {
         link: `/users/${reviewedUserId}/reviews`,
       });
 
-      if (reviewed.pushToken) {
+      const settings = reviewed.notificationSettings || {};
+      const allowPush = settings.push !== false;
+      const allowReviews = settings.reviews !== false;
+
+      if (reviewed.pushToken && allowPush && allowReviews) {
         let tokens = [];
         if (Array.isArray(reviewed.pushToken)) {
           tokens = reviewed.pushToken;

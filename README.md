@@ -33,10 +33,10 @@ Nu ai hobby-uri? Nu e problemă, aici îți poți găsi pasiunile! Te poți cone
   <a href="https://reactnative.dev" target="_blank"><img src="https://img.shields.io/badge/React_Native-0.81-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React Native" /></a>
   <a href="https://socket.io" target="_blank"><img src="https://img.shields.io/badge/Socket.IO-4-010101?style=for-the-badge&logo=socket.io&logoColor=white" alt="Socket.IO" /></a>
   <a href="https://jwt.io" target="_blank"><img src="https://img.shields.io/badge/JWT-jsonwebtoken-FF9900?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT" /></a>
-</div>
+</div>V
 
 </td>
-<td width="50%" valign="top">
+<td width="50%" valign="middle">
 
 <p align="center">
   <img src="./mobile-app/assets/images/poster.png" alt="Hobbiz Poster" width="560" />

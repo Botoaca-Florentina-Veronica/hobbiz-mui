@@ -55,7 +55,7 @@ router.post('/:announcementId', auth, async (req, res) => {
     if (String(ann.user) !== String(req.userId)) {
       try {
         const Notification = require('../models/Notification');
-        const owner = await User.findById(ann.user).select('pushToken');
+        const owner = await User.findById(ann.user).select('pushToken notificationSettings');
         
         await Notification.create({
           userId: ann.user,
@@ -63,7 +63,10 @@ router.post('/:announcementId', auth, async (req, res) => {
           link: `/announcements/${ann._id}`,
         });
 
-        if (owner && owner.pushToken) {
+        const settings = owner ? owner.notificationSettings : {};
+        const allowPush = settings.push !== false;
+
+        if (owner && owner.pushToken && allowPush) {
            let tokens = [];
            if (Array.isArray(owner.pushToken)) {
              tokens = owner.pushToken;

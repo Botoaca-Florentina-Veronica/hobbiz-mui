@@ -41,6 +41,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import ImageViewing from '../../src/components/ImageViewer';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
+import { useLocale } from '../../src/context/LocaleContext';
 // NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
 // NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
 // Dacă vrei snapshot real pentru web mai târziu, putem introduce o implementare fallback bazată pe canvas.
@@ -88,8 +89,125 @@ interface Message {
   deleted?: boolean;
 }
 
+const TRANSLATIONS = {
+  ro: {
+    loadingMessages: 'Se încarcă mesajele...',
+    noConversation: 'Nicio conversație încă. Scrie primul mesaj!',
+    writeMessage: 'Scrie mesajul tău...',
+    error: 'Eroare',
+    sendMessageError: 'Nu s-a putut trimite mesajul.',
+    permissionTitle: 'Permisiune',
+    galleryPermission: 'Trebuie să permiți accesul la galerie pentru a selecta o imagine.',
+    sendImageError: 'Nu s-a putut trimite imaginea.',
+    selectImageError: 'A apărut o eroare la selectarea imaginii.',
+    filePermission: 'Trebuie să permiți accesul la fișiere pentru a selecta un document.',
+    sendFileError: 'Nu s-a putut trimite fișierul.',
+    selectFileError: 'A apărut o eroare la selectarea fișierului.',
+    reactionError: 'Nu s-a putut salva reacția. Verifică conexiunea și încearcă din nou.',
+    cannotDelete: 'Nu poți șterge',
+    notOwner: 'Nu ești proprietarul acestui mesaj. Poți folosi Raportează dacă este neadecvat.',
+    alreadyDeleted: 'Mesaj deja șters',
+    messageDeleted: 'Acest mesaj este deja marcat ca șters.',
+    deleteMessage: 'Șterge mesaj',
+    deleteConfirm: 'Ești sigur că vrei să ștergi acest mesaj?',
+    cancel: 'Anulează',
+    delete: 'Șterge',
+    copied: 'Copiat',
+    messageCopied: 'Mesajul a fost copiat.',
+    imageLinkCopied: 'Link-ul imaginii a fost copiat.',
+    nothingToCopy: 'Nimic de copiat',
+    nothingToCopyMessage: 'Mesajul nu conține text sau imagine ce poate fi copiat.',
+    forward: 'Forward',
+    comingSoon: 'Funcționalitate în curând',
+    removed: 'Removed',
+    removedFromFavorites: 'Mesajul a fost eliminat din favorite.',
+    saved: 'Saved',
+    markedWithStar: 'Mesajul a fost marcat cu stea.',
+    updateFavoritesError: 'Nu s-a putut actualiza mesajele favorite.',
+    reportMessage: 'Raportează mesaj',
+    reportConfirm: 'Vrei să raportezi acest mesaj?',
+    report: 'Raportează',
+    reported: 'Raportat',
+    messageReported: 'Mesajul a fost raportat.',
+    speak: 'Speak',
+    textToSpeech: 'Text-to-speech funcționalitate în curând',
+    deletedMessage: 'acest mesaj a fost șters',
+    photo: 'Fotografie',
+    you: 'Tu',
+    star: 'Marchează cu Stea',
+    reply: 'Răspunde',
+    copy: 'Copiază',
+    deleteBtn: 'Șterge',
+    messages: 'Mesaje',
+    continueConversations: 'Continuă conversațiile tale',
+    buying: 'De cumpărat',
+    selling: 'De vândut',
+    loadingConversations: 'Se încarcă conversațiile...',
+    noConversations: 'Nu ai conversații',
+    startWriting: 'E momentul tău Eminescu, începe să scrii!',
+  },
+  en: {
+    loadingMessages: 'Loading messages...',
+    noConversation: 'No conversation yet. Write the first message!',
+    writeMessage: 'Write your message...',
+    error: 'Error',
+    sendMessageError: 'Could not send the message.',
+    permissionTitle: 'Permission',
+    galleryPermission: 'You must allow access to gallery to select an image.',
+    sendImageError: 'Could not send the image.',
+    selectImageError: 'An error occurred while selecting the image.',
+    filePermission: 'You must allow access to files to select a document.',
+    sendFileError: 'Could not send the file.',
+    selectFileError: 'An error occurred while selecting the file.',
+    reactionError: 'Could not save the reaction. Check your connection and try again.',
+    cannotDelete: 'Cannot delete',
+    notOwner: 'You are not the owner of this message. You can use Report if it is inappropriate.',
+    alreadyDeleted: 'Message already deleted',
+    messageDeleted: 'This message is already marked as deleted.',
+    deleteMessage: 'Delete message',
+    deleteConfirm: 'Are you sure you want to delete this message?',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    copied: 'Copied',
+    messageCopied: 'The message has been copied.',
+    imageLinkCopied: 'The image link has been copied.',
+    nothingToCopy: 'Nothing to copy',
+    nothingToCopyMessage: 'The message does not contain text or image that can be copied.',
+    forward: 'Forward',
+    comingSoon: 'Feature coming soon',
+    removed: 'Removed',
+    removedFromFavorites: 'The message has been removed from favorites.',
+    saved: 'Saved',
+    markedWithStar: 'The message has been marked with a star.',
+    updateFavoritesError: 'Could not update favorite messages.',
+    reportMessage: 'Report message',
+    reportConfirm: 'Do you want to report this message?',
+    report: 'Report',
+    reported: 'Reported',
+    messageReported: 'The message has been reported.',
+    speak: 'Speak',
+    textToSpeech: 'Text-to-speech feature coming soon',
+    deletedMessage: 'this message has been deleted',
+    photo: 'Photo',
+    you: 'You',
+    star: 'Star',
+    reply: 'Reply',
+    copy: 'Copy',
+    deleteBtn: 'Delete',
+    messages: 'Messages',
+    continueConversations: 'Continue your conversations',
+    buying: 'Buying',
+    selling: 'Selling',
+    loadingConversations: 'Loading conversations...',
+    noConversations: 'You have no conversations',
+    startWriting: 'It\'s your moment, start writing!',
+  },
+};
+
 export default function ChatScreen() {
   const { tokens, isDark } = useAppTheme();
+  const { locale } = useLocale();
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -127,6 +245,7 @@ export default function ChatScreen() {
   const [bubbleLayoutsMap, setBubbleLayoutsMap] = useState<Record<string, {x:number;y:number;width:number;height:number}>>({});
   const [reactionDimsMap, setReactionDimsMap] = useState<Record<string, {width:number;height:number}>>({});
   const [replyTo, setReplyTo] = useState<{ messageId: string; senderId: string; senderName: string; text?: string; image?: string } | null>(null);
+  const [targetMessageId, setTargetMessageId] = useState<string | null>(null);
 
   const width = Dimensions.get('window').width;
   // Static local empty-state image (added to mobile-app/assets/images)
@@ -173,6 +292,9 @@ export default function ChatScreen() {
       if (found) {
         setSelectedConversation(found);
         handledRouteConversationIdRef.current = expectedConversationId;
+        if (routeMessageId) setTargetMessageId(String(routeMessageId));
+        // Clear params so we don't reopen on back/refresh
+        router.setParams({ conversationId: undefined, messageId: undefined });
       } else {
         // Create a lightweight temporary conversation so the UI opens
         const tempConv: Conversation = {
@@ -194,6 +316,9 @@ export default function ChatScreen() {
         };
         setSelectedConversation(tempConv);
         handledRouteConversationIdRef.current = expectedConversationId;
+        if (routeMessageId) setTargetMessageId(String(routeMessageId));
+        // Clear params so we don't reopen on back/refresh
+        router.setParams({ conversationId: undefined, messageId: undefined });
       }
       // We still allow the announcementOwnerId flow below to run if present
     }
@@ -219,6 +344,8 @@ export default function ChatScreen() {
       if (found) {
         setSelectedConversation(found);
         handledRouteConversationIdRef.current = expectedConversationId;
+        // Clear params
+        router.setParams({ announcementOwnerId: undefined, announcementId: undefined });
         return;
       }
 
@@ -227,7 +354,8 @@ export default function ChatScreen() {
         id: ownerId,
         conversationId: expectedConversationId,
         name: (routeParams as any)?.announcementTitle || '(fără titlu)',
-        avatar: (routeParams as any)?.announcementOwnerAvatar || '',
+        // Prefer an explicit announcement image when available, fallback to owner's avatar
+        avatar: (routeParams as any)?.announcementImage || (routeParams as any)?.announcementOwnerAvatar || '',
         participantName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
         participantAvatar: (routeParams as any)?.announcementOwnerAvatar || '',
         announcementTitle: (routeParams as any)?.announcementTitle || '',
@@ -244,6 +372,8 @@ export default function ChatScreen() {
       // Open the temporary conversation but don't mutate the fetched conversations array.
       setSelectedConversation(tempConv);
       handledRouteConversationIdRef.current = expectedConversationId;
+      // Clear params
+      router.setParams({ announcementOwnerId: undefined, announcementId: undefined });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,19 +381,20 @@ export default function ChatScreen() {
 
   // If the route contained a messageId, scroll to it after messages load
   useEffect(() => {
-    const routeMessageId = (routeParams as any)?.messageId;
-    if (!routeMessageId) return;
+    const idToScroll = targetMessageId || (routeParams as any)?.messageId;
+    if (!idToScroll) return;
     if (!messages || messages.length === 0) return;
-    const layout = bubbleLayoutsMap[routeMessageId];
+    const layout = bubbleLayoutsMap[idToScroll];
     if (layout && messagesEndRef.current && typeof messagesEndRef.current.scrollTo === 'function') {
       // Scroll so the message is visible with some offset (20px)
       try {
         messagesEndRef.current.scrollTo({ y: Math.max(0, layout.y - 20), animated: true });
-        // Optionally, mark message as read on server side could be done here
+        // Clear target so we don't keep scrolling
+        if (targetMessageId) setTargetMessageId(null);
       } catch (e) {}
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, bubbleLayoutsMap, routeParams]);
+  }, [messages, bubbleLayoutsMap, routeParams, targetMessageId]);
 
   // Fetch conversations
   const fetchConversations = useCallback(async () => {
@@ -499,7 +630,7 @@ export default function ChatScreen() {
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages((prev) => prev.filter((msg) => msg._id !== tempMessage._id));
-      Alert.alert('Eroare', 'Nu s-a putut trimite mesajul.');
+      Alert.alert(t.error, t.sendMessageError);
     }
   };
 
@@ -508,7 +639,7 @@ export default function ChatScreen() {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (permissionResult.status !== 'granted') {
-        Alert.alert('Permisiune', 'Trebuie să permiți accesul la galerie pentru a selecta o imagine.');
+        Alert.alert(t.permissionTitle, t.galleryPermission);
         return;
       }
 
@@ -583,11 +714,11 @@ export default function ChatScreen() {
       } catch (err) {
         console.error('Upload image error:', err);
         setMessages((prev) => prev.filter((m) => m._id !== tempMessage._id));
-        Alert.alert('Eroare', 'Nu s-a putut trimite imaginea.');
+        Alert.alert(t.error, t.sendImageError);
       }
     } catch (err) {
       console.error('handlePickImagePress error:', err);
-      Alert.alert('Eroare', 'A apărut o eroare la selectarea imaginii.');
+      Alert.alert(t.error, t.selectImageError);
     }
   };
 
@@ -608,7 +739,7 @@ export default function ChatScreen() {
               const g2 = await PermissionsAndroid.requestMultiple([imgPerm, vidPerm]);
               const ok = Object.values(g2).some((v) => v === PermissionsAndroid.RESULTS.GRANTED);
               if (!ok) {
-                Alert.alert('Permisiune', 'Trebuie să permiți accesul la fișiere pentru a selecta un document.');
+                Alert.alert(t.permissionTitle, t.filePermission);
                 return;
               }
             }
@@ -671,11 +802,11 @@ export default function ChatScreen() {
       } catch (err) {
         console.error('Upload file error:', err);
         setMessages((prev) => prev.filter((m) => m._id !== tempMessage._id));
-        Alert.alert('Eroare', 'Nu s-a putut trimite fișierul.');
+        Alert.alert(t.error, t.sendFileError);
       }
     } catch (err) {
       console.error('handlePickFilePress error:', err);
-      Alert.alert('Eroare', 'A apărut o eroare la selectarea fișierului.');
+      Alert.alert(t.error, t.selectFileError);
     }
   };
 
@@ -915,7 +1046,7 @@ export default function ChatScreen() {
       }
       // Inform user (non-blocking)
       try {
-        Alert.alert('Eroare', 'Nu s-a putut salva reacția. Verifică conexiunea și încearcă din nou.');
+        Alert.alert(t.error, t.reactionError);
       } catch (e) {}
     }
   };
@@ -924,24 +1055,24 @@ export default function ChatScreen() {
     if (!selectedMessage) return;
     // Only allow actual delete if current user is the sender
     if (String(selectedMessage.senderId) !== String(userId)) {
-      Alert.alert('Nu poți șterge', 'Nu ești proprietarul acestui mesaj. Poți folosi Raportează dacă este neadecvat.');
+      Alert.alert(t.cannotDelete, t.notOwner);
       closeContextMenu();
       return;
     }
 
     if (selectedMessage.deleted) {
-      Alert.alert('Mesaj deja șters', 'Acest mesaj este deja marcat ca șters.');
+      Alert.alert(t.alreadyDeleted, t.messageDeleted);
       closeContextMenu();
       return;
     }
 
     Alert.alert(
-      'Șterge mesaj',
-      'Ești sigur că vrei să ștergi acest mesaj?',
+      t.deleteMessage,
+      t.deleteConfirm,
       [
-        { text: 'Anulează', style: 'cancel' },
+        { text: t.cancel, style: 'cancel' },
         {
-          text: 'Șterge',
+          text: t.delete,
           style: 'destructive',
           onPress: async () => {
             try {
@@ -969,17 +1100,17 @@ export default function ChatScreen() {
     try {
       if (selectedMessage.text) {
         await Clipboard.setStringAsync(selectedMessage.text);
-        Alert.alert('Copiat', 'Mesajul a fost copiat.');
+        Alert.alert(t.copied, t.messageCopied);
         closeContextMenu();
         return;
       }
       if (selectedMessage.image) {
         await Clipboard.setStringAsync(selectedMessage.image);
-        Alert.alert('Copiat', 'Link-ul imaginii a fost copiat.');
+        Alert.alert(t.copied, t.imageLinkCopied);
         closeContextMenu();
         return;
       }
-      Alert.alert('Nimic de copiat', 'Mesajul nu conține text sau imagine ce poate fi copiat.');
+      Alert.alert(t.nothingToCopy, t.nothingToCopyMessage);
       closeContextMenu();
     } catch (err) {
       console.error('Copy error:', err);
@@ -1007,7 +1138,7 @@ export default function ChatScreen() {
 
   const handleForwardMessage = () => {
     // TODO: implement forward functionality
-    Alert.alert('Forward', 'Funcționalitate în curând');
+    Alert.alert(t.forward, t.comingSoon);
     closeContextMenu();
   };
 
@@ -1024,7 +1155,7 @@ export default function ChatScreen() {
           const updated = list.filter((s: any) => String(s._id) !== String(selectedMessage._id));
           await storage.setItemAsync(key, JSON.stringify(updated));
           console.log('[star] removed, newCount=', updated.length);
-          Alert.alert('Removed', 'Mesajul a fost eliminat din favorite.');
+          Alert.alert(t.removed, t.removedFromFavorites);
         } else {
           // store minimal message snapshot
           const snapshot = {
@@ -1040,11 +1171,11 @@ export default function ChatScreen() {
           const confirmRaw = await storage.getItemAsync(key);
           const confirmList = confirmRaw ? JSON.parse(confirmRaw) : [];
           console.log('[star] saved, newCount=', confirmList.length);
-          Alert.alert('Saved', `Mesajul a fost marcat cu stea. (${confirmList.length} total)`);
+          Alert.alert(t.saved, `${t.markedWithStar} (${confirmList.length} total)`);
         }
       } catch (err) {
         console.error('Star error:', err);
-        Alert.alert('Eroare', 'Nu s-a putut actualiza mesajele favorite.');
+        Alert.alert(t.error, t.updateFavoritesError);
       } finally {
         closeContextMenu();
       }
@@ -1052,11 +1183,11 @@ export default function ChatScreen() {
   };
 
   const handleReportMessage = () => {
-    Alert.alert('Raportează mesaj', 'Vrei să raportezi acest mesaj?', [
-      { text: 'Anulează', style: 'cancel' },
-      { text: 'Raportează', onPress: () => {
+    Alert.alert(t.reportMessage, t.reportConfirm, [
+      { text: t.cancel, style: 'cancel' },
+      { text: t.report, onPress: () => {
         // TODO: report to server
-        Alert.alert('Raportat', 'Mesajul a fost raportat.');
+        Alert.alert(t.reported, t.messageReported);
         closeContextMenu();
       }},
     ]);
@@ -1165,12 +1296,12 @@ export default function ChatScreen() {
           {loading && messages.length === 0 ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={tokens.colors.primary} />
-                <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă mesajele...</Text>
+                <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loadingMessages}</Text>
               </View>
           ) : messages.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Ionicons name="chatbubbles-outline" size={64} color={tokens.colors.border} />
-                <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>Nicio conversație încă. Scrie primul mesaj!</Text>
+                <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>{t.noConversation}</Text>
               </View>
           ) : (
             <>
@@ -1280,7 +1411,7 @@ export default function ChatScreen() {
                           ]}
                         >
                           {message.deleted ? (
-                            <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>acest mesaj a fost șters</Text>
+                            <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>{t.deletedMessage}</Text>
                           ) : (
                             <>
                               {/* Reply preview in message bubble (only when replyTo.messageId exists) */}
@@ -1319,7 +1450,7 @@ export default function ChatScreen() {
                                           marginLeft: 4 
                                         }]}
                                       >
-                                        Fotografie
+                                        {t.photo}
                                       </Text>
                                     </View>
                                   )}
@@ -1389,7 +1520,7 @@ export default function ChatScreen() {
                   <View style={styles.replyPreviewImageRow}>
                     <Ionicons name="image-outline" size={16} color={tokens.colors.muted} />
                     <Text style={[styles.replyPreviewText, { color: tokens.colors.muted, marginLeft: 4 }]}>
-                      Fotografie
+                      {t.photo}
                     </Text>
                   </View>
                 )}
@@ -1414,7 +1545,7 @@ export default function ChatScreen() {
           </TouchableOpacity>
           <TextInput
             style={[styles.inputClean, isDark ? styles.inputCleanDark : undefined]}
-            placeholder="Scrie mesajul tău..."
+            placeholder={t.writeMessage}
             placeholderTextColor={tokens.colors.placeholder}
             value={newMessage}
             onChangeText={setNewMessage}
@@ -1583,39 +1714,39 @@ export default function ChatScreen() {
                       keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                       <View style={[styles.contextMenu, { backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }] }>
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Star</Text>
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.star}</Text>
                       <Ionicons name="star-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Reply</Text>
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.reply}</Text>
                       <Ionicons name="arrow-undo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleForwardMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Forward</Text>
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.forward}</Text>
                       <Ionicons name="arrow-redo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Copy</Text>
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.copy}</Text>
                       <Ionicons name="copy-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
-                    <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert('Speak', 'Text-to-speech funcționalitate în curând'); closeContextMenu(); }}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Speak</Text>
+                    <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert(t.speak, t.textToSpeech); closeContextMenu(); }}>
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.speak}</Text>
                       <Ionicons name="volume-medium-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>Report</Text>
+                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.report}</Text>
                       <Ionicons name="warning-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     {String(selectedMessage?.senderId) === String(userId) && !selectedMessage?.deleted ? (
                       <>
                         <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                         <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
-                          <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>Delete</Text>
+                          <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>{t.deleteBtn}</Text>
                           <Ionicons name="trash-outline" size={20} color="#ff3b30" />
                         </TouchableOpacity>
                       </>
@@ -1653,8 +1784,8 @@ export default function ChatScreen() {
       >
         <View style={styles.listHeaderTopRow}>
           <View>
-            <Text style={styles.listHeaderTitle}>Mesaje ({totalConversations})</Text>
-            <Text style={styles.listHeaderSubtitle}>Continuă conversațiile tale</Text>
+            <Text style={styles.listHeaderTitle}>{t.messages} ({totalConversations})</Text>
+            <Text style={styles.listHeaderSubtitle}>{t.continueConversations}</Text>
           </View>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85} onPress={() => router.push('/starred-messages')}>
@@ -1683,7 +1814,7 @@ export default function ChatScreen() {
                   conversationFilter === filterKey && styles.filterButtonTextActive,
                 ]}
               >
-                {filterKey === 'buying' ? 'De cumpărat' : 'De vândut'}
+                {filterKey === 'buying' ? t.buying : t.selling}
               </Text>
             </TouchableOpacity>
           ))}
@@ -1700,7 +1831,7 @@ export default function ChatScreen() {
           {loading && conversations.length === 0 ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={isDark ? tokens.colors.primary : '#355070'} />
-              <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă conversațiile...</Text>
+              <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loadingConversations}</Text>
             </View>
           ) : filteredConversations.length > 0 ? (
             filteredConversations.map((conv) => (
@@ -1725,7 +1856,20 @@ export default function ChatScreen() {
                 }}
                 style={[styles.conversationCardFlat, conv.unread && styles.conversationCardUnread, { borderBottomColor: tokens.colors.border }]}
               >
+                {/* Gradient accent for unread conversations */}
+                {conv.unread && (
+                  <LinearGradient
+                    colors={isDark ? ['rgba(245, 24, 102, 0.12)', 'rgba(245, 24, 102, 0.04)'] : ['rgba(245, 24, 102, 0.08)', 'rgba(245, 24, 102, 0.02)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.conversationGradientOverlay}
+                  />
+                )}
                 <View style={styles.conversationAvatarWrapper}>
+                  {/* Pulse ring for unread conversations */}
+                  {conv.unread && (
+                    <View style={[styles.avatarPulseRing, { borderColor: isDark ? '#F51866' : '#F51866' }]} />
+                  )}
                   <Image
                     source={{ uri: conv.avatar || conv.participantAvatar || getAvatarFallback(conv.participantName) }}
                     style={styles.conversationAvatar}
@@ -1740,12 +1884,12 @@ export default function ChatScreen() {
                 </View>
                 <View style={styles.conversationInfo}>
                   <View style={styles.conversationRowTop}>
-                    <Text style={[styles.conversationName, { color: tokens.colors.text }]} numberOfLines={1}>
+                    <Text style={[styles.conversationName, conv.unread && styles.conversationNameUnread, { color: tokens.colors.text }]} numberOfLines={1}>
                       {conv.participantName}
                     </Text>
                     <Text style={[styles.conversationTime, { color: tokens.colors.muted }]}>{conv.time}</Text>
                   </View>
-                  <Text style={[styles.conversationSnippet, { color: tokens.colors.muted }]} numberOfLines={1}>
+                  <Text style={[styles.conversationSnippet, conv.unread && styles.conversationSnippetUnread, { color: tokens.colors.muted }]} numberOfLines={1}>
                     {conv.lastMessage}
                   </Text>
                   <Text style={[styles.conversationTopic, { color: tokens.colors.muted }]} numberOfLines={1}>
@@ -1763,8 +1907,8 @@ export default function ChatScreen() {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={[styles.chatEmptyText, { color: tokens.colors.text }]}>Nu ai conversații </Text>
-              <Text style={[styles.chatEmptySubtitle, { color: tokens.colors.muted }]}>E momentul tău Eminescu, începe să scrii!</Text>
+              <Text style={[styles.chatEmptyText, { color: tokens.colors.text }]}>{t.noConversations} </Text>
+              <Text style={[styles.chatEmptySubtitle, { color: tokens.colors.muted }]}>{t.startWriting}</Text>
             </View>
           )}
         </ScrollView>
@@ -1860,9 +2004,39 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e6e6e6',
   },
   conversationCardUnread: {
-    backgroundColor: 'rgba(245, 24, 102, 0.04)',
-    borderLeftWidth: 3,
+    borderLeftWidth: 4,
     borderLeftColor: '#F51866',
+    shadowColor: '#F51866',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  conversationGradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 0,
+  },
+  avatarPulseRing: {
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 2.5,
+    borderColor: '#F51866',
+    opacity: 0.4,
+  },
+  conversationNameUnread: {
+    fontWeight: '800',
+    color: '#F51866',
+  },
+  conversationSnippetUnread: {
+    fontWeight: '600',
   },
   conversationAvatarWrapper: {
     position: 'relative',
@@ -1875,28 +2049,28 @@ const styles = StyleSheet.create({
   },
   conversationBadge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
+    top: -4,
+    right: -4,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
     backgroundColor: '#F51866',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
-    borderWidth: 2,
+    borderWidth: 2.5,
     borderColor: '#ffffff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-    elevation: 4,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   conversationBadgeText: {
     color: '#ffffff',
     fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    fontWeight: '800',
+    letterSpacing: -0.5,
   },
   conversationInfo: {
     flex: 1,
