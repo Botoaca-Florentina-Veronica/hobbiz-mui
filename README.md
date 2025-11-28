@@ -9,16 +9,15 @@ Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API
 
 ---
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
 ## 🧭 Descriere
+
+<a href="https://hobbiz.netlify.app">
+  <img src="./mobile-app/assets/images/poster.png" align="right" width="380" alt="Hobbiz Poster" style="margin-left: 20px; margin-bottom: 20px;" />
+</a>
 
 Hobbiz este o platformă unde utilizatorii își pot publica anunțuri în vederea monetizarii hobby‑urilor. De ce? Pentru că în ziua de azi nu mai e de ajuns o singură sursă de venit. Aici poți îmbina utilul cu plăcutul!
 
 Nu ai hobby-uri? Nu e problemă, aici îți poți găsi pasiunile! Te poți conecta cu oameni cu aceleași interese ca tine și să învățați împreună lucruri noi prin intermediul unei comunități vaste și prietenoase. Apoi cine știe, înveți și pe alții!
-
 
 ### 🛠️ Tech Stack
 
@@ -32,19 +31,9 @@ Nu ai hobby-uri? Nu e problemă, aici îți poți găsi pasiunile! Te poți cone
   <a href="https://expo.dev" target="_blank"><img src="https://img.shields.io/badge/Expo-54-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" /></a>
   <a href="https://reactnative.dev" target="_blank"><img src="https://img.shields.io/badge/React_Native-0.81-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React Native" /></a>
   <a href="https://socket.io" target="_blank"><img src="https://img.shields.io/badge/Socket.IO-4-010101?style=for-the-badge&logo=socket.io&logoColor=white" alt="Socket.IO" /></a>
-  <a href="https://jwt.io" target="_blank"><img src="https://img.shields.io/badge/JWT-jsonwebtoken-FF9900?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT" /></a>
-</div>V
+</div>
 
-</td>
-<td width="50%" valign="middle">
-
-<p align="center">
-  <img src="./mobile-app/assets/images/poster.png" alt="Hobbiz Poster" width="560" />
-</p>
-
-</td>
-</tr>
-</table>
+<br clear="all" />
 
 ---
 
@@ -60,25 +49,9 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
 
 ### Capturi de Ecran
 
-<table align="center">
-  <tr>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image.png" width="190" height="350" alt="Ecran principal" /></td>
-    <td>&nbsp;&nbsp;&nbsp;</td>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image2.png" width="180" height="350" alt="Chat" /></td>
-    <td>&nbsp;&nbsp;&nbsp;</td>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image3.png" width="220" height="350" alt="Profil" /></td>
-  </tr>
-  <tr>
-    <td style="height:18px"></td>
-  </tr>
-  <tr>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image4.png" width="220" height="350" alt="Căutare" /></td>
-    <td>&nbsp;&nbsp;&nbsp;</td>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image5.png" width="180" height="350" alt="Anunț" /></td>
-    <td>&nbsp;&nbsp;&nbsp;</td>
-    <td style="text-align:center"><img style="display:block;margin:0 auto" src="./device-view_images/image7.png" width="190" height="350" alt="Notificări" /></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="./device-view_images/POSTERE HOBBIZ.png" alt="POSTERE HOBBIZ" width="720" style="max-width:100%;height:auto;" />
+</p>
 
 ---
 
