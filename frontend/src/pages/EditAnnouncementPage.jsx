@@ -471,6 +471,13 @@ export default function EditAnnouncementPage() {
           onClose={handleCategoryClose}
           anchorOrigin={{ vertical: 'bottom', horizontal: isMobile ? 'center' : 'left' }}
           transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'left' }}
+          BackdropProps={{
+            sx: {
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+              backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.35)'
+            }
+          }}
           PaperProps={{ 
             sx: {
               // Mobile: responsive width using clamp(min, preferred, max)

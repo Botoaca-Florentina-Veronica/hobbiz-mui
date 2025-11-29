@@ -1,46 +1,99 @@
-/* ==============================
- * FavoriteAnnouncements Styles
- * Structure:
- * - Layout & Card
- * - Media queries (desktop/tablet/mobile/very small)
- * - Dark mode
- * - Utilities (toast, mobile header, counters)
- * ============================== */
+/* =============================================================
+   FAVORITE ANNOUNCEMENTS PAGE
+   ============================================================= */
 
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* Dimensiuni & Layout */
+  --fav-card-width: 280px;
+  --fav-card-radius: 12px;
+  
+  /* Culori Light Mode (Default) */
+  --fav-bg-card: #ffffff;
+  --fav-border: transparent; /* sau 1px solid transparent dacă e cazul */
+  --fav-shadow: 0 2px 12px rgba(63,63,63,0.12);
+  --fav-shadow-hover: 0 4px 18px rgba(63,63,63,0.18);
+  
+  --fav-text-title: #3f3f3f;
+  --fav-text-category: #575757;
+  --fav-text-meta: #717171; /* Locație, Dată */
+  --fav-text-price: #3f3f3f; /* Desktop default */
+  
+  --fav-icon-heart: #575757;
+  --fav-icon-heart-filled: #f51866;
+  
+  /* Mobile Header specific */
+  --fav-mobile-header-text: var(--chat-text, #3f3f3f);
+  --fav-mobile-btn-bg: var(--chat-elev, #f5f5f5);
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --fav-bg-card: #121212;
+  --fav-border: 1px solid rgba(245, 24, 102, 0.3);
+  --fav-shadow: none;
+  --fav-shadow-hover: 0 4px 18px rgba(245, 24, 102, 0.3);
+  --fav-border-hover-color: rgba(245, 24, 102, 0.5);
+
+  --fav-text-title: #ffffff;
+  --fav-text-category: #e0e0e0;
+  --fav-text-meta: #d6d6d6;
+  --fav-text-price: #f51866; /* Preț accentuat în dark mode */
+
+  --fav-icon-heart: #e0e0e0;
+  --fav-icon-heart-filled: #f51866;
+}
+
+
+/* 2. LAYOUT PRINCIPAL (DESKTOP FIRST)
+   ---------------------------------------------------------- */
 .favorite-announcements-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
   justify-content: flex-start;
   align-items: flex-start;
   max-width: 1800px;
   margin: 0 auto;
   padding: 0 16px;
+  gap: 24px;
 }
 
+/* Card Base Style (Desktop: Vertical) */
 .favorite-announcement-card {
-  width: 280px;
-  min-height: 320px;
-  max-width: 280px;
-  flex-direction: column;
-  position: relative;
-  cursor: pointer;
-  box-sizing: border-box;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(63,63,63,0.12);
-  transition: box-shadow 0.2s;
   display: flex;
+  flex-direction: column; /* Vertical pe desktop */
+  position: relative;
+  width: var(--fav-card-width);
+  max-width: var(--fav-card-width);
+  min-height: 320px;
+  box-sizing: border-box;
+  background: var(--fav-bg-card);
+  border: var(--fav-border);
+  border-radius: var(--fav-card-radius);
+  box-shadow: var(--fav-shadow);
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  cursor: pointer;
 }
 
 .favorite-announcement-card:hover {
-  box-shadow: 0 4px 18px rgba(63,63,63,0.18);
+  box-shadow: var(--fav-shadow-hover);
+}
+/* Dark mode border hover specific */
+.dark-mode .favorite-announcement-card:hover {
+  border-color: var(--fav-border-hover-color);
 }
 
+
+/* 3. ELEMENTE INTERNE CARD
+   ---------------------------------------------------------- */
+/* Imagine */
 .favorite-announcement-image {
   width: 100%;
-  margin-right: 0;
   display: block;
+  /* Reseturi pentru consistență */
+  margin: 0; 
+  flex-shrink: 0;
 }
 
 .favorite-announcement-img {
@@ -48,27 +101,14 @@
   height: 140px;
   object-fit: cover;
   border-radius: 8px;
+  display: block;
 }
 
 .favorite-announcement-img.placeholder {
   background: #ffebf0;
 }
 
-.favorite-heart {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  z-index: 2;
-  color: #575757; /* icon color when not filled */
-}
-
-.favorite-heart:hover { transform: scale(1.2); }
-
-/* Default icon size inside heart */
-.favorite-heart .MuiSvgIcon-root { font-size: 32px; }
-
+/* Info Container */
 .favorite-announcement-info {
   padding: 10px;
   display: flex;
@@ -76,7 +116,6 @@
   flex: 1;
 }
 
-/* Top row: date + heart */
 .favorite-info-top {
   display: flex;
   justify-content: space-between;
@@ -84,30 +123,51 @@
   margin-bottom: 4px;
 }
 
+/* Heart Icon - Poziționare Desktop (Absolută) */
+.favorite-heart {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 2;
+  color: var(--fav-icon-heart);
+  /* Resetări pentru a preveni stiluri moștenite nedorite */
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.favorite-heart:hover { transform: scale(1.2); }
+.favorite-heart.filled { color: var(--fav-icon-heart-filled); }
+.favorite-heart .MuiSvgIcon-root { font-size: 32px; }
+
+/* Typography */
 .favorite-announcement-title {
   font-size: 14px;
-  margin-bottom: 4px;
   font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--fav-text-title);
 }
 
 .favorite-announcement-category {
-  font-weight: 500;
-  color: #575757;
-  margin-bottom: 4px;
   font-size: 12px;
+  font-weight: 500;
+  color: var(--fav-text-category);
+  margin-bottom: 4px;
 }
 
 .favorite-announcement-location {
-  color: #717171;
-  margin-bottom: 4px;
   font-size: 12px;
+  color: var(--fav-text-meta);
+  margin-bottom: 4px;
 }
 
 .favorite-date {
-  color: #717171;
   font-size: 17px;
   font-weight: 400;
   line-height: 1.2;
+  color: var(--fav-text-meta);
   margin-right: 10px;
   display: block;
   text-align: left;
@@ -116,43 +176,37 @@
 .favorite-price {
   font-weight: 700;
   font-size: 22px;
-  color: #3f3f3f;
+  color: var(--fav-text-price);
   margin-top: 12px;
 }
 
+/* Page Header Elements */
 .favorite-count {
   text-align: center;
   font-weight: 600;
   font-size: 22px;
-  margin-top: 4px;
-  margin-bottom: 4px;
+  margin: 4px 0;
   line-height: 1.3;
 }
-
 @media (min-width: 1025px) {
-  .favorite-count {
-    margin-top: 32px;
-    margin-bottom: 24px;
-  }
+  .favorite-count { margin: 32px 0 24px 0; }
+  .my-announcements-title { margin-top: 80px; }
 }
 
+
+/* 4. MEDIA QUERIES - DESKTOP & TABLET ADJUSTMENTS
+   ---------------------------------------------------------- */
+/* Large Screens */
 @media (min-width: 1200px) {
   .favorite-announcements-list {
     gap: 20px;
     padding: 0 32px;
-    justify-content: flex-start;
     max-width: 1200px;
   }
-  .favorite-announcement-card {
-    width: 280px;
-    max-width: 280px;
-    min-height: 320px;
-  }
-  .favorite-announcement-img {
-    height: 140px;
-  }
+  .favorite-announcement-img { height: 140px; }
 }
 
+/* Tablet Portrait */
 @media (max-width: 768px) and (min-width: 701px) {
   .favorite-announcements-list {
     gap: 18px;
@@ -165,330 +219,229 @@
   }
 }
 
-@media (max-width: 480px) {
+
+/* 5. MOBILE OVERHAUL (max-width: 1024px)
+   Transformare din Vertical în Orizontal - FĂRĂ !IMPORTANT
+   Scriind aceste reguli aici, ele suprascriu natural regulile de mai sus.
+   ---------------------------------------------------------- */
+@media (max-width: 1024px) {
+  
+  /* --- Hide Desktop Elements --- */
+  .my-announcements-title { display: none; }
+
+  /* --- List Layout --- */
   .favorite-announcements-list {
-    padding: 0 8px !important;
-    gap: 10px !important;
+    gap: 12px;
+    padding: 0 12px;
+    flex-direction: column; /* Listă verticală */
+    max-width: 100%;
   }
-  
+
+  /* --- Card Layout (Switch to Row) --- */
   .favorite-announcement-card {
-    padding: 8px !important;
-    min-height: 110px !important;
+    width: 100%;
+    max-width: 100%;
+    min-height: 130px;
+    flex-direction: row; /* Orizontal pe mobil */
+    align-items: stretch;
+    padding: 16px;
+    gap: 12px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(63,63,63,0.12);
   }
-  
+
+  .favorite-announcement-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(63,63,63,0.18);
+  }
+
+  /* --- Image --- */
   .favorite-announcement-image {
-    width: 75px !important;
-    height: 75px !important;
-    margin-right: 8px !important;
+    width: 90px;
+    height: 90px;
+    margin: 0;
+    align-self: center;
   }
-  
+
   .favorite-announcement-img {
-    width: 75px !important;
-    height: 75px !important;
-    border-radius: 8px !important;
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
   }
-  
+
+  /* --- Info Wrapper --- */
   .favorite-announcement-info {
-    min-height: 75px !important;
+    padding: 0;
+    justify-content: space-between;
+    height: auto;
+    min-height: 90px;
+    margin: 0;
   }
-  
-  .favorite-announcement-info > div:first-child > span {
-    font-size: 10px !important;
+
+  /* --- Top Section (Date + Heart) --- */
+  /* Redefinim .favorite-info-top sau folosim primul div */
+  .favorite-announcement-info > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 6px;
   }
-  
+
+  /* Date Text */
+  .favorite-date {
+    font-size: 10px;
+    margin-right: 8px;
+    flex: 1;
+  }
+
+  /* Heart Icon - Repositioning static */
   .favorite-heart {
-    width: 28px !important;
-    height: 28px !important;
+    position: static; /* Nu mai e absolut */
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0;
+    transform: none;
+    /* Resetări specifice mobil */
+    right: auto;
+    bottom: auto;
   }
-  
+
+  .favorite-heart .MuiSvgIcon-root {
+    font-size: 22px;
+  }
+
+  /* --- Content --- */
   .favorite-announcement-title {
-    font-size: 13px !important;
-    margin-bottom: 3px !important;
+    font-size: 14px;
+    line-height: 1.3;
+    margin-top: 0;
+    margin-bottom: 6px;
+    /* Truncate text */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    width: 100%;
   }
-  
+
+  /* Meta wrapper (Category + Location) */
+  .favorite-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 8px;
+  }
+
   .favorite-announcement-category,
   .favorite-announcement-location {
-    font-size: 10px !important;
-    margin-bottom: 2px !important;
-  }
-  
-  .favorite-announcement-info > div:last-child {
-    font-size: 14px !important;
-  }
-}
-
-@media (max-width: 1024px) {
-  /* Hide desktop H1 title on mobile (mobile header already shows the page title) */
-  .my-announcements-title {
-    display: none !important;
+    font-size: 11px;
+    margin-bottom: 0;
+    width: 100%;
+    display: block;
   }
 
-  .favorite-announcements-list {
-    gap: 12px !important;
-    padding: 0 12px !important;
-    justify-content: flex-start !important;
-    flex-direction: column !important;
-    max-width: 100% !important;
+  /* --- Price --- */
+  .favorite-price {
+    font-size: 15px;
+    color: #355070; /* Accent light mode mobile */
+    margin-top: auto;
+    margin-bottom: 0;
+    align-self: flex-end;
+    width: 100%;
   }
   
-  .favorite-announcement-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 130px !important;
-    flex-direction: row !important;
-    padding: 16px !important;
-    display: flex !important;
-    align-items: stretch !important;
-    border-radius: 16px !important;
-    box-shadow: 0 2px 8px rgba(63,63,63,0.12) !important;
-    position: relative !important;
-    gap: 12px !important; /* spațiu consistent între imagine și conținut */
-  }
-  
-  .favorite-announcement-card:hover {
-    box-shadow: 0 4px 12px rgba(63,63,63,0.18) !important;
-    transform: translateY(-1px) !important; /* efect subtil de ridicare */
-  }
-  
-  .favorite-announcement-image {
-    flex-shrink: 0 !important;
-    width: 90px !important;
-    height: 90px !important;
-    display: block !important;
-    margin: 0 !important;
-    align-self: center !important; /* centrează vertical imaginea */
-  }
-  
-  .favorite-announcement-img {
-    width: 90px !important;
-    height: 90px !important;
-    border-radius: 12px !important;
-    object-fit: cover !important;
-  }
-  
-  .favorite-announcement-info {
-    flex: 1 !important;
-    padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important; /* distribuie uniform conținutul */
-    height: auto !important;
-    min-height: 90px !important;
-    position: relative !important;
-    margin: 0 !important;
-  }
-  
-  /* Container pentru partea de sus (data + heart) */
-  .favorite-announcement-info > div:first-child {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-start !important;
-    margin-bottom: 6px !important;
-    position: relative !important;
-    width: 100% !important;
-    flex-direction: row !important;
-  }
-  
-  /* Data - poziționată în partea stângă sus */
-  .favorite-date,
-  .favorite-announcement-info > div:first-child > span {
-    color: #717171 !important;
-    font-size: 10px !important;
-    font-weight: 400 !important;
-    line-height: 1.2 !important;
-    flex: 1 !important;
-    margin-right: 8px !important;
-    display: block !important;
-    text-align: left !important;
-  }
-  
-  /* Heart - poziționat în partea dreaptă sus */
-  .favorite-heart {
-    position: static !important;
-    width: 28px !important;
-    height: 28px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    transform: none !important;
-    right: auto !important;
-    bottom: auto !important;
-  }
-  
-  .favorite-heart .MuiSvgIcon-root {
-    font-size: 22px !important; /* iconița puțin mai mică pentru proporționalitate */
-  }
-  
-  /* Titlu - poziționat sub data/heart cu mai mult spațiu */
-  .favorite-announcement-title {
-    font-size: 14px !important;
-    margin-bottom: 6px !important;
-    line-height: 1.3 !important;
-    font-weight: 600 !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-    color: #3f3f3f !important;
-    margin-top: 0 !important;
-    width: 100% !important;
-  }
-  
-  /* Container pentru categoria și locația */
-  .favorite-meta-info {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 3px !important;
-    margin-bottom: 8px !important;
-  }
-  
-  /* Categorie */
-  .favorite-announcement-category {
-    font-size: 11px !important;
-    margin-bottom: 0 !important;
-    font-weight: 500 !important;
-    color: #575757 !important;
-    display: block !important;
-    width: 100% !important;
-  }
-  
-  /* Locație */
-  .favorite-announcement-location {
-    font-size: 11px !important;
-    margin-bottom: 0 !important;
-    display: block !important;
-    color: #717171 !important;
-    width: 100% !important;
-  }
-  
-  /* Preț - poziționat în partea de jos cu mai mult accent */
-  .favorite-price,
-  .favorite-announcement-info > div:last-child {
-    font-weight: 700 !important;
-    font-size: 15px !important;
-    color: #355070 !important; /* culoare accent pentru preț */
-    margin-top: auto !important;
-    margin-bottom: 0 !important;
-    display: block !important;
-    width: 100% !important;
-    align-self: flex-end !important;
+  /* Dark mode override for mobile price color logic from original CSS */
+  .dark-mode .favorite-price {
+     color: #f51866;
   }
 
-  /* Mobile header visible only on small and tablet screens */
+  /* --- Mobile Header & Utility --- */
+  /* Need specificity or !important here only if overriding external MUI/Theme styles */
   .mobile-header {
     display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important; /* ensure items stick together on the left */
-    gap: 8px !important; /* reduced distance between back button and title */
-    margin-bottom: 8px !important; /* matches old mb:1 */
-    padding-top: 2px !important; /* ultra-compact spacing */
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    color: var(--chat-text) !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 2px 8px 0 8px;
+    color: var(--fav-mobile-header-text);
   }
 
-  /* Force IconButton dimensions and visuals on mobile */
   .my-announcements-container .mobile-back-btn {
     width: 40px !important;
     height: 40px !important;
     padding: 8px !important;
-    border-radius: 50% !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--chat-elev) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    margin-top: -2rem !important; /* eliminat complet spațiul superior */
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--fav-mobile-btn-bg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-top: -2rem !important;
   }
-  .my-announcements-container .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
-
-  /* Match icon and title styling exactly */
-  .mobile-header .MuiSvgIcon-root {
-    font-size: 24px !important;
-    color: var(--chat-text) !important;
-  }
-  /* Selector mai specific pentru pagina de favorite */
+  
   .my-announcements-container .mobile-header-title {
-    font-weight: 600 !important;
-    color: var(--chat-text) !important;
-    font-size: 24px !important; /* MUI h5 on mobile */
-    line-height: 1.334 !important;
-    margin: 0 !important; /* reset */
-    margin-top: -2rem !important; /* eliminat complet spațiul superior */
-    flex: 0 0 auto !important; /* prevent stretching to the right */
-    margin-left: 4px !important; /* nudge closer to the back button */
-  }
-
-  .favorite-count {
-    margin-top: 4px !important;  /* xs: 0.5 spacing -> 4px */
-    margin-bottom: 4px !important; /* xs: 0.5 spacing -> 4px */
+    font-size: 24px !important;
+    font-weight: 600;
+    color: var(--fav-mobile-header-text);
+    margin: -2rem 0 0 4px !important;
+    line-height: 1.334;
   }
 }
 
-/* Dark Mode Styles */
-.dark-mode .favorite-announcement-card {
-  background: #121212 !important;
-  border: 1px solid rgba(245, 24, 102, 0.3) !important;
-  color: #ffffff !important;
-}
 
-.dark-mode .favorite-announcement-card:hover {
-  border-color: rgba(245, 24, 102, 0.5) !important;
-  box-shadow: 0 4px 18px rgba(245, 24, 102, 0.3) !important;
-}
-
-.dark-mode .favorite-announcement-title {
-  color: #ffffff !important;
-}
-
-.dark-mode .favorite-announcement-category {
-  color: #e0e0e0 !important;
-}
-
-.dark-mode .favorite-announcement-location {
-  color: #cccccc !important;
-}
-
-.dark-mode .favorite-date,
-.dark-mode .favorite-announcement-info > div:first-child > span {
-  color: #d6d6d6 !important;
-}
-
-.dark-mode .favorite-price,
-.dark-mode .favorite-announcement-info > div:last-child {
-  color: #f51866 !important;
-}
-
-.dark-mode .favorite-heart {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: #e0e0e0 !important; /* default outline icon in dark mode */
-}
-
-.dark-mode .favorite-heart:hover {
-  background: transparent !important;
-}
-
-/* Filled state for heart icon */
-.favorite-heart.filled { color: #f51866; }
-.dark-mode .favorite-heart.filled { color: #f51866 !important; }
-
-/* Desktop-only spacing for the main page title */
-@media (min-width: 1024px) {
-  .my-announcements-title {
-    margin-top: 80px;
+/* 6. VERY SMALL MOBILE (max-width: 480px)
+   Fine-tuning dimensions
+   ---------------------------------------------------------- */
+@media (max-width: 480px) {
+  .favorite-announcements-list {
+    padding: 0 8px;
+    gap: 10px;
   }
+  
+  .favorite-announcement-card {
+    padding: 8px;
+    min-height: 110px;
+  }
+  
+  .favorite-announcement-image,
+  .favorite-announcement-img {
+    width: 75px;
+    height: 75px;
+  }
+  .favorite-announcement-image { margin-right: 8px; }
+  .favorite-announcement-img { border-radius: 8px; }
+  
+  .favorite-announcement-info {
+    min-height: 75px;
+  }
+  
+  .favorite-date { font-size: 10px; }
+  .favorite-heart { width: 28px; height: 28px; }
+  
+  .favorite-announcement-title {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+  
+  .favorite-announcement-category,
+  .favorite-announcement-location {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+  
+  .favorite-price { font-size: 14px; }
 }
 
-/* Empty state for Favorites */
+
+/* 7. EMPTY STATE
+   ---------------------------------------------------------- */
 .favorites-empty {
   display: flex;
   flex-direction: column;
@@ -507,30 +460,22 @@
   height: auto;
   max-width: 80%;
   object-fit: contain;
-  display: block;
   margin: 0 auto;
+  display: block;
 }
 
 .favorites-empty-text {
   font-size: 1.1rem;
-  color: #3f3f3f;
+  color: var(--fav-text-title);
 }
 
-
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  .favorites-empty { margin-top: 12rem; }
   .favorites-empty-icon img { width: 350px; }
   .favorites-empty-text { font-size: 1rem; padding: 0 8px; }
-
-  .favorites-empty {
-  margin-top: 12rem;
-  }
 }
 
 @media (max-width: 500px) {
+  .favorites-empty { margin-top: 8rem; }
   .favorites-empty-icon img { width: 270px; }
-  .favorites-empty-text { font-size: 1rem; padding: 0 8px; }
-
-  .favorites-empty {
-  margin-top: 8rem;
-  }
 }

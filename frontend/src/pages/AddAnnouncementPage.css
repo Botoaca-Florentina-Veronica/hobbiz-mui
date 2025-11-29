@@ -1,70 +1,130 @@
-/* Variables and global helpers for this page */
+/* ==========================================================================
+   1. VARIABLES & THEME CONFIGURATION
+   ========================================================================== */
 :root {
-  --aa-bg: var(--app-bg);
-  --aa-surface: var(--app-surface);
+  /* --- Palette Definition --- */
   --aa-primary: #355070;
   --aa-accent: #fe6585;
   --aa-success: #388e3c;
   --aa-danger: #d32f2f;
   --aa-muted: #5b7a88;
-}
 
-@media (min-width: 500px) {
-  .category-title-popover {
-    display: none !important;
-  }
+  /* --- Dynamic Theme Variables (Light Mode Defaults) --- */
+  --bg-app: var(--app-bg, #f3f5f6);
+  --bg-surface: #ffffff;
+  --bg-input: #f3f5f6;
+  --bg-input-focus: #f8fafb;
   
-  .category-description-popover,
-  .category-hint-popover {
-    display: block !important;
-  }
+  --text-main: #183642;
+  --text-secondary: #5b7a88;
+  --text-title-special: #183642; /* Titlul principal */
+  --text-placeholder: #5b7a88;
+  
+  --border-color: transparent;
+  --border-focus: #355070;
+  
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.07);
+  --shadow-hover: 0 4px 16px rgba(24,54,66,0.10);
+
+  /* --- Feedback Colors --- */
+  --bg-error: #fff0f0;
+  --border-error: #ffcdd2;
+  --text-error: #d32f2f;
+  
+  --bg-success: #e8f5e9;
+  --border-success: #a5d6a7;
+  --text-success: #388e3c;
+
+  /* --- Specific Elements --- */
+  --upload-bg-main: #fff8e6;
+  --upload-underline: #ffd600;
+  
+  /* MUI Popovers defaults */
+  --mui-paper-bg: #fff;
+  --mui-paper-color: inherit;
+  --mui-border: #e5e7eb;
 }
 
-/* Desktop: hide mobile drawer header elements for "Alege categoria" popover */
-@media (min-width: 500px) {
-  .categories-popover-header-mobile,
-  .categories-popover-close,
-  .categories-popover-title {
-    display: none !important;
-  }
+/* --- Dark Mode Overrides --- */
+.dark-mode {
+  --bg-app: #121212;
+  --bg-surface: #121212; /* Surface a0 */
+  --bg-input: #2c2c2c;
+  --bg-input-focus: #575757; /* Surface a30 */
+  
+  --text-main: #ffffff;
+  --text-secondary: #8b8b8b; /* Surface a50 */
+  --text-title-special: #f51866; /* Primary a0 */
+  --text-placeholder: #717171; /* Surface a40 */
+  
+  --border-color: #3f3f3f; /* Surface a20 */
+  --border-focus: #fe6585; /* Primary a20 */
+  
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.3);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.5);
+
+  /* Feedback Colors Dark */
+  --bg-error: #3f3f3f;
+  --border-error: #f51866;
+  --text-error: #ff7e95;
+  
+  --bg-success: #282828;
+  --border-success: #fe6585;
+  --text-success: #fe6585;
+
+  /* Specific Elements Dark */
+  --upload-bg-main: #2c2c2c;
+  --upload-underline: #ffabb7;
+
+  /* MUI Popovers Dark */
+  --mui-paper-bg: #121212;
+  --mui-paper-color: #ffffff;
+  --mui-border: #575757;
 }
 
-/* Base Styles */
+/* ==========================================================================
+   2. BASE LAYOUT & CONTAINERS
+   ========================================================================== */
+
 .add-announcement-container {
-  background: var(--app-bg);
+  background: var(--bg-app);
   min-height: 120vh;
   padding: 40px 0;
-  margin-top: 4rem;
+  color: var(--text-main);
+  /* Desktop margin default */
+  margin-top: 4rem; 
 }
 
-/* Mobile: remove desktop top offset and enforce background match */
-@media (max-width: 768px) {
+/* Mobile & Tablet Overrides (No !important needed) */
+@media (max-width: 1024px) {
   .add-announcement-container {
-    margin-top: 0 !important;
-    background: var(--app-bg) !important;
+    margin-top: 0;
   }
 }
 
-/* Tablet: keep same behavior up to 1024px */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .add-announcement-container {
-    margin-top: 0 !important;
-    background: var(--app-bg) !important;
-  }
+/* Common Card Style for all sections */
+.add-announcement-form,
+.add-announcement-actions-section,
+.add-announcement-description-section,
+.add-announcement-location-section,
+.add-announcement-contact-section,
+.add-announcement-images-section {
+  background: var(--bg-surface);
+  border-radius: 14px;
+  max-width: 900px;
+  margin: 32px auto 0 auto;
+  padding: 36px 48px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  /* Border is transparent in light mode, visible in dark mode via variable */
+  border: 1px solid var(--border-color);
 }
 
 .add-announcement-form {
-    background: #fff;
-    border-radius: 14px;
-    max-width: 900px;
-    margin: 32px auto 0 auto;
-    padding: 36px 48px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
 }
 
 .add-announcement-form > * {
@@ -72,98 +132,174 @@
   max-width: 760px;
 }
 
-/* Increase left margin for the desktop title to visually offset it from the form */
+.add-announcement-description-section,
+.add-announcement-location-section,
+.add-announcement-contact-section {
+  flex-direction: column;
+  gap: 18px;
+}
+
+.add-announcement-images-section {
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   3. TYPOGRAPHY & INPUTS
+   ========================================================================== */
+
 .add-announcement-title {
   margin-left: clamp(48px, 8vw, 96px);
+  color: var(--text-title-special);
 }
 
 .add-announcement-subtitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #183642;
+  color: var(--text-main);
   margin-bottom: 18px;
 }
 
 .add-announcement-label {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #183642;
+  color: var(--text-main);
   margin-bottom: 6px;
 }
 
-.add-announcement-title-input {
+/* --- Shared Input Styles --- */
+.add-announcement-title-input,
+.add-announcement-category-select,
+.add-announcement-description-input {
   width: 100%;
+  border-radius: 8px; /* Unified radius slightly if acceptable, else keep separate */
+  border: none;
+  background: var(--bg-input);
+  color: var(--text-main);
+  resize: none;
+  /* Border logic for Dark Mode is handled by border: 1px solid var(--border-color) override below if needed, 
+     but original code had 'border: none' for light and 'border: 1px solid' for dark.
+     We simulate this via transparent border in light mode variables or override. */
+  border: 1px solid var(--border-color); 
+}
+
+/* Specific Adjustments per Input */
+.add-announcement-title-input {
   height: 30px;
   font-size: 1.2rem;
   border-radius: 8px;
-  border: none;
-  background: #f3f5f6;
   padding: 18px;
   margin-bottom: 4px;
-  resize: none;
-  color: #183642;
-}
-
-.add-announcement-title-input:focus {
-  outline: 2px solid #355070;
-  background: #f8fafb;
-}
-
-.add-announcement-charcount {
-  text-align: right;
-  color: #5b7a88;
-  font-size: 1rem;
-  margin-bottom: 2px;
-}
-
-.add-announcement-char-helper-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2px;
-}
-
-.add-announcement-helper {
-  color: #5b7a88;
-  font-size: 1rem;
 }
 
 .add-announcement-category-select {
-  width: 100%;
   padding: 18px;
   font-size: 1.1rem;
   border-radius: 8px;
-  border: none;
-  background: #f3f5f6;
-  color: #183642;
   margin-bottom: 12px;
 }
 
-.add-announcement-category-select:focus {
-  outline: 2px solid #355070;
-  background: #f8fafb;
-}
-
 .add-announcement-description-input {
-  width: 100%;
   min-height: 180px;
   font-size: 1.35rem;
   border-radius: 12px;
-  border: none;
-  background: #f3f5f6;
   padding: 28px 24px;
   margin-bottom: 4px;
-  resize: none;
-  color: #355070;
   box-sizing: border-box;
 }
 
+/* Shared Focus State */
+.add-announcement-title-input:focus,
+.add-announcement-category-select:focus,
 .add-announcement-description-input:focus {
-  outline: 2px solid #355070;
-  background: #f8fafb;
+  outline: 2px solid var(--border-focus);
+  background: var(--bg-input-focus);
 }
 
-/* Categories Grid - Desktop */
+/* Placeholders & Caret */
+::placeholder {
+  color: var(--text-placeholder);
+}
+input, textarea, select {
+  caret-color: var(--text-title-special); /* Usually matches primary/title color in dark mode */
+}
+
+/* --- Helpers --- */
+.add-announcement-charcount,
+.add-announcement-helper,
+.add-announcement-images-helper {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+.add-announcement-charcount { text-align: right; margin-bottom: 2px; }
+.add-announcement-char-helper-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+.add-announcement-images-helper { margin-bottom: 18px; }
+
+
+/* --- Location & Contact Inputs Wrappers --- */
+.add-announcement-location-input-wrapper,
+.add-announcement-contact-input-wrapper {
+  background: var(--bg-input);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 18px 32px;
+  margin-top: 8px;
+  width: 60%;
+  min-width: 320px;
+  max-width: 600px;
+  border: 1px solid var(--border-color);
+}
+
+.add-announcement-location-input,
+.add-announcement-contact-input {
+  border: none;
+  background: transparent;
+  font-size: 1.3rem;
+  color: var(--text-main);
+  outline: none;
+  width: 100%;
+}
+
+/* Specific Contact Inputs (Email/Tel) */
+.add-announcement-contact-input[type="email"],
+.add-announcement-contact-input[type="tel"] {
+  font-size: 1.3rem;
+  margin-top: 8px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  padding: 18px 32px;
+  color: var(--text-main); /* Changed from generic specific color to var for dark mode compat */
+  width: 60%;
+  min-width: 300px;
+  max-width: 600px;
+  border: 1px solid var(--border-color);
+  outline: none;
+}
+/* Revert text color for Light Mode specific if needed to match strictly #5b7a88 */
+:root:not(.dark-mode) .add-announcement-contact-input[type="email"],
+:root:not(.dark-mode) .add-announcement-contact-input[type="tel"] {
+  color: #5b7a88;
+}
+
+.add-announcement-contact-input[type="email"]:focus,
+.add-announcement-contact-input[type="tel"]:focus {
+  background: var(--bg-input-focus);
+  outline: 2px solid var(--border-focus);
+  border-color: var(--border-focus); /* For dark mode consistency */
+}
+
+/* Icons Colors */
+.location-icon,
+.add-announcement-location-check {
+  color: var(--border-focus); /* Uses accent color in dark mode */
+}
+/* Force original green for light mode check if strictly required, otherwise var is fine */
+:root:not(.dark-mode) .add-announcement-location-check { color: inherit; } 
+
+/* ==========================================================================
+   4. CATEGORIES POPOVER (GRID & CARDS)
+   ========================================================================== */
 .categories-grid-popover {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -175,72 +311,62 @@
   box-sizing: border-box;
 }
 
-  .category-card-popover {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    cursor: pointer;
-    padding: 1.1rem;
-    width: 170px;
-    height: auto;
-    min-height: 140px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: transform 0.2s, box-shadow 0.2s;
-    justify-content: flex-start;
-  }
+.category-card-popover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  background: #fff; /* Default white in light mode */
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  cursor: pointer;
+  padding: 1.1rem;
+  width: 170px; /* Fixed width as per original */
+  height: auto;
+  min-height: 140px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+  justify-content: flex-start;
+}
 
-/* Responsive columns for desktop popover */
+/* Dark Mode Card Overrides */
+.dark-mode .category-card-popover {
+  background: transparent !important;
+  border-color: rgba(255,255,255,0.18) !important;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255,255,255,0.02) !important;
+}
+
+/* Responsive Grid Logic (Preserved Exact Breakpoints) */
 @media (min-width: 500px) and (max-width: 699px) {
-  .categories-grid-popover {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-  }
-  .category-card-popover {
-    width: 100%;
-    min-height: 160px;
-    padding: 0.8rem;
-  }
+  .categories-grid-popover { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  .category-card-popover { width: 100%; min-height: 160px; padding: 0.8rem; }
 }
 
 @media (min-width: 700px) and (max-width: 899px) {
-  .categories-grid-popover {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
-  }
-  .category-card-popover {
-    width: 100%;
-    min-height: 170px;
-  }
+  .categories-grid-popover { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .category-card-popover { width: 100%; min-height: 170px; }
 }
 
 @media (min-width: 900px) {
-  .categories-grid-popover {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-  }
-  .category-card-popover {
-    width: 100%;
-    min-height: 170px;
-  }
+  .categories-grid-popover { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+  .category-card-popover { width: 100%; min-height: 170px; }
 }
 
-/* Ultra-wide: add a 5th column to reduce horizontal whitespace */
 @media (min-width: 1400px) {
-  .categories-grid-popover {
-    grid-template-columns: repeat(5, 1fr);
-  }
+  .categories-grid-popover { grid-template-columns: repeat(5, 1fr); }
 }
 
+/* Hover Effects */
 .category-card-popover:hover {
   transform: scale(1.04);
-  box-shadow: 0 4px 16px rgba(24,54,66,0.10);
+  box-shadow: var(--shadow-hover);
+}
+.dark-mode .category-card-popover:hover {
+  background: #575757; /* Surface a30 */
+  border-color: var(--border-focus);
 }
 
-/* Avoid hover scale on smaller desktop/tablet to preserve gaps */
 @media (max-width: 1024px) {
   .category-card-popover:hover {
     transform: none;
@@ -248,731 +374,249 @@
   }
 }
 
+/* Inner Card Elements */
 .image-container-popover {
-  width: 54px;
-  height: 54px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 54px; height: 54px; margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center;
 }
-
 .category-image-popover {
-  width: 65px;
-  height: 65px;
-  object-fit: contain;
-  border-radius: 8px;
+  width: 65px; height: 65px; object-fit: contain; border-radius: 8px;
 }
-
 .category-title-popover {
-  font-size: 1rem;
-  color: #183642;
-  font-weight: 500;
-  text-align: center;
-  margin-top: 0.5rem;
-  display: block;
+  font-size: 1rem; color: var(--text-main); font-weight: 500;
+  text-align: center; margin-top: 0.5rem; display: block;
 }
-
+.category-description-popover, .category-hint-popover {
+  text-align: center; display: block;
+}
+.category-hint-popover {
+  color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.1rem; line-height: 1.2;
+}
 .category-description-popover {
-  display: none;
+  color: var(--text-main); font-size: 0.95rem; line-height: 1.25; margin-top: 0.25rem;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; word-break: break-word; min-height: calc(1.25em * 2);
+  display: none; /* Mobile default */
 }
 
-  .category-hint-popover {
-    color: #5b7a88;
-    font-size: 0.8rem;
-    text-align: center;
-    margin: 0;
-    margin-top: 0.1rem;
-    line-height: 1.2;
-    display: block;
-  }
-
-/* Desktop enhancements: ensure text fits cleanly */
+/* Display Toggles for Popover Content */
 @media (min-width: 500px) {
+  .category-title-popover { display: none; } /* Original logic seemed to hide title here? Adjusted below based on orig code: */
+  /* Wait, original said .category-title-popover display: none !important at min-width 500. */
+  /* Re-reading carefully: Original hides .category-title-popover on >500px but shows description/hint. */
+  
+  .category-title-popover { display: none !important; }
+  
   .category-description-popover,
-  .category-hint-popover {
-    display: block;
-  }
-  .category-description-popover {
-    color: #183642;
-    font-size: 0.95rem;
-    line-height: 1.25;
-    text-align: center;
-    margin-top: 0.25rem;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    word-break: break-word;
-    min-height: calc(1.25em * 2);
-  }
-  .category-hint-popover {
-    font-size: 0.8rem;
-    line-height: 1.2;
-    opacity: 0.9;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    min-height: calc(1.2em * 2);
-  }
+  .category-hint-popover { display: block !important; }
+  
+  /* Mobile header elements hide */
+  .categories-popover-header-mobile,
+  .categories-popover-close,
+  .categories-popover-title { display: none !important; }
 }
 
-/* Other Sections */
-  .add-announcement-actions-section {
-    background: #fff;
-    border-radius: 14px;
-    max-width: 900px;
-    margin: 32px auto 0 auto;
-    padding: 36px 48px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-  }
+/* Selected State */
+.dark-mode .category-card-popover.selected {
+  background: #f51866; border-color: #f51866; color: #ffffff;
+}
+/* Ensure text colors force to white in dark mode inside cards */
+.dark-mode .category-card-popover .category-title-popover,
+.dark-mode .category-card-popover .category-description-popover,
+.dark-mode .category-card-popover .category-hint-popover {
+  color: #ffffff !important;
+}
 
-  .add-announcement-actions-left {
-    display: none;
-  }
 
+/* ==========================================================================
+   5. ACTION BUTTONS & UPLOAD
+   ========================================================================== */
+
+.add-announcement-actions-section {
+  flex-direction: row; align-items: center; justify-content: center; gap: 32px;
+}
+.add-announcement-actions-left { display: none; }
 .add-announcement-actions-right {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 24px;
+  display: flex; flex-direction: row; align-items: center; gap: 24px;
 }
 
-/* Stil corect pentru butonul de previzualizare */
+/* Buttons */
+.add-announcement-preview,
+.add-announcement-submit {
+  font-size: 1.15rem; font-weight: 700; border-radius: 10px; padding: 12px 32px;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+/* Preview Button */
 .add-announcement-preview {
   background: #f9faf8;
   border: 2px solid #355070;
   color: #355070;
-  font-size: 1.15rem;
-  font-weight: 700;
-  cursor: pointer;
-  border-radius: 10px;
-  padding: 12px 32px;
   margin-right: 12px;
-  transition: background 0.2s, color 0.2s, border 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.dark-mode .add-announcement-preview {
+  background: #282828; border-color: #f51866; color: #ffffff;
 }
 
 .add-announcement-preview:hover {
-  background: #355070;
-  color: #f9faf8;
-  border: 2px solid #355070;
+  background: #355070; color: #f9faf8; border: 2px solid #355070;
+}
+.dark-mode .add-announcement-preview:hover {
+  background: #f51866; color: #ffffff; border-color: #f51866;
 }
 
+/* Submit Button */
 .add-announcement-submit {
-  background: #355070;
-  color: #f9faf8;
-  font-size: 1.15rem;
-  font-weight: 700;
-  border: 2px solid #355070;
-  border-radius: 10px;
-  padding: 12px 32px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  background: #355070; color: #f9faf8; border: 2px solid #355070;
+}
+.dark-mode .add-announcement-submit {
+  background: #f51866; color: #ffffff; border: 2px solid #f51866;
 }
 
 .add-announcement-submit:hover {
-  background: #f9faf8;
-  color: #355070;
-  border: 2px solid #355070;
+  background: #f9faf8; color: #355070; border: 2px solid #355070;
+}
+.dark-mode .add-announcement-submit:hover {
+  background: #282828; color: #fe6585; border-color: #fe6585;
 }
 
-.add-announcement-description-section,
-.add-announcement-location-section,
-.add-announcement-contact-section {
-  background: #fff;
-  border-radius: 14px;
-  max-width: 900px;
-  margin: 32px auto 0 auto;
-  padding: 36px 48px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.add-announcement-location-input-wrapper,
-.add-announcement-contact-input-wrapper {
-  background: #f3f5f6;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  padding: 18px 32px;
-  margin-top: 8px;
-  width: 60%;
-  min-width: 320px;
-  max-width: 600px;
-}
-
-.add-announcement-location-input,
-.add-announcement-contact-input {
-  border: none;
-  background: transparent;
-  font-size: 1.3rem;
-  color: #183642;
-  outline: none;
-  width: 100%;
-}
-
-.add-announcement-contact-input[type="email"],
-.add-announcement-contact-input[type="tel"] {
-  font-size: 1.3rem;
-  margin-top: 8px;
-  background: #f3f5f6;
-  border-radius: 10px;
-  padding: 18px 32px;
-  color: #5b7a88;
-  width: 60%;
-  min-width: 300px;
-  max-width: 600px;
-  border: none;
-  outline: none;
-}
-
-.add-announcement-contact-input[type="email"]:focus,
-.add-announcement-contact-input[type="tel"]:focus {
-  background: #f8fafb;
-  outline: 2px solid #355070;
-}
-
-.add-announcement-images-section {
-  background: #fff;
-  border-radius: 14px;
-  max-width: 900px;
-  margin: 32px auto 0 auto;
-  padding: 36px 48px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.add-announcement-images-helper {
-  color: #46626a;
-  font-size: 1.1rem;
-  margin-bottom: 18px;
-}
-
-.add-announcement-images-grid {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
+/* Upload */
+.add-announcement-images-grid { display: flex; gap: 24px; flex-wrap: wrap; }
 
 .add-announcement-image-upload {
-  width: 200px;
-  height: 160px;
-  background: #f3f5f6;
-  border: none;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
+  width: 200px; height: 160px;
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: none; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
   transition: box-shadow 0.2s, background 0.2s;
-  font-size: 1.2rem;
-  color: #183642;
-  outline: none;
+  font-size: 1.2rem; outline: none;
+}
+.add-announcement-image-upload:hover {
+  background: var(--bg-input-focus);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.35); /* Dark mode shadow logic included via var if desired, but hardcoded in orig */
 }
 
 .add-announcement-image-upload-main {
-  background: #fff8e6;
-  border: 2px solid #fff8e6;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 24px 18px 18px 24px;
-  font-weight: 600;
+  background: var(--upload-bg-main);
+  border: 2px solid var(--upload-bg-main);
+  flex-direction: column; align-items: flex-start; justify-content: flex-end;
+  padding: 24px 18px 18px 24px; font-weight: 600;
 }
+.dark-mode .add-announcement-image-upload-main { border-color: var(--border-color); }
 
 .add-announcement-image-upload-text {
-  font-size: 1.1rem;
-  color: #183642;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-bottom: 8px;
 }
 
 .add-announcement-image-upload-underline {
-  display: block;
-  width: 60px;
-  height: 3px;
-  background: #ffd600;
-  border-radius: 2px;
-  margin-top: 4px;
+  display: block; width: 60px; height: 3px;
+  background: var(--upload-underline);
+  border-radius: 2px; margin-top: 4px;
+}
+.dark-mode .add-announcement-image-upload-icon svg { fill: #fe6585; color: #fe6585; }
+
+
+/* ==========================================================================
+   6. FEEDBACK MESSAGES
+   ========================================================================== */
+.add-announcement-message {
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
 }
 
-
-/* Message styles */
-.add-announcement-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
+.add-announcement-error,
+.add-announcement-success {
+  border-radius: 10px; padding: 12px 24px; font-weight: 600; font-size: 1.1rem;
+  display: flex; align-items: center; gap: 10px;
 }
 
 .add-announcement-error {
-  color: #d32f2f;
-  background: #fff0f0;
-  border: 1px solid #ffcdd2;
-  border-radius: 10px;
-  padding: 12px 24px;
-  font-weight: 600;
-  font-size: 1.1rem;
+  color: var(--text-error);
+  background: var(--bg-error);
+  border: 1px solid var(--border-error);
   box-shadow: 0 2px 8px rgba(211,47,47,0.08);
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .add-announcement-success {
-  color: #388e3c;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-  border-radius: 10px;
-  padding: 12px 24px;
-  font-weight: 600;
-  font-size: 1.1rem;
+  color: var(--text-success);
+  background: var(--bg-success);
+  border: 1px solid var(--border-success);
   box-shadow: 0 2px 8px rgba(56,142,60,0.08);
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
-/* Dark Mode Base Styles - Using Palette Colors Only */
-.dark-mode .add-announcement-container {
-  background: #121212 ;  /* Surface - a0 */
-  color: #ffffff;
-}
+.dark-mode .add-announcement-error-icon svg { fill: #ff7e95; }
+.dark-mode .add-announcement-success-icon svg { fill: #fe6585; }
 
-.dark-mode .add-announcement-title {
-  color: #f51866; /* Primary - a0 */
-}
+/* ==========================================================================
+   7. MUI OVERRIDES & UTILITIES (KEEP !IMPORTANT)
+   ========================================================================== */
+/* These styles must use !important to override Material UI dynamic styles */
 
-.dark-mode .add-announcement-form {
-  background: #121212; /* Surface - a0 */
-  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
-  border: 1px solid #3f3f3f; /* Surface - a20 */
-}
-
-.dark-mode .add-announcement-subtitle,
-.dark-mode .add-announcement-label {
-  color: #ffffff;
-}
-
-.dark-mode .add-announcement-title-input,
-.dark-mode .add-announcement-category-select,
-.dark-mode .add-announcement-description-input {
-  background: #2c2c2c; 
-  color: #ffffff;
-  border: 1px solid #575757; /* Surface - a30 */
-}
-
-.dark-mode .add-announcement-title-input:focus,
-.dark-mode .add-announcement-category-select:focus,
-.dark-mode .add-announcement-description-input:focus {
-  outline: 2px solid #fe6585; /* Primary - a20 */
-  background: #575757; /* Surface - a30 */
-}
-
-.dark-mode .add-announcement-charcount,
-.dark-mode .add-announcement-helper {
-  color: #8b8b8b; /* Surface - a50 */
-}
-
-.dark-mode .category-card-popover {
-  background: #2c2c2c; /* Surface - a20 */
-  border-color: #575757; /* Surface - a30 */
-  color: #ffffff;
-}
-
-.dark-mode .category-card-popover:hover {
-  background: #575757; /* Surface - a30 */
-  border-color: #fe6585; /* Primary - a20 */
-}
-
-.dark-mode .category-card-popover.selected {
-  background: #f51866; /* Primary - a0 */
-  border-color: #f51866; /* Primary - a0 */
-  color: #ffffff;
-}
-
-.dark-mode .category-title-popover,
-.dark-mode .category-description-popover {
-  color: #ffffff;
-}
-
-.dark-mode .add-announcement-image-upload-text {
-  color: #ffffff;
-}
-
-.dark-mode .add-announcement-error {
-  color: #ff7e95; /* Primary - a30 */
-  background: #3f3f3f; /* Surface - a20 */
-  border-color: #f51866; /* Primary - a0 */
-}
-
-.dark-mode .add-announcement-success {
-  color: #fe6585; /* Primary - a20 */
-  background: #282828; /* Surface - a10 */
-  border-color: #fe6585; /* Primary - a20 */
-}
-
-/* Additional Dark Mode polish - Using Palette Colors Only */
-.dark-mode .add-announcement-title-input::placeholder,
-.dark-mode .add-announcement-category-select::placeholder,
-.dark-mode .add-announcement-description-input::placeholder,
-.dark-mode .add-announcement-location-input::placeholder,
-.dark-mode .add-announcement-contact-input::placeholder {
-  color: #717171; /* Surface - a40 */
-}
-
-.dark-mode .add-announcement-title-input,
-.dark-mode .add-announcement-category-select,
-.dark-mode .add-announcement-description-input,
-.dark-mode .add-announcement-location-input,
-.dark-mode .add-announcement-contact-input,
-.dark-mode .add-announcement-contact-input[type="email"],
-.dark-mode .add-announcement-contact-input[type="tel"] {
-  caret-color: #f51866; /* Primary - a0 */
-}
-
-.dark-mode .add-announcement-location-input-wrapper,
-.dark-mode .add-announcement-contact-input-wrapper {
-  background: #2c2c2c; /* Surface - a20 */
-  border: 1px solid #575757; /* Surface - a30 */
-}
-
-.dark-mode .location-icon,
-.dark-mode .add-announcement-location-check {
-  color: #fe6585; /* Primary - a20 */
-}
-
-/* Buttons */
-.dark-mode .add-announcement-preview {
-  background: #282828; /* Surface - a10 */
-  border: 2px solid #f51866; /* Primary - a0 */
-  color: #ffffff;
-}
-
-.dark-mode .add-announcement-preview:hover {
-  background: #f51866; /* Primary - a0 */
-  color: #ffffff;
-  border-color: #f51866; /* Primary - a0 */
-}
-
-.dark-mode .add-announcement-submit {
-  background: #f51866; /* Primary - a0 */
-  color: #ffffff;
-  border: 2px solid #f51866; /* Primary - a0 */
-}
-
-.dark-mode .add-announcement-submit:hover {
-  background: #282828; /* Surface - a10 */
-  color: #fe6585; /* Primary - a20 */
-  border-color: #fe6585; /* Primary - a20 */
-}
-
-/* Images section */
-.dark-mode .add-announcement-images-section {
-  background: #121212; /* Surface - a0 */
-  border: 1px solid #3f3f3f; /* Surface - a20 */
-}
-
-.dark-mode .add-announcement-images-helper {
-  color: #8b8b8b; /* Surface - a50 */
-}
-
-.dark-mode .add-announcement-image-upload {
-  background: #2c2c2c;
-  color: #ffffff;
-}
-
-.dark-mode .add-announcement-image-upload:hover {
-  background: #575757; /* Surface - a30 */
-  box-shadow: 0 2px 10px rgba(0,0,0,0.35);
-}
-
-.dark-mode .add-announcement-image-upload-main {
-  background: #2c2c2c; 
-  border-color: #3f3f3f; /* Surface - a20 */
-}
-
-.dark-mode .add-announcement-image-upload-text {
-  color: #ffffff;
-}
-
-.dark-mode .add-announcement-image-upload-underline {
-  background: #ffabb7; /* Primary - a50 */
-}
-
-.dark-mode .add-announcement-image-upload-icon svg {
-  color: #fe6585; /* Primary - a20 */
-  fill: #fe6585; /* Primary - a20 */
-}
-
-/* Sections containers */
-.dark-mode .add-announcement-description-section,
-.dark-mode .add-announcement-location-section,
-.dark-mode .add-announcement-contact-section,
-.dark-mode .add-announcement-actions-section {
-  background: #121212; /* Surface - a0 */
-  border: 1px solid #3f3f3f; /* Surface - a20 */
-}
-
-.dark-mode .add-announcement-charcount {
-  color: #8b8b8b; /* Surface - a50 */
-}
-
-/* Contact Information Section - Enhanced Dark Mode */
-.dark-mode .add-announcement-contact-input[type="email"],
-.dark-mode .add-announcement-contact-input[type="tel"] {
-  background: #2c2c2c;
-  color: #ffffff;
-  border: 1px solid #575757; /* Surface - a30 */
-}
-
-.dark-mode .add-announcement-contact-input[type="email"]:focus,
-.dark-mode .add-announcement-contact-input[type="tel"]:focus {
-  background: #2c2c2c; 
-  outline: 2px solid #fe6585; /* Primary - a20 */
-  border-color: #fe6585; /* Primary - a20 */
-}
-
-.dark-mode .add-announcement-contact-input[type="email"]::placeholder,
-.dark-mode .add-announcement-contact-input[type="tel"]::placeholder {
-  color: #717171; /* Surface - a40 */
-}
-
-/* Error icons in dark mode */
-.dark-mode .add-announcement-error-icon svg {
-  fill: #ff7e95; /* Primary - a30 */
-}
-
-/* Success icons in dark mode */
-.dark-mode .add-announcement-success-icon svg {
-  fill: #fe6585; /* Primary - a20 */
-}
-
-/* Location check mark in dark mode */
-.dark-mode .add-announcement-location-check {
-  color: #fe6585; /* Primary - a20 */
-  font-weight: bold;
-}
-
-/* Ensure the categories popover container uses the page dark background (not white) */
-.dark-mode .categories-grid-popover,
-.dark-mode .categories-list-mobile,
-.dark-mode .categories-popover-header-mobile {
-  background: #121212 !important;
-}
-
-/* Make sure the popover paper and inner containers blend with the page background */
-.dark-mode .categories-grid-popover .category-card-popover {
-  background: transparent !important;
-  border-color: rgba(255,255,255,0.04) !important;
-}
-
-/* Override MUI Popover/Paper when app uses body-level dark-mode class
-   MUI components read theme.palette.mode; if the project toggles dark
-   via a CSS class we need to override the Paper background/border here. */
 .dark-mode .MuiPopover-paper,
 .dark-mode .MuiPaper-root.MuiPopover-paper,
-.dark-mode #category-popover > .MuiPaper-root {
+.dark-mode #category-popover > .MuiPaper-root,
+.dark-mode .MuiPopover-paper,
+.dark-mode .MuiPaper-root.MuiPopover-paper {
   background: #121212 !important;
   border: 1px solid #575757 !important;
   color: #ffffff !important;
   box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
 }
 
-/* Location Popover - Dark Mode Enhanced */
-.dark-mode #location-popover.MuiPopover-root .MuiPaper-root {
-  background: #282828 !important;
-  border: 1px solid #575757 !important;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+/* Remove only the outer border for the categories popover in dark mode (user requested) */
+.dark-mode #category-popover > .MuiPaper-root {
+  border: none !important;
 }
 
-/* Backdrop blur pentru location popover */
-.dark-mode #location-popover .MuiBackdrop-root {
-  backdrop-filter: blur(4px);
-  background-color: rgba(0, 0, 0, 0.4) !important;
-}
 
-#location-popover .MuiBackdrop-root {
-  backdrop-filter: blur(4px);
-  background-color: rgba(0, 0, 0, 0.3) !important;
-}
-
-.dark-mode #location-popover .MuiBox-root {
-  background: #282828 !important;
-  color: #ffffff !important;
-}
-
-.dark-mode #location-popover .MuiTypography-root {
-  color: #ffffff !important;
-}
-
-.dark-mode #location-popover .MuiDivider-root {
-  border-color: #575757 !important;
-}
-
+/* Location Popover Internals */
+.dark-mode #location-popover .MuiBox-root,
+.dark-mode #location-popover .MuiTypography-root,
 .dark-mode #location-popover .MuiListItemButton-root {
+  background: transparent !important;
   color: #ffffff !important;
 }
-
-.dark-mode #location-popover .MuiListItemButton-root:hover {
-  background: rgba(254, 101, 133, 0.12) !important;
-}
-
-.dark-mode #location-popover .MuiListItemText-primary {
-  color: #ffffff !important;
-}
+.dark-mode #location-popover .MuiDivider-root { border-color: var(--mui-border) !important; }
+.dark-mode #location-popover .MuiListItemButton-root:hover { background: rgba(254, 101, 133, 0.12) !important; }
+.dark-mode #location-popover .MuiInputBase-input { color: #ffffff !important; }
+.dark-mode #location-popover .MuiInputBase-input::placeholder { color: #8b8b8b !important; }
 
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root {
   background: #1e1e1e !important;
   color: #ffffff !important;
 }
-
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-notchedOutline {
-  border-color: #575757 !important;
+  border-color: var(--mui-border) !important;
 }
-
-.dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #fe6585 !important;
-}
-
+.dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline,
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #fe6585 !important;
 }
 
-.dark-mode #location-popover .MuiInputBase-input {
-  color: #ffffff !important;
+/* Backdrops */
+.dark-mode #location-popover .MuiBackdrop-root {
+  backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.4) !important;
+}
+#location-popover .MuiBackdrop-root {
+  backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
-.dark-mode #location-popover .MuiInputBase-input::placeholder {
-  color: #8b8b8b !important;
-  opacity: 1 !important;
-}
+/* Scrollbars */
+#location-popover .MuiBox-root::-webkit-scrollbar { width: 6px; }
+#location-popover .MuiBox-root::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
+#location-popover .MuiBox-root::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 3px; }
+#location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover { background: #f51866; }
 
-.dark-mode #location-popover .MuiInputAdornment-root svg {
-  color: #fe6585 !important;
-}
+.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb { background: #575757; }
+.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover { background: #fe6585; }
 
-.dark-mode #location-popover .MuiIconButton-root {
-  color: #fe6585 !important;
-}
+/* Image Preview & Utility */
+.image-preview { position: relative; display: inline-block; margin-right: 12px; }
+.image-preview-img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc; display: block; }
+.image-preview-img.main { border: 2px solid var(--aa-success); }
+.image-preview-remove { position: absolute; top: 4px; right: 4px; background: #fff; border: none; border-radius: 50%; cursor: pointer; padding: 2px 6px; line-height: 1; }
+.image-preview-badge { position: absolute; bottom: 4px; left: 4px; background: var(--aa-success); color: #fff; font-size: 12px; border-radius: 4px; padding: 2px 6px; }
 
-.dark-mode #location-popover .MuiIconButton-root:hover {
-  background: rgba(254, 101, 133, 0.12) !important;
-}
-
-.dark-mode #location-popover .MuiChip-root {
-  background: #f51866 !important;
-  color: #ffffff !important;
-  border-color: #f51866 !important;
-}
-
-.dark-mode #location-popover .MuiChip-root:hover {
-  background: #fe6585 !important;
-}
-
-/* Scrollbar pentru popover location în dark mode */
-.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar {
-  width: 6px;
-}
-
-.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 8px 0;
-}
-
-.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb {
-  background: #575757;
-  border-radius: 3px;
-}
-
-.dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover {
-  background: #fe6585;
-}
-
-/* Scrollbar light mode */
-#location-popover .MuiBox-root::-webkit-scrollbar {
-  width: 6px;
-}
-
-#location-popover .MuiBox-root::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 8px 0;
-}
-
-#location-popover .MuiBox-root::-webkit-scrollbar-thumb {
-  background: #d0d0d0;
-  border-radius: 3px;
-}
-
-#location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover {
-  background: #f51866;
-}
-
-/* Also ensure mobile list drawer uses same paper background */
-.dark-mode .categories-list-mobile,
-.dark-mode .categories-grid-popover {
-  background: #121212 !important;
-}
-
-/* Image preview styles (used by AddAnnouncementPage.jsx) */
-.image-preview {
-  position: relative;
-  display: inline-block;
-  margin-right: 12px;
-}
-.image-preview-img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  display: block;
-}
-.image-preview-img.main {
-  border: 2px solid var(--aa-success);
-}
-.image-preview-remove {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  padding: 2px 6px;
-  line-height: 1;
-}
-.image-preview-badge {
-  position: absolute;
-  bottom: 4px;
-  left: 4px;
-  background: var(--aa-success);
-  color: #fff;
-  font-size: 12px;
-  border-radius: 4px;
-  padding: 2px 6px;
-}
-
-/* Utility classes */
-.visually-hidden {
-  display: none;
-}
-.remove-icon {
-  font-weight: 700;
-  color: var(--aa-danger);
-}
+.visually-hidden { display: none; }
+.remove-icon { font-weight: 700; color: var(--aa-danger); }

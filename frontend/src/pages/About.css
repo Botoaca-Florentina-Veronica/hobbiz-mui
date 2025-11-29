@@ -1,52 +1,188 @@
-@import url("./PrivacyPolicy.css");
+/* =============================================================
+   ABOUT PAGE STYLES
+   Refactorizat: Variabile CSS, Structură Modulară, Fără cod duplicat
+   ============================================================= */
 
-/* Pagina About modernă și dinamică */
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout & Spacing --- */
+  --ab-radius-xl: 24px;
+  --ab-radius-lg: 20px;
+  --ab-radius-md: 16px;
+  --ab-radius-sm: 12px;
+  
+  /* --- Colors (Light Mode Default) --- */
+  --ab-bg-page: var(--app-bg);
+  
+  /* Hero */
+  --ab-bg-hero: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  --ab-bg-hero-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  --ab-text-hero: #ffffff;
+  --ab-badge-bg: rgba(255, 255, 255, 0.15);
+  --ab-badge-border: rgba(255, 255, 255, 0.2);
+  --ab-hero-highlight: linear-gradient(45deg, #F8B195, #ffd89b);
+  --ab-hero-stat-num: #F8B195;
+  --ab-hero-stat-label: rgba(255, 255, 255, 0.8);
+  --ab-hero-divider: rgba(255, 255, 255, 0.3);
+
+  /* Cards & Surface */
+  --ab-bg-surface: #ffffff;
+  --ab-bg-surface-alt: #f7fafc; /* pt pillars */
+  --ab-border-card: transparent; /* border invizibil pe light */
+  --ab-border-card-hover: #355070;
+  
+  /* Text */
+  --ab-text-heading: #2d3748;
+  --ab-text-heading-alt: #355070;
+  --ab-text-body: #4a5568;
+  --ab-text-muted: #718096;
+  
+  /* Icons & Accents */
+  --ab-icon-bg: linear-gradient(135deg, #355070, #406b92);
+  --ab-icon-color: #ffffff;
+  --ab-accent-primary: #355070;
+  --ab-accent-secondary: #F8B195;
+  --ab-gradient-bar: linear-gradient(90deg, #355070, #F8B195);
+  
+  /* Value Cards Borders (Light) */
+  --ab-val-border-1: #355070;
+  --ab-val-border-2: #406b92;
+  --ab-val-border-3: #F8B195;
+
+  /* CTA */
+  --ab-bg-cta: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
+  --ab-text-cta: #ffffff;
+  --ab-btn-bg: #ffffff;
+  --ab-btn-text: #355070;
+  --ab-btn-hover-bg: #ffffff;
+
+  /* Shadows */
+  --ab-shadow-hero: 0 12px 48px rgba(53, 80, 112, 0.25);
+  --ab-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.08);
+  --ab-shadow-hover: 0 8px 40px rgba(53, 80, 112, 0.12);
+  --ab-shadow-icon: 0 8px 24px rgba(53, 80, 112, 0.2);
+  
+  /* FAQ */
+  --ab-faq-q-bg: #355070;
+  --ab-faq-q-hover: #406b92;
+  --ab-faq-q-text: #ffffff;
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --ab-bg-page: #121212;
+
+  /* Hero */
+  --ab-bg-hero: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  --ab-bg-hero-overlay: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+  --ab-text-hero: #ffffff;
+  --ab-badge-bg: rgba(254, 101, 133, 0.15);
+  --ab-badge-border: rgba(254, 101, 133, 0.3);
+  --ab-hero-highlight: linear-gradient(45deg, #f51866, #fe6585);
+  --ab-hero-stat-num: #fe6585;
+  --ab-hero-stat-label: #8b8b8b;
+  --ab-hero-divider: rgba(255, 255, 255, 0.2);
+
+  /* Cards & Surface */
+  --ab-bg-surface: #282828;
+  --ab-bg-surface-alt: #3f3f3f;
+  --ab-border-card: 1px solid #3f3f3f;
+  --ab-border-card-hover: #fe6585;
+
+  /* Text */
+  --ab-text-heading: #ffffff;
+  --ab-text-heading-alt: #ffffff;
+  --ab-text-body: #ffffff;
+  --ab-text-muted: #8b8b8b;
+
+  /* Icons & Accents */
+  --ab-icon-bg: linear-gradient(135deg, #f51866, #fe6585);
+  --ab-icon-color: #ffffff;
+  --ab-accent-primary: #fe6585; 
+  --ab-accent-secondary: #f51866;
+  --ab-gradient-bar: linear-gradient(90deg, #f51866, #fe6585);
+
+  /* Value Cards Borders (Dark) */
+  --ab-val-border-1: #f51866;
+  --ab-val-border-2: #fa4875;
+  --ab-val-border-3: #fe6585;
+
+  /* CTA */
+  --ab-bg-cta: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  --ab-btn-bg: #ffffff;
+  --ab-btn-text: #f51866;
+  --ab-btn-hover-bg: #8b8b8b; /* Din codul original, deși un gri deschis ar fi mai ok */
+
+  /* Shadows */
+  --ab-shadow-hero: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --ab-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.3);
+  --ab-shadow-hover: 0 8px 40px rgba(245, 24, 102, 0.2);
+  --ab-shadow-icon: 0 8px 24px rgba(245, 24, 102, 0.3);
+
+  /* FAQ */
+  --ab-faq-q-bg: #f51866;
+  --ab-faq-q-hover: #fa4875;
+}
+
+
+/* 2. LAYOUT PRINCIPAL
+   ---------------------------------------------------------- */
 .about-page {
-  /* Use app-level background to keep a unified color */
-  background: var(--app-bg);
+  background: var(--ab-bg-page);
   min-height: 100vh;
   padding: 40px 0;
-  /* Avoid two-tone band at the very top by using safe-area-aware padding instead of margin */
+  /* Safe area padding */
   padding-top: calc(env(safe-area-inset-top, 0px) + 100px);
+  transition: background-color 0.3s ease;
 }
 
 .about-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  color: var(--ab-text-body);
 }
 
+
+/* 3. HERO SECTION
+   ---------------------------------------------------------- */
 .about-hero {
   text-align: center;
-  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
-  color: white;
+  background: var(--ab-bg-hero);
+  color: var(--ab-text-hero);
   padding: 80px 40px;
-  border-radius: 24px;
+  border-radius: var(--ab-radius-xl);
   margin-bottom: 60px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+  box-shadow: var(--ab-shadow-hero);
 }
 
 .about-hero::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: var(--ab-bg-hero-overlay);
   transform: rotate(30deg);
   pointer-events: none;
+}
+
+/* Ensure all text in hero is forced to white/light in dark mode via variables */
+.about-hero h1, 
+.about-hero .hero-description, 
+.about-hero .hero-subtitle {
+  color: var(--ab-text-hero);
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--ab-badge-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--ab-badge-border);
   padding: 12px 24px;
   border-radius: 50px;
   font-size: 0.9rem;
@@ -54,11 +190,13 @@
   margin-bottom: 32px;
   position: relative;
   z-index: 2;
+  color: var(--ab-text-hero);
 }
 
 .hero-badge-icon {
   font-size: 1.1rem;
   animation: sparkle 2s ease-in-out infinite;
+  color: var(--ab-text-hero);
 }
 
 @keyframes sparkle {
@@ -77,14 +215,14 @@
 }
 
 .hero-title .highlight {
-  background: linear-gradient(45deg, #F8B195, #ffd89b);
+  background: var(--ab-hero-highlight);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   position: relative;
 }
 
-.hero-description {
+.hero-description, .about-hero-subtitle {
   font-size: 1.3rem;
   opacity: 0.95;
   max-width: 700px;
@@ -103,17 +241,16 @@
   position: relative;
   z-index: 2;
   margin-top: 40px;
+  color: var(--ab-text-hero);
 }
 
-.stat-item {
-  text-align: center;
-}
+.stat-item { text-align: center; }
 
 .stat-number {
   display: block;
   font-size: 2.2rem;
   font-weight: 700;
-  color: #F8B195;
+  color: var(--ab-hero-stat-num);
   margin-bottom: 4px;
 }
 
@@ -121,38 +258,40 @@
   font-size: 0.9rem;
   opacity: 0.8;
   font-weight: 500;
+  color: var(--ab-hero-stat-label);
 }
 
 .stat-divider {
   width: 1px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--ab-hero-divider);
 }
 
-/* Mission Section */
+
+/* 4. MISSION SECTION
+   ---------------------------------------------------------- */
 .mission-section {
-  background: white;
+  background: var(--ab-bg-surface);
   padding: 60px 40px;
-  border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  border-radius: var(--ab-radius-lg);
+  box-shadow: var(--ab-shadow-card);
   margin-bottom: 60px;
   position: relative;
   overflow: hidden;
+  border: var(--ab-border-card);
 }
 
 .mission-section::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #355070, #F8B195);
+  top: 0; left: 0; right: 0; height: 4px;
+  background: var(--ab-gradient-bar);
 }
 
 .mission-content {
   max-width: 900px;
   margin: 0 auto;
+  color: var(--ab-text-body);
 }
 
 .mission-header {
@@ -161,53 +300,48 @@
   gap: 24px;
   margin-bottom: 40px;
   text-align: left;
+  color: var(--ab-text-heading);
 }
 
 .mission-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #355070, #406b92);
+  width: 80px; height: 80px;
+  background: var(--ab-icon-bg);
   border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 2rem;
-  box-shadow: 0 8px 24px rgba(53, 80, 112, 0.2);
+  box-shadow: var(--ab-shadow-icon);
   flex-shrink: 0;
+  color: var(--ab-icon-color);
 }
 
-.mission-text {
-  flex: 1;
-}
+.mission-text { flex: 1; }
 
 .mission-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--ab-text-heading);
   margin: 0 0 8px 0;
   letter-spacing: -1px;
 }
 
 .mission-subtitle {
   font-size: 1.2rem;
-  color: #718096;
+  color: var(--ab-text-muted);
   margin: 0;
   font-weight: 500;
 }
 
-.mission-body {
-  text-align: left;
-}
+.mission-body { text-align: left; color: var(--ab-text-body); }
 
 .mission-description {
   font-size: 1.15rem;
   line-height: 1.7;
-  color: #4a5568;
+  color: var(--ab-text-body);
   margin-bottom: 40px;
 }
 
 .mission-description strong {
-  color: #355070;
+  color: var(--ab-accent-primary);
   font-weight: 700;
 }
 
@@ -222,87 +356,80 @@
   align-items: flex-start;
   gap: 16px;
   padding: 24px;
-  background: #f7fafc;
+  background: var(--ab-bg-surface-alt);
   border-radius: 16px;
   transition: all 0.3s ease;
-  border: 2px solid transparent;
+  border: 2px solid transparent; /* invisible border for layout stability */
 }
+/* Adjust border for dark mode via variable or override */
+.dark-mode .pillar-item { border: 1px solid transparent; }
 
 .pillar-item:hover {
-  background: #edf2f7;
-  border-color: #355070;
+  background: var(--ab-bg-surface-alt); /* or slightly different on hover */
+  border-color: var(--ab-accent-primary);
   transform: translateY(-2px);
 }
+.dark-mode .pillar-item:hover { background: #575757; } /* specific override preserved */
 
 .pillar-icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #355070, #F8B195);
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--ab-accent-primary), var(--ab-accent-secondary));
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 1.5rem;
   flex-shrink: 0;
+  color: var(--ab-icon-color);
+}
+.dark-mode .pillar-icon {
+  background: var(--ab-icon-bg);
 }
 
 .pillar-content h4 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #2d3748;
+  color: var(--ab-text-heading);
   margin: 0 0 8px 0;
 }
 
 .pillar-content p {
-  color: #718096;
+  color: var(--ab-text-muted);
   margin: 0;
   line-height: 1.5;
   font-size: 0.95rem;
 }
 
-.about-hero h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  margin: 0 0 16px 0;
-  letter-spacing: -1px;
-  position: relative;
-  z-index: 2;
-}
 
-.about-hero-subtitle {
-  font-size: 1.2rem;
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
-  position: relative;
-  z-index: 2;
-}
-
+/* 5. ABOUT SECTIONS (GRID)
+   ---------------------------------------------------------- */
 .about-content {
   display: grid;
   grid-template-columns: 1fr;
   gap: 40px;
   margin-bottom: 40px;
+  /* background transparent by default */
 }
 
 .about-section {
-  background: white;
+  background: var(--ab-bg-surface);
   padding: 40px;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-left: 4px solid #355070;
+  border-left: 4px solid var(--ab-accent-primary);
   position: relative;
+  /* For dark mode borders */
+  border-top: var(--ab-border-card);
+  border-right: var(--ab-border-card);
+  border-bottom: var(--ab-border-card);
 }
 
 .about-section:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 40px rgba(53, 80, 112, 0.12);
+  box-shadow: var(--ab-shadow-hover);
 }
 
 .about-section h2 {
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 1.8rem;
   font-weight: 600;
   margin: 0 0 20px 0;
@@ -313,14 +440,14 @@
 
 .about-section-icon {
   font-size: 1.5rem;
-  background: linear-gradient(135deg, #355070, #406b92);
+  background: var(--ab-icon-bg);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .about-section p {
-  color: #4a5568;
+  color: var(--ab-text-body);
   line-height: 1.7;
   margin-bottom: 20px;
   font-size: 1.05rem;
@@ -334,40 +461,37 @@
 }
 
 .feature-card {
-  background: white;
+  background: var(--ab-bg-surface);
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  border: 1px solid #e8ecef;
+  border: 1px solid #e8ecef; /* Default light border */
   position: relative;
   overflow: hidden;
 }
+.dark-mode .feature-card { border: 1px solid #3f3f3f; box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3); }
 
 .feature-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #355070, #406b92, #F8B195);
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--ab-gradient-bar);
   transform: translateX(-100%);
   transition: transform 0.3s ease;
 }
 
-.feature-card:hover::before {
-  transform: translateX(0);
-}
+.feature-card:hover::before { transform: translateX(0); }
 
 .feature-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(53, 80, 112, 0.15);
-  border-color: #355070;
+  box-shadow: var(--ab-shadow-hover);
+  border-color: var(--ab-accent-primary);
 }
+.dark-mode .feature-card:hover { background: #3f3f3f; }
 
 .feature-card h3 {
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 1.3rem;
   font-weight: 600;
   margin: 0 0 15px 0;
@@ -376,19 +500,13 @@
   gap: 10px;
 }
 
-.feature-icon {
-  font-size: 1.2rem;
-}
+.feature-icon { font-size: 1.2rem; }
 
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.feature-list { list-style: none; padding: 0; margin: 0; }
 
 .feature-list li {
   padding: 8px 0;
-  color: #4a5568;
+  color: var(--ab-text-body);
   position: relative;
   padding-left: 25px;
   line-height: 1.6;
@@ -398,36 +516,40 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: #355070;
+  color: var(--ab-accent-primary);
   font-weight: bold;
   font-size: 1.1rem;
 }
 
-/* Secțiune How It Works - Optimizată */
+
+/* 6. HOW IT WORKS
+   ---------------------------------------------------------- */
 .how-it-works {
   margin: 60px 0;
-  background: white;
+  background: var(--ab-bg-surface);
   border-radius: 20px;
   padding: 50px 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
+  border: var(--ab-border-card);
 }
+.dark-mode .how-it-works { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 
 .how-it-works::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: linear-gradient(135deg, rgba(53, 80, 112, 0.02) 0%, transparent 50%);
   pointer-events: none;
+}
+.dark-mode .how-it-works::before {
+  background: linear-gradient(135deg, rgba(245, 24, 102, 0.05) 0%, transparent 50%);
 }
 
 .how-it-works h2 {
   text-align: center;
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 20px;
@@ -437,12 +559,11 @@
 
 .how-it-works-subtitle {
   text-align: center;
-  color: #6b7280;
+  color: var(--ab-text-muted);
   font-size: 1.1rem;
   margin-bottom: 40px;
   max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: auto; margin-right: auto;
   position: relative;
   z-index: 2;
 }
@@ -459,60 +580,49 @@
 
 .timeline-line {
   position: absolute;
-  top: 30px;
-  left: 60px;
-  right: 60px;
+  top: 30px; left: 60px; right: 60px;
   height: 2px;
   background: linear-gradient(90deg, #355070, #406b92, #F8B195);
   z-index: 1;
 }
+.dark-mode .timeline-line { background: linear-gradient(90deg, #f51866, #fa4875, #fe6585); }
 
 .step-item {
-  flex: 1;
-  text-align: center;
-  max-width: 200px;
-  position: relative;
-  z-index: 2;
+  flex: 1; text-align: center; max-width: 200px;
+  position: relative; z-index: 2;
 }
 
 .step-circle {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #355070, #406b92);
+  width: 60px; height: 60px;
+  background: var(--ab-icon-bg);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   margin: 0 auto 20px auto;
   position: relative;
   box-shadow: 0 4px 15px rgba(53, 80, 112, 0.3);
   transition: all 0.3s ease;
 }
+.dark-mode .step-circle { box-shadow: 0 4px 15px rgba(245, 24, 102, 0.4); }
 
 .step-circle:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(53, 80, 112, 0.4);
 }
+.dark-mode .step-circle:hover { box-shadow: 0 6px 20px rgba(245, 24, 102, 0.5); }
 
 .step-circle::before {
   content: '';
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 80px; height: 80px;
   border: 2px solid rgba(53, 80, 112, 0.2);
   border-radius: 50%;
   animation: ripple 2s infinite;
 }
+.dark-mode .step-circle::before { border-color: rgba(245, 24, 102, 0.3); }
 
 @keyframes ripple {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.2);
-    opacity: 0;
-  }
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.2); opacity: 0; }
 }
 
 .step-number {
@@ -524,14 +634,14 @@
 }
 
 .step-title {
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0 0 10px 0;
 }
 
 .step-description {
-  color: #4a5568;
+  color: var(--ab-text-body);
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0;
@@ -539,51 +649,45 @@
 
 .step-icon {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  background: #F8B195;
+  top: -8px; right: -8px;
+  width: 24px; height: 24px;
+  background: var(--ab-accent-secondary);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 0.7rem;
   color: white;
   opacity: 0;
   transform: scale(0);
   transition: all 0.3s ease;
 }
+.dark-mode .step-icon { background: #fe6585; }
 
-.step-circle:hover .step-icon {
-  opacity: 1;
-  transform: scale(1);
-}
+.step-circle:hover .step-icon { opacity: 1; transform: scale(1); }
 
-/* Secțiune Values */
+
+/* 7. VALUES SECTION
+   ---------------------------------------------------------- */
 .values-section {
   margin: 60px 0;
-  background: white;
+  background: var(--ab-bg-surface);
   padding: 60px 40px;
   border-radius: 24px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--ab-shadow-card);
   position: relative;
   overflow: hidden;
+  border: var(--ab-border-card);
 }
 
 .values-section::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #355070, #406b92, #F8B195);
+  top: 0; left: 0; right: 0; height: 4px;
+  background: var(--ab-gradient-bar);
 }
 
 .values-section h2 {
   text-align: center;
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 50px;
@@ -598,36 +702,34 @@
 }
 
 .value-card {
-  background: white;
+  background: var(--ab-bg-surface);
   padding: 40px 30px;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   position: relative;
-  border-top: 4px solid #355070;
+  border-top: 4px solid var(--ab-val-border-1);
+  /* Dark mode compatibility */
+  border-left: var(--ab-border-card);
+  border-right: var(--ab-border-card);
+  border-bottom: var(--ab-border-card);
 }
+.dark-mode .value-card { background: #3f3f3f; border: 1px solid #575757; border-top: 4px solid var(--ab-val-border-1); }
 
 .value-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(53, 80, 112, 0.15);
+  box-shadow: var(--ab-shadow-hover);
 }
+.dark-mode .value-card:hover { background: #575757; border-color: var(--ab-accent-primary); }
 
-.value-card:nth-child(2) {
-  border-top-color: #406b92;
-}
-
-.value-card:nth-child(3) {
-  border-top-color: #F8B195;
-}
+.value-card:nth-child(2) { border-top-color: var(--ab-val-border-2); }
+.value-card:nth-child(3) { border-top-color: var(--ab-val-border-3); }
 
 .value-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #355070, #406b92);
+  width: 80px; height: 80px;
+  background: var(--ab-icon-bg);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 2rem;
   margin-bottom: 20px;
   position: relative;
@@ -636,43 +738,46 @@
 .value-icon::before {
   content: '';
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   background: linear-gradient(135deg, rgba(248, 181, 149, 0.3), rgba(64, 107, 146, 0.3));
   border-radius: 50%;
   transform: scale(0);
   transition: transform 0.3s ease;
 }
-
-.value-card:hover .value-icon::before {
-  transform: scale(1.2);
+.dark-mode .value-icon::before {
+  background: linear-gradient(135deg, rgba(245, 24, 102, 0.3), rgba(254, 101, 133, 0.3));
 }
 
+.value-card:hover .value-icon::before { transform: scale(1.2); }
+
 .value-card h3 {
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 15px 0;
 }
 
 .value-card p {
-  color: #4a5568;
+  color: var(--ab-text-body);
   line-height: 1.7;
   margin: 0;
   font-size: 1.05rem;
 }
 
-/* Secțiune FAQ */
+
+/* 8. FAQ SECTION
+   ---------------------------------------------------------- */
 .faq-section {
   margin: 60px 0;
-  background-color: white;
+  background-color: var(--ab-bg-surface);
   padding: 50px 40px;
   border-radius: 20px;
+  border: var(--ab-border-card);
 }
 
 .faq-section h2 {
   text-align: center;
-  color: #355070;
+  color: var(--ab-text-heading-alt);
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 40px;
@@ -684,21 +789,24 @@
 }
 
 .faq-item {
-  background: white;
+  background: var(--ab-bg-surface);
   margin-bottom: 16px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  border: var(--ab-border-card);
 }
+.dark-mode .faq-item { background: #282828; }
 
 .faq-item:hover {
-  box-shadow: 0 4px 16px rgba(53, 80, 112, 0.1);
+  box-shadow: var(--ab-shadow-hover);
 }
+.dark-mode .faq-item:hover { border-color: #575757; }
 
 .faq-question {
-  background: #355070;
-  color: white;
+  background: var(--ab-faq-q-bg);
+  color: var(--ab-faq-q-text);
   padding: 20px 25px;
   font-size: 1.1rem;
   font-weight: 600;
@@ -707,19 +815,17 @@
   position: relative;
 }
 
-.faq-question:hover {
-  background: #406b92;
-}
+.faq-question:hover { background: var(--ab-faq-q-hover); }
 
 .faq-question::after {
   content: '+';
   position: absolute;
-  right: 25px;
-  top: 50%;
+  right: 25px; top: 50%;
   transform: translateY(-50%);
   font-size: 1.5rem;
   font-weight: 300;
   transition: transform 0.3s ease;
+  color: inherit;
 }
 
 .faq-question.active::after {
@@ -728,38 +834,45 @@
 
 .faq-answer {
   padding: 25px;
-  color: #4a5568;
+  color: var(--ab-text-body);
   line-height: 1.7;
   font-size: 1rem;
   border-top: 1px solid #e8ecef;
 }
+.dark-mode .faq-answer { background: #282828; border-top-color: #3f3f3f; }
 
+
+/* 9. CTA SECTION
+   ---------------------------------------------------------- */
 .cta-section {
-  background: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
-  color: white;
+  background: var(--ab-bg-cta);
+  color: var(--ab-text-cta);
   padding: 50px 40px;
   border-radius: 16px;
   text-align: center;
   margin-top: 40px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--ab-shadow-hero); /* Reusing heavy shadow */
 }
 
 .cta-section h2 {
   font-size: 2.2rem;
   margin: 0 0 16px 0;
   font-weight: 700;
+  color: inherit;
 }
 
 .cta-section p {
   font-size: 1.2rem;
   margin: 0 0 30px 0;
   opacity: 0.95;
+  color: inherit;
 }
 
 .cta-button {
-  background: white;
-  color: #355070;
+  background: var(--ab-btn-bg);
+  color: var(--ab-btn-text);
   padding: 15px 30px;
   border: none;
   border-radius: 50px;
@@ -776,672 +889,81 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   text-decoration: none;
-  color: #355070;
+  background: var(--ab-btn-hover-bg);
+  color: var(--ab-btn-text); /* usually keeps same text color or slightly different */
 }
 
-/* Responsivitate */
+
+/* 10. MEDIA QUERIES (RESPONSIVE)
+   ---------------------------------------------------------- */
 @media (max-width: 768px) {
   .about-page {
     padding: 20px 0;
-    /* Replace top margin with safe-area-aware padding on mobile */
     padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   }
   
-  .about-container {
-    padding: 0 16px;
-  }
+  .about-container { padding: 0 16px; }
   
   .about-hero {
     padding: 50px 20px;
     margin-bottom: 40px;
   }
   
-  .hero-title {
-    font-size: 2.5rem;
-    letter-spacing: -1px;
-  }
+  .hero-title { font-size: 2.5rem; letter-spacing: -1px; }
+  .hero-description { font-size: 1.1rem; margin-bottom: 32px; }
   
-  .hero-description {
-    font-size: 1.1rem;
-    margin-bottom: 32px;
-  }
+  .hero-stats { flex-direction: column; gap: 20px; }
+  .stat-divider { width: 60px; height: 1px; }
+  .stat-number { font-size: 1.8rem; }
+  .stat-label { font-size: 0.85rem; }
   
-  .hero-stats {
-    flex-direction: column;
-    gap: 20px;
-  }
+  /* Mission */
+  .mission-section { padding: 40px 20px; margin-bottom: 40px; }
+  .mission-header { flex-direction: column; text-align: center; gap: 16px; }
+  .mission-title { font-size: 2rem; }
+  .mission-subtitle { font-size: 1.1rem; }
+  .mission-description { font-size: 1.05rem; text-align: center; }
+  .mission-pillars { grid-template-columns: 1fr; gap: 20px; }
+  .pillar-item { padding: 20px; }
   
-  .stat-divider {
-    width: 60px;
-    height: 1px;
-  }
+  .about-section { padding: 25px 20px; }
+  .about-features { grid-template-columns: 1fr; gap: 20px; }
+  .feature-card { padding: 20px; }
   
-  .stat-number {
-    font-size: 1.8rem;
-  }
+  .cta-section { padding: 30px 20px; }
+  .cta-section h2 { font-size: 1.8rem; }
   
-  .stat-label {
-    font-size: 0.85rem;
-  }
+  /* How it works */
+  .how-it-works { margin: 40px 0; padding: 30px 20px; }
+  .how-it-works h2 { font-size: 1.8rem; margin-bottom: 15px; }
+  .how-it-works-subtitle { font-size: 1rem; margin-bottom: 30px; }
   
-  /* Mission Section Responsive */
-  .mission-section {
-    padding: 40px 20px;
-    margin-bottom: 40px;
-  }
-  
-  .mission-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 16px;
-  }
-  
-  .mission-title {
-    font-size: 2rem;
-  }
-  
-  .mission-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .mission-description {
-    font-size: 1.05rem;
-    text-align: center;
-  }
-  
-  .mission-pillars {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .pillar-item {
-    padding: 20px;
-  }
-  
-  .about-section {
-    padding: 25px 20px;
-  }
-  
-  .about-features {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .feature-card {
-    padding: 20px;
-  }
-  
-  .cta-section {
-    padding: 30px 20px;
-  }
-  
-  .cta-section h2 {
-    font-size: 1.8rem;
-  }
-  
-  /* How it works responsive */
-  .how-it-works {
-    margin: 40px 0;
-    padding: 30px 20px;
-  }
-  
-  .how-it-works h2 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-  }
-  
-  .how-it-works-subtitle {
-    font-size: 1rem;
-    margin-bottom: 30px;
-  }
-  
-  .steps-timeline {
-    flex-direction: column;
-    gap: 30px;
-  }
-  
-  .timeline-line {
-    display: none;
-  }
+  .steps-timeline { flex-direction: column; gap: 30px; }
+  .timeline-line { display: none; }
   
   .step-item {
     max-width: 100%;
-    display: flex;
-    align-items: center;
-    text-align: left;
-    gap: 20px;
+    display: flex; align-items: center; text-align: left; gap: 20px;
   }
+  .step-circle { flex-shrink: 0; margin: 0; }
+  .step-content { flex: 1; }
+  .step-title { font-size: 1.1rem; margin-bottom: 8px; }
+  .step-description { font-size: 0.9rem; }
   
-  .step-circle {
-    flex-shrink: 0;
-    margin: 0;
-  }
+  /* Values */
+  .values-section { margin: 40px 0; padding: 40px 20px; border-radius: 16px; }
+  .values-section h2 { font-size: 2rem; margin-bottom: 30px; }
+  .values-grid { grid-template-columns: 1fr; gap: 20px; }
+  .value-card { padding: 30px 20px; }
   
-  .step-content {
-    flex: 1;
-  }
-  
-  .step-title {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-  }
-  
-  .step-description {
-    font-size: 0.9rem;
-  }
-  
-  /* Values responsive */
-  .values-section {
-    margin: 40px 0;
-    padding: 40px 20px;
-    border-radius: 16px;
-  }
-  
-  .values-section h2 {
-    font-size: 2rem;
-    margin-bottom: 30px;
-  }
-  
-  .values-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .value-card {
-    padding: 30px 20px;
-  }
-  
-  /* FAQ responsive */
-  .faq-section {
-    margin: 40px 0;
-    padding: 30px 20px;
-  }
-  
-  .faq-section h2 {
-    font-size: 2rem;
-    margin-bottom: 30px;
-  }
-  
-  .faq-question {
-    padding: 15px 20px;
-    font-size: 1rem;
-  }
-  
-  .faq-answer {
-    padding: 20px;
-    font-size: 0.95rem;
-  }
+  /* FAQ */
+  .faq-section { margin: 40px 0; padding: 30px 20px; }
+  .faq-section h2 { font-size: 2rem; margin-bottom: 30px; }
+  .faq-question { padding: 15px 20px; font-size: 1rem; }
+  .faq-answer { padding: 20px; font-size: 0.95rem; }
 }
 
-/* Dark Mode Styles pentru About Page */
-.dark-mode .about-page {
-  background-color: #121212;
-  color: #ffffff;
-}
-
-.dark-mode .about-container {
-  color: #ffffff;
-}
-
-.dark-mode .about-hero {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
-  color: #ffffff;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
-}
-
-.dark-mode .about-hero::before {
-  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
-}
-
-.dark-mode .hero-badge {
-  background: rgba(254, 101, 133, 0.15);
-  border-color: rgba(254, 101, 133, 0.3);
-  color: #ffffff;
-}
-
-.dark-mode .hero-title {
-  color: #ffffff;
-}
-
-.dark-mode .hero-title .highlight {
-  background: linear-gradient(45deg, #f51866, #fe6585);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dark-mode .hero-description {
-  color: #ffffff;
-  opacity: 0.9;
-}
-
-.dark-mode .stat-number {
-  color: #fe6585;
-}
-
-.dark-mode .stat-label {
-  color: #8b8b8b;
-}
-
-.dark-mode .stat-divider {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Dark Mode pentru Mission Section */
-.dark-mode .mission-section {
-  background: #282828;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .mission-section::before {
-  background: linear-gradient(90deg, #f51866, #fe6585);
-}
-
-.dark-mode .mission-icon {
-  background: linear-gradient(135deg, #f51866, #fe6585);
-  box-shadow: 0 8px 24px rgba(245, 24, 102, 0.3);
-}
-
-.dark-mode .mission-title {
-  color: #ffffff;
-}
-
-.dark-mode .mission-subtitle {
-  color: #8b8b8b;
-}
-
-.dark-mode .mission-description {
-  color: #ffffff;
-}
-
-.dark-mode .mission-description strong {
-  color: #fe6585;
-}
-
-.dark-mode .pillar-item {
-  background: #3f3f3f;
-  border-color: transparent;
-}
-
-.dark-mode .pillar-item:hover {
-  background: #575757;
-  border-color: #fe6585;
-}
-
-.dark-mode .pillar-icon {
-  background: linear-gradient(135deg, #f51866, #fe6585);
-}
-
-.dark-mode .pillar-content h4 {
-  color: #ffffff;
-}
-
-.dark-mode .pillar-content p {
-  color: #8b8b8b;
-}
-
-/* Dark Mode pentru About Sections */
-.dark-mode .about-section {
-  background: #282828;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border-left-color: #fe6585;
-  border: 1px solid #3f3f3f;
-  border-left: 4px solid #fe6585;
-}
-
-.dark-mode .about-section:hover {
-  box-shadow: 0 8px 40px rgba(245, 24, 102, 0.2);
-}
-
-.dark-mode .about-section h2 {
-  color: #ffffff;
-}
-
-.dark-mode .about-section p {
-  color: #8b8b8b;
-}
-
-/* Dark Mode pentru Values Section */
-.dark-mode .values-section {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
-  border: 1px solid rgba(245, 24, 102, 0.3);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .values-section::before {
-  background: linear-gradient(90deg, #f51866, #fa4875, #fe6585);
-}
-
-.dark-mode .values-section h2 {
-  color: #ffffff;
-}
-
-.dark-mode .value-card {
-  background: #3f3f3f;
-  border: 1px solid #575757;
-}
-
-.dark-mode .value-card:hover {
-  background: #575757;
-  border-color: #fe6585;
-}
-
-.dark-mode .value-icon {
-  background: linear-gradient(135deg, #f51866, #fe6585);
-}
-
-.dark-mode .value-card h3 {
-  color: #ffffff;
-}
-
-.dark-mode .value-card p {
-  color: #8b8b8b;
-}
-
-/* Dark Mode pentru How It Works Section */
-.dark-mode .how-it-works-section {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .how-it-works-section h2 {
-  color: #ffffff;
-}
-
-.dark-mode .step-card {
-  background: #3f3f3f;
-  border: 1px solid #575757;
-}
-
-.dark-mode .step-card:hover {
-  background: #575757;
-  border-color: #fe6585;
-}
-
-.dark-mode .step-number {
-  background: linear-gradient(135deg, #f51866, #fe6585);
-  color: #ffffff;
-}
-
-.dark-mode .step-title {
-  color: #ffffff;
-}
-
-.dark-mode .step-description {
-  color: #8b8b8b;
-}
-
-/* Dark Mode pentru FAQ Section */
-.dark-mode .faq-section {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .faq-section h2 {
-  color: #ffffff;
-}
-
-.dark-mode .faq-item {
-  border-color: #3f3f3f;
-}
-
-.dark-mode .faq-question {
-  background: #3f3f3f;
-  color: #ffffff;
-}
-
-.dark-mode .faq-question:hover {
-  background: #575757;
-}
-
-.dark-mode .faq-answer {
-  background: #282828;
-  color: #8b8b8b;
-}
-
-/* Dark Mode pentru Call to Action */
-.dark-mode .about-cta {
-  background: linear-gradient(135deg, #f51866, #fe6585);
-  box-shadow: 0 12px 48px rgba(245, 24, 102, 0.3);
-}
-
-.dark-mode .cta-title {
-  color: #ffffff;
-}
-
-.dark-mode .cta-description {
-  color: #ffffff;
-  opacity: 0.9;
-}
-
-.dark-mode .cta-button {
-  background: #ffffff;
-  color: #f51866;
-}
-
-.dark-mode .cta-button:hover {
-  background: #8b8b8b;
-  color: #ffffff;
-}
-
-/* Dark Mode completări pentru componente lipsă */
-
-/* Dark Mode pentru How It Works (secțiunea din About) */
-.dark-mode .how-it-works {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .how-it-works::before {
-  background: linear-gradient(135deg, rgba(245, 24, 102, 0.05) 0%, transparent 50%);
-}
-
-.dark-mode .how-it-works h2 {
-  color: #ffffff;
-}
-
-.dark-mode .how-it-works-subtitle {
-  color: #8b8b8b;
-}
-
-.dark-mode .timeline-line {
-  background: linear-gradient(90deg, #f51866, #fa4875, #fe6585);
-}
-
-.dark-mode .step-circle {
-  background: linear-gradient(135deg, #f51866, #fa4875);
-  box-shadow: 0 4px 15px rgba(245, 24, 102, 0.4);
-}
-
-.dark-mode .step-circle:hover {
-  box-shadow: 0 6px 20px rgba(245, 24, 102, 0.5);
-}
-
-.dark-mode .step-circle::before {
-  border: 2px solid rgba(245, 24, 102, 0.3);
-}
-
-.dark-mode .step-title {
-  color: #ffffff;
-}
-
-.dark-mode .step-description {
-  color: #8b8b8b;
-}
-
-.dark-mode .step-icon {
-  background: #fe6585;
-}
-
-/* Dark Mode pentru Feature Cards */
-.dark-mode .feature-card {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .feature-card::before {
-  background: linear-gradient(90deg, #f51866, #fa4875, #fe6585);
-}
-
-.dark-mode .feature-card:hover {
-  background: #3f3f3f;
-  border-color: #fe6585;
-  box-shadow: 0 8px 25px rgba(245, 24, 102, 0.2);
-}
-
-.dark-mode .feature-card h3 {
-  color: #ffffff;
-}
-
-.dark-mode .feature-list li {
-  color: #8b8b8b;
-}
-
-.dark-mode .feature-list li::before {
-  color: #fe6585;
-}
-
-/* Dark Mode pentru About Section Icon */
-.dark-mode .about-section-icon {
-  background: linear-gradient(135deg, #f51866, #fa4875);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Dark Mode pentru CTA Section (diferit de about-cta) */
-.dark-mode .cta-section {
-  background: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
-  color: #ffffff;
-}
-
-.dark-mode .cta-section h2 {
-  color: #ffffff;
-}
-
-.dark-mode .cta-section p {
-  color: #ffffff;
-}
-
-/* Dark Mode pentru About Features */
-.dark-mode .about-features {
-  background: transparent;
-}
-
-/* Dark Mode pentru About Content */
-.dark-mode .about-content {
-  background: transparent;
-}
-
-/* Dark Mode completări pentru FAQ din About */
-.dark-mode .faq-container {
-  background: transparent;
-}
-
-.dark-mode .faq-item {
-  background: #282828;
-  border: 1px solid #3f3f3f;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .faq-item:hover {
-  box-shadow: 0 4px 16px rgba(245, 24, 102, 0.2);
-  border-color: #575757;
-}
-
-.dark-mode .faq-question {
-  background: #f51866;
-  color: #ffffff;
-}
-
-.dark-mode .faq-question:hover {
-  background: #fa4875;
-}
-
-.dark-mode .faq-question::after {
-  color: #ffffff;
-}
-
-.dark-mode .faq-answer {
-  background: #282828;
-  color: #ffffff;
-  border-top: 1px solid #3f3f3f;
-}
-
-/* Dark Mode pentru About Hero completări */
-.dark-mode .about-hero h1 {
-  color: #ffffff;
-}
-
-.dark-mode .about-hero-subtitle {
-  color: #ffffff;
-  opacity: 0.9;
-}
-
-/* Dark Mode pentru Hero Badge Icon */
-.dark-mode .hero-badge-icon {
-  color: #ffffff;
-}
-
-/* Dark Mode pentru Mission Content și Header */
-.dark-mode .mission-content {
-  color: #ffffff;
-}
-
-.dark-mode .mission-header {
-  color: #ffffff;
-}
-
-.dark-mode .mission-text {
-  color: #ffffff;
-}
-
-.dark-mode .mission-body {
-  color: #ffffff;
-}
-
-/* Dark Mode pentru Value Icon Effects */
-.dark-mode .value-icon::before {
-  background: linear-gradient(135deg, rgba(245, 24, 102, 0.3), rgba(254, 101, 133, 0.3));
-}
-
-.dark-mode .value-card:hover .value-icon::before {
-  background: linear-gradient(135deg, rgba(245, 24, 102, 0.5), rgba(254, 101, 133, 0.5));
-}
-
-/* Dark Mode pentru Value Card Border Colors */
-.dark-mode .value-card:nth-child(1) {
-  border-top-color: #f51866;
-}
-
-.dark-mode .value-card:nth-child(2) {
-  border-top-color: #fa4875;
-}
-
-.dark-mode .value-card:nth-child(3) {
-  border-top-color: #fe6585;
-}
-
-/* Dark Mode pentru statistici și alte elemente */
-.dark-mode .stat-item {
-  color: #ffffff;
-}
-
-.dark-mode .hero-stats {
-  color: #ffffff;
-}
-
-/* Dark Mode pentru CTA Button hover state îmbunătățit */
-.dark-mode .cta-button:hover {
-  background: rgba(255, 255, 255, 0.9);
-  color: #f51866;
-  transform: translateY(-2px);
-}
-
-/* Mobile header (back button + title) for About page */
+/* Mobile Header Overrides */
 @media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
@@ -1466,7 +988,6 @@
     background-color: var(--chat-elev) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
   }
-
   .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
 
   .mobile-header .MuiSvgIcon-root {
@@ -1483,31 +1004,4 @@
     flex: 0 0 auto !important;
     margin-left: 4px !important;
   }
-}
-/* Dark Mode pentru toate textele din hero */
-.dark-mode .about-hero * {
-  color: #ffffff;
-}
-
-.dark-mode .hero-badge * {
-  color: #ffffff;
-}
-
-/* Dark Mode pentru toate link-urile și butoanele interactive */
-.dark-mode .feature-card:hover {
-  background: #575757;
-}
-
-.dark-mode .pillar-item:hover {
-  background: #575757;
-  transform: translateY(-2px);
-}
-
-.dark-mode .about-section:hover {
-  transform: translateY(-5px);
-}
-
-/* Dark Mode pentru separatori și decorații */
-.dark-mode .hero-stats .stat-divider {
-  background: rgba(245, 24, 102, 0.3);
 }

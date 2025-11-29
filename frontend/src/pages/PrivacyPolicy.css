@@ -1,39 +1,136 @@
+/* =============================================================
+   PRIVACY POLICY PAGE STYLES
+   Refactorizat: Structură modulară și Variabile CSS
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout & Dimensions --- */
+  --pp-radius-lg: 24px;
+  --pp-radius-md: 20px;
+  --pp-radius-sm: 16px;
+  --pp-spacing-top-desktop: 4rem;
+
+  /* --- Colors (Light Mode Default) --- */
+  --pp-bg-page: var(--app-bg);
+  
+  /* Header / Hero */
+  --pp-bg-header: #355070;
+  --pp-bg-header-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  --pp-text-header: #ffffff;
+  
+  /* Infobox */
+  --pp-bg-infobox: rgba(255, 255, 255, 0.15);
+  --pp-border-infobox: rgba(255, 255, 255, 0.2);
+  --pp-text-infobox-accent: #F8B195;
+
+  /* Intro Section */
+  --pp-bg-intro: #b3d9e8;
+  --pp-border-intro: transparent;
+  --pp-text-intro-main: #2c5f7a;
+  --pp-text-intro-strong: #2c5f7a;
+  --pp-icon-intro: #2c5f7a;
+
+  /* Content Body */
+  --pp-bg-content: #ffffff;
+  --pp-border-content: transparent;
+  --pp-gradient-top: linear-gradient(90deg, #355070, #F8B195);
+  
+  /* Text & Typography */
+  --pp-text-heading: #355070;
+  --pp-text-body: #4a5568;
+  --pp-text-strong: #355070;
+  --pp-text-link: #355070;
+  --pp-text-link-hover: #F8B195;
+  --pp-list-bullet: #355070;
+  
+  /* Icons & Decor */
+  --pp-icon-main: inherit; /* Moștenește culoarea textului în header */
+  
+  /* Shadows */
+  --pp-shadow-header: 0 12px 48px rgba(53, 80, 112, 0.25);
+  --pp-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.08);
+  --pp-shadow-infobox: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --pp-bg-page: #121212;
+
+  /* Header */
+  --pp-bg-header: #282828;
+  --pp-bg-header-overlay: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+  
+  /* Infobox (rămâne similar, dar textul accent se schimbă) */
+  --pp-text-infobox-accent: #f51866;
+
+  /* Intro Section */
+  --pp-bg-intro: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  --pp-border-intro: 1px solid rgba(245, 24, 102, 0.3);
+  --pp-text-intro-main: #ffffff;
+  --pp-text-intro-strong: #ffffff;
+  --pp-icon-intro: #f51866;
+
+  /* Content Body */
+  --pp-bg-content: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  --pp-border-content: 1px solid rgba(245, 24, 102, 0.3);
+  /* Hide the top gradient stripe in dark mode if needed, or change colors */
+  --pp-gradient-top: linear-gradient(90deg, #f51866, #3f3f3f); 
+
+  /* Text & Typography */
+  --pp-text-heading: #ffffff;
+  --pp-text-body: #ffffff;
+  --pp-text-strong: #f51866;
+  --pp-text-link: #ffffff;
+  --pp-text-link-hover: #f51866;
+  --pp-list-bullet: #ffffff;
+
+  /* Icons */
+  --pp-icon-main: #f51866;
+}
+
+
+/* 2. LAYOUT PRINCIPAL
+   ---------------------------------------------------------- */
 .privacy-policy {
   /* Unify with app background to prevent two-tone bands */
-  background: var(--app-bg);
+  background: var(--pp-bg-page);
   min-height: 100vh;
   padding: 40px 0;
-  /* Replace top margin with safe-area-aware padding */
+  /* Safe-area-aware padding */
   padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
+  transition: background-color 0.3s ease;
 }
 
 .privacy-policy__container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
-  margin-top: 4rem;
+  margin-top: var(--pp-spacing-top-desktop);
 }
 
+
+/* 3. HEADER SECTION
+   ---------------------------------------------------------- */
 .privacy-policy__header {
   text-align: center;
-  background: #355070;
-  color: white;
+  background: var(--pp-bg-header);
+  color: var(--pp-text-header);
   padding: 60px 40px;
-  border-radius: 24px;
+  border-radius: var(--pp-radius-lg);
   margin-bottom: 40px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+  box-shadow: var(--pp-shadow-header);
 }
 
 .privacy-policy__header::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: var(--pp-bg-header-overlay);
   transform: rotate(30deg);
   pointer-events: none;
 }
@@ -44,6 +141,7 @@
   display: block;
   position: relative;
   z-index: 2;
+  color: var(--pp-icon-main);
 }
 
 .privacy-policy h1 {
@@ -54,34 +152,32 @@
   position: relative;
   z-index: 2;
   line-height: 1.1;
-}
-
-.dark-mode .privacy-policy h1 {
-  color: #fff;
+  color: inherit; /* Inherits from header text color */
 }
 
 .privacy-policy__date {
   font-size: 1.1rem;
   opacity: 0.9;
-  margin-bottom: 0;
-  margin-top: 0;
+  margin: 0;
   font-weight: 500;
   position: relative;
   z-index: 2;
- color: #fff !important;
+  color: inherit !important;
 }
 
+
+/* 4. INFOBOX COMPONENT (Inside Header)
+   ---------------------------------------------------------- */
 .privacy-policy__infobox {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--pp-bg-infobox);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  border-radius: 16px;
+  border: 1px solid var(--pp-border-infobox);
+  color: var(--pp-text-header);
+  border-radius: var(--pp-radius-sm);
   padding: 24px;
-  margin-bottom: 0;
   margin-top: 24px;
   font-size: 1rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--pp-shadow-infobox);
   display: flex;
   align-items: flex-start;
   gap: 16px;
@@ -96,7 +192,7 @@
 }
 
 .privacy-policy__infobox strong {
-  color: #F8B195;
+  color: var(--pp-text-infobox-accent);
   font-weight: 600;
 }
 
@@ -106,19 +202,22 @@
   opacity: 0.95;
 }
 
-/* Intro Section */
+
+/* 5. INTRO SECTION
+   ---------------------------------------------------------- */
 .privacy-policy__intro {
-  background: #b3d9e8;
-  border-radius: 20px;
+  background: var(--pp-bg-intro);
+  border: var(--pp-border-intro);
+  border-radius: var(--pp-radius-md);
   padding: 40px;
   margin-bottom: 40px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--pp-shadow-card);
   position: relative;
   overflow: hidden;
 }
 
 .privacy-policy__intro-content {
-  color: #2c5f7a;
+  color: var(--pp-text-intro-main);
   font-size: 1.05rem;
   display: flex;
   align-items: flex-start;
@@ -129,11 +228,11 @@
   font-size: 2rem;
   flex-shrink: 0;
   margin-top: 4px;
-  color: #2c5f7a;
+  color: var(--pp-icon-intro);
 }
 
 .privacy-policy__intro-content strong {
-  color: #2c5f7a;
+  color: var(--pp-text-intro-strong);
   font-weight: 700;
   font-size: 1.3rem;
   display: block;
@@ -144,16 +243,19 @@
   margin: 0;
   line-height: 1.6;
   font-size: 1.05rem;
-  color: #2c5f7a;
+  color: var(--pp-text-intro-main);
 }
 
-/* Content Sections */
+
+/* 6. CONTENT BODY
+   ---------------------------------------------------------- */
 .privacy-policy__content {
-  background: white;
-  border-radius: 20px;
+  background: var(--pp-bg-content);
+  border: var(--pp-border-content);
+  border-radius: var(--pp-radius-md);
   padding: 40px;
   margin-bottom: 30px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--pp-shadow-card);
   position: relative;
   overflow: hidden;
 }
@@ -161,54 +263,44 @@
 .privacy-policy__content::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #355070, #F8B195);
+  top: 0; left: 0; right: 0; height: 4px;
+  background: var(--pp-gradient-top);
 }
 
-.privacy-policy section {
-  margin-bottom: 40px;
-}
+.privacy-policy section { margin-bottom: 40px; }
 
+/* Typography */
 .privacy-policy h2 {
   font-size: 2rem;
-  margin-top: 0;
-  margin-bottom: 24px;
-  color: #355070;
+  margin: 0 0 24px 0;
+  color: var(--pp-text-heading);
   font-weight: 700;
   position: relative;
-  padding-left: 0;
 }
 
 .privacy-policy h3 {
   font-size: 1.4rem;
-  margin-top: 32px;
-  margin-bottom: 16px;
-  color: #355070;
+  margin: 32px 0 16px 0;
+  color: var(--pp-text-heading);
   font-weight: 600;
 }
 
-.dark-mode .privacy-policy h2::before {
-  background: #60a5fa;
-}
-
 .privacy-policy p {
-  color: #4a5568;
+  color: var(--pp-text-body);
   line-height: 1.7;
   margin-bottom: 20px;
   font-size: 1.05rem;
 }
 
-.privacy-policy p strong {
-  color: #355070;
+.privacy-policy p strong,
+.privacy-policy strong {
+  color: var(--pp-text-strong);
   font-weight: 600;
 }
 
+/* Lists */
 .privacy-policy ul {
-  margin-left: 0;
-  margin-bottom: 20px;
+  margin: 0 0 20px 0;
   padding-left: 0;
   list-style: none;
 }
@@ -217,7 +309,7 @@
   margin-bottom: 12px;
   position: relative;
   padding-left: 24px;
-  color: #4a5568;
+  color: var(--pp-text-body);
   line-height: 1.6;
 }
 
@@ -225,12 +317,13 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: #355070;
+  color: var(--pp-list-bullet);
   font-weight: bold;
 }
 
+/* Links */
 .privacy-policy a {
-  color: #355070;
+  color: var(--pp-text-link);
   text-decoration: none;
   font-weight: 500;
   transition: all 0.2s;
@@ -239,22 +332,22 @@
 }
 
 .privacy-policy a:hover {
-  color: #F8B195;
-  border-bottom-color: #F8B195;
+  color: var(--pp-text-link-hover);
   border-bottom-color: rgba(255, 106, 0, 0.7);
 }
 
-/* Responsive Design */
+
+/* 7. MEDIA QUERIES (RESPONSIVE)
+   ---------------------------------------------------------- */
 @media (max-width: 768px) {
   .privacy-policy {
     padding: 20px 0;
-    /* Safe-area-aware padding on mobile - ultra-compact */
     padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
   }
   
   .privacy-policy__container {
     padding: 0 16px;
-    margin-top: 1rem; /* redus de la 4rem pentru mai puțin spațiu de sus */
+    margin-top: 1rem; 
   }
   
   .privacy-policy__header {
@@ -262,13 +355,8 @@
     margin-bottom: 30px;
   }
   
-  .privacy-policy h1 {
-    font-size: 2.2rem;
-  }
-  
-  .privacy-policy__icon {
-    font-size: 3rem;
-  }
+  .privacy-policy h1 { font-size: 2.2rem; }
+  .privacy-policy__icon { font-size: 3rem; }
   
   .privacy-policy__infobox {
     padding: 20px;
@@ -288,101 +376,21 @@
     gap: 16px;
   }
   
-  .privacy-policy__intro-icon {
-    font-size: 1.8rem;
-  }
-  
-  .privacy-policy__intro-content strong {
-    font-size: 1.2rem;
-  }
+  .privacy-policy__intro-icon { font-size: 1.8rem; }
+  .privacy-policy__intro-content strong { font-size: 1.2rem; }
   
   .privacy-policy__content {
     padding: 30px 20px;
     margin-bottom: 20px;
   }
   
-  .privacy-policy h2 {
-    font-size: 1.6rem;
-  }
-  
-  .privacy-policy h3 {
-    font-size: 1.2rem;
-  }
-  
-  .privacy-policy p {
-    font-size: 1rem;
-  }
+  .privacy-policy h2 { font-size: 1.6rem; }
+  .privacy-policy h3 { font-size: 1.2rem; }
+  .privacy-policy p { font-size: 1rem; }
 }
 
-/* Dark Mode Styles */
-.dark-mode .privacy-policy {
-  background: #121212;
-}
-
-.dark-mode .privacy-policy__header {
-  background: #282828;
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy__header::before {
-  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
-}
-
-.dark-mode .privacy-policy h1 {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy__subtitle {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy__intro {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
-  border: 1px solid rgba(245, 24, 102, 0.3);
-}
-
-.dark-mode .privacy-policy__intro-content strong {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy__intro-content p {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy__content {
-  background: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
-  border: 1px solid rgba(245, 24, 102, 0.3);
-}
-
-.dark-mode .privacy-policy h2 {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy h3 {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy p {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy ul li {
-  color: #ffffff;
-}
-
-.dark-mode .privacy-policy strong {
-  color: #f51866;
-}
-
-.dark-mode .privacy-policy__icon {
-  color: #f51866;
-}
-
-.dark-mode .privacy-policy__intro-icon {
-  color: #f51866;
-}
-
-/* Mobile header (back button + title) */
+/* 8. MOBILE HEADER OVERRIDES (MUI COMPATIBILITY)
+   ---------------------------------------------------------- */
 @media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
@@ -391,7 +399,7 @@
     gap: 8px !important;
     margin-bottom: 8px !important;
     margin-top: -3rem !important;
-    padding-top: 2px !important; /* ultra-compact spacing */
+    padding-top: 2px !important;
     padding-left: 8px !important;
     padding-right: 8px !important;
     color: var(--chat-text) !important;
@@ -407,9 +415,8 @@
     justify-content: center !important;
     background-color: var(--chat-elev) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    margin-top: 0 !important; /* eliminat spațiul superior */
+    margin-top: 0 !important;
   }
-
   .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
 
   .mobile-header .MuiSvgIcon-root {
@@ -423,7 +430,6 @@
     font-size: 24px !important;
     line-height: 1.334 !important;
     margin: 0 !important;
-    margin-top: 0 !important; /* eliminat spațiul superior */
     flex: 0 0 auto !important;
     margin-left: 4px !important;
     padding-right: 2rem !important;

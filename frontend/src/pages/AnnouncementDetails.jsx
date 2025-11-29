@@ -543,7 +543,7 @@ export default function AnnouncementDetails() {
                         width: '100%',
                         height: '100%',
                         objectFit: 'contain',
-                        bgcolor: '#f5f5f5',
+                        bgcolor: getIsDarkMode() ? '#121212' : '#ffffff',
                         opacity: fade ? 1 : 0,
                         transition: 'opacity 0.4s cubic-bezier(.4,0,.2,1)',
                         cursor: 'pointer'
@@ -983,7 +983,27 @@ export default function AnnouncementDetails() {
       )}
 
       {/* ========== Rating Dialog ========== */}
-      <Dialog open={rateOpen} onClose={handleRateClose} fullWidth maxWidth="sm">
+      <Dialog
+        open={rateOpen}
+        onClose={handleRateClose}
+        fullWidth
+        maxWidth="sm"
+        BackdropProps={{
+          sx: {
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            backgroundColor: getIsDarkMode() ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.35)'
+          }
+        }}
+        PaperProps={{
+          sx: {
+            bgcolor: getIsDarkMode() ? '#121212' : '#ffffff',
+            color: getIsDarkMode() ? '#f5f5f5' : 'inherit',
+            borderRadius: 2,
+            boxShadow: getIsDarkMode() ? '0 10px 30px rgba(0,0,0,0.6)' : undefined
+          }
+        }}
+      >
         <DialogTitle>Evaluează utilizatorul</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -1002,6 +1022,25 @@ export default function AnnouncementDetails() {
             minRows={3}
             value={ratingComment}
             onChange={(e) => setRatingComment(e.target.value)}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: getIsDarkMode() ? '#e5e7eb' : '#374151'
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: getIsDarkMode() ? '#374151' : '#d1d5db'
+                },
+                '&:hover fieldset': {
+                  borderColor: getIsDarkMode() ? '#4b5563' : '#cbd5e1'
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: getIsDarkMode() ? '#6b7280' : '#9ca3af'
+                }
+              },
+              '& .MuiInputLabel-root': {
+                color: getIsDarkMode() ? '#9ca3af' : '#6b7280'
+              }
+            }}
           />
         </DialogContent>
         <DialogActions>

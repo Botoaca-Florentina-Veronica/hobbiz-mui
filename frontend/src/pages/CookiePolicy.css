@@ -1,17 +1,91 @@
-/* Cookie Policy Page - stil consistent cu About.css */
-.cookie-policy-page {
-  background-color: var(--app-bg); /* align with desktop footer background */
-  min-height: 100vh;
-  padding: 40px 0;
-  margin-top: 4rem;
+/* =============================================================
+   COOKIE POLICY PAGE STYLES
+   Refactorizat: Structură modulară, Variabile CSS, fără !important inutil.
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout & Spacing --- */
+  --cp-hero-radius: 24px;
+  --cp-card-radius: 16px;
+  --cp-margin-top-desktop: 4rem;
+
+  /* --- Colors (Light Mode Default) --- */
+  --cp-bg-page: var(--app-bg);
+  --cp-bg-hero: linear-gradient(135deg, #ffabb7 0%, #ff96a6 100%);
+  --cp-bg-hero-overlay: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+  
+  --cp-bg-surface: #ffffff;
+  --cp-bg-surface-secondary: #ffffff; /* Pentru carduri interne */
+  --cp-bg-toc-hover: #ffebf0;
+  --cp-bg-badge: rgba(245, 24, 102, 0.08);
+
+  --cp-text-main: #121212;
+  --cp-text-heading: #3f3f3f;
+  --cp-text-body: #575757;
+  --cp-text-muted: #717171;
+  --cp-text-link: #575757;
+  --cp-text-link-hover: #2e2e2e;
+
+  /* --- Borders & Accents --- */
+  --cp-border-color: #8b8b8b;
+  --cp-border-badge: rgba(245, 24, 102, 0.25);
+  --cp-accent-gradient: linear-gradient(90deg, #f51866, #fa4875);
+  --cp-accent-solid: #f51866;
+  
+  /* --- Shadows --- */
+  --cp-shadow-hero: 0 12px 48px rgba(63, 63, 63, 0.2);
+  --cp-shadow-card: 0 8px 32px rgba(63, 63, 63, 0.12);
+  --cp-shadow-toc: 0 6px 22px rgba(63, 63, 63, 0.08);
+  --cp-shadow-hover: 0 12px 40px rgba(63, 63, 63, 0.15);
+  
+  /* --- Specific Components --- */
+  --cp-note-bg: linear-gradient(135deg, #ffabb7, #ff96a6);
+  --cp-note-border: #fa4875;
+  --cp-note-text: #121212;
 }
 
-/* Tablet & small laptops up to 1024px: păstrăm același fundal și fără offset sus */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .cookie-policy-page {
-    margin-top: 0 !important;
-    background-color: var(--app-bg) !important;
-  }
+/* Dark Mode Overrides */
+.dark-mode {
+  --cp-bg-page: #121212;
+  --cp-bg-hero: #282828;
+  --cp-bg-hero-overlay: radial-gradient(circle, rgba(245, 24, 102, 0.18) 0%, transparent 70%);
+  
+  --cp-bg-surface: #1b1b1b;
+  --cp-bg-surface-secondary: #1f1f1f;
+  --cp-bg-toc-hover: rgba(245, 24, 102, 0.15);
+  --cp-bg-badge: rgba(245, 24, 102, 0.15);
+
+  --cp-text-main: #ffffff;
+  --cp-text-heading: #ffffff;
+  --cp-text-body: #d6d6d6;
+  --cp-text-muted: #8b8b8b; /* Last updated text */
+  --cp-text-link: #c9c9c9;
+  --cp-text-link-hover: #ffffff;
+
+  --cp-border-color: #3f3f3f;
+  --cp-border-badge: rgba(245, 24, 102, 0.3);
+  
+  --cp-shadow-hero: 0 12px 48px rgba(0, 0, 0, 0.35);
+  --cp-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.35);
+  --cp-shadow-toc: none;
+  --cp-shadow-hover: 0 8px 28px rgba(245, 24, 102, 0.12);
+
+  --cp-note-bg: linear-gradient(135deg, rgba(255, 123, 167, 0.18), rgba(250, 72, 117, 0.18));
+  --cp-note-border: rgba(245, 24, 102, 0.35);
+  --cp-note-text: #ffd7e3;
+}
+
+
+/* 2. PAGE LAYOUT
+   ---------------------------------------------------------- */
+.cookie-policy-page {
+  background-color: var(--cp-bg-page);
+  min-height: 100vh;
+  padding: 40px 0;
+  margin-top: var(--cp-margin-top-desktop);
+  transition: background-color 0.3s ease, margin-top 0.3s ease;
 }
 
 .cookie-policy-container {
@@ -20,26 +94,34 @@
   padding: 0 20px;
 }
 
+/* Tablet & Mobile Layout Adjustment */
+@media (max-width: 1024px) {
+  .cookie-policy-page {
+    margin-top: 0; /* Natural override, no !important needed */
+  }
+}
+
+
+/* 3. HERO SECTION
+   ---------------------------------------------------------- */
 .cookie-policy-hero {
   text-align: center;
-  background: linear-gradient(135deg, #ffabb7 0%, #ff96a6 100%);
-  color: #121212;
+  background: var(--cp-bg-hero);
+  color: var(--cp-text-main);
   padding: 80px 40px;
-  border-radius: 24px;
+  border-radius: var(--cp-hero-radius);
   margin-bottom: 60px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(63, 63, 63, 0.2);
+  box-shadow: var(--cp-shadow-hero);
 }
 
 .cookie-policy-hero::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: var(--cp-bg-hero-overlay);
   transform: rotate(30deg);
   pointer-events: none;
 }
@@ -48,9 +130,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(245, 24, 102, 0.08);
+  background: var(--cp-bg-badge);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(245, 24, 102, 0.25);
+  border: 1px solid var(--cp-border-badge);
   padding: 12px 24px;
   border-radius: 50px;
   font-size: 0.9rem;
@@ -58,6 +140,7 @@
   margin-bottom: 32px;
   position: relative;
   z-index: 2;
+  color: inherit;
 }
 
 .hero-badge-icon {
@@ -73,6 +156,7 @@
   position: relative;
   z-index: 2;
   line-height: 1.1;
+  color: inherit;
 }
 
 .hero-title .highlight {
@@ -83,45 +167,46 @@
   position: relative;
 }
 
-/* Content Sections */
+
+/* 4. CONTENT STRUCTURE
+   ---------------------------------------------------------- */
 .cookie-policy-content {
-  background: white;
+  background: var(--cp-bg-surface);
   border-radius: 20px;
   padding: 60px;
-  box-shadow: 0 8px 32px rgba(63, 63, 63, 0.12);
+  box-shadow: var(--cp-shadow-card);
   margin-bottom: 40px;
+  border: 1px solid transparent; /* Prepared for dark mode */
+}
+.dark-mode .cookie-policy-content {
+  border-color: #282828;
 }
 
+/* Typography in Content */
 .policy-section {
   margin-bottom: 50px;
 }
-
-.policy-section:last-child {
-  margin-bottom: 0;
-}
+.policy-section:last-child { margin-bottom: 0; }
 
 .policy-section h2 {
-  color: #3f3f3f;
+  color: var(--cp-text-heading);
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 24px;
   position: relative;
   padding-bottom: 16px;
 }
-
 .policy-section h2::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #f51866, #fa4875);
+  bottom: 0; left: 0;
+  width: 60px; height: 3px;
+  background: var(--cp-accent-gradient);
   border-radius: 2px;
 }
 
 .policy-section h3 {
-  color: #3f3f3f;
+  color: var(--cp-text-heading);
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 16px;
@@ -129,45 +214,51 @@
 }
 
 .policy-section h4 {
-  color: #3f3f3f;
+  color: var(--cp-text-heading);
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
 .policy-section p {
-  color: #575757;
+  color: var(--cp-text-body);
   font-size: 1.1rem;
   line-height: 1.7;
   margin-bottom: 16px;
 }
 
 .policy-section ul {
-  color: #575757;
+  color: var(--cp-text-body);
   font-size: 1.1rem;
   line-height: 1.7;
   margin-left: 20px;
   margin-bottom: 16px;
 }
+.policy-section ul li { margin-bottom: 8px; }
 
-.policy-section ul li {
-  margin-bottom: 8px;
-}
+/* Links in content (specific override) */
+.dark-mode .cookie-policy-content a { color: #ff96a6; }
+.dark-mode .cookie-policy-content a:hover { color: #ff7e95; }
+
+
+/* 5. COMPONENTS
+   ---------------------------------------------------------- */
 
 /* Table of Contents */
 .cookie-toc {
-  background: #ffffff;
-  border: 1px solid #8b8b8b;
+  background: var(--cp-bg-surface-secondary);
+  border: 1px solid var(--cp-border-color);
   border-radius: 14px;
   padding: 32px 32px 28px;
   margin: 0 0 50px 0;
-  box-shadow: 0 6px 22px rgba(63,63,63,0.08);
+  box-shadow: var(--cp-shadow-toc);
 }
+
 .cookie-toc .toc-title {
   margin: 0 0 18px 0;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #3f3f3f;
+  color: var(--cp-text-heading);
   position: relative;
   padding-bottom: 10px;
 }
@@ -176,14 +267,16 @@
   position: absolute;
   left: 0; bottom: 0;
   width: 50px; height: 3px;
-  background: linear-gradient(90deg,#f51866,#fa4875);
+  background: var(--cp-accent-gradient);
   border-radius: 2px;
 }
+
 .cookie-toc ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
 .cookie-toc ul li { margin: 0; }
+
 .cookie-toc a {
   text-decoration: none;
-  color: #575757;
+  color: var(--cp-text-link);
   font-weight: 600;
   font-size: 1.05rem;
   display: flex;
@@ -191,59 +284,48 @@
   gap: 10px;
   padding: 12px 16px;
   border-radius: 12px;
-  transition: background .25s ease, color .25s ease, transform .25s ease;
+  transition: all .25s ease;
   position: relative;
   line-height: 1.35;
   margin-bottom: -0.75rem;
 }
 .cookie-toc a:before {
   content: '•';
-  color: #f51866;
+  color: var(--cp-accent-solid);
   font-size: 1.1rem;
   line-height: 1;
 }
+
 .cookie-toc a:hover {
-  background: #ffebf0;
-  color: #2e2e2e;
+  background: var(--cp-bg-toc-hover);
+  color: var(--cp-text-link-hover);
   transform: translateX(4px);
 }
 .cookie-toc a:focus-visible {
-  outline: 2px solid #f51866;
+  outline: 2px solid var(--cp-accent-solid);
   outline-offset: 2px;
 }
 
-@media (max-width: 768px) {
-  .cookie-toc { padding: 18px 16px 16px; margin-bottom: 32px; }
-  .cookie-toc .toc-title { font-size: 1.18rem; margin-bottom: 12px; }
-  .cookie-toc ul { gap: 1px; }
-  .cookie-toc a { padding: 7px 12px; font-size: 0.96rem; line-height: 1.22; gap: 6px; margin-bottom: -1rem;}
-  .cookie-toc a:before { font-size: 0.9rem; }
-}
-
-/* Cookie Types */
+/* Cookie Types & Tags */
 .cookie-type {
-  background: #ffffff;
-  border: 1px solid #8b8b8b;
-  border-radius: 16px;
+  background: var(--cp-bg-surface-secondary);
+  border: 1px solid var(--cp-border-color);
+  border-radius: var(--cp-card-radius);
   padding: 32px;
   margin-bottom: 24px;
   transition: all 0.3s ease;
 }
-
 .cookie-type:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(63, 63, 63, 0.12);
+  box-shadow: var(--cp-shadow-hover);
 }
 
 .cookie-examples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 16px;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
 }
 
 .cookie-tag {
-  background: linear-gradient(135deg, #f51866, #fa4875);
+  background: var(--cp-accent-gradient);
   color: #ffffff;
   padding: 6px 14px;
   border-radius: 20px;
@@ -260,146 +342,107 @@
 }
 
 .reason-card {
-  background: white;
-  border: 1px solid #8b8b8b;
-  border-radius: 16px;
+  background: var(--cp-bg-surface-secondary);
+  border: 1px solid var(--cp-border-color);
+  border-radius: var(--cp-card-radius);
   padding: 32px 24px;
   text-align: center;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
-
 .reason-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #f51866, #fa4875);
+  top: 0; left: 0; right: 0; height: 4px;
+  background: var(--cp-accent-gradient);
 }
-
 .reason-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(63, 63, 63, 0.15);
+  box-shadow: var(--cp-shadow-hover);
 }
 
-.reason-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  display: block;
-}
-
-.reason-card h4 {
-  color: #3f3f3f;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.reason-card p {
-  color: #717171;
-  font-size: 1rem;
-  line-height: 1.6;
-  margin: 0;
-}
+.reason-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+.reason-card h4 { color: var(--cp-text-heading); font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; }
+.reason-card p { color: var(--cp-text-body); font-size: 1rem; line-height: 1.6; margin: 0; }
+.dark-mode .reason-card p { color: #c9c9c9; }
 
 /* Browser Guides */
 .browser-guides {
-  background: #ffffff;
-  border: 1px solid #8b8b8b;
+  background: var(--cp-bg-surface-secondary);
+  border: 1px solid var(--cp-border-color);
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
 }
-
-.browser-guides h4 {
-  color: #3f3f3f;
-  margin-bottom: 16px;
-}
-
-.browser-guides ul {
-  margin-left: 0;
-  list-style: none;
-}
+.browser-guides h4 { color: var(--cp-text-heading); margin-bottom: 16px; }
+.browser-guides ul { margin-left: 0; list-style: none; }
 
 .browser-guides ul li {
-  background: #ffffff;
-  border: 1px solid #8b8b8b;
+  background: var(--cp-bg-surface-secondary);
+  border: 1px solid var(--cp-border-color);
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 8px;
   transition: background 0.2s ease;
+  color: var(--cp-text-body);
 }
-
 .browser-guides ul li:hover {
-  background: #ffebf0; /* subtle very light from pink family */
+  background: var(--cp-bg-toc-hover); /* Reusing hover background */
 }
+.dark-mode .browser-guides ul li { background: #232323; }
+.dark-mode .browser-guides ul li:hover { background: #282828; }
 
 /* Important Note */
 .important-note {
-  background: linear-gradient(135deg, #ffabb7, #ff96a6);
-  border: 1px solid #fa4875;
+  background: var(--cp-note-bg);
+  border: 1px solid var(--cp-note-border);
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
 }
-
 .important-note h4 {
-  color: #121212;
+  color: var(--cp-note-text);
   margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
+.important-note p { color: var(--cp-note-text); margin: 0; }
 
-.important-note p {
-  color: #121212;
-  margin: 0;
-}
-
-/* Contact Section */
+/* Contact & Footer */
 .contact-section {
-  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-  border: 1px solid #8b8b8b;
+  background: var(--cp-bg-surface-secondary);
+  border: 1px solid var(--cp-border-color);
   border-radius: 16px;
   padding: 40px;
 }
+.dark-mode .contact-section { background: #181818; }
 
 .contact-info {
-  background: white;
+  background: var(--cp-bg-surface);
   border-radius: 12px;
   padding: 24px;
   margin-top: 20px;
 }
-
-.contact-info p {
-  margin-bottom: 12px;
-  color: #575757;
-}
+.contact-info p { margin-bottom: 12px; color: var(--cp-text-body); }
 
 .last-updated {
   font-style: italic;
-  color: #717171;
-  border-top: 1px solid #8b8b8b;
+  color: var(--cp-text-muted);
+  border-top: 1px solid var(--cp-border-color);
   padding-top: 16px;
   margin-top: 24px;
 }
 
-/* Responsive Design */
+
+/* 6. MEDIA QUERIES (RESPONSIVE)
+   ---------------------------------------------------------- */
+
 @media (max-width: 768px) {
   .cookie-policy-page {
     padding: 20px 0;
-    /* pe mobil nu avem header fix, deci nu e nevoie de offset sus */
-    margin-top: 0;
-    /* Align mobile page background with desktop footer background */
-    background-color: var(--app-bg) !important;
   }
   
-  .cookie-policy-container {
-    padding: 0 16px;
-  }
+  .cookie-policy-container { padding: 0 16px; }
   
   .cookie-policy-hero {
     padding: 60px 24px;
@@ -407,188 +450,39 @@
     margin-bottom: 40px;
   }
   
-  .hero-title {
-    font-size: 2.5rem;
-    letter-spacing: -1px;
-  }
-  
+  .hero-title { font-size: 2.5rem; letter-spacing: -1px; }
   
   .cookie-policy-content {
     padding: 40px 24px;
     border-radius: 16px;
   }
   
-  .policy-section h2 {
-    font-size: 1.8rem;
-  }
+  .policy-section h2 { font-size: 1.8rem; }
   
-  .cookie-type {
-    padding: 24px 20px;
-  }
+  .cookie-toc { padding: 18px 16px 16px; margin-bottom: 32px; }
+  .cookie-toc .toc-title { font-size: 1.18rem; margin-bottom: 12px; }
+  .cookie-toc ul { gap: 1px; }
+  .cookie-toc a { padding: 7px 12px; font-size: 0.96rem; line-height: 1.22; gap: 6px; margin-bottom: -1rem; }
+  .cookie-toc a:before { font-size: 0.9rem; }
   
-  .reasons-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  .cookie-type { padding: 24px 20px; }
   
-  .reason-card {
-    padding: 24px 20px;
-  }
+  .reasons-grid { grid-template-columns: 1fr; gap: 16px; }
+  .reason-card { padding: 24px 20px; }
   
-  .browser-guides {
-    padding: 20px;
-  }
-  
-  .contact-section {
-    padding: 32px 24px;
-  }
+  .browser-guides { padding: 20px; }
+  .contact-section { padding: 32px 24px; }
 }
 
 @media (max-width: 480px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .cookie-policy-content {
-    padding: 32px 20px;
-  }
-  
-  .policy-section h2 {
-    font-size: 1.6rem;
-  }
-  
-  .cookie-examples {
-    justify-content: center;
-  }
-  
-  .cookie-tag {
-    font-size: 0.8rem;
-    padding: 4px 12px;
-  }
+  .hero-title { font-size: 2rem; }
+  .cookie-policy-content { padding: 32px 20px; }
+  .policy-section h2 { font-size: 1.6rem; }
+  .cookie-examples { justify-content: center; }
+  .cookie-tag { font-size: 0.8rem; padding: 4px 12px; }
 }
 
-/* Dark Mode Support (STRICT palette) */
-.dark-mode .cookie-policy-page {
-  background-color: #121212 !important;
-}
-
-.dark-mode .cookie-policy-hero {
-  background: #282828 !important;
-  color: #ffffff !important;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35) !important;
-}
-
-.dark-mode .cookie-policy-hero::before {
-  background: radial-gradient(circle, rgba(245, 24, 102, 0.18) 0%, transparent 70%) !important;
-}
-
-.dark-mode .hero-badge {
-  background: rgba(245, 24, 102, 0.15) !important;
-  border: 1px solid rgba(245, 24, 102, 0.3) !important;
-  color: #ffffff !important;
-}
-
-.dark-mode .hero-title {
-  color: #ffffff !important;
-}
-
-.dark-mode .cookie-policy-content {
-  background: #1b1b1b !important;
-  color: #d6d6d6 !important;
-  border: 1px solid #282828 !important;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35) !important;
-}
-
-.dark-mode .policy-section h2,
-.dark-mode .policy-section h3,
-.dark-mode .policy-section h4 {
-  color: #ffffff !important;
-}
-
-.dark-mode .policy-section h2::after {
-  background: linear-gradient(90deg, #f51866, #fa4875) !important;
-}
-
-.dark-mode .policy-section p,
-.dark-mode .policy-section ul,
-.dark-mode .policy-section ul li {
-  color: #d6d6d6 !important;
-}
-
-.dark-mode .cookie-type {
-  background: #1f1f1f !important;
-  border: 1px solid #3f3f3f !important;
-  box-shadow: none !important;
-}
-
-.dark-mode .cookie-type:hover {
-  box-shadow: 0 8px 28px rgba(245, 24, 102, 0.12) !important;
-}
-
-.dark-mode .cookie-tag {
-  background: linear-gradient(135deg, #f51866, #fa4875) !important;
-  color: #ffffff !important;
-}
-
-.dark-mode .reasons-grid .reason-card {
-  background: #1f1f1f !important;
-  border: 1px solid #3f3f3f !important;
-}
-
-.dark-mode .reason-card::before {
-  background: linear-gradient(90deg, #f51866, #fa4875) !important;
-}
-
-.dark-mode .reason-card h4 { color: #ffffff !important; }
-.dark-mode .reason-card p { color: #c9c9c9 !important; }
-
-.dark-mode .browser-guides {
-  background: #1b1b1b !important;
-  border: 1px solid #3f3f3f !important;
-}
-.dark-mode .browser-guides h4 { color: #ffffff !important; }
-.dark-mode .browser-guides ul li {
-  background: #232323 !important;
-  border: 1px solid #3f3f3f !important;
-  color: #d6d6d6 !important;
-}
-.dark-mode .browser-guides ul li:hover { background: #282828 !important; }
-
-.dark-mode .important-note {
-  background: linear-gradient(135deg, rgba(255, 123, 167, 0.18), rgba(250, 72, 117, 0.18)) !important;
-  border: 1px solid rgba(245, 24, 102, 0.35) !important;
-}
-.dark-mode .important-note h4,
-.dark-mode .important-note p { color: #ffd7e3 !important; }
-
-.dark-mode .contact-section {
-  background: #181818 !important;
-  border: 1px solid #3f3f3f !important;
-}
-
-.dark-mode .contact-info { background: #1f1f1f !important; }
-.dark-mode .contact-info p { color: #d6d6d6 !important; }
-
-.dark-mode .last-updated {
-  color: #8b8b8b !important;
-  border-top: 1px solid #3f3f3f !important;
-}
-
-/* Dark mode TOC */
-.dark-mode .cookie-toc {
-  background: #1f1f1f !important;
-  border: 1px solid #3f3f3f !important;
-  box-shadow: none !important;
-}
-.dark-mode .cookie-toc .toc-title { color: #ffffff !important; }
-.dark-mode .cookie-toc a { color: #c9c9c9 !important; }
-.dark-mode .cookie-toc a:hover { background: rgba(245,24,102,0.15) !important; color: #ffffff !important; }
-.dark-mode .cookie-toc a:before { color: #fa4875 !important; }
-
-.dark-mode .cookie-policy-content a { color: #ff96a6 !important; }
-.dark-mode .cookie-policy-content a:hover { color: #ff7e95 !important; }
-
-/* Mobile header (back button + title) */
+/* Mobile Header (Needs High Specificity/Important for MUI overrides) */
 @media (max-width: 1024px) {
   .mobile-header {
     display: flex !important;
@@ -599,7 +493,7 @@
     padding-top: clamp(8px, 3vh, 24px) !important;
     padding-left: 8px !important;
     padding-right: 8px !important;
-    color: var(--chat-text) !important;
+    color: var(--cp-text-heading) !important;
   }
 
   .mobile-back-btn {
@@ -610,20 +504,20 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background-color: var(--chat-elev) !important;
+    background-color: var(--cp-bg-surface-secondary) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    color: var(--cp-text-heading) !important;
   }
-
-  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+  .mobile-back-btn:hover { background-color: var(--cp-bg-surface) !important; }
 
   .mobile-header .MuiSvgIcon-root {
     font-size: 24px !important;
-    color: var(--chat-text) !important;
+    color: inherit !important;
   }
 
   .mobile-header-title {
     font-weight: 600 !important;
-    color: var(--chat-text) !important;
+    color: inherit !important;
     font-size: 24px !important;
     line-height: 1.334 !important;
     margin: 0 !important;

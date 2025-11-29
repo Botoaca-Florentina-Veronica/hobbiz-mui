@@ -1,9 +1,5 @@
 /* =============================================================
-   Announcement Details Page Styles (Reorganizare pentru lizibilitate)
-   IMPORTANT: Doar reordonare + comentarii. Nicio regulă CSS a
-   selectorilor existenți NU a fost modificată (pentru a evita
-   schimbarea comportamentului vizual). Orice repetiție păstrată
-   intenționat pentru compatibilitate.
+   Announcement Details Page Styles
    Secțiuni:
      1. Bază & Reset / Behavior
      2. Animations
@@ -407,3 +403,23 @@ html { scroll-behavior: smooth; }
   outline: 2px solid var(--primary-a0);
   outline-offset: 2px;
 }
+
+/* Override: make announcement info container text and border white in dark mode */
+.dark-mode .pf-card,
+.dark-mode .seller-card,
+.dark-mode .contact-paper,
+.dark-mode .announcement-image-container {
+  border-color: rgba(255,255,255,0.12) !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .pf-card .MuiTypography-root,
+.dark-mode .pf-card .MuiTypography-body1,
+.dark-mode .pf-card .MuiTypography-body2,
+.dark-mode .seller-card .MuiTypography-root,
+.dark-mode .seller-card .MuiTypography-body1,
+.dark-mode .seller-card .MuiTypography-body2 {
+  color: #ffffff !important;
+}
+
+/* Keep buttons and primary accents unchanged; only surface text/borders are forced white here. */
