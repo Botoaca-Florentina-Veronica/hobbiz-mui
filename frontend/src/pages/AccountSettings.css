@@ -1,67 +1,175 @@
+/* =============================================================
+   ACCOUNT SETTINGS PAGE STYLES
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout --- */
+  --as-radius: 8px;
+  --as-container-padding-top: 4rem;
+  
+  /* --- Colors (Light Mode Default) --- */
+  --as-bg-page: #f5f7f8;
+  
+  /* Text */
+  --as-text-title: #183642;
+  --as-text-primary: #183642;
+  --as-text-label: #0B2D5A;
+  
+  /* Menu & Items */
+  --as-bg-menu: #fff;
+  --as-border-menu: transparent;
+  --as-bg-item: #f3f5f6;
+  --as-bg-item-hover: #f8fafb;
+  
+  /* Forms */
+  --as-bg-input: #f0f0f0;
+  --as-border-input: #ccc;
+  --as-border-input-focus: #0B2D5A;
+  
+  /* Buttons */
+  --as-btn-bg: #0B2D5A;
+  --as-btn-text: #fff;
+  --as-btn-hover: #0D47A1;
+  
+  /* Messages */
+  --as-msg-success-bg: #E3F2FD;
+  --as-msg-success-text: #0D47A1;
+  --as-msg-success-border: #BBDEFB;
+  
+  --as-msg-error-bg: #f8d7da;
+  --as-msg-error-text: #721c24;
+  --as-msg-error-border: #f5c6cb;
+  
+  /* Shadows */
+  --as-shadow-menu: 0 2px 16px rgba(0,0,0,0.07);
+  --as-shadow-item: 0 2px 8px rgba(0,0,0,0.04);
+  --as-shadow-item-hover: 0 4px 16px rgba(24,54,66,0.08);
+
+  /* Mobile Header */
+  --as-mob-header-text: var(--chat-text, #183642);
+  --as-mob-btn-bg: var(--chat-elev, #ffffff);
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --as-bg-page: #121212;
+  
+  /* Text */
+  --as-text-title: #f51866;
+  --as-text-primary: #ffffff;
+  --as-text-label: #ffffff;
+  
+  /* Menu & Items */
+  --as-bg-menu: #121212;
+  --as-border-menu: 1px solid #3f3f3f;
+  --as-bg-item: #282828;
+  --as-bg-item-hover: #575757;
+  
+  /* Forms */
+  --as-bg-input: #282828;
+  --as-border-input: #575757;
+  --as-border-input-focus: #fe6585;
+  
+  /* Buttons */
+  --as-btn-bg: #f51866;
+  --as-btn-text: #ffffff;
+  --as-btn-hover: #fe6585;
+  
+  /* Messages */
+  --as-msg-success-bg: #282828;
+  --as-msg-success-text: #ffffff;
+  --as-msg-success-border: #fe6585;
+  
+  --as-msg-error-bg: #3f3f3f;
+  --as-msg-error-text: #ff7e95;
+  --as-msg-error-border: #f51866;
+  
+  /* Shadows */
+  --as-shadow-menu: 0 2px 16px rgba(0,0,0,0.3);
+  --as-shadow-item: 0 2px 8px rgba(0,0,0,0.2);
+  --as-shadow-item-hover: 0 4px 16px rgba(0,0,0,0.4);
+  
+  /* Mobile Header */
+  --as-mob-header-text: #ffffff;
+  --as-mob-btn-bg: #2a3f56;
+}
+
+
+/* 2. LAYOUT PRINCIPAL
+   ---------------------------------------------------------- */
 .account-settings-container {
-  background: #f5f7f8;
+  background: var(--as-bg-page);
   min-height: 100vh;
   padding: 40px 20px;
-  margin-top: 4rem;
-  max-width: 100vw;
-  margin-left: 0;
-  margin-right: 0;
-  border-radius: 0;
-  box-shadow: none;
+  margin-top: var(--as-container-padding-top);
+  /* Reseturi implicite simplificate */
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
+
 .settings-title {
   font-size: 2.8rem;
   font-weight: bold;
-  color: #183642;
+  color: var(--as-text-title);
   margin-bottom: 32px;
-  margin-left: 8vw;
+  /* Centrat pe desktop logic, nu cu margin-left hardcodat ci prin container width */
+  max-width: 900px;
+  margin-left: auto; margin-right: auto; 
   text-align: left;
-  background: none;
-  padding-left: 0;
   letter-spacing: -1px;
   line-height: 1.1;
+  width: calc(100% - 40px);
 }
+
 .settings-menu {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--as-bg-menu);
+  border-radius: var(--as-radius);
   max-width: 900px;
   margin: 0 auto;
-  padding: 36px 48px 36px 48px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  padding: 36px 48px;
+  box-shadow: var(--as-shadow-menu);
   display: flex;
   flex-direction: column;
   gap: 24px;
-  margin-left: auto;
-  margin-right: auto;
   width: calc(100% - 40px);
   box-sizing: border-box;
+  border: var(--as-border-menu);
 }
+
+
+/* 3. SETTINGS ITEMS
+   ---------------------------------------------------------- */
 .settings-item {
-  background: #f3f5f6;
-  border-radius: 8px;
+  background: var(--as-bg-item);
+  border-radius: var(--as-radius);
   padding: 24px 32px;
   font-size: 1.2rem;
-  color: #183642;
+  color: var(--as-text-primary);
   margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: var(--as-shadow-item);
   font-weight: 500;
   cursor: pointer;
   transition: box-shadow 0.2s, background 0.2s;
   position: relative;
   z-index: 1;
-  pointer-events: auto;
   display: flex;
   align-items: center;
 }
+
 .settings-item:hover {
-  background: #f8fafb;
-  box-shadow: 0 4px 16px rgba(24,54,66,0.08);
+  background: var(--as-bg-item-hover);
+  box-shadow: var(--as-shadow-item-hover);
 }
 
-/* Styles for the email change section */
+
+/* 4. EMAIL CHANGE SECTION
+   ---------------------------------------------------------- */
 .email-change-section {
-  background: #f3f5f6;
-  border-radius: 8px;
+  background: var(--as-bg-item); /* Refolosește background item */
+  border-radius: var(--as-radius);
   padding: 18px;
   margin-bottom: 12px;
   box-shadow: none;
@@ -69,55 +177,48 @@
   flex-direction: column;
   gap: 16px;
   margin-top: -16px;
+  /* Border handled by theme variable override if needed, using default border from item if applied */
+  border: 1px solid transparent; /* Placeholder */
 }
+.dark-mode .email-change-section { border-color: #575757; }
 
 .email-change-section label {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #0B2D5A;
+  color: var(--as-text-label);
   display: block;
   margin-bottom: 4px;
 }
 
-.email-change-section input[type="email"] {
+.email-change-section input[type="email"],
+.email-change-section input[type="password"] {
   padding: 12px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 1px solid var(--as-border-input);
+  border-radius: var(--as-radius);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
-  background-color: #f0f0f0;
+  background-color: var(--as-bg-input);
   width: 90%;
   box-sizing: border-box;
-}
-
-.email-change-section input[type="email"]:focus {
-  border-color: #0B2D5A;
+  color: var(--as-text-primary);
 }
 
 .email-change-section input[type="password"] {
-  padding: 12px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s;
-  background-color: #f0f0f0;
-  width: 90%;
-  box-sizing: border-box;
   margin-bottom: 12px;
 }
 
+.email-change-section input[type="email"]:focus,
 .email-change-section input[type="password"]:focus {
-  border-color: #0B2D5A;
+  border-color: var(--as-border-input-focus);
 }
 
 .email-change-section button {
-  background-color: #0B2D5A;
-  color: #fff;
+  background-color: var(--as-btn-bg);
+  color: var(--as-btn-text);
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--as-radius);
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
@@ -127,116 +228,47 @@
 }
 
 .email-change-section button:hover {
-  background-color: #0D47A1;
+  background-color: var(--as-btn-hover);
 }
 
-/* Styles for messages */
+
+/* 5. MESSAGES (Success/Error)
+   ---------------------------------------------------------- */
 .message {
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--as-radius);
   font-size: 1rem;
   font-weight: 500;
   margin-bottom: 12px;
 }
 
 .message.success {
-  background-color: #E3F2FD;
-  color: #0D47A1;
-  border: 1px solid #BBDEFB;
+  background-color: var(--as-msg-success-bg);
+  color: var(--as-msg-success-text);
+  border: 1px solid var(--as-msg-success-border);
 }
 
 .message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: var(--as-msg-error-bg);
+  color: var(--as-msg-error-text);
+  border: 1px solid var(--as-msg-error-border);
 }
 
-/* Dark Mode Styles pentru Account Settings */
-.dark-mode .account-settings-container {
-  background: #121212;
-  color: #ffffff;
-}
 
-.dark-mode .settings-title {
-  color: #f51866;
-}
+/* 6. RESPONSIVE / MOBILE
+   ---------------------------------------------------------- */
 
-.dark-mode .settings-menu {
-  background: #282828;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
-  border: 1px solid #3f3f3f;
-}
-
-.dark-mode .settings-item {
-  background: #3f3f3f;
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.dark-mode .settings-item:hover {
-  background: #575757;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-
-/* Dark Mode pentru Email Change Section */
-.dark-mode .email-change-section {
-  background: #3f3f3f;
-  border: 1px solid #575757;
-}
-
-.dark-mode .email-change-section label {
-  color: #ffffff;
-}
-
-.dark-mode .email-change-section input[type="email"],
-.dark-mode .email-change-section input[type="password"] {
-  background-color: #282828;
-  border: 1px solid #575757;
-  color: #ffffff;
-}
-
-.dark-mode .email-change-section input[type="email"]:focus,
-.dark-mode .email-change-section input[type="password"]:focus {
-  border-color: #fe6585;
-}
-
-.dark-mode .email-change-section button {
-  background-color: #f51866;
-  color: #ffffff;
-}
-
-.dark-mode .email-change-section button:hover {
-  background-color: #fe6585;
-}
-
-/* Dark Mode pentru Messages */
-.dark-mode .message.success {
-  background-color: #282828;
-  color: #ffffff;
-  border: 1px solid #fe6585;
-}
-
-.dark-mode .message.error {
-  background-color: #3f3f3f;
-  color: #ff7e95;
-  border: 1px solid #f51866;
-}
-
-/* ==== Mobile optimizations ==== */
+/* Standard Mobile & Tablet (<1024px) */
 @media (max-width: 1024px) {
   .account-settings-container {
-    padding: clamp(24px, 5vh, 48px) 12px 16px; /* ușor mai mic sus, având header mobil local */
-    margin-top: 0; /* fără header pe mobil pe ruta setări */
-    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom)); /* spațiu pentru footer-ul mobil fix */
-    min-height: 100dvh; /* adaptează înălțimea la viewport-ul efectiv pe mobil */
+    padding: clamp(24px, 5vh, 48px) 12px 16px;
+    margin-top: 0;
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
+    min-height: 100dvh;
   }
 
-  .settings-title {
-    font-size: 1.8rem;
-    margin: 0 0 12px 0;
-    padding: 0 4px;
-    letter-spacing: -0.5px;
-  }
+  /* Hide Desktop Title */
+  .settings-title { display: none; }
 
   .settings-menu {
     width: 100%;
@@ -245,7 +277,7 @@
     border-radius: 10px;
     gap: 16px;
     box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-    margin-bottom: 12px; /* spațiu suplimentar sub card pe mobil */
+    margin-bottom: 12px;
   }
 
   .settings-item {
@@ -261,9 +293,7 @@
     margin-top: -8px;
   }
 
-  .email-change-section label {
-    font-size: 1rem;
-  }
+  .email-change-section label { font-size: 1rem; }
 
   .email-change-section input[type="email"],
   .email-change-section input[type="password"] {
@@ -278,86 +308,72 @@
     font-size: 1rem;
   }
 
-  .message {
-    font-size: 0.95rem;
-  }
+  .message { font-size: 0.95rem; }
 }
 
-/* Make action items and buttons easier to tap on larger phones/tablets up to 1000px */
+/* Touch Optimizations (<1000px) */
 @media (max-width: 1000px) {
   .settings-item {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 16px 18px !important;
-    font-size: 1.05rem !important;
-    border-radius: 10px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    width: 100%;
+    padding: 16px 18px;
+    font-size: 1.05rem;
+    box-sizing: border-box;
   }
-
-  /* Ensure buttons inside dynamic sections are full width */
+  
   .email-change-section button,
   .settings-menu button,
   .settings-menu .MuiButton-root {
-    width: 100% !important;
-    min-width: 0 !important;
-    padding: 12px 16px !important;
-    font-size: 1rem !important;
-  }
-
-  /* Slightly increase hit area for back button on small tablets */
-  .mobile-back-btn {
-    width: 44px !important;
-    height: 44px !important;
+    width: 100%;
+    min-width: 0;
   }
 }
 
-/* Mobile header styles (match Favorites/Notifications) */
+
+/* 7. MOBILE HEADER (Custom Implementation)
+   ---------------------------------------------------------- */
+.mobile-header {
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-top: clamp(8px, 3vh, 24px);
+  padding-left: 8px;
+  padding-right: 8px;
+  color: var(--as-mob-header-text);
+}
+
+.mobile-back-btn {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--as-mob-btn-bg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.mobile-back-btn:hover {
+  /* Slightly darker on hover via filter to save vars */
+  filter: brightness(0.95);
+}
+
+.mobile-header .MuiSvgIcon-root {
+  font-size: 24px;
+  color: inherit;
+}
+
+.mobile-header-title {
+  font-weight: 600;
+  color: inherit;
+  font-size: 24px;
+  line-height: 1.334;
+  margin: 0;
+  flex: 0 0 auto;
+  margin-left: 4px;
+}
+
 @media (max-width: 1024px) {
-  /* Hide desktop title on mobile */
-  .settings-title {
-    display: none !important;
-  }
-
-  .mobile-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    margin-bottom: 8px !important;
-    padding-top: clamp(8px, 3vh, 24px) !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    color: var(--chat-text) !important;
-  }
-
-  .mobile-back-btn {
-    width: 40px !important;
-    height: 40px !important;
-    padding: 8px !important;
-    border-radius: 50% !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--chat-elev) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  }
-
-  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
-
-  .mobile-header .MuiSvgIcon-root {
-    font-size: 24px !important;
-    color: var(--chat-text) !important;
-  }
-
-  .mobile-header-title {
-    font-weight: 600 !important;
-    color: var(--chat-text) !important;
-    font-size: 24px !important; /* MUI h5 on mobile */
-    line-height: 1.334 !important;
-    margin: 0 !important;
-    flex: 0 0 auto !important;
-    margin-left: 4px !important;
-  }
+  .mobile-header { display: flex; }
 }

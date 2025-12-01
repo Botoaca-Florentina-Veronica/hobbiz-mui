@@ -411,7 +411,7 @@ export default function MyAnnouncements() {
           
           {/* Card Actions */}
           <div className="my-announcement-actions">
-            <button className="my-announcement-btn" onClick={() => handleEdit(announcement)}>
+            <button className="my-announcement-btn primary" onClick={() => handleEdit(announcement)}>
               Editează
             </button>
             <button className="my-announcement-btn secondary">

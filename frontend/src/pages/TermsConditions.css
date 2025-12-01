@@ -1,10 +1,95 @@
+/* =============================================================
+   TERMS & CONDITIONS PAGE STYLES
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout --- */
+  --tc-radius-lg: 24px;
+  --tc-radius-md: 20px;
+  --tc-radius-sm: 16px;
+  --tc-spacing-top: 60px;
+
+  /* --- Colors (Light Mode Default) --- */
+  --tc-bg-page: var(--app-bg);
+  
+  /* Header */
+  --tc-bg-header: #355070;
+  --tc-bg-header-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  --tc-text-header: #ffffff;
+  
+  /* Intro Box */
+  --tc-bg-intro: linear-gradient(135deg, #f8b595 0%, #f67e7d 100%);
+  --tc-shadow-intro: 0 8px 32px rgba(246, 126, 125, 0.3);
+  --tc-text-intro: #ffffff;
+  
+  /* Content Body */
+  --tc-bg-content: #ffffff;
+  --tc-border-content: 1px solid #f1f5f9;
+  --tc-shadow-content: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --tc-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+  
+  /* Text Typography */
+  --tc-text-heading: #355070;     /* H1, H2 */
+  --tc-text-subheading: #2d3748;  /* H3, Strong */
+  --tc-text-body: #4a5568;        /* Paragraphs */
+  --tc-text-accent: #355070;      /* em, bold */
+  --tc-accent-color: #f8b595;     /* underlinings, bullets */
+  
+  /* Footer */
+  --tc-bg-footer: #f8fafc;
+  --tc-border-footer: #355070;
+  --tc-text-footer: #64748b;
+  
+  /* Mobile Header */
+  --tc-mobile-btn-bg: #ffffff;
+  --tc-mobile-btn-text: #355070;
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --tc-bg-page: #121212;
+  
+  /* Header */
+  --tc-bg-header: #282828;
+  --tc-bg-header-overlay: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+  
+  /* Intro Box */
+  --tc-bg-intro: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  --tc-shadow-intro: 0 8px 32px rgba(0, 0, 0, 0.3);
+  
+  /* Content Body */
+  --tc-bg-content: #1e1e1e;
+  --tc-border-content: 1px solid #333;
+  --tc-shadow-content: 0 4px 24px rgba(0, 0, 0, 0.3);
+  
+  /* Text Typography */
+  --tc-text-heading: #ffffff;
+  --tc-text-subheading: #e0e0e0;
+  --tc-text-body: #b0b0b0;
+  --tc-text-accent: #e0e0e0;
+  --tc-accent-color: #f8b595;
+  
+  /* Footer */
+  --tc-bg-footer: #1a1a1a;
+  --tc-border-footer: #f8b595;
+  --tc-text-footer: #888888;
+  
+  /* Mobile Header */
+  --tc-mobile-btn-bg: #1e1e1e;
+  --tc-mobile-btn-text: #f8b595;
+}
+
+
+/* 2. LAYOUT PRINCIPAL
+   ---------------------------------------------------------- */
 .terms-conditions {
-  /* Unify with app background to prevent two-tone bands */
-  background: var(--app-bg);
+  background: var(--tc-bg-page);
   min-height: 100vh;
   padding: 40px 0;
-  /* Replace top margin with safe-area-aware padding */
   padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
+  transition: background-color 0.3s ease;
 }
 
 .terms-conditions__container {
@@ -13,14 +98,17 @@
   padding: 0 20px;
 }
 
+
+/* 3. HEADER SECTION (Desktop)
+   ---------------------------------------------------------- */
 .terms-conditions__header {
   text-align: center;
-  background: #355070;
-  color: white;
+  background: var(--tc-bg-header);
+  color: var(--tc-text-header);
   padding: 60px 40px;
-  border-radius: 24px;
+  border-radius: var(--tc-radius-lg);
   margin-bottom: 40px;
-  margin-top: 60px;
+  margin-top: var(--tc-spacing-top);
   position: relative;
   overflow: hidden;
   box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
@@ -29,11 +117,9 @@
 .terms-conditions__header::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: var(--tc-bg-header-overlay);
   transform: rotate(30deg);
   pointer-events: none;
 }
@@ -44,6 +130,7 @@
   display: block;
   position: relative;
   z-index: 2;
+  color: inherit;
 }
 
 .terms-conditions h1 {
@@ -53,6 +140,7 @@
   letter-spacing: -0.02em;
   position: relative;
   z-index: 2;
+  color: inherit;
 }
 
 .terms-conditions__date {
@@ -62,16 +150,21 @@
   font-weight: 400;
   position: relative;
   z-index: 2;
+  color: inherit;
 }
 
+
+/* 4. INTRO SECTION
+   ---------------------------------------------------------- */
 .terms-conditions__intro {
-  background: linear-gradient(135deg, #f8b595 0%, #f67e7d 100%);
+  background: var(--tc-bg-intro);
   padding: 32px;
-  border-radius: 20px;
+  border-radius: var(--tc-radius-md);
   margin-bottom: 40px;
-  color: white;
-  box-shadow: 0 8px 32px rgba(246, 126, 125, 0.3);
+  color: var(--tc-text-intro);
+  box-shadow: var(--tc-shadow-intro);
 }
+.dark-mode .terms-conditions__intro { border: 1px solid rgba(255, 255, 255, 0.1); }
 
 .terms-conditions__intro-content {
   display: flex;
@@ -83,6 +176,7 @@
   font-size: 2rem;
   flex-shrink: 0;
   margin-top: 4px;
+  color: inherit;
 }
 
 .terms-conditions__intro strong {
@@ -90,6 +184,7 @@
   font-size: 1.3rem;
   margin-bottom: 12px;
   font-weight: 600;
+  color: inherit;
 }
 
 .terms-conditions__intro p {
@@ -97,33 +192,42 @@
   line-height: 1.6;
   font-size: 1.05rem;
   opacity: 0.95;
+  color: inherit;
 }
 
+
+/* 5. CONTENT BODY
+   ---------------------------------------------------------- */
 .terms-conditions__content {
-  background: white;
+  background: var(--tc-bg-content);
   padding: 40px;
-  border-radius: 16px;
+  border-radius: var(--tc-radius-sm);
   margin-bottom: 32px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f1f5f9;
+  box-shadow: var(--tc-shadow-content);
+  border: var(--tc-border-content);
+  transition: all 0.3s ease;
 }
 
-.terms-conditions__content section {
-  margin: 0;
+.terms-conditions__content:hover {
+  box-shadow: var(--tc-shadow-hover);
+  transform: translateY(-2px);
 }
 
+.terms-conditions__content section { margin: 0; }
+
+/* Typography */
 .terms-conditions__content h2 {
-  color: #355070;
+  color: var(--tc-text-heading);
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0 0 24px 0;
   padding-bottom: 12px;
-  border-bottom: 3px solid #f8b595;
+  border-bottom: 3px solid var(--tc-accent-color);
   display: inline-block;
 }
 
 .terms-conditions__content h3 {
-  color: #2d3748;
+  color: var(--tc-text-subheading);
   font-size: 1.3rem;
   font-weight: 600;
   margin: 32px 0 16px 0;
@@ -134,17 +238,15 @@
 .terms-conditions__content h3::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 50%;
+  left: 0; top: 50%;
   transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  background: #f8b595;
+  width: 8px; height: 8px;
+  background: var(--tc-accent-color);
   border-radius: 50%;
 }
 
 .terms-conditions__content p {
-  color: #4a5568;
+  color: var(--tc-text-body);
   line-height: 1.7;
   margin-bottom: 16px;
   font-size: 1rem;
@@ -152,36 +254,87 @@
 }
 
 .terms-conditions__content strong {
-  color: #2d3748;
+  color: var(--tc-text-subheading);
   font-weight: 600;
 }
 
 .terms-conditions__content em {
-  color: #355070;
+  color: var(--tc-text-accent);
   font-style: normal;
   font-weight: 500;
 }
 
+
+/* 6. FOOTER SECTION
+   ---------------------------------------------------------- */
 .terms-conditions__footer {
-  background: #f8fafc;
+  background: var(--tc-bg-footer);
   padding: 32px;
-  border-radius: 16px;
+  border-radius: var(--tc-radius-sm);
   margin-top: 40px;
-  border-left: 4px solid #355070;
+  border-left: 4px solid var(--tc-border-footer);
 }
 
 .terms-conditions__footer p {
   margin: 0;
-  color: #64748b;
+  color: var(--tc-text-footer);
   font-size: 0.95rem;
   line-height: 1.6;
   text-align: center;
   font-style: italic;
 }
 
-/* Mobile Header pentru back button */
+
+/* 7. MEDIA QUERIES (RESPONSIVE)
+   ---------------------------------------------------------- */
+
+/* Tablet & Mobile (max-width: 1200px) 
+   Switches from Desktop Header to Mobile Header logic */
+@media (max-width: 1200px) {
+  .terms-conditions {
+    padding: 20px 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+  }
+  
+  .terms-conditions__header { display: none; }
+  
+  .mobile-header {
+    display: flex; /* Activăm headerul mobil */
+  }
+  
+  .terms-conditions__container { padding: 0 16px; }
+  
+  .terms-conditions__content { padding: 24px; margin-bottom: 24px; }
+  .terms-conditions__intro { padding: 24px; margin-bottom: 24px; }
+  .terms-conditions__intro-content { flex-direction: column; gap: 16px; }
+  .terms-conditions__intro-icon { font-size: 1.5rem; margin-top: 0; }
+  
+  .terms-conditions h1 { font-size: 2rem; }
+  .terms-conditions__content h2 { font-size: 1.5rem; }
+  .terms-conditions__content h3 { font-size: 1.2rem; margin: 24px 0 12px 0; }
+  
+  .terms-conditions__footer { padding: 24px; margin-top: 24px; }
+}
+
+/* Small Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .terms-conditions__container { padding: 0 12px; }
+  .terms-conditions__content { padding: 20px; }
+  .terms-conditions__intro { padding: 20px; }
+  
+  .terms-conditions__content p { text-align: left; }
+
+  /* Ensure footer navigation visibility */
+  .terms-conditions {
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* 8. MOBILE HEADER (MUI Overrides & Custom)
+   ---------------------------------------------------------- */
 .mobile-header {
-  display: none;
+  display: none; /* Hidden by default on desktop */
   align-items: center;
   padding: 20px 0;
   margin-bottom: 20px;
@@ -190,161 +343,32 @@
 }
 
 .mobile-back-btn {
-  color: #355070 !important;
-  background: white !important;
+  color: var(--tc-mobile-btn-text) !important;
+  background: var(--tc-mobile-btn-bg) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   width: 44px !important;
   height: 44px !important;
+  border-radius: 50% !important; /* Ensure circle */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .mobile-header-title {
-  color: #355070 !important;
+  color: var(--tc-text-heading) !important;
   font-weight: 600 !important;
   font-size: 1.3rem !important;
   margin: 0 !important;
 }
-
-/* Dark Mode Support */
-body.dark-mode .terms-conditions {
-  background: #121212;
+.dark-mode .mobile-header-title {
+  color: var(--tc-text-subheading) !important;
 }
 
-body.dark-mode .terms-conditions__content {
-  background: #1e1e1e;
-  border-color: #333;
-  color: #e0e0e0;
-}
 
-body.dark-mode .terms-conditions__content h2 {
-  color: #f8b595;
-}
-
-body.dark-mode .terms-conditions__content h3 {
-  color: #e0e0e0;
-}
-
-body.dark-mode .terms-conditions__content p {
-  color: #b0b0b0;
-}
-
-body.dark-mode .terms-conditions__content strong {
-  color: #e0e0e0;
-}
-
-body.dark-mode .terms-conditions__footer {
-  background: #1a1a1a;
-  border-left-color: #f8b595;
-}
-
-body.dark-mode .terms-conditions__footer p {
-  color: #888;
-}
-
-body.dark-mode .mobile-back-btn {
-  background: #1e1e1e !important;
-  color: #f8b595 !important;
-}
-
-body.dark-mode .mobile-header-title {
-  color: #e0e0e0 !important;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .terms-conditions {
-    padding: 20px 0;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
-  }
-  
-  .mobile-header {
-    display: flex;
-  }
-  
-  .terms-conditions__header {
-    display: none;
-  }
-  
-  .terms-conditions__container {
-    padding: 0 16px;
-  }
-  
-  .terms-conditions__content {
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-  
-  .terms-conditions__intro {
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-  
-  .terms-conditions__intro-content {
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .terms-conditions__intro-icon {
-    font-size: 1.5rem;
-    margin-top: 0;
-  }
-  
-  .terms-conditions h1 {
-    font-size: 2rem;
-  }
-  
-  .terms-conditions__content h2 {
-    font-size: 1.5rem;
-  }
-  
-  .terms-conditions__content h3 {
-    font-size: 1.2rem;
-    margin: 24px 0 12px 0;
-  }
-  
-  .terms-conditions__footer {
-    padding: 24px;
-    margin-top: 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .terms-conditions__container {
-    padding: 0 12px;
-  }
-  
-  .terms-conditions__content {
-    padding: 20px;
-  }
-  
-  .terms-conditions__intro {
-    padding: 20px;
-  }
-  
-  .terms-conditions__content p {
-    text-align: left;
-  }
-
-  /* Reserve space for fixed mobile footer so the last lines aren't hidden */
-  .terms-conditions {
-    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
-  }
-}
-
-/* Smooth animations */
-.terms-conditions__content {
-  transition: all 0.3s ease;
-}
-
-.terms-conditions__content:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-}
-
-/* Print styles */
+/* 9. PRINT STYLES
+   ---------------------------------------------------------- */
 @media print {
-  .mobile-header {
-    display: none !important;
-  }
+  .mobile-header { display: none !important; }
   
   .terms-conditions__header {
     display: block !important;
@@ -361,5 +385,6 @@ body.dark-mode .mobile-header-title {
   .terms-conditions__content {
     box-shadow: none !important;
     page-break-inside: avoid;
+    border: none;
   }
 }

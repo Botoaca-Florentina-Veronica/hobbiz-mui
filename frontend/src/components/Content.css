@@ -1,172 +1,158 @@
-/* Animatie GIF orizontal, infinit */
+/* =============================================================
+   CONTENT & PROMO SECTION STYLES
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout & Animation --- */
+  --gif-height: 170px;
+  --gif-img-height: 150px;
+  --gif-offset-top: -10rem;
+  
+  /* --- Colors (Light Mode) --- */
+  --ct-bg-page: var(--app-bg);
+  --ct-text-primary: var(--app-text);
+  
+  /* Popular Announcements Container */
+  --pop-bg-container: #f3f5f6;
+  --pop-radius: 12px;
+  --pop-padding: 20px;
+  
+  /* Popular Card */
+  --pop-card-bg: #ffffff;
+  --pop-card-border: transparent;
+  --pop-card-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  
+  /* Typography */
+  --pop-title-color: inherit;
+  --pop-caption-color: #6b7280;
+}
+
+/* --- Dark Mode Overrides --- */
+.dark-mode {
+  --ct-bg-page: #121212;
+  --ct-text-primary: #ffffff;
+  
+  /* Popular Announcements Container Dark */
+  --pop-bg-container: #121212; /* Match background for seamless look or surface color */
+  
+  /* Popular Card Dark */
+  --pop-card-bg: #141414;
+  --pop-card-border: #575757;
+  --pop-card-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  
+  --pop-card-border-hover: #717171;
+  --pop-card-shadow-hover: 0 10px 28px rgba(0,0,0,0.45);
+  
+  --pop-title-color: #ffffff;
+  --pop-caption-color: #a1a1aa;
+}
+
+
+/* 2. MOVING GIF ANIMATION
+   ---------------------------------------------------------- */
 .moving-gif-container {
   position: relative;
   width: 100%;
-  height: 170px;
+  height: var(--gif-height);
   overflow: hidden;
   margin-bottom: 10px;
-  margin-top: -10rem;
+  margin-top: var(--gif-offset-top);
 }
 
 .moving-gif {
   position: absolute;
   left: -200px; /* Start off-screen */
-  height: 150px;
+  height: var(--gif-img-height);
   pointer-events: none;
   animation: move-horizontal 16s linear infinite;
 }
 
 @keyframes move-horizontal {
-  0% {
-    left: -200px;
-  }
-  90% {
-    left: calc(100% + 200px);
-  }
-  100% {
-    left: calc(100% + 200px);
-  }
+  0% { left: -200px; }
+  90% { left: calc(100% + 200px); }
+  100% { left: calc(100% + 200px); }
 }
-/* Stiluri pentru Content */
+
+
+/* 3. CONTENT SECTION BASE
+   ---------------------------------------------------------- */
 .content {
-  padding: 150px 0px 150px 0px;
-  color: var(--app-text);
+  padding: 150px 0;
+  color: var(--ct-text-primary);
   font-size: 40px;
   font-weight: bold;
-  background-color: var(--app-bg);
+  background-color: var(--ct-bg-page);
   height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-@media (max-width: 700px) {
-  .content {
-    padding: 60px 0 60px 0;
-    font-size: 1.2rem;
-    height: auto;
-  }
-  .content h2,
-  .promo-section .promo-title {
-    font-size: 2rem;
-    padding: 20px 10px 30px 10px;
-    margin-top: 0;
-  }
-  
-  /* Mobile-specific optimizations for popular announcements - 2 per row */
-  .popular-announcements-container {
-    max-width: 100% !important;
-    padding: 20px 12px !important;
-    gap: 12px !important;
-    background: #f3f5f6 !important;
-    border-radius: 12px !important;
-  }
-
-  /* Force a 2-column grid on narrow viewports to guarantee 2 cards per row */
-  .popular-announcements-container {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    align-items: start;
-  }
-  .popular-announcements-container > .MuiCard-root {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-  }
-  
-  .popular-announcements-container .MuiCard-root {
-    margin-bottom: 12px;
-    flex-basis: calc(50% - 6px) !important;
-  }
-  
-  .popular-announcements-container .MuiCardContent-root {
-    padding: 6px !important;
-    height: 90px !important;
-  }
-  
-  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
-    font-size: 0.75rem !important;
-    line-height: 1.1 !important;
-    -webkit-line-clamp: 2 !important;
-    line-clamp: 2 !important;
-    margin-bottom: 2px !important;
-  }
-  
-  .popular-announcements-container .MuiTypography-caption {
-    font-size: 0.55rem !important;
-    line-height: 1 !important;
-  }
-  
-  .popular-announcements-container svg {
-    width: 9px !important;
-    height: 9px !important;
-  }
+.content h2,
+.promo-section .promo-title {
+  text-align: center;
+  color: var(--ct-text-primary);
+  font-size: 3.5rem;
+  font-weight: bolder;
+  padding: 50px 70px 70px 50px;
+  margin-top: -60px;
 }
 
-/* Tablet optimizations - Small tablets */
-@media (min-width: 701px) and (max-width: 900px) {
-  .content {
-    padding: 80px 0 80px 0;
-    font-size: 1.3rem;
-    height: auto;
-  }
-  .content h2,
-  .promo-section .promo-title {
-    font-size: 2.5rem;
-    padding: 30px 20px 40px 20px;
-  }
-  
-  .popular-announcements-container {
-    max-width: 100% !important;
-    padding: 20px 16px !important;
-    gap: 16px !important;
-    background: #f3f5f6 !important;
-    border-radius: 12px !important;
-  }
-  
-  .popular-announcements-container .MuiCard-root {
-    margin-bottom: 16px;
-    flex-basis: calc(50% - 8px) !important;
-  }
-  
-  .popular-announcements-container .MuiCardContent-root {
-    padding: 8px !important;
-    height: 100px !important;
-  }
-  
-  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
-    font-size: 0.85rem !important;
-    line-height: 1.15 !important;
-    margin-bottom: 3px !important;
-  }
-  
-  .popular-announcements-container .MuiTypography-caption {
-    font-size: 0.65rem !important;
-    line-height: 1.05 !important;
-  }
-  
-  .popular-announcements-container svg {
-    width: 11px !important;
-    height: 11px !important;
-  }
+
+/* 4. POPULAR ANNOUNCEMENTS (Override MUI Cards)
+   ---------------------------------------------------------- */
+/* Container Default (Desktop) handled by inline styles usually, but here are overrides */
+.popular-announcements-container {
+  background: var(--pop-bg-container) !important;
+  border-radius: var(--pop-radius) !important;
 }
 
-/* Large tablet optimizations */
+/* Card Styles (applied globally to content cards via class context) */
+.content .MuiCard-root,
+.popular-announcements-container .MuiCard-root {
+  background: var(--pop-card-bg) !important;
+  border: 1px solid var(--pop-card-border) !important;
+  box-shadow: var(--pop-card-shadow) !important;
+}
+
+.content .MuiCard-root:hover,
+.popular-announcements-container .MuiCard-root:hover {
+  border-color: var(--pop-card-border-hover, transparent) !important;
+  box-shadow: var(--pop-card-shadow-hover, 0 8px 24px rgba(0,0,0,0.12)) !important;
+}
+
+.content .MuiCard-root .MuiTypography-root,
+.popular-announcements-container .MuiTypography-root {
+  color: var(--pop-title-color) !important;
+}
+
+.content .MuiCard-root .MuiTypography-caption,
+.popular-announcements-container .MuiTypography-caption {
+  color: var(--pop-caption-color) !important;
+}
+
+
+/* 5. RESPONSIVE STYLES
+   ---------------------------------------------------------- */
+
+/* Large Tablet (901px - 1024px) */
 @media (min-width: 901px) and (max-width: 1024px) {
   .content {
-    padding: 100px 0 100px 0;
+    padding: 100px 0;
     font-size: 1.4rem;
     height: auto;
   }
-  .content h2,
-  .promo-section .promo-title {
+  .content h2, .promo-section .promo-title {
     font-size: 3rem;
-    padding: 40px 30px 50px 30px;
+    padding: 40px 30px 50px;
   }
   
   .popular-announcements-container {
     max-width: 100% !important;
-    padding: 20px 20px !important;
+    padding: 20px !important;
     gap: 20px !important;
-    background: #f3f5f6!important;
-    border-radius: 12px !important;
   }
   
   .popular-announcements-container .MuiCard-root {
@@ -175,68 +161,97 @@
   }
   
   .popular-announcements-container .MuiCardContent-root {
-    padding: 12px !important;
-    height: 110px !important;
+    padding: 12px !important; height: 110px !important;
+  }
+  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
+    font-size: 0.95rem !important; line-height: 1.2 !important; margin-bottom: 4px !important;
+  }
+  .popular-announcements-container .MuiTypography-caption {
+    font-size: 0.7rem !important; line-height: 1.1 !important;
+  }
+  .popular-announcements-container svg { width: 13px !important; height: 13px !important; }
+}
+
+/* Small Tablet (701px - 900px) */
+@media (min-width: 701px) and (max-width: 900px) {
+  .content {
+    padding: 80px 0;
+    font-size: 1.3rem;
+    height: auto;
+  }
+  .content h2, .promo-section .promo-title {
+    font-size: 2.5rem;
+    padding: 30px 20px 40px;
+  }
+  
+  .popular-announcements-container {
+    max-width: 100% !important;
+    padding: 20px 16px !important;
+    gap: 16px !important;
+  }
+  
+  .popular-announcements-container .MuiCard-root {
+    margin-bottom: 16px;
+    flex-basis: calc(50% - 8px) !important;
+  }
+  
+  .popular-announcements-container .MuiCardContent-root {
+    padding: 8px !important; height: 100px !important;
+  }
+  .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
+    font-size: 0.85rem !important; line-height: 1.15 !important; margin-bottom: 3px !important;
+  }
+  .popular-announcements-container .MuiTypography-caption {
+    font-size: 0.65rem !important; line-height: 1.05 !important;
+  }
+  .popular-announcements-container svg { width: 11px !important; height: 11px !important; }
+}
+
+/* Mobile (max-width 700px) */
+@media (max-width: 700px) {
+  .content {
+    padding: 60px 0;
+    font-size: 1.2rem;
+    height: auto;
+  }
+  .content h2, .promo-section .promo-title {
+    font-size: 2rem;
+    padding: 20px 10px 30px;
+    margin-top: 0;
+  }
+  
+  /* Mobile 2-column Grid Enforcement */
+  .popular-announcements-container {
+    max-width: 100% !important;
+    padding: 20px 12px !important;
+    gap: 12px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    align-items: start;
+  }
+  
+  .popular-announcements-container > .MuiCard-root {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-bottom: 12px;
+    flex-basis: auto !important; /* Reset flex basis for grid */
+  }
+  
+  .popular-announcements-container .MuiCardContent-root {
+    padding: 6px !important; height: 90px !important;
   }
   
   .popular-announcements-container .MuiCardContent-root .MuiTypography-h6 {
-    font-size: 0.95rem !important;
-    line-height: 1.2 !important;
-    margin-bottom: 4px !important;
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+    -webkit-line-clamp: 2 !important; line-clamp: 2 !important;
+    margin-bottom: 2px !important;
   }
   
   .popular-announcements-container .MuiTypography-caption {
-    font-size: 0.7rem !important;
-    line-height: 1.1 !important;
+    font-size: 0.55rem !important; line-height: 1 !important;
   }
   
-  .popular-announcements-container svg {
-    width: 13px !important;
-    height: 13px !important;
-  }
-}
-
-.content h2,
-.promo-section .promo-title {
-  text-align: center;
-  color: var(--app-text);
-  font-size: 3.5rem;
-  font-weight: bolder;
-  padding: 50px 70px 70px 50px;
-  margin-top: -60px;
-}
-
-.dark-mode .content {
-  background-color: #121212;
-  color: var(--app-text);
-}
-
-/* In dark mode ensure the popular container has a suitable surface color */
-.dark-mode .popular-announcements-container {
-  background: #121212 !important;
-  border-radius: 12px !important;
-}
-
-.dark-mode .content h2,
-.dark-mode .promo-section .promo-title {
-  color: var(--app-text);
-}
-
-/* Dark mode: visible outline for cards in "Anunțuri populare" (desktop + mobile) */
-.dark-mode .content .MuiCard-root {
-  background: #141414 !important; /* surface a0/a10 area */
-  border: 1px solid #575757 !important; /* surface a30 */
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
-}
-
-.dark-mode .content .MuiCard-root:hover,
-.dark-mode .content .MuiCard-root:focus-visible {
-  border-color: #717171 !important; /* surface a40 */
-  box-shadow: 0 10px 28px rgba(0,0,0,0.45) !important;
-  outline: none;
-}
-
-/* Ensure card titles remain readable in dark mode */
-.dark-mode .content .MuiCard-root .MuiTypography-root {
-  color: var(--app-text) !important;
+  .popular-announcements-container svg { width: 9px !important; height: 9px !important; }
 }

@@ -114,19 +114,18 @@
 /* Dark Mode Styles */
 .dark-mode .login-container {
   background: #282828; /* solid, the darker color from the previous gradient */
-  border: 1px solid rgba(245, 24, 102, 0.3);
-  box-shadow: 0 0 20px rgba(245, 24, 102, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
 }
 
 .dark-mode .email-login input {
   background-color: #575757;
-  border: 1px solid rgba(245, 24, 102, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
 }
 
 .dark-mode .email-login input:focus {
-  border-color: #f51866;
+  border-color: #ffffff;
   outline: none;
 }
 

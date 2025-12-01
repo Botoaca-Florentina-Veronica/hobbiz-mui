@@ -1,55 +1,141 @@
-/* Modern switch toggle - clean and fast */
+/* =============================================================
+   DARK MODE & TOGGLE STYLES
+   Refactorizat: Variabile CSS, Performanță
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Toggle Switch Colors --- */
+  --toggle-border: #355070;
+  --toggle-bg: rgba(255, 255, 255, 0.95);
+  --toggle-thumb: #355070;
+  --toggle-thumb-text: #ffffff;
+  --toggle-hover-thumb: #2a4a65;
+  --toggle-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* --- App Global Colors (Light Defaults) --- */
+  --app-bg: #f5f7f8; /* presupunând un fundal light default */
+  --app-surface: #ffffff;
+  --app-text: #183642;
+  --app-border: #e8ecef;
+  
+  /* --- Specific Elements --- */
+  --header-bg: transparent; /* Sau culoarea default a headerului tău */
+  --header-link-text: inherit;
+  --main-text-color: inherit;
+  
+  /* Buttons */
+  --btn-signup-bg: #355070;
+  --btn-signup-text: #ffffff;
+  --btn-signup-hover-bg: #355070; /* sau o nuanță mai închisă */
+  
+  --btn-second-bg: #dfccaf;
+  --btn-second-text: #F8B195;
+  --btn-second-border: #f9faf8;
+  --btn-second-hover-bg: #F8B195;
+  --btn-second-hover-text: #F67280;
+
+  /* Categories & Search */
+  --cat-container-bg: transparent;
+  --cat-title: inherit;
+  --search-input-bg: #fff;
+  --search-input-border: #ccc;
+  --search-btn-bg: #355070;
+  
+  /* Icons & Actions */
+  --icon-fav-color: inherit;
+  --action-add-bg: #355070;
+}
+
+/* --- Dark Mode Overrides --- */
+body.dark-mode {
+  /* --- Toggle Switch Dark --- */
+  --toggle-border: #f51866;
+  --toggle-bg: rgba(40, 40, 40, 0.95);
+  --toggle-thumb: #f51866;
+  --toggle-hover-thumb: #fe6585;
+
+  /* --- App Global Dark --- */
+  --app-bg: #121212;
+  --app-surface: #282828;
+  --app-text: #ffffff;
+  --app-border: #3f3f3f;
+
+  /* --- Specific Elements Dark --- */
+  --header-bg: #282828;
+  --header-link-bg: #282828;
+  --header-link-text: #ffffff;
+  
+  --main-text-color: #F51866; /* Titluri principale */
+  
+  /* Buttons Dark */
+  --btn-signup-bg: #ffffff;
+  --btn-signup-text: #282828;
+  --btn-signup-hover-bg: #3f3f3f;
+  --btn-signup-hover-text: #ffffff;
+  
+  --btn-second-bg: #ffffff;
+  --btn-second-text: #282828;
+  --btn-second-hover-bg: #3f3f3f;
+  --btn-second-hover-text: #ffffff;
+
+  /* Categories & Search Dark */
+  --cat-container-bg: #121212;
+  --cat-title: #fa4875;
+  --cat-desc: #fe6585;
+  
+  --search-input-bg: #282828;
+  --search-input-border: #3f3f3f;
+  --search-btn-bg: #F51866;
+  
+  /* Icons & Actions Dark */
+  --icon-fav-color: #fe6585;
+  --action-add-bg: #ffabb7;     /* Add button bg */
+  --action-add-text: #282828;   /* Add button text */
+}
+
+
+/* 2. TOGGLE SWITCH COMPONENT
+   ---------------------------------------------------------- */
 .dark-mode-toggle {
   position: fixed;
-  top: 18px;
-  right: 24px;
+  top: 18px; right: 24px;
   z-index: 1200;
 }
 
 .toggle-switch {
   background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  outline: none;
+  border: none; padding: 0;
+  cursor: pointer; outline: none;
 }
 
 .toggle-track {
   position: relative;
-  width: 70px;
-  height: 34px;
+  width: 70px; height: 34px;
   border-radius: 20px;
-  transition: background-color 0.2s ease;
-  border: 2px solid #355070;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.toggle-track.dark {
-  background: rgba(40, 40, 40, 0.95);
-  border-color: #f51866;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  border: 2px solid var(--toggle-border);
+  background: var(--toggle-bg);
+  box-shadow: var(--toggle-shadow);
 }
 
 .toggle-thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 30px;
-  height: 30px;
+  top: 2px; left: 2px;
+  width: 30px; height: 30px;
   border-radius: 50%;
-  background: #355070;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--toggle-thumb);
+  display: flex; align-items: center; justify-content: center;
   font-size: 0.9rem;
-  color: #ffffff;
+  color: var(--toggle-thumb-text);
   transition: transform 0.2s ease, background-color 0.2s ease;
   will-change: transform;
 }
 
-.toggle-track.dark .toggle-thumb {
+/* Starea Dark Mode a Switch-ului (folosind clasa pe track sau body) */
+body.dark-mode .toggle-thumb {
   transform: translateX(36px);
-  background: #f51866;
 }
 
 .toggle-switch:hover .toggle-track {
@@ -57,162 +143,124 @@
 }
 
 .toggle-switch:hover .toggle-thumb {
-  background: #2a4a65;
-}
-
-.toggle-switch:hover .toggle-track.dark .toggle-thumb {
-  background: #fe6585;
+  background: var(--toggle-hover-thumb);
 }
 
 .toggle-switch:active .toggle-thumb {
   transform: scale(0.95);
 }
 
-.toggle-switch:active .toggle-track.dark .toggle-thumb {
-  transform: translateX(32px) scale(0.95);
+body.dark-mode .toggle-switch:active .toggle-thumb {
+  transform: translateX(36px) scale(0.95);
 }
 
 
-/* --------- DARK MODE  --------- */
-body.dark-mode {
-  background-color: #121212;
-  color: #ffffff;
+/* 3. GLOBAL DARK MODE APPLICATION
+   Aici aplicăm variabilele definite mai sus elementelor specifice
+   ---------------------------------------------------------- */
+
+/* Body & Layout Roots */
+body.dark-mode,
+body.dark-mode .main-stage,
+body.dark-mode .content,
+body.dark-mode .hole-action,
+body.dark-mode .footer {
+  background-color: var(--app-bg);
+  color: var(--app-text);
 }
 
-.dark-mode .header {
-  background-color: #282828;
-  color: #ffffff;
-}
-.dark-mode .main-stage,
-.dark-mode .content,
-.dark-mode .hole-action,
-.dark-mode .footer {
-  background-color: #121212;
-  color: #ffffff;
+/* Header Elements */
+body.dark-mode .header {
+  background-color: var(--header-bg);
+  color: var(--app-text);
 }
 
-.dark-mode .header .logo {
+body.dark-mode .header .logo {
   color: #eceeef;
 }
 
-.dark-mode .header ul a {
-  color: #ffffff;
-  background-color: #282828;
+body.dark-mode .header ul a {
+  color: var(--header-link-text);
+  background-color: var(--header-link-bg);
 }
 
-.dark-mode .main-text {
-  color: #F51866;
-  border-color: #3f3f3f;
-  background-color: #282828;
+/* Main Text / Titles */
+body.dark-mode .main-text {
+  color: var(--main-text-color);
+  border-color: var(--app-border);
+  background-color: var(--app-surface);
 }
 
-.dark-mode .favorite-btn, 
-.dark-mode .user-account-btn {
-  color: #fe6585;
-}
-
-.dark-mode .add-button {
-  background-color: #ffabb7;
-  color: #282828;
-}
-
-.dark-mode .categories-button {
-  background-color: #ffabb7;
-  color: #282828;
-}
-
-.dark-mode .categories-container{
-  background-color: #121212;
-}
-
-.dark-mode .search-input{
-  background-color: #282828;
-  border-color: #3f3f3f;
-  color: #ffffff;
-}
-
-.dark-mode .location-section{
-  background-color: #282828;
-  border-color: #3f3f3f;
-  color: #ffffff;
-}
-
-.dark-mode .search-button{
-  background-color: #F51866;
-  color: #282828;
-}
-
-.dark-mode .main-text #main-title {
+body.dark-mode .main-text #main-title {
   color: #f9faf8;
 }
 
-.dark-mode .sign-up-button {
+body.dark-mode .content h2 {
+  color: var(--app-text);
+}
+
+/* Interactive Elements (Buttons & Icons) */
+body.dark-mode .favorite-btn, 
+body.dark-mode .user-account-btn {
+  color: var(--icon-fav-color);
+}
+
+body.dark-mode .add-button,
+body.dark-mode .categories-button {
+  background-color: var(--action-add-bg);
+  color: var(--action-add-text);
+}
+
+/* Search & Categories */
+body.dark-mode .categories-container {
+  background-color: var(--cat-container-bg);
+}
+
+body.dark-mode .categories-title {
+  color: var(--cat-title);
+}
+
+body.dark-mode .category-description {
+  color: var(--cat-desc);
+}
+
+body.dark-mode .search-input {
+  background-color: var(--search-input-bg);
+  border-color: var(--search-input-border);
+  color: var(--app-text);
+}
+
+body.dark-mode .search-button {
+  background-color: var(--search-btn-bg);
   color: #282828;
-  background-color: #ffffff;
 }
 
-.dark-mode .sign-up-button:hover {
-  color: #ffffff;
-  background-color: #3f3f3f;
+body.dark-mode .location-section {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
 }
 
-.dark-mode .second-button {
-  color: #362318;
-  background-color: #eceeef;
+/* Cards */
+body.dark-mode .card img {
+  border-color: var(--app-border);
 }
 
-.dark-mode .second-button:hover {
-  color: #eceeef;
-  background-color: #301717;
-}
-
-.dark-mode .content {
-  background-color: #282828;
-  color: #ffffff;
-}
-
-.dark-mode .content h2 {
-  color: #ffffff;
-}
-
-.dark-mode .card img {
-  border-color: #3f3f3f;
-}
-
-.dark-mode .categories-title{
-  color: #fa4875;
-}
-
-.dark-mode .category-description{
-  color: #fe6585;
-}
-
-.dark-mode .call-to-action {
-  background-color: #282828;
-  color: #ffffff;
-}
-
-.dark-mode .second-button {
-  color: #282828;
-  background-color: #ffffff;
-}
-
-.dark-mode .second-button:hover {
-  color: #ffffff;
-  background-color: #3f3f3f;
-}
-
-.dark-mode .footer {
-  background: #121212;
-  color: #ffffff;
+body.dark-mode .call-to-action {
+  background-color: var(--app-surface);
+  color: var(--app-text);
 }
 
 
+/* 4. BUTTONS (Refactored to use Variables)
+   ---------------------------------------------------------- */
+
+/* Sign Up Button */
 .sign-up-button {
   margin-top: 20px;
   padding: 15px 30px;
-  background-color: #355070;
-  color: white;
+  background-color: var(--btn-signup-bg);
+  color: var(--btn-signup-text);
   border: none;
   border-radius: 8px;
   font-size: 1.2rem;
@@ -221,22 +269,31 @@ body.dark-mode {
 }
 
 .sign-up-button:hover {
-  background-color: #355070;
+  background-color: var(--btn-signup-hover-bg) !important;
+  color: var(--btn-signup-hover-text) !important;
   transform: translateY(-3px);
 }
 
+/* Second Button */
 .second-button {
   border-radius: 10px;
-  border: #f9faf8 2px solid;
-  background-color: #dfccaf;
-  color: #F8B195;
+  border: 2px solid var(--btn-second-border);
+  background-color: var(--btn-second-bg);
+  color: var(--btn-second-text);
+  /* Add padding/display if missing in original, assuming needed */
+  padding: 10px 20px; 
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .second-button:hover {
-  color: #F67280;
-  background-color: #F8B195;
+  color: var(--btn-second-hover-text);
+  background-color: var(--btn-second-hover-bg);
 }
 
+
+/* 5. RESPONSIVE
+   ---------------------------------------------------------- */
 @media (max-width: 1024px) {
   .dark-mode-toggle {
     display: none !important;

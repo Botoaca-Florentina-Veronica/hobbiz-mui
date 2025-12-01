@@ -900,11 +900,11 @@ export default function AnnouncementDetails() {
                     </Button>
 
                     {/* Phone Contact */}
-                    <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+                    <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: getIsDarkMode() ? '#121212' : '#ffffff', border: getIsDarkMode() ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(0,0,0,0.12)' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <PhoneIcon sx={{ color: getAccentCss(), fontSize: 20 }} />
-                          <Typography variant="body1">
+                          <Typography variant="body1" sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>
                             {showPhone 
                               ? (announcement.contactPhone || announcement.user.phone || 'N/A')
                               : 'xxx xxx xxx'
@@ -1004,7 +1004,7 @@ export default function AnnouncementDetails() {
           }
         }}
       >
-        <DialogTitle>Evaluează utilizatorul</DialogTitle>
+        <DialogTitle sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>Evaluează utilizatorul</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <Rating
@@ -1012,8 +1012,16 @@ export default function AnnouncementDetails() {
               value={ratingValue}
               onChange={(e, v) => setRatingValue(v)}
               size="large"
+              sx={{
+                '& .MuiRating-iconFilled': {
+                  color: '#faaf00'
+                },
+                '& .MuiRating-iconEmpty': {
+                  color: getIsDarkMode() ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.26)'
+                }
+              }}
             />
-            <Typography variant="body2">{ratingValue}.0</Typography>
+            <Typography variant="body2" sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>{ratingValue}.0</Typography>
           </Box>
           <TextField
             label="Comentariu (opțional)"
@@ -1024,28 +1032,28 @@ export default function AnnouncementDetails() {
             onChange={(e) => setRatingComment(e.target.value)}
             sx={{
               '& .MuiInputBase-input': {
-                color: getIsDarkMode() ? '#e5e7eb' : '#374151'
+                color: getIsDarkMode() ? '#ffffff' : '#374151'
               },
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
-                  borderColor: getIsDarkMode() ? '#374151' : '#d1d5db'
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#d1d5db'
                 },
                 '&:hover fieldset': {
-                  borderColor: getIsDarkMode() ? '#4b5563' : '#cbd5e1'
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#cbd5e1'
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: getIsDarkMode() ? '#6b7280' : '#9ca3af'
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#9ca3af'
                 }
               },
               '& .MuiInputLabel-root': {
-                color: getIsDarkMode() ? '#9ca3af' : '#6b7280'
+                color: getIsDarkMode() ? '#ffffff' : '#6b7280'
               }
             }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleRateClose}>Anulează</Button>
-          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() } }}>Trimite</Button>
+          <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>Anulează</Button>
+          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>Trimite</Button>
         </DialogActions>
       </Dialog>
 

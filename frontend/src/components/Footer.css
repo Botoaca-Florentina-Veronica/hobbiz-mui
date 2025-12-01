@@ -1,639 +1,324 @@
-  .footer-publish-btn .footer-publish-label {
-    font-size: 1.15rem;
-    margin-top: 4px;
-    display: none;
-    color: #e2e7eb;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
-    height: 0;
-    overflow: hidden;
-  }
-  .footer-publish-btn:hover .footer-publish-label {
-    display: block;
-    opacity: 1;
-    height: auto;
-    pointer-events: auto;
-    transition-delay: 0.08s;
-  }
-/* Stiluri pentru Footer */
+/* =============================================================
+   FOOTER STYLES
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Colors (Light Mode) --- */
+  --ft-bg-main: var(--app-bg);
+  --ft-text-main: var(--app-text);
+  
+  /* Mobile Bar */
+  --ft-mob-bg: var(--app-surface);
+  --ft-mob-border: var(--app-border);
+  --ft-mob-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+  --ft-mob-icon: var(--app-muted);
+  --ft-mob-icon-active: var(--primary);
+  
+  /* Publish Button */
+  --ft-pub-bg: var(--primary);
+  --ft-pub-text: var(--primary-contrast);
+  --ft-pub-hover: var(--primary-hover);
+  --ft-pub-shadow: 0 2px 8px rgba(26, 90, 135, 0.3);
+  
+  /* Publish Label */
+  --ft-pub-label: #e2e7eb;
+  
+  /* Dropdown (if used here) */
+  --ft-drop-bg: var(--app-surface);
+  --ft-drop-border: transparent;
+  --ft-drop-shadow: 0 14px 35px 0 rgba(9,9,12,0.4);
+  
+  /* Separator */
+  --ft-separator: var(--app-border);
+  
+  /* Mobile Legal Spacing Tokens (as requested) */
+  --mobile-legal-right-padding: 12px;
+  --mobile-legal-left-padding: 20px;
+  --mobile-legal-list-gap: 6px;
+  --mobile-legal-list-margin-bottom: 2px;
+  --mobile-legal-last-list-margin-bottom: 0px;
+  --mobile-legal-link-font-size: 1.12rem;
+  --mobile-legal-title-font-size: 1.25rem;
+  --mobile-legal-title-margin-top: 42px;
+  --mobile-legal-title-second-top: 28px;
+}
+
+/* --- Dark Mode Overrides --- */
+.dark-mode {
+  --ft-bg-main: var(--app-bg);
+  --ft-text-main: var(--app-text);
+  
+  /* Mobile Bar */
+  --ft-mob-bg: var(--app-surface);
+  --ft-mob-border: var(--app-border);
+  --ft-mob-icon: var(--app-text);
+  --ft-mob-icon-active: var(--primary-hover);
+  
+  /* Publish Button (Dark Mode Outline Style) */
+  --ft-pub-bg: var(--app-border);
+  --ft-pub-text: var(--primary-contrast); /* Icon color */
+  --ft-pub-hover: var(--primary);
+  
+  /* Publish Label */
+  --ft-pub-label: var(--primary-contrast);
+  --ft-pub-label-hover: var(--primary-hover);
+  
+  /* Dropdown */
+  --ft-drop-bg: var(--app-surface);
+  --ft-drop-border: var(--app-border);
+  --ft-drop-shadow: 0 14px 35px 0 rgba(0,0,0,0.6);
+  
+  /* Separator */
+  --ft-separator: var(--app-border);
+}
+
+
+/* 2. BASE FOOTER STYLES
+   ---------------------------------------------------------- */
 .footer {
   font-size: 20px;
-  background: var(--app-bg);
-  color: var(--app-text);
+  background: var(--ft-bg-main);
+  color: var(--ft-text-main);
   display: flex;
-  flex-direction: column; /* asigura aranjarea pe verticala */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .icon-arrow {
-  width: 150px;
-  height: 150px;
+  width: 150px; height: 150px;
   cursor: pointer;
-  margin-right: -100px;
-  margin-bottom: -470px;
+  margin-right: -100px; margin-bottom: -470px;
 }
 
-.dark-mode .footer {
-  background: var(--app-bg);
-  color: var(--app-text);
+/* 3. DESKTOP FOOTER (Default visible, hidden on mobile via media query)
+   ---------------------------------------------------------- */
+.desktop-footer {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 8px;
+  background: var(--ft-bg-main);
+  color: var(--ft-text-main);
+}
+.desktop-footer p { color: var(--ft-text-main); }
+
+.footer-separator {
+  width: 100%; height: 1px;
+  background: var(--ft-separator);
+  margin: 24px 0; border: none; box-sizing: content-box;
 }
 
-/* Dark Mode pentru Footer Mobile Buttons */
-.dark-mode .footer-mobile-buttons {
-  background: var(--app-surface);
-  border-top: 1px solid var(--app-border);
-}
-
-.dark-mode .footer-mobile-buttons .footer-icon {
-  color: var(--app-text);
-}
-
-.dark-mode .footer-mobile-buttons .footer-icon svg {
-  color: var(--app-text);
-  stroke: var(--app-text);
-}
-
-.dark-mode .footer-mobile-buttons .footer-icon:hover {
-  color: var(--primary-hover);
-}
-
-.dark-mode .footer-mobile-buttons .footer-icon:hover svg {
-  color: var(--primary-hover);
-  stroke: var(--primary-hover);
-}
-
-.dark-mode .footer-mobile-buttons .footer-icon span,
-.dark-mode .footer-mobile-buttons .footer-publish-label,
-.dark-mode .footer-mobile-buttons .footer-account-label,
-.dark-mode .footer-mobile-buttons .footer-explore-label {
-  color: var(--app-text);
-}
-
-.dark-mode .footer-mobile-buttons .footer-icon:hover span,
-.dark-mode .footer-mobile-buttons .footer-icon:hover .footer-publish-label,
-.dark-mode .footer-mobile-buttons .footer-icon:hover .footer-account-label,
-.dark-mode .footer-mobile-buttons .footer-icon:hover .footer-explore-label {
-  color: var(--primary-hover);
-}
-
-/* Dark Mode pentru Footer Publish Button */
-.dark-mode .footer-publish-btn {
-  background: var(--app-border);
-  border: 2px solid var(--app-border);
-}
-
-.dark-mode .footer-publish-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-}
-
-.dark-mode .footer-publish-btn svg {
-  color: var(--primary-contrast);
-  stroke: var(--primary-contrast);
-}
-
-.dark-mode .footer-publish-btn:hover svg {
-  color: var(--app-surface);
-  stroke: var(--app-surface);
-}
-
-.dark-mode .footer-publish-btn .footer-publish-label {
-  color: var(--primary-contrast);
-}
-
-.dark-mode .footer-publish-btn:hover .footer-publish-label {
-  color: var(--primary-hover);
-}
-
-/* Dark Mode pentru Footer Dropdown */
-.dark-mode .section-dropdown.footer-dropdown {
-  background-color: var(--app-surface);
-  border: 1px solid var(--app-border);
-  box-shadow: 0 14px 35px 0 rgba(0,0,0,0.6);
-}
-
-.dark-mode .section-dropdown.footer-dropdown a {
-  background-color: var(--app-surface) !important;
-  color: var(--app-text) !important;
-}
-
-.dark-mode .section-dropdown.footer-dropdown a:hover {
-  color: var(--app-surface) !important;
-  background-color: var(--primary) !important;
-}
-
-/* Dark Mode pentru Desktop Footer */
-.dark-mode .desktop-footer {
-  background: var(--app-bg);
-  color: var(--app-text);
-}
-
-.dark-mode .desktop-footer p {
-  color: var(--app-text);
-}
-
-/* Utility to hide on mobile */
+/* Utility to force hide desktop on mobile logic */
 .desktop-only { display: block; }
 @media (max-width: 1024px) {
   .desktop-only { display: none !important; }
 }
 
-/* Desktop Legal styles live in components/LegalSection.css.
-  Removed duplicates here to keep Footer.css focused on mobile footer, mobile legal, and shared helpers. */
 
-.footer-mobile-buttons {
-  display: none;
-}
-
-/* Mobile Legal (compact list) */
-.mobile-legal { display: none; }
-@media (max-width: 1024px) {
-  .mobile-legal {
-    display: block;
-    width: 100%;
-    max-width: 960px;
-  /* Padding order: top | right | bottom | left */
-  padding: 0 var(--mobile-legal-right-padding, 12px) 76px var(--mobile-legal-left-padding, 20px);
-    box-sizing: border-box;
-    /* Mobile Legal spacing tokens — tweak here */
-    --mobile-legal-list-gap: 6px;                 /* space between links */
-    --mobile-legal-list-margin-bottom: 2px;       /* space under lists (default) */
-    --mobile-legal-last-list-margin-bottom: 0px;  /* space under the LAST list (under Cookie Policy) */
-  --mobile-legal-link-font-size: 1.12rem;       /* link text size on mobile */
-  --mobile-legal-left-padding: 20px;            /* extra left space for all elements in footer area */
-  --mobile-legal-right-padding: 12px;           /* keep right compact by default */
-  --mobile-legal-title-font-size: 1.25rem;      /* section heading size on mobile */
-  --mobile-legal-title-margin-top: 42px;        /* space above the first section title */
-  --mobile-legal-title-second-top: 28px;        /* extra space above the second title (Legal) */
-  }
-  .mobile-legal__group {
-    background: transparent;
-    border: none;
-    margin: 0 0 8px 0;
-  }
-  .mobile-legal__title {
-    font-size: var(--mobile-legal-title-font-size);
-    font-weight: 700;
-    color: var(--app-text);
-    margin: var(--mobile-legal-title-margin-top) 0 6px;
-  }
-  .mobile-legal__list {
-    list-style: none;
-    margin: 0 0 var(--mobile-legal-list-margin-bottom) 0; /* controlled via token */
-    padding: 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--mobile-legal-list-gap);
-  }
-  /* Extra spacing above second title (Legal) */
-  .mobile-legal .mobile-legal__group + .mobile-legal__group .mobile-legal__title { margin-top: var(--mobile-legal-title-second-top); }
-  /* No extra space after the last list (under Cookie Policy) */
-  .mobile-legal__group:last-of-type { margin-bottom: 0; }
-  .mobile-legal__group:last-of-type .mobile-legal__list { margin-bottom: var(--mobile-legal-last-list-margin-bottom); }
-  .mobile-legal__list a {
-    text-decoration: none;
-    color: var(--app-muted);
-  font-size: var(--mobile-legal-link-font-size);
-  }
-  .mobile-legal__list a:hover { color: var(--primary); text-decoration: underline; }
-}
+/* 4. MOBILE FOOTER BAR (Sticky Bottom)
+   ---------------------------------------------------------- */
+.footer-mobile-buttons { display: none; } /* Hidden on desktop */
 
 @media (max-width: 1024px) {
-  /* Hide desktop footer on small screens to avoid overlap with fixed mobile bar */
-  .desktop-footer {
-    display: none !important;
-  }
-  
-  /* Footer-ul mobile cu stiluri OLX-inspired */
+  /* Hide Desktop elements */
+  .desktop-footer { display: none !important; }
+
+  /* Mobile Bar Container */
   .footer-mobile-buttons {
-    position: fixed !important;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 65px;
-    --footer-height: 65px; /* expose height as CSS var for pages to adapt spacing */
+    position: fixed !important; left: 0; bottom: 0;
+    width: 100%; height: 65px;
+    --footer-height: 65px;
     display: flex !important;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    background: var(--app-surface);
-    border-top: 1px solid var(--app-border);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
-    z-index: 1000;
-    padding: 0;
-    /* Responsive sizing */
-    min-height: 60px;
-    max-height: 80px;
+    flex-direction: column; justify-content: flex-end; align-items: center;
+    background: var(--ft-mob-bg);
+    border-top: 1px solid var(--ft-mob-border);
+    box-shadow: var(--ft-mob-shadow);
+    z-index: 1000; padding: 0;
+    min-height: 60px; max-height: 80px;
+    /* Safe Area */
+    padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
   }
 
-  /* Active indicator bar */
+  /* Active Indicator */
   .footer-active-indicator {
-    position: absolute;
-    top: 0;
-    height: 3px;
+    position: absolute; top: 0; height: 3px;
     background: var(--primary);
     border-radius: 0 0 2px 2px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1001;
-    opacity: 0;
-    transform: translateY(-1px);
+    z-index: 1001; opacity: 0; transform: translateY(-1px);
   }
+  
+  .footer-mobile-buttons:has(.footer-icon.active) .footer-active-indicator { opacity: 1; transform: translateY(0); }
+  
+  /* Indicator Positioning Logic */
+  .footer-mobile-buttons:has(.footer-icon:nth-child(1).active) .footer-active-indicator { left: 0%; width: 20%; }
+  .footer-mobile-buttons:has(.footer-icon:nth-child(2).active) .footer-active-indicator { left: 20%; width: 20%; }
+  .footer-mobile-buttons:has(.footer-publish.active) .footer-active-indicator { left: 40%; width: 20%; }
+  .footer-mobile-buttons:has(.footer-icon:nth-child(4).active) .footer-active-indicator { left: 60%; width: 20%; }
+  .footer-mobile-buttons:has(.footer-icon:nth-child(5).active) .footer-active-indicator { left: 80%; width: 20%; }
 
-  /* Show indicator when any button is active */
-  .footer-mobile-buttons:has(.footer-icon.active) .footer-active-indicator {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Calculate indicator position based on active button */
-  .footer-mobile-buttons:has(.footer-icon:nth-child(1).active) .footer-active-indicator {
-    left: 0%;
-    width: 20%;
-  }
-
-  .footer-mobile-buttons:has(.footer-icon:nth-child(2).active) .footer-active-indicator {
-    left: 20%;
-    width: 20%;
-  }
-
-  .footer-mobile-buttons:has(.footer-publish.active) .footer-active-indicator {
-    left: 40%;
-    width: 20%;
-  }
-
-  .footer-mobile-buttons:has(.footer-icon:nth-child(4).active) .footer-active-indicator {
-    left: 60%;
-    width: 20%;
-  }
-
-  .footer-mobile-buttons:has(.footer-icon:nth-child(5).active) .footer-active-indicator {
-    left: 80%;
-    width: 20%;
-  }
-
+  /* Icons Container */
   .footer-mobile-buttons .footer-icons {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    gap: 0;
-    position: relative;
+    display: flex; justify-content: space-around; align-items: center;
+    width: 100%; height: 100%; gap: 0; position: relative;
   }
-  
+
+  /* Individual Footer Icon */
   .footer-mobile-buttons .footer-icon {
-    flex: 1;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    cursor: pointer;
-    color: var(--app-muted);
-    font-size: 0.7rem;
-    gap: 0.2rem;
+    flex: 1; display: flex !important;
+    flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; cursor: pointer;
+    color: var(--ft-mob-icon);
+    font-size: 0.7rem; gap: 0.2rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-    border: none;
-    background: none;
-    padding: 0.5rem;
-    position: relative;
-    /* Elegant tap target */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    text-decoration: none; border: none; background: none;
+    padding: 0.5rem; position: relative;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
 
-  /* Enhanced hover and active states */
-  .footer-mobile-buttons .footer-icon:hover {
-    color: var(--primary);
-    transform: translateY(-1px);
-  }
+  .footer-mobile-buttons .footer-icon:hover { color: var(--ft-mob-icon-active); transform: translateY(-1px); }
+  .footer-mobile-buttons .footer-icon:active { transform: translateY(0px) scale(0.96); }
+  .footer-mobile-buttons .footer-icon.active { color: var(--primary); }
 
-  .footer-mobile-buttons .footer-icon:active {
-    transform: translateY(0px) scale(0.96);
-    transition: transform 0.1s cubic-bezier(0.4, 0, 0.6, 1);
-  }
-
-  .footer-mobile-buttons .footer-icon.active {
-    color: var(--primary);
-  }
-
-  /* Ripple effect on tap */
-  .footer-mobile-buttons .footer-icon::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: var(--primary);
-    opacity: 0;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .footer-mobile-buttons .footer-icon:active::before {
-    width: 40px;
-    height: 40px;
-    opacity: 0.1;
-  }
-  
+  /* Icon SVG & Text */
   .footer-mobile-buttons .footer-icon svg {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 0.2rem;
-    stroke: currentColor;
-    fill: currentColor;
-    stroke-width: 1.5;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    z-index: 1;
+    width: 24px; height: 24px; margin-bottom: 0.2rem;
+    stroke: currentColor; fill: currentColor; stroke-width: 1.5;
+    transition: transform 0.2s; position: relative; z-index: 1;
   }
+  .footer-mobile-buttons .footer-icon:hover svg { transform: scale(1.1); color: var(--ft-mob-icon-active); stroke: var(--ft-mob-icon-active); }
+  .footer-mobile-buttons .footer-icon.active svg { transform: scale(1.05); }
 
-  .footer-mobile-buttons .footer-icon:hover svg {
-    transform: scale(1.1);
-  }
-
-  .footer-mobile-buttons .footer-icon.active svg {
-    transform: scale(1.05);
-  }
-  
   .footer-mobile-buttons .footer-icon span {
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: inherit;
-    opacity: 1;
-    height: auto;
-    overflow: visible;
-    pointer-events: auto;
-    margin: 0;
-    letter-spacing: 0;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    z-index: 1;
+    font-size: 0.7rem; font-weight: 500; color: inherit;
+    transition: transform 0.2s; position: relative; z-index: 1;
+  }
+  .footer-mobile-buttons .footer-icon:hover span { 
+    transform: scale(1.05); color: var(--ft-mob-icon-active); 
   }
 
-  .footer-mobile-buttons .footer-icon:hover span {
-    transform: scale(1.05);
-  }
-
-  /* Butonul special de Vinde */
-  .footer-mobile-buttons .footer-publish {
-    position: relative;
-  }
+  /* --- Publish Button (Special Middle Button) --- */
+  .footer-mobile-buttons .footer-publish { position: relative; }
 
   .footer-mobile-buttons .footer-publish-icon {
-    background: var(--primary);
-    color: var(--primary-contrast);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 0; /* evită aliniere pe baseline care poate muta vertical */
-    margin-bottom: 0.2rem;
-    box-shadow: 0 2px 8px rgba(26, 90, 135, 0.3);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--ft-pub-bg);
+    color: var(--ft-pub-text);
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 0; margin-bottom: 0.2rem;
+    box-shadow: var(--ft-pub-shadow);
+    transition: all 0.25s;
+    /* Dark Mode specific border logic handled via bg variable */
+    border: 2px solid transparent; 
   }
+  /* Dark mode outline style application */
+  .dark-mode .footer-mobile-buttons .footer-publish-icon { border-color: var(--ft-pub-bg); }
 
   .footer-mobile-buttons .footer-publish:hover .footer-publish-icon {
+    background: var(--ft-pub-hover);
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(26, 90, 135, 0.4);
   }
+  .dark-mode .footer-mobile-buttons .footer-publish:hover .footer-publish-icon { border-color: var(--primary); }
 
   .footer-mobile-buttons .footer-publish:active .footer-publish-icon {
     transform: scale(0.95);
     box-shadow: 0 1px 4px rgba(26, 90, 135, 0.3);
   }
 
-  /* Iconița MUI pentru Vinde - centrare și dimensiune calibrată */
   .footer-publish .footer-publish-svg {
-    display: block;
-    line-height: 0;
-    font-size: 22px; /* 32px container => 22px vizual echilibrat */
-    margin: 0;
-    transition: transform 0.2s ease;
+    display: block; line-height: 0; font-size: 22px; margin: 0;
+    transition: transform 0.2s;
+    /* Color override for dark mode hover */
+    color: inherit; stroke: inherit;
   }
+  .dark-mode .footer-publish:hover .footer-publish-svg { color: var(--app-surface); stroke: var(--app-surface); }
 
   .footer-mobile-buttons .footer-publish span {
-    color: var(--primary);
-    font-weight: 600;
+    color: var(--primary); font-weight: 600;
   }
 
-  .footer-mobile-buttons .footer-publish.active .footer-publish-icon {
-    background: var(--primary-hover);
+  /* Publish Label Animation (Hover) */
+  .footer-publish-btn .footer-publish-label {
+    font-size: 1.15rem; margin-top: 4px; display: none;
+    color: var(--ft-pub-label);
+    font-weight: 400; letter-spacing: 0.5px;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    height: 0; overflow: hidden;
   }
-
-  /* Responsive adjustments for different screen sizes */
-  
-  /* Small phones */
-  @media (max-width: 320px) {
-    .footer-mobile-buttons {
-      height: 60px;
-    }
-    
-    .footer-mobile-buttons .footer-icon svg {
-      width: 20px;
-      height: 20px;
-    }
-    
-    .footer-mobile-buttons .footer-icon span {
-      font-size: 0.65rem;
-    }
-    
-    .footer-mobile-buttons .footer-publish-icon {
-      width: 28px;
-      height: 28px;
-    }
-    
-    .footer-publish .footer-publish-svg {
-      font-size: 18px;
-    }
+  .footer-publish-btn:hover .footer-publish-label {
+    display: block; opacity: 1; height: auto; pointer-events: auto; transition-delay: 0.08s;
   }
-  
-  /* Large phones */
-  @media (min-width: 414px) {
-    .footer-mobile-buttons {
-      height: 70px;
-    }
-    
-    .footer-mobile-buttons .footer-icon svg {
-      width: 26px;
-      height: 26px;
-    }
-    
-    .footer-mobile-buttons .footer-icon span {
-      font-size: 0.75rem;
-    }
-    
-    .footer-mobile-buttons .footer-publish-icon {
-      width: 36px;
-      height: 36px;
-    }
-    
-    .footer-publish .footer-publish-svg {
-      font-size: 24px;
-    }
-  }
-
-  /* Safe area for devices with home indicators */
-  .footer-mobile-buttons {
-    padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
-  }
-
-  /* Desktop legal section hidden in favor of compact MobileLegal component */
-  .legal-section { display: none !important; }
-  .legal-section__column {
-    flex: 1 1 auto;
-    padding-bottom: 4px !important;
-  }
-  .legal-section__column h4 {
-    margin: 2px 0 4px 0 !important;
-    line-height: 1.2;
-  }
-  .legal-section__column ul {
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none !important; /* fără bullets pe mobil */
-  }
-  .legal-section__column ul li {
-    margin: 0 !important; /* lipite între ele */
-  }
-  .legal-section__column a {
-    display: block;
-    line-height: 1.05;
-    margin: 0 !important;
-    padding: 0 !important; /* fără spațiu suplimentar */
-  }
-  .legal-section__desc {
-    line-height: 1.2;
-  }
-  .legal-section__socials .legal-section__icons {
-    gap: 8px !important;
-  }
-  .legal-section__socials .legal-section__icons svg,
-  .legal-section__socials .legal-section__icons img {
-    width: 20px;
-    height: 20px;
-  }
-  .footer-separator {
-    margin: 8px 0 !important;
-  }
+  .dark-mode .footer-publish-btn:hover .footer-publish-label { color: var(--ft-pub-label-hover); }
 }
 
-/* Very small screens: stack sections and use single-column lists */
-@media (max-width: 480px) {
-  .legal-section {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    grid-template-areas:
-      "brand"
-      "links"
-      "legal"
-      "socials" !important;
-    gap: 10px !important;
-  }
-  .legal-section__column ul {
-    grid-template-columns: 1fr !important;
-  }
-}
 
-/* Make desktop footer compact up to tablet width without changing text sizes */
+/* 5. MOBILE LEGAL SECTION (max-width: 1024px)
+   ---------------------------------------------------------- */
+.mobile-legal { display: none; }
+
 @media (max-width: 1024px) {
-  .desktop-footer {
-    padding: 6px 0 !important;
-    margin-top: 6px !important;
+  .mobile-legal {
+    display: block; width: 100%; max-width: 960px;
+    padding: 0 var(--mobile-legal-right-padding) 76px var(--mobile-legal-left-padding);
+    box-sizing: border-box;
   }
-  .legal-section {
-    padding: 12px 12px 8px !important;
-    gap: 10px !important;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "brand brand"
-      "links legal"
-      "socials socials";
+  
+  .mobile-legal__group { background: transparent; border: none; margin: 0 0 8px 0; }
+  
+  .mobile-legal__title {
+    font-size: var(--mobile-legal-title-font-size);
+    font-weight: 700; color: var(--app-text);
+    margin: var(--mobile-legal-title-margin-top) 0 6px;
   }
-  .legal-section__column {
-    padding-bottom: 6px !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
+  
+  .mobile-legal__list {
+    list-style: none; margin: 0 0 var(--mobile-legal-list-margin-bottom) 0;
+    padding: 0; display: grid; grid-template-columns: 1fr;
+    gap: var(--mobile-legal-list-gap);
   }
-  /* Map existing columns to grid areas */
-  .legal-section__column:nth-child(1) { grid-area: brand; }
-  .legal-section__column:nth-child(2) { grid-area: links; }
-  .legal-section__column:nth-child(3) { grid-area: legal; }
-  .legal-section__column:nth-child(4) { grid-area: socials; }
-  .legal-section__column h4 {
-    margin: 0 0 8px 0 !important;
-    line-height: 1.25 !important;
+  
+  .mobile-legal .mobile-legal__group + .mobile-legal__group .mobile-legal__title {
+    margin-top: var(--mobile-legal-title-second-top);
   }
-  .legal-section__column ul {
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none !important;
-    display: grid !important;
-    grid-template-columns: 1fr;
-    column-gap: 12px;
-    row-gap: 0;
+  
+  .mobile-legal__group:last-of-type { margin-bottom: 0; }
+  .mobile-legal__group:last-of-type .mobile-legal__list { margin-bottom: var(--mobile-legal-last-list-margin-bottom); }
+  
+  .mobile-legal__list a {
+    text-decoration: none; color: var(--app-muted);
+    font-size: var(--mobile-legal-link-font-size);
   }
-  .legal-section__column ul li {
-    margin: 0 !important;
-  }
-  .legal-section__column a {
-    display: block;
-    line-height: 1.1 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .legal-section__desc {
-    line-height: 1.25 !important;
-    margin-top: 4px !important;
-  }
-  .legal-section__socials .legal-section__icons {
-    gap: 10px !important;
-    justify-content: flex-start;
-  }
-  .legal-section__socials .legal-section__icons svg,
-  .legal-section__socials .legal-section__icons img {
-    width: 20px;
-    height: 20px;
-  }
-  .footer-separator {
-    margin: 8px 0 !important;
-  }
+  .mobile-legal__list a:hover { color: var(--primary); text-decoration: underline; }
+  
+  /* Legacy Desktop Legal Override hide */
+  .legal-section { display: none !important; }
 }
 
-.desktop-footer {
-  display: block;
-  width: 100%;
-  text-align: center;
-  margin-top: 8px;
+
+/* 6. DROPDOWN (Global footer logic)
+   ---------------------------------------------------------- */
+.section-dropdown.footer-dropdown {
+  background-color: var(--ft-drop-bg);
+  border: 1px solid var(--ft-drop-border);
+  box-shadow: var(--ft-drop-shadow);
+}
+.section-dropdown.footer-dropdown a {
+  background-color: var(--ft-drop-bg) !important;
+  color: var(--ft-text-main) !important;
+}
+.section-dropdown.footer-dropdown a:hover {
+  color: var(--ft-drop-bg) !important; /* Inverted logic usually */
+  background-color: var(--primary) !important;
 }
 
-.footer-separator {
-  width: 100%;
-  height: 1px;
-  background: var(--app-border);
-  margin: 24px 0 24px 0;
-  border: none;
-  box-sizing: content-box;
-}
 
-/* Dark Mode pentru Footer Separator */
-.dark-mode .footer-separator {
-  background: var(--app-border);
-}
-
-/* Hide desktop footer parts on pages that opt-in via hide-on-mobile (mobile only) */
+/* 7. PAGE-SPECIFIC HIDING LOGIC
+   ---------------------------------------------------------- */
+/* Hide desktop parts on mobile-opt-in pages */
 @media (max-width: 1024px) {
   .footer.hide-on-mobile .legal-section,
   .footer.hide-on-mobile .footer-separator,
@@ -641,10 +326,8 @@
   .footer.hide-on-mobile .mobile-legal {
     display: none !important;
   }
-}
-
-/* Ascunde legal + desktop footer pe paginile care cer acest lucru (ex: detalii anunț) până la pragul desktopului */
-@media (max-width: 1024px) {
+  
+  /* Logic specific for announcement details etc */
   .footer.hide-legal-upto-1200 .legal-section,
   .footer.hide-legal-upto-1200 .footer-separator,
   .footer.hide-legal-upto-1200 .desktop-footer,
@@ -653,8 +336,23 @@
   }
 }
 
-/* Hard override: ensure mobile footer is visible up to 1024px regardless of import order */
-@media (max-width: 1024px) {
-  .footer-mobile-buttons { display: flex !important; }
-  .desktop-footer { display: none !important; }
+
+/* 8. RESPONSIVE UTILITIES
+   ---------------------------------------------------------- */
+/* Small Phones */
+@media (max-width: 320px) {
+  .footer-mobile-buttons { height: 60px; }
+  .footer-mobile-buttons .footer-icon svg { width: 20px; height: 20px; }
+  .footer-mobile-buttons .footer-icon span { font-size: 0.65rem; }
+  .footer-mobile-buttons .footer-publish-icon { width: 28px; height: 28px; }
+  .footer-publish .footer-publish-svg { font-size: 18px; }
+}
+
+/* Large Phones */
+@media (min-width: 414px) {
+  .footer-mobile-buttons { height: 70px; }
+  .footer-mobile-buttons .footer-icon svg { width: 26px; height: 26px; }
+  .footer-mobile-buttons .footer-icon span { font-size: 0.75rem; }
+  .footer-mobile-buttons .footer-publish-icon { width: 36px; height: 36px; }
+  .footer-publish .footer-publish-svg { font-size: 24px; }
 }

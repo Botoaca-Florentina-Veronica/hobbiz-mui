@@ -1,19 +1,116 @@
-/* ==============================
- * NotificationsPage Styles
- * Structure:
- * - Layout & List Items
- * - Mobile header (align with Favorites)
- * - Responsiveness
- * - Dark mode
- * - Utilities (spinner/empty state)
- * ============================== */
-/* Pagina de notificări modernă și atractivă */
+/* =============================================================
+   NOTIFICATIONS PAGE STYLES
+   ============================================================= */
+
+/* 1. CONFIGURARE & VARIABILE
+   ---------------------------------------------------------- */
+:root {
+  /* --- Layout --- */
+  --nt-radius: 12px;
+  --nt-container-padding-top: calc(40px + 4rem);
+  
+  /* --- Colors (Light Mode Default) --- */
+  --nt-bg-page: #f5f7f8;
+  
+  /* Title & Text */
+  --nt-text-title: #183642;
+  --nt-text-primary: #183642;
+  --nt-text-secondary: #6b7280;
+  --nt-text-sender: #355070;
+  
+  /* Containers */
+  --nt-bg-content: #fff;
+  --nt-bg-item: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
+  --nt-bg-item-unread: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  --nt-bg-item-hover: rgba(53, 80, 112, 0.02);
+  
+  /* Borders */
+  --nt-border-item: #e8ecef;
+  --nt-border-unread: #355070;
+  --nt-border-hover: #355070;
+  --nt-accent-bar: linear-gradient(to bottom, #355070, #406b92);
+  
+  /* Indicators */
+  --nt-indicator-color: #355070;
+  
+  /* Actions & Avatars */
+  --nt-avatar-border: #355070;
+  --nt-btn-delete-color: #6b7280;
+  --nt-btn-delete-hover-bg: rgba(239, 68, 68, 0.1);
+  --nt-btn-delete-hover-text: #ef4444;
+  
+  /* Links */
+  --nt-link-text: #355070;
+  --nt-link-bg: rgba(53, 80, 112, 0.1);
+  --nt-link-border: rgba(53, 80, 112, 0.2);
+  --nt-link-hover-bg: rgba(53, 80, 112, 0.2);
+  
+  /* Shadows */
+  --nt-shadow-content: 0 4px 20px rgba(0,0,0,0.08);
+  --nt-shadow-unread: 0 2px 8px rgba(53, 80, 112, 0.1);
+  --nt-shadow-hover: 0 8px 25px rgba(53, 80, 112, 0.15);
+  
+  /* Mobile Header */
+  --nt-mob-header-text: var(--chat-text, #183642);
+  --nt-mob-btn-bg: var(--chat-elev, #fff);
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --nt-bg-page: #121214;
+  
+  /* Title & Text */
+  --nt-text-title: #ffffff;
+  --nt-text-primary: #e4e4e7;
+  --nt-text-secondary: #a1a1aa;
+  --nt-text-sender: #fe85a4;
+  
+  /* Containers */
+  --nt-bg-content: #1c1c1f;
+  --nt-bg-item: #1f1f23;
+  --nt-bg-item-unread: linear-gradient(180deg, rgba(245, 24, 102, 0.08) 0%, rgba(245, 24, 102, 0.04) 100%);
+  --nt-bg-item-hover: transparent; /* Handled via border/shadow in dark mode usually */
+  
+  /* Borders */
+  --nt-border-item: #2a2a2e;
+  --nt-border-unread: rgba(245, 24, 102, 0.35);
+  --nt-border-hover: rgba(245, 24, 102, 0.45);
+  --nt-accent-bar: linear-gradient(to bottom, rgba(245, 24, 102, 0.9), rgba(254, 101, 133, 0.8));
+  
+  /* Indicators */
+  --nt-indicator-color: #f51866;
+  
+  /* Actions & Avatars */
+  --nt-avatar-border: #f68aa6;
+  --nt-btn-delete-color: #bbbcc2;
+  --nt-btn-delete-hover-bg: rgba(245, 24, 102, 0.12);
+  --nt-btn-delete-hover-text: #ff7099;
+  
+  /* Links */
+  --nt-link-text: #ffdbe6;
+  --nt-link-bg: rgba(245, 24, 102, 0.12);
+  --nt-link-border: rgba(245, 24, 102, 0.28);
+  --nt-link-hover-bg: rgba(245, 24, 102, 0.2);
+  
+  /* Shadows */
+  --nt-shadow-content: none;
+  --nt-shadow-unread: none;
+  --nt-shadow-hover: 0 10px 28px rgba(0, 0, 0, 0.45);
+  
+  /* Mobile Header */
+  --nt-mob-header-text: #ffffff;
+  --nt-mob-btn-bg: #2a3f56;
+}
+
+
+/* 2. LAYOUT PRINCIPAL
+   ---------------------------------------------------------- */
 .notifications-page {
-  background: #f5f7f8;
+  background: var(--nt-bg-page);
   min-height: 100vh;
-  /* Use padding-top instead of margin-top to prevent margin collapse revealing body bg */
   padding: 40px 0;
-  padding-top: calc(40px + 4rem);
+  padding-top: var(--nt-container-padding-top);
+  transition: background-color 0.3s ease;
 }
 
 .notifications-container {
@@ -25,7 +122,7 @@
 .notifications-title {
   font-size: 2.8rem;
   font-weight: bold;
-  color: #183642;
+  color: var(--nt-text-title);
   margin-bottom: 32px;
   text-align: left;
   letter-spacing: -1px;
@@ -33,11 +130,14 @@
 }
 
 .notifications-content {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--nt-bg-content);
+  border-radius: var(--nt-radius);
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: var(--nt-shadow-content);
+  /* Border for dark mode separation */
+  border: 1px solid transparent; 
 }
+.dark-mode .notifications-content { border-color: #2a2a2e; }
 
 .notifications-list {
   list-style: none;
@@ -45,10 +145,13 @@
   margin: 0;
 }
 
+
+/* 3. NOTIFICATION ITEMS
+   ---------------------------------------------------------- */
 .notification-item {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
-  border: 1px solid #e8ecef;
-  border-radius: 12px;
+  background: var(--nt-bg-item);
+  border: 1px solid var(--nt-border-item);
+  border-radius: var(--nt-radius);
   padding: 20px 24px;
   margin-bottom: 16px;
   transition: all 0.3s ease;
@@ -56,475 +159,270 @@
   overflow: hidden;
 }
 
+.notification-item:last-child { margin-bottom: 0; }
+
+/* Unread State */
 .notification-item.unread {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border-color: #355070;
-  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.1);
+  background: var(--nt-bg-item-unread);
+  border-color: var(--nt-border-unread);
+  box-shadow: var(--nt-shadow-unread);
 }
 
-.notification-item.read {
-  opacity: 0.8;
+/* Read State */
+.notification-item.read { opacity: 0.8; }
+
+/* Hover State */
+.notification-item:hover {
+  box-shadow: var(--nt-shadow-hover);
+  border-color: var(--nt-border-hover);
 }
 
+/* Accent Bar (Left side) */
+.notification-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--nt-accent-bar);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Unread Dot */
 .unread-indicator {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 8px;
-  height: 8px;
-  background: #355070;
+  top: 12px; left: 12px;
+  width: 8px; height: 8px;
+  background: var(--nt-indicator-color);
   border-radius: 50%;
   animation: pulse 2s infinite;
 }
+.dark-mode .unread-indicator { box-shadow: 0 0 0 4px rgba(245, 24, 102, 0.18); }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* 4. NOTIFICATION CONTENT
+   ---------------------------------------------------------- */
+.notification-content {
+  margin-left: 12px;
+  display: flex; flex-direction: column; flex: 1;
+}
+
+.notification-header {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
 }
 
 .notification-main-content {
+  flex: 1;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .notification-item.unread .notification-main-content:hover {
-  /* Eliminăm transformarea care mută punctul albastru */
-  /* transform: translateX(4px); */
-  background: rgba(53, 80, 112, 0.02);
+  background: var(--nt-bg-item-hover);
 }
 
-.notification-item:last-child {
-  margin-bottom: 0;
-}
-
-.notification-item:hover {
-  box-shadow: 0 8px 25px rgba(53, 80, 112, 0.15);
-  border-color: #355070;
-}
-
-.notification-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(to bottom, #355070, #406b92);
-  border-radius: 0 4px 4px 0;
-}
-
-.notification-content {
-  margin-left: 12px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.notification-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.notification-main-content {
-  flex: 1;
-}
-
-.notification-delete-btn {
-  background: transparent;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-}
-
-/* Match icon sizing via CSS (no inline props) */
-.notification-delete-icon {
-  font-size: 20px; /* comparable to Favorites icon handling */
-}
-
-.notification-delete-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  transform: scale(1.1);
-}
-
-.notification-delete-btn:active {
-  transform: scale(0.95);
-}
-
+/* Sender & Message */
 .notification-sender {
-  color: #355070;
+  color: var(--nt-text-sender);
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 6px;
 }
 
 .notification-message-container {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 8px;
+  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px;
 }
 
 .notification-avatar {
-  width: 32px;
-  height: 32px;
+  width: 32px; height: 32px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  border: 2px solid #355070;
+  border: 2px solid var(--nt-avatar-border);
   box-shadow: 0 2px 8px rgba(53, 80, 112, 0.2);
-  order: 1; /* Avatar primul în ordine */
+  order: 1;
 }
 
 .notification-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100%; height: 100%; object-fit: cover; display: block;
 }
 
 .notification-message {
-  color: #183642;
+  color: var(--nt-text-primary);
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: 0;
   font-weight: 500;
   flex: 1;
-  order: 2; /* Mesajul al doilea în ordine */
+  order: 2;
 }
 
+/* Date */
 .notification-date {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--nt-text-secondary);
   margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  display: flex; align-items: center; gap: 6px;
 }
+.notification-date::before { content: '🕒'; font-size: 0.75rem; }
 
-.notification-date::before {
-  content: '🕒';
-  font-size: 0.75rem;
-}
-
+/* Action Links */
 .notification-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #355070;
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--nt-link-text);
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.9rem; font-weight: 600;
   padding: 8px 16px;
-  background: rgba(53, 80, 112, 0.1);
+  background: var(--nt-link-bg);
   border-radius: 20px;
   transition: all 0.2s ease;
-  border: 1px solid rgba(53, 80, 112, 0.2);
+  border: 1px solid var(--nt-link-border);
   cursor: pointer;
   font-family: inherit;
 }
 
 .notification-link:hover {
-  background: rgba(53, 80, 112, 0.2);
+  background: var(--nt-link-hover-bg);
   transform: translateX(2px);
   text-decoration: none;
-  color: #355070;
+  color: var(--nt-link-text);
+}
+.notification-link::after { content: '→'; transition: transform 0.2s ease; }
+.notification-link:hover::after { transform: translateX(2px); }
+
+/* Delete Button */
+.notification-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--nt-btn-delete-color);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  flex-shrink: 0;
 }
 
-.notification-link::after {
-  content: '→';
-  transition: transform 0.2s ease;
-}
+.notification-delete-icon { font-size: 20px; }
 
-.notification-link:hover::after {
-  transform: translateX(2px);
+.notification-delete-btn:hover {
+  background: var(--nt-btn-delete-hover-bg);
+  color: var(--nt-btn-delete-hover-text);
+  transform: scale(1.1);
 }
+.notification-delete-btn:active { transform: scale(0.95); }
 
-/* ==============================
- * Utilities: Empty & Loading
- * ============================== */
-/* Stări pentru loading și fără notificări */
+
+/* 5. UTILITIES (Empty & Loading)
+   ---------------------------------------------------------- */
 .notifications-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; text-align: center;
   padding: 26px 20px;
-  color: #6b7280;
+  color: var(--nt-text-secondary);
   font-size: 1.1rem;
 }
+.notifications-empty::before { display: none; }
+
+.notifications-empty-icon img {
+  width: 220px; height: 220px; object-fit: cover;
+  display: block; margin: 0 auto; margin-bottom: -1rem;
+}
+
+.notifications-empty-text { font-size: 1.3rem; margin-top: -3rem; }
 
 .notifications-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
   border: 3px solid #e8ecef;
   border-top: 3px solid #355070;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-.notifications-empty::before { display: none; }
 
-/* Decorative image for empty notifications */
-.notifications-empty-icon img {
-  width: 220px;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-  margin: 0 auto;
-  margin-bottom: -1rem;
-}
-
-.notifications-empty-text{
-  font-size: 1.3rem;
-  margin-top: -3rem;
-}
+/* 6. MOBILE HEADER
+   ---------------------------------------------------------- */
+.mobile-header { display: none !important; } /* Hidden on desktop */
 
 @media (max-width: 1024px) {
-  /* On mobile show a smaller version of the empty image */
-  .notifications-empty-icon img { display: block; width: 120px; height: 120px; border-radius: 10px; }
-  .notifications-empty { padding: 20px 12px; gap: 8px; }
-  .notifications-empty-text { 
-    font-size: 1rem;
-    margin-top: -1rem; 
-  }
-}
-
-/* ==============================
- * Mobile header (match Favorites)
- * ============================== */
-/* Hide mobile header on desktop - should only show on mobile */
-.mobile-header {
-  display: none !important;
-}
-
-@media (max-width: 1024px) {
-  /* Hide desktop H1 on mobile because mobile header shows title */
-  .notifications-title {
-    display: none !important;
-  }
+  .notifications-title { display: none !important; }
 
   .mobile-header {
     display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
+    align-items: center;
+    justify-content: flex-start;
     gap: 8px !important;
     margin-bottom: 8px !important;
     padding-top: clamp(8px, 3vh, 24px) !important;
     padding-left: 8px !important;
     padding-right: 8px !important;
-    color: var(--chat-text) !important;
+    color: var(--nt-mob-header-text) !important;
   }
 
   .mobile-back-btn {
-    width: 40px !important;
-    height: 40px !important;
-    padding: 8px !important;
+    width: 40px !important; height: 40px !important; padding: 8px !important;
     border-radius: 50% !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--chat-elev) !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    background-color: var(--nt-mob-btn-bg) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
   }
-  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+  .mobile-back-btn:hover { filter: brightness(0.95); }
 
   .mobile-header .MuiSvgIcon-root {
     font-size: 24px !important;
-    color: var(--chat-text) !important;
+    color: inherit !important;
   }
 
   .mobile-header-title {
     font-weight: 600 !important;
-    color: var(--chat-text) !important;
-    font-size: 24px !important; /* MUI h5 on mobile */
+    color: inherit !important;
+    font-size: 24px !important;
     line-height: 1.334 !important;
     margin: 0 !important;
     flex: 0 0 auto !important;
     margin-left: 4px !important;
   }
+  
+  /* Mobile Empty State Adjustments */
+  .notifications-empty-icon img { width: 120px; height: 120px; border-radius: 10px; }
+  .notifications-empty { padding: 20px 12px; gap: 8px; }
+  .notifications-empty-text { font-size: 1rem; margin-top: -1rem; }
 }
 
-/* ==============================
- * Responsivitate
- * ============================== */
+
+/* 7. RESPONSIVITATE SUPLIMENTARĂ
+   ---------------------------------------------------------- */
 @media (max-width: 768px) {
   .notifications-page {
-    /* On mobile we hide MobileHeader, so remove extra offset and avoid margin to keep bg continuous */
+    /* Reduce top padding as we use MobileHeader logic */
     padding: 20px 0;
     padding-top: 20px;
   }
   
-  .notifications-container {
-    padding: 0 16px;
-  }
+  .notifications-container { padding: 0 16px; }
   
-  .notifications-title {
-    font-size: 2.2rem;
-    margin-bottom: 24px;
-  }
+  .notifications-content { padding: 16px; border-radius: 8px; }
   
-  .notifications-content {
-    padding: 16px;
-    border-radius: 8px;
-  }
+  .notification-item { padding: 16px 20px; margin-bottom: 12px; }
   
-  .notification-item {
-    padding: 16px 20px;
-    margin-bottom: 12px;
-  }
+  .notification-message { font-size: 0.95rem; }
+  .notification-message-container { gap: 8px; }
+  .notification-avatar { width: 28px; height: 28px; }
+  .notification-header { gap: 8px; }
   
-  .notification-message {
-    font-size: 0.95rem;
-  }
-  
-  .notification-message-container {
-    gap: 8px;
-  }
-  
-  .notification-avatar {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .notification-header {
-    gap: 8px;
-  }
-  
-  .notification-delete-btn {
-    width: 32px;
-    height: 32px;
-    padding: 6px;
-  }
-}
-
-/* ==============================
- * Dark Mode Styles
- * ============================== */
-.dark-mode .notifications-page {
-  background: #121214;
-}
-
-.dark-mode .notifications-title {
-  color: #ffffff;
-}
-
-.dark-mode .notifications-content {
-  background: #1c1c1f;
-  border: 1px solid #2a2a2e;
-  color: #e6e6e6;
-}
-
-.dark-mode .notification-item {
-  background: #1f1f23;
-  border: 1px solid #2a2a2e;
-  color: #e8e8e8;
-}
-
-.dark-mode .notification-item.unread {
-  background: linear-gradient(180deg, rgba(245, 24, 102, 0.08) 0%, rgba(245, 24, 102, 0.04) 100%);
-  border-color: rgba(245, 24, 102, 0.35);
-}
-
-.dark-mode .notification-item:hover {
-  border-color: rgba(245, 24, 102, 0.45);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 24, 102, 0.08) inset;
-}
-
-.dark-mode .notification-message {
-  color: #e4e4e7;
-}
-
-.dark-mode .notification-time {
-  color: #a1a1aa;
-}
-
-.dark-mode .notification-type {
-  background: rgba(245, 24, 102, 0.14);
-  color: #ffdbe6;
-  border: 1px solid rgba(245, 24, 102, 0.28);
-}
-
-.dark-mode .notification-delete-btn {
-  background: transparent;
-  color: #bbbcc2;
-}
-
-.dark-mode .notification-delete-btn:hover {
-  background: rgba(245, 24, 102, 0.12);
-  color: #ff7099;
-}
-
-.dark-mode .notification-unread-indicator {
-  background: #f51866;
-}
-
-/* Dark mode: refine accent bar and indicator */
-.dark-mode .notification-item::before {
-  background: linear-gradient(to bottom, rgba(245, 24, 102, 0.9), rgba(254, 101, 133, 0.8));
-}
-
-.dark-mode .unread-indicator {
-  background: #f51866;
-  box-shadow: 0 0 0 4px rgba(245, 24, 102, 0.18);
-}
-
-/* Dark mode: sender/date/link/avatars */
-.dark-mode .notification-sender {
-  color: #fe85a4;
-}
-
-.dark-mode .notification-date {
-  color: #a1a1aa;
-}
-
-.dark-mode .notification-link {
-  color: #ffdbe6;
-  background: rgba(245, 24, 102, 0.12);
-  border-color: rgba(245, 24, 102, 0.28);
-}
-
-.dark-mode .notification-link:hover {
-  background: rgba(245, 24, 102, 0.2);
-  color: #ffe6ee;
-}
-
-.dark-mode .notification-avatar {
-  border-color: #f68aa6;
-  box-shadow: 0 2px 10px rgba(245, 24, 102, 0.25);
+  .notification-delete-btn { width: 32px; height: 32px; padding: 6px; }
 }

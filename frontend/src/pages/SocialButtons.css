@@ -53,12 +53,12 @@
 .dark-mode .google {
   background: #3f3f3f;
   color: #ffffff;
-  border: 1px solid rgba(245, 24, 102, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .dark-mode .google:hover {
   background: #575757;
-  border-color: rgba(245, 24, 102, 0.5);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .dark-mode .facebook {
@@ -85,5 +85,5 @@
 
 .dark-mode .divider::before,
 .dark-mode .divider::after {
-  border-bottom: 1px solid rgba(245, 24, 102, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }

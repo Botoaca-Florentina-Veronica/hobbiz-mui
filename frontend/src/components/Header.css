@@ -1,983 +1,516 @@
-/* ================================
- * HEADER CSS - ORGANIZED STRUCTURE
- * ================================
- * 
- * TABLE OF CONTENTS:
- * 1. Base Styles & Variables
- * 2. Layout & Structure
- * 3. Logo & Branding
- * 4. Navigation Elements
- * 5. Buttons & Interactive Elements
- * 6. Notification System
- * 7. User Account Dropdown
- * 8. Dark Mode Styles
- * 9. Media Queries (Mobile First)
- * ================================ */
+/* =============================================================
+   HEADER STYLES - FIXED & REFACTORED
+   ============================================================= */
 
-/* ================================
- * 1. BASE STYLES & VARIABLES
- * ================================ */
+/* 1. CONFIGURARE VARIABILE (LIGHT MODE DEFAULT) */
+:root {
+  /* --- Header Base --- */
+  --hdr-bg: var(--primary);
+  --hdr-text: var(--primary-contrast);
+  
+  /* --- Language Selector --- */
+  --lang-btn-color: #355070;
+  --lang-btn-border: #355070;
+  --lang-btn-bg-hover: #355070;
+  --lang-btn-text-hover: #fff;
+  --lang-dropdown-bg: #fff;
+  --lang-dropdown-text: #183642;
+  --lang-option-hover: #f3f5f6;
+
+  /* --- Buttons (Base Colors) --- */
+  --btn-add-bg: var(--app-surface);
+  --btn-add-text: var(--primary);
+  
+  /* --- Notifications --- */
+  --notif-badge-bg: #fbbf24;
+  --notif-badge-text: var(--app-text);
+  --notif-badge-border: var(--primary);
+
+  /* --- User Menu --- */
+  --menu-bg: var(--app-surface);
+  --menu-shadow: rgba(9,9,12,0.4);
+  --menu-link-text: var(--primary);
+  --menu-link-hover-bg: var(--primary);
+  --menu-link-hover-text: var(--primary-contrast);
+  
+  /* --- Avatar --- */
+  --avatar-border: rgba(255, 255, 255, 0.3);
+  --avatar-border-hover: rgba(255, 255, 255, 0.6);
+}
+
+/* 2. CONFIGURARE VARIABILE (DARK MODE) */
+.dark-mode {
+  /* --- Header Base --- */
+  --hdr-bg: #121212;
+  
+  /* --- Language Selector --- */
+  --lang-btn-color: #f51866;
+  --lang-btn-border: #f51866;
+  --lang-btn-bg-hover: #f51866;
+  --lang-btn-text-hover: #fff;
+  --lang-dropdown-bg: #2c2c2c;
+  --lang-dropdown-text: #ffffff;
+  --lang-option-hover: #3f3f3f;
+
+  /* --- Buttons --- */
+  --btn-add-bg: var(--app-surface);
+  --btn-add-text: var(--primary);
+
+  /* --- Notifications --- */
+  --notif-badge-bg: #fbbf24;
+  --notif-badge-text: #1f1f1f;
+  --notif-badge-border: var(--primary);
+
+  /* --- User Menu --- */
+  --menu-bg: var(--app-surface);
+  --menu-shadow: #121212;
+  --menu-link-text: var(--app-text);
+  --menu-link-hover-bg: var(--primary);
+  --menu-link-hover-text: var(--app-surface);
+
+  /* --- Avatar --- */
+  --avatar-border: rgba(255, 255, 255, 0.2);
+  --avatar-border-hover: rgba(255, 255, 255, 0.5);
+}
+
+/* =========================================================
+   3. STRUCTURA & LAYOUT
+   ========================================================= */
 .header {
-  /* Core Layout */
   font-size: 18px;
   height: 72px;
-  background-color: var(--primary);
-  color: var(--primary-contrast);
+  background-color: var(--hdr-bg) !important;
+  color: var(--hdr-text);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 1rem;
   box-sizing: border-box;
-  
-  /* Reset */
   margin: 0;
   border: none;
   outline: none;
-
-  /* Animație de încărcare - doar slide-down, fără fade */
   animation: headerSlideIn 0.6s ease-out forwards;
   transform: translateY(-20px);
 }
 
-/* Keyframes pentru animația de slide-down */
-@keyframes headerSlideIn {
-  0% {
-    transform: translateY(-20px);
-  }
-  100% {
-    transform: translateY(0);
-  }
+/* Umbră specifică dark mode pentru header */
+.dark-mode .header {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* ================================
- * 2. LAYOUT & STRUCTURE
- * ================================ */
+@keyframes headerSlideIn {
+  0% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+
 .fixed-header {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 0; left: 0; width: 100%;
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .header ul {
   list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  padding: 0; margin: 0;
+  display: flex; flex-direction: row;
+  justify-content: space-between; align-items: center;
   margin-left: 150px;
 }
 
 .nav-right {
-  display: flex;
-  align-items: center;
-  gap: 0;
+  display: flex; align-items: center; gap: 0;
 }
+.nav-right li { list-style: none; }
 
-/* ================================
- * 3. LOGO & BRANDING
- * ================================ */
-
-/* Language Selector - pozitionat in stanga logo-ului */
-.language-selector {
-  position: absolute;
-  left: 2rem;
-  display: flex;
-  align-items: center;
-  /* Keep selector above categories overlay and menu */
-  z-index: 10500;
-  margin-right: 1rem;
-}
-
-.language-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  margin: auto;
-  background: transparent;
-  border: 2px solid #355070;
-  outline: 2px solid #ffffff;
-  outline-offset: -4px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #355070;
-}
-
-.language-btn:hover {
-  background: #355070;
-  color: #fff;
-  outline-color: #ffffff;
-}
-
-.language-icon {
-  font-size: 1.3rem;
-  color:#ffffff;
-}
-
-.current-lang {
-  font-size: 0.9rem;
-  letter-spacing: 0.5px;
-  color: #ffffff;
-}
-
-.language-dropdown {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
-  background: #fff;
-  border: 2px solid #355070;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 160px;
-  overflow: hidden;
-  /* Must be above categories overlay (9999) and dropdown (10000) */
-  z-index: 10500;
-}
-
-.language-option {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
-  color: #183642;
-}
-
-.language-option:hover {
-  background: #f3f5f6;
-}
-
-.language-option.active {
-  background: #355070;
-  color: #fff;
-  font-weight: 600;
-}
-
-.lang-flag {
-  font-size: 1.3rem;
-}
-
-/* Dark Mode pentru Language Selector */
-.dark-mode .language-btn {
-  border-color: #f51866;
-  color: #f51866;
-  outline: 2px solid #ffffff;
-  outline-offset: -4px;
-}
-
-.dark-mode .language-btn:hover {
-  background: #f51866;
-  color: #fff;
-  outline-color: #ffffff;
-}
-
-.dark-mode .language-dropdown {
-  background: #2c2c2c;
-  border-color: #f51866;
-}
-
-.dark-mode .language-option {
-  color: #ffffff;
-}
-
-.dark-mode .language-option:hover {
-  background: #3f3f3f;
-}
-
-.dark-mode .language-option.active {
-  background: #f51866;
-  color: #fff;
-}
-
+/* =========================================================
+   4. LOGO & BRANDING
+   ========================================================= */
 .logo {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+  display: flex; align-items: center; cursor: pointer;
   transition: opacity 0.2s ease;
 }
+.logo:hover { opacity: 0.9; }
 
-.logo:hover {
-  opacity: 0.9;
-}
+/* Ensure logo + title sit to the right of the language selector and never overlap it
+   We use a responsive margin that keeps a safe gap from the language button. */
+.logo { margin-left: 6rem; gap: 8px; }
 
 .puzzle-logo {
-  height: 45px;
+  height: 45px; 
   width: auto;
-  margin-right: 2px;
-  margin-left: -2rem !important;
+  margin-right: -10px; 
+  /* FIX: Am resetat marginea negativă care îl împingea prea tare stânga */
+  margin-left: 0 !important; 
   transition: transform 0.2s ease;
 }
 
 .main-logo {
-  height: 220px;
-  width: 220px;
-  padding-right: 24px;
-  margin-left: 0;
-  margin-top: 1rem;
+  height: 220px; width: 220px;
+  padding-right: 24px; margin-left: 0; margin-top: 1rem;
   transition: transform 0.2s ease;
 }
 
-/* ================================
- * 4. NAVIGATION ELEMENTS
- * ================================ */
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 0;
+/* =========================================================
+   5. LANGUAGE SELECTOR
+   ========================================================= */
+.language-selector {
+  position: absolute; left: 2rem;
+  display: flex; align-items: center;
+  z-index: 10500; margin-right: 1rem;
 }
 
-.nav-right li {
-  list-style: none;
+.language-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem; margin: auto;
+  background: transparent;
+  border: 2px solid var(--lang-btn-border);
+  outline: 2px solid #ffffff; outline-offset: -4px;
+  border-radius: 8px; cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem; font-weight: 600;
+  color: var(--lang-btn-color);
 }
 
-/* ================================
- * 5. BUTTONS & INTERACTIVE ELEMENTS
- * ================================ */
+.language-btn:hover {
+  background: var(--lang-btn-bg-hover);
+  color: var(--lang-btn-text-hover);
+  outline-color: #ffffff;
+}
+
+.language-icon { font-size: 1.3rem; color: #ffffff; }
+.current-lang { font-size: 0.9rem; letter-spacing: 0.5px; color: #ffffff; }
+
+.language-dropdown {
+  position: absolute; top: calc(100% + 0.5rem); left: 0;
+  background: var(--lang-dropdown-bg);
+  border: 2px solid var(--lang-btn-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 160px; overflow: hidden;
+  z-index: 10500;
+}
+
+.language-option {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem; color: var(--lang-dropdown-text);
+}
+
+.language-option:hover { background: var(--lang-option-hover); }
+
+.language-option.active {
+  background: var(--lang-btn-bg-hover);
+  color: var(--lang-btn-text-hover);
+  font-weight: 600;
+}
+
+.lang-flag { font-size: 1.3rem; }
+
+/* =========================================================
+   6. BUTTONS & INTERACTIVE ELEMENTS
+   ========================================================= */
 .add-button {
-  background-color: var(--app-surface);
-  color: var(--primary);
-  border: none;
+  background-color: var(--btn-add-bg);
+  color: var(--btn-add-text);
+  border: none; 
   border-radius: 4px;
-  padding: 14px 24px;
+  padding: 14px 24px; 
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1rem; 
   font-weight: bold;
   margin-right: 40px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* FIX: Hover stiluri originale RESTAURATE complet */
 .add-button:hover {
   background-color: var(--app-elev);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.add-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.add-button:active { 
+  transform: translateY(0); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
-.favorite-btn {
-  margin-right: 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 2rem;
-  transition: all 0.3s ease;
-  color: var(--primary-contrast);
-  position: relative;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.favorite-btn:hover {
-  transform: scale(1.1);
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-}
-/* ================================
- * 6. NOTIFICATION SYSTEM
- * ================================ */
-.notification-btn {
-  position: relative;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  background: #fbbf24;
-  color: var(--app-text);
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: bold;
-  border: 2px solid var(--primary);
-  min-width: 18px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-  transition: all 0.2s ease;
-}
-
-.notification-badge:hover {
-  transform: scale(1.1);
-}
-
-/* Badge pentru numere cu două cifre */
-.notification-badge:has-text,
-.notification-badge:is(:has-text),
-.notification-badge:contains('10'),
-.notification-badge:contains('11'),
-.notification-badge:contains('12'),
-.notification-badge:contains('13'),
-.notification-badge:contains('14'),
-.notification-badge:contains('15'),
-.notification-badge:contains('16'),
-.notification-badge:contains('17'),
-.notification-badge:contains('18'),
-.notification-badge:contains('19'),
-.notification-badge:contains('20') {
-  padding: 0 4px;
-  border-radius: 10px;
-  min-width: 20px;
-  width: auto;
-  font-size: 0.7rem;
-}
-
-/* Badge pentru numere foarte mari (99+) */
-.notification-badge-large {
-  padding: 0 6px;
-  border-radius: 12px;
-  min-width: 24px;
-  width: auto;
-  font-size: 0.65rem;
-}
-
-/* ================================
- * 7. USER ACCOUNT DROPDOWN
- * ================================ */
-.user-account-container {
-  position: relative;
-  margin-right: 6rem;
-}
-
-.user-account-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  font-size: 1.2rem;
-  color: inherit;
-  transition: all 0.2s ease;
-  margin-right: 6rem;
-  border-radius: 4px;
-}
-
-.user-account-btn:hover {
-  opacity: 0.8;
-  background: rgba(0, 0, 0, 0.05);
-  transform: scale(1.05);
-}
-
-.dropdown {
-  position: absolute;
-  left: -9999px;
-  opacity: 0;
-}
-
-.for-dropdown {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--primary-contrast);
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s ease;
-}
-
-.for-dropdown:hover {
-  opacity: 0.8;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-.section-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 220px;
-  background-color: var(--app-surface);
-  border-radius: 4px;
-  padding: 5px;
-  box-shadow: 0 14px 35px 0 rgba(9,9,12,0.4);
-  z-index: 1001;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-  transition: all 200ms ease-out;
-  margin-top: 10px;
-}
-
-.dropdown:checked ~ .section-dropdown,
-.user-account-container:hover .section-dropdown {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.section-dropdown a {
-  display: block;
-  color: var(--primary);
-  padding: 8px 16px;
-  text-decoration: none;
-  transition: all 100ms linear;
-  border-radius: 2px;
-  text-align: left;
-}
-
-.section-dropdown a:hover {
-  color: var(--primary-contrast);
-  background-color: var(--primary);
-  cursor: pointer;
-}
-
-.section-dropdown:after {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  right: 20px;
-  border-width: 8px;
-  border-style: solid;
-  border-color: transparent transparent var(--app-surface) transparent;
-}
-
-.avatar-img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 8px;
-  vertical-align: middle;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-}
-
-.avatar-img:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  transform: scale(1.05);
-}
-
-/* ================================
- * 8. DARK MODE STYLES
- * ================================ */
-.dark-mode .header {
-  background-color: #121212 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .add-button {
-  background-color: var(--app-surface);
-  color: var(--primary);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
+/* FIX: Dark Mode Hover original restaurat */
 .dark-mode .add-button:hover {
-  /* Stronger contrast on hover so text remains clearly visible */
   background-color: var(--primary);
   color: var(--primary-contrast);
   border: 1px solid var(--primary);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Keyboard focus visibility for accessibility in dark mode */
 .dark-mode .add-button:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-.dark-mode .favorite-btn {
-  color: var(--primary-contrast);
+.favorite-btn {
+  margin-right: 20px; background: none; border: none;
+  cursor: pointer; font-size: 2rem;
+  transition: all 0.3s ease;
+  color: var(--hdr-text);
+  position: relative; padding: 8px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
 }
 
+.favorite-btn:hover {
+  transform: scale(1.1); color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
 .dark-mode .favorite-btn:hover {
   background: rgba(255, 255, 255, 0.15);
 }
 
-.dark-mode .notification-badge {
-  background: #fbbf24;
-  color: #1f1f1f;
-  border-color: var(--primary);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+/* =========================================================
+   7. NOTIFICATION SYSTEM
+   ========================================================= */
+.notification-btn { position: relative; }
+
+.notification-badge {
+  position: absolute; top: -2px; right: -2px;
+  background: var(--notif-badge-bg);
+  color: var(--notif-badge-text);
+  border-radius: 50%; width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: bold;
+  border: 2px solid var(--notif-badge-border);
+  min-width: 18px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10; transition: all 0.2s ease;
+}
+.notification-badge:hover { transform: scale(1.1); }
+.dark-mode .notification-badge { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); }
+
+.notification-badge:has-text,
+.notification-badge:is(:has-text),
+.notification-badge:contains('10'), .notification-badge:contains('11'),
+.notification-badge:contains('12'), .notification-badge:contains('13'),
+.notification-badge:contains('14'), .notification-badge:contains('15'),
+.notification-badge:contains('16'), .notification-badge:contains('17'),
+.notification-badge:contains('18'), .notification-badge:contains('19'),
+.notification-badge:contains('20') {
+  padding: 0 4px; border-radius: 10px; min-width: 20px; width: auto; font-size: 0.7rem;
 }
 
-.dark-mode .for-dropdown {
-  color: var(--primary-hover);
+.notification-badge-large {
+  padding: 0 6px; border-radius: 12px; min-width: 24px; width: auto; font-size: 0.65rem;
 }
 
-.dark-mode .for-dropdown:hover {
-  background: rgba(255, 255, 255, 0.1);
+/* =========================================================
+   8. USER ACCOUNT & MENU
+   ========================================================= */
+.user-account-container { position: relative; margin-right: 6rem; }
+
+.user-account-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: transparent; border: none; cursor: pointer;
+  padding: 0.5rem 1rem; font-size: 1.2rem; color: inherit;
+  transition: all 0.2s ease; margin-right: 6rem; border-radius: 4px;
+}
+.user-account-btn:hover {
+  opacity: 0.8; background: rgba(0, 0, 0, 0.05); transform: scale(1.05);
 }
 
-.dark-mode .section-dropdown {
-  background-color: var(--app-surface);
-  box-shadow: 0 14px 35px 0 #121212;
-  border: 1px solid var(--app-border);
+.dropdown { position: absolute; left: -9999px; opacity: 0; }
+
+.for-dropdown {
+  display: flex; align-items: center; gap: 0.5rem;
+  color: var(--hdr-text);
+  cursor: pointer; padding: 0.5rem 1rem; transition: all 0.2s ease;
+}
+.dark-mode .for-dropdown { color: var(--primary-hover); }
+
+.for-dropdown:hover {
+  opacity: 0.8; background: rgba(0, 0, 0, 0.05); border-radius: 4px;
+}
+.dark-mode .for-dropdown:hover { background: rgba(255, 255, 255, 0.1); }
+
+.section-dropdown {
+  position: absolute; top: 100%; right: 0; width: 220px;
+  background-color: var(--menu-bg);
+  border-radius: 4px; padding: 5px;
+  box-shadow: 0 14px 35px 0 var(--menu-shadow);
+  z-index: 1001; opacity: 0; pointer-events: none;
+  transform: translateY(10px); transition: all 200ms ease-out; margin-top: 10px;
+}
+.dark-mode .section-dropdown { border: 1px solid var(--app-border); }
+
+.dropdown:checked ~ .section-dropdown,
+.user-account-container:hover .section-dropdown {
+  opacity: 1; pointer-events: auto; transform: translateY(0);
 }
 
-.dark-mode .section-dropdown a {
-  background-color: var(--app-surface) !important;
-  color: var(--app-text) !important;
+.section-dropdown a {
+  display: block; color: var(--menu-link-text);
+  padding: 8px 16px; text-decoration: none;
+  transition: all 100ms linear; border-radius: 2px; text-align: left;
 }
 
-.dark-mode .section-dropdown a:hover {
-  color: var(--app-surface) !important;
-  background-color: var(--primary) !important;
+.section-dropdown a:hover {
+  color: var(--menu-link-hover-text) !important;
+  background-color: var(--menu-link-hover-bg) !important;
+  cursor: pointer;
 }
 
-.dark-mode .section-dropdown:after {
-  border-bottom-color: var(--app-surface);
+.section-dropdown:after {
+  content: ''; position: absolute; bottom: 100%; right: 20px;
+  border-width: 8px; border-style: solid;
+  border-color: transparent transparent var(--menu-bg) transparent;
 }
 
-.dark-mode .avatar-img {
-  border-color: rgba(255, 255, 255, 0.2);
+.avatar-img {
+  width: 32px; height: 32px; border-radius: 50%;
+  object-fit: cover; margin-right: 8px; vertical-align: middle;
+  border: 2px solid var(--avatar-border);
+  transition: all 0.2s ease;
+}
+.avatar-img:hover {
+  border-color: var(--avatar-border-hover); transform: scale(1.05);
 }
 
-.dark-mode .avatar-img:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-}
+/* =========================================================
+   9. MEDIA QUERIES (MOBILE FIRST)
+   ========================================================= */
 
-/* ================================
- * 9. MEDIA QUERIES (MOBILE FIRST)
- * ================================ */
-
-/* --------------------------------
- * Mobile Phones (320px - 480px)
- * -------------------------------- */
+/* Mobile Phones (320-480) */
 @media screen and (max-width: 480px) {
-  .header {
-    padding: 0 0.5rem;
-    height: 60px;
-    font-size: 16px;
-  }
+  .header { padding: 0 0.5rem; height: 60px; font-size: 16px; }
+  .header ul { margin-left: 0; gap: 8px; }
   
-  .header ul {
-    margin-left: 0;
-    gap: 8px;
-  }
+  .puzzle-logo { height: 32px; margin-left: 0 !important; }
+  .logo { margin-left: 3.5rem; }
+  .main-logo { height: 120px; width: 120px; padding-right: 8px; margin-top: 0.5rem; }
   
-  .puzzle-logo {
-    height: 32px;
-    margin-left: -1rem;
-  }
+  .add-button { padding: 8px 12px; font-size: 0.85rem; margin-right: 8px; }
+  .favorite-btn { font-size: 1.4rem; margin-right: 8px; padding: 6px; }
   
-  .main-logo {
-    height: 120px;
-    width: 120px;
-    padding-right: 8px;
-    margin-top: 0.5rem;
-  }
+  .user-account-container { margin-right: 0.5rem; }
+  .user-account-btn { margin-right: 0; font-size: 1rem; padding: 0.25rem 0.5rem; }
   
-  .add-button {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    margin-right: 8px;
-  }
-  
-  .favorite-btn {
-    font-size: 1.4rem;
-    margin-right: 8px;
-    padding: 6px;
-  }
-  
-  .user-account-container {
-    margin-right: 0.5rem;
-  }
-  
-  .user-account-btn {
-    margin-right: 0;
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;
-  }
-  
-  .section-dropdown {
-    width: 180px;
-    right: -10px;
-  }
-  
-  .avatar-img {
-    width: 24px;
-    height: 24px;
-  }
+  .section-dropdown { width: 180px; right: -10px; }
+  .avatar-img { width: 24px; height: 24px; }
 }
 
-/* --------------------------------
- * Large Mobile/Small Tablet (481px - 768px)
- * -------------------------------- */
+/* Large Mobile / Small Tablet (481-768) */
 @media screen and (min-width: 481px) and (max-width: 768px) {
-  .header {
-    padding: 0 0.75rem;
-    height: 64px;
-  }
+  .header { padding: 0 0.75rem; height: 64px; }
+  .header ul { margin-left: 50px; gap: 12px; }
+  .puzzle-logo { height: 38px; margin-left: 0 !important; }
+  .logo { margin-left: 4.5rem; }
+  .main-logo { height: 160px; width: 160px; padding-right: 16px; margin-top: 0.75rem; }
   
-  .header ul {
-    margin-left: 50px;
-    gap: 12px;
-  }
+  .add-button { padding: 10px 16px; font-size: 0.9rem; margin-right: 16px; }
+  .favorite-btn { font-size: 1.6rem; margin-right: 12px; }
   
-  .puzzle-logo {
-    height: 38px;
-    margin-left: -2rem;
-  }
-  
-  .main-logo {
-    height: 160px;
-    width: 160px;
-    padding-right: 16px;
-    margin-top: 0.75rem;
-  }
-  
-  .add-button {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    margin-right: 16px;
-  }
-  
-  .favorite-btn {
-    font-size: 1.6rem;
-    margin-right: 12px;
-  }
-  
-  .user-account-container {
-    margin-right: 2rem;
-  }
-  
-  .section-dropdown {
-    width: 200px;
-  }
-  
-  .avatar-img {
-    width: 28px;
-    height: 28px;
-  }
+  .user-account-container { margin-right: 2rem; }
+  .section-dropdown { width: 200px; }
+  .avatar-img { width: 28px; height: 28px; }
 }
 
-/* --------------------------------
- * Tablet (769px - 1024px)
- * -------------------------------- */
+/* Tablet (769-1024) */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
-  .header {
-    padding: 0 1rem;
-    height: 68px;
-  }
+  .header { padding: 0 1rem; height: 68px; }
+  .header ul { margin-left: 100px; }
+  .puzzle-logo { height: 42px; margin-left: 0 !important; }
+  .logo { margin-left: 5.5rem; }
+  .main-logo { height: 200px; width: 200px; padding-right: 20px; margin-top: 0.875rem; }
   
-  .header ul {
-    margin-left: 100px;
-  }
-  
-  .puzzle-logo {
-    height: 42px;
-    margin-left: -3rem;
-  }
-  
-  .main-logo {
-    height: 200px;
-    width: 200px;
-    padding-right: 20px;
-    margin-top: 0.875rem;
-  }
-  
-  .add-button {
-    padding: 12px 20px;
-    font-size: 0.95rem;
-    margin-right: 24px;
-  }
-  
-  .favorite-btn {
-    font-size: 1.8rem;
-    margin-right: 16px;
-  }
-  
-  .user-account-container {
-    margin-right: 3rem;
-  }
-  
-  .user-account-btn {
-    margin-right: 3rem;
-    font-size: 1.1rem;
-  }
-  
-  .avatar-img {
-    width: 30px;
-    height: 30px;
-  }
+  .add-button { padding: 12px 20px; font-size: 0.95rem; margin-right: 24px; }
+  .favorite-btn { font-size: 1.8rem; margin-right: 16px; }
+  .user-account-container, .user-account-btn { margin-right: 3rem; }
+  .user-account-btn { font-size: 1.1rem; }
+  .avatar-img { width: 30px; height: 30px; }
 }
 
-/* --------------------------------
- * Small Desktop (1025px - 1200px)
- * -------------------------------- */
+/* Small Desktop (1025-1200) */
 @media screen and (min-width: 1025px) and (max-width: 1200px) {
-  .header {
-    height: 70px;
-  }
+  .header { height: 70px; }
+  .header ul { margin-left: 120px; }
+  .puzzle-logo { height: 44px; margin-left: 0 !important; }
+  .logo { margin-left: 6rem; }
+  .main-logo { height: 210px; width: 210px; padding-right: 22px; }
   
-  .header ul {
-    margin-left: 120px;
-  }
-  
-  .puzzle-logo {
-    height: 44px;
-    margin-left: -3.5rem;
-  }
-  
-  .main-logo {
-    height: 210px;
-    width: 210px;
-    padding-right: 22px;
-  }
-  
-  .add-button {
-    margin-right: 32px;
-  }
-  
-  .favorite-btn {
-    margin-right: 18px;
-  }
-  
-  .user-account-container {
-    margin-right: 4rem;
-  }
-  
-  .user-account-btn {
-    margin-right: 4rem;
-  }
+  .add-button { margin-right: 32px; }
+  .favorite-btn { margin-right: 18px; }
+  .user-account-container, .user-account-btn { margin-right: 4rem; }
 }
 
-/* --------------------------------
- * Large Desktop (1201px+)
- * -------------------------------- */
+/* Large Desktop (1201+) */
 @media screen and (min-width: 1201px) {
-  .header {
-    height: 72px;
-  }
+  .header { height: 72px; }
+  .header ul { margin-left: 150px; }
+  .puzzle-logo { height: 45px; margin-left: 0 !important; }
+  .logo { margin-left: 6.5rem; }
+  .main-logo { height: 220px; width: 220px; padding-right: 24px; margin-top: 1rem; }
   
-  .header ul {
-    margin-left: 150px;
-  }
-  
-  .puzzle-logo {
-    height: 45px;
-    margin-left: -4rem;
-  }
-  
-  .main-logo {
-    height: 220px;
-    width: 220px;
-    padding-right: 24px;
-    margin-top: 1rem;
-  }
-  
-  .add-button {
-    margin-right: 40px;
-  }
-  
-  .favorite-btn {
-    margin-right: 20px;
-  }
-  
-  .user-account-container {
-    margin-right: 6rem;
-  }
-  
-  .user-account-btn {
-    margin-right: 6rem;
-  }
+  .add-button { margin-right: 40px; }
+  .favorite-btn { margin-right: 20px; }
+  .user-account-container, .user-account-btn { margin-right: 6rem; }
 }
 
-/* --------------------------------
- * Ultra Wide Desktop (1441px+)
- * -------------------------------- */
+/* Ultra Wide (1441+) */
 @media screen and (min-width: 1441px) {
-  .header {
-    padding: 0 2rem;
-  }
-  
-  .header ul {
-    margin-left: 200px;
-  }
-  
-  .add-button {
-    padding: 16px 28px;
-    font-size: 1.1rem;
-    margin-right: 50px;
-  }
-  
-  .favorite-btn {
-    font-size: 2.2rem;
-    margin-right: 24px;
-  }
-  
-  .user-account-container {
-    margin-right: 8rem;
-  }
-  
-  .user-account-btn {
-    margin-right: 8rem;
-    font-size: 1.3rem;
-  }
-  
-  .section-dropdown {
-    width: 240px;
-  }
+  .header { padding: 0 2rem; }
+  .header ul { margin-left: 200px; }
+  .add-button { padding: 16px 28px; font-size: 1.1rem; margin-right: 50px; }
+  .favorite-btn { font-size: 2.2rem; margin-right: 24px; }
+  .user-account-container, .user-account-btn { margin-right: 8rem; font-size: 1.3rem; }
+  .section-dropdown { width: 240px; }
 }
 
-/* --------------------------------
- * 4K+ Screens (2561px+)
- * -------------------------------- */
+/* 4K+ (2561+) */
 @media screen and (min-width: 2561px) {
-  .header {
-    height: 80px;
-    padding: 0 3rem;
-    font-size: 20px;
-  }
-  
-  .header ul {
-    margin-left: 250px;
-  }
-  
-  .puzzle-logo {
-    height: 50px;
-  }
-  
-  .main-logo {
-    height: 240px;
-    width: 240px;
-  }
-  
-  .add-button {
-    padding: 18px 32px;
-    font-size: 1.2rem;
-    margin-right: 60px;
-  }
-  
-  .favorite-btn {
-    font-size: 2.4rem;
-    margin-right: 28px;
-  }
-  
-  .user-account-btn {
-    font-size: 1.4rem;
-  }
-  
-  .section-dropdown {
-    width: 260px;
-  }
-  
-  .avatar-img {
-    width: 36px;
-    height: 36px;
-  }
+  .header { height: 80px; padding: 0 3rem; font-size: 20px; }
+  .header ul { margin-left: 250px; }
+  .puzzle-logo { height: 50px; }
+  .main-logo { height: 240px; width: 240px; }
+  .add-button { padding: 18px 32px; font-size: 1.2rem; margin-right: 60px; }
+  .favorite-btn { font-size: 2.4rem; margin-right: 28px; }
+  .user-account-btn { font-size: 1.4rem; }
+  .section-dropdown { width: 260px; }
+  .avatar-img { width: 36px; height: 36px; }
 }
 
-/* ================================
- * 10. HOMEPAGE SPECIFIC RULES
- * ================================ */
-
-/* Reguli specifice pentru pagina principală (/) */
-/* Pe homepage: sub 1025px = DOAR mobile header, peste 1024px = DOAR desktop header */
-
-/* Desktop header - ascuns pe homepage sub pragul desktopului */
+/* =========================================================
+   10. HOMEPAGE SPECIFIC RULES
+   ========================================================= */
 @media screen and (max-width: 1024px) {
   .homepage .header,
-  .homepage .fixed-header {
-    display: none !important;
-  }
+  .homepage .fixed-header { display: none !important; }
+  
+  .homepage .mobile-header,
+  .homepage .mobile-header-spacer { display: flex !important; }
+  .homepage .mobile-header-spacer { display: block !important; }
+  
+  .language-selector { left: 0.5rem; }
+  .language-btn { padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+  .language-icon { font-size: 1.1rem; }
+  .current-lang { font-size: 0.8rem; }
+  .puzzle-logo { margin-left: -1rem !important; }
 }
 
-/* Mobile header - ascuns pe homepage peste pragul desktopului */
 @media screen and (min-width: 1025px) {
   .homepage .mobile-header,
-  .homepage .mobile-header-spacer {
-    display: none !important;
-  }
-}
-
-/* Asigurăm că pe homepage mobile header-ul este vizibil sub pragul desktopului */
-@media screen and (max-width: 1024px) {
-  .homepage .mobile-header {
-    display: flex !important;
-  }
+  .homepage .mobile-header-spacer { display: none !important; }
   
-  .homepage .mobile-header-spacer {
-    display: block !important;
-  }
-
-  /* Ajustări pentru butonul de limbă pe mobile/tablet */
-  .language-selector {
-    left: 0.5rem;
-  }
-
-  .language-btn {
-    padding: 0.4rem 0.7rem;
-    font-size: 0.85rem;
-  }
-
-  .language-icon {
-    font-size: 1.1rem;
-  }
-
-  .current-lang {
-    font-size: 0.8rem;
-  }
-
-  .puzzle-logo {
-    margin-left: -1rem !important;
-  }
-}
-
-/* Asigurăm că pe homepage desktop header-ul este vizibil peste pragul desktopului */
-@media screen and (min-width: 1025px) {
   .homepage .header,
-  .homepage .fixed-header {
-    display: flex !important;
-  }
+  .homepage .fixed-header { display: flex !important; }
 }
 
-/* Responsive pentru ecrane foarte mici */
 @media screen and (max-width: 768px) {
-  .language-selector {
-    left: 0.25rem;
-  }
-
-  .language-btn {
-    padding: 0.3rem 0.5rem;
-    border-width: 1.5px;
-  }
-
-  .language-icon {
-    font-size: 1rem;
-  }
-
-  .current-lang {
-    display: none; /* Ascunde textul pe ecrane foarte mici, doar iconița */
-  }
-
-  .language-dropdown {
-    min-width: 140px;
-  }
-
-  .language-option {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.9rem;
-  }
-
-  .puzzle-logo {
-    margin-left: 0 !important;
-    height: 40px;
-  }
-
-  .main-logo {
-    height: 180px;
-    width: 180px;
-  }
+  .language-selector { left: 0.25rem; }
+  .language-btn { padding: 0.3rem 0.5rem; border-width: 1.5px; }
+  .language-icon { font-size: 1rem; }
+  .current-lang { display: none; }
+  .language-dropdown { min-width: 140px; }
+  .language-option { padding: 0.6rem 0.8rem; font-size: 0.9rem; }
+  
+  .puzzle-logo { margin-left: 0 !important; height: 40px; }
+  .main-logo { height: 180px; width: 180px; }
 }

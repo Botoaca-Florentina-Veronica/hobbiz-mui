@@ -427,7 +427,7 @@ export default function Header() {
               )}
             </div>
 
-            <ul className="logo" onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ul className="logo" onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <li style={{display: 'flex', alignItems: 'center'}}>
                 <img src={isDarkMode ? puzzle2 : puzzleLogo} alt="Puzzle Logo" className="puzzle-logo" />
                 <img src={logoDark} alt="Logo" className="main-logo" />
