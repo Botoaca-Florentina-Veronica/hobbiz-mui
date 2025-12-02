@@ -277,22 +277,42 @@ const createMessage = async (req, res) => {
             message: `Ai primit un mesaj nou${announcementId ? ` la anunțul #${announcementId}` : ''}`,
             link,
           });
+          
+          // Emit Socket.IO event for real-time notification
+          try {
+            const io = req.app.get('io');
+            const activeUsers = req.app.get('activeUsers');
+            if (io && activeUsers) {
+              const sid = activeUsers.get(String(destinatarId));
+              if (sid) {
+                io.to(sid).emit('newNotification', { userId: destinatarId });
+              }
+            }
+          } catch (_) {}
         }
 
         // Trimite push notification dacă destinatarul are pushToken
         try {
           const recipient = await User.findById(destinatarId).select('pushToken notificationSettings');
           let sender = null;
-          try { sender = await User.findById(senderId).select('firstName lastName'); } catch (_) {}
+          try { sender = await User.findById(senderId).select('firstName lastName avatar'); } catch (_) {}
           const title = sender ? `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Mesaj nou' : 'Mesaj nou';
           const bodyPreview = hasText ? String(text).slice(0, 120) : (messageData.image ? 'Imagine nouă' : 'Mesaj nou');
-          // If this message belongs to an announcement, try to include announcement title in the push
+          // If this message belongs to an announcement, try to include announcement title and image in the push
           let announcementTitle = null;
+          let announcementImage = null;
+          let announcementOwnerId = null;
           if (messageData.announcementId) {
             try {
               const Announcement = require('../models/Announcement');
-              const ann = await Announcement.findById(String(messageData.announcementId)).select('title');
-              if (ann) announcementTitle = ann.title || null;
+              const ann = await Announcement.findById(String(messageData.announcementId)).select('title images user');
+              if (ann) {
+                announcementTitle = ann.title || null;
+                if (ann.images && ann.images.length > 0) {
+                  announcementImage = ann.images[0];
+                }
+                announcementOwnerId = ann.user ? String(ann.user) : null;
+              }
             } catch (e) {
               // ignore
             }
@@ -315,6 +335,17 @@ const createMessage = async (req, res) => {
             tokens = tokens.filter(t => /^ExponentPushToken\[.+\]$/.test(t));
 
             if (tokens.length > 0) {
+              // Build complete data payload with all metadata for proper chat navigation
+              const pushData = { 
+                link,
+                announcementId: messageData.announcementId,
+                announcementTitle,
+                announcementImage,
+                announcementOwnerId,
+                senderName: sender ? `${sender.firstName || ''} ${sender.lastName || ''}`.trim() : null,
+                senderAvatar: sender?.avatar || null
+              };
+              
               // Folosim fetch global (Node 18+) cu fallback la node-fetch dacă e necesar
               const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
               await doFetch('https://exp.host/--/api/v2/push/send', {
@@ -324,7 +355,7 @@ const createMessage = async (req, res) => {
                   to: tokens,
                   title,
                   body,
-                  data: { link, announcementId: messageData.announcementId, announcementTitle },
+                  data: pushData,
                   priority: 'high',
                   sound: 'default',
                   channelId: 'default',

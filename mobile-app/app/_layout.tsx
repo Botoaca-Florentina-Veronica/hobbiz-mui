@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
 import { ChatNotificationProvider } from '../src/context/ChatNotificationContext';
+import { NotificationProvider } from '../src/context/NotificationContext';
 import { LocaleProvider } from '../src/context/LocaleContext';
 import { setupNotificationListeners } from '../src/services/notificationService';
 
@@ -32,9 +33,18 @@ export default function RootLayout() {
             const parts = data.link.split('/');
             // parts[0] is empty, parts[1] is 'chat', parts[2] is conversationId, parts[3] is messageId
             if (parts[1] === 'chat' && parts[2]) {
+               const params: any = { conversationId: parts[2] };
+               if (parts[3]) params.messageId = parts[3];
+               // Pass additional metadata if available
+               if (data.senderName) params.senderName = data.senderName;
+               if (data.senderAvatar) params.senderAvatar = data.senderAvatar;
+               if (data.announcementOwnerId) params.announcementOwnerId = data.announcementOwnerId;
+               if (data.announcementId) params.announcementId = data.announcementId;
+               if (data.announcementTitle) params.announcementTitle = data.announcementTitle;
+               if (data.announcementImage) params.announcementImage = data.announcementImage;
                router.push({
                   pathname: '/(tabs)/chat',
-                  params: { conversationId: parts[2], messageId: parts[3] }
+                  params
                });
             } else if (parts[1] === 'users' && parts[3] === 'reviews') {
                // /users/:id/reviews
@@ -62,10 +72,11 @@ export default function RootLayout() {
     <ThemeProvider>
       <LocaleProvider>
         <AuthProvider>
-          <ChatNotificationProvider>
-            <SafeAreaProvider>
-              <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack>
+          <NotificationProvider>
+            <ChatNotificationProvider>
+              <SafeAreaProvider>
+                <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="login" options={{ headerShown: false }} />
                 <Stack.Screen name="oauth" options={{ headerShown: false }} />
@@ -80,10 +91,11 @@ export default function RootLayout() {
                 <Stack.Screen name="post-success" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
               </Stack>
-              <StatusBar style="auto" />
-            </NavThemeProvider>
-          </SafeAreaProvider>
-        </ChatNotificationProvider>
+                <StatusBar style="auto" />
+              </NavThemeProvider>
+            </SafeAreaProvider>
+          </ChatNotificationProvider>
+        </NotificationProvider>
       </AuthProvider>
       </LocaleProvider>
     </ThemeProvider>

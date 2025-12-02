@@ -58,33 +58,38 @@ export default function NotificationsScreen() {
 
   const handleReply = useCallback(async (notificationId: string) => {
     const notification = items.find(it => it._id === notificationId);
-    if (!notification?.link) return;
+    if (!notification) return;
 
     // Step 1: Mark notification as read optimistically
     setItems(prev => prev.map(it => 
       it._id === notificationId ? { ...it, read: true } : it
     ));
 
-    // Step 2: Parse the link to extract navigation params
-    let navParams: any = {};
-    
-    if (notification.link.startsWith('/chat/')) {
-      const chatPath = notification.link.replace('/chat/', '');
-      const [conversationId, messageId] = chatPath.split('/').map(s => s?.trim()).filter(Boolean);
-      
-      if (!conversationId) {
-        console.warn('Invalid notification link - no conversationId');
-        return;
-      }
+    // Step 2: Use explicit fields from backend if available, or fallback to link parsing
+    const notifData = notification as any;
+    let conversationId = notifData.conversationId;
+    let messageId = null;
 
-      navParams = { conversationId };
+    if (!conversationId && notification.link && notification.link.startsWith('/chat/')) {
+      const chatPath = notification.link.replace('/chat/', '');
+      const parts = chatPath.split('/').map(s => s?.trim()).filter(Boolean);
+      conversationId = parts[0];
+      if (parts.length > 1) messageId = parts[1];
+    }
+
+    if (conversationId) {
+      const navParams: any = { conversationId };
       if (messageId) navParams.messageId = messageId;
       
       // Add announcement metadata if available (from enriched notification)
-      const notifData = notification as any;
       if (notifData.announcementOwnerId) navParams.announcementOwnerId = notifData.announcementOwnerId;
       if (notifData.announcementId) navParams.announcementId = notifData.announcementId;
       if (notifData.announcementTitle) navParams.announcementTitle = notifData.announcementTitle;
+      if (notifData.announcementImage) navParams.announcementImage = notifData.announcementImage;
+      // Add sender details to pre-populate the conversation header
+      if (notifData.senderName) navParams.senderName = notifData.senderName;
+      if (notifData.senderAvatar) navParams.senderAvatar = notifData.senderAvatar;
+      if (notifData.senderId) navParams.senderId = notifData.senderId;
 
       // Step 3: Navigate to chat (replace to avoid stack issues)
       router.replace({ 
@@ -106,8 +111,7 @@ export default function NotificationsScreen() {
         }
       }, 500);
     } else {
-      // Handle other link types if needed in the future
-      console.warn('Unsupported notification link type:', notification.link);
+      console.warn('Invalid notification link - no conversationId');
     }
   }, [items, router]);
 

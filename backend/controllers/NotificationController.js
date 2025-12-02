@@ -25,6 +25,7 @@ const getNotifications = async (req, res) => {
             // Link may be in two forms: /chat/:conversationId or /chat/:conversationId/:messageId
             const payload = link.split('/chat/')[1] || '';
             const [conversationId, messageId] = payload.split('/').map(p => p && String(p).trim());
+            obj.conversationId = conversationId; // Explicitly add conversationId to the object
             try {
               if (messageId) {
                 // If a specific message id is provided, try to load that message for exact preview
@@ -34,6 +35,7 @@ const getNotifications = async (req, res) => {
                   if (sender) {
                     obj.senderName = `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Utilizator';
                     obj.senderAvatar = sender.avatar || null;
+                    obj.senderId = String(sender._id);
                   }
                   obj.preview = msg.text ? String(msg.text) : (msg.image ? 'Imagine nouă' : obj.message);
                 }
@@ -44,11 +46,17 @@ const getNotifications = async (req, res) => {
                     if (parts.length === 3 && /^[a-fA-F0-9]{24}$/.test(parts[2])) {
                       obj.announcementId = parts[2];
                       obj.announcementOwnerId = parts[0];
-                      // Try to fetch announcement title for better client rendering
+                      // Try to fetch announcement title and images for better client rendering
                       try {
                         const Announcement = require('../models/Announcement');
-                        const ann = await Announcement.findById(obj.announcementId).select('title');
-                        if (ann) obj.announcementTitle = ann.title || '';
+                        const ann = await Announcement.findById(obj.announcementId).select('title images');
+                        if (ann) {
+                          obj.announcementTitle = ann.title || '';
+                          // Use first image from images array if available
+                          if (ann.images && ann.images.length > 0) {
+                            obj.announcementImage = ann.images[0];
+                          }
+                        }
                       } catch (e) {
                         // ignore if Announcement model not available or fetch fails
                       }
@@ -69,6 +77,7 @@ const getNotifications = async (req, res) => {
                   if (sender) {
                     obj.senderName = `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Utilizator';
                     obj.senderAvatar = sender.avatar || null;
+                    obj.senderId = String(sender._id);
                   }
                   obj.preview = lastIncoming.text
                     ? String(lastIncoming.text)
@@ -82,6 +91,7 @@ const getNotifications = async (req, res) => {
                     if (sender) {
                       obj.senderName = `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Utilizator';
                       obj.senderAvatar = sender.avatar || null;
+                      obj.senderId = String(sender._id);
                     }
                   }
                 }
@@ -93,12 +103,18 @@ const getNotifications = async (req, res) => {
         } catch (e) {
           console.warn('⚠️ Eroare enrich notification:', e.message);
         }
-        // Normalize avatar to absolute URL if it's a relative path
+        // Normalize avatar/image to absolute URL if it's a relative path
         try {
+          const base = `${req.protocol}://${req.get('host')}`.replace(/\/$/, '');
+          
           if (obj.senderAvatar && typeof obj.senderAvatar === 'string' && !/^https?:\/\//i.test(obj.senderAvatar)) {
-            const base = `${req.protocol}://${req.get('host')}`.replace(/\/$/, '');
             const path = obj.senderAvatar.startsWith('/') ? obj.senderAvatar : `/${obj.senderAvatar}`;
             obj.senderAvatar = `${base}${path}`;
+          }
+          
+          if (obj.announcementImage && typeof obj.announcementImage === 'string' && !/^https?:\/\//i.test(obj.announcementImage)) {
+            const path = obj.announcementImage.startsWith('/') ? obj.announcementImage : `/${obj.announcementImage}`;
+            obj.announcementImage = `${base}${path}`;
           }
         } catch (_) {}
         return obj;
@@ -117,6 +133,19 @@ const createNotification = async (req, res) => {
   try {
     const { userId, message, link, title } = req.body;
     const notif = await Notification.create({ userId, message, link, title });
+    
+    // Emit Socket.IO event for real-time notification
+    try {
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        const sid = activeUsers.get(String(userId));
+        if (sid) {
+          io.to(sid).emit('newNotification', { userId });
+        }
+      }
+    } catch (_) {}
+    
     res.status(201).json(notif);
   } catch (err) {
     res.status(500).json({ error: err.message });

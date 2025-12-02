@@ -57,37 +57,54 @@ router.post('/:announcementId', auth, async (req, res) => {
         const Notification = require('../models/Notification');
         const owner = await User.findById(ann.user).select('pushToken notificationSettings');
         
-        await Notification.create({
-          userId: ann.user,
-          message: `Cineva a adăugat anunțul "${ann.title}" la favorite!`,
-          link: `/announcements/${ann._id}`,
-        });
-
         const settings = owner ? owner.notificationSettings : {};
-        const allowPush = settings.push !== false;
+        const allowFavoriteNotifications = settings.favorites !== false;
 
-        if (owner && owner.pushToken && allowPush) {
-           let tokens = [];
-           if (Array.isArray(owner.pushToken)) {
-             tokens = owner.pushToken;
-           } else if (typeof owner.pushToken === 'string') {
-             tokens = [owner.pushToken];
-           }
-           tokens = tokens.filter(t => /^ExponentPushToken\[.+\]$/.test(t));
+        // Only create notification and send push if user has favorites notifications enabled
+        if (allowFavoriteNotifications) {
+          await Notification.create({
+            userId: ann.user,
+            message: `Cineva a adăugat anunțul "${ann.title}" la favorite!`,
+            link: `/announcements/${ann._id}`,
+          });
+          
+          // Emit Socket.IO event for real-time notification
+          try {
+            const io = req.app.get('io');
+            const activeUsers = req.app.get('activeUsers');
+            if (io && activeUsers) {
+              const sid = activeUsers.get(String(ann.user));
+              if (sid) {
+                io.to(sid).emit('newNotification', { userId: ann.user });
+              }
+            }
+          } catch (_) {}
 
-           if (tokens.length > 0) {
-             const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
-             await doFetch('https://exp.host/--/api/v2/push/send', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                 to: tokens,
-                 title: 'Anunț apreciat',
-                 body: `Cineva a adăugat anunțul "${ann.title}" la favorite!`,
-                 data: { link: `/announcements/${ann._id}` },
-               }),
-             });
-           }
+          const allowPush = settings.push !== false;
+
+          if (owner && owner.pushToken && allowPush) {
+             let tokens = [];
+             if (Array.isArray(owner.pushToken)) {
+               tokens = owner.pushToken;
+             } else if (typeof owner.pushToken === 'string') {
+               tokens = [owner.pushToken];
+             }
+             tokens = tokens.filter(t => /^ExponentPushToken\[.+\]$/.test(t));
+
+             if (tokens.length > 0) {
+               const doFetch = (url, opts) => (typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts));
+               await doFetch('https://exp.host/--/api/v2/push/send', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({
+                   to: tokens,
+                   title: 'Anunț apreciat',
+                   body: `Cineva a adăugat anunțul "${ann.title}" la favorite!`,
+                   data: { link: `/announcements/${ann._id}` },
+                 }),
+               });
+             }
+          }
         }
       } catch (e) {
         console.warn('Failed to notify owner about favorite:', e);

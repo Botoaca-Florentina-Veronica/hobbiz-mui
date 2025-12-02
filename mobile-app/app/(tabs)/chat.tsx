@@ -297,28 +297,44 @@ export default function ChatScreen() {
         router.setParams({ conversationId: undefined, messageId: undefined });
       } else {
         // Create a lightweight temporary conversation so the UI opens
+        // Try to use senderName/senderAvatar from notification params if available
+        const senderName = (routeParams as any)?.senderName || 'Utilizator';
+        const senderAvatar = (routeParams as any)?.senderAvatar || '';
+        let senderId = (routeParams as any)?.senderId || '';
+        
+        // Fallback: try to extract senderId from conversationId if not provided
+        if (!senderId && expectedConversationId && userId) {
+          const parts = expectedConversationId.split('-');
+          // Find a part that is NOT the current user ID and looks like a Mongo ID (24 hex chars)
+          const candidate = parts.find(p => p !== userId && /^[a-fA-F0-9]{24}$/.test(p));
+          if (candidate) senderId = candidate;
+        }
+
+        // Prefer announcement image if available, otherwise use avatar
+        const conversationAvatar = (routeParams as any)?.announcementImage || senderAvatar;
+        
         const tempConv: Conversation = {
-          id: expectedConversationId,
+          id: senderId || expectedConversationId,
           conversationId: expectedConversationId,
-          name: '(Conversatie)',
-          avatar: '',
-          participantName: 'Utilizator',
-          participantAvatar: '',
-          announcementTitle: '',
-          announcementOwnerName: 'Utilizator',
+          name: (routeParams as any)?.announcementTitle || '(Conversatie)',
+          avatar: conversationAvatar,
+          participantName: senderName,
+          participantAvatar: senderAvatar,
+          announcementTitle: (routeParams as any)?.announcementTitle || '',
+          announcementOwnerName: senderName,
           lastMessage: '',
           time: new Date().toLocaleString('ro-RO'),
           unread: false,
-          otherParticipant: { id: '', firstName: '', lastName: '', avatar: '' },
+          otherParticipant: { id: senderId, firstName: '', lastName: '', avatar: senderAvatar },
           lastSeen: undefined,
-          announcementOwnerId: '',
-          announcementId: '',
+          announcementOwnerId: (routeParams as any)?.announcementOwnerId || '',
+          announcementId: (routeParams as any)?.announcementId || '',
         };
         setSelectedConversation(tempConv);
         handledRouteConversationIdRef.current = expectedConversationId;
         if (routeMessageId) setTargetMessageId(String(routeMessageId));
         // Clear params so we don't reopen on back/refresh
-        router.setParams({ conversationId: undefined, messageId: undefined });
+        router.setParams({ conversationId: undefined, messageId: undefined, senderName: undefined, senderAvatar: undefined, announcementImage: undefined, announcementTitle: undefined, announcementId: undefined, announcementOwnerId: undefined, senderId: undefined });
       }
       // We still allow the announcementOwnerId flow below to run if present
     }
@@ -350,20 +366,27 @@ export default function ChatScreen() {
       }
 
       // If not found, create a temporary conversation object so the UI opens a detail view
+      // Prefer senderName/senderAvatar from notification params if available
+      const senderName = (routeParams as any)?.senderName || 
+        `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 
+        'Utilizator';
+      const senderAvatar = (routeParams as any)?.senderAvatar || 
+        (routeParams as any)?.announcementOwnerAvatar || '';
+      
       const tempConv: Conversation = {
         id: ownerId,
         conversationId: expectedConversationId,
         name: (routeParams as any)?.announcementTitle || '(fără titlu)',
-        // Prefer an explicit announcement image when available, fallback to owner's avatar
-        avatar: (routeParams as any)?.announcementImage || (routeParams as any)?.announcementOwnerAvatar || '',
-        participantName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
-        participantAvatar: (routeParams as any)?.announcementOwnerAvatar || '',
+        // Prefer an explicit announcement image when available, fallback to sender's avatar
+        avatar: (routeParams as any)?.announcementImage || senderAvatar || '',
+        participantName: senderName,
+        participantAvatar: senderAvatar,
         announcementTitle: (routeParams as any)?.announcementTitle || '',
-        announcementOwnerName: `${(routeParams as any)?.announcementOwnerFirstName || ''} ${(routeParams as any)?.announcementOwnerLastName || ''}`.trim() || 'Utilizator',
+        announcementOwnerName: senderName,
         lastMessage: '',
         time: new Date().toLocaleString('ro-RO'),
         unread: false,
-        otherParticipant: { id: ownerId, firstName: (routeParams as any)?.announcementOwnerFirstName, lastName: (routeParams as any)?.announcementOwnerLastName, avatar: (routeParams as any)?.announcementOwnerAvatar },
+        otherParticipant: { id: ownerId, firstName: (routeParams as any)?.announcementOwnerFirstName, lastName: (routeParams as any)?.announcementOwnerLastName, avatar: senderAvatar },
         lastSeen: undefined,
         announcementOwnerId: ownerId,
         announcementId: announcementId || '',
@@ -439,6 +462,17 @@ export default function ChatScreen() {
         };
       });
       setConversations(formattedConversations);
+      
+      // If a temporary conversation was selected, update it with real data if now available
+      if (selectedConversation) {
+        const updatedConv = formattedConversations.find(
+          (c) => c.conversationId === selectedConversation.conversationId
+        );
+        if (updatedConv) {
+          setSelectedConversation(updatedConv);
+        }
+      }
+      
       // Update global unread badge locally for instant feedback
       try {
         const localTotal = formattedConversations.reduce((acc: number, c: Conversation) => acc + (c.unreadCount ?? (c.unread ? 1 : 0)), 0);
@@ -849,8 +883,10 @@ export default function ChatScreen() {
   const resolveAvatarUrl = (src?: string) => {
     if (!src) return '';
     if (src.startsWith('http') || src.startsWith('data:')) return src;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
     const cleaned = src.replace(/^\.\//, '').replace(/^\//, '');
-    return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\\/]/, '')}`;
+    const path = cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\\/]/, '')}`;
+    return `${base}${path}`;
   };
 
   const handleOpenImage = useCallback(

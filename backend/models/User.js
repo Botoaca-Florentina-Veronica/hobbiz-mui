@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
     push: { type: Boolean, default: true },
     messages: { type: Boolean, default: true },
     reviews: { type: Boolean, default: true },
+    favorites: { type: Boolean, default: true },
     promotions: { type: Boolean, default: false }
   }
 });

@@ -27,6 +27,7 @@ export default function NotificationSettingsScreen() {
     push: true,
     messages: true,
     reviews: true,
+    favorites: true,
     promotions: false
   });
 
@@ -45,6 +46,8 @@ export default function NotificationSettingsScreen() {
       messagesDesc: 'Notificări când primești un mesaj nou',
       reviews: 'Recenzii Noi',
       reviewsDesc: 'Notificări când primești o recenzie nouă',
+      favorites: 'Anunțuri Adăugate la Favorite',
+      favoritesDesc: 'Notificări când cineva adaugă anunțurile tale la favorite',
       promotions: 'Promoții și Noutăți',
       promotionsDesc: 'Fii la curent cu ultimele noutăți',
       saveSuccess: 'Setările au fost salvate',
@@ -60,6 +63,8 @@ export default function NotificationSettingsScreen() {
       messagesDesc: 'Notify when you receive a new message',
       reviews: 'New Reviews',
       reviewsDesc: 'Notify when you receive a new review',
+      favorites: 'Announcements Added to Favorites',
+      favoritesDesc: 'Notify when someone adds your announcements to favorites',
       promotions: 'Promotions & News',
       promotionsDesc: 'Stay updated with the latest news',
       saveSuccess: 'Settings saved successfully',
@@ -162,6 +167,7 @@ export default function NotificationSettingsScreen() {
           {renderSettingItem('email', t.email, t.emailDesc)}
           {renderSettingItem('messages', t.messages, t.messagesDesc)}
           {renderSettingItem('reviews', t.reviews, t.reviewsDesc)}
+          {renderSettingItem('favorites', t.favorites, t.favoritesDesc)}
           {renderSettingItem('promotions', t.promotions, t.promotionsDesc)}
         </View>
       </ScrollView>

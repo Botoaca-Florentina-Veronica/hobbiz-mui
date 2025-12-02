@@ -47,6 +47,18 @@ const createReview = async (req, res) => {
         message: `Ai primit o recenzie nouă (${parsedScore}/5)`,
         link: `/users/${reviewedUserId}/reviews`,
       });
+      
+      // Emit Socket.IO event for real-time notification
+      try {
+        const io = req.app.get('io');
+        const activeUsers = req.app.get('activeUsers');
+        if (io && activeUsers) {
+          const sid = activeUsers.get(String(reviewedUserId));
+          if (sid) {
+            io.to(sid).emit('newNotification', { userId: reviewedUserId });
+          }
+        }
+      } catch (_) {}
 
       const settings = reviewed.notificationSettings || {};
       const allowPush = settings.push !== false;

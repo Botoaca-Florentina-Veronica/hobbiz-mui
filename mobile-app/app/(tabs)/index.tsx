@@ -10,6 +10,7 @@ import MobileHeader from '@/components/MobileHeader';
 import LegalFooter from '@/components/LegalFooter';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/context/AuthContext';
+import { useNotifications } from '../../src/context/NotificationContext';
 import api from '../../src/services/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Text } from 'react-native';
@@ -102,7 +103,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const [notifCount, setNotifCount] = useState(0);
+  const { unreadNotificationCount, refreshNotificationCount } = useNotifications();
   const [popular, setPopular] = useState<any[]>([]);
   const [popularLoading, setPopularLoading] = useState(false);
   const { locale } = useLocale();
@@ -171,31 +172,11 @@ export default function HomeScreen() {
 
 
 
-  const loadCount = useCallback(async () => {
-    try {
-      if (!isAuthenticated || !user?.id) { 
-        setNotifCount(0); 
-        return; 
-      }
-      const res = await api.get(`/api/notifications/${user.id}`);
-      const list = Array.isArray(res.data) ? res.data : [];
-      // Considerăm ne-citit orice element cu read === false
-      const unread = list.filter((n: any) => n && n.read === false).length;
-      setNotifCount(unread);
-    } catch (e: any) {
-      // Suppress 404 and 401 errors in console (user not fully authenticated yet)
-      if (e?.response?.status !== 404 && e?.response?.status !== 401) {
-        console.error('Error loading notification count:', e);
-      }
-      setNotifCount(0);
-    }
-  }, [isAuthenticated, user?.id]);
-
   useFocusEffect(
     useCallback(() => {
-      loadCount();
+      refreshNotificationCount();
       loadPopular();
-    }, [loadCount])
+    }, [refreshNotificationCount])
   );
 
   const loadPopular = useCallback(async () => {
@@ -222,7 +203,7 @@ export default function HomeScreen() {
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
       <CheckeredBackground />
       <MobileHeader 
-        notificationCount={notifCount}
+        notificationCount={unreadNotificationCount}
         onSearchFocus={() => console.log('Search focused')}
         onNotificationClick={() => router.push('/notifications')}
       />
