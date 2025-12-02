@@ -1189,7 +1189,8 @@ const createStyles = (tokens: any) => StyleSheet.create({
   },
   compactButton: {
     flexShrink: 0,
-    minWidth: 100,
+    // minWidth removed to allow button to shrink to content size (strictly necessary width)
+    // minWidth: 100, 
   },
   actionButton: {
     paddingVertical: 5,

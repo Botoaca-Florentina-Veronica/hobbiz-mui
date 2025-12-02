@@ -607,7 +607,7 @@ export default function AnnouncementDetailsScreen() {
           experimentalBlurMethod="dimezisBlurView"
           style={[StyleSheet.absoluteFill, styles.ratingModalOverlay, { zIndex: 1000 }]}
         >
-          <View style={[styles.ratingModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+          <View style={[styles.ratingModalCard, { backgroundColor: isDark ? '#121212' : tokens.colors.surface, borderColor: tokens.colors.border }]}>
             <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
             <View style={styles.ratingStarsRow}>
               {Array.from({ length: 5 }).map((_, i) => (
@@ -618,7 +618,7 @@ export default function AnnouncementDetailsScreen() {
               <Text style={[styles.ratingNumeric, { color: tokens.colors.text }]}>{Number(ratingScore).toFixed(1)}</Text>
             </View>
 
-            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}> 
+            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: isDark ? '#1e1e1e' : tokens.colors.elev }]}> 
               <TextInput
                 multiline
                 numberOfLines={4}

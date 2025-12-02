@@ -22,6 +22,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { Toast } from '../../components/ui/Toast';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -246,6 +247,9 @@ export default function ChatScreen() {
   const [reactionDimsMap, setReactionDimsMap] = useState<Record<string, {width:number;height:number}>>({});
   const [replyTo, setReplyTo] = useState<{ messageId: string; senderId: string; senderName: string; text?: string; image?: string } | null>(null);
   const [targetMessageId, setTargetMessageId] = useState<string | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
   const width = Dimensions.get('window').width;
   // Static local empty-state image (added to mobile-app/assets/images)
@@ -274,6 +278,8 @@ export default function ChatScreen() {
 
   // Check incoming route params to auto-open a conversation (e.g. from announcement details)
   const routeParams = useLocalSearchParams();
+  const routeParamsRef = useRef(routeParams);
+  routeParamsRef.current = routeParams;
   const handledRouteConversationIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -576,18 +582,21 @@ export default function ChatScreen() {
     useCallback(() => {
       // Only fetch if we don't have a selected conversation from route params
       // This prevents clearing the conversation when navigating from notifications
-      const hasRouteConversation = !!(routeParams as any)?.conversationId || !!(routeParams as any)?.announcementOwnerId;
+      const currentParams = routeParamsRef.current;
+      const hasRouteConversation = !!(currentParams as any)?.conversationId || !!(currentParams as any)?.announcementOwnerId;
       if (!hasRouteConversation) {
         // Refresh conversations and unread count when screen gains focus naturally
         fetchConversations();
         refreshUnreadCount();
+        // If no route params, ensure we show the list (clear any stale selected conversation)
+        setSelectedConversation(null);
       }
       
       return () => {
         // Don't auto-close conversation on blur - let user navigate back explicitly
         showTabBar();
       };
-    }, [showTabBar])
+    }, [showTabBar, fetchConversations, refreshUnreadCount])
   );
 
   // Handle Android hardware back button when inside a conversation: close it and show tab bar.
@@ -961,62 +970,19 @@ export default function ChatScreen() {
       setContextMenuVisible(true);
       return;
     }
-    // First measurement (immediate)
+    // Measure and show immediately without snapshot
     UIManager.measureInWindow(node, (x, y, width, height) => {
       const screenHeight = Dimensions.get('window').height;
       const spaceAbove = y - insets.top;
       const spaceBelow = screenHeight - (y + height) - insets.bottom;
       const estimatedMenuHeight = 320; // rough estimate
       const showAbove = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
-      // set initial values so UI can render quickly
+      
       setSelectedMessage(message);
       setMenuPosition({ x, y, width, height, showAbove });
       setContextMenuVisible(true);
-      if (!captureRef) {
-        // Fallback clone will be used; consider it ready immediately
-        setFloatingReady(true);
-      }
-      // Re-measure after a very short delay to get a stabilized height/width
-      // (addresses race conditions where layout/line-wrapping can change slightly)
-      setTimeout(() => {
-        try {
-          UIManager.measureInWindow(node, (x2, y2, w2, h2) => {
-            const screenH2 = Dimensions.get('window').height;
-            const spaceAbove2 = y2 - insets.top;
-            const spaceBelow2 = screenH2 - (y2 + h2) - insets.bottom;
-            const showAbove2 = spaceBelow2 < estimatedMenuHeight && spaceAbove2 > spaceBelow2;
-            setMenuPosition({ x: x2, y: y2, width: w2, height: h2, showAbove: showAbove2 });
-          });
-          // Try to capture a pixel-perfect snapshot of the original bubble so we can
-          // render it above the BlurView (avoids blurring the message). This only
-          // works on native when captureRef is available; otherwise we'll fallback
-          // to rendering a cloned view above the blur.
-          if (captureRef) {
-            try {
-              // captureRef can fail if view transiently changes; ignore failures
-              // @ts-ignore
-              captureRef(ref, { format: 'png', quality: 1, result: 'tmpfile' })
-                .then((uri: string) => {
-                  setFloatingSnapshot(uri as string);
-                  setFloatingReady(true);
-                })
-                .catch(() => {
-                  // ignore, fallback handled in render
-                  setFloatingReady(true);
-                });
-            } catch (e) {
-              // ignore
-              setFloatingReady(true);
-            }
-          } else {
-            // captureRef unavailable → fallback clone considered ready already (if not yet set)
-            setFloatingReady(true);
-          }
-        } catch (e) {
-          // ignore failed re-measure
-          setFloatingReady(true);
-        }
-      }, 45);
+      // We are ready immediately as we will render the component directly
+      setFloatingReady(true);
     });
   };
 
@@ -1155,17 +1121,23 @@ export default function ChatScreen() {
     try {
       if (selectedMessage.text) {
         await Clipboard.setStringAsync(selectedMessage.text);
-        Alert.alert(t.copied, t.messageCopied);
+        setToastMessage(t.messageCopied);
+        setToastType('success');
+        setToastVisible(true);
         closeContextMenu();
         return;
       }
       if (selectedMessage.image) {
         await Clipboard.setStringAsync(selectedMessage.image);
-        Alert.alert(t.copied, t.imageLinkCopied);
+        setToastMessage(t.imageLinkCopied);
+        setToastType('success');
+        setToastVisible(true);
         closeContextMenu();
         return;
       }
-      Alert.alert(t.nothingToCopy, t.nothingToCopyMessage);
+      setToastMessage(t.nothingToCopyMessage || t.nothingToCopy);
+      setToastType('info');
+      setToastVisible(true);
       closeContextMenu();
     } catch (err) {
       console.error('Copy error:', err);
@@ -1650,20 +1622,108 @@ export default function ChatScreen() {
             />
             {selectedMessage && menuPosition && (
               <>
-                {/* Floating snapshot OR fallback clone (unblurred) */}
-                {floatingReady && floatingSnapshot ? (
+                {/* Floating bubble (unblurred) */}
+                {floatingReady && (
                   <View
                     style={[
-                      styles.floatingBubble,
-                      { top: menuPosition.y, left: menuPosition.x, width: menuPosition.width, height: menuPosition.height, zIndex: 30 },
+                      styles.messageBubbleClean,
+                      selectedMessage.senderId === userId
+                        ? {
+                            backgroundColor: isDark ? tokens.colors.primary : '#d1e7ff',
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            borderBottomLeftRadius: 20,
+                            borderBottomRightRadius: 6,
+                          }
+                        : {
+                            backgroundColor: tokens.colors.elev,
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            borderBottomLeftRadius: 6,
+                            borderBottomRightRadius: 20,
+                          },
+                      {
+                        position: 'absolute',
+                        top: menuPosition.y,
+                        left: menuPosition.x,
+                        width: menuPosition.width,
+                        height: menuPosition.height,
+                        zIndex: 30,
+                        margin: 0,
+                        marginLeft: 0,
+                        marginRight: 0,
+                        maxWidth: undefined,
+                      },
                       Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined,
                     ]}
                     {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
                   >
-                    <Image source={{ uri: floatingSnapshot }} style={{ width: menuPosition.width, height: menuPosition.height, borderRadius: 12 }} resizeMode="cover" />
+                    {selectedMessage.deleted ? (
+                      <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>{t.deletedMessage}</Text>
+                    ) : (
+                      <>
+                        {selectedMessage.replyTo && selectedMessage.replyTo.messageId && (
+                          <View style={[styles.replyInBubble, { 
+                            backgroundColor: selectedMessage.senderId === userId 
+                              ? (isDark ? '#ffffff' : 'rgba(0,0,0,0.08)') 
+                              : 'rgba(0,0,0,0.05)',
+                            borderLeftColor: isDark ? '#000000' : tokens.colors.primary 
+                          }]}> 
+                            <Text style={[styles.replyInBubbleName, { 
+                              color: selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.primary 
+                            }]}>
+                              {selectedMessage.replyTo.senderName}
+                            </Text>
+                            {selectedMessage.replyTo.text && (
+                              <Text 
+                                style={[styles.replyInBubbleText, { 
+                                  color: selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.muted 
+                                }]} 
+                                numberOfLines={1}
+                              >
+                                {selectedMessage.replyTo.text}
+                              </Text>
+                            )}
+                            {selectedMessage.replyTo.image && (
+                              <View style={styles.replyInBubbleImageRow}>
+                                <Ionicons 
+                                  name="image-outline" 
+                                  size={14} 
+                                  color={selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.muted} 
+                                />
+                                <Text 
+                                  style={[styles.replyInBubbleText, { 
+                                    color: selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.muted,
+                                    marginLeft: 4 
+                                  }]}
+                                >
+                                  {t.photo}
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        )}
+                        
+                        {selectedMessage.text && (
+                          <Text style={[styles.messageTextClean, { color: selectedMessage.senderId === userId && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
+                            {selectedMessage.text}
+                          </Text>
+                        )}
+                        {selectedMessage.image && (
+                          <Image source={{ uri: selectedMessage.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
+                        )}
+                        {selectedMessage.senderId === userId && (
+                          <Ionicons
+                            name="checkmark-done"
+                            size={15}
+                            color={selectedMessage.isRead ? (isDark ? '#ffabb7' : '#34B7F1') : tokens.colors.muted}
+                            style={styles.tickIconClean}
+                          />
+                        )}
+                      </>
+                    )}
                   </View>
-                ) : null}
-                {/* When snapshot unavailable (e.g., web), keep original bubble visible */}
+                )}
 
                 {/* Reaction bar (unblurred) */}
                 <View
@@ -1735,7 +1795,7 @@ export default function ChatScreen() {
                       const win = Dimensions.get('window');
                       const gap = 8; // match reaction bar spacing to keep both close to the bubble
                       // Exact menu height based on current items (Delete shown only for own, non-deleted messages)
-                      const baseCount = 6; // Star, Reply, Forward, Copy, Speak, Report
+                      const baseCount = 4; // Reply, Forward, Copy, Report
                       const showDelete = !!(selectedMessage && String(selectedMessage.senderId) === String(userId) && !selectedMessage.deleted);
                       const count = baseCount + (showDelete ? 1 : 0);
                       const desiredH = count * MENU_ITEM_HEIGHT + Math.max(0, count - 1) * MENU_DIVIDER_HEIGHT;
@@ -1769,11 +1829,6 @@ export default function ChatScreen() {
                     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }}
                       keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                       <View style={[styles.contextMenu, { backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }] }>
-                    <TouchableOpacity style={styles.contextMenuItem} onPress={handleStarMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.star}</Text>
-                      <Ionicons name="star-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
-                    </TouchableOpacity>
-                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
                       <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.reply}</Text>
                       <Ionicons name="arrow-undo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
@@ -1787,11 +1842,6 @@ export default function ChatScreen() {
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
                       <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.copy}</Text>
                       <Ionicons name="copy-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
-                    </TouchableOpacity>
-                    <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
-                    <TouchableOpacity style={styles.contextMenuItem} onPress={() => { Alert.alert(t.speak, t.textToSpeech); closeContextMenu(); }}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.speak}</Text>
-                      <Ionicons name="volume-medium-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
@@ -1815,6 +1865,13 @@ export default function ChatScreen() {
             )}
           </Pressable>
         </Modal>
+        {/* Global toast for copy/notifications */}
+        <Toast
+          visible={toastVisible}
+          message={toastMessage}
+          type={toastType}
+          onHide={() => setToastVisible(false)}
+        />
       </KeyboardAvoidingView>
       </ProtectedRoute>
     );
