@@ -1,10 +1,12 @@
 import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { Stack, router } from 'expo-router';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
+import { TransitionPresets } from '@react-navigation/stack';
 
+import { JsStack } from '../components/JsStack';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
@@ -76,21 +78,31 @@ export default function RootLayout() {
             <ChatNotificationProvider>
               <SafeAreaProvider>
                 <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="login" options={{ headerShown: false }} />
-                <Stack.Screen name="oauth" options={{ headerShown: false }} />
-                <Stack.Screen name="settings" options={{ headerShown: false }} />
-                <Stack.Screen name="notification-settings" options={{ headerShown: false }} />
-                <Stack.Screen name="about" options={{ headerShown: false }} />
-                <Stack.Screen name="legal" options={{ headerShown: false }} />
-                <Stack.Screen name="notifications" options={{ headerShown: false }} />
-                <Stack.Screen name="profile" options={{ headerShown: false }} />
-                <Stack.Screen name="my-announcements" options={{ headerShown: false }} />
-                <Stack.Screen name="edit-announcement" options={{ headerShown: false }} />
-                <Stack.Screen name="post-success" options={{ headerShown: false }} />
-                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              </Stack>
+                <JsStack
+                  screenOptions={{
+                    ...TransitionPresets.SlideFromRightIOS,
+                    headerShown: false,
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
+                    cardStyle: {
+                      backgroundColor: colorScheme === 'dark' ? '#000000' : '#ffffff',
+                    },
+                  }}
+                >
+                <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <JsStack.Screen name="login" options={{ headerShown: false }} />
+                <JsStack.Screen name="oauth" options={{ headerShown: false }} />
+                <JsStack.Screen name="settings" options={{ headerShown: false }} />
+                <JsStack.Screen name="notification-settings" options={{ headerShown: false }} />
+                <JsStack.Screen name="about" options={{ headerShown: false }} />
+                <JsStack.Screen name="legal" options={{ headerShown: false }} />
+                <JsStack.Screen name="notifications" options={{ headerShown: false }} />
+                <JsStack.Screen name="profile" options={{ headerShown: false }} />
+                <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
+                <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />
+                <JsStack.Screen name="post-success" options={{ headerShown: false }} />
+                <JsStack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+              </JsStack>
                 <StatusBar style="auto" />
               </NavThemeProvider>
             </SafeAreaProvider>

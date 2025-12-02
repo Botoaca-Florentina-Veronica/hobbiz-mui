@@ -6,16 +6,19 @@ import { useAppTheme } from '../src/context/ThemeContext';
 interface MobileHeaderProps {
   notificationCount?: number;
   onSearchFocus?: () => void;
+  onSearchSubmit?: (query: string) => void;
   onNotificationClick?: () => void;
 }
 
 export default function MobileHeader({ 
   notificationCount = 0, 
   onSearchFocus, 
-  onNotificationClick 
+  onNotificationClick,
+  onSearchSubmit,
 }: MobileHeaderProps) {
   const { tokens } = useAppTheme();
   const webBox = (tokens as any)?.shadow?.elev1?.boxShadow;
+  const [query, setQuery] = React.useState('');
 
   return (
     <View style={[styles.header, { backgroundColor: tokens.colors.bg }]}>
@@ -38,10 +41,24 @@ export default function MobileHeader({
             placeholder="Ce anume cauți?"
             placeholderTextColor={tokens.colors.muted}
             onFocus={onSearchFocus}
+            value={query}
+            onChangeText={setQuery}
+            returnKeyType="search"
+            onSubmitEditing={() => {
+              const q = (query || '').trim();
+              if (onSearchSubmit) onSearchSubmit(q);
+            }}
           />
-          <View style={[styles.searchButton, { backgroundColor: tokens.colors.primary }]}>
+          <TouchableOpacity
+            style={[styles.searchButton, { backgroundColor: tokens.colors.primary }]}
+            activeOpacity={0.85}
+            onPress={() => {
+              const q = (query || '').trim();
+              if (onSearchSubmit) onSearchSubmit(q);
+            }}
+          >
             <Ionicons name="search" size={20} color={tokens.colors.primaryContrast} />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 

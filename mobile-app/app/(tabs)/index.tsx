@@ -204,7 +204,12 @@ export default function HomeScreen() {
       <CheckeredBackground />
       <MobileHeader 
         notificationCount={unreadNotificationCount}
-        onSearchFocus={() => console.log('Search focused')}
+        onSearchFocus={() => {
+          try { router.push('/all-announcements'); } catch (e) { router.push({ pathname: '/all-announcements' }); }
+        }}
+        onSearchSubmit={(q) => {
+          try { router.push(q ? `/all-announcements?q=${encodeURIComponent(q)}` : '/all-announcements'); } catch (e) { router.push({ pathname: '/all-announcements', params: q ? { q } : undefined }); }
+        }}
         onNotificationClick={() => router.push('/notifications')}
       />
   <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -293,7 +298,17 @@ export default function HomeScreen() {
   <View style={[styles.popularSection, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <ThemedText style={[styles.popularTitle, { color: tokens.colors.text }]}>{t.popularTitle}</ThemedText>
-            <TouchableOpacity onPress={() => router.push('/announcement-details?sort=popular') }>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  console.log('[Explore] See all pressed - navigating to all-announcements');
+                } catch (e) {}
+                try { router.push({ pathname: '/all-announcements' }); } catch (e) { router.push('/all-announcements'); }
+              }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityRole="button"
+              activeOpacity={0.8}
+            >
               <Text style={{ color: tokens.colors.primary }}>{t.seeAll}</Text>
             </TouchableOpacity>
           </View>
@@ -355,11 +370,21 @@ export default function HomeScreen() {
                     // render placeholder card (fills empty slot) with a single informative text
                     if (item && item.placeholder) {
                       return (
-                        <View style={itemStyle}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          style={itemStyle}
+                          onPress={() => {
+                            try {
+                              router.push('/all-announcements');
+                            } catch (e) {
+                              router.push({ pathname: '/all-announcements' });
+                            }
+                          }}
+                        >
                           <View style={styles.placeholderBox}>
                             <Text style={[styles.placeholderText, { color: tokens.colors.primary }]}>{t.showAllAnnouncements}</Text>
                           </View>
-                        </View>
+                        </TouchableOpacity>
                       );
                     }
 

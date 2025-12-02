@@ -312,20 +312,29 @@ export default function ChatScreen() {
 
         // Prefer announcement image if available, otherwise use avatar
         const conversationAvatar = (routeParams as any)?.announcementImage || senderAvatar;
+        const resolvedAvatar = resolveAvatarUrl(conversationAvatar) || resolveAvatarUrl(senderAvatar) || '';
+        const resolvedParticipantAvatar = resolveAvatarUrl(senderAvatar) || '';
         
         const tempConv: Conversation = {
           id: senderId || expectedConversationId,
           conversationId: expectedConversationId,
           name: (routeParams as any)?.announcementTitle || '(Conversatie)',
-          avatar: conversationAvatar,
+          avatar: resolvedAvatar,
           participantName: senderName,
-          participantAvatar: senderAvatar,
+          participantAvatar: resolvedParticipantAvatar,
           announcementTitle: (routeParams as any)?.announcementTitle || '',
           announcementOwnerName: senderName,
           lastMessage: '',
-          time: new Date().toLocaleString('ro-RO'),
+          time: new Date().toLocaleString('ro-RO', { hour: '2-digit', minute: '2-digit' }),
           unread: false,
-          otherParticipant: { id: senderId, firstName: '', lastName: '', avatar: senderAvatar },
+          unreadCount: 0,
+          otherParticipant: { 
+            id: senderId, 
+            firstName: senderName.split(' ')[0] || '', 
+            lastName: senderName.split(' ').slice(1).join(' ') || '', 
+            avatar: resolvedParticipantAvatar,
+            lastSeen: undefined
+          },
           lastSeen: undefined,
           announcementOwnerId: (routeParams as any)?.announcementOwnerId || '',
           announcementId: (routeParams as any)?.announcementId || '',
@@ -373,20 +382,30 @@ export default function ChatScreen() {
       const senderAvatar = (routeParams as any)?.senderAvatar || 
         (routeParams as any)?.announcementOwnerAvatar || '';
       
+      const conversationAvatar = (routeParams as any)?.announcementImage || senderAvatar || '';
+      const resolvedAvatar = resolveAvatarUrl(conversationAvatar) || '';
+      const resolvedParticipantAvatar = resolveAvatarUrl(senderAvatar) || '';
+      
       const tempConv: Conversation = {
         id: ownerId,
         conversationId: expectedConversationId,
         name: (routeParams as any)?.announcementTitle || '(fără titlu)',
-        // Prefer an explicit announcement image when available, fallback to sender's avatar
-        avatar: (routeParams as any)?.announcementImage || senderAvatar || '',
+        avatar: resolvedAvatar,
         participantName: senderName,
-        participantAvatar: senderAvatar,
+        participantAvatar: resolvedParticipantAvatar,
         announcementTitle: (routeParams as any)?.announcementTitle || '',
         announcementOwnerName: senderName,
         lastMessage: '',
-        time: new Date().toLocaleString('ro-RO'),
+        time: new Date().toLocaleString('ro-RO', { hour: '2-digit', minute: '2-digit' }),
         unread: false,
-        otherParticipant: { id: ownerId, firstName: (routeParams as any)?.announcementOwnerFirstName, lastName: (routeParams as any)?.announcementOwnerLastName, avatar: senderAvatar },
+        unreadCount: 0,
+        otherParticipant: { 
+          id: ownerId, 
+          firstName: (routeParams as any)?.announcementOwnerFirstName || senderName.split(' ')[0] || '', 
+          lastName: (routeParams as any)?.announcementOwnerLastName || senderName.split(' ').slice(1).join(' ') || '', 
+          avatar: resolvedParticipantAvatar,
+          lastSeen: undefined
+        },
         lastSeen: undefined,
         announcementOwnerId: ownerId,
         announcementId: announcementId || '',
@@ -1624,7 +1643,8 @@ export default function ChatScreen() {
           <Pressable style={styles.modalOverlay} onPress={closeContextMenu}>
             <BlurView
               intensity={80}
-              tint="dark"
+              tint={isDark ? 'dark' : 'light'}
+              experimentalBlurMethod="dimezisBlurView"
               style={StyleSheet.absoluteFill}
               {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : { style: [StyleSheet.absoluteFill, { pointerEvents: 'none' }] })}
             />
@@ -1823,14 +1843,7 @@ export default function ChatScreen() {
             <Text style={styles.listHeaderTitle}>{t.messages} ({totalConversations})</Text>
             <Text style={styles.listHeaderSubtitle}>{t.continueConversations}</Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85} onPress={() => router.push('/starred-messages')}>
-              <Ionicons name="star-outline" size={22} color="#ffffff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerIconButton} activeOpacity={0.85}>
-              <Ionicons name="search" size={22} color="#ffffff" />
-            </TouchableOpacity>
-          </View>
+          {/* Header action buttons removed as per design: star & search hidden */}
         </View>
 
         <View style={styles.filterSegment}>

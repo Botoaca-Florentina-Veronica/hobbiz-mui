@@ -683,7 +683,10 @@ export default function ProfileScreen() {
             )}
           </View>
           
-          <View style={[styles.mapContainer, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.borderNeutral }]}>
+          <View style={[
+            styles.mapContainer,
+            { backgroundColor: profileToShow?.localitate ? tokens.colors.surface : '#121212', borderColor: tokens.colors.borderNeutral }
+          ]}>
             {profileToShow?.localitate ? (
               (() => {
                 const encoded = encodeURIComponent(profileToShow.localitate);
@@ -753,7 +756,12 @@ export default function ProfileScreen() {
                 ) : (
                   <Ionicons name="map" size={48} color={tokens.colors.muted} />
                 )}
-                <ThemedText style={[styles.mapText, { color: tokens.colors.muted, marginTop: 8 }]}>{t.noLocationText}</ThemedText>
+                <ThemedText style={[styles.mapText, { color: tokens.colors.muted, marginTop: 8 }]}>
+                  {isViewingOwnProfile
+                    ? t.noLocationText
+                    : (locale === 'en' ? "This user hasn't set their location yet." : 'Acest utilizator nu și-a setat încă locația')
+                  }
+                </ThemedText>
               </View>
             )}
             {/* map pin removed as requested */}
@@ -1077,10 +1085,8 @@ export default function ProfileScreen() {
             </>
           ) : (
             <View style={styles.noReviewsContainer}>
-              <Image source={require('../assets/images/gumballCrying.png')} style={styles.noReviewsImage} resizeMode="contain" />
-              <Text style={[styles.noReviewsText, { color: tokens.colors.muted }]}>
-                Nu există încă review-uri
-              </Text>
+              <Ionicons name="star" size={56} color={tokens.colors.muted} style={{ marginBottom: 8 }} />
+              <Text style={[styles.noReviewsText, { color: tokens.colors.muted }]}>Nu există încă review-uri</Text>
             </View>
           )}
         </View>
