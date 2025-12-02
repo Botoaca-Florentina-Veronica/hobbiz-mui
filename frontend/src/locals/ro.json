@@ -79,9 +79,136 @@
     "art": "Arta",
     "technology": "Tehnologie",
     "auto": "Auto",
-    "tutoring": "Meditații"
-  }
-  ,
+    "tutoring": "Meditații",
+    "Fotografie": "Fotografie",
+    "Prajituri, Băcănie, Gătit": "Prajituri, Băcănie, Gătit",
+    "Traduceri & Redactare": "Traduceri & Redactare",
+    "Finanțe & Contabilitate": "Finanțe & Contabilitate",
+    "Video & Animație": "Video & Animație",
+    "Business": "Business",
+    "Meditații & Cursuri": "Meditații & Cursuri",
+    "Grafică & Design": "Grafică & Design",
+    "Curatenie, Întreținere casă": "Curatenie, Întreținere casă",
+    "Reparații, Instalatii, Bricolaj": "Reparații, Instalatii, Bricolaj",
+    "Muzică, Teatru, Dans": "Muzică, Teatru, Dans",
+    "Auto, Moto, Biciclete": "Auto, Moto, Biciclete",
+    "Imobiliare, Construcții, Amenajari": "Imobiliare, Construcții, Amenajari",
+    "Transport, Logistică, Curierat": "Transport, Logistică, Curierat"
+  },
+  "categoryDetails": {
+    "fotografie": {
+      "columns": [
+        { "title": "Servicii Foto", "items": ["Evenimente", "Portret", "Produse", "Imobiliare"] },
+        { "title": "Echipament Recomandat", "items": ["Camere DSLR/Mirrorless", "Obiective", "Blitz-uri", "Trepiede"] },
+        { "title": "Tutoriale & Resurse", "items": ["Cursuri Online", "Editare Foto", "Comunități"] },
+        { "title": "Sfaturi Utile", "items": ["Compoziție", "Lumină", "Marketing"] }
+      ]
+    },
+    "prajituri_gatit": {
+      "columns": [
+        { "title": "Produse & Servicii", "items": ["Torturi Personalizate", "Catering Mic", "Dulciuri de Casă"] },
+        { "title": "Echipamente Cheie", "items": ["Mixer Planetar", "Cuptor Electric", "Forme & Ustensile"] },
+        { "title": "Rețete & Inspirație", "items": ["Tradiționale", "Internaționale", "Sfaturi Patiserie"] },
+        { "title": "Gestionare & Vânzare", "items": ["Ambalare", "Autorizații", "Strategii Preț"] }
+      ]
+    },
+    "traduceri_redactare": {
+      "columns": [
+        { "title": "Tipuri de Servicii", "items": ["Traduceri Autorizate", "Redactare Conținut", "Corectură & Editare"] },
+        { "title": "Instrumente", "items": ["Software CAT", "Dicționare", "Resurse Online"] },
+        { "title": "Specializări", "items": ["Juridic", "Tehnic", "Medical", "Marketing"] },
+        { "title": "Sfaturi Profesionale", "items": ["Tarife", "Contracte", "Clienți"] }
+      ]
+    },
+    "finante_contabilitate": {
+      "columns": [
+        { "title": "Servicii Oferite", "items": ["Consultanță Financiară", "Evidență Contabilă", "Declarații Fiscale"] },
+        { "title": "Programe & Unelte", "items": ["Software Contabil", "Excel", "Resurse Legislative"] },
+        { "title": "Domenii", "items": ["PFA/SRL", "Asociații", "Persoane Fizice"] },
+        { "title": "Optimizare", "items": ["Planificare Buget", "Reducere Costuri", "Analiză Performanță"] }
+      ]
+    },
+    "video_animatie": {
+      "columns": [
+        { "title": "Servicii Creație", "items": ["Clipuri Promoționale", "Animații Explicative", "Editare Video"] },
+        { "title": "Echipament Utilizat", "items": ["Camere Video", "Software Editare", "Microfoane"] },
+        { "title": "Tehnici", "items": ["Storyboarding", "Motion Graphics", "Post-producție"] },
+        { "title": "Distribuție", "items": ["Social Media", "Platforme Video", "Targetare"] }
+      ]
+    },
+    "business": {
+      "columns": [
+        { "title": "Tipuri de Consultanță", "items": ["Start-up", "Dezvoltare Afacere", "Marketing"] },
+        { "title": "Strategii", "items": ["Planificare Afacere", "Analiză Piață", "Branding"] },
+        { "title": "Resurse & Unelte", "items": ["Modele Business Plan", "Studii de Caz", "Software Management"] },
+        { "title": "Networking", "items": ["Evenimente", "Parteneriate", "Comunități"] }
+      ]
+    },
+    "meditatii_cursuri": {
+      "columns": [
+        { "title": "Discipline", "items": ["Matematică", "Română", "Limbi Străine", "Informatică"] },
+        { "title": "Format", "items": ["Individual", "Grup", "Online", "Fizic"] },
+        { "title": "Materiale Didactice", "items": ["Culegeri", "Teste", "Prezentări"] },
+        { "title": "Pregătire Specifică", "items": ["Evaluare Națională", "Bacalaureat", "Admitere"] }
+      ]
+    },
+    "grafica_design": {
+      "columns": [
+        { "title": "Servicii Design", "items": ["Logo Design", "Grafică Print", "Grafică Digitală"] },
+        { "title": "Software Utilizat", "items": ["Adobe Photoshop", "Illustrator", "Figma"] },
+        { "title": "Domenii", "items": ["Branding", "Web Design", "Ilustrație"] },
+        { "title": "Resurse", "items": ["Fonturi", "Mockups", "Stock Images"] }
+      ]
+    },
+    "curatenie_intretinere_casa": {
+      "columns": [
+        { "title": "Servicii Curățenie", "items": ["Curățenie Generală", "După Constructor", "Geamuri"] },
+        { "title": "Întreținere", "items": ["Grădinărit Mic", "Reparații Minore", "Instalații Sanitare Simple"] },
+        { "title": "Produse Recomandate", "items": ["Eco", "Profesionale", "Specifice"] },
+        { "title": "Organizare", "items": ["Planificare", "Echipă", "Logistica"] }
+      ]
+    },
+    "reparatii_instalatii_bricolaj": {
+      "columns": [
+        { "title": "Tipuri de Reparații", "items": ["Electrice", "Sanitare", "Mobilier"] },
+        { "title": "Instalații", "items": ["Montaj", "Verificare", "Modernizare"] },
+        { "title": "Unelte Esențiale", "items": ["Trusă Bricolaj", "Scule Electrice", "Consumabile"] },
+        { "title": "Proiecte DIY", "items": ["Mic Mobilier", "Decorațiuni", "Amenajări"] }
+      ]
+    },
+    "muzica_teatru_dans": {
+      "columns": [
+        { "title": "Activități", "items": ["Lecții Instrument", "Actorie", "Coregrafie"] },
+        { "title": "Genuri", "items": ["Clasic", "Modern", "Popular"] },
+        { "title": "Pregătire", "items": ["Audiții", "Spectacole", "Concursuri"] },
+        { "title": "Resurse", "items": ["Partituri", "Scenarii", "Tutoriale Video"] }
+      ]
+    },
+    "auto_moto_biciclete": {
+      "columns": [
+        { "title": "Servicii Vehicule", "items": ["Mecanică", "Estetică", "Verificări"] },
+        { "title": "Tipuri", "items": ["Autoturisme", "Motociclete", "Biciclete"] },
+        { "title": "Accesorii & Piese", "items": ["Anvelope", "Consumabile", "Echipament Protecție"] },
+        { "title": "Sfaturi Întreținere", "items": ["Revizii", "Sezon", "Curățare"] }
+      ]
+    },
+    "imobiliare_constructii_amenajari": {
+      "columns": [
+        { "title": "Servicii Imobiliare", "items": ["Evaluare", "Tranzacții", "Consultanță"] },
+        { "title": "Construcții", "items": ["Planificare", "Materiale", "Execuție"] },
+        { "title": "Amenajări", "items": ["Design Interior", "Renovări", "Peisagistică"] },
+        { "title": "Legislație", "items": ["Autorizații", "Cadastru", "Intabulare"] }
+      ]
+    },
+    "transport_logistica_curierat": {
+      "columns": [
+        { "title": "Servicii Transport", "items": ["Persoane", "Marfă", "Specializat"] },
+        { "title": "Logistică", "items": ["Optimizare Rute", "Depozitare", "Management Flotă"] },
+        { "title": "Curierat", "items": ["Local", "Național", "Internațional"] },
+        { "title": "Reglementări", "items": ["Licențe", "Legislație Rutieră", "Siguranță"] }
+      ]
+    }
+  },
   "addAnnouncement": {
     "pageTitle": "Publică un anunț",
     "categoryHints": {
@@ -234,6 +361,59 @@
       { "question": "Cum funcționează sistemul de mesagerie?", "answer": "Sistemul nostru de mesagerie îți permite să comunici direct cu alți utilizatori în timp real, să negociezi prețuri și să coordonezi livrări în siguranță." }
     ],
     "lastUpdated": "Ultima actualizare: 19 iulie 2025"
+  },
+  "profile": {
+    "mobileBackAria": "Înapoi",
+    "mobileTitle": "Profil",
+    "back": "Înapoi",
+    "edit": "Editează",
+    "editCover": "Editează copertă",
+    "editAvatar": "Schimbă poza de profil",
+    "myLocation": "Locația mea",
+    "changeLocation": "Schimbă locația",
+    "mapTitle": "Harta locației",
+    "contactInfo": "Informații de Contact",
+    "contactInfoTitle": "Informații de Contact",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "phone": "Telefon",
+    "email": "Email",
+    "memberSince": "Membru din",
+    "unspecified": "Nespecificat",
+    "placeholders": {
+      "firstName": "Introduceți prenumele",
+      "lastName": "Introduceți numele",
+      "localitate": "Introduceți localitatea",
+      "phone": "Introduceți numărul de telefon"
+    },
+    "actions": {
+      "cancel": "Renunță",
+      "save": "Salvează",
+      "saving": "Se salvează...",
+      "edit": "Editează"
+    },
+    "announcements": {
+      "title": "Anunțurile mele",
+      "loading": "Se încarcă...",
+      "noAnnouncements": "Nu ai încă anunțuri.",
+      "noImage": "Fără imagine"
+    },
+    "loading": "Se încarcă...",
+    "emptyAnnouncements": "Nu ai încă anunțuri.",
+    "noImage": "Fără imagine",
+    "messages": {
+      "errorLoadingProfile": "Eroare la încărcarea profilului",
+      "locationUpdated": "Locația a fost actualizată cu succes!",
+      "errorSavingLocation": "Eroare la salvarea locației",
+      "profileUpdated": "Profilul a fost actualizat cu succes!",
+      "errorSavingProfile": "Eroare la salvarea profilului",
+      "avatarUpdated": "Avatar actualizat cu succes!",
+      "errorUploadingImage": "Eroare la încărcarea imaginii",
+      "coverUpdated": "Coperta a fost actualizată cu succes!",
+      "errorUploadingCover": "Eroare la încărcarea imaginii de copertă",
+      "coverDeleted": "Coperta a fost ștearsă.",
+      "errorDeletingCover": "Eroare la ștergerea copertei"
+    }
   },
   "terms": {
     "title": "Termeni și condiții",

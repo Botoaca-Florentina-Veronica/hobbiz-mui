@@ -45,24 +45,62 @@ export default function AnnouncementsByCategory() {
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
   const { user, favorites: authFavorites, toggleFavorite } = useAuth() || {};
-
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    const stored = localStorage.getItem(FAVORITES_KEY);
+    const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
     if (!stored) return [];
-    
+
     try {
       const parsed = JSON.parse(stored);
       // Verifică dacă e în formatul vechi (array de string-uri) sau nou (array de obiecte)
-      if (parsed.length > 0 && typeof parsed[0] === 'string') {
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
         return parsed; // returnează ID-urile pentru compatibilitate
-      } else {
+      } else if (Array.isArray(parsed)) {
         // Format nou - returnează doar ID-urile pentru compatibilitate
-        return parsed.map(item => item.id);
+        return parsed.map(item => item.id).filter(Boolean);
       }
+      return [];
     } catch {
       return [];
     }
   });
+
+  // Keep favoriteIds in sync with authenticated favorites when user logs in
+  useEffect(() => {
+    if (user) {
+      // If authenticated, reflect server favorites into local state for rendering
+      setFavoriteIds(Array.isArray(authFavorites) ? authFavorites : []);
+    }
+  }, [user, authFavorites]);
+
+  // Listen for favorites updates (storage + custom event) so UI stays in sync across app
+  useEffect(() => {
+    const handleFavoritesUpdated = () => {
+      const stored = localStorage.getItem(FAVORITES_KEY);
+      if (!stored) {
+        setFavoriteIds([]);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(stored || '[]');
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+          setFavoriteIds(parsed);
+        } else if (Array.isArray(parsed)) {
+          setFavoriteIds(parsed.map(item => item.id).filter(Boolean));
+        } else {
+          setFavoriteIds([]);
+        }
+      } catch {
+        setFavoriteIds([]);
+      }
+    };
+
+    window.addEventListener('favorites:updated', handleFavoritesUpdated);
+    window.addEventListener('storage', handleFavoritesUpdated);
+    return () => {
+      window.removeEventListener('favorites:updated', handleFavoritesUpdated);
+      window.removeEventListener('storage', handleFavoritesUpdated);
+    };
+  }, [FAVORITES_KEY]);
 
   // Get unique locations from announcements
   const uniqueLocations = useMemo(() => {
@@ -162,10 +200,10 @@ export default function AnnouncementsByCategory() {
         </button>
         <span className="mobile-back-label">Înapoi</span>
       </div>
-      <Typography variant="h4" className="my-announcements-title" gutterBottom>
-        {category}
-      </Typography>
       <div className="abc-align-container">
+        <Typography variant="h4" className="my-announcements-title" gutterBottom>
+          {category}
+        </Typography>
         {/* Searchbar și filtre */}
         <div className="abc-searchbar">
           <Stack spacing={2} sx={{ width: '100%' }}>

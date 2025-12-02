@@ -1,57 +1,67 @@
-/* --- VARIABILE ȘI SETĂRI GENERALE --- */
-.announcements-by-category {
-  --abc-primary-color: #23484a;
-  --abc-secondary-color: #f51866;
-  --abc-background-light: #fff;
-  --abc-background-dark: #1f1f1f;
-  --abc-text-light: #23484a;
-  --abc-text-dark: #ffffff;
-  --abc-shadow-light: 0 2px 12px rgba(34,72,74,0.08);
-  --abc-shadow-dark: 0 8px 28px rgba(0,0,0,0.45);
-  --abc-border-radius: 16px;
-  --abc-border-radius-mobile: 10px;
-  --abc-transition: all 0.2s ease;
+/* =============================================================
+   ANNOUNCEMENTS BY CATEGORY STYLES
+   ============================================================= */
+
+/* 1. VARIABLES & CONFIGURATION
+   ---------------------------------------------------------- */
+:root {
+  /* Layout */
+  --abc-radius: 24px;
+  --abc-radius-mobile: 14px;
   --abc-grid-gap: 16px;
+  --abc-transition: all 0.2s ease;
+  --abc-spacing-desktop: 80px;
+  
+  /* Colors - Light Mode */
+  --abc-bg-page: transparent;
+  --abc-bg-card: #ffffff;
+  --abc-bg-search: #ffffff;
+  --abc-text-primary: #23484a;
+  --abc-text-secondary: #888888;
+  --abc-text-accent: #f51866;
+  
+  /* Borders & Shadows */
+  --abc-shadow: 0 2px 12px rgba(34,72,74,0.08);
+  --abc-shadow-card: 0 2px 12px rgba(34,72,74,0.08);
+  --abc-border-card: transparent;
+  --abc-focus-shadow: 0 0 0 2px rgba(245, 24, 102, 0.35);
+  --abc-focus-border: rgba(245, 24, 102, 0.4);
+  
+  /* Mobile Back Button */
+  --abc-back-bg: #ffffff;
+  --abc-back-text: #23484a;
+  --abc-back-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Dark Mode Variable Overrides */
+.dark-mode {
+  --abc-bg-card: #121212;
+  --abc-bg-search: #121212;
+  --abc-text-primary: #ffffff;
+  --abc-text-secondary: #b5b5b5;
+  --abc-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  --abc-shadow-card: 0 8px 28px rgba(0,0,0,0.45);
+  --abc-border-card: 1px solid #b5b5b5;
 }
 
 
-/* Mobile back button (visible on widths <= 1000px) */ 
-.announcements-by-category .mobile-back-container { 
-  display: flex; 
-  align-items: center; 
-  gap: 10px; 
-  margin-bottom: 8px; 
-  cursor: pointer; 
-} 
-.announcements-by-category .mobile-back-btn { 
-  width: 40px; 
-  height: 40px; 
-  border-radius: 999px; 
-  border: none; 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  background: #ffffff; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-  padding: 6px; 
-} 
-.announcements-by-category .mobile-back-btn svg { 
-  display: block; 
-} 
-.announcements-by-category .mobile-back-label { 
-  font-size: 1rem; 
-  font-weight: 600; 
-  color: #23484a; 
-  text-transform: none; 
-}
-
-
-/* --- CONTAINER PRINCIPAL --- */
+/* 2. MAIN CONTAINER
+   ---------------------------------------------------------- */
 .announcements-by-category.my-announcements-container {
-  padding-left: 80px;
-  padding-right: 80px;
+  /* outer container no longer adds large horizontal offset; inner `.abc-align-container` handles spacing */
+  padding-left: 0;
+  padding-right: 0;
   box-sizing: border-box;
   width: 100%;
+}
+
+/* Align the page title with the inner `.abc-align-container` so it lines up with searchbar and cards */
+.announcements-by-category .my-announcements-title {
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  text-align: left;
 }
 
 .announcements-by-category .abc-align-container {
@@ -62,192 +72,46 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch; /* use full inner width so title/search/cards align */
 }
 
-/* --- SEARCHBAR --- */
+@media (min-width: 901px) {
+  .announcements-by-category.my-announcements-container {
+    margin-top: 80px;
+  }
+}
+
+
+/* 3. SEARCHBAR
+   ---------------------------------------------------------- */
 .announcements-by-category .abc-searchbar {
   width: 100%;
   padding: 24px;
   margin-bottom: 32px;
-  background: var(--abc-background-light);
-  border-radius: var(--abc-border-radius);
-  box-shadow: var(--abc-shadow-light);
+  background: var(--abc-bg-search);
+  border-radius: var(--abc-radius);
+  box-shadow: var(--abc-shadow);
   display: flex;
   align-items: center;
   box-sizing: border-box;
   transition: var(--abc-transition);
 }
 
-/* --- LISTA DE ANUNȚURI --- */
-.announcements-by-category .favorite-announcements-list {
-  padding: 0;
-  margin: 0;
-  width: 100%;
-}
-
-/* Modul grid - centrare și spațiere îmbunătățite */
-.announcements-by-category .favorite-announcements-list.grid-view {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--abc-grid-gap);
-  width: 100%;
-  justify-items: center;
-}
-
-/* Modul listă */
-.announcements-by-category .favorite-announcements-list.list-view {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  align-items: stretch;
-}
-
-.announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  background: var(--abc-background-light);
-  border-radius: var(--abc-border-radius);
-  box-shadow: var(--abc-shadow-light);
-  padding: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 0;
-  position: relative;
-  margin-bottom: 14px;
-  transition: var(--abc-transition);
-}
-
-/* --- CARDURI DE ANUNȚURI --- */
-.announcements-by-category .my-announcement-card {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  transition: var(--abc-transition);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* Focus (accessibility) light mode */
-.announcements-by-category .my-announcement-card:focus-within {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(245, 24, 102, 0.35), var(--abc-shadow-light);
-  border: 1px solid rgba(245, 24, 102, 0.4);
-  border-radius: var(--abc-border-radius);
-}
-
-/* Carduri în modul grid */
-.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-  min-height: 340px;
-  max-width: 320px;
-}
-
-/* Imagine în carduri */
-.announcements-by-category .my-announcement-image {
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-  width: 100%;
-  height: 200px;
-}
-
-.announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
-  width: 30%;
-  min-width: 30%;
-  height: auto;
-}
-
-.announcements-by-category .my-announcement-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: var(--abc-transition);
-}
-
-/* Informații card */
-.announcements-by-category .my-announcement-info {
-  padding: 12px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.announcements-by-category .my-announcement-title {
-  margin-bottom: 4px;
-  font-weight: 600;
-  display: block;
-  overflow: visible;
-  max-height: none;
-  white-space: normal;
-  flex-shrink: 0;
-}
-
-.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-title {
-  max-width: 65%;
-  padding-right: 140px;
-}
-
-.announcements-by-category .my-announcement-category {
-  font-weight: 500;
-  color: var(--abc-primary-color);
-  margin-bottom: 3px;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.announcements-by-category .my-announcement-location {
-  color: var(--abc-primary-color);
-  margin-bottom: 3px;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.announcements-by-category .my-announcement-price {
-  color: var(--abc-secondary-color);
-  font-weight: 600;
-  margin-top: auto;
-  flex-shrink: 0;
-}
-
-.announcements-by-category .my-announcement-id {
-  color: #888;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: 600;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  flex-shrink: 0;
-  z-index: 2;
-  backdrop-filter: none;
-  box-shadow: none;
-}
-
-/* --- DARK MODE --- */
+/* Dark Mode Searchbar */
 .dark-mode .announcements-by-category .abc-searchbar {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #ffffff !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .dark-mode .announcements-by-category .abc-searchbar .MuiOutlinedInput-root {
   background: rgba(42, 42, 42, 0.8);
-  color: var(--abc-text-dark);
+  color: var(--abc-text-primary);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
 .dark-mode .announcements-by-category .abc-searchbar .MuiInputBase-input {
-  color: var(--abc-text-dark) !important;
-  caret-color: var(--abc-text-dark);
+  color: var(--abc-text-primary) !important;
+  caret-color: var(--abc-text-primary);
 }
 
 .dark-mode .announcements-by-category .abc-searchbar .MuiInputBase-input::placeholder {
@@ -264,7 +128,7 @@
 }
 
 .dark-mode .announcements-by-category .abc-searchbar .MuiInputLabel-root.Mui-focused {
-  color: var(--abc-secondary-color);
+  color: var(--abc-text-accent);
 }
 
 .dark-mode .announcements-by-category .abc-searchbar .MuiOutlinedInput-root:hover {
@@ -272,60 +136,201 @@
   box-shadow: 0 2px 8px rgba(245, 24, 102, 0.1);
 }
 
-.announcements-by-category.dark-mode .my-announcement-card {
-  background: linear-gradient(135deg, #1f1f1f 0%, #2b2b2b 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--abc-text-dark);
-  border-radius: var(--abc-border-radius);
-  box-shadow: var(--abc-shadow-dark);
+
+/* 4. MOBILE BACK BUTTON
+   ---------------------------------------------------------- */
+.announcements-by-category .mobile-back-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
 }
 
-.announcements-by-category.dark-mode .my-announcement-card:hover {
+.announcements-by-category .mobile-back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--abc-back-bg);
+  box-shadow: var(--abc-back-shadow);
+  padding: 6px;
+}
+
+.announcements-by-category .mobile-back-btn svg {
+  display: block;
+}
+
+.announcements-by-category .mobile-back-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--abc-back-text);
+  text-transform: none;
+}
+
+
+/* 5. ANNOUNCEMENT CARDS & LIST
+   ---------------------------------------------------------- */
+.announcements-by-category .favorite-announcements-list {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* Grid View */
+.announcements-by-category .favorite-announcements-list.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--abc-grid-gap);
+  width: 100%;
+  justify-items: start; /* align cards to the left of the grid area */
+  margin: 0 auto; /* center the grid within the align container */
+}
+
+/* List View */
+.announcements-by-category .favorite-announcements-list.list-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* Common Card Styles */
+.announcements-by-category .my-announcement-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--abc-bg-card);
+  border-radius: var(--abc-radius);
+  box-shadow: var(--abc-shadow-card);
+  border: var(--abc-border-card);
+  transition: var(--abc-transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* List View Card Layout */
+.announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 14px;
+}
+
+/* Grid View Card Layout */
+.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
+  min-height: 340px;
+  max-width: 320px;
+}
+
+/* Focus State */
+.announcements-by-category .my-announcement-card:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(245, 24, 102, 0.35), var(--abc-shadow-card);
+  border: 1px solid var(--abc-focus-border);
+}
+
+/* Dark Mode Card Hover */
+.dark-mode .announcements-by-category .my-announcement-card:hover {
   transform: translateY(-2px);
   border-color: rgba(245, 24, 102, 0.35);
   box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(245, 24, 102, 0.15);
 }
 
-.announcements-by-category.dark-mode .my-announcement-title,
-.announcements-by-category.dark-mode .my-announcement-category,
-.announcements-by-category.dark-mode .my-announcement-location {
-  color: var(--abc-text-dark);
+/* Dark Mode List View Card Background Fix */
+.dark-mode .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
+  background: var(--abc-bg-card) !important;
 }
 
-.announcements-by-category.dark-mode .my-announcement-price {
-  color: var(--abc-secondary-color);
+
+/* 6. CARD CONTENT - IMAGE
+   ---------------------------------------------------------- */
+.announcements-by-category .my-announcement-image {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.announcements-by-category.dark-mode .favorite-announcements-list.list-view .my-announcement-image {
+.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--abc-radius) var(--abc-radius) 0 0;
+}
+
+.announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
+  width: 30%;
+  min-width: 30%;
+  height: auto;
+  border-radius: var(--abc-radius) 0 0 var(--abc-radius);
+}
+
+.announcements-by-category .my-announcement-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--abc-transition);
+  display: block;
+}
+
+/* Dark Mode Image Backgrounds */
+.dark-mode .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
   background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--abc-border-radius) 0 0 var(--abc-border-radius);
 }
 
-.announcements-by-category.dark-mode .favorite-announcements-list.grid-view .my-announcement-image {
+.dark-mode .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
   background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--abc-border-radius) var(--abc-border-radius) 0 0;
 }
 
-.announcements-by-category.dark-mode .favorite-announcements-list.list-view .my-announcement-info {
-  background: linear-gradient(135deg, #202020 0%, #262626 100%);
+
+/* 7. CARD CONTENT - INFO
+   ---------------------------------------------------------- */
+.announcements-by-category .my-announcement-info {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dark-mode .announcements-by-category .favorite-announcements-list.list-view .my-announcement-info {
+  background: transparent !important;
   border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.announcements-by-category.dark-mode .favorite-announcements-list.grid-view .my-announcement-info {
-  background: linear-gradient(135deg, #202020 0%, #262626 100%);
+/* Title */
+.announcements-by-category .my-announcement-title {
+  margin-bottom: 4px;
+  font-weight: 600;
+  display: block;
+  overflow: visible;
+  max-height: none;
+  white-space: normal;
+  flex-shrink: 0;
+  color: var(--abc-text-primary);
 }
 
-.announcements-by-category.dark-mode .my-announcement-id {
-  color: #b5b5b5;
-  background: transparent;
-  border: none;
-  backdrop-filter: none;
-  box-shadow: none;
+.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-title {
+  max-width: 65%;
+  padding-right: 140px;
 }
 
-.announcements-by-category.dark-mode .my-announcement-category {
+/* Category Badge */
+.announcements-by-category .my-announcement-category {
+  font-weight: 500;
+  color: var(--abc-text-primary);
+  margin-bottom: 3px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.dark-mode .announcements-by-category .my-announcement-category {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 999px;
@@ -333,6 +338,39 @@
   color: #ffd9e7;
 }
 
+/* Location */
+.announcements-by-category .my-announcement-location {
+  color: var(--abc-text-primary);
+  margin-bottom: 3px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Price */
+.announcements-by-category .my-announcement-price {
+  color: var(--abc-text-accent);
+  font-weight: 600;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+/* ID Badge */
+.announcements-by-category .my-announcement-id {
+  color: var(--abc-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+/* Favorite Heart */
 .announcements-by-category .favorite-heart {
   position: absolute;
   bottom: 12px;
@@ -347,170 +385,105 @@
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 2;
-  box-shadow: none;
 }
 
 .announcements-by-category .favorite-heart:hover {
   transform: scale(1.1);
-  box-shadow: none;
 }
 
-.announcements-by-category.dark-mode .favorite-heart {
-  background: transparent;
-  box-shadow: none;
+.dark-mode .announcements-by-category .favorite-heart svg {
+  /* In dark mode, make the favorite heart pink to match the accent color */
+  color: #f51866 !important;
 }
 
-.announcements-by-category.dark-mode .favorite-heart svg {
-  color: #c9c9c9 !important;
+/* Ensure outlined heart (not-favorited) also uses a softer pink tint in dark mode */
+.dark-mode .announcements-by-category .favorite-heart svg path {
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
-.announcements-by-category.dark-mode .my-announcement-card:focus-within {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(245, 24, 102, 0.35);
-  border-color: rgba(245, 24, 102, 0.45);
-}
 
-/* --- MEDIA QUERIES PENTRU RESPONSIVITATE --- */
+/* 8. RESPONSIVE DESIGN - MEDIA QUERIES
+   ---------------------------------------------------------- */
 
-/* Ecrane foarte mari (peste 1700px) */
+/* Extra Large Screens (>1700px) */
 @media (min-width: 1700px) {
-  .announcements-by-category .abc-align-container {
-    max-width: 1600px;
-  }
-  
+  .announcements-by-category .abc-align-container { max-width: 1600px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 380px;
-    max-width: 350px;
+    min-height: 380px; max-width: 350px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 220px;
   }
-  
-  .announcements-by-category .abc-searchbar {
-    padding: 28px;
-  }
-
-  /* Mobile back container hidden by default; shown only on small screens */ 
-  .announcements-by-category .mobile-back-container { 
-    display: none; 
-  }
+  .announcements-by-category .abc-searchbar { padding: 28px; }
+  .announcements-by-category .mobile-back-container { display: none; }
 }
 
 /* Ecrane mari (1400px - 1699px) */
 @media (min-width: 1400px) and (max-width: 1699px) {
-  .announcements-by-category .abc-align-container {
-    max-width: 1320px;
-  }
-  
+  .announcements-by-category .abc-align-container { max-width: 1320px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 360px;
-    max-width: 330px;
+    min-height: 360px; max-width: 330px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 210px;
   }
-
-  /* Mobile back container hidden by default; shown only on small screens */ 
-  .announcements-by-category .mobile-back-container { 
-    display: none; 
-  }
-
+  .announcements-by-category .mobile-back-container { display: none; }
 }
 
 /* Laptop (1200px - 1399px) */
 @media (min-width: 1200px) and (max-width: 1399px) {
-  .announcements-by-category .abc-align-container {
-    max-width: 1140px;
-  }
-  
+  .announcements-by-category .abc-align-container { max-width: 1140px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 350px;
-    max-width: 300px;
+    min-height: 350px; max-width: 300px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 190px;
   }
-
-  /* Mobile back container hidden by default; shown only on small screens */ 
-  .announcements-by-category .mobile-back-container { 
-    display: none; 
-  }
-
+  .announcements-by-category .mobile-back-container { display: none; }
 }
 
 /* Laptop (1025px - 1199px) */
 @media (max-width: 1199px) {
   .announcements-by-category.my-announcements-container {
-    padding-left: 60px;
-    padding-right: 60px;
+    padding-left: 60px; padding-right: 60px;
   }
-  
-  .announcements-by-category .abc-align-container {
-    padding: 0 12px;
-  }
-  
+  .announcements-by-category .abc-align-container { padding: 0 12px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    justify-content: center;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); justify-content: center;
   }
 }
 
 /* Tablet mare (901px - 1024px) */
 @media (max-width: 1024px) {
   .announcements-by-category.my-announcements-container {
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-left: 40px; padding-right: 40px;
   }
-  
-  .announcements-by-category .abc-align-container {
-    padding: 0 12px;
-  }
-  
-  .announcements-by-category .abc-searchbar {
-    padding: 20px;
-    margin-bottom: 28px;
-  }
+  .announcements-by-category .abc-align-container { padding: 0 12px; }
+  .announcements-by-category .abc-searchbar { padding: 20px; margin-bottom: 28px; }
   
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 320px;
-    max-width: 100%;
+    min-height: 320px; max-width: 100%;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 180px;
   }
-  
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
     margin-bottom: 12px;
   }
-  
-  .announcements-by-category .my-announcement-info {
-    padding: 10px;
-  }
-  
+  .announcements-by-category .my-announcement-info { padding: 10px; }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 35%;
   }
@@ -519,226 +492,125 @@
 /* Tablet (768px - 1024px) */
 @media (max-width: 1024px) {
   .announcements-by-category.my-announcements-container {
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 30px; padding-right: 30px;
   }
-  
-  .announcements-by-category .abc-align-container {
-    padding: 0 10px;
-  }
-  
+  .announcements-by-category .abc-align-container { padding: 0 10px; }
   .announcements-by-category .abc-searchbar {
-    padding: 18px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
+    padding: 18px; margin-bottom: 24px; flex-wrap: wrap;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
     min-height: 300px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 160px;
   }
-  
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 40%;
   }
-  
-  .announcements-by-category .my-announcement-title {
-    font-size: 0.95rem;
-  }
+  .announcements-by-category .my-announcement-title { font-size: 0.95rem; }
 }
 
 /* Tablet mic (700px - 767px) */
 @media (max-width: 767px) {
   .announcements-by-category.my-announcements-container {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 20px; padding-right: 20px;
   }
-  
-  .announcements-by-category .abc-align-container {
-    padding: 0 8px;
-  }
-  
-  .announcements-by-category .abc-searchbar {
-    padding: 16px;
-    margin-bottom: 20px;
-  }
+  .announcements-by-category .abc-align-container { padding: 0 8px; }
+  .announcements-by-category .abc-searchbar { padding: 16px; margin-bottom: 20px; }
   
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
     min-height: 280px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 140px;
   }
-  
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 45%;
   }
-  
   .announcements-by-category .my-announcement-title {
-    font-size: 0.9rem;
-    max-width: 100%;
-    padding-right: 0;
+    font-size: 0.9rem; max-width: 100%; padding-right: 0;
   }
-  
   .announcements-by-category .my-announcement-category,
-  .announcements-by-category .my-announcement-location {
-    font-size: 11px;
-  }
+  .announcements-by-category .my-announcement-location { font-size: 11px; }
 }
 
-/* Dispozitive medii (460px - 699px) - 2 carduri pe rând */
+/* Dispozitive medii (460px - 699px) */
 @media (min-width: 460px) and (max-width: 699px) {
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr); gap: 12px;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 260px;
-    max-width: 100%;
+    min-height: 260px; max-width: 100%;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 130px;
   }
-  
   .announcements-by-category .my-announcement-title {
-    font-size: 0.85rem;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 0.85rem; line-clamp: 2; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
   }
-  
   .announcements-by-category .my-announcement-category,
-  .announcements-by-category .my-announcement-location {
-    font-size: 10px;
-  }
-  
-  .announcements-by-category .my-announcement-price {
-    font-size: 0.9rem;
-  }
+  .announcements-by-category .my-announcement-location { font-size: 10px; }
+  .announcements-by-category .my-announcement-price { font-size: 0.9rem; }
 }
 
 /* Telefoane mari (361px - 459px) */
 @media (max-width: 459px) {
   .announcements-by-category.my-announcements-container {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 16px; padding-right: 16px;
   }
-  
-  .announcements-by-category .abc-align-container {
-    padding: 0 8px;
-    max-width: 100%;
-  }
-  
+  .announcements-by-category .abc-align-container { padding: 0 8px; max-width: 100%; }
   .announcements-by-category .abc-searchbar {
-    padding: 14px;
-    margin-bottom: 16px;
-    border-radius: var(--abc-border-radius-mobile);
+    padding: 14px; margin-bottom: 16px; border-radius: var(--abc-radius-mobile);
   }
   
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    justify-items: center;
+    grid-template-columns: 1fr; gap: 10px; justify-items: center;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: auto;
-    max-width: 100%;
-    border-radius: var(--abc-border-radius-mobile);
+    min-height: auto; max-width: 100%; border-radius: var(--abc-radius-mobile);
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 160px;
-    border-radius: var(--abc-border-radius-mobile) var(--abc-border-radius-mobile) 0 0;
+    height: 160px; border-radius: var(--abc-radius-mobile) var(--abc-radius-mobile) 0 0;
   }
   
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 10px;
-    border-radius: var(--abc-border-radius-mobile);
+    flex-direction: column; gap: 12px; margin-bottom: 10px; border-radius: var(--abc-radius-mobile);
   }
-  
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
-    width: 100%;
-    height: 160px;
-    border-radius: var(--abc-border-radius-mobile) var(--abc-border-radius-mobile) 0 0;
+    width: 100%; height: 160px; border-radius: var(--abc-radius-mobile) var(--abc-radius-mobile) 0 0;
   }
   
-  .announcements-by-category .my-announcement-info {
-    padding: 8px;
-  }
-  
+  .announcements-by-category .my-announcement-info { padding: 8px; }
   .announcements-by-category .my-announcement-id {
-    top: 8px;
-    right: 8px;
-    font-size: 9px;
-    padding: 2px 5px;
+    top: 8px; right: 8px; font-size: 9px; padding: 2px 5px;
   }
 }
 
 /* Telefoane mici (până în 360px) */
 @media (max-width: 360px) {
   .announcements-by-category.my-announcements-container {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 12px; padding-right: 12px;
   }
-  
-  .announcements-by-category .abc-align-container {
-    padding: 0 6px;
-  }
-  
-  .announcements-by-category .abc-searchbar {
-    padding: 12px;
-    margin-bottom: 14px;
-    border-radius: 8px;
-  }
+  .announcements-by-category .abc-align-container { padding: 0 6px; }
+  .announcements-by-category .abc-searchbar { padding: 12px; margin-bottom: 14px; border-radius: 8px; }
   
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
     max-width: 100%;
   }
-  
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 140px;
   }
-  
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     height: 120px;
   }
-  
   .announcements-by-category .my-announcement-title {
-    font-size: 0.85rem;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
+    font-size: 0.85rem; line-clamp: 2; -webkit-line-clamp: 2;
   }
-  
-  .announcements-by-category .my-announcement-category {
-    display: none;
-  }
-
-}
-
-/* Desktop: margine superioară pentru paginile de categorii */
-@media (min-width: 901px) {
-  .announcements-by-category.my-announcements-container {
-    margin-top: 80px;
-  }
+  .announcements-by-category .my-announcement-category { display: none; }
 }

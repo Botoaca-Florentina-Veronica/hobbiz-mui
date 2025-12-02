@@ -1,5 +1,28 @@
 /* App.css - stiluri globale si layout general. Stilurile pentru componente sunt mutate in fisiere dedicate. */
 
+/* Import Fira Sans for category titles */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700;800&display=swap');
+
+/* Category title styles: use Fira Sans, bold, black */
+.my-announcements-title,
+.category-text,
+.category-details-title,
+.category-title-popover,
+.category-card-popover .category-title-popover {
+  font-family: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-weight: 700 !important;
+  color: #000000 !important;
+}
+
+/* Dark mode: make category titles white */
+.dark-mode .my-announcements-title,
+.dark-mode .category-text,
+.dark-mode .category-details-title,
+.dark-mode .category-title-popover,
+.dark-mode .category-card-popover .category-title-popover {
+  color: #ffffff !important;
+}
+
 /* Asigură același fundal pentru wrapper-ul aplicației */
 .app {
   background: var(--bg-primary);

@@ -169,6 +169,24 @@ const categoriesDetails = {
   }
 };
 
+// Map displayed Romanian category name to a stable slug used for translations
+const categorySlugs = {
+  "Fotografie": "fotografie",
+  "Prajituri, Băcănie, Gătit": "prajituri_gatit",
+  "Traduceri & Redactare": "traduceri_redactare",
+  "Finanțe & Contabilitate": "finante_contabilitate",
+  "Video & Animație": "video_animatie",
+  "Business": "business",
+  "Meditații & Cursuri": "meditatii_cursuri",
+  "Grafică & Design": "grafica_design",
+  "Curatenie, Întreținere casă": "curatenie_intretinere_casa",
+  "Reparații, Instalatii, Bricolaj": "reparatii_instalatii_bricolaj",
+  "Muzică, Teatru, Dans": "muzica_teatru_dans",
+  "Auto, Moto, Biciclete": "auto_moto_biciclete",
+  "Imobiliare, Construcții, Amenajari": "imobiliare_constructii_amenajari",
+  "Transport, Logistică, Curierat": "transport_logistica_curierat"
+};
+
 // Helper functions
 function getLocalitatiForJudet(judet) {
   if (!localitatiPeJudet[judet]) return [];
@@ -287,7 +305,7 @@ export default function MainStage() {
                     {categoryIcons[cat]}
                   </Box>
                   <Typography className="category-text">
-                    {cat}
+                    {t(`categories.${cat}`)}
                   </Typography>
                   <ArrowForwardIosIcon className="category-arrow" fontSize="small" />
                 </Box>
@@ -304,25 +322,25 @@ export default function MainStage() {
             >
               <CardContent className="category-details-content">
                 <Typography className="category-details-title">
-                  {hoveredCategory}
+                  {t(`categories.${hoveredCategory}`)}
                 </Typography>
                 <Box className="category-details-grid">
                   {categoriesDetails[hoveredCategory].columns.map((col, idx) => (
                     <Box key={idx} className="detail-column">
                       <Typography className="detail-title">
-                        {col.title}
+                        {t(`categoryDetails.${categorySlugs[hoveredCategory] || hoveredCategory}.columns.${idx}.title`, { defaultValue: col.title })}
                       </Typography>
-                      <Box className="detail-items">
-                        {col.items.map((item, i) => (
-                          <Chip
-                            key={i}
-                            label={item}
-                            variant="outlined"
-                            size="small"
-                            className="detail-chip"
-                          />
-                        ))}
-                      </Box>
+                          <Box className="detail-items">
+                            {col.items.map((item, i) => (
+                              <Chip
+                                key={i}
+                                label={t(`categoryDetails.${categorySlugs[hoveredCategory] || hoveredCategory}.columns.${idx}.items.${i}`, { defaultValue: item })}
+                                variant="outlined"
+                                size="small"
+                                className="detail-chip"
+                              />
+                            ))}
+                          </Box>
                     </Box>
                   ))}
                 </Box>

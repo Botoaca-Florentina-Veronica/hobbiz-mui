@@ -79,9 +79,136 @@
     "art": "Art",
     "technology": "Technology",
     "auto": "Auto",
-    "tutoring": "Tutoring"
-  }
-  ,
+    "tutoring": "Tutoring",
+    "Fotografie": "Photography",
+    "Prajituri, Băcănie, Gătit": "Cakes, Bakery, Cooking",
+    "Traduceri & Redactare": "Translation & Writing",
+    "Finanțe & Contabilitate": "Finance & Accounting",
+    "Video & Animație": "Video & Animation",
+    "Business": "Business",
+    "Meditații & Cursuri": "Coaching & Courses",
+    "Grafică & Design": "Graphics & Design",
+    "Curatenie, Întreținere casă": "Cleaning, Home Care",
+    "Reparații, Instalatii, Bricolaj": "Repairs, Installations, DIY",
+    "Muzică, Teatru, Dans": "Music, Theater, Dance",
+    "Auto, Moto, Biciclete": "Cars, Motorcycles, Bikes",
+    "Imobiliare, Construcții, Amenajari": "Real Estate, Construction, Renovations",
+    "Transport, Logistică, Curierat": "Transport, Logistics, Courier"
+  },
+  "categoryDetails": {
+    "fotografie": {
+      "columns": [
+        { "title": "Photo Services", "items": ["Events", "Portrait", "Product", "Real Estate"] },
+        { "title": "Recommended Equipment", "items": ["DSLR/Mirrorless Cameras", "Lenses", "Flashes", "Tripods"] },
+        { "title": "Tutorials & Resources", "items": ["Online Courses", "Photo Editing", "Communities"] },
+        { "title": "Useful Tips", "items": ["Composition", "Lighting", "Marketing"] }
+      ]
+    },
+    "prajituri_gatit": {
+      "columns": [
+        { "title": "Products & Services", "items": ["Custom Cakes", "Small Catering", "Homemade Sweets"] },
+        { "title": "Key Equipment", "items": ["Planetary Mixer", "Electric Oven", "Molds & Utensils"] },
+        { "title": "Recipes & Inspiration", "items": ["Traditional", "International", "Pastry Tips"] },
+        { "title": "Management & Sales", "items": ["Packaging", "Permits", "Pricing Strategies"] }
+      ]
+    },
+    "traduceri_redactare": {
+      "columns": [
+        { "title": "Service Types", "items": ["Certified Translations", "Content Writing", "Proofreading & Editing"] },
+        { "title": "Tools", "items": ["CAT Software", "Dictionaries", "Online Resources"] },
+        { "title": "Specializations", "items": ["Legal", "Technical", "Medical", "Marketing"] },
+        { "title": "Professional Tips", "items": ["Rates", "Contracts", "Clients"] }
+      ]
+    },
+    "finante_contabilitate": {
+      "columns": [
+        { "title": "Offered Services", "items": ["Financial Consulting", "Accounting Records", "Tax Declarations"] },
+        { "title": "Programs & Tools", "items": ["Accounting Software", "Excel", "Legal Resources"] },
+        { "title": "Sectors", "items": ["Sole Proprietorships/LLC", "Associations", "Individuals"] },
+        { "title": "Optimization", "items": ["Budget Planning", "Cost Reduction", "Performance Analysis"] }
+      ]
+    },
+    "video_animatie": {
+      "columns": [
+        { "title": "Creation Services", "items": ["Promotional Clips", "Explainer Animations", "Video Editing"] },
+        { "title": "Equipment Used", "items": ["Video Cameras", "Editing Software", "Microphones"] },
+        { "title": "Techniques", "items": ["Storyboarding", "Motion Graphics", "Post-production"] },
+        { "title": "Distribution", "items": ["Social Media", "Video Platforms", "Targeting"] }
+      ]
+    },
+    "business": {
+      "columns": [
+        { "title": "Consulting Types", "items": ["Start-up", "Business Development", "Marketing"] },
+        { "title": "Strategies", "items": ["Business Planning", "Market Analysis", "Branding"] },
+        { "title": "Resources & Tools", "items": ["Business Plan Templates", "Case Studies", "Management Software"] },
+        { "title": "Networking", "items": ["Events", "Partnerships", "Communities"] }
+      ]
+    },
+    "meditatii_cursuri": {
+      "columns": [
+        { "title": "Subjects", "items": ["Mathematics", "Romanian", "Foreign Languages", "Computer Science"] },
+        { "title": "Format", "items": ["One-to-One", "Group", "Online", "In-Person"] },
+        { "title": "Teaching Materials", "items": ["Workbooks", "Tests", "Presentations"] },
+        { "title": "Exam Preparation", "items": ["National Exams", "Baccalaureate", "Admissions"] }
+      ]
+    },
+    "grafica_design": {
+      "columns": [
+        { "title": "Design Services", "items": ["Logo Design", "Print Graphics", "Digital Graphics"] },
+        { "title": "Software Used", "items": ["Adobe Photoshop", "Illustrator", "Figma"] },
+        { "title": "Areas", "items": ["Branding", "Web Design", "Illustration"] },
+        { "title": "Resources", "items": ["Fonts", "Mockups", "Stock Images"] }
+      ]
+    },
+    "curatenie_intretinere_casa": {
+      "columns": [
+        { "title": "Cleaning Services", "items": ["General Cleaning", "Post-construction", "Windows"] },
+        { "title": "Maintenance", "items": ["Small Gardening", "Minor Repairs", "Simple Plumbing"] },
+        { "title": "Recommended Products", "items": ["Eco", "Professional", "Specific"] },
+        { "title": "Organization", "items": ["Scheduling", "Team", "Logistics"] }
+      ]
+    },
+    "reparatii_instalatii_bricolaj": {
+      "columns": [
+        { "title": "Repair Types", "items": ["Electrical", "Plumbing", "Furniture"] },
+        { "title": "Installations", "items": ["Assembly", "Inspection", "Upgrades"] },
+        { "title": "Essential Tools", "items": ["DIY Kit", "Power Tools", "Consumables"] },
+        { "title": "DIY Projects", "items": ["Small Furniture", "Decorations", "Fittings"] }
+      ]
+    },
+    "muzica_teatru_dans": {
+      "columns": [
+        { "title": "Activities", "items": ["Instrument Lessons", "Acting", "Choreography"] },
+        { "title": "Genres", "items": ["Classical", "Modern", "Folk"] },
+        { "title": "Training", "items": ["Auditions", "Shows", "Competitions"] },
+        { "title": "Resources", "items": ["Scores", "Scripts", "Video Tutorials"] }
+      ]
+    },
+    "auto_moto_biciclete": {
+      "columns": [
+        { "title": "Vehicle Services", "items": ["Mechanics", "Detailing", "Inspections"] },
+        { "title": "Types", "items": ["Cars", "Motorcycles", "Bicycles"] },
+        { "title": "Accessories & Parts", "items": ["Tires", "Consumables", "Protective Gear"] },
+        { "title": "Maintenance Tips", "items": ["Service", "Seasonal Care", "Cleaning"] }
+      ]
+    },
+    "imobiliare_constructii_amenajari": {
+      "columns": [
+        { "title": "Real Estate Services", "items": ["Valuation", "Transactions", "Consulting"] },
+        { "title": "Construction", "items": ["Planning", "Materials", "Execution"] },
+        { "title": "Interior Design", "items": ["Design", "Renovations", "Landscaping"] },
+        { "title": "Regulation", "items": ["Permits", "Cadastral", "Registration"] }
+      ]
+    },
+    "transport_logistica_curierat": {
+      "columns": [
+        { "title": "Transport Services", "items": ["People", "Goods", "Specialized"] },
+        { "title": "Logistics", "items": ["Route Optimization", "Storage", "Fleet Management"] },
+        { "title": "Courier", "items": ["Local", "National", "International"] },
+        { "title": "Regulations", "items": ["Licenses", "Road Legislation", "Safety"] }
+      ]
+    }
+  },
   "addAnnouncement": {
     "pageTitle": "Post an announcement",
     "categoryHints": {
@@ -234,6 +361,59 @@
       { "question": "How does the messaging system work?", "answer": "Our messaging system allows you to communicate directly with other users in real time, negotiate prices and coordinate deliveries securely." }
     ],
     "lastUpdated": "Last updated: July 19, 2025"
+  },
+  "profile": {
+    "mobileBackAria": "Back",
+    "mobileTitle": "Profile",
+    "back": "Back",
+    "edit": "Edit",
+    "editCover": "Edit cover",
+    "editAvatar": "Change avatar",
+    "myLocation": "My location",
+    "changeLocation": "Change location",
+    "mapTitle": "Location map",
+    "contactInfo": "Contact information",
+    "contactInfoTitle": "Contact information",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "memberSince": "Member since",
+    "unspecified": "Unspecified",
+    "placeholders": {
+      "firstName": "Enter first name",
+      "lastName": "Enter last name",
+      "localitate": "Enter locality",
+      "phone": "Enter phone number"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "edit": "Edit"
+    },
+    "announcements": {
+      "title": "My announcements",
+      "loading": "Loading...",
+      "noAnnouncements": "You don't have any announcements yet.",
+      "noImage": "No image"
+    },
+    "loading": "Loading...",
+    "emptyAnnouncements": "You don't have any announcements yet.",
+    "noImage": "No image",
+    "messages": {
+      "errorLoadingProfile": "Error loading profile",
+      "locationUpdated": "Location updated successfully!",
+      "errorSavingLocation": "Error saving location",
+      "profileUpdated": "Profile updated successfully!",
+      "errorSavingProfile": "Error saving profile",
+      "avatarUpdated": "Avatar updated successfully!",
+      "errorUploadingImage": "Error uploading image",
+      "coverUpdated": "Cover updated successfully!",
+      "errorUploadingCover": "Error uploading cover image",
+      "coverDeleted": "Cover deleted.",
+      "errorDeletingCover": "Error deleting cover"
+    }
   },
   "terms": {
     "title": "Terms and Conditions",

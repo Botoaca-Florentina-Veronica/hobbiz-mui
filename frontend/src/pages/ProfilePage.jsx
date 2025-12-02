@@ -10,6 +10,7 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   Alert,
@@ -38,6 +39,7 @@ import './ProfilePage.css';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   
   // ============================================
   // STATE MANAGEMENT
@@ -118,7 +120,7 @@ export default function ProfilePage() {
           phone: res.data.phone || ''
         });
       } catch (e) {
-        setError('Eroare la încărcarea profilului');
+        setError('profile.messages.errorLoadingProfile');
         setProfile({});
       } finally {
         setLoading(false);
@@ -169,10 +171,10 @@ export default function ProfilePage() {
       await apiClient.put('/api/users/profile', { localitate: newLocation });
       setProfile({ ...profile, localitate: newLocation });
       setLocationModalOpen(false);
-      setSuccess('Locația a fost actualizată cu succes!');
+      setSuccess('profile.messages.locationUpdated');
       setTimeout(() => setSuccess(''), 3000);
     } catch (e) {
-      setError('Eroare la salvarea locației');
+      setError('profile.messages.errorSavingLocation');
     } finally {
       setSaving(false);
     }
@@ -202,10 +204,10 @@ export default function ProfilePage() {
       await apiClient.put('/api/users/profile', form);
       setProfile({ ...profile, ...form });
       setEditMode(false);
-      setSuccess('Profilul a fost actualizat cu succes!');
+      setSuccess('profile.messages.profileUpdated');
       setTimeout(() => setSuccess(''), 3000);
     } catch (e) {
-      setError('Eroare la salvarea profilului');
+      setError('profile.messages.errorSavingProfile');
     } finally {
       setSaving(false);
     }
@@ -246,10 +248,10 @@ export default function ProfilePage() {
         } catch (_) {}
       }
       
-      setSuccess('Avatar actualizat cu succes!');
+      setSuccess('profile.messages.avatarUpdated');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Eroare la încărcarea imaginii');
+      setError('profile.messages.errorUploadingImage');
     } finally {
       setAvatarUploading(false);
     }
@@ -265,10 +267,10 @@ export default function ProfilePage() {
       formData.append('cover', file);
       const res = await apiClient.post('/api/users/cover', formData);
       setProfile({ ...profile, coverImage: res.data.coverImage });
-      setSuccess('Coperta a fost actualizată cu succes!');
+      setSuccess('profile.messages.coverUpdated');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Eroare la încărcarea imaginii de copertă');
+      setError('profile.messages.errorUploadingCover');
     } finally {
       setCoverUploading(false);
     }
@@ -283,11 +285,11 @@ export default function ProfilePage() {
         data: { url: profile.coverImage }
       });
       setProfile({ ...profile, coverImage: null });
-      setSuccess('Coperta a fost ștearsă.');
+      setSuccess('profile.messages.coverDeleted');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error('Eroare la ștergerea copertei:', err);
-      setError('Eroare la ștergerea copertei');
+      setError('profile.messages.errorDeletingCover');
     } finally {
       setCoverUploading(false);
     }
@@ -332,12 +334,12 @@ export default function ProfilePage() {
         className="mobile-back-btn"
         disableRipple
         disableFocusRipple
-        aria-label="Înapoi"
+        aria-label={t('profile.back')}
       >
         <ArrowBackIcon />
       </IconButton>
       <Typography variant="h5" className="mobile-header-title">
-        Profil
+        {t('profile.mobileTitle')}
       </Typography>
     </div>
   );
@@ -347,14 +349,14 @@ export default function ProfilePage() {
       {error && (
         <Fade in={!!error}>
           <Alert severity="error" className="profile-alert">
-            {error}
+            {t(error) || error}
           </Alert>
         </Fade>
       )}
       {success && (
         <Fade in={!!success}>
           <Alert severity="success" className="profile-alert">
-            {success}
+            {t(success) || success}
           </Alert>
         </Fade>
       )}
@@ -375,8 +377,8 @@ export default function ProfilePage() {
           className="profile-cover-upload-btn"
           onClick={handleCoverClick}
           disabled={coverUploading}
-          aria-label="Editează copertă"
-          title="Editează copertă"
+          aria-label={t('profile.editCover')}
+          title={t('profile.editCover')}
         >
           {coverUploading ? (
             <CircularProgress
@@ -386,7 +388,7 @@ export default function ProfilePage() {
           ) : (
             <>
               <EditIcon className="profile-icon" />
-              Editează
+              {t('profile.edit')}
             </>
           )}
         </button>
@@ -412,7 +414,7 @@ export default function ProfilePage() {
         {profile?.avatar ? (
           <img
             src={profile.avatar}
-            alt="Avatar"
+            alt={t('profile.editAvatar')}
             className="profile-avatar-image"
           />
         ) : (
@@ -440,7 +442,7 @@ export default function ProfilePage() {
     const fullName =
       (profile?.firstName || '') +
       (profile?.lastName ? ' ' + profile.lastName : '') ||
-      'Profil utilizator';
+      t('profile.mobileTitle');
 
     return (
       <div className="profile-name-section">
@@ -462,9 +464,9 @@ export default function ProfilePage() {
   const renderLocationCard = () => (
     <div className="profile-location-card">
       <div className="profile-location-header">
-        <h2 className="profile-info-main-title">Locația mea</h2>
+        <h2 className="profile-info-main-title">{t('profile.myLocation')}</h2>
         <button className="profile-edit-button" onClick={handleLocationEdit}>
-          Schimbă locația
+          {t('profile.changeLocation')}
         </button>
       </div>
       <div className="profile-location-map">
@@ -488,7 +490,7 @@ export default function ProfilePage() {
       <div className="contact-field">
         <div className="contact-label">{label}</div>
         <div className={`contact-value ${!value ? 'unspecified' : ''}`}>
-          {value || 'Nespecificat'}
+          {value || t('profile.unspecified')}
         </div>
       </div>
     </div>
@@ -498,29 +500,29 @@ export default function ProfilePage() {
     <div className="contact-list">
       {renderContactField(
         <PersonIcon />,
-        'Nume',
+        t('profile.lastName'),
         profile?.lastName
       )}
       {renderContactField(
         <PersonIcon />,
-        'Prenume',
+        t('profile.firstName'),
         profile?.firstName
       )}
       {renderContactField(
         <PhoneIcon />,
-        'Telefon',
+        t('profile.phone'),
         profile?.phone
       )}
       {renderContactField(
         <EmailIcon />,
-        'Email',
+        t('profile.email'),
         profile?.email
       )}
       {renderContactField(
         <CalendarMonthIcon />,
-        'Membru din',
+        t('profile.memberSince'),
         profile?.createdAt
-          ? new Date(profile.createdAt).toLocaleDateString('ro-RO', {
+          ? new Date(profile.createdAt).toLocaleDateString(i18n?.language === 'en' ? 'en-US' : 'ro-RO', {
               year: 'numeric',
               month: 'long',
               day: '2-digit'
@@ -549,32 +551,32 @@ export default function ProfilePage() {
   const renderContactEditMode = () => (
     <div className="profile-form-grid">
       <div className="profile-form-column">
-        {renderInputField(
-          'lastName',
-          'Nume',
-          <PersonIcon className="profile-icon" />,
-          'Introduceți numele'
-        )}
-        {renderInputField(
-          'firstName',
-          'Prenume',
-          <PersonIcon className="profile-icon" />,
-          'Introduceți prenumele'
-        )}
+          {renderInputField(
+            'lastName',
+            t('profile.lastName'),
+            <PersonIcon className="profile-icon" />,
+            t('profile.placeholders.lastName')
+          )}
+          {renderInputField(
+            'firstName',
+            t('profile.firstName'),
+            <PersonIcon className="profile-icon" />,
+            t('profile.placeholders.firstName')
+          )}
       </div>
       <div className="profile-form-column">
-        {renderInputField(
-          'localitate',
-          'Localitate',
-          <LocationOnIcon className="profile-icon" />,
-          'Introduceți localitatea'
-        )}
-        {renderInputField(
-          'phone',
-          'Număr de telefon',
-          <PhoneIcon className="profile-icon" />,
-          'Introduceți numărul de telefon'
-        )}
+          {renderInputField(
+            'localitate',
+            t('profile.myLocation'),
+            <LocationOnIcon className="profile-icon" />,
+            t('profile.placeholders.localitate')
+          )}
+          {renderInputField(
+            'phone',
+            t('profile.phone'),
+            <PhoneIcon className="profile-icon" />,
+            t('profile.placeholders.phone')
+          )}
       </div>
     </div>
   );
@@ -589,7 +591,7 @@ export default function ProfilePage() {
           disabled={saving}
         >
           <CancelIcon className="profile-icon" />
-          Renunță
+          {t('profile.actions.cancel')}
         </button>
         <button
           className="profile-action-button save"
@@ -602,12 +604,12 @@ export default function ProfilePage() {
                 className="profile-loading-spinner-small"
                 style={{ color: 'white' }}
               />
-              <span className="profile-loading-text">Se salvează...</span>
+              <span className="profile-loading-text">{t('profile.actions.saving')}</span>
             </>
           ) : (
             <>
               <SaveIcon className="profile-icon" />
-              Salvează
+              {t('profile.actions.save')}
             </>
           )}
         </button>
@@ -619,11 +621,11 @@ export default function ProfilePage() {
     <div className="profile-info-main-card">
       <div className="profile-info-content">
         <div className="profile-info-header-section">
-          <h2 className="profile-info-main-title">Informații de Contact</h2>
+          <h2 className="profile-info-main-title">{t('profile.contactInfoTitle')}</h2>
           {!editMode && (
             <button className="profile-edit-button" onClick={handleEdit}>
               <EditIcon className="profile-icon" />
-              Editează
+              {t('profile.actions.edit')}
             </button>
           )}
         </div>
@@ -650,7 +652,7 @@ export default function ProfilePage() {
           className="announcement-image"
         />
       ) : (
-        <div className="announcement-image-placeholder">Fără imagine</div>
+        <div className="announcement-image-placeholder">{t('profile.noImage')}</div>
       )}
 
       <div className="announcement-card-body">
@@ -675,10 +677,10 @@ export default function ProfilePage() {
         {announcementsLoading ? (
           <Box className="profile-announcements-loading">
             <CircularProgress size={20} />
-            <span className="profile-loading-inline-text">Se încarcă...</span>
+            <span className="profile-loading-inline-text">{t('profile.loading')}</span>
           </Box>
         ) : userAnnouncements.length === 0 ? (
-          <Box className="profile-empty-state">Nu ai încă anunțuri.</Box>
+          <Box className="profile-empty-state">{t('profile.emptyAnnouncements')}</Box>
         ) : (
           <div className="profile-announcements-vertical">
             {userAnnouncements.map(renderAnnouncementCard)}
