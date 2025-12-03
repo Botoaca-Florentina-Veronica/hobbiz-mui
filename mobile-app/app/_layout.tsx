@@ -45,7 +45,7 @@ export default function RootLayout() {
                if (data.announcementTitle) params.announcementTitle = data.announcementTitle;
                if (data.announcementImage) params.announcementImage = data.announcementImage;
                router.push({
-                  pathname: '/(tabs)/chat',
+                  pathname: '/conversation',
                   params
                });
             } else if (parts[1] === 'users' && parts[3] === 'reviews') {
@@ -97,6 +97,7 @@ export default function RootLayout() {
                 <JsStack.Screen name="about" options={{ headerShown: false }} />
                 <JsStack.Screen name="legal" options={{ headerShown: false }} />
                 <JsStack.Screen name="notifications" options={{ headerShown: false }} />
+                <JsStack.Screen name="conversation" options={{ headerShown: false }} />
                 <JsStack.Screen name="profile" options={{ headerShown: false }} />
                 <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
                 <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />

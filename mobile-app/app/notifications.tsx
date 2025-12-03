@@ -93,7 +93,7 @@ export default function NotificationsScreen() {
 
       // Step 3: Navigate to chat (replace to avoid stack issues)
       router.replace({ 
-        pathname: '/(tabs)/chat', 
+        pathname: '/conversation', 
         params: navParams 
       });
 

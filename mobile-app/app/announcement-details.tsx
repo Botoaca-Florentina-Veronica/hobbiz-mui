@@ -334,7 +334,7 @@ export default function AnnouncementDetailsScreen() {
       </View>
 
       {/* Main Card */}
-      <View style={[styles.mainCard, { backgroundColor: '#121212', borderColor: tokens.colors.border }]}>        
+      <View style={[styles.mainCard, { backgroundColor: isDark ? '#121212' : '#ffffff', borderColor: tokens.colors.border }]}>        
         {/* Action buttons (favorite, share) top-right */}
         <View style={styles.cardActions}>
           <TouchableOpacity
@@ -380,17 +380,17 @@ export default function AnnouncementDetailsScreen() {
         </View>
         <Text style={[styles.postedAt, { color: tokens.colors.muted }]}>Postat {new Date(announcement.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
         
-        <Text style={[styles.sectionHeading, { color: '#ffffff' }]}>Descriere</Text>
-        <Text style={[styles.description, { color: '#ffffff' }]}>{announcement.description}</Text>
+        <Text style={[styles.sectionHeading, { color: isDark ? '#ffffff' : '#000000' }]}>Descriere</Text>
+        <Text style={[styles.description, { color: isDark ? '#ffffff' : '#000000' }]}>{announcement.description}</Text>
         <View style={[styles.divider, { borderBottomColor: tokens.colors.border }]} />
         <View style={styles.metaRow}>          
-          <Text style={[styles.metaItem, { color: '#ffffff' }]}>ID: {announcement._id.slice(-8)}</Text>
-          {!!announcement.views && <Text style={[styles.metaItem, { color: '#ffffff' }]}>{announcement.views} vizualizări</Text>}
+          <Text style={[styles.metaItem, { color: isDark ? '#ffffff' : tokens.colors.muted }]}>ID: {announcement._id.slice(-8)}</Text>
+          {!!announcement.views && <Text style={[styles.metaItem, { color: isDark ? '#ffffff' : tokens.colors.muted }]}>{announcement.views} vizualizări</Text>}
         </View>
       </View>
 
       {/* Seller Card */}
-      <View style={[styles.sellerCard, { backgroundColor: '#121212', borderColor: tokens.colors.border }]}>        
+      <View style={[styles.sellerCard, { backgroundColor: isDark ? '#121212' : '#ffffff', borderColor: tokens.colors.border }]}>        
         <Text style={[styles.sellerHeading, { color: tokens.colors.text }]}>Informații vânzător</Text>
 
         {/* Avatar + Name + Rating (tap to open seller profile) */}
