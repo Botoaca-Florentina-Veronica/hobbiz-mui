@@ -315,22 +315,25 @@ export default function AllReviewsScreen() {
                 {[5, 4, 3, 2, 1].map(star => {
                   const count = reviewStats.distribution[star as keyof typeof reviewStats.distribution] || 0;
                   const percentage = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
+                  const isEmpty = count === 0;
+                  // Choose a lighter grey for empty rows in light mode, keep borderNeutral in dark mode
+                  const emptyColor = isEmpty ? (isDark ? tokens.colors.borderNeutral : '#d1d5db') : null;
                   return (
                     <View key={star} style={styles.barRow}>
-                      <Text style={[styles.starLabel, { color: tokens.colors.text }]}>{star}</Text>
-                      <Ionicons name="star" size={14} color={tokens.colors.rating} />
-                      <View style={[styles.barTrack, { backgroundColor: tokens.colors.elev }]}>
+                      <Text style={[styles.starLabel, { color: isEmpty ? emptyColor : tokens.colors.text }]}>{star}</Text>
+                      <Ionicons name="star" size={14} color={isEmpty ? emptyColor : tokens.colors.rating} />
+                      <View style={[styles.barTrack, { backgroundColor: isEmpty ? emptyColor : tokens.colors.elev }]}>
                         <View 
                           style={[
                             styles.barFill, 
                             { 
-                              backgroundColor: tokens.colors.primary, 
+                              backgroundColor: isEmpty ? emptyColor : tokens.colors.primary, 
                               width: `${percentage}%` 
                             }
                           ]} 
                         />
                       </View>
-                      <Text style={[styles.countLabel, { color: tokens.colors.muted }]}>{count}</Text>
+                      <Text style={[styles.countLabel, { color: isEmpty ? emptyColor : tokens.colors.muted }]}>{count}</Text>
                     </View>
                   );
                 })}

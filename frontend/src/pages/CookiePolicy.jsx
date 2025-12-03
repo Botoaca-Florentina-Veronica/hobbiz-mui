@@ -207,7 +207,7 @@ export default function CookiePolicy() {
                 {t('cookies.s8.intro')}
               </p>
               <div className="contact-info">
-                <p><strong>{t('cookies.s8.emailLabel')}</strong> privacy@hobbiz.ro</p>
+                <p><strong>{t('cookies.s8.emailLabel')}</strong> team.hobbiz@gmail.com</p>
                 <p><strong>{t('cookies.s8.supportLabel')}</strong> {t('cookies.s8.supportText')}</p>
                 <p><strong>{t('cookies.s8.addressLabel')}</strong> {t('cookies.s8.addressText')}</p>
               </div>

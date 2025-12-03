@@ -317,8 +317,8 @@ export default function ConversationScreen() {
         announcementOwnerName: senderName,
         lastMessage: '',
         time: new Date().toLocaleString('ro-RO', { hour: '2-digit', minute: '2-digit' }),
-        unread: false,
-        unreadCount: 0,
+        unread: (routeParams as any)?.unread === 'true',
+        unreadCount: parseInt((routeParams as any)?.unreadCount || '0', 10),
         otherParticipant: { 
           id: senderId, 
           firstName: senderName.split(' ')[0] || '', 
@@ -365,8 +365,8 @@ export default function ConversationScreen() {
                 announcementOwnerName: senderName,
                 lastMessage: '',
                 time: new Date().toLocaleString('ro-RO', { hour: '2-digit', minute: '2-digit' }),
-                unread: false,
-                unreadCount: 0,
+                unread: (routeParams as any)?.unread === 'true',
+                unreadCount: parseInt((routeParams as any)?.unreadCount || '0', 10),
                 otherParticipant: { 
                 id: ownerId, 
                 firstName: (routeParams as any)?.announcementOwnerFirstName || senderName.split(' ')[0] || '', 

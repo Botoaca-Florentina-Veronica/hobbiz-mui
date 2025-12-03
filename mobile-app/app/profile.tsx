@@ -685,7 +685,7 @@ export default function ProfileScreen() {
           
           <View style={[
             styles.mapContainer,
-            { backgroundColor: profileToShow?.localitate ? tokens.colors.surface : '#121212', borderColor: tokens.colors.borderNeutral }
+            { backgroundColor: profileToShow?.localitate ? tokens.colors.surface : (isDark ? '#121212' : '#ffffff'), borderColor: tokens.colors.borderNeutral }
           ]}>
             {profileToShow?.localitate ? (
               (() => {
@@ -1158,6 +1158,8 @@ export default function ProfileScreen() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item) => item._id}
               contentContainerStyle={styles.announcementsList}
+              scrollEnabled={true}
+              nestedScrollEnabled={true}
               renderItem={({ item }) => {
                 const imageUri = item.images?.[0] ? getImageSrc(item.images[0]) : null;
                 return (
@@ -1589,7 +1591,7 @@ const styles = StyleSheet.create({
   },
   announcementsList: {
     paddingVertical: 16,
-    gap: 2,
+    paddingHorizontal: 4,
   },
   announcementCard: {
     width: 150,

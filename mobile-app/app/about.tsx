@@ -19,7 +19,7 @@ const TRANSLATIONS: Record<string, any> = {
     heroSuffix: 'în oportunitate',
     missionTitle: 'Misiunea noastră',
     missionSubtitle: 'Construim punți între talente și oportunități',
-    missionText: 'Hobbiz este o comunitate care celebrează autenticitatea și creativitatea. Credem că fiecare talent merită să fie văzut și apreciat.',
+    missionText: 'Hobbiz este o platformă comunitară gratuită care celebrează autenticitatea și creativitatea. Credem că fiecare talent merită să fie văzut și apreciat. Platforma noastră conectează pasionați cu clienți care apreciază calitatea și originalitatea, creând un ecosistem unde hobby-urile devin surse de venit.',
     pillars: [
       { icon: '🌟', title: 'Autenticitate', text: 'Promovăm produse și servicii unice, create cu pasiune' },
       { icon: '🤝', title: 'Comunitate', text: 'Legăm pasionați și clienți în mod direct și cald' },
@@ -64,7 +64,11 @@ const TRANSLATIONS: Record<string, any> = {
       { q: 'Pot vinde atât produse cât și servicii?', a: 'Absolut! Poți promova servicii, produse handmade, obiecte, vechituri, alimente și multe altele.' },
       { q: 'Cum funcționează sistemul de mesagerie?', a: 'Mesageria integrată îți permite discuții directe, negociere și coordonare în siguranță.' },
     ],
-    updateText: 'Ultima actualizare: 19 iulie 2025',
+    updateText: 'Ultima actualizare: 3 decembrie 2025',
+    contactTitle: 'Contactează-ne',
+    contactText: 'Pentru întrebări, sugestii sau asistență tehnică (răspunsuri în 2-5 zile):',
+    contactEmail: 'Email: team.hobbiz@gmail.com',
+    contactCompany: 'Platformă comunitară gratuită - România',
   },
   en: {
     title: 'About Us',
@@ -74,7 +78,7 @@ const TRANSLATIONS: Record<string, any> = {
     heroSuffix: 'into opportunity',
     missionTitle: 'Our mission',
     missionSubtitle: 'Building bridges between talent and opportunity',
-    missionText: 'Hobbiz is a community celebrating authenticity and creativity. We believe every talent deserves to be seen and recognized.',
+    missionText: 'Hobbiz is a free community platform celebrating authenticity and creativity. We believe every talent deserves to be seen and recognized. Our platform connects passionate creators with clients who appreciate quality and originality, creating an ecosystem where hobbies become income sources.',
     pillars: [
       { icon: '🌟', title: 'Authenticity', text: 'We promote unique products and services made with passion' },
       { icon: '🤝', title: 'Community', text: 'Connecting creators and customers directly and warmly' },
@@ -119,7 +123,11 @@ const TRANSLATIONS: Record<string, any> = {
       { q: 'Can I sell both products and services?', a: 'Absolutely! You can promote services, handmade products, items, vintage goods, food and more.' },
       { q: 'How does messaging work?', a: 'Built-in messaging lets you chat directly, negotiate and coordinate safely.' },
     ],
-    updateText: 'Last updated: July 19, 2025',
+    updateText: 'Last updated: December 3, 2025',
+    contactTitle: 'Contact Us',
+    contactText: 'For questions, suggestions or technical support (replies in 2-5 days):',
+    contactEmail: 'Email: team.hobbiz@gmail.com',
+    contactCompany: 'Free community platform - Romania',
   }
 };
 
@@ -347,6 +355,19 @@ export default function AboutScreen() {
                 );
               })}
               <ThemedText style={[styles.updateText, { color: tokens.colors.muted }]}>{t?.updateText}</ThemedText>
+            </View>
+
+            {/* Contact Section */}
+            <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
+              <ThemedText style={[styles.sectionHeader, { color: tokens.colors.text }]}>{t?.contactTitle ?? 'Contactează-ne'}</ThemedText>
+              <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>{t?.contactText}</ThemedText>
+              <View style={[styles.pillarItem, { borderColor: tokens.colors.border, marginTop: 12 }]}>                
+                <View style={styles.pillarIcon}><ThemedText>📧</ThemedText></View>
+                <View style={{ flex: 1 }}>
+                  <ThemedText style={[styles.pillarTitle, { color: tokens.colors.text }]}>{t?.contactEmail}</ThemedText>
+                  <ThemedText style={[styles.pillarText, { color: tokens.colors.muted }]}>{t?.contactCompany}</ThemedText>
+                </View>
+              </View>
             </View>
       </ScrollView>
     </ThemedView>

@@ -302,6 +302,14 @@ export default function ChatScreen() {
                 key={conv.conversationId}
                 activeOpacity={0.9}
                 onPress={() => {
+                  // Mark as read locally immediately
+                  setConversations(prev => prev.map(c => {
+                    if (c.conversationId === conv.conversationId) {
+                      return { ...c, unread: false, unreadCount: 0 };
+                    }
+                    return c;
+                  }));
+
                   router.push({
                     pathname: '/conversation',
                     params: {
@@ -313,6 +321,8 @@ export default function ChatScreen() {
                       announcementId: conv.announcementId,
                       announcementOwnerId: conv.announcementOwnerId,
                       announcementImage: conv.avatar,
+                      unread: conv.unread ? 'true' : 'false',
+                      unreadCount: conv.unreadCount ? conv.unreadCount.toString() : '0',
                     }
                   });
                 }}

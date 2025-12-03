@@ -304,7 +304,7 @@
     "mission": {
       "title": "Our mission",
       "subtitle": "We build bridges between talent and opportunity",
-      "description": "is not just a platform - it's a community that celebrates authenticity and creativity. We were born from the belief that every passion deserves to be shared and every talent should be valued."
+      "description": "Hobbiz is not just a platform - it's a community that celebrates authenticity and creativity. We were born from the belief that every passion deserves to be shared and every talent should be valued."
     },
     "pillars": {
       "authenticity": { "title": "Authenticity", "desc": "We promote unique products and services created with passion and dedication" },
@@ -360,7 +360,7 @@
       { "question": "Can I sell both products and services?", "answer": "Absolutely! While Hobbiz is primarily designed for services, you can also sell handmade products, items, vintage goods, vehicles, food and more." },
       { "question": "How does the messaging system work?", "answer": "Our messaging system allows you to communicate directly with other users in real time, negotiate prices and coordinate deliveries securely." }
     ],
-    "lastUpdated": "Last updated: July 19, 2025"
+    "lastUpdated": "Last updated: December 3, 2025"
   },
   "profile": {
     "mobileBackAria": "Back",
@@ -417,7 +417,7 @@
   },
   "terms": {
     "title": "Terms and Conditions",
-    "lastUpdated": "Last updated: September 5, 2025",
+    "lastUpdated": "Last updated: December 3, 2025",
     "intro": {
       "title": "Hobbiz Platform Usage Agreement",
       "text": "By accessing and using the Hobbiz platform, you agree to comply with the terms and conditions presented in this document. Please read these provisions carefully before creating an account or using our services."
@@ -441,9 +441,9 @@
       "h1": "Posting listings",
       "p1": "Users can post listings for the sale of new or second-hand products, provision of services, rental of goods or other legal commercial transactions. Each listing must contain an accurate and complete description of the product or service, real and unmodified photos and a correct and transparent price.",
       "p2": "Posting listings for the following is strictly prohibited: counterfeit or pirated products, substances prohibited by law, weapons and ammunition, protected or illegally obtained animals, illegal or immoral services, adult content or materials that violate copyright. We actively monitor content through automated algorithms and human moderation.",
-      "h2": "User responsibilities",
-      "p3": "Users are fully responsible for the content posted, the accuracy of information provided and compliance with all applicable laws. We reserve the right to remove any content that violates these terms or current legislation, without the obligation to provide detailed explanations.",
-      "p4": "Communication between users must be conducted in a respectful and professional manner. Harassment, threats, vulgar or discriminatory language, spam and fraud attempts will be sanctioned through temporary or permanent account restrictions."
+      "h2": "User responsibilities and content moderation",
+      "p3": "Users are fully responsible for the content posted. Hobbiz has zero tolerance for objectionable content or abusive users. Users can report objectionable content or abusive behavior directly through the in-app reporting feature or by contacting support. Our team will review reports and take firm action (including removing content and suspending/blocking the user) within a maximum of 24 hours of receiving the report.",
+      "p4": "Communication between users must be conducted in a respectful manner. Harassment, threats, vulgar or discriminatory language, spam and fraud attempts are strictly prohibited and will result in immediate account suspension."
     },
     "s4": {
       "title": "4. Transactions and payments",
@@ -502,17 +502,17 @@
     "s10": {
       "title": "10. Contact and support",
       "h1": "Contact information",
-      "p1": "For questions about these terms and conditions, complaints or support requests, you can contact us through the following methods: official email at legal@hobbiz.ro, contact form on the platform or traditional mail at the registered office address.",
+      "p1": "For questions about these terms and conditions, complaints or support requests, you can contact us through the following methods: official email at team.hobbiz@gmail.com, contact form on the platform or traditional mail at the registered office address.",
       "p2": "Our support team generally responds within 24-48 hours for standard questions and within a maximum of 72 hours for complex issues requiring technical or legal investigations. For security emergencies, we offer accelerated support through priority channels.",
       "h2": "Complaint Procedure",
-      "p3": "Complaints can be submitted through the integrated platform system, which allows status tracking and automatic notifications. For serious situations, we also accept direct communication via email at the dedicated address complaints@hobbiz.ro.",
+      "p3": "Complaints can be submitted through the integrated platform system, which allows status tracking and automatic notifications. For serious situations, we also accept direct communication via email at the dedicated address team.hobbiz@gmail.com.",
       "p4": "We investigate all complaints in an impartial and transparent manner, respecting the rights of all parties involved. Investigation results are communicated in writing, and for complex cases, we provide detailed explanations of the measures taken."
     },
-    "footer": "This document was last updated on September 5, 2025 and takes effect immediately for all Hobbiz platform users. For previous versions of these terms, please contact us at legal@hobbiz.ro."
+    "footer": "This document was last updated on December 3, 2025 and takes effect immediately for all Hobbiz platform users. For previous versions of these terms, please contact us at team.hobbiz@gmail.com."
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: July 19, 2025",
+    "lastUpdated": "Last updated: December 3, 2025",
     "intro": {
       "title": "Transparency and data protection",
       "text": "At Hobbiz, we consider the protection of personal data a fundamental responsibility. This document describes in detail our information management practices, in accordance with the General Data Protection Regulation (GDPR) and applicable Romanian legislation."
@@ -520,7 +520,7 @@
     "s1": {
       "title": "1. Purpose and scope",
       "p1": "This policy applies to all information collected through the Hobbiz platform, including through the website, mobile applications and any other associated interfaces. The document defines the legal and operational framework for the processing of personal data, including the purposes of collection, processing methods, user rights and security measures implemented.",
-      "p2": "The data controller is SC Hobbiz SRL, registered in Romania, which determines the purposes and means of data processing. For any questions regarding the content of this policy, please contact us using the details provided in the final section."
+      "p2": "The data controller is SC Hobbiz SRL. For any questions regarding the content of this policy, please contact us at: team.hobbiz@gmail.com."
     },
     "s2": {
       "title": "2. Categories of data processed",
@@ -647,7 +647,7 @@
       },
       "erasure": {
         "title": "Right to erasure:",
-        "text": "You can request the deletion of personal data when it is no longer necessary in relation to the purposes for which it was collected or processed."
+        "text": "You can request the deletion of personal data when it is no longer necessary in relation to the purposes for which it was collected or processed. You can request account deletion directly from the app settings ('Delete Account') or by contacting us at team.hobbiz@gmail.com. Requests will be processed immediately."
       },
       "restriction": {
         "title": "Right to restriction of processing:",
@@ -665,11 +665,11 @@
       "intro": "If you have any questions or concerns regarding this privacy policy or our data processing practices, please contact us using the following details:",
       "operator": {
         "title": "Data controller:",
-        "text": "SC Hobbiz SRL, registered at the Trade Register under no. J40/1234/2023, CUI 12345678, with its headquarters at Strada Exemplu no. 10, Bucharest, Romania."
+        "text": "SC Hobbiz SRL. Email: team.hobbiz@gmail.com"
       },
       "dpo": {
         "title": "Data protection officer:",
-        "text": "You can contact our data protection officer at",
+        "text": "You can contact our data protection officer at team.hobbiz@gmail.com",
         "purpose": "for any matters related to personal data processing."
       },
       "authority": {
@@ -780,14 +780,14 @@
       "title": "Updates to this policy",
       "text": "This cookie policy may be updated periodically to reflect changes in our practices or for legal and regulatory reasons. We encourage you to review this page from time to time.",
       "lastUpdatedLabel": "Last updated:",
-      "lastUpdatedDate": "September 2025"
+      "lastUpdatedDate": "December 3, 2025"
     },
     "s8": {
       "title": "Contact us",
       "intro": "If you have questions about this cookie policy or about the use of data on the Hobbiz platform, please contact us:",
       "emailLabel": "Email:",
       "supportLabel": "Support:",
-      "supportText": "through the platform chat",
+      "supportText": "team.hobbiz@gmail.com",
       "addressLabel": "Address:",
       "addressText": "Bucharest, Romania"
     }

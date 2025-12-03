@@ -200,7 +200,7 @@ const PrivacyPolicy = () => {
         </ul>
         
         <p>
-            {t('privacy.s5.certifications.contact')} <a href="mailto:security@hobbiz.ro">security@hobbiz.ro</a>.
+            {t('privacy.s5.certifications.contact')} <a href="mailto:team.hobbiz@gmail.com">team.hobbiz@gmail.com</a>.
         </p>
         </section>
       </div>
@@ -233,7 +233,7 @@ const PrivacyPolicy = () => {
           </p>
           
           <p>
-            {t('privacy.s6.contact')} <a href="mailto:protectiadatelor@hobbiz.ro">protectiadatelor@hobbiz.ro</a>. {t('privacy.s6.response')}
+            {t('privacy.s6.contact')} <a href="mailto:team.hobbiz@gmail.com">team.hobbiz@gmail.com</a>. {t('privacy.s6.response')}
           </p>
         </section>
       </div>
@@ -250,7 +250,7 @@ const PrivacyPolicy = () => {
           </p>
           
           <p>
-            <strong>{t('privacy.s7.dpo.title')}</strong> {t('privacy.s7.dpo.text')} <a href="mailto:dpo@hobbiz.ro">dpo@hobbiz.ro</a> {t('privacy.s7.dpo.purpose')}
+            <strong>{t('privacy.s7.dpo.title')}</strong> {t('privacy.s7.dpo.text')} <a href="mailto:team.hobbiz@gmail.com">team.hobbiz@gmail.com</a> {t('privacy.s7.dpo.purpose')}
           </p>
           
           <p>

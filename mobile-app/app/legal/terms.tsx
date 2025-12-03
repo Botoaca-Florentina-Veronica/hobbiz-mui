@@ -50,7 +50,7 @@ export default function TermsScreen() {
         <View style={[styles.desktopHeader, { backgroundColor: WEB_PRIMARY }]}>          
           <ThemedText style={styles.headerIcon}>📝</ThemedText>
           <ThemedText style={styles.headerH1}>{locale === 'en' ? 'Terms and Conditions' : 'Termeni și condiții'}</ThemedText>
-          <ThemedText style={styles.headerDate}>{locale === 'en' ? 'Last updated: September 5, 2025' : 'Ultima actualizare: 5 septembrie 2025'}</ThemedText>
+          <ThemedText style={styles.headerDate}>{locale === 'en' ? 'Last updated: December 3, 2025' : 'Ultima actualizare: 3 decembrie 2025'}</ThemedText>
           <View style={styles.radialOverlay} />
         </View>
 
@@ -64,8 +64,8 @@ export default function TermsScreen() {
               <ThemedText style={styles.introStrong}>{locale === 'en' ? 'Hobbiz Platform Terms of Use' : 'Acordul de utilizare a platformei Hobbiz'}</ThemedText>
               <ThemedText style={styles.introParagraph}>
                 {locale === 'en'
-                  ? 'By accessing and using the Hobbiz platform, you agree to comply with the terms and conditions set out in this document. Please read these provisions carefully before creating an account or using our services.'
-                  : 'Prin accesarea și utilizarea platformei Hobbiz, acceptați să respectați termenii și condițiile prezentate în acest document. Vă rugăm să citiți cu atenție aceste prevederi înainte de a crea un cont sau de a utiliza serviciile noastre.'}
+                  ? 'Hobbiz is a free community platform operated by an individual in Romania. By accessing and using this platform, you agree to these terms and acknowledge that services are provided "as is" without warranties. Please read these provisions carefully before creating an account.'
+                  : 'Hobbiz este o platformă comunitară gratuită administrată de o persoană fizică din România. Prin accesarea și utilizarea acestei platforme, acceptați acești termeni și recunoașteți că serviciile sunt oferite "în forma actuala" fără garanții. Vă rugăm să citiți cu atenție aceste prevederi înainte de a crea un cont.'}
               </ThemedText>
             </View>
           </View>
@@ -118,8 +118,8 @@ export default function TermsScreen() {
           }</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'Hobbiz operates as a digital marketplace connecting people who wish to sell or buy various products and services. We are not the owners or sellers of the listed items but facilitate interaction between users using modern web technologies, including React.js, Node.js and MongoDB.'
-              : 'Platforma Hobbiz funcționează ca un marketplace digital care conectează persoane interesate să vândă sau să cumpere produse și servicii diverse. Nu suntem proprietarii sau vânzătorii produselor listate, ci facilităm interacțiunea între utilizatori prin intermediul tehnologiilor web moderne, inclusiv React.js, Node.js și baze de date MongoDB.'
+              ? 'Hobbiz operates as a free digital community platform connecting people who wish to share, exchange, or trade various products and services. I, as the individual administrator, am not the owner or seller of listed items but facilitate interaction between users. The platform uses modern web technologies including React.js, Node.js and MongoDB.'
+              : 'Platforma Hobbiz funcționează ca o platformă comunitară digitală gratuită care conectează persoane interesate să partajeze, să facă schimb sau să tranzacționeze produse și servicii diverse. Eu, ca administrator individual, nu sunt proprietarul sau vânzătorul produselor listate, ci facilitez interacțiunea între utilizatori. Platforma folosește tehnologii web moderne, inclusiv React.js, Node.js și baze de date MongoDB.'
           }</ThemedText>
         </View>
 
@@ -181,29 +181,29 @@ export default function TermsScreen() {
 
         {/* Section 5 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>{locale === 'en' ? '5. Transactions and Payments' : '5. Tranzacții și plăți'}</ThemedText>
-          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Facilitating Transactions' : 'Facilitarea tranzacțiilor'}</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>{locale === 'en' ? '5. User Interactions and Transactions' : '5. Interacțiuni utilizatori și tranzacții'}</ThemedText>
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Platform Role' : 'Rolul platformei'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'Hobbiz acts as a technical intermediary between buyers and sellers and is not a party to transactions. We do not guarantee the quality, authenticity or conformity of items sold; these are the sole responsibility of sellers. We recommend users exercise caution and inspect items before finalizing transactions.'
-              : 'Hobbiz acționează ca intermediar tehnologic între cumpărători și vânzători, fără a fi parte în tranzacțiile efectuate. Nu garantăm calitatea, autenticitatea sau conformitatea produselor vândute, acestea fiind responsabilitatea exclusivă a vânzătorilor. Recomandăm utilizatorilor să fie precauți și să verifice întotdeauna produsele înainte de finalizarea tranzacțiilor.'
+              ? 'Hobbiz is a free platform that facilitates connections between users. I act as a technical intermediary and am not a party to any transactions or agreements between users. This is a community service provided without charge - no fees, commissions, or payment processing occurs through the platform.'
+              : 'Hobbiz este o platformă gratuită care facilitează conexiuni între utilizatori. Acționez ca intermediar tehnologic și nu sunt parte în nicio tranzacție sau acord între utilizatori. Acesta este un serviciu comunitar oferit fără cost - nu se percep taxe, comisioane sau procesare de plăți prin platformă.'
           }</ThemedText>
-          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
+          <ThemedText style={[styles.paragraph, { color: bodyColor, fontStyle: 'italic' }]}>{
             locale === 'en'
-              ? 'For certain premium services we process payments via certified processors such as Stripe and PayPal, which comply with PCI DSS standards. We do not store credit card details on our servers; all sensitive data is handled by specialized providers.'
-              : 'Pentru anumite servicii premium, procesăm plăți prin intermediul procesatorilor certificați Stripe și PayPal, care respectă standardele PCI DSS pentru securitatea datelor financiare. Nu stocăm informații despre carduri de credit pe serverele noastre, toate datele sensibile fiind gestionate exclusiv de furnizorii specializați.'
+              ? 'Disclaimer: I do not guarantee the quality, authenticity, legality, or safety of items/services listed by users. All transactions and arrangements between users are entirely their own responsibility. Use this platform at your own risk and exercise appropriate caution when dealing with other users.'
+              : 'Disclaimer: Nu garantez calitatea, autenticitatea, legalitatea sau siguranța articolelor/serviciilor listate de utilizatori. Toate tranzacțiile și aranjamentele între utilizatori sunt integral responsabilitatea lor. Folosiți această platformă pe propriul risc și exercitați prudență adecvată când interacționați cu alți utilizatori.'
           }</ThemedText>
 
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Disputes and Resolution' : 'Dispute și rezolvarea conflictelor'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'In user disputes we provide an internal reporting and mediation system, but final responsibility for resolving disputes rests with the parties involved. For high-value transactions we recommend written contracts and secure payment methods that provide protection for both parties.'
-              : 'În cazul disputelor între utilizatori, oferim un sistem intern de raportare și mediere, însă responsabilitatea finală pentru rezolvarea conflictelor revine părților implicate. Pentru tranzacții de valoare mare, recomandăm utilizarea de contracte scrise și metode de plată securizate care oferă protecție pentru ambele părți.'
+              ? 'Users are solely responsible for resolving any disputes arising from their interactions. I provide a basic reporting system for serious violations of these Terms, but I am not obligated to mediate, arbitrate, or resolve conflicts between users. For legal disputes, users should seek appropriate legal counsel and resolution through proper legal channels.'
+              : 'Utilizatorii sunt singurii responsabili pentru rezolvarea oricăror dispute ce decurg din interacțiunile lor. Ofer un sistem de bază de raportare pentru încălcări grave ale acestor Termeni, dar nu sunt obligat să mediez, să arbitrez sau să rezolv conflictele între utilizatori. Pentru dispute legale, utilizatorii ar trebui să apeleze la consiliere juridică adecvată și rezolvare prin canale legale corespunzătoare.'
           }</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'We may suspend accounts involved in repeated or serious disputes, but are not legally obligated to arbitrate commercial disputes between users. For matters involving potential criminal activity we cooperate with competent authorities as required by law.'
-              : 'Putem interveni prin suspendarea temporară a conturilor implicate în dispute repetate sau grave, dar nu avem obligația legală de a arbitra conflictele comerciale dintre utilizatori. Pentru situații care implică posibile infracțiuni, cooperăm cu autoritățile competente conform cerințelor legale.'
+              ? 'I may suspend or terminate accounts involved in repeated violations, harassment, fraud attempts, or other serious misconduct, but this is at my sole discretion and does not create any legal obligations or liability on my part.'
+              : 'Pot suspenda sau închide conturi implicate în încălcări repetate, hărțuire, tentative de fraudă sau alte comportamente grave neadecvate, dar aceasta este la discreția mea exclusivă și nu creează nicio obligație legală sau răspundere din partea mea.'
           }</ThemedText>
         </View>
 
@@ -246,6 +246,11 @@ export default function TermsScreen() {
           }</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
+              ? 'We use Firebase (Firebase Cloud Messaging - FCM) for push notifications and Google Analytics (Firebase Analytics) for usage analytics. These providers may process certain data on our behalf (for example: push tokens and aggregated analytics). Please review their privacy policies for details. You can opt out of analytics via the app settings or by contacting team.hobbiz@gmail.com.'
+              : 'Folosim Firebase (Firebase Cloud Messaging - FCM) pentru notificări push și Google Analytics (Firebase Analytics) pentru analizele de utilizare. Acești furnizori pot procesa anumite date în numele nostru (de exemplu: token-uri push și analize agregate). Vă rugăm să consultați politicile lor de confidențialitate pentru detalii. Puteți renunța la analize din setările aplicației sau contactând team.hobbiz@gmail.com.'
+          }</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
+            locale === 'en'
               ? 'Data is stored in SOC 2 Type II certified data centers with daily backups and geographic redundancy. Access to production systems is tightly controlled with multi-factor authentication and full administrative activity logging.'
               : 'Datele sunt stocate în centre de date certificate SOC 2 Type II, cu backup-uri automate zilnice și sisteme de redundanță geografică. Accesul la sistemele de producție este strict controlat prin autentificare cu doi factori și jurnalizarea completă a activităților administrative.'
           }</ThemedText>
@@ -265,29 +270,38 @@ export default function TermsScreen() {
 
         {/* Section 8 */}
         <View style={[styles.sectionCard, { backgroundColor: surface }]}>          
-          <ThemedText style={[styles.h2, { color: headingColor }]}>{locale === 'en' ? '8. Limitation of Liability' : '8. Limitări de răspundere'}</ThemedText>
-          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Disclaimers' : 'Excluderi de răspundere'}</ThemedText>
+          <ThemedText style={[styles.h2, { color: headingColor }]}>{locale === 'en' ? '8. Limitation of Liability and Disclaimers' : '8. Limitări de răspundere și excluderi'}</ThemedText>
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'AS-IS Service' : 'Serviciu "În forma actuală"'}</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor, fontWeight: '600' }]}>{
+            locale === 'en'
+              ? 'THIS PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. AS AN INDIVIDUAL OPERATOR WITH LIMITED RESOURCES, I MAKE NO WARRANTIES REGARDING: accuracy, reliability, or completeness of content; uninterrupted or error-free operation; fitness for any particular purpose; or absence of viruses or harmful components.'
+              : 'ACEASTĂ PLATFORMĂ ESTE OFERITĂ "ÎN FORMA ACTUALĂ" ȘI "DISPONIBILĂ AȘA CUM ESTE" FĂRĂ GARANȚII DE NICIUN FEL, EXPLICITE SAU IMPLICITE. CA OPERATOR INDIVIDUAL CU RESURSE LIMITATE, NU OFER GARANȚII PRIVIND: acuratețea, fiabilitatea sau completitudinea conținutului; funcționarea neîntreruptă sau fără erori; potrivirea pentru un anumit scop; sau absența virușilor sau componentelor dăunătoare.'
+          }</ThemedText>
+          
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'No Liability for User Content and Actions' : 'Lipsă răspundere pentru conținut și acțiuni utilizatori'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'Hobbiz is not responsible for damages resulting from transactions between users, data loss due to hardware or software failures, temporary service interruptions for technical reasons, fraudulent actions by users or third parties, or consequences of improper use of the Platform.'
-              : 'Hobbiz nu este responsabil pentru: daunele rezultate din tranzacțiile între utilizatori, pierderea de date din cauza defecțiunilor hardware sau software, întreruperile temporare ale serviciilor din motive tehnice, acțiunile frauduloase ale utilizatorilor sau terților sau consecințele utilizării inadecvate a platformei.'
+              ? 'I am NOT responsible for: content posted by users (listings, messages, reviews, images); accuracy of user-provided information; transactions, agreements, or disputes between users; damages from fraudulent or illegal user activities; loss of data, revenue, or business opportunities; any direct, indirect, incidental, or consequential damages arising from platform use.'
+              : 'NU sunt responsabil pentru: conținutul postat de utilizatori (anunțuri, mesaje, recenzii, imagini); acuratețea informațiilor furnizate de utilizatori; tranzacții, acorduri sau dispute între utilizatori; daune cauzate de activități frauduloase sau ilegale ale utilizatorilor; pierderi de date, venituri sau oportunități de afaceri; orice daune directe, indirecte, accidentale sau consecutive ce rezultă din utilizarea platformei.'
           }</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'In no event will our total liability exceed the amount of fees paid by the user for premium services in the last 12 months. This limitation applies regardless of the nature of the claim: contractual, tortious, or otherwise.'
-              : 'În niciun caz răspunderea noastră totală nu va depăși valoarea taxelor plătite de utilizator pentru serviciile premium în ultimele 12 luni. Această limitare se aplică indiferent de natura reclamației: contractuală, delictuală sau din orice altă cauză legală.'
+              ? 'This is a free community platform. Users acknowledge that I provide this service voluntarily without compensation and accept full responsibility for their own actions and interactions on the platform.'
+              : 'Aceasta este o platformă comunitară gratuită. Utilizatorii recunosc că ofer acest serviciu benevol fără compensație și acceptă răspunderea totală pentru propriile acțiuni și interacțiuni pe platformă.'
+          }</ThemedText>
+
+          <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Maximum Liability' : 'Răspundere maximă'}</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
+            locale === 'en'
+              ? 'IN NO EVENT WILL MY TOTAL LIABILITY TO YOU EXCEED ZERO (0) EUR. Since this is a completely free service with no fees charged, users acknowledge there is no financial basis for claims against the platform administrator.'
+              : 'ÎN NICIUN CAZ RĂSPUNDEREA MEA TOTALĂ FAȚĂ DE DUMNEAVOASTRĂ NU VA DEPĂȘI ZERO (0) EUR. Fiind un serviciu complet gratuit fără taxe percepute, utilizatorii recunosc că nu există bază financiară pentru reclamații împotriva administratorului platformei.'
           }</ThemedText>
 
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Force Majeure' : 'Forță majoră'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'We are not liable for delays or inability to perform due to force majeure events: natural disasters, wars, large-scale cyber attacks, restrictive government regulations, or other events beyond our reasonable control.'
-              : 'Nu suntem responsabili pentru întârzieri sau imposibilitatea de a îndeplini obligațiile din cauza evenimentelor de forță majoră: dezastre naturale, războaie, atacuri cibernetice la scară largă, reglementări guvernamentale restrictive sau alte evenimente în afara controlului nostru rezonabil.'
-          }</ThemedText>
-          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
-            locale === 'en'
-              ? 'In such situations we will use reasonable efforts to minimize impact and restore services as quickly as possible. Users will be promptly informed of major outages via our official communication channels.'
-              : 'În astfel de situații, vom depune toate eforturile rezonabile pentru a minimiza impactul asupra utilizatorilor și pentru a restabili serviciile cât mai rapid posibil. Utilizatorii vor fi informați prompt despre orice întreruperi majore prin canalele noastre oficiale de comunicare.'
+              ? 'I am not liable for delays or inability to perform due to events beyond reasonable control: natural disasters, wars, cyber attacks, government regulations, internet service provider failures, hosting provider outages, or other unforeseen circumstances. As an individual operator, I will make reasonable efforts to restore services when possible.'
+              : 'Nu sunt responsabil pentru întârzieri sau imposibilitatea de a îndeplini obligațiile din cauza evenimentelor în afara controlului rezonabil: dezastre naturale, războaie, atacuri cibernetice, reglementări guvernamentale, defecțiuni ale furnizorilor de internet, întreruperi ale furnizorilor de găzduire sau alte circumstanțe neprevăzute. Ca operator individual, voi depune eforturi rezonabile pentru a restabili serviciile când este posibil.'
           }</ThemedText>
         </View>
 
@@ -353,25 +367,25 @@ export default function TermsScreen() {
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Contact Information' : 'Informații de contact'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? <>For questions about these Terms, complaints or support requests you can contact us at the official email <ThemedText style={styles.strong}>legal@hobbiz.ro</ThemedText>, via the in-platform contact form, or by postal mail to our registered office address.</>
-              : <>Pentru întrebări despre acești termeni și condiții, reclamații sau solicitări de asistență, ne puteți contacta prin următoarele modalități: email oficial la <ThemedText style={styles.strong}>legal@hobbiz.ro</ThemedText>, formularul de contact din platformă sau poșta tradițională la adresa sediului social înregistrat.</>
+              ? <>For questions about these Terms, concerns or support requests, please contact: <ThemedText style={styles.strong}>team.hobbiz@gmail.com</ThemedText>. This platform is operated by an individual, and I will respond to inquiries as time permits, typically within 2-5 business days.</>
+              : <>Pentru întrebări despre acești termeni și condiții, nelămuriri sau solicitări de asistență, vă rog contactați: <ThemedText style={styles.strong}>team.hobbiz@gmail.com</ThemedText>. Această platformă este administrată de o persoană fizică, și voi răspunde la solicitări în măsura timpului disponibil, de obicei în 2-5 zile lucrătoare.</>
           }</ThemedText>
-          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
+          <ThemedText style={[styles.paragraph, { color: bodyColor, fontStyle: 'italic' }]}>{
             locale === 'en'
-              ? 'Our support team typically responds within 24-48 hours for standard inquiries and up to 72 hours for complex cases requiring technical or legal investigation. For security emergencies we provide prioritized support channels.'
-              : 'Echipa noastră de asistență răspunde în general în termen de 24-48 de ore pentru întrebările standard și în maximum 72 de ore pentru problemele complexe care necesită investigații tehnice sau legale. Pentru urgențe de securitate, oferim suport accelerat prin canale prioritare.'
+              ? 'Please note: As a free community platform operated by an individual with limited resources, response times may vary and I cannot guarantee immediate support. For urgent security issues, I will prioritize responses when possible.'
+              : 'Notă: Ca platformă comunitară gratuită administrată de o persoană fizică cu resurse limitate, timpii de răspuns pot varia și nu pot garanta suport imediat. Pentru probleme urgente de securitate, voi prioritiza răspunsurile când este posibil.'
           }</ThemedText>
 
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Complaint Procedure' : 'Procedura de reclamații'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? <>Complaints can be submitted via the integrated platform system, which allows tracking and automated notifications. For serious matters, direct email to <ThemedText style={styles.strong}>complaints@hobbiz.ro</ThemedText> is also accepted.</>
-              : <>Reclamațiile se pot depune prin sistemul integrat din platformă, care permite urmărirea statusului și primirea de notificări automate. Pentru situații grave, acceptăm și comunicarea directă prin email la adresa dedicată <ThemedText style={styles.strong}>complaints@hobbiz.ro</ThemedText>.</>
+              ? <>Complaints can be submitted via email to <ThemedText style={styles.strong}>team.hobbiz@gmail.com</ThemedText>. I will review complaints as time allows, but cannot guarantee resolution timelines or outcomes. Users are encouraged to resolve disputes directly with other users when possible.</>
+              : <>Reclamațiile pot fi trimise prin email la <ThemedText style={styles.strong}>team.hobbiz@gmail.com</ThemedText>. Voi revizui reclamațiile în măsura timpului disponibil, dar nu pot garanta termene sau rezultate specifice. Utilizatorii sunt încurajați să rezolve disputele direct cu alți utilizatori când este posibil.</>
           }</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'
-              ? 'We investigate complaints impartially and transparently, respecting the rights of all parties. Investigation results are communicated in writing and for complex cases we provide detailed explanations of measures taken.'
-              : 'Investigăm toate reclamațiile într-un mod imparțial și transparent, respectând drepturile tuturor părților implicate. Rezultatele investigațiilor sunt comunicate în scris, iar pentru cazurile complexe oferim explicații detaliate despre măsurile luate.'
+              ? 'For consumer protection issues, Romanian users may contact the National Authority for Consumer Protection (ANPC) or use the EU Online Dispute Resolution (ODR) platform.'
+              : 'Pentru probleme de protecție a consumatorilor, utilizatorii din România pot contacta Autoritatea Națională pentru Protecția Consumatorilor (ANPC) sau pot folosi platforma europeană ODR pentru soluționarea online a disputelor.'
           }</ThemedText>
         </View>
 
@@ -379,8 +393,8 @@ export default function TermsScreen() {
         <View style={[styles.footerNotice, { backgroundColor: footerBg, borderLeftColor: WEB_PRIMARY }]}>          
           <ThemedText style={[styles.footerParagraph, { color: isDarkMode ? '#888' : '#64748b' }]}>{
             locale === 'en'
-              ? 'This document was updated on September 5, 2025 and is effective immediately for all Hobbiz users. For prior versions of these Terms please contact us at legal@hobbiz.ro.'
-              : 'Documentul a fost actualizat la data de 5 septembrie 2025 și intră în vigoare imediat pentru toți utilizatorii platformei Hobbiz. Pentru versiunile anterioare ale acestor termeni, vă rugăm să ne contactați la adresa legal@hobbiz.ro.'
+              ? 'This document was updated on December 3, 2025 and is effective immediately for all Hobbiz users. For prior versions of these Terms please contact us at team.hobbiz@gmail.com.'
+              : 'Documentul a fost actualizat la data de 3 decembrie 2025 și intră în vigoare imediat pentru toți utilizatorii platformei Hobbiz. Pentru versiunile anterioare ale acestor termeni, vă rugăm să ne contactați la adresa team.hobbiz@gmail.com.'
           }</ThemedText>
         </View>
 

@@ -304,7 +304,7 @@
     "mission": {
       "title": "Misiunea noastră",
       "subtitle": "Construim punți între talente și oportunități",
-      "description": "nu este doar o platformă - este o comunitate care celebrează autenticitatea și creativitatea. Ne-am născut din convingerea că fiecare pasiune merită să fie împărtășită și că fiecare talent merită să fie valorificat."
+      "description": "Hobbiz nu este doar o platformă - este o comunitate care celebrează autenticitatea și creativitatea. Ne-am născut din convingerea că fiecare pasiune merită să fie împărtășită și că fiecare talent merită să fie valorificat."
     },
     "pillars": {
       "authenticity": { "title": "Autenticitate", "desc": "Promovăm produse și servicii unice, create cu pasiune și dedicare" },
@@ -360,7 +360,7 @@
       { "question": "Pot vinde atât produse cât și servicii?", "answer": "Absolut! Chiar dacă Hobbiz este conceput mai mult pentru servicii, poți vinde și produse handmade, obiecte, vechituri, mașini, alimente și multe altele." },
       { "question": "Cum funcționează sistemul de mesagerie?", "answer": "Sistemul nostru de mesagerie îți permite să comunici direct cu alți utilizatori în timp real, să negociezi prețuri și să coordonezi livrări în siguranță." }
     ],
-    "lastUpdated": "Ultima actualizare: 19 iulie 2025"
+    "lastUpdated": "Ultima actualizare: 3 Decembrie 2025"
   },
   "profile": {
     "mobileBackAria": "Înapoi",
@@ -417,7 +417,7 @@
   },
   "terms": {
     "title": "Termeni și condiții",
-    "lastUpdated": "Ultima actualizare: 5 septembrie 2025",
+    "lastUpdated": "Ultima actualizare: 3 Decembrie 2025",
     "intro": {
       "title": "Acordul de utilizare a platformei Hobbiz",
       "text": "Prin accesarea și utilizarea platformei Hobbiz, acceptați să respectați termenii și condițiile prezentate în acest document. Vă rugăm să citiți cu atenție aceste prevederi înainte de a crea un cont sau de a utiliza serviciile noastre."
@@ -425,102 +425,102 @@
     "s1": {
       "title": "1. Definiții și interpretare",
       "p1": "În cadrul acestor termeni și condiții, următoarele definiții se aplică: \"Platforma\" se referă la website-ul Hobbiz și toate aplicațiile mobile asociate; \"Servicii\" include toate funcționalitățile oferite prin platformă, inclusiv publicarea anunțurilor, căutarea, comunicarea între utilizatori și procesarea plăților; \"Utilizator\" desemnează orice persoană fizică sau juridică care accesează sau folosește platforma; \"Conținut\" include texte, imagini, video, date și alte materiale încărcate pe platformă.",
-      "p2": "Platforma Hobbiz funcționează ca un marketplace digital care conectează persoane interesate să vândă sau să cumpere produse și servicii diverse. Nu suntem proprietarii sau vânzătorii produselor listate, ci facilităm interacțiunea între utilizatori prin intermediul tehnologiilor web moderne, inclusiv React.js, Node.js și baze de date MongoDB."
+      "p2": "Platforma Hobbiz funcționează ca un marketplace digital care conectează persoane interesate să vândă sau să cumpere produse și servicii diverse."
     },
     "s2": {
       "title": "2. Eligibilitate și înregistrare",
       "h1": "Cerințe de vârstă și capacitate juridică",
       "p1": "Pentru a utiliza serviciile Hobbiz, trebuie să aveți minimum 18 ani și să dețineți capacitatea juridică deplină conform legislației românești. Minorilor cu vârsta cuprinsă între 16-18 ani li se permite utilizarea platformei doar cu consimțământul explicit al părinților sau reprezentanților legali și sub supravegherea acestora.",
-      "p2": "Persoanele juridice pot utiliza platforma prin intermediul reprezentanților autorizați, care răspund pentru toate acțiunile întreprinse în numele organizației. Verificăm documentele de înregistrare pentru conturile business și ne rezervăm dreptul de a solicita documente suplimentare pentru validarea identității.",
+      "p2": "Persoanele juridice pot utiliza platforma prin intermediul reprezentanților autorizați.",
       "h2": "Procesul de înregistrare",
       "p3": "Crearea unui cont necesită furnizarea unor informații exacte și complete: nume real, adresă de email validă și număr de telefon functional. Informațiile false sau înșelătoare constituie o încălcare a acestor termeni și pot duce la suspendarea sau închiderea contului fără preaviz.",
-      "p4": "Suportăm înregistrarea prin metode multiple: email și parolă, autentificare prin Google OAuth 2.0, sau prin alte furnizori de identitate autorizați. Fiecare utilizator poate deține un singur cont activ, iar crearea de conturi multiple pentru evitarea restricțiilor este strict interzisă."
+      "p4": "Fiecare utilizator poate deține un singur cont activ."
     },
     "s3": {
-      "title": "3. Utilizarea platformei și anunțuri",
+      "title": "3. Utilizarea platformei și anunțurile",
       "h1": "Publicarea anunțurilor",
-      "p1": "Utilizatorii pot publica anunțuri pentru vânzarea de produse noi sau second-hand, prestarea de servicii, închirierea de bunuri sau alte tranzacții comerciale legale. Fiecare anunț trebuie să conțină o descriere exactă și completă a produsului sau serviciului, fotografii reale și nemodificate și un preț corect și transparent.",
-      "p2": "Este strict interzisă publicarea de anunțuri pentru: produse contrafăcute sau piratate, substanțe interzise prin lege, arme și muniții, animale protejate sau obținute ilegal, servicii ilegale sau imorale, conținut pentru adulți sau materiale ce încalcă drepturile de autor. Monitorizăm activ conținutul prin algoritmi automatizați și moderare umană.",
-      "h2": "Responsabilitățile utilizatorilor",
-      "p3": "Utilizatorii sunt integral responsabili pentru conținutul publicat, exactitatea informațiilor furnizate și respectarea tuturor legilor aplicabile. Ne rezervăm dreptul de a elimina orice conținut care încalcă acești termeni sau legislația în vigoare, fără obligația de a oferi explicații detaliate.",
-      "p4": "Comunicarea între utilizatori trebuie să se desfășoare într-un mod respectuos și professional. Hărțuirea, amenințările, limbajul vulgar sau discriminatoriu, spam-ul și tentativele de fraudă vor fi sancționate prin restricții temporare sau permanente ale contului."
+      "p1": "Utilizatorii pot publica anunțuri pentru vânzarea de produse noi sau second-hand, prestarea de servicii, închirierea de bunuri sau alte tranzacții comerciale legale. Fiecare anunț trebuie să conțină o descriere fidelă și completă a produsului sau serviciului, fotografii reale și nemodificate și un preț corect și transparent.",
+      "p2": "Este strict interzisă publicarea de anunțuri pentru: produse contrafăcute sau piratate, substanțe interzise de lege, arme și muniții, animale protejate sau obținute ilegal, servicii ilegale sau imorale, conținut pentru adulți sau materiale care încalcă drepturile de autor. Monitorizăm activ conținutul prin algoritmi automați și moderare umană.",
+      "h2": "Responsabilitățile utilizatorilor și moderarea conținutului",
+      "p3": "Utilizatorii sunt pe deplin responsabili pentru conținutul postat. Hobbiz nu tolerează conținutul inacceptabil sau utilizatorii abuzivi. Utilizatorii pot raporta conținutul inacceptabil sau comportamentul abuziv direct prin intermediul funcției de raportare din aplicație sau contactând suportul. Echipa noastră va analiza rapoartele și va lua măsuri ferme (inclusiv ștergerea conținutului și suspendarea/blocarea utilizatorului) în termen de maxim 24 de ore de la primirea raportului.",
+      "p4": "Comunicarea între utilizatori trebuie să se desfășoare într-o manieră respectuoasă. Hărțuirea, amenințările, limbajul vulgar sau discriminatoriu, spam-ul și tentativele de fraudă sunt strict interzise și vor duce la suspendarea imediată a contului."
     },
     "s4": {
       "title": "4. Tranzacții și plăți",
       "h1": "Facilitarea tranzacțiilor",
-      "p1": "Hobbiz acționează ca intermediar tehnologic între cumpărători și vânzători, fără a fi parte în tranzacțiile efectuate. Nu garantăm calitatea, autenticitatea sau conformitatea produselor vândute, acestea fiind responsabilitatea exclusivă a vânzătorilor. Recomandăm utilizatorilor să fie precauți și să verifice întotdeauna produsele înainte de finalizarea tranzacțiilor.",
-      "p2": "Pentru anumite servicii premium, procesăm plăți prin intermediul procesatorilor certificați Stripe și PayPal, care respectă standardele PCI DSS pentru securitatea datelor financiare. Nu stocăm informații despre carduri de credit pe serverele noastre, toate datele sensibile fiind gestionate exclusiv de furnizorii specializați.",
+      "p1": "Hobbiz acționează ca intermediar tehnologic între cumpărători și vânzători, fără a fi parte în tranzacțiile efectuate. Nu garantăm calitatea, autenticitatea sau conformitatea produselor vândute, acestea fiind responsabilitatea exclusivă a vânzătorilor.",
+      "p2": "Pentru anumite servicii premium, procesăm plăți prin intermediul procesatorilor certificați.",
       "h2": "Dispute și rezolvarea conflictelor",
-      "p3": "În cazul disputelor între utilizatori, oferim un sistem intern de raportare și mediere, însă responsabilitatea finală pentru rezolvarea conflictelor revine părților implicate. Pentru tranzacții de valoare mare, recomandăm utilizarea de contracte scrise și metode de plată securizate care oferă protecție pentru ambele părți.",
-      "p4": "Putem interveni prin suspendarea temporară a conturilor implicate în dispute repetate sau grave, dar nu avem obligația legală de a arbitra conflictele comerciale dintre utilizatori. Pentru situații care implică posibile infracțiuni, cooperăm cu autoritățile competente conform cerințelor legale."
+      "p3": "În cazul disputelor între utilizatori, oferim un sistem intern de raportare și mediere, însă responsabilitatea finală pentru rezolvarea conflictelor revine părților implicate.",
+      "p4": "Putem interveni prin suspendarea temporară a conturilor implicate în dispute repetate sau grave."
     },
     "s5": {
       "title": "5. Proprietate intelectuală",
       "h1": "Drepturile platformei",
-      "p1": "Codul sursă, designul, logo-ul, mărcile comerciale și toate elementele tehnice ale platformei Hobbiz sunt protejate prin drepturi de autor și proprietate intelectuală. Utilizarea neautorizată a acestor elemente, inclusiv copierea codului sau replicarea designului, constituie o încălcare a drepturilor noastre și poate fi urmărită legal.",
-      "p2": "Tehnologiile folosite (React.js, Node.js, MongoDB) sunt open-source și utilizate conform licențelor respective, însă implementarea specifică și arhitectura sistemului nostru sunt proprietate exclusivă. Interzicerea reverse engineering-ului sau tentativelor de replicare a funcționalităților este strict aplicată.",
+      "p1": "Codul sursă, designul, logo-ul, mărcile comerciale și toate elementele tehnice ale platformei Hobbiz sunt protejate prin drepturi de autor și proprietate intelectuală.",
+      "p2": "Utilizarea neautorizată a acestor elemente este strict interzisă.",
       "h2": "Conținutul utilizatorilor",
-      "p3": "Utilizatorii rămân proprietarii conținutului pe care îl publică (fotografii, descrieri, recenzii), dar acordă Hobbiz o licență neexclusivă, transferabilă și sub-licențiabilă pentru a afișa, modifica și distribui acest conținut în scopul furnizării serviciilor platformei.",
-      "p4": "Este responsabilitatea utilizatorilor să se asigure că dețin toate drepturile necesare pentru conținutul publicat și că nu încalcă drepturile de autor ale terților. În cazul reclamațiilor DMCA valide, vom elimina prompt conținutul problematic și vom lua măsurile necesare împotriva conturilor care încalcă în mod repetat drepturile de autor."
+      "p3": "Utilizatorii rămân proprietarii conținutului pe care îl publică, dar acordă Hobbiz o licență neexclusivă pentru a afișa și distribui acest conținut în scopul furnizării serviciilor platformei.",
+      "p4": "Este responsabilitatea utilizatorilor să se asigure că dețin toate drepturile necesare pentru conținutul publicat."
     },
     "s6": {
       "title": "6. Securitate și protecția datelor",
       "h1": "Măsuri de securitate tehnice",
-      "p1": "Implementăm măsuri avansate de securitate informatică: criptarea SSL/TLS pentru toate comunicațiile, hashing-ul securizat al parolelor cu algoritmi bcrypt, protecție împotriva atacurilor CSRF și XSS, firewall-uri configurate și monitorizare constantă pentru activități suspecte. Actualizăm regulat toate componentele software pentru a corecta vulnerabilitățile de securitate.",
-      "p2": "Datele sunt stocate în centre de date certificate SOC 2 Type II, cu backup-uri automate zilnice și sisteme de redundanță geografică. Accesul la sistemele de producție este strict controlat prin autentificare cu doi factori și jurnalizarea completă a activităților administrative.",
+      "p1": "Implementăm măsuri avansate de securitate informatică pentru a proteja datele utilizatorilor.",
+      "p2": "Datele sunt stocate în centre de date securizate.",
       "h2": "Responsabilitățile utilizatorilor",
-      "p3": "Utilizatorii trebuie să păstreze confidențialitatea credențialelor de acces, să folosească parole complexe și unice și să ne notifice imediat în cazul suspiciunii că contul a fost compromis. Nu suntem responsabili pentru pierderi rezultate din neglijența utilizatorilor în păstrarea securității conturilor.",
-      "p4": "Activarea autentificării cu doi factori este puternic recomandată pentru toate conturile, în special pentru cele care gestionează tranzacții financiare frecvente. Oferim opțiuni multiple: SMS, aplicații TOTP (Google Authenticator, Authy) și chei hardware compatibile FIDO2."
+      "p3": "Utilizatorii trebuie să păstreze confidențialitatea credențialelor de acces.",
+      "p4": "Activarea autentificării cu doi factori este recomandată."
     },
     "s7": {
       "title": "7. Limitări de răspundere",
       "h1": "Excluderi de răspundere",
-      "p1": "Hobbiz nu este responsabil pentru: daunele rezultate din tranzacțiile între utilizatori, pierderea de date din cauza defecțiunilor hardware sau software, întreruperile temporare ale serviciilor din motive tehnice, acțiunile frauduloase ale utilizatorilor sau terților sau consecințele utilizării inadecvate a platformei.",
-      "p2": "În niciun caz răspunderea noastră totală nu va depăși valoarea taxelor plătite de utilizator pentru serviciile premium în ultimele 12 luni. Această limitare se aplică indiferent de natura reclamației: contractuală, delictuală sau din orice altă cauză legală.",
+      "p1": "Hobbiz nu este responsabil pentru daunele rezultate din tranzacțiile între utilizatori sau utilizarea platformei.",
+      "p2": "Răspunderea noastră este limitată conform legii.",
       "h2": "Forță majoră",
-      "p3": "Nu suntem responsabili pentru întârzieri sau imposibilitatea de a îndeplini obligațiile din cauza evenimentelor de forță majoră: dezastre naturale, războaie, atacuri cibernetice la scară largă, reglementări guvernamentale restrictive sau alte evenimente în afara controlului nostru rezonabil.",
-      "p4": "În astfel de situații, vom depune toate eforturile rezonabile pentru a minimiza impactul asupra utilizatorilor și pentru a restabili serviciile cât mai rapid posibil. Utilizatorii vor fi informați prompt despre orice întreruperi majore prin canalele noastre oficiale de comunicare."
+      "p3": "Nu suntem responsabili pentru evenimente de forță majoră.",
+      "p4": "Vom depune eforturi pentru a minimiza impactul acestor evenimente."
     },
     "s8": {
       "title": "8. Modificări și încetarea serviciilor",
       "h1": "Modificări ale termenilor",
-      "p1": "Ne rezervăm dreptul de a modifica acești termeni și condiții pentru a reflecta schimbările în serviciile oferite, cerințele legale sau practicile comerciale. Utilizatorii vor fi notificați cu minimum 30 de zile înainte de intrarea în vigoare a modificărilor majore prin email și notificări în platformă.",
-      "p2": "Continuarea utilizării serviciilor după intrarea în vigoare a modificărilor constituie acceptarea noilor termeni. Utilizatorii care nu sunt de acord cu modificările pot închide conturile și înceta utilizarea platformei fără penalități suplimentare.",
+      "p1": "Ne rezervăm dreptul de a modifica acești termeni și condiții. Utilizatorii vor fi notificați cu privire la modificările majore.",
+      "p2": "Continuarea utilizării serviciilor constituie acceptarea noilor termeni.",
       "h2": "Suspendarea și închiderea conturilor",
-      "p3": "Putem suspenda sau închide conturile care încalcă acești termeni, participă la activități frauduloase, afectează negativ experiența altor utilizatori sau prezintă riscuri de securitate pentru platformă. În funcție de gravitatea încălcării, putem aplica avertismente, restricții temporare sau închiderea definitivă.",
-      "p4": "Utilizatorii pot închide voluntar conturile oricând prin setările platformei. La închiderea contului, datele personale vor fi anonimizate sau șterse conform politicii noastre de confidențialitate, iar anunțurile active vor fi eliminate automat."
+      "p3": "Putem suspenda sau închide conturile care încalcă acești termeni.",
+      "p4": "Utilizatorii pot închide voluntar conturile oricând."
     },
     "s9": {
       "title": "9. Legea aplicabilă și jurisdicția",
       "h1": "Cadrul legal",
-      "p1": "Acești termeni și condiții sunt guvernați de legea română și se interpretează conform acesteia. Toate disputele rezultate din utilizarea platformei vor fi soluționate de instanțele competente din România, utilizatorii renunțând la orice pretenție de incompetență teritorială.",
-      "p2": "Pentru utilizatorii din Uniunea Europeană, respectăm prevederile Regulamentului Digital Services Act (DSA) și ale Directivei privind Drepturile Consumatorilor. Consumatorii pot beneficia de proceduri alternative de soluționare a disputelor conform reglementărilor UE aplicabile.",
+      "p1": "Acești termeni și condiții sunt guvernați de legea română.",
+      "p2": "Pentru utilizatorii din UE, respectăm reglementările aplicabile.",
       "h2": "Conformitate cu reglementările",
-      "p3": "Platforma respectă prevederile GDPR pentru protecția datelor, reglementările PSD2 pentru serviciile de plată, cerințele de e-commerce conform OUG 34/2014 și alte acte normative relevante din România și UE. Cooperăm cu autoritățile de reglementare și aplicăm prompt orice cerințe legale noi.",
-      "p4": "Pentru problemele specifice protecției consumatorilor, utilizatorii se pot adresa ANPC (Autoritatea Națională pentru Protecția Consumatorilor) sau pot folosi platforma europeană ODR pentru soluționarea online a disputelor comerciale."
+      "p3": "Platforma respectă prevederile legale în vigoare.",
+      "p4": "Pentru problemele specifice protecției consumatorilor, utilizatorii se pot adresa ANPC."
     },
     "s10": {
       "title": "10. Contact și asistență",
       "h1": "Informații de contact",
-      "p1": "Pentru întrebări despre acești termeni și condiții, reclamații sau solicitări de asistență, ne puteți contacta prin următoarele modalități: email oficial la legal@hobbiz.ro, formularul de contact din platformă sau poșta tradițională la adresa sediului social înregistrat.",
-      "p2": "Echipa noastră de asistență răspunde în general în termen de 24-48 de ore pentru întrebările standard și în maximum 72 de ore pentru problemele complexe care necesită investigații tehnice sau legale. Pentru urgențe de securitate, oferim suport accelerat prin canalele prioritare.",
+      "p1": "Pentru întrebări despre acești termeni și condiții, ne puteți contacta la adresa de email: team.hobbiz@gmail.com.",
+      "p2": "Echipa noastră de asistență răspunde în cel mai scurt timp posibil.",
       "h2": "Procedura de reclamații",
-      "p3": "Reclamațiile se pot depune prin sistemul integrat din platformă, care permite urmărirea statusului și primirea de notificări automate. Pentru situații grave, acceptăm și comunicarea directă prin email la adresa dedicată complaints@hobbiz.ro.",
-      "p4": "Investigăm toate reclamațiile într-un mod imparțial și transparent, respectând drepturile tuturor părților implicate. Rezultatele investigațiilor sunt comunicate în scris, iar pentru cazurile complexe oferim explicații detaliate despre măsurile luate."
+      "p3": "Reclamațiile se pot depune prin email la team.hobbiz@gmail.com.",
+      "p4": "Investigăm toate reclamațiile într-un mod imparțial."
     },
-    "footer": "Documentul a fost actualizat la data de 5 septembrie 2025 și intră în vigoare imediat pentru toți utilizatorii platformei Hobbiz. Pentru versiunile anterioare ale acestor termeni, vă rugăm să ne contactați la adresa legal@hobbiz.ro."
+    "footer": "Documentul a fost actualizat la data de 3 Decembrie 2025 și intră în vigoare imediat. Pentru versiunile anterioare, contactați-ne la team.hobbiz@gmail.com."
   },
   "privacy": {
     "title": "Politica de confidențialitate",
-    "lastUpdated": "Ultima actualizare: 19 iulie 2025",
+    "lastUpdated": "Ultima actualizare: 3 Decembrie 2025",
     "intro": {
       "title": "Transparență și protecție a datelor",
-      "text": "La Hobbiz, considerăm protecția datelor personale o responsabilitate fundamentală. Acest document descrie în detaliu practicile noastre de gestionare a informațiilor, conform Regulamentului General privind Protecția Datelor (GDPR) și legislației românești aplicabile."
+      "text": "La Hobbiz, considerăm protecția datelor personale o responsabilitate fundamentală. Acest document descrie în detaliu practicile noastre de gestionare a informațiilor, conform Regulamentului General privind Protecția Datelor (GDPR) și legislației românești aplicabile. Ne angajăm să protejăm confidențialitatea utilizatorilor noștri."
     },
     "s1": {
       "title": "1. Scopul și domeniul de aplicare",
       "p1": "Această politică se aplică tuturor informațiilor colectate prin intermediul platformei Hobbiz, inclusiv prin website, aplicații mobile și orice alte interfețe asociate. Documentul definește cadrul legal și operațional pentru prelucrarea datelor cu caracter personal, inclusiv scopurile de colectare, metodele de procesare, drepturile utilizatorilor și măsurile de securitate implementate.",
-      "p2": "Operatorul de date este SC Hobbiz SRL, înregistrată în România, care determină scopurile și mijloacele prelucrării datelor. Pentru orice nelămuriri referitoare la conținutul acestei politici, vă rugăm să ne contactați folosind detaliile furnizate în secțiunea finală."
+      "p2": "Operatorul de date este SC Hobbiz SRL. Pentru orice nelămuriri referitoare la conținutul acestei politici, vă rugăm să ne contactați la adresa de email: team.hobbiz@gmail.com."
     },
     "s2": {
       "title": "2. Categorii de date prelucrate",
@@ -647,7 +647,7 @@
       },
       "erasure": {
         "title": "Dreptul la ștergere:",
-        "text": "Puteți solicita ștergerea datelor personale, când acestea nu mai sunt necesare în raport cu scopurile pentru care au fost colectate sau prelucrate."
+        "text": "Puteți solicita ștergerea datelor personale, când acestea nu mai sunt necesare în raport cu scopurile pentru care au fost colectate sau prelucrate. Puteți solicita ștergerea contului direct din setările aplicației ('Șterge cont') sau contactându-ne la team.hobbiz@gmail.com. Cererile vor fi procesate imediat."
       },
       "restriction": {
         "title": "Dreptul la restricționarea prelucrării:",
@@ -665,11 +665,11 @@
       "intro": "Dacă aveți întrebări sau nelămuriri referitoare la această politică de confidențialitate sau la practicile noastre de prelucrare a datelor, vă rugăm să ne contactați folosind următoarele detalii:",
       "operator": {
         "title": "Operator de date:",
-        "text": "SC Hobbiz SRL, înregistrată la Registrul Comerțului sub nr. J40/1234/2023, CUI 12345678, cu sediul în Strada Exemplu nr. 10, București, România."
+        "text": "SC Hobbiz SRL. Email: team.hobbiz@gmail.com"
       },
       "dpo": {
         "title": "Responsabil cu protecția datelor:",
-        "text": "Puteți contacta responsabilul nostru cu protecția datelor la adresa",
+        "text": "Puteți contacta responsabilul nostru cu protecția datelor la adresa team.hobbiz@gmail.com",
         "purpose": "pentru orice aspecte legate de prelucrarea datelor personale."
       },
       "authority": {
@@ -780,14 +780,14 @@
       "title": "Actualizări ale acestei politici",
       "text": "Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești această pagină din când în când.",
       "lastUpdatedLabel": "Ultima actualizare:",
-      "lastUpdatedDate": "Septembrie 2025"
+      "lastUpdatedDate": "3 Decembrie 2025"
     },
     "s8": {
       "title": "Contactează-ne",
       "intro": "Dacă ai întrebări despre această politică de cookie-uri sau despre utilizarea datelor pe platforma Hobbiz, te rugăm să ne contactezi:",
       "emailLabel": "Email:",
       "supportLabel": "Suport:",
-      "supportText": "prin chat-ul de pe platformă",
+      "supportText": "team.hobbiz@gmail.com",
       "addressLabel": "Adresă:",
       "addressText": "București, România"
     }

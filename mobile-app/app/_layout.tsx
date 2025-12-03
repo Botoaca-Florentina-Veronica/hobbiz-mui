@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { TransitionPresets } from '@react-navigation/stack';
 
 import { JsStack } from '../components/JsStack';
+import { NetworkStatus } from '../components/NetworkStatus';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
@@ -77,6 +78,7 @@ export default function RootLayout() {
           <NotificationProvider>
             <ChatNotificationProvider>
               <SafeAreaProvider>
+                <NetworkStatus />
                 <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <JsStack
                   screenOptions={{
