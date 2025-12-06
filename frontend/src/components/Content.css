@@ -79,17 +79,39 @@
 /* 3. CONTENT SECTION BASE
    ---------------------------------------------------------- */
 .content {
-  padding: 150px 0;
+  padding: 120px 0 180px;
   color: var(--ct-text-primary);
-  font-size: 40px;
-  font-weight: bold;
   background-color: var(--bg-secondary);
-  height: 80vh;
+  min-height: 85vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 0;
-  padding-top: 100px;
+  position: relative;
+}
+
+.dark-mode .content {
+  /* Use the same variable so dark-mode values from theme.css apply */
+  background-color: var(--bg-secondary);
+}
+
+/* Dark mode gradient fade at top for smooth transition from MainStage */
+.dark-mode .content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, #121212 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure content elements are above the gradient overlay */
+.dark-mode .content > * {
+  position: relative;
+  z-index: 1;
 }
 
 .content h2,
@@ -101,6 +123,37 @@
   /* increased space above title to visually separate from hero */
   padding: 140px 70px 70px 50px; /* top, right, bottom, left */
   margin-top: 0;
+}
+
+/* Make the top spacing smaller when the shared class is used inside the popular section */
+.content {
+  /* Reduce the large padding/margin applied by the generic rules above */
+  padding-top: 1.25rem !important;
+  margin-top: 0.4rem !important;
+  font-size: 2.5rem !important; /* keep the same size as choose-us by default */
+}
+
+.content h2 {
+  padding-bottom: 0.5rem !important;
+}
+
+/* Reuse ChooseUs subtitle styles here so the Content subtitle matches exactly */
+.choose-us-subtitle {
+  font-family: 'Poppins', sans-serif !important;
+  color: #3b82f6 !important;
+  margin-bottom: 4rem !important;
+  max-width: 700px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 1.1rem !important;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Dark mode override to match ChooseUs behavior */
+.dark-mode .choose-us-subtitle {
+  color: #ff0055 !important;
 }
 
 

@@ -3,13 +3,21 @@ import {
   IconButton, 
   Box, 
   Card, 
-  CardMedia, 
   CardContent, 
   Typography, 
   Chip,
-  Skeleton
+  Skeleton,
+  Avatar,
+  Stack
 } from '@mui/material';
-import { ChevronLeft, ChevronRight, FavoriteOutlined } from '@mui/icons-material';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  FavoriteBorder, 
+  LocationOn,
+  AccessTime,
+  TrendingUp
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 // Content.css is imported in App.jsx to ensure it is loaded after global styles
 import apiClient from '../api/api';
@@ -20,6 +28,7 @@ export default function Content() {
   const [popular, setPopular] = useState([]);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isDarkMode = document.body.classList.contains('dark-mode');
 
   // Format date in Romanian like "09 septembrie 2025"
   const formatRoDate = (date) => {
@@ -50,97 +59,154 @@ export default function Content() {
 
   return (
     <section className="content">
-      <h2>{t('content.popularTitle')}</h2>
-        <Box sx={{ 
-        maxWidth: '1100px',
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography variant="h2" className="choose-us-title">
+          {t('content.popularTitle')}
+        </Typography>
+        <Typography 
+          variant="subtitle1" 
+          className="choose-us-subtitle"
+          sx={{ 
+            color: isDarkMode ? '#aaa' : '#666',
+            fontSize: { xs: '0.95rem', md: '1.1rem' },
+            maxWidth: '600px',
+            fontWeight: 400,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            display: 'block'
+          }}
+        >
+          Cele mai apreciate anunțuri din comunitatea noastră
+        </Typography>
+      </Box>
+
+      <Box sx={{ 
+        maxWidth: '1200px',
         margin: '0 auto',
-        position: 'relative'
+        position: 'relative',
+        px: { xs: 0, lg: 2 }
       }}>
         <IconButton 
           onClick={() => handleScroll('left')}
           sx={{
             position: 'absolute',
-            left: '-50px',
+            left: { lg: '-60px' },
             top: '50%',
             transform: 'translateY(-50%)',
-            zIndex: 1,
-            backgroundColor: '#f51866',
+            zIndex: 10,
+            background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
             color: 'white',
-            display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' }, // Only visible on large screens
+            width: 48,
+            height: 48,
+            display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' },
+            boxShadow: '0 4px 20px rgba(245, 24, 102, 0.3)',
             '&:hover': {
-              backgroundColor: '#2a4a65'
-            }
+              background: 'linear-gradient(135deg, #d01456 0%, #e55888 100%)',
+              transform: 'translateY(-50%) scale(1.05)',
+              boxShadow: '0 6px 25px rgba(245, 24, 102, 0.4)',
+            },
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           <ChevronLeft fontSize="large" />
         </IconButton>
 
-        {/* Responsive card container */}
+        {/* Modern card container */}
         <Box
           ref={carouselRef}
           className="popular-announcements-container"
           sx={{
-            /* Use grid on small screens to guarantee 2 columns, switch to horizontal flex/scroll on large screens */
             display: { xs: 'grid', lg: 'flex' },
-            gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
-            gap: { xs: '12px', sm: '16px', md: '20px', lg: '20px' },
+            gridTemplateColumns: { 
+              xs: 'repeat(2, 1fr)', 
+              sm: 'repeat(2, 1fr)', 
+              md: 'repeat(3, 1fr)' 
+            },
+            gap: { xs: '16px', sm: '20px', md: '24px', lg: '24px' },
             flexWrap: { lg: 'nowrap' },
-            overflowX: { xs: 'hidden', sm: 'hidden', md: 'hidden', lg: 'auto' },
+            overflowX: { xs: 'hidden', lg: 'auto' },
             overflowY: 'visible',
             scrollBehavior: 'smooth',
-            padding: { xs: '20px 12px', sm: '20px 16px', md: '20px 20px', lg: '20px 10px' },
+            padding: { xs: '16px', sm: '20px', md: '24px', lg: '20px 10px' },
             justifyContent: { lg: 'flex-start' },
-            maxHeight: { xs: 'none', sm: 'none', md: 'none', lg: 'auto' },
             '&::-webkit-scrollbar': {
-              height: '8px',
-              backgroundColor: '#f5f5f5',
-              display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }
+              height: '6px',
+              backgroundColor: 'transparent',
+              display: { xs: 'none', lg: 'block' }
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#f51866',
-              borderRadius: '4px'
+              background: 'linear-gradient(90deg, #f51866 0%, #ff6b9d 100%)',
+              borderRadius: '10px'
             },
             '&::-webkit-scrollbar-track': {
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px'
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              borderRadius: '10px',
+              margin: '0 10px'
             }
           }}
         >
           {popular.length === 0 ? (
-            // Loading skeletons
+            // Loading skeletons with modern design
             [...Array(6)].map((_, index) => (
               <Card
                 key={index}
                 sx={{
-                  /* Full width within grid columns on small screens, fixed card width on large screens */
-                  width: { xs: '100%', sm: '100%', md: '100%', lg: 320 },
-                  minWidth: { lg: 320 },
-                  maxWidth: { lg: 320 },
-                  height: { 
-                    xs: 220, 
-                    sm: 260, 
-                    md: 300, 
-                    lg: 310 
-                  },
+                  width: { xs: '100%', lg: 340 },
+                  minWidth: { lg: 340 },
+                  maxWidth: { lg: 340 },
+                  height: { xs: 280, sm: 320, md: 360, lg: 400 },
                   flexShrink: 0,
-                  borderRadius: 3,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  background: isDarkMode 
+                    ? 'linear-gradient(145deg, #1a1a1a 0%, #141414 100%)'
+                    : 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                  boxShadow: isDarkMode 
+                    ? '0 8px 32px rgba(0,0,0,0.4)'
+                    : '0 8px 32px rgba(0,0,0,0.06)',
+                  border: isDarkMode ? '1px solid #2a2a2a' : 'none'
                 }}
               >
                 <Skeleton 
                   variant="rectangular" 
-                  height={{ xs: 120, sm: 150, md: 180, lg: 190 }} 
+                  height={{ xs: 180, sm: 200, md: 240, lg: 260 }}
+                  sx={{ 
+                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)',
+                    animation: 'pulse 1.5s ease-in-out infinite'
+                  }}
                 />
-                <CardContent>
-                  <Skeleton variant="text" height={20} />
-                  <Skeleton variant="text" width="60%" height={16} />
-                  <Skeleton variant="text" width="40%" height={16} />
+                <CardContent sx={{ p: 2.5 }}>
+                  <Skeleton 
+                    variant="text" 
+                    height={28} 
+                    sx={{ 
+                      mb: 1.5,
+                      bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)'
+                    }} 
+                  />
+                  <Skeleton 
+                    variant="text" 
+                    height={20} 
+                    width="80%" 
+                    sx={{ 
+                      mb: 1,
+                      bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)'
+                    }} 
+                  />
+                  <Skeleton 
+                    variant="text" 
+                    height={20} 
+                    width="60%" 
+                    sx={{ 
+                      bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)'
+                    }} 
+                  />
                 </CardContent>
               </Card>
             ))
           ) : (
             popular.map((a, index) => {
-              // Compute created date; fallback to ObjectId timestamp if createdAt missing
+              // Compute created date
               let createdAtLabel = null;
               try {
                 const createdAt = a?.createdAt ? new Date(a.createdAt) : (a?._id ? new Date(parseInt(String(a._id).substring(0, 8), 16) * 1000) : null);
@@ -148,138 +214,208 @@ export default function Content() {
                   createdAtLabel = formatRoDate(createdAt);
                 }
               } catch {}
+              
               return (
               <Card
                 key={a._id || index}
                 onClick={() => a?._id && navigate(`/announcement/${a._id}`)}
                 sx={{
-                  width: { xs: '100%', sm: '100%', md: '100%', lg: 320 },
-                  minWidth: { lg: 320 },
-                  maxWidth: { lg: 320 },
-                  height: { 
-                    xs: 220, 
-                    sm: 260, 
-                    md: 300, 
-                    lg: 310 
-                  },
+                  width: { xs: '100%', lg: 340 },
+                  minWidth: { lg: 340 },
+                  maxWidth: { lg: 340 },
+                  height: { xs: 280, sm: 320, md: 360, lg: 400 },
                   flexShrink: 0,
                   cursor: 'pointer',
-                  borderRadius: 3,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  background: isDarkMode 
+                    ? 'linear-gradient(145deg, #1a1a1a 0%, #141414 100%)'
+                    : 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                  border: isDarkMode 
+                    ? '1px solid rgba(255,255,255,0.08)' 
+                    : '1px solid rgba(0,0,0,0.06)',
+                  boxShadow: isDarkMode 
+                    ? '0 8px 32px rgba(0,0,0,0.4)'
+                    : '0 8px 32px rgba(0,0,0,0.06)',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                    transform: 'translateY(-12px) scale(1.02)',
+                    boxShadow: isDarkMode 
+                      ? '0 20px 60px rgba(245, 24, 102, 0.25)'
+                      : '0 20px 60px rgba(245, 24, 102, 0.15)',
+                    border: isDarkMode 
+                      ? '1px solid rgba(245, 24, 102, 0.3)' 
+                      : '1px solid rgba(245, 24, 102, 0.2)',
+                    '& .card-image': {
+                      transform: 'scale(1.1)',
+                    },
+                    '& .overlay-gradient': {
+                      opacity: 0.7
+                    }
                   }
                 }}
               >
+                {/* Image Section with Gradient Overlay */}
                 <Box sx={{ 
                   position: 'relative', 
-                  height: { xs: 120, sm: 150, md: 180, lg: 190 }, 
-                  overflow: 'hidden' 
+                  height: { xs: 180, sm: 200, md: 240, lg: 260 }, 
+                  overflow: 'hidden',
+                  backgroundColor: '#f0f0f0'
                 }}>
                   {a?.images && a.images[0] ? (
-                    <CardMedia
-                      component="img"
-                      height="120"
-                      image={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
-                        ? a.images[0]
-                        : `/uploads/${a.images[0].replace(/^.*[\\\/]/, '')}`}
-                      alt={a.title || 'anunț popular'}
-                      sx={{
-                        height: { xs: 120, sm: 150, md: 180, lg: 190 },
-                        objectFit: 'cover',
-                        transition: 'transform 0.3s ease',
-                        '&:hover': {
-                          transform: 'scale(1.05)'
-                        }
-                      }}
-                    />
+                    <>
+                      <Box
+                        component="img"
+                        className="card-image"
+                        src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
+                          ? a.images[0]
+                          : `/uploads/${a.images[0].replace(/^.*[\\\/]/, '')}`}
+                        alt={a.title || 'anunț popular'}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}
+                      />
+                      {/* Gradient overlay for better text readability */}
+                      <Box
+                        className="overlay-gradient"
+                        sx={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: '60%',
+                          background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
+                          opacity: 0.5,
+                          transition: 'opacity 0.4s ease',
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    </>
                   ) : (
                     <Box
                       sx={{
-                        height: { xs: 120, sm: 150, md: 180, lg: 190 },
-                        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#666'
+                        color: 'white',
+                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        fontWeight: 500
                       }}
                     >
-                      <Typography variant="body2">Fără imagine</Typography>
+                      Fără imagine
                     </Box>
                   )}
                   
-                  {/* Favorite count badge */}
+                  {/* Favorite Badge - Modern Design */}
                   {a.favoritesCount > 0 && (
                     <Chip
-                      icon={<FavoriteOutlined sx={{ fontSize: { xs: 14, sm: 15, md: 16 } }} />}
+                      icon={<FavoriteBorder sx={{ fontSize: 16, color: 'white !important' }} />}
                       label={a.favoritesCount}
                       size="small"
                       sx={{
                         position: 'absolute',
-                        top: { xs: 8, sm: 10, md: 12 },
-                        right: { xs: 8, sm: 10, md: 12 },
-                        backgroundColor: 'rgba(245, 24, 102, 0.9)',
+                        top: 12,
+                        right: 12,
+                        background: 'rgba(255, 255, 255, 0.25)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
                         color: 'white',
-                        backdropFilter: 'blur(8px)',
-                        fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
-                        height: { xs: '20px', sm: '22px', md: '24px' },
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        height: '32px',
+                        px: 0.5,
                         '& .MuiChip-icon': {
-                          color: 'white'
+                          color: 'white',
+                          marginLeft: '4px'
+                        },
+                        '& .MuiChip-label': {
+                          px: 1
                         }
+                      }}
+                    />
+                  )}
+
+                  {/* Category Badge */}
+                  {a.category && (
+                    <Chip
+                      label={a.category}
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        top: 12,
+                        left: 12,
+                        background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
+                        color: 'white',
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        height: '28px',
+                        textTransform: 'capitalize',
+                        border: 'none',
+                        boxShadow: '0 4px 12px rgba(245, 24, 102, 0.3)'
                       }}
                     />
                   )}
                 </Box>
                 
+                {/* Content Section - Modern Layout */}
                 <CardContent sx={{ 
-                  p: { xs: 0.75, sm: 1, md: 1.5, lg: 2 }, 
-                  height: { xs: 90, sm: 100, md: 110, lg: 100 }, 
+                  p: { xs: 1.5, sm: 2, md: 2.5 }, 
+                  height: { xs: 100, sm: 120, md: 120, lg: 140 }, 
                   display: 'flex', 
                   flexDirection: 'column',
                   justifyContent: 'space-between'
                 }}>
+                  {/* Title */}
                   <Typography
                     variant="h6"
                     component="h3"
                     sx={{
-                      fontWeight: 600,
-                      fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem', lg: '1.1rem' },
-                      lineHeight: { xs: 1.1, sm: 1.15, md: 1.2, lg: 1.3 },
+                      fontWeight: 700,
+                      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem', lg: '1.15rem' },
+                      lineHeight: 1.3,
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      color: '#1a1a1a',
-                      mb: { xs: 0.2, sm: 0.3, md: 0.5, lg: 1 }
+                      color: isDarkMode ? '#ffffff' : '#1a1a1a',
+                      mb: 1.5,
+                      letterSpacing: '-0.01em'
                     }}
                   >
                     {a.title || 'Anunț fără titlu'}
                   </Typography>
                   
-                  {/* Location and Date info */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 0.1, sm: 0.15, md: 0.2 } }}>
+                  {/* Info Stack - Location & Date */}
+                  <Stack spacing={0.8}>
                     {a.location && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.3, sm: 0.4, md: 0.5 } }}>
-                        <Box
-                          component="svg"
-                          sx={{ width: { xs: 9, sm: 11, md: 13, lg: 14 }, height: { xs: 9, sm: 11, md: 13, lg: 14 }, color: '#666' }}
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </Box>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 0.8 
+                      }}>
+                        <LocationOn sx={{ 
+                          fontSize: { xs: 16, md: 18 }, 
+                          color: '#f51866',
+                          flexShrink: 0
+                        }} />
                         <Typography 
-                          variant="caption" 
+                          variant="body2" 
                           sx={{ 
-                            color: '#666', 
-                            fontSize: { xs: '0.55rem', sm: '0.65rem', md: '0.7rem', lg: '0.75rem' },
-                            lineHeight: { xs: 1, sm: 1.05, md: 1.1, lg: 1.2 },
+                            color: isDarkMode ? '#bbb' : '#666', 
+                            fontSize: { xs: '0.8rem', md: '0.85rem' },
+                            fontWeight: 500,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
-                            maxWidth: '100%'
+                            flex: 1
                           }}
                         >
                           {a.location}
@@ -288,28 +424,29 @@ export default function Content() {
                     )}
                     
                     {createdAtLabel && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.3, sm: 0.4, md: 0.5 } }}>
-                        <Box
-                          component="svg"
-                          sx={{ width: { xs: 9, sm: 11, md: 13, lg: 14 }, height: { xs: 9, sm: 11, md: 13, lg: 14 }, color: '#666' }}
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
-                        </Box>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 0.8 
+                      }}>
+                        <AccessTime sx={{ 
+                          fontSize: { xs: 16, md: 18 }, 
+                          color: isDarkMode ? '#888' : '#999',
+                          flexShrink: 0
+                        }} />
                         <Typography 
-                          variant="caption" 
+                          variant="body2" 
                           sx={{ 
-                            color: '#666', 
-                            fontSize: { xs: '0.55rem', sm: '0.65rem', md: '0.7rem', lg: '0.75rem' },
-                            lineHeight: { xs: 1, sm: 1.05, md: 1.1, lg: 1.2 }
+                            color: isDarkMode ? '#888' : '#999', 
+                            fontSize: { xs: '0.75rem', md: '0.8rem' },
+                            fontWeight: 400
                           }}
                         >
                           {createdAtLabel}
                         </Typography>
                       </Box>
                     )}
-                  </Box>
+                  </Stack>
                 </CardContent>
               </Card>
             );
@@ -321,16 +458,22 @@ export default function Content() {
           onClick={() => handleScroll('right')}
           sx={{
             position: 'absolute',
-            right: '-50px',
+            right: { lg: '-60px' },
             top: '50%',
             transform: 'translateY(-50%)',
-            zIndex: 1,
-            backgroundColor: '#f51866',
+            zIndex: 10,
+            background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
             color: 'white',
-            display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' }, // Only visible on large screens
+            width: 48,
+            height: 48,
+            display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' },
+            boxShadow: '0 4px 20px rgba(245, 24, 102, 0.3)',
             '&:hover': {
-              backgroundColor: '#2a4a65'
-            }
+              background: 'linear-gradient(135deg, #d01456 0%, #e55888 100%)',
+              transform: 'translateY(-50%) scale(1.05)',
+              boxShadow: '0 6px 25px rgba(245, 24, 102, 0.4)',
+            },
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           <ChevronRight fontSize="large" />

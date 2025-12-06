@@ -48,7 +48,14 @@ export default function Categories() {
   return (
     <div className="categories-container">
       <Container maxWidth="lg">
-        <h2 className="categories-title">{t('categories.title')}</h2>
+        <h2 className="choose-us-title">{t('categories.title')}</h2>
+        <Typography
+          variant="subtitle1"
+          className="choose-us-subtitle"
+          sx={{ textAlign: 'center', display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '100%' }}
+        >
+          {t('categories.subtitle')}
+        </Typography>
         
         {/* Categories Grid - compact on mobile */}
         <Grid 
@@ -58,29 +65,13 @@ export default function Categories() {
         >
           {categories.map((category, index) => (
             <Grid item xs={3} sm={4} md={3} lg={2} key={index}>
-        <Card
+              <Card
+                className="category-card-modern"
                 onClick={() => navigate(`/anunturi-categorie/${encodeURIComponent(category.description)}`)}
-                sx={{
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  borderRadius: { xs: '10px', sm: '12px', md: '16px' },
-                  overflow: 'hidden',
-                  position: 'relative',
-                  '&:hover': {
-                    transform: { sm: 'translateY(-6px)', md: 'translateY(-8px)' },
-                    boxShadow: { sm: '0 6px 18px rgba(0,0,0,0.12)', md: '0 8px 25px rgba(0,0,0,0.15)' },
-                  },
-          background: `linear-gradient(135deg, ${category.color}20, ${category.color}10)`,
-          // In dark mode (desktop), we add borders via CSS. Avoid overriding them here.
-          border: (theme) => theme.palette.mode === 'dark' ? '1px solid transparent' : `1px solid ${category.color}40`,
-                }}
+                sx={{ cursor: 'pointer' }}
               >
-                <Box sx={{ 
+                <Box className="category-image-box" sx={{ 
                   height: { xs: 72, sm: 96, md: 120 },
-                  backgroundColor: 'white', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
                   p: { xs: 1, sm: 1.5, md: 2 }
                 }}>
                   <img
@@ -99,9 +90,8 @@ export default function Categories() {
                   <Typography 
                     variant="subtitle2" 
                     component="h3"
-                    className="category-description"
+                    className="category-name"
                     sx={{ 
-                      fontWeight: 700,
                       fontSize: { xs: '0.8rem', sm: '0.95rem' },
                       lineHeight: 1.2,
                       mb: 0
