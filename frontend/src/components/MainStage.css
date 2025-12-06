@@ -162,6 +162,7 @@
   position: relative;
   overflow: hidden;
   min-height: 600px;
+  margin-bottom: 0;
 }
 
 /* Dark Mode Grid Background */
@@ -476,6 +477,11 @@ body.dark-mode .main-stage > *,
   padding: 0 15px;
   border-top: 1px solid var(--ms-loc-border);
   border-bottom: 1px solid var(--ms-loc-border);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.location-section:hover {
+  background-color: var(--ms-hover-bg, rgba(0,0,0,0.02));
 }
 
 .location-input {
@@ -495,6 +501,98 @@ body.dark-mode .main-stage > *,
 }
 .search-button:hover { background: var(--ms-btn-hover-bg); }
 .search-icon { margin-left: 8px; }
+
+
+/* Location Popover Styles */
+.location-popover {
+  width: 300px !important;
+  max-height: 400px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+  margin-top: 4px !important;
+  overflow: hidden !important;
+}
+
+.dark-mode .location-popover {
+  background-color: var(--ms-drop-bg) !important;
+  border: 1px solid var(--ms-drop-border) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+}
+
+.popover-title {
+  padding: 16px 20px 8px !important;
+  font-weight: 600 !important;
+  color: var(--ms-text-primary) !important;
+  font-size: 1rem !important;
+  background-color: var(--ms-drop-bg) !important;
+  border-bottom: 1px solid var(--ms-drop-border) !important;
+}
+
+.popover-list {
+  padding: 0 !important;
+  overflow-y: auto !important;
+  max-height: 340px !important;
+  background-color: var(--ms-drop-bg) !important;
+}
+
+.popover-list .MuiListItemButton-root {
+  padding: 12px 20px !important;
+  transition: background-color 0.2s !important;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.dark-mode .popover-list .MuiListItemButton-root {
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.popover-list .MuiListItemButton-root:hover {
+  background-color: var(--ms-item-hover-bg) !important;
+}
+
+.judet-all {
+  font-weight: 700;
+  color: var(--ms-text-title);
+  display: flex;
+  align-items: center;
+  font-size: 1.05rem;
+}
+
+.back-to-judete {
+  font-weight: 600;
+  color: var(--ms-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-to-judete::before {
+  content: '←';
+  font-size: 1.2em;
+  color: var(--ms-item-icon);
+}
+
+.localitate-item {
+  color: var(--ms-text-primary) !important;
+}
+
+/* Sticky Back Button */
+.popover-list .MuiListItemButton-root:has(.back-to-judete) {
+  position: sticky !important;
+  top: 0 !important;
+  background-color: var(--ms-drop-bg) !important;
+  z-index: 2 !important;
+  border-bottom: 1px solid var(--ms-drop-border) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+.dark-mode .popover-list .MuiListItemButton-root:has(.back-to-judete) {
+  background-color: var(--ms-drop-bg) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.localitate-button:hover .localitate-item {
+  color: var(--ms-item-hover-text) !important;
+}
 
 
 /* 7. RESPONSIVE / MOBILE

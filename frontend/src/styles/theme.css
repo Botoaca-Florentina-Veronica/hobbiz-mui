@@ -18,7 +18,7 @@
 :root {
   /* --- FUNDAL & SUPRAFEȚE --- */
   --bg-primary: #ffffff;           /* Fundal principal al paginii */
-  --bg-secondary: #f8fafb;         /* Fundal secundar (cards, sidebar) */
+  --bg-secondary: #ffffff;         /* Fundal secundar (unified with primary) */
   --bg-elevated: #ffffff;          /* Elemente ridicate (modals, dropdowns) */
   --bg-hover: #f3f5f6;            /* Hover pe elemente */
   
@@ -80,7 +80,7 @@
 .dark-mode {
   /* --- FUNDAL & SUPRAFEȚE --- */
   --bg-primary: #121212;           /* Fundal principal întunecat */
-  --bg-secondary: #1e1e1e;         /* Fundal secundar (cards, sidebar) */
+  --bg-secondary: #121212;         /* Fundal secundar (unified with primary) */
   --bg-elevated: #2a2a2a;          /* Elemente ridicate */
   --bg-hover: #333333;             /* Hover pe elemente */
   

@@ -6,6 +6,7 @@ import Header from './components/Header';
 import MainStage from './components/MainStage';
 import Content from './components/Content';
 import Categories from './components/Categories';
+import ChooseUs from './components/ChooseUs';
 // import PromoSection from './components/PromoSection';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
@@ -158,6 +159,7 @@ function App() {
               <Header />
               <MainStage />
               <Content />
+              <ChooseUs />
               {/* <PromoSection /> */}
               <Categories />
               <CallToAction />
@@ -171,6 +173,7 @@ function App() {
             <Header />
             <MainStage />
             <Content />
+            <ChooseUs />
             {/* <PromoSection /> */}
             <Categories />
             <CallToAction />

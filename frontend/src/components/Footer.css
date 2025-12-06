@@ -6,14 +6,14 @@
    ---------------------------------------------------------- */
 :root {
   /* --- Colors (Light Mode) --- */
-  --ft-bg-main: var(--app-bg);
-  --ft-text-main: var(--app-text);
+  --ft-bg-main: var(--bg-secondary);
+  --ft-text-main: var(--text-primary);
   
   /* Mobile Bar */
-  --ft-mob-bg: var(--app-surface);
-  --ft-mob-border: var(--app-border);
+  --ft-mob-bg: var(--bg-secondary);
+  --ft-mob-border: var(--border-color);
   --ft-mob-shadow: 0 -2px 12px rgba(0,0,0,0.1);
-  --ft-mob-icon: var(--app-muted);
+  --ft-mob-icon: var(--text-secondary);
   --ft-mob-icon-active: var(--primary);
   
   /* Publish Button */
@@ -26,12 +26,12 @@
   --ft-pub-label: #e2e7eb;
   
   /* Dropdown (if used here) */
-  --ft-drop-bg: var(--app-surface);
+  --ft-drop-bg: var(--bg-elevated);
   --ft-drop-border: transparent;
   --ft-drop-shadow: 0 14px 35px 0 rgba(9,9,12,0.4);
   
   /* Separator */
-  --ft-separator: var(--app-border);
+  --ft-separator: var(--border-color);
   
   /* Mobile Legal Spacing Tokens (as requested) */
   --mobile-legal-right-padding: 12px;
@@ -47,17 +47,17 @@
 
 /* --- Dark Mode Overrides --- */
 .dark-mode {
-  --ft-bg-main: var(--app-bg);
-  --ft-text-main: var(--app-text);
+  --ft-bg-main: var(--bg-secondary);
+  --ft-text-main: var(--text-primary);
   
   /* Mobile Bar */
-  --ft-mob-bg: var(--app-surface);
-  --ft-mob-border: var(--app-border);
-  --ft-mob-icon: var(--app-text);
+  --ft-mob-bg: var(--bg-secondary);
+  --ft-mob-border: var(--border-color);
+  --ft-mob-icon: var(--text-primary);
   --ft-mob-icon-active: var(--primary-hover);
   
   /* Publish Button (Dark Mode Outline Style) */
-  --ft-pub-bg: var(--app-border);
+  --ft-pub-bg: var(--border-color);
   --ft-pub-text: var(--primary-contrast); /* Icon color */
   --ft-pub-hover: var(--primary);
   
@@ -66,12 +66,12 @@
   --ft-pub-label-hover: var(--primary-hover);
   
   /* Dropdown */
-  --ft-drop-bg: var(--app-surface);
-  --ft-drop-border: var(--app-border);
+  --ft-drop-bg: var(--bg-elevated);
+  --ft-drop-border: var(--border-color);
   --ft-drop-shadow: 0 14px 35px 0 rgba(0,0,0,0.6);
   
   /* Separator */
-  --ft-separator: var(--app-border);
+  --ft-separator: var(--border-color);
 }
 
 

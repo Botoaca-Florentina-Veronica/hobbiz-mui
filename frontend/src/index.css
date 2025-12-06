@@ -47,7 +47,7 @@ html {
 
 body {
   display: flex;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
   color: var(--text-primary);
   margin: 0;
   padding: 0;
@@ -59,7 +59,7 @@ body {
 
 /* Elimină orice spațiu alb provenit din stacking context/root container */
 html, body, #root {
-  background: var(--bg-primary) !important;
+  background: var(--bg-secondary) !important;
   color: var(--text-primary) !important;
   margin: 0 !important;
   padding: 0 !important;

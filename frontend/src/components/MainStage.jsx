@@ -371,7 +371,7 @@ export default function MainStage() {
               placeholder={t('mainStage.searchPlaceholder')} 
               className="search-input"
             />
-            <div className="location-section">
+            <div className="location-section" onClick={handleInputClick}>
               <FaMapMarkerAlt className="location-icon" />
               <input 
                 type="text" 
@@ -379,7 +379,6 @@ export default function MainStage() {
                 className="location-input"
                 value={selectedLocalitate || selectedJudet || t('mainStage.locationPlaceholder')}
                 readOnly
-                onClick={handleInputClick}
               />
             </div>
             <button className="search-button">
@@ -469,12 +468,16 @@ export default function MainStage() {
                   />
                 </ListItemButton>
                 {getLocalitatiForJudet(selectedJudet).map((localitate) => (
-                  <ListItemText
+                  <ListItemButton
                     key={localitate}
-                    primary={localitate}
-                    className="localitate-item"
                     onClick={() => handleLocalitateClick(localitate)}
-                  />
+                    className="localitate-button"
+                  >
+                    <ListItemText
+                      primary={localitate}
+                      className="localitate-item"
+                    />
+                  </ListItemButton>
                 ))}
               </List>
             </>

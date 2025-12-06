@@ -1,0 +1,239 @@
+.choose-us-section {
+  background-color: var(--bg-secondary);
+  padding: 6rem 1rem; /* increased top/bottom padding to move title down */
+  width: 100%;
+  box-sizing: border-box; /* Fix for overflow/white bars */
+  display: flex;
+  justify-content: center;
+}
+
+.choose-us-container {
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  margin-bottom: 4rem;
+}
+
+.choose-us-title {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 700 !important;
+  margin-top: 8rem !important; /* increased to add more space above the heading */
+  margin-bottom: 1rem !important;
+  color: var(--text-primary);
+  font-size: 2.5rem !important;
+}
+
+.choose-us-subtitle {
+  font-family: 'Poppins', sans-serif !important;
+  color: #3b82f6 !important; /* Blue in light mode */
+  margin-bottom: 4rem !important;
+  max-width: 700px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 1.1rem !important;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.choose-us-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0; /* Remove gap for continuous grid */
+  padding: 0;
+  border: 1px solid var(--border-color); /* Outer border */
+  margin: 0 1rem; /* Add margin to respect container padding */
+}
+
+@media (min-width: 768px) {
+  .choose-us-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .choose-us-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.choose-us-card {
+  background-color: transparent;
+  text-align: left;
+  padding: 2rem 2rem 2rem 3.5rem;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  border: none; /* Reset default border */
+  border-bottom: 1px solid var(--border-color); /* Default bottom border */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+  overflow: visible;
+}
+
+/* Mobile: Last item has no bottom border */
+.choose-us-card:last-child {
+  border-bottom: none;
+}
+
+/* Tablet (2 columns) */
+@media (min-width: 768px) {
+  .choose-us-card {
+    border-right: 1px solid var(--border-color);
+  }
+  
+  /* Remove right border for every 2nd item */
+  .choose-us-card:nth-child(2n) {
+    border-right: none;
+  }
+  
+  /* Remove bottom border for last 2 items */
+  .choose-us-card:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+}
+
+/* Desktop (3 columns) */
+@media (min-width: 1024px) {
+  /* Reset borders first */
+  .choose-us-card {
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  /* Restore right border for 2nd item (overriding tablet rule) */
+  .choose-us-card:nth-child(2n) {
+    border-right: 1px solid var(--border-color);
+  }
+  
+  /* Remove right border for every 3rd item */
+  .choose-us-card:nth-child(3n) {
+    border-right: none;
+  }
+  
+  /* Ensure bottom borders are present for first row */
+  .choose-us-card:nth-child(-n+3) {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  /* Remove bottom border for last 3 items */
+  .choose-us-card:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+}
+
+/* The vertical pill bar */
+.choose-us-card::before {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  top: 2rem;
+  bottom: 2rem;
+  width: 4px; /* Slightly thinner */
+  background-color: var(--text-secondary);
+  border-radius: 10px;
+  opacity: 0.2;
+}
+
+.choose-us-card:hover {
+  background-color: var(--bg-elevated);
+  transform: none; /* Remove transform to keep grid structure */
+  box-shadow: none; /* Remove shadow */
+  z-index: 1; /* Bring to front if needed */
+}
+
+.choose-us-icon-wrapper {
+  font-size: 1.8rem;
+  color: #3b82f6; /* Blue color */
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align left */
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background-color: transparent; /* Removed background */
+  padding: 0;
+}
+
+.choose-us-content {
+  width: 100%;
+}
+
+.choose-us-card-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary);
+}
+
+.choose-us-card-desc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  min-height: 3rem; /* Ensure alignment */
+}
+
+.choose-us-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding-top: 0.5rem;
+}
+
+.choose-us-link:hover {
+  color: #3b82f6;
+}
+
+/* Dark mode adjustments */
+.dark-mode .choose-us-section {
+  background-color: #121212;
+}
+
+.dark-mode .choose-us-title {
+  color: #ffffff;
+}
+
+.dark-mode .choose-us-subtitle {
+  color: #ff0055 !important; /* Pink in dark mode */
+}
+
+.dark-mode .choose-us-card {
+  border-color: #333;
+}
+
+.dark-mode .choose-us-card::before {
+  background-color: #888; /* More visible grey in dark mode */
+  opacity: 0.3;
+}
+
+.dark-mode .choose-us-card:hover {
+  background-color: #1e1e1e;
+  /* No border color change on hover to maintain grid look */
+}
+
+.dark-mode .choose-us-icon-wrapper {
+  color: #ff0055;
+  background-color: transparent;
+}
+
+.dark-mode .choose-us-link {
+  color: #ffffff; /* White in dark mode */
+}
+
+.dark-mode .choose-us-link:hover {
+  color: #ffffff; /* Keep white on hover for clearer contrast */
+}
+

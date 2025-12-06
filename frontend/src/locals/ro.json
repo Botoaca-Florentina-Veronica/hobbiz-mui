@@ -833,5 +833,18 @@
       "updatePasswordError": "Eroare la schimbarea parolei.",
       "mitmError": "Eroare la detectarea MITM: "
     }
+  },
+  "chooseUs": {
+    "title": "De ce să ne alegi?",
+    "subtitle": "Platforma unde pasiunea întâlnește oportunitatea. Verificăm totul pentru tine.",
+    "items": {
+      "1": { "title": "Platformă Modernă", "desc": "Design adaptat pentru mobil și desktop, ușor de folosit." },
+      "2": { "title": "Comunitate Prietenoasă", "desc": "Suport rapid și o comunitate gata să te ajute." },
+      "3": { "title": "Promovare Gratuită", "desc": "Expune-ți pasiunile fără costuri ascunse." },
+      "4": { "title": "Interfață Intuitivă", "desc": "Experiență de utilizare optimă pentru toți." },
+      "5": { "title": "Siguranță Garantată", "desc": "Securitate și confidențialitate pentru datele tale." },
+      "6": { "title": "Conectare Directă", "desc": "Vorbește direct cu creatorii și cumpărătorii." }
+    },
+    "seeMore": "Vezi mai multe"
   }
 }

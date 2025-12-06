@@ -15,7 +15,7 @@
   --ct-text-primary: var(--app-text);
   
   /* Popular Announcements Container */
-  --pop-bg-container: #f3f5f6;
+  --pop-bg-container: var(--bg-secondary);
   --pop-radius: 12px;
   --pop-padding: 20px;
   
@@ -83,11 +83,13 @@
   color: var(--ct-text-primary);
   font-size: 40px;
   font-weight: bold;
-  background-color: var(--ct-bg-page);
+  background-color: var(--bg-secondary);
   height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 0;
+  padding-top: 100px;
 }
 
 .content h2,
@@ -96,8 +98,9 @@
   color: var(--ct-text-primary);
   font-size: 3.5rem;
   font-weight: bolder;
-  padding: 50px 70px 70px 50px;
-  margin-top: -60px;
+  /* increased space above title to visually separate from hero */
+  padding: 140px 70px 70px 50px; /* top, right, bottom, left */
+  margin-top: 0;
 }
 
 

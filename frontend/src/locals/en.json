@@ -833,5 +833,18 @@
       "updatePasswordError": "Error changing password.",
       "mitmError": "Error detecting MITM: "
     }
+  },
+  "chooseUs": {
+    "title": "Why choose us?",
+    "subtitle": "The platform where passion meets opportunity. We verify everything for you.",
+    "items": {
+      "1": { "title": "Modern Platform", "desc": "Responsive design for mobile and desktop, easy to use." },
+      "2": { "title": "Friendly Community", "desc": "Fast support and a community ready to help." },
+      "3": { "title": "Free Promotion", "desc": "Showcase your passions with no hidden costs." },
+      "4": { "title": "Intuitive Interface", "desc": "Optimal user experience for everyone." },
+      "5": { "title": "Guaranteed Safety", "desc": "Security and privacy for your data." },
+      "6": { "title": "Direct Connection", "desc": "Talk directly with creators and buyers." }
+    },
+    "seeMore": "See more"
   }
 }
