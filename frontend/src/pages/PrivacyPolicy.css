@@ -90,6 +90,20 @@
   --pp-icon-main: #f51866;
 }
 
+/* Specific dark mode overrides for content containers */
+.dark-mode .privacy-policy__content {
+  background: #121212 !important;
+  color: white !important;
+  border: 1px solid white !important;
+}
+
+.dark-mode .privacy-policy__content h2,
+.dark-mode .privacy-policy__content h3,
+.dark-mode .privacy-policy__content p,
+.dark-mode .privacy-policy__content strong,
+.dark-mode .privacy-policy__content em {
+  color: white !important;
+}
 
 /* 2. LAYOUT PRINCIPAL
    ---------------------------------------------------------- */

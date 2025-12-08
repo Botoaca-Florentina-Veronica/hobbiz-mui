@@ -713,7 +713,7 @@
   border-right: var(--ab-border-card);
   border-bottom: var(--ab-border-card);
 }
-.dark-mode .value-card { background: #3f3f3f; border: 1px solid #fff; border-top: 4px solid var(--ab-val-border-1); }
+.dark-mode .value-card { background: #121212; border: 1px solid #fff; border-top: 4px solid var(--ab-val-border-1); }
 
 .value-card:hover {
   transform: translateY(-5px);
