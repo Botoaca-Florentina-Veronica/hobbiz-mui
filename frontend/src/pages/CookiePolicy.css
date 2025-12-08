@@ -178,9 +178,7 @@
   border: 1px solid transparent; /* Prepared for dark mode */
 }
 .dark-mode .cookie-policy-content {
-  background: #121212 !important;
-  border: 1px solid white !important;
-  color: white !important;
+  border-color: #282828;
 }
 
 /* Typography in Content */
@@ -240,16 +238,6 @@
 /* Links in content (specific override) */
 .dark-mode .cookie-policy-content a { color: #ff96a6; }
 .dark-mode .cookie-policy-content a:hover { color: #ff7e95; }
-
-/* Text elements in content */
-.dark-mode .cookie-policy-content h2,
-.dark-mode .cookie-policy-content h3,
-.dark-mode .cookie-policy-content p,
-.dark-mode .cookie-policy-content strong,
-.dark-mode .cookie-policy-content em,
-.dark-mode .cookie-policy-content li {
-  color: white !important;
-}
 
 
 /* 5. COMPONENTS
@@ -329,17 +317,6 @@
 .cookie-type:hover {
   transform: translateY(-2px);
   box-shadow: var(--cp-shadow-hover);
-}
-
-.dark-mode .cookie-type {
-  background: #121212 !important;
-  border: 1px solid white !important;
-  color: white !important;
-}
-
-.dark-mode .cookie-type h3,
-.dark-mode .cookie-type p {
-  color: white !important;
 }
 
 .cookie-examples {
@@ -437,26 +414,7 @@
   border-radius: 16px;
   padding: 40px;
 }
-.dark-mode .contact-section { 
-  background: #121212 !important;
-  border: 1px solid white !important;
-  color: white !important;
-}
-
-.dark-mode .contact-section h2,
-.dark-mode .contact-section p {
-  color: white !important;
-}
-
-.dark-mode .contact-info {
-  background: #121212 !important;
-  border: 1px solid white !important;
-  color: white !important;
-}
-
-.dark-mode .contact-info p {
-  color: white !important;
-}
+.dark-mode .contact-section { background: #181818; }
 
 .contact-info {
   background: var(--cp-bg-surface);

@@ -1,260 +1,502 @@
-﻿.promo-section {
+.promo-section {
+  padding: 40px 0px 40px 0px;
+  color: var(--app-text);
+  /* Section background - light mode uses pink, dark mode uses app background */
+  background: #F8B195;
+  /* Make section height proportional to number of slides instead of a huge fixed vh value.
+     --slides is set by the component (defaults to 4). Adjust multiplier to control scroll length. */
+  min-height: calc(var(--slides, 4) * 75vh);
   position: relative;
-  width: 100%;
-  height: 500vh; /* Enough height for sticky reveal and extra scroll */
-  background: var(--bg-secondary);
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
-.promo-header {
+.promo-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 64px;
+  padding: 0 20px;
+  position: relative; /* make parent relative so only the image column is sticky */
+  min-height: 70vh;
+}
+
+.promo-image-sticky {
+  flex: 0 0 55%;
   position: sticky;
-  top: 4rem;
-  text-align: center;
-  z-index: 10;
-  padding: 2rem 20px;
+  top: 120px; /* stays fixed at this distance from viewport top when scrolling */
+  align-self: flex-start;
+  /* ensure sticky behavior is stable; avoid will-change here to prevent subpixel jitter */
+}
+
+/* Shift the image container slightly left on larger screens to align visually with the layout */
+@media (min-width: 901px) {
+  .promo-image-sticky {
+    margin-left: -6%;
+  }
+  /* when the image enters the 'large' state keep the shift but allow overflow for the scale effect */
+  /* Note: avoid changing the parent margin when image-large is active to keep the frame horizontally fixed.
+     The visual enlargement is handled by scaling the inner image (.promo-image-frame img) only. */
+}
+
+.promo-image-frame {
+  background: var(--app-surface); /* adapts to light/dark mode */
+  padding: 10px; /* slight inner padding to create a frame */
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  overflow: hidden;
+  /* Fixed visual size so the frame is always identical regardless of image */
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: var(--bg-secondary);
-}
-
-.promo-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 2.5rem;
-  color: var(--text-primary);
-  margin-bottom: 0;
-}
-
-.promo-subtitle {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.1rem;
-  color: #3b82f6;
-  max-width: 700px;
-  margin: 0 auto;
-  margin-top: -4rem;
-}
-
-.promo-images-container {
-  position: relative;
-  width: 100%;
-  max-width: 1800px;
+  height: 420px; /* default frame height on small desktop */
+  max-height: 60vh;
   display: flex;
-  justify-content: flex-start; /* align left-to-right */
   align-items: center;
-  gap: 1rem;
-  padding: 0 1rem;
-  margin: 0 auto;
-  z-index: 3;
-  pointer-events: none;
+  justify-content: center;
+  /* ensure frame itself is positioned correctly within sticky parent */
+  position: relative;
 }
 
-.promo-image {
-  position: fixed; /* keep fixed so transitions don't jump layout */
-  top: 55%;
-  flex: 0 0 auto;
-  width: 24%;
-  opacity: 0;
-  transform: translateY(320px) scale(0.9);
-  transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  will-change: transform, opacity;
-  pointer-events: none;
-  z-index: 500;
+.promo-image-frame img {
+  /* keep the image filling the frame exactly so it doesn't shift when sticky state changes */
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain; /* keep whole image visible while matching frame size */
+  border-radius: 8px; /* slight rounding inside the white frame */
+  background: var(--app-surface); /* adapts to light/dark mode */
+  transform: translateZ(0); /* promote to its own layer to reduce repaint jitter */
+}
+
+/* When showing two images side-by-side for the phone slide */
+.promo-image-frame.pair {
   display: flex;
+  gap: 8px; /* reduced gap per request */
+  align-items: center;
   justify-content: center;
 }
+.promo-image-frame.pair img {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  /* account for frame padding (10px each side) and gap (8px) */
+  width: calc((100% - 20px - 8px) / 2);
+  height: calc(100% - 20px); /* subtract vertical padding */
+  object-fit: contain; /* ensure whole image fits without cropping */
+  border-radius: 8px;
+  transition: object-position 200ms ease, opacity 200ms ease;
+}
 
-.promo-image.visible {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
+@media (max-width: 700px) {
+  .promo-image-frame.pair {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .promo-image-frame.pair img {
+    width: 100%;
+    height: auto;
+    max-height: 48%;
+  }
+}
+
+/* Larger desktop: make the frame taller so images are more prominent */
+@media (min-width: 901px) {
+  .promo-image-frame {
+    height: 520px;
+  }
+}
+
+/* Mid screens (tablet landscape) */
+@media (min-width: 701px) and (max-width: 1024px) {
+  .promo-image-frame {
+    height: 460px;
+  }
+}
+
+/* Mobile: smaller fixed height but still consistent */
+@media (max-width: 700px) {
+  .promo-image-frame {
+    height: 320px;
+  }
+}
+
+/* For the ss2 slide scale image up visually (keeps container size same) */
+.promo-section.image-large .promo-image-sticky .promo-image-frame img {
+  transform-origin: left center;
+  /* scale up so image looks larger without changing flex layout */
+  transform: scale(1.18) translateX(-8%);
+  transition: transform 700ms ease;
+}
+
+.promo-text-container {
+  flex: 1 1 45%;
+  position: relative;
+  min-height: 900px; /* increased to allow taller slide content */
+  display: flex;
+  flex-direction: column;
+  gap: 120px; /* reduced gap for faster, more consistent scroll transitions */
+  transition: transform 700ms ease;
+  justify-content: flex-start; /* ensure slides start at the top, aligning with image frame */
+  padding-top: 10px; /* small top offset to align with the white frame's inner padding */
+}
+
+.promo-section.image-large .promo-image-sticky {
+  /* For the ss2 slide we want the image smaller so the text has more room */
+  /* Match ss1 layout: image ~55% */
+  flex: 0 0 55%;
+  overflow: visible; /* allow scaled image to overflow visually without changing layout */
+  transition: flex-basis 1.2s ease, -webkit-flex-basis 1.2s ease, margin-left 0.6s ease;
+}
+
+.promo-section.image-large .promo-text-container {
+  /* Give the text container more width so slides expand horizontally */
+  /* Match ss1 layout: text ~45% */
+  flex: 1 1 45%;
+  transition: flex-basis 1.2s ease, -webkit-flex-basis 1.2s ease, transform 700ms ease;
+  transform: translateX(0); /* remove left shift so text is fully visible */
+}
+
+/* Reduce scaling on narrower screens so image doesn't overflow badly */
+@media (max-width: 1024px) {
+  .promo-section.image-large .promo-image-sticky img {
+    transform: scale(1) translateX(0);
+  }
+}
+
+.promo-text-slide {
+  position: relative;
+  width: 100%;
+  padding: 40px;
+  border-radius: 0;
+  background: transparent; /* inherit from section background */
+  backdrop-filter: none;
+  opacity: 0.4;
+  filter: brightness(0.7);
+  transform: translateY(0);
   pointer-events: auto;
-  z-index: 1000;
+  box-shadow: none;
+  transition: opacity 0.6s ease, filter 0.6s ease;
 }
 
-/* Stagger the animation slightly for each image */
-.promo-image:nth-child(1) {
-  left: 2%;
-  transition-delay: 0s;
+.promo-text-slide.active {
+  opacity: 1;
+  filter: brightness(1);
 }
 
-.promo-image:nth-child(2) {
-  left: 26%;
-  transition-delay: 0.1s;
+/* Align first slide's content flush with the top of the image frame */
+.promo-text-container .promo-text-slide:first-child {
+  padding-top: 0;
 }
 
-.promo-image:nth-child(3) {
-  left: 50%;
-  transition-delay: 0.2s;
+.slide-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 30px;
 }
 
-.promo-image:nth-child(4) {
-  left: 74%;
-  transition-delay: 0.3s;
+.slide-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-text);
 }
 
-.promo-image img {
-  width: auto;
-  max-width: 100%;
-  max-height: 85vh; /* Ensure it fits vertically */
-  height: auto;
-  display: block;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.slide-icon svg {
+  width: 32px;
+  height: 32px;
 }
 
-.promo-image img:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+.slide-titles {
+  flex: 1;
 }
 
-/* Dark mode support */
-.dark-mode .promo-title {
-  color: #ffffff;
+.promo-text-slide h3 {
+  margin: 0 0 8px 0;
+  font-size: 2.2rem;
+  color: var(--app-text);
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-.dark-mode .promo-subtitle {
-  color: #ff0055;
+.slide-subtitle {
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.85;
 }
 
-.dark-mode .promo-header {
-  background: var(--bg-secondary);
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .promo-image {
-    width: 220px;
-  }
-  
-  .promo-images-container {
-    gap: 1.5rem;
-  }
-
-  .promo-image:nth-child(1).visible {
-    left: 2rem;
-  }
-  
-  .promo-image:nth-child(2).visible {
-    left: calc(2rem + 244px);
-  }
-  
-  .promo-image:nth-child(3).visible {
-    left: calc(2rem + 2 * 244px);
-  }
-  
-  .promo-image:nth-child(4).visible {
-    left: calc(2rem + 3 * 244px);
-  }
+.benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--app-text);
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
-@media (max-width: 992px) {
-  .promo-image {
-    width: 180px;
-  }
-  
-  .promo-images-container {
-    gap: 1rem;
-  }
-  
-  .promo-title {
-    font-size: 2rem;
-  }
-
-  .promo-image:nth-child(1).visible {
-    left: 2rem;
-  }
-  
-  .promo-image:nth-child(2).visible {
-    left: calc(2rem + 196px);
-  }
-  
-  .promo-image:nth-child(3).visible {
-    left: calc(2rem + 2 * 196px);
-  }
-  
-  .promo-image:nth-child(4).visible {
-    left: calc(2rem + 3 * 196px);
-  }
+/* Smooth animation for benefit bullets */
+.benefit-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
 }
 
-@media (max-width: 768px) {
+.benefit-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.benefits-list .checkmark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  color: var(--app-text);
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.benefits-list span {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* Title styling matching Content.h2 */
+.promo-section .promo-title {
+  text-align: center;
+  color: var(--app-text);
+  font-size: 3.5rem;
+  font-weight: bolder;
+  padding: 50px 70px 70px 50px;
+  margin-top: -60px;
+}
+
+.dark-mode .promo-section {
+  /* Use app background instead of pink in dark mode */
+  background: var(--app-bg);
+}
+
+.dark-mode .promo-image-frame {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  border: 1px solid var(--app-border);
+}
+
+.dark-mode .slide-icon {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--app-border);
+}
+
+.dark-mode .benefits-list .checkmark {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 700px) {
   .promo-section {
-    min-height: 400vh;
+    padding: 60px 0 60px 0;
+    font-size: 1.2rem;
+    min-height: calc(var(--slides, 4) * 55vh);
   }
   
-  .promo-images-container {
-    flex-wrap: wrap;
-    gap: 1.5rem;
+  .promo-section .promo-title {
+    font-size: 2rem;
+    padding: 20px 10px 30px 10px;
+    margin-top: 0;
+  }
+
+  .promo-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+    padding: 0 16px;
+    top: 80px;
+  }
+
+  .promo-image-sticky {
+    flex: 0 0 auto;
+    width: 100%;
+    position: static; /* Remove sticky on mobile for better UX */
+  }
+
+  .promo-text-container {
+    min-height: 500px;
+    gap: 100px; /* consistent gap for mobile */
+  }
+
+  .promo-text-slide {
+    padding: 28px;
+    border-radius: 0;
+  }
+
+  .slide-header {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .slide-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+  }
+
+  .slide-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+  }
+
+  .slide-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .benefits-list {
+    gap: 14px;
+  }
+
+  .benefits-list li {
+    font-size: 0.95rem;
+  }
+
+  .benefits-list .checkmark {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1024px) {
+  .promo-section {
+    padding: 80px 0 80px 0;
+    font-size: 1.3rem;
+    min-height: calc(var(--slides, 4) * 65vh);
   }
   
-  .promo-image {
-    width: 150px;
+  .promo-section .promo-title {
+    font-size: 2.5rem;
+    padding: 30px 20px 40px 20px;
   }
-  
-  .promo-title {
-    font-size: 1.75rem;
+
+  .promo-inner {
+    gap: 48px;
+    top: 90px;
   }
-  
-  .promo-subtitle {
+
+  .promo-text-slide {
+    padding: 34px;
+    border-radius: 0;
+  }
+
+  .slide-header {
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+
+  .slide-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+
+  .slide-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .promo-text-slide h3 {
+    font-size: 1.9rem;
+  }
+
+  .slide-subtitle {
     font-size: 1rem;
   }
 
-  .promo-image:nth-child(1) {
-    left: 2rem;
-    top: 50%;
-    transition-delay: 0s;
+  .benefits-list {
+    gap: 15px;
   }
 
-  .promo-image:nth-child(2) {
-    left: calc(2rem + 174px);
-    top: 50%;
-    transition-delay: 0.05s;
+  .benefits-list li {
+    font-size: 1rem;
   }
 
-  .promo-image:nth-child(3) {
-    left: 2rem;
-    top: calc(50% + 120px);
-    transition-delay: 0.1s;
-  }
-  
-  .promo-image:nth-child(4) {
-    left: calc(2rem + 174px);
-    top: calc(50% + 120px);
-    transition-delay: 0.15s;
+  .benefits-list .checkmark {
+    width: 22px;
+    height: 22px;
   }
 }
 
-@media (max-width: 576px) {
-  .promo-image {
-    width: 130px;
+@media (min-width: 901px) and (max-width: 1199px) {
+  .promo-section {
+    padding: 100px 0 100px 0;
+    font-size: 1.4rem;
+    min-height: 480vh;
   }
   
-  .promo-images-container {
-    gap: 1rem;
+  .promo-section .promo-title {
+    font-size: 3rem;
+    padding: 40px 30px 50px 30px;
   }
 
-  .promo-image:nth-child(1) {
-    left: 2rem;
-    top: 50%;
-    transition-delay: 0s;
+  .promo-text-slide {
+    padding: 36px;
+    border-radius: 0;
   }
 
-  .promo-image:nth-child(2) {
-    left: calc(2rem + 146px);
-    top: 50%;
-    transition-delay: 0.05s;
+  .slide-header {
+    gap: 18px;
+    margin-bottom: 28px;
   }
 
-  .promo-image:nth-child(3) {
-    left: 2rem;
-    top: calc(50% + 100px);
-    transition-delay: 0.1s;
+  .slide-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 15px;
   }
 
-  .promo-image:nth-child(4) {
-    left: calc(2rem + 146px);
-    top: calc(50% + 100px);
-    transition-delay: 0.15s;
+  .promo-text-slide h3 {
+    font-size: 2rem;
+  }
+
+  .slide-subtitle {
+    font-size: 1.05rem;
+  }
+
+  .benefits-list li {
+    font-size: 1.02rem;
+  }
+
+  /* add larger gap on mid-large screens to keep spacing consistent */
+  .promo-inner {
+    gap: 64px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .promo-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .promo-image {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .promo-text {
+    padding: 16px;
+    margin-top: 12px;
   }
 }

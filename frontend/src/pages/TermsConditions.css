@@ -81,20 +81,6 @@
   --tc-mobile-btn-text: #f8b595;
 }
 
-/* Specific dark mode overrides for content containers */
-.dark-mode .terms-conditions__content {
-  background: #121212 !important;
-  color: white !important;
-  border: 1px solid white !important;
-}
-
-.dark-mode .terms-conditions__content h2,
-.dark-mode .terms-conditions__content h3,
-.dark-mode .terms-conditions__content p,
-.dark-mode .terms-conditions__content strong,
-.dark-mode .terms-conditions__content em {
-  color: white !important;
-}
 
 /* 2. LAYOUT PRINCIPAL
    ---------------------------------------------------------- */

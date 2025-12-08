@@ -7,7 +7,7 @@ import MainStage from './components/MainStage';
 import Content from './components/Content';
 import Categories from './components/Categories';
 import ChooseUs from './components/ChooseUs';
-import PromoSection from './components/PromoSection';
+// import PromoSection from './components/PromoSection';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
@@ -160,7 +160,7 @@ function App() {
               <MainStage />
               <Content />
               <ChooseUs />
-              <PromoSection />
+              {/* <PromoSection /> */}
               <Categories />
               <CallToAction />
             <Footer />
@@ -174,7 +174,7 @@ function App() {
             <MainStage />
             <Content />
             <ChooseUs />
-            <PromoSection />
+            {/* <PromoSection /> */}
             <Categories />
             <CallToAction />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}

@@ -30,15 +30,77 @@ import {
   ArrowForward as ArrowForwardIcon,
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
 import './HowItWorks.css';
+
+const steps = [
+  {
+    label: 'Creează-ți contul',
+    description: 'Înregistrează-te rapid cu emailul sau intră ca invitat și personalizează-ți profilul.',
+    icon: <AssignmentIcon />,
+    details: 'Completezi informațiile de bază și, opțional, adaugi avatar și o scurtă descriere. Poți porni în modul invitat și să îți creezi contul mai târziu.'
+  },
+  {
+    label: 'Publică sau caută anunțuri',
+    description: 'Publică ușor un anunț sau explorează categoriile și filtrele pentru a găsi ce te interesează.',
+    icon: <PublishIcon />,
+    details: 'Folosește filtre (preț, locație, dată, popularitate) și sortări, sau adaugă rapid un anunț cu imagini, categorie și detalii clare.'
+  },
+  {
+    label: 'Salvează în Favorite și revino',
+    description: 'Apasă inimioara pentru a salva anunțurile preferate și a le accesa ulterior.',
+    icon: <FavoriteIcon />,
+    details: 'Favoritele se salvează pe dispozitiv, separate pe utilizator sau invitat, și pot fi regăsite în pagina „Favorite”.'
+  },
+  {
+    label: 'Discută și primește notificări',
+    description: 'Deschide chatul cu autorul anunțului și urmărește actualizările în „Notificări”.',
+    icon: <ChatIcon />,
+    details: 'Chat integrat pentru întrebări rapide. Primești notificări despre mesaje noi sau activitate pe anunțurile tale.'
+  }
+];
+
+const features = [
+  {
+    icon: <CategoryIcon />,
+    title: 'Categorii și filtre puternice',
+    description: 'Navigare pe categorii, căutare după cuvinte cheie, sortări și filtre pentru rezultate relevante.',
+    color: '#355070'
+  },
+  {
+    icon: <FavoriteIcon />,
+    title: 'Favorite sincronizate local',
+    description: 'Salvează ce-ți place și revino oricând. Stocare pe dispozitiv și separare pe utilizator/guest.',
+    color: '#406b92'
+  },
+  {
+    icon: <ChatIcon />,
+    title: 'Chat integrat',
+    description: 'Comunică rapid cu autorii anunțurilor. Avatare normalizate și fallback cu inițiale.',
+    color: '#F8B195'
+  },
+  {
+    icon: <NotificationsIcon />,
+    title: 'Notificări clare',
+    description: 'Vezi noutățile importante, cu avatare, linkuri către anunțuri și evidențiere pentru elementele necitite.',
+    color: '#355070'
+  },
+  {
+    icon: <NightlightIcon />,
+    title: 'Dark mode elegant',
+    description: 'Paletă dark rafinată și accente roz, cu contrast și lizibilitate optimizate pe toate paginile.',
+    color: '#406b92'
+  },
+  {
+    icon: <ShieldIcon />,
+    title: 'Siguranță și încredere',
+    description: 'Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.',
+    color: '#F8B195'
+  }
+];
 
 export default function HowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
   const navigate = useNavigate();
-  const { t } = useTranslation();
-
-  const steps = t('howItWorksPage.steps.list', { returnObjects: true });
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -67,33 +129,36 @@ export default function HowItWorks() {
             >
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h5" className="mobile-header-title">{t('howItWorksPage.title')}</Typography>
+            <Typography variant="h5" className="mobile-header-title">Cum funcționează</Typography>
           </div>
           
           {/* Hero Section */}
           <div className="how-it-works-hero">
             <div className="hero-badge">
               <span className="hero-badge-icon">🚀</span>
-              {t('howItWorksPage.hero.badge')}
+              Simplu și eficient
             </div>
-            <h1 className="hero-title" dangerouslySetInnerHTML={{ __html: t('howItWorksPage.hero.title') }}></h1>
+            <h1 className="hero-title">
+              Cum funcționează <span className="highlight">Hobbiz</span>?
+            </h1>
             <p className="hero-description">
-              {t('howItWorksPage.hero.description')}
+              Descoperă cum poți să-ți găsești rapid persoane cu aceleași pasiuni și să participi 
+              la activități captivante. Procesul nostru în 4 pași te va ghida pas cu pas.
             </p>
             <div className="hero-stats">
               <div className="stat-item">
                 <span className="stat-number">10K+</span>
-                <span className="stat-label">{t('howItWorksPage.hero.stats.members')}</span>
+                <span className="stat-label">Membri activi</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
                 <span className="stat-number">2K+</span>
-                <span className="stat-label">{t('howItWorksPage.hero.stats.conversations')}</span>
+                <span className="stat-label">Conversații lunare</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
                 <span className="stat-number">50+</span>
-                <span className="stat-label">{t('howItWorksPage.hero.stats.categories')}</span>
+                <span className="stat-label">Categorii hobby</span>
               </div>
             </div>
           </div>
@@ -101,8 +166,8 @@ export default function HowItWorks() {
           {/* Interactive Stepper Section */}
           <div className="interactive-stepper-section">
             <div className="section-header">
-              <h2>{t('howItWorksPage.steps.header')}</h2>
-              <p>{t('howItWorksPage.steps.subtitle')}</p>
+              <h2>Pașii pentru a începe</h2>
+              <p>Urmează acești pași simpli pentru a te alătura comunității noastre</p>
             </div>
             
             <Box sx={{ maxWidth: 800, margin: '0 auto' }}>
@@ -116,7 +181,7 @@ export default function HowItWorks() {
                           width: 40,
                           height: 40
                         }}>
-                          {index === 0 ? <AssignmentIcon /> : index === 1 ? <PublishIcon /> : index === 2 ? <FavoriteIcon /> : <ChatIcon />}
+                          {step.icon}
                         </Avatar>
                       }
                     >
@@ -148,14 +213,14 @@ export default function HowItWorks() {
                             }}
                             endIcon={index === steps.length - 1 ? <CheckCircleIcon /> : <ArrowForwardIcon />}
                           >
-                            {index === steps.length - 1 ? t('howItWorksPage.steps.buttons.finish') : t('howItWorksPage.steps.buttons.continue')}
+                            {index === steps.length - 1 ? 'Finalizează' : 'Continuă'}
                           </Button>
                           <Button
                             disabled={index === 0}
                             onClick={handleBack}
                             sx={{ mt: 1, mr: 1 }}
                           >
-                            {t('howItWorksPage.steps.buttons.back')}
+                            Înapoi
                           </Button>
                         </div>
                       </Box>
@@ -166,13 +231,13 @@ export default function HowItWorks() {
               {activeStep === steps.length && (
                 <Paper square elevation={0} sx={{ p: 3, textAlign: 'center' }}>
                   <Typography variant="h6" sx={{ color: '#355070', mb: 2 }}>
-                    {t('howItWorksPage.steps.completion.message')}
+                    Gata! Acum poți începe să explorezi platforma 🎉
                   </Typography>
                   <Button 
                     onClick={handleReset} 
                     sx={{ mt: 1, mr: 1 }}
                   >
-                    {t('howItWorksPage.steps.completion.reset')}
+                    Resetează
                   </Button>
                   <Button
                     variant="contained"
@@ -199,7 +264,7 @@ export default function HowItWorks() {
             </div>
             
             <Grid container spacing={3} sx={{ mt: 2 }}>
-              {t('howItWorksPage.features', { returnObjects: true }).map((feature, index) => (
+              {features.map((feature, index) => (
                 <Grid item xs={12} md={6} lg={4} key={index}>
                   <Card className="feature-card-mui" sx={{ height: '100%' }}>
                     <CardContent sx={{ textAlign: 'center', p: 3 }}>
@@ -211,7 +276,7 @@ export default function HowItWorks() {
                           margin: '0 auto 16px auto'
                         }}
                       >
-                        {index === 0 ? <CategoryIcon /> : index === 1 ? <FavoriteIcon /> : index === 2 ? <ChatIcon /> : index === 3 ? <NotificationsIcon /> : index === 4 ? <NightlightIcon /> : <ShieldIcon />}
+                        {feature.icon}
                       </Avatar>
                       <Typography variant="h6" sx={{ color: '#355070', fontWeight: 600, mb: 2 }}>
                         {feature.title}
@@ -228,8 +293,8 @@ export default function HowItWorks() {
 
           {/* CTA Section */}
           <div className="cta-section">
-            <h2>{t('howItWorksPage.cta.title')}</h2>
-            <p>{t('howItWorksPage.cta.description')}</p>
+            <h2>Gata să începi aventura?</h2>
+            <p>Alătură-te comunității noastre și descoperă noi pasiuni împreună cu oameni minunați!</p>
             <div className="cta-buttons">
               <Button
                 variant="contained"
@@ -249,12 +314,12 @@ export default function HowItWorks() {
                   }
                 }}
               >
-                {t('howItWorksPage.cta.buttons.create')}
+                Înregistrează-te gratuit
               </Button>
               <Button
                 variant="outlined"
                 size="large"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/about')}
                 sx={{
                   color: 'white',
                   borderColor: 'white',
@@ -269,7 +334,7 @@ export default function HowItWorks() {
                   }
                 }}
               >
-                {t('howItWorksPage.cta.buttons.explore')}
+                Află mai multe
               </Button>
             </div>
           </div>
