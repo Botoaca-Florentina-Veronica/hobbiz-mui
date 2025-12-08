@@ -1,7 +1,109 @@
 /* Pagina How It Works - Design modern și interactiv */
+:root {
+  /* Layout & Spacing */
+  --hw-radius-xl: 24px;
+  --hw-radius-lg: 20px;
+  --hw-radius-md: 16px;
+  --hw-radius-sm: 12px;
+  
+  /* Colors (Light Mode Default) */
+  --hw-bg-page: var(--app-bg);
+  
+  /* Hero */
+  --hw-bg-hero: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  --hw-bg-hero-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  --hw-text-hero: #ffffff;
+  --hw-badge-bg: rgba(255, 255, 255, 0.15);
+  --hw-badge-border: rgba(255, 255, 255, 0.2);
+  --hw-hero-highlight: linear-gradient(45deg, #F8B195, #ffd89b);
+  --hw-hero-stat-num: #F8B195;
+  --hw-hero-stat-label: rgba(255, 255, 255, 0.8);
+  --hw-hero-divider: rgba(255, 255, 255, 0.3);
+
+  /* Cards & Surface */
+  --hw-bg-surface: #ffffff;
+  --hw-bg-surface-alt: #f7fafc;
+  --hw-border-card: transparent;
+  --hw-border-card-hover: #355070;
+  
+  /* Text */
+  --hw-text-heading: #2d3748;
+  --hw-text-heading-alt: #355070;
+  --hw-text-body: #4a5568;
+  --hw-text-muted: #718096;
+  
+  /* Icons & Accents */
+  --hw-icon-bg: linear-gradient(135deg, #355070, #406b92);
+  --hw-icon-color: #ffffff;
+  --hw-accent-primary: #355070;
+  --hw-accent-secondary: #F8B195;
+  --hw-gradient-bar: linear-gradient(90deg, #355070, #F8B195);
+  
+  /* CTA */
+  --hw-bg-cta: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
+  --hw-text-cta: #ffffff;
+  --hw-btn-bg: #ffffff;
+  --hw-btn-text: #355070;
+  --hw-btn-hover-bg: #ffffff;
+
+  /* Shadows */
+  --hw-shadow-hero: 0 12px 48px rgba(53, 80, 112, 0.25);
+  --hw-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.08);
+  --hw-shadow-hover: 0 8px 40px rgba(53, 80, 112, 0.12);
+  --hw-shadow-icon: 0 8px 24px rgba(53, 80, 112, 0.2);
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  --hw-bg-page: #121212;
+
+  /* Hero */
+  --hw-bg-hero: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  --hw-bg-hero-overlay: radial-gradient(circle, rgba(245, 24, 102, 0.15) 0%, transparent 70%);
+  --hw-text-hero: #ffffff;
+  --hw-badge-bg: rgba(254, 101, 133, 0.15);
+  --hw-badge-border: rgba(254, 101, 133, 0.3);
+  --hw-hero-highlight: linear-gradient(45deg, #f51866, #fe6585);
+  --hw-hero-stat-num: #fe6585;
+  --hw-hero-stat-label: #8b8b8b;
+  --hw-hero-divider: rgba(255, 255, 255, 0.2);
+
+  /* Cards & Surface */
+  --hw-bg-surface: #121212;
+  --hw-bg-surface-alt: #121212;
+  --hw-border-card: 1px solid #fff;
+  --hw-border-card-hover: #fe6585;
+
+  /* Text */
+  --hw-text-heading: #ffffff;
+  --hw-text-heading-alt: #ffffff;
+  --hw-text-body: #ffffff;
+  --hw-text-muted: #8b8b8b;
+
+  /* Icons & Accents */
+  --hw-icon-bg: linear-gradient(135deg, #f51866, #fe6585);
+  --hw-icon-color: #ffffff;
+  --hw-accent-primary: #fe6585; 
+  --hw-accent-secondary: #f51866;
+  --hw-gradient-bar: linear-gradient(90deg, #f51866, #fe6585);
+
+  /* CTA */
+  --hw-bg-cta: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  --hw-btn-bg: #ffffff;
+  --hw-btn-text: #f51866;
+  --hw-btn-hover-bg: #8b8b8b;
+
+  /* Shadows */
+  --hw-shadow-hero: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --hw-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.3);
+  --hw-shadow-hover: 0 8px 40px rgba(245, 24, 102, 0.2);
+  --hw-shadow-icon: 0 8px 24px rgba(245, 24, 102, 0.3);
+}
+
+/* Pagina How It Works - Design modern și interactiv */
 .how-it-works-page {
   /* Use app-level background to keep a unified color */
-  background: var(--app-bg);
+  background: var(--hw-bg-page);
   min-height: 100vh;
   padding: 40px 0;
   /* Avoid top two-tone band by using safe-area-aware padding instead of margin */
@@ -17,14 +119,14 @@
 /* Hero Section */
 .how-it-works-hero {
   text-align: center;
-  background: linear-gradient(135deg, #355070 0%, #406b92 100%);
-  color: white;
+  background: var(--hw-bg-hero);
+  color: var(--hw-text-hero);
   padding: 80px 40px;
-  border-radius: 24px;
+  border-radius: var(--hw-radius-xl);
   margin-bottom: 60px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+  box-shadow: var(--hw-shadow-hero);
 }
 
 .how-it-works-hero::before {
@@ -34,7 +136,7 @@
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
+  background: var(--hw-bg-hero-overlay);
   transform: rotate(30deg);
   pointer-events: none;
 }
@@ -43,9 +145,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--hw-badge-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--hw-badge-border);
   padding: 12px 24px;
   border-radius: 50px;
   font-size: 0.9rem;
@@ -77,7 +179,7 @@
 }
 
 .hero-title .highlight {
-  background: linear-gradient(45deg, #F8B195, #ffd89b);
+  background: var(--hw-hero-highlight);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -113,7 +215,7 @@
   display: block;
   font-size: 2.2rem;
   font-weight: 700;
-  color: #F8B195;
+  color: var(--hw-hero-stat-num);
   margin-bottom: 4px;
 }
 
@@ -121,12 +223,13 @@
   font-size: 0.9rem;
   opacity: 0.8;
   font-weight: 500;
+  color: var(--hw-hero-stat-label);
 }
 
 .stat-divider {
   width: 1px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--hw-hero-divider);
 }
 
 /* Interactive Stepper Section */
@@ -455,6 +558,16 @@
 
 .dark-mode .section-header p {
   color: #ffffff;
+}
+
+.dark-mode .interactive-stepper-section {
+  background: #121212;
+  border: 1px solid white;
+}
+
+.dark-mode .features-showcase {
+  background: #121212;
+  border: 1px solid white;
 }
 
 .dark-mode .step-card {

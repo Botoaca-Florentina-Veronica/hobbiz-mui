@@ -363,6 +363,95 @@
     ],
     "lastUpdated": "Last updated: December 3, 2025"
   },
+  "howItWorksPage": {
+    "title": "How it works",
+    "hero": {
+      "badge": "Simple and efficient",
+      "title": "How does <span class=\"highlight\">Hobbiz</span> work?",
+      "description": "Discover how you can quickly find people with the same passions and participate in engaging activities. Our 4-step process will guide you step by step.",
+      "stats": {
+        "members": "10K+ Active members",
+        "conversations": "2K+ Monthly conversations",
+        "categories": "50+ Hobby categories"
+      }
+    },
+    "steps": {
+      "header": "Steps to get started",
+      "subtitle": "Follow these simple steps to join our community",
+      "list": [
+        {
+          "label": "Create your account",
+          "description": "Register quickly with your email or sign in as a guest and customize your profile.",
+          "details": "Fill in basic information and optionally add an avatar and a short description. You can start in guest mode and create your account later."
+        },
+        {
+          "label": "Post or search announcements",
+          "description": "Easily post an announcement or explore categories and filters to find what interests you.",
+          "details": "Use filters (price, location, date, popularity) and sorting, or quickly add an announcement with images, category and clear details."
+        },
+        {
+          "label": "Save to Favorites and return",
+          "description": "Tap the heart to save your favorite announcements and access them later.",
+          "details": "Favorites are saved on the device, separated by user or guest, and can be found in the 'Favorites' page."
+        },
+        {
+          "label": "Discuss and receive notifications",
+          "description": "Open the chat with the announcement author and follow updates in 'Notifications'.",
+          "details": "Integrated chat for quick questions. You receive notifications about new messages or activity on your announcements."
+        }
+      ],
+      "buttons": {
+        "continue": "Continue",
+        "finish": "Finish",
+        "back": "Back",
+        "reset": "Reset"
+      },
+      "completion": {
+        "message": "All done! Now you can start exploring the platform 🎉",
+        "reset": "Reset"
+      }
+    },
+    "features": [
+      {
+        "title": "Powerful categories and filters",
+        "description": "Browse by categories, search by keywords, sorting and filters for relevant results.",
+        "color": "#355070"
+      },
+      {
+        "title": "Locally synchronized favorites",
+        "description": "Save what you like and come back anytime. Device storage and separation by user/guest.",
+        "color": "#406b92"
+      },
+      {
+        "title": "Integrated chat",
+        "description": "Communicate quickly with announcement authors. Normalized avatars and fallback with initials.",
+        "color": "#F8B195"
+      },
+      {
+        "title": "Clear notifications",
+        "description": "See important news, with avatars, links to announcements and highlighting for unread items.",
+        "color": "#355070"
+      },
+      {
+        "title": "Elegant dark mode",
+        "description": "Refined dark palette and pink accents, with optimized contrast and readability on all pages.",
+        "color": "#406b92"
+      },
+      {
+        "title": "Security and trust",
+        "description": "URL image normalization, contact data protection and good UI/UX practices.",
+        "color": "#F8B195"
+      }
+    ],
+    "cta": {
+      "title": "Ready to start?",
+      "description": "Join our community of passionate people and discover new opportunities.",
+      "buttons": {
+        "explore": "Explore announcements",
+        "create": "Create account"
+      }
+    }
+  },
   "profile": {
     "mobileBackAria": "Back",
     "mobileTitle": "Profile",

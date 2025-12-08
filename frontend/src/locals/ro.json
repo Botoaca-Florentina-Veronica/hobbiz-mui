@@ -361,7 +361,96 @@
       { "question": "Pot vinde atât produse cât și servicii?", "answer": "Absolut! Chiar dacă Hobbiz este conceput mai mult pentru servicii, poți vinde și produse handmade, obiecte, vechituri, mașini, alimente și multe altele." },
       { "question": "Cum funcționează sistemul de mesagerie?", "answer": "Sistemul nostru de mesagerie îți permite să comunici direct cu alți utilizatori în timp real, să negociezi prețuri și să coordonezi livrări în siguranță." }
     ],
-    "lastUpdated": "Ultima actualizare: 3 Decembrie 2025"
+    "lastUpdated": "Ultima actualizare: 3 decembrie 2025"
+  },
+  "howItWorksPage": {
+    "title": "Cum funcționează",
+    "hero": {
+      "badge": "Simplu și eficient",
+      "title": "Cum funcționează <span class=\"highlight\">Hobbiz</span>?",
+      "description": "Descoperă cum poți să-ți găsești rapid persoane cu aceleași pasiuni și să participi la activități captivante. Procesul nostru în 4 pași te va ghida pas cu pas.",
+      "stats": {
+        "members": "10K+ Membri activi",
+        "conversations": "2K+ Conversații lunare",
+        "categories": "50+ Categorii hobby"
+      }
+    },
+    "steps": {
+      "header": "Pașii pentru a începe",
+      "subtitle": "Urmează acești pași simpli pentru a te alătura comunității noastre",
+      "list": [
+        {
+          "label": "Creează-ți contul",
+          "description": "Înregistrează-te rapid cu emailul sau intră ca invitat și personalizează-ți profilul.",
+          "details": "Completezi informațiile de bază și, opțional, adaugi avatar și o scurtă descriere. Poți porni în modul invitat și să îți creezi contul mai târziu."
+        },
+        {
+          "label": "Publică sau caută anunțuri",
+          "description": "Publică ușor un anunț sau explorează categoriile și filtrele pentru a găsi ce te interesează.",
+          "details": "Folosește filtre (preț, locație, dată, popularitate) și sortări, sau adaugă rapid un anunț cu imagini, categorie și detalii clare."
+        },
+        {
+          "label": "Salvează în Favorite și revino",
+          "description": "Apasă inimioara pentru a salva anunțurile preferate și a le accesa ulterior.",
+          "details": "Favoritele se salvează pe dispozitiv, separate pe utilizator sau invitat, și pot fi regăsite în pagina „Favorite”."
+        },
+        {
+          "label": "Discută și primește notificări",
+          "description": "Deschide chatul cu autorul anunțului și urmărește actualizările în „Notificări”.",
+          "details": "Chat integrat pentru întrebări rapide. Primești notificări despre mesaje noi sau activitate pe anunțurile tale."
+        }
+      ],
+      "buttons": {
+        "continue": "Continuă",
+        "finish": "Finalizează",
+        "back": "Înapoi",
+        "reset": "Resetează"
+      },
+      "completion": {
+        "message": "Gata! Acum poți începe să explorezi platforma 🎉",
+        "reset": "Resetează"
+      }
+    },
+    "features": [
+      {
+        "title": "Categorii și filtre puternice",
+        "description": "Navigare pe categorii, căutare după cuvinte cheie, sortări și filtre pentru rezultate relevante.",
+        "color": "#355070"
+      },
+      {
+        "title": "Favorite sincronizate local",
+        "description": "Salvează ce-ți place și revino oricând. Stocare pe dispozitiv și separare pe utilizator/guest.",
+        "color": "#406b92"
+      },
+      {
+        "title": "Chat integrat",
+        "description": "Comunică rapid cu autorii anunțurilor. Avatare normalizate și fallback cu inițiale.",
+        "color": "#F8B195"
+      },
+      {
+        "title": "Notificări clare",
+        "description": "Vezi noutățile importante, cu avatare, linkuri către anunțuri și evidențiere pentru elementele necitite.",
+        "color": "#355070"
+      },
+      {
+        "title": "Dark mode elegant",
+        "description": "Paletă dark rafinată și accente roz, cu contrast și lizibilitate optimizate pe toate paginile.",
+        "color": "#406b92"
+      },
+      {
+        "title": "Siguranță și încredere",
+        "description": "Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.",
+        "color": "#F8B195"
+      }
+    ],
+    "cta": {
+      "title": "Gata să începi?",
+      "description": "Alătură-te comunității noastre de oameni pasionați și descoperă noi oportunități.",
+      "buttons": {
+        "explore": "Explorează anunțuri",
+        "create": "Creează cont"
+      }
+    }
   },
   "profile": {
     "mobileBackAria": "Înapoi",
