@@ -108,6 +108,11 @@
   padding: 40px 0;
   /* Avoid top two-tone band by using safe-area-aware padding instead of margin */
   padding-top: calc(env(safe-area-inset-top, 0px) + 100px);
+  font-family: 'Poppins', sans-serif;
+}
+
+.how-it-works-page * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .how-it-works-container {

@@ -4,12 +4,14 @@ import img1 from '../../../device-view_images/1.png';
 import img2 from '../../../device-view_images/2.png';
 import img3 from '../../../device-view_images/3.png';
 import img4 from '../../../device-view_images/4.png';
+import { useTranslation } from 'react-i18next';
 import './PromoSection.css';
 
 export default function PromoSection() {
   const sectionRef = useRef(null);
   // Stage 0 = nicio imagine, 1-4 = imagini vizibile
   const [activeStage, setActiveStage] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,9 +63,9 @@ export default function PromoSection() {
       <div className="promo-sticky-wrapper">
         
         <div className="promo-header">
-          <h2 className="promo-title">Postează oriunde, oricând de pe orice</h2>
+          <h2 className="promo-title">{t('promoSection.title')}</h2>
           <p className="promo-subtitle">
-            Publică rapid și gestionează anunțurile tale de pe orice dispozitiv
+            {t('promoSection.subtitle')}
           </p>
         </div>
 

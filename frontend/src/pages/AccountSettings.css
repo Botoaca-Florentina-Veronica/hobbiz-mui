@@ -108,6 +108,11 @@
   width: 100%;
   box-sizing: border-box;
   transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.account-settings-container * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .settings-title {
@@ -118,7 +123,7 @@
   /* Centrat pe desktop logic, nu cu margin-left hardcodat ci prin container width */
   max-width: 900px;
   margin-left: auto; margin-right: auto; 
-  text-align: left;
+  text-align: center;
   letter-spacing: -1px;
   line-height: 1.1;
   width: calc(100% - 40px);

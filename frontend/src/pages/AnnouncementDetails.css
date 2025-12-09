@@ -102,6 +102,11 @@ html { scroll-behavior: smooth; }
   min-height: 100vh;
   background: var(--ad-bg-page);
   transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.announcement-details-page * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Animations */

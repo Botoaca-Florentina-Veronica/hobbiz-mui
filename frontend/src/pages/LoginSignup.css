@@ -7,6 +7,14 @@
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 @media (min-width: 900px) {
@@ -32,6 +40,7 @@
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .login-links {
@@ -49,6 +58,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .submit-btn:disabled {
@@ -63,12 +73,14 @@
 .login-links a {
   color: var(--link-color);
   text-decoration: none;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .error-message {
   color: #ff4444;
   margin-bottom: 1rem;
   text-align: center;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Password toggle wrapper */
@@ -98,6 +110,7 @@
   justify-content: center;
   border-radius: 50%;
   transition: background .2s ease, color .2s ease;
+  font-family: 'Poppins', sans-serif !important;
 }
 .toggle-password-btn:hover, .toggle-password-btn:focus-visible {
   background: rgba(53,80,112,0.08);
@@ -155,8 +168,8 @@
   color: #fa4875;
 }
 
-.dark-mode .error-message {
-  color: #ff6b6b;
+.dark-mode .login-container h2 {
+  color: #ffffff;
 }
 
 /* Ensure the login/signup pages always have a full-viewport themed background

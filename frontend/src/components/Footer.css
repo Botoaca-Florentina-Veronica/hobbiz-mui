@@ -85,6 +85,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.footer * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .icon-arrow {

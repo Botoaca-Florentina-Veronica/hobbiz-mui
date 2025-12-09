@@ -169,6 +169,7 @@
   border-radius: 8px; cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.95rem; font-weight: 600;
+  font-family: 'Poppins', sans-serif !important;
   color: var(--lang-btn-color);
 }
 
@@ -179,7 +180,7 @@
 }
 
 .language-icon { font-size: 1.3rem; color: #ffffff; }
-.current-lang { font-size: 0.9rem; letter-spacing: 0.5px; color: #ffffff; }
+.current-lang { font-size: 0.9rem; letter-spacing: 0.5px; color: #ffffff; font-family: 'Poppins', sans-serif !important; }
 
 .language-dropdown {
   position: absolute; top: calc(100% + 0.5rem); left: 0;
@@ -196,6 +197,7 @@
   padding: 0.75rem 1rem; cursor: pointer;
   transition: all 0.2s ease;
   font-size: 1rem; color: var(--lang-dropdown-text);
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .language-option:hover { background: var(--lang-option-hover); }
@@ -220,6 +222,7 @@
   cursor: pointer;
   font-size: 1rem; 
   font-weight: bold;
+  font-family: 'Poppins', sans-serif !important;
   margin-right: 40px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -253,6 +256,7 @@
 .favorite-btn {
   margin-right: 20px; background: none; border: none;
   cursor: pointer; font-size: 2rem;
+  font-family: 'Poppins', sans-serif !important;
   transition: all 0.3s ease;
   color: var(--hdr-text);
   position: relative; padding: 8px; border-radius: 50%;
@@ -279,6 +283,7 @@
   border-radius: 50%; width: 18px; height: 18px;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.7rem; font-weight: bold;
+  font-family: 'Poppins', sans-serif !important;
   border: 2px solid var(--notif-badge-border);
   min-width: 18px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -300,6 +305,7 @@
 
 .notification-badge-large {
   padding: 0 6px; border-radius: 12px; min-width: 24px; width: auto; font-size: 0.65rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* =========================================================
@@ -311,6 +317,7 @@
   display: flex; align-items: center; gap: 0.5rem;
   background: transparent; border: none; cursor: pointer;
   padding: 0.5rem 1rem; font-size: 1.2rem; color: inherit;
+  font-family: 'Poppins', sans-serif !important;
   transition: all 0.2s ease; margin-right: 6rem; border-radius: 4px;
 }
 .user-account-btn:hover {
@@ -322,6 +329,7 @@
 .for-dropdown {
   display: flex; align-items: center; gap: 0.5rem;
   color: var(--hdr-text);
+  font-family: 'Poppins', sans-serif !important;
   cursor: pointer; padding: 0.5rem 1rem; transition: all 0.2s ease;
 }
 .dark-mode .for-dropdown { color: var(--primary-hover); }
@@ -349,6 +357,7 @@
 .section-dropdown a {
   display: block; color: var(--menu-link-text);
   padding: 8px 16px; text-decoration: none;
+  font-family: 'Poppins', sans-serif !important;
   transition: all 100ms linear; border-radius: 2px; text-align: left;
 }
 

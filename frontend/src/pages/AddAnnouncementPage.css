@@ -92,10 +92,13 @@
   padding: 40px 0;
   color: var(--text-main);
   /* Desktop margin default */
-  margin-top: 4rem; 
+  margin-top: 4rem;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Mobile & Tablet Overrides (No !important needed) */
+.add-announcement-container * {
+  font-family: 'Poppins', sans-serif !important;
+}/* Mobile & Tablet Overrides (No !important needed) */
 @media (max-width: 1024px) {
   .add-announcement-container {
     margin-top: 0;
@@ -149,8 +152,13 @@
    ========================================================================== */
 
 .add-announcement-title {
-  margin-left: clamp(48px, 8vw, 96px);
+  text-align: center;
   color: var(--text-title-special);
+  font-size: 2.8rem;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .add-announcement-subtitle {

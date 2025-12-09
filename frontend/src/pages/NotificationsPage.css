@@ -111,6 +111,7 @@
   padding: 40px 0;
   padding-top: var(--nt-container-padding-top);
   transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .notifications-container {
@@ -124,9 +125,10 @@
   font-weight: bold;
   color: var(--nt-text-title);
   margin-bottom: 32px;
-  text-align: left;
+  text-align: center;
   letter-spacing: -1px;
   line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .notifications-content {
@@ -232,6 +234,7 @@
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 6px;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .notification-message-container {
@@ -260,6 +263,7 @@
   font-weight: 500;
   flex: 1;
   order: 2;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Date */
@@ -268,6 +272,7 @@
   color: var(--nt-text-secondary);
   margin-bottom: 12px;
   display: flex; align-items: center; gap: 6px;
+  font-family: 'Poppins', sans-serif !important;
 }
 .notification-date::before { content: '🕒'; font-size: 0.75rem; }
 
@@ -283,7 +288,7 @@
   transition: all 0.2s ease;
   border: 1px solid var(--nt-link-border);
   cursor: pointer;
-  font-family: inherit;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .notification-link:hover {
@@ -327,6 +332,7 @@
   padding: 26px 20px;
   color: var(--nt-text-secondary);
   font-size: 1.1rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 .notifications-empty::before { display: none; }
 
@@ -335,7 +341,7 @@
   display: block; margin: 0 auto; margin-bottom: -1rem;
 }
 
-.notifications-empty-text { font-size: 1.3rem; margin-top: -3rem; }
+.notifications-empty-text { font-size: 1.3rem; margin-top: -3rem; font-family: 'Poppins', sans-serif !important; }
 
 .notifications-loading {
   display: flex; flex-direction: column; align-items: center; gap: 16px;
@@ -395,6 +401,7 @@
     margin: 0 !important;
     flex: 0 0 auto !important;
     margin-left: 4px !important;
+    font-family: 'Poppins', sans-serif !important;
   }
   
   /* Mobile Empty State Adjustments */

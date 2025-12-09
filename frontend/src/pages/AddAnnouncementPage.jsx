@@ -630,6 +630,7 @@ export default function AddAnnouncementPage() {
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
               color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
               border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
+              fontFamily: "'Poppins', sans-serif",
               '& .categories-grid-popover': {
                 padding: 0
               }

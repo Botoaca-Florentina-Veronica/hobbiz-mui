@@ -165,7 +165,7 @@ export default function AccountSettings() {
           </div>
         )}
         <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>{t('accountSettings.menu.myAnnouncements')}</div>
-        <div className="settings-item">{t('accountSettings.menu.notifications')}</div>
+        <div className="settings-item" onClick={() => navigate('/setari-notificari')}>{t('accountSettings.menu.notifications')}</div>
         <div className="settings-item">{t('accountSettings.menu.billing')}</div>
         <div className="settings-item">{t('accountSettings.menu.logoutAll')}</div>
         <div className="settings-item" onClick={() => setShowDeleteDialog(true)}>{t('accountSettings.menu.deleteAccount')}</div>

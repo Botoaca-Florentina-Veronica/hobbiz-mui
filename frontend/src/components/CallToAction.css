@@ -16,6 +16,7 @@
   font-size: 28px;
   gap: 60px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif !important;
 }
 
 @media (max-width: 800px) {
@@ -57,6 +58,7 @@
   margin: 0;
   font-size: 40px;
   font-weight: bold;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .call-to-action p {
@@ -66,6 +68,7 @@
   margin-right: 30px;
   line-height: 1.5;
   flex: 1;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .second-button {
@@ -73,6 +76,7 @@
   border: #f9faf8 2px solid;
   background-color: #1a237e !important;
   color: #f9faf8 !important;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .second-button:hover {

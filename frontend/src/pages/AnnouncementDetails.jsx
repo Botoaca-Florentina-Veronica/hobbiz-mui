@@ -624,7 +624,7 @@ export default function AnnouncementDetails() {
                         Postat {formatDate(announcement.createdAt)}
                       </Typography>
                     </Box>
-                    <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' } }}>
+                    <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' }, textAlign: 'center' }}>
                       {announcement.title}
                     </Typography>
                     {announcement.category && (
@@ -1000,11 +1000,12 @@ export default function AnnouncementDetails() {
             bgcolor: getIsDarkMode() ? '#121212' : '#ffffff',
             color: getIsDarkMode() ? '#f5f5f5' : 'inherit',
             borderRadius: 2,
-            boxShadow: getIsDarkMode() ? '0 10px 30px rgba(0,0,0,0.6)' : undefined
+            boxShadow: getIsDarkMode() ? '0 10px 30px rgba(0,0,0,0.6)' : undefined,
+            fontFamily: "'Poppins', sans-serif !important"
           }
         }}
       >
-        <DialogTitle sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>Evaluează utilizatorul</DialogTitle>
+        <DialogTitle sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>Evaluează utilizatorul</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <Rating
@@ -1021,7 +1022,7 @@ export default function AnnouncementDetails() {
                 }
               }}
             />
-            <Typography variant="body2" sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>{ratingValue}.0</Typography>
+            <Typography variant="body2" sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{ratingValue}.0</Typography>
           </Box>
           <TextField
             label="Comentariu (opțional)"
@@ -1052,8 +1053,8 @@ export default function AnnouncementDetails() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>Anulează</Button>
-          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit' }}>Trimite</Button>
+          <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>Anulează</Button>
+          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>Trimite</Button>
         </DialogActions>
       </Dialog>
 

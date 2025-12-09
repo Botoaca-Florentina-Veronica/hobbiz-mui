@@ -85,6 +85,11 @@
   padding: 40px 0;
   margin-top: var(--cp-margin-top-desktop);
   transition: background-color 0.3s ease, margin-top 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.cookie-policy-page * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .cookie-policy-container {

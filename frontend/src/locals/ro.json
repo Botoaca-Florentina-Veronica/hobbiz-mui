@@ -928,13 +928,88 @@
     "title": "De ce să ne alegi?",
     "subtitle": "Platforma unde pasiunea întâlnește oportunitatea. Verificăm totul pentru tine.",
     "items": {
-      "1": { "title": "Platformă Modernă", "desc": "Design adaptat pentru mobil și desktop, ușor de folosit." },
-      "2": { "title": "Comunitate Prietenoasă", "desc": "Suport rapid și o comunitate gata să te ajute." },
-      "3": { "title": "Promovare Gratuită", "desc": "Expune-ți pasiunile fără costuri ascunse." },
-      "4": { "title": "Interfață Intuitivă", "desc": "Experiență de utilizare optimă pentru toți." },
-      "5": { "title": "Siguranță Garantată", "desc": "Securitate și confidențialitate pentru datele tale." },
-      "6": { "title": "Conectare Directă", "desc": "Vorbește direct cu creatorii și cumpărătorii." }
+      "1": { 
+        "title": "Platformă Modernă", 
+        "desc": "Design adaptat pentru mobil și desktop, ușor de folosit.",
+        "details": "Hobbiz oferă o experiență completă, optimizată pentru toate dispozitivele. Platforma noastră este construită cu tehnologii moderne care asigură rapiditate, stabilitate și accesibilitate.",
+        "features": [
+          "Design responsive pentru mobil și desktop",
+          "Interfată rapidă și fluidă",
+          "Compatibil cu toate browser-ele moderne"
+        ]
+      },
+      "2": { 
+        "title": "Comunitate Prietenoasă", 
+        "desc": "Suport rapid și o comunitate gata să te ajute.",
+        "details": "Faci parte dintr-o comunitate vibrantă de pasionați și creatori care împărtășesc aceleași interese. Echipa noastră de suport este disponibilă să răspundă prompt la întrebările tale.",
+        "features": [
+          "Suport rapid prin chat și email",
+          "Comunitate activă și implicată",
+          "Ghiduri și tutoriale utile"
+        ]
+      },
+      "3": { 
+        "title": "Promovare Gratuită", 
+        "desc": "Expune-ți pasiunile fără costuri ascunse.",
+        "details": "Pe Hobbiz, poți să îți publici anunțurile complet gratuit, fără taxe de înscriere sau comisioane ascunse. Credem că talentul și pasiunea nu ar trebui să fie limitate de costuri.",
+        "features": [
+          "Publicare de anunțuri 100% gratuită",
+          "Fără taxe de înscriere sau comisioane",
+          "Instrumente de promovare incluse"
+        ]
+      },
+      "4": { 
+        "title": "Interfață Intuitivă", 
+        "desc": "Experiență de utilizare optimă pentru toți.",
+        "details": "Am proiectat fiecare element al platformei având în vedere simplitatea și eficiența. Navigarea este fluidă, iar procesele sunt clare și ușor de urmărit.",
+        "features": [
+          "Navigare simplă și intuitivă",
+          "Funcționalități ușor de găsit",
+          "Design curat și modern"
+        ]
+      },
+      "5": { 
+        "title": "Siguranță Garantată", 
+        "desc": "Securitate și confidențialitate pentru datele tale.",
+        "details": "Securitatea ta este prioritatea noastră numărul unu. Toate datele personale sunt criptate și stocate în siguranță, respectând cele mai stricte standarde de protecție a datelor.",
+        "features": [
+          "Criptare avansată a datelor personale",
+          "Autentificare securizată",
+          "Respectăm standardele GDPR"
+        ]
+      },
+      "6": { 
+        "title": "Conectare Directă", 
+        "desc": "Vorbește direct cu creatorii și cumpărătorii.",
+        "details": "Eliminăm intermediarii și facilităm comunicarea directă între utilizatori. Sistemul nostru de mesagerie încorporat îți permite să discuți în timp real.",
+        "features": [
+          "Sistem de mesagerie integrat",
+          "Comunicare în timp real",
+          "Fără intermediari sau comisioane"
+        ]
+      }
     },
     "seeMore": "Vezi mai multe"
+  },
+  "promoSection": {
+    "title": "Postează oriunde, oricând de pe orice",
+    "subtitle": "Publică rapid și gestionează anunțurile tale de pe orice dispozitiv"
+  },
+  "notificationSettings": {
+    "title": "Setări Notificări",
+    "email": "Notificări prin Email",
+    "emailDesc": "Primește actualizări importante pe email",
+    "push": "Notificări Push",
+    "pushDesc": "Primește notificări pe telefon",
+    "messages": "Mesaje Noi",
+    "messagesDesc": "Notificări când primești un mesaj nou",
+    "reviews": "Recenzii Noi",
+    "reviewsDesc": "Notificări când primești o recenzie nouă",
+    "favorites": "Anunțuri Adăugate la Favorite",
+    "favoritesDesc": "Notificări când cineva adaugă anunțurile tale la favorite",
+    "promotions": "Promoții și Noutăți",
+    "promotionsDesc": "Fii la curent cu ultimele noutăți",
+    "saveSuccess": "Setările au fost salvate",
+    "saveError": "Nu s-au putut salva setările"
   }
 }

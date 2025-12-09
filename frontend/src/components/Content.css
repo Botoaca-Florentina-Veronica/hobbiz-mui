@@ -184,11 +184,25 @@
 .content .MuiCard-root .MuiTypography-root,
 .popular-announcements-container .MuiTypography-root {
   color: var(--pop-title-color) !important;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .content .MuiCard-root .MuiTypography-caption,
 .popular-announcements-container .MuiTypography-caption {
   color: var(--pop-caption-color) !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Ensure all MUI components in cards use Poppins */
+.content .MuiCard-root .MuiChip-root,
+.popular-announcements-container .MuiChip-root {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Placeholder text for cards without images */
+.content .MuiCard-root .MuiBox-root,
+.popular-announcements-container .MuiBox-root {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 

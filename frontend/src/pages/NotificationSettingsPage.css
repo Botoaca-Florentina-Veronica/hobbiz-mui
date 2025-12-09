@@ -1,0 +1,111 @@
+.notification-settings-container {
+  padding-top: 20px;
+  padding-bottom: 40px;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.notification-settings-container * {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.notification-title {
+  text-align: center;
+  color: var(--text-title-special);
+  font-size: 2.8rem;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
+  margin: 4rem 0 0 0;
+}
+
+.settings-paper {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+  width: 100%;
+  max-width: 600px;
+}
+
+.setting-item {
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px !important;
+}
+
+.setting-item .MuiListItemText-primary {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+/* Responsive design for larger screens */
+@media (min-width: 768px) {
+  .notification-settings-container {
+    padding-top: 40px;
+    padding-bottom: 60px;
+  }
+
+  .settings-paper {
+    max-width: 800px;
+  }
+
+  .setting-item {
+    padding: 24px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .settings-paper {
+    max-width: 1000px;
+  }
+
+  .setting-item {
+    padding: 32px !important;
+  }
+}
+
+.settings-header {
+  width: 100%;
+  max-width: 600px;
+}
+
+@media (min-width: 768px) {
+  .settings-header {
+    max-width: 800px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .settings-header {
+    max-width: 1000px;
+  }
+}
+
+/* Dark mode overrides */
+.dark-mode .MuiTypography-root {
+  color: var(--text-primary);
+}
+
+.dark-mode .MuiListItemText-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.dark-mode .MuiIconButton-root {
+  color: var(--text-primary) !important;
+}
+
+.dark-mode .MuiSwitch-root .MuiSwitch-switchBase.Mui-checked {
+  color: #f51866 !important;
+}
+
+.dark-mode .MuiSwitch-root .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+  background-color: #f51866 !important;
+}

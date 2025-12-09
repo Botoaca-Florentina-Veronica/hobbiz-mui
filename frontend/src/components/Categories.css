@@ -6,6 +6,11 @@
   height: auto;
   min-height: auto;
   padding-bottom: 4rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.categories-container * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 @media (max-width: 700px) {

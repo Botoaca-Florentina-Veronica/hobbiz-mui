@@ -15,6 +15,7 @@ import DarkModeToggle from './components/DarkModeToggle';
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
 import AccountSettings from './pages/AccountSettings';
+import NotificationSettingsPage from './pages/NotificationSettingsPage';
 import OAuthSuccess from './pages/OAuthSuccess';
 import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
@@ -187,6 +188,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AccountSettings />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/setari-notificari" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <NotificationSettingsPage />
             <Footer hideOnMobile />
           </>
         } />

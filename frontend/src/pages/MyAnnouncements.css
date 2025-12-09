@@ -143,6 +143,11 @@
   padding: 24px 80px;
   padding-top: var(--ma-container-padding-top);
   background: var(--ma-bg-page);
+  font-family: 'Poppins', sans-serif;
+}
+
+.my-announcements-container * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .my-announcements-title {

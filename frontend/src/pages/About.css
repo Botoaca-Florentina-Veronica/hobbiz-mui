@@ -134,6 +134,11 @@
   /* Safe area padding */
   padding-top: calc(env(safe-area-inset-top, 0px) + 100px);
   transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.about-page * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .about-container {

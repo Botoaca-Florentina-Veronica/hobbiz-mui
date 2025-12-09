@@ -43,7 +43,7 @@
   grid-template-columns: repeat(1, 1fr);
   gap: 0; /* Remove gap for continuous grid */
   padding: 0;
-  border: 1px solid var(--border-color); /* Outer border */
+  border: none; /* Remove outer border */
   margin: 0 1rem; /* Add margin to respect container padding */
 }
 
@@ -131,8 +131,8 @@
   content: '';
   position: absolute;
   left: 1.5rem;
-  top: 2rem;
-  bottom: 2rem;
+  top: 4rem;
+  bottom: 4rem;
   width: 4px; /* Slightly thinner */
   background-color: var(--text-secondary);
   border-radius: 10px;

@@ -163,6 +163,11 @@
   overflow: hidden;
   min-height: 500px;
   margin-bottom: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.main-stage * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Dark mode gradient fade at bottom for smooth transition to Content */

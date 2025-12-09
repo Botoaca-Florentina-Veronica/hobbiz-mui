@@ -928,13 +928,88 @@
     "title": "Why choose us?",
     "subtitle": "The platform where passion meets opportunity. We verify everything for you.",
     "items": {
-      "1": { "title": "Modern Platform", "desc": "Responsive design for mobile and desktop, easy to use." },
-      "2": { "title": "Friendly Community", "desc": "Fast support and a community ready to help." },
-      "3": { "title": "Free Promotion", "desc": "Showcase your passions with no hidden costs." },
-      "4": { "title": "Intuitive Interface", "desc": "Optimal user experience for everyone." },
-      "5": { "title": "Guaranteed Safety", "desc": "Security and privacy for your data." },
-      "6": { "title": "Direct Connection", "desc": "Talk directly with creators and buyers." }
+      "1": { 
+        "title": "Modern Platform", 
+        "desc": "Responsive design for mobile and desktop, easy to use.",
+        "details": "Hobbiz offers a complete experience, optimized for all devices. Our platform is built with modern technologies that ensure speed, stability, and accessibility.",
+        "features": [
+          "Responsive design for mobile and desktop",
+          "Fast and fluid interface",
+          "Compatible with all modern browsers"
+        ]
+      },
+      "2": { 
+        "title": "Friendly Community", 
+        "desc": "Fast support and a community ready to help.",
+        "details": "You're part of a vibrant community of enthusiasts and creators who share the same interests. Our support team is available to promptly answer your questions.",
+        "features": [
+          "Fast support via chat and email",
+          "Active and engaged community",
+          "Helpful guides and tutorials"
+        ]
+      },
+      "3": { 
+        "title": "Free Promotion", 
+        "desc": "Showcase your passions with no hidden costs.",
+        "details": "On Hobbiz, you can publish your announcements completely free, with no registration fees or hidden commissions. We believe talent and passion should not be limited by costs.",
+        "features": [
+          "100% free announcement posting",
+          "No registration fees or commissions",
+          "Promotion tools included"
+        ]
+      },
+      "4": { 
+        "title": "Intuitive Interface", 
+        "desc": "Optimal user experience for everyone.",
+        "details": "We designed every element of the platform with simplicity and efficiency in mind. Navigation is fluid, and processes are clear and easy to follow.",
+        "features": [
+          "Simple and intuitive navigation",
+          "Easy-to-find features",
+          "Clean and modern design"
+        ]
+      },
+      "5": { 
+        "title": "Guaranteed Safety", 
+        "desc": "Security and privacy for your data.",
+        "details": "Your security is our number one priority. All personal data is encrypted and stored securely, following the strictest data protection standards.",
+        "features": [
+          "Advanced personal data encryption",
+          "Secure authentication",
+          "GDPR compliant"
+        ]
+      },
+      "6": { 
+        "title": "Direct Connection", 
+        "desc": "Talk directly with creators and buyers.",
+        "details": "We eliminate intermediaries and facilitate direct communication between users. Our built-in messaging system allows you to chat in real-time.",
+        "features": [
+          "Integrated messaging system",
+          "Real-time communication",
+          "No intermediaries or commissions"
+        ]
+      }
     },
     "seeMore": "See more"
+  },
+  "promoSection": {
+    "title": "Post anywhere, anytime from any device",
+    "subtitle": "Publish quickly and manage your ads from any device"
+  },
+  "notificationSettings": {
+    "title": "Notification Settings",
+    "email": "Email Notifications",
+    "emailDesc": "Receive important updates via email",
+    "push": "Push Notifications",
+    "pushDesc": "Receive notifications on your phone",
+    "messages": "New Messages",
+    "messagesDesc": "Notify when you receive a new message",
+    "reviews": "New Reviews",
+    "reviewsDesc": "Notify when you receive a new review",
+    "favorites": "Announcements Added to Favorites",
+    "favoritesDesc": "Notify when someone adds your announcements to favorites",
+    "promotions": "Promotions & News",
+    "promotionsDesc": "Stay updated with the latest news",
+    "saveSuccess": "Settings saved successfully",
+    "saveError": "Could not save settings"
   }
 }

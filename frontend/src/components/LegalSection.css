@@ -8,6 +8,11 @@
   border-radius: 12px 12px 0 0;
   margin-bottom: 0;
   gap: 1rem; /* Reduced gap for more compact layout */
+  font-family: 'Poppins', sans-serif;
+}
+
+.legal-section * {
+  font-family: 'Poppins', sans-serif !important;
 }
 .legal-section__column {
   flex: 1 1 180px;

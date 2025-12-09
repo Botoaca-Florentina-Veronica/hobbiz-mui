@@ -115,6 +115,11 @@
   /* Safe-area-aware padding */
   padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
   transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.privacy-policy * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .privacy-policy__container {

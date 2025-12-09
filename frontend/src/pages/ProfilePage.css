@@ -43,6 +43,11 @@
   margin-left: auto;
   margin-right: auto;
   padding: 0 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.profile-page-container * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* ============================================
