@@ -891,7 +891,7 @@
       "changeEmail": "Schimbă email-ul",
       "myAnnouncements": "Anunțuri",
       "notifications": "Setează notificările",
-      "billing": "Date de facturare",
+      "billing": "Descarcă datele mele",
       "logoutAll": "Ieși din cont de pe toate dispozitivele",
       "deleteAccount": "Șterge contul"
     },
@@ -921,7 +921,9 @@
       "enterPasswords": "Introduceți ambele parole.",
       "updateEmailError": "Eroare la actualizarea emailului.",
       "updatePasswordError": "Eroare la schimbarea parolei.",
-      "mitmError": "Eroare la detectarea MITM: "
+      "mitmError": "Eroare la detectarea MITM: ",
+      "downloadSuccess": "Datele tale au fost descărcate cu succes!",
+      "downloadError": "Nu s-a putut descărca datele. Încearcă din nou."
     }
   },
   "chooseUs": {

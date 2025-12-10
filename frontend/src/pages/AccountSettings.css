@@ -173,19 +173,23 @@
 /* 4. EMAIL CHANGE SECTION
    ---------------------------------------------------------- */
 .email-change-section {
-  background: var(--as-bg-item); /* Refolosește background item */
+  background: transparent; /* inherit Paper background to avoid visible gap */
   border-radius: var(--as-radius);
-  padding: 18px;
-  margin-bottom: 12px;
+  padding: 18px 24px 24px 24px;
+  margin-bottom: 0;
   box-shadow: none;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: -16px;
-  /* Border handled by theme variable override if needed, using default border from item if applied */
-  border: 1px solid transparent; /* Placeholder */
+  margin-top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-top: 1px solid #ffffff;
 }
-.dark-mode .email-change-section { border-color: #575757; }
+.dark-mode .email-change-section { 
+  border-top-color: #575757;
+}
 
 .email-change-section label {
   font-size: 1.1rem;

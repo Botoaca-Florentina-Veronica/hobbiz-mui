@@ -20,20 +20,22 @@
   letter-spacing: -1px;
   line-height: 1.1;
   font-family: 'Poppins', sans-serif !important;
-  margin: 4rem 0 0 0;
+  margin: 4rem 0 2rem 0;
 }
 
 .settings-paper {
   background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
+  border: 1px solid #000 !important;
   border-radius: 16px !important;
   overflow: hidden;
   width: 100%;
-  max-width: 600px;
+  max-width: 1200px;
+  margin: 24px auto;
+  box-sizing: border-box;
 }
 
 .setting-item {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #000;
   padding: 16px !important;
 }
 
@@ -43,7 +45,7 @@
 }
 
 .setting-item:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
 /* Responsive design for larger screens */
@@ -64,7 +66,7 @@
 
 @media (min-width: 1024px) {
   .settings-paper {
-    max-width: 1000px;
+    max-width: 1050px;
   }
 
   .setting-item {
@@ -74,7 +76,8 @@
 
 .settings-header {
   width: 100%;
-  max-width: 600px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 @media (min-width: 768px) {
@@ -85,7 +88,7 @@
 
 @media (min-width: 1024px) {
   .settings-header {
-    max-width: 1000px;
+    max-width: 1200px;
   }
 }
 
@@ -96,6 +99,14 @@
 
 .dark-mode .MuiListItemText-secondary {
   color: var(--text-secondary) !important;
+}
+
+.dark-mode .settings-paper {
+  border: 1px solid #fff !important;
+}
+
+.dark-mode .setting-item {
+  border-bottom: 1px solid #fff;
 }
 
 .dark-mode .MuiIconButton-root {

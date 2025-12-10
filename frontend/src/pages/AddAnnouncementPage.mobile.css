@@ -31,7 +31,7 @@
   .add-announcement-title {
     font-size: 2.1rem;
     font-weight: bold;
-    color: #183642;
+    color: var(--text-title-special);
     margin-bottom: 18px;
     margin-left: 0 !important;
     padding: 0 16px !important; /* align with container gutters */
@@ -56,14 +56,14 @@
   .add-announcement-subtitle {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #183642;
+    color: var(--app-text);
     margin-bottom: 12px;
     margin-top: 12px;
   }
   .add-announcement-label {
     font-size: 1rem;
     font-weight: 500;
-    color: #183642;
+    color: var(--app-text);
     margin-bottom: 4px;
   }
 
@@ -74,11 +74,11 @@
     font-size: 1rem;
     border-radius: 10px;
     border: none;
-    background: #f3f5f6;
+    background: var(--bg-hover);
     padding: 0.9rem;
     margin-bottom: 0.25rem;
     resize: none;
-    color: #183642;
+    color: var(--app-text);
     box-sizing: border-box;
     appearance: none;
     width: 100%;
@@ -126,8 +126,8 @@
     padding: 1.1rem 1.2rem;
     margin-left: -32rem;
     border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    border: 1px solid #e5e7eb;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
     background: var(--app-surface);
     font-size: 1rem;
     transition: background 0.2s;
@@ -156,7 +156,7 @@
   }
   .category-title-popover {
     font-size: 1.1rem;
-    color: #183642;
+    color: var(--app-text);
     font-weight: 500;
     text-align: left;
     white-space: nowrap;
@@ -224,24 +224,24 @@
   .add-announcement-preview {
     background: none;
     border: none;
-    color: #183642;
+    color: var(--primary);
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    border-bottom: 2px solid #183642;
+    border-bottom: 2px solid var(--primary);
     padding: 0 10px 2px 10px;
     border-radius: 0;
     margin-right: 0;
     transition: color 0.2s, border-bottom 0.2s;
   }
   .add-announcement-preview:hover {
-    color: #27405a;
-    border-bottom: 2px solid #27405a;
+    color: var(--primary-hover);
+    border-bottom: 2px solid var(--primary-hover);
     background: none;
   }
   .add-announcement-submit {
-    background: #183642;
-    color: #fff;
+    background: var(--primary);
+    color: var(--primary-contrast);
     font-size: 1rem;
     font-weight: 700;
     border: none;
@@ -251,10 +251,10 @@
     transition: background 0.2s;
   }
   .add-announcement-submit:hover {
-    background: #27405a;
+    background: var(--primary-hover);
   }
   .add-announcement-images-helper {
-    color: #46626a;
+    color: var(--app-text);
     font-size: 1rem;
     margin-bottom: 12px;
   }
@@ -266,7 +266,7 @@
   .add-announcement-image-upload {
     width: 120px;
     height: 90px;
-    background: #f3f5f6;
+    background: var(--bg-hover);
     border: none;
     border-radius: 10px;
     display: flex;
@@ -276,12 +276,12 @@
     position: relative;
     transition: box-shadow 0.2s, background 0.2s;
     font-size: 1rem;
-    color: #183642;
+    color: var(--app-text);
     outline: none;
   }
   .add-announcement-image-upload-main {
-    background: #fff8e6;
-    border: 2px solid #fff8e6;
+    background: var(--accent-light);
+    border: 2px solid var(--accent-light);
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-end;
@@ -290,7 +290,7 @@
   }
   .add-announcement-image-upload-text {
     font-size: 1rem;
-    color: #183642;
+    color: var(--app-text);
     font-weight: 600;
     margin-bottom: 6px;
   }
@@ -310,9 +310,9 @@
     font-size: 1rem;
   }
   .add-announcement-error {
-    color: #d32f2f;
-    background: #fff0f0;
-    border: 1px solid #ffcdd2;
+    color: var(--error);
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.18);
     border-radius: 10px;
     padding: 8px 14px;
     font-weight: 600;
@@ -323,9 +323,9 @@
     gap: 8px;
   }
   .add-announcement-success {
-    color: #388e3c;
-    background: #e8f5e9;
-    border: 1px solid #a5d6a7;
+    color: var(--success);
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.18);
     border-radius: 10px;
     padding: 8px 14px;
     font-weight: 600;

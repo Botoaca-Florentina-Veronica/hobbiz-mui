@@ -32,6 +32,7 @@
   --text-secondary: #6b7280;       /* Text secundar/descriptiv */
   --text-muted: #9ca3af;           /* Text foarte șters */
   --text-placeholder: #aaaaaa;     /* Placeholdere în input-uri */
+  --text-title-special: #183642;   /* Titluri speciale */
   
   /* --- CULORI BRAND --- */
   --primary: #355070;              /* Culoare primară */
@@ -94,6 +95,7 @@
   --text-secondary: #b0b0b0;       /* Text secundar */
   --text-muted: #8b8b8b;           /* Text foarte șters */
   --text-placeholder: #6b6b6b;     /* Placeholdere în input-uri */
+  --text-title-special: #f51866;   /* Titluri speciale */
   
   /* --- CULORI BRAND (Dark Mode folosește accent pink) --- */
   --primary: #f51866;              /* Culoare primară = accent în dark */

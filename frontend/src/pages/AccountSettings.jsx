@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import './AccountSettings.css';
-import { updateEmail, updatePassword, detectMitm, deleteAccount, logout } from '../api/api';
+import './NotificationSettingsPage.css';
+import { updateEmail, updatePassword, detectMitm, deleteAccount, logout, getProfile } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IconButton, Typography } from '@mui/material';
+import { IconButton, Typography, Container, Paper, List, ListItem, ListItemText } from '@mui/material';
 import ConfirmDialog from './ConfirmDialog';
+import Toast from '../components/Toast';
 import { useTranslation } from 'react-i18next';
 
 export default function AccountSettings() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showEmailChange, setShowEmailChange] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [newEmail, setNewEmail] = useState('');
@@ -18,6 +20,8 @@ export default function AccountSettings() {
   const [mitmLoading, setMitmLoading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [successDelete, setSuccessDelete] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastData, setToastData] = useState({ message: '', type: 'success' });
   const navigate = useNavigate();
 
   // Ștergere cont
@@ -105,8 +109,54 @@ export default function AccountSettings() {
     }
   };
 
+  const showToast = (message, type = 'success') => {
+    setToastData({ message, type });
+    setToastVisible(true);
+  };
+
+  const handleDownloadData = async () => {
+    setMessage(null);
+    try {
+      const response = await getProfile();
+      const userData = response.data;
+
+      const exportData = {
+        nume: `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A',
+        email: userData.email || 'N/A',
+        telefon: userData.phone || 'N/A',
+        locatie: userData.localitate || 'N/A',
+        dataInregistrarii: userData.createdAt 
+          ? new Date(userData.createdAt).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ro-RO', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : 'N/A',
+        exportatLa: new Date().toISOString(),
+      };
+
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `datele_mele_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      showToast(t('accountSettings.messages.downloadSuccess'), 'success');
+    } catch (error) {
+      console.error('Download data error:', error);
+      showToast(t('accountSettings.messages.downloadError'), 'error');
+    }
+  };
+
   return (
-    <div className="account-settings-container">
+    <Container maxWidth="lg" className="notification-settings-container">
       {/* Mobile header: back + title */}
       <div className="mobile-header">
         <IconButton
@@ -120,11 +170,21 @@ export default function AccountSettings() {
         </IconButton>
         <Typography variant="h5" className="mobile-header-title">{t('accountSettings.mobileHeaderTitle')}</Typography>
       </div>
-      <h1 className="settings-title">{t('accountSettings.pageTitle')}</h1>
-      <div className="settings-menu">
-        <div className="settings-item" onClick={handlePasswordChangeClick}>{t('accountSettings.menu.changePassword')}</div>
+      
+      <h1 className="notification-title">{t('accountSettings.pageTitle')}</h1>
+      
+      {/* Change Password */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={handlePasswordChangeClick} className="setting-item" style={{ borderBottom: showPasswordChange ? '1px solid #000' : 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.changePassword')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+            />
+          </ListItem>
+        </List>
         {showPasswordChange && (
-          <div className="email-change-section">
+          <div className="email-change-section" style={{ padding: '24px', marginTop: 0 }}>
             {message && (
               <div className={`message ${message.type}`}>{message.text}</div>
             )}
@@ -147,9 +207,20 @@ export default function AccountSettings() {
             <button onClick={handleSavePassword}>{t('accountSettings.buttons.save')}</button>
           </div>
         )}
-        <div className="settings-item" onClick={handleEmailChangeClick}>{t('accountSettings.menu.changeEmail')}</div>
+      </Paper>
+
+      {/* Change Email */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={handleEmailChangeClick} className="setting-item" style={{ borderBottom: showEmailChange ? '1px solid #000' : 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.changeEmail')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+            />
+          </ListItem>
+        </List>
         {showEmailChange && (
-          <div className="email-change-section">
+          <div className="email-change-section" style={{ padding: '24px', marginTop: 0 }}>
             {message && (
               <div className={`message ${message.type}`}>{message.text}</div>
             )}
@@ -164,22 +235,86 @@ export default function AccountSettings() {
             <button onClick={handleSaveEmail}>{t('accountSettings.buttons.save')}</button>
           </div>
         )}
-        <div className="settings-item" onClick={() => navigate('/anunturile-mele')}>{t('accountSettings.menu.myAnnouncements')}</div>
-        <div className="settings-item" onClick={() => navigate('/setari-notificari')}>{t('accountSettings.menu.notifications')}</div>
-        <div className="settings-item">{t('accountSettings.menu.billing')}</div>
-        <div className="settings-item">{t('accountSettings.menu.logoutAll')}</div>
-        <div className="settings-item" onClick={() => setShowDeleteDialog(true)}>{t('accountSettings.menu.deleteAccount')}</div>
-        <ConfirmDialog
-          open={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
-          onConfirm={handleDeleteAccount}
-          title={t('accountSettings.confirm.deleteTitle')}
-          description={t('accountSettings.confirm.deleteDescription')}
-        />
-        {successDelete && (
-          <div className="message success" style={{textAlign:'center',marginTop:20}}>{t('accountSettings.messages.deleteSuccess')}</div>
-        )}
-      </div>
-    </div>
+      </Paper>
+
+      {/* My Announcements */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={() => navigate('/anunturile-mele')} className="setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.myAnnouncements')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Notifications */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={() => navigate('/setari-notificari')} className="setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.notifications')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Billing */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={handleDownloadData} className="setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.billing')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Logout All */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem className="setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.logoutAll')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Delete Account */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={() => setShowDeleteDialog(true)} className="setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.deleteAccount')} 
+              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem', color: 'error.main' }} 
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDeleteAccount}
+        title={t('accountSettings.confirm.deleteTitle')}
+        description={t('accountSettings.confirm.deleteDescription')}
+      />
+      {successDelete && (
+        <div className="message success" style={{textAlign:'center',marginTop:20}}>{t('accountSettings.messages.deleteSuccess')}</div>
+      )}
+      
+      <Toast
+        visible={toastVisible}
+        message={toastData.message}
+        type={toastData.type}
+        onClose={() => setToastVisible(false)}
+        duration={3000}
+      />
+    </Container>
   );
 }

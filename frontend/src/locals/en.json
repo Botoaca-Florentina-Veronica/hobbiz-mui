@@ -891,7 +891,7 @@
       "changeEmail": "Change email",
       "myAnnouncements": "My announcements",
       "notifications": "Notification settings",
-      "billing": "Billing details",
+      "billing": "Download my data",
       "logoutAll": "Log out from all devices",
       "deleteAccount": "Delete account"
     },
@@ -921,7 +921,9 @@
       "enterPasswords": "Please enter both passwords.",
       "updateEmailError": "Error updating email.",
       "updatePasswordError": "Error changing password.",
-      "mitmError": "Error detecting MITM: "
+      "mitmError": "Error detecting MITM: ",
+      "downloadSuccess": "Your data has been downloaded successfully!",
+      "downloadError": "Could not download data. Please try again."
     }
   },
   "chooseUs": {

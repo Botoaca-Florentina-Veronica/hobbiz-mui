@@ -11,13 +11,12 @@ import {
   IconButton, 
   Paper,
   CircularProgress,
-  Alert,
-  Snackbar
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getProfile, updateProfile } from '../api/api';
+import Toast from '../components/Toast';
 import './NotificationSettingsPage.css';
 
 export default function NotificationSettingsPage() {
@@ -33,7 +32,8 @@ export default function NotificationSettingsPage() {
     favorites: true,
     promotions: false
   });
-  const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastData, setToastData] = useState({ message: '', type: 'success' });
 
   useEffect(() => {
     fetchSettings();
@@ -61,7 +61,7 @@ export default function NotificationSettingsPage() {
     try {
       setSaving(true);
       await updateProfile({ notificationSettings: newSettings });
-      // showToast(t('notificationSettings.saveSuccess'), 'success');
+      showToast(t('notificationSettings.saveSuccess'), 'success');
     } catch (error) {
       console.error('Error saving settings:', error);
       showToast(t('notificationSettings.saveError'), 'error');
@@ -72,12 +72,9 @@ export default function NotificationSettingsPage() {
     }
   };
 
-  const showToast = (message, severity = 'success') => {
-    setToast({ open: true, message, severity });
-  };
-
-  const handleCloseToast = () => {
-    setToast({ ...toast, open: false });
+  const showToast = (message, type = 'success') => {
+    setToastData({ message, type });
+    setToastVisible(true);
   };
 
   const renderSettingItem = (key, labelKey, descKey) => (
@@ -101,14 +98,13 @@ export default function NotificationSettingsPage() {
   );
 
   return (
-    <Container maxWidth="md" className="notification-settings-container">
+    <Container maxWidth="lg" className="notification-settings-container">
       <Box display="flex" alignItems="center" justifyContent="center" mb={3} mt={2} className="settings-header">
         <h1 className="notification-title">{t('notificationSettings.title')}</h1>
-        {saving && <CircularProgress size={20} sx={{ ml: 2 }} />}
       </Box>
 
       <Paper elevation={0} className="settings-paper">
-        <List>
+        <List disablePadding>
           {renderSettingItem('push', 'notificationSettings.push', 'notificationSettings.pushDesc')}
           {renderSettingItem('email', 'notificationSettings.email', 'notificationSettings.emailDesc')}
           {renderSettingItem('messages', 'notificationSettings.messages', 'notificationSettings.messagesDesc')}
@@ -118,11 +114,12 @@ export default function NotificationSettingsPage() {
         </List>
       </Paper>
 
-      <Snackbar open={toast.open} autoHideDuration={3000} onClose={handleCloseToast}>
-        <Alert onClose={handleCloseToast} severity={toast.severity} sx={{ width: '100%' }}>
-          {toast.message}
-        </Alert>
-      </Snackbar>
+      <Toast 
+        message={toastData.message} 
+        type={toastData.type} 
+        visible={toastVisible} 
+        onClose={() => setToastVisible(false)} 
+      />
     </Container>
   );
 }
