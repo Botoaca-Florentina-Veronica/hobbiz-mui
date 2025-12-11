@@ -70,6 +70,8 @@ export const updatePassword = (passwordData) => apiClient.put('/api/users/update
 export const updateProfile = (profileData) => apiClient.put('/api/users/profile', profileData);
 export const detectMitm = () => apiClient.get('/api/mitm/detect-mitm');
 
+// Announcement search for autocomplete suggestions
+export const searchAnnouncements = (searchQuery) => apiClient.get(`/api/announcements/search?q=${encodeURIComponent(searchQuery)}`);
 
 // Logout request (pentru sesiuni/cookie-uri)
 export const logout = () => apiClient.get('/auth/logout', { withCredentials: true });

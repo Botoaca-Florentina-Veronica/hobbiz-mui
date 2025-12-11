@@ -2,6 +2,37 @@ const express = require('express');
 const router = express.Router();
 const Announcement = require('../models/Announcement');
 
+// GET /api/announcements/search?q=cuvant - căutare anunțuri pentru autocomplete/suggestions
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) {
+      return res.json([]);
+    }
+
+    const searchTerm = q.trim();
+    const filter = {
+      archived: { $ne: true },
+      $or: [
+        { title: { $regex: searchTerm, $options: 'i' } },
+        { description: { $regex: searchTerm, $options: 'i' } },
+        { location: { $regex: searchTerm, $options: 'i' } },
+        { category: { $regex: searchTerm, $options: 'i' } }
+      ]
+    };
+
+    const announcements = await Announcement.find(filter)
+      .select('title location category price images')
+      .sort({ favoritesCount: -1, createdAt: -1 })
+      .limit(8);
+    
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la search suggestions:', error);
+    res.status(500).json({ error: 'Eroare server la căutare anunțuri' });
+  }
+});
+
 // GET /api/announcements?category=CategoryName
 router.get('/', async (req, res) => {
   try {

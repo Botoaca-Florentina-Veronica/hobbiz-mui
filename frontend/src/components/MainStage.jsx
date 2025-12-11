@@ -14,6 +14,7 @@ import { Paper, CardContent, Chip, Box, IconButton, InputBase, Stack, useMediaQu
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import './MainStage.css';
+import { searchAnnouncements } from '../api/api';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
@@ -210,9 +211,63 @@ export default function MainStage() {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [categoryDetailsAnimating, setCategoryDetailsAnimating] = useState(false);
   
+  // Search autocomplete state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  
   // Refs
   const categoriesButtonRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  const searchContainerRef = useRef(null);
+
+  // Effect pentru debounced search
+  useEffect(() => {
+    if (searchTerm.trim().length >= 2) {
+      setIsSearching(true);
+      // Debounce: așteaptă 300ms după ce utilizatorul termină de tastat
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          const response = await searchAnnouncements(searchTerm);
+          setSearchSuggestions(response.data);
+          setShowSuggestions(true);
+          setIsSearching(false);
+        } catch (error) {
+          console.error('Eroare la căutarea de sugestii:', error);
+          setSearchSuggestions([]);
+          setIsSearching(false);
+        }
+      }, 300);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      setIsSearching(false);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchTerm]);
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Event Handlers
   const handleCategoryHover = (category) => {
@@ -281,6 +336,23 @@ export default function MainStage() {
       }
     };
   }, []);
+
+  const handleSuggestionClick = (announcementId) => {
+    setShowSuggestions(false);
+    setSearchTerm("");
+    navigate(`/announcement/${announcementId}`);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      setShowSuggestions(false);
+      // Redirecționează către homepage cu scroll la categories sau poți crea o pagină dedicată
+      // Pentru acum, voi folosi categoria "Fotografie" cu parametru de căutare custom
+      // Sau mai bine, navigăm către homepage și facem scroll
+      navigate(`/?search=${encodeURIComponent(searchTerm)}`);
+    }
+  };
 
   const open = Boolean(anchorEl);
   const id = open ? 'location-popover' : undefined;
@@ -365,31 +437,76 @@ export default function MainStage() {
         )}
 
         {!isMobile ? (
-          <div className="search-container mainstage-search-desktop">
-            <input 
-              type="text" 
-              placeholder={t('mainStage.searchPlaceholder')} 
-              className="search-input"
-            />
-            <div className="location-section" onClick={handleInputClick}>
-              <FaMapMarkerAlt className="location-icon" />
+          <div className="search-container mainstage-search-desktop" ref={searchContainerRef}>
+            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', flex: 1, position: 'relative' }}>
               <input 
                 type="text" 
-                placeholder={t('mainStage.locationPlaceholder')} 
-                className="location-input"
-                value={selectedLocalitate || selectedJudet || t('mainStage.locationPlaceholder')}
-                readOnly
+                placeholder={t('mainStage.searchPlaceholder')} 
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
               />
-            </div>
-            <button className="search-button">
-              <span>{t('mainStage.searchButton')}</span>
-              <FaSearch className="search-icon" />
-            </button>
+              <div className="location-section" onClick={handleInputClick}>
+                <FaMapMarkerAlt className="location-icon" />
+                <input 
+                  type="text" 
+                  placeholder={t('mainStage.locationPlaceholder')} 
+                  className="location-input"
+                  value={selectedLocalitate || selectedJudet || t('mainStage.locationPlaceholder')}
+                  readOnly
+                />
+              </div>
+              <button type="submit" className="search-button">
+                <span>{t('mainStage.searchButton')}</span>
+                <FaSearch className="search-icon" />
+              </button>
+              
+              {/* Suggestions Dropdown */}
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <div className="search-suggestions-dropdown">
+                  {searchSuggestions.map((announcement) => (
+                    <div
+                      key={announcement._id}
+                      className="suggestion-item"
+                      onClick={() => handleSuggestionClick(announcement._id)}
+                    >
+                      <div className="suggestion-image">
+                        {announcement.images && announcement.images.length > 0 ? (
+                          <img src={announcement.images[0]} alt={announcement.title} />
+                        ) : (
+                          <div className="no-image-placeholder">
+                            <FaSearch />
+                          </div>
+                        )}
+                      </div>
+                      <div className="suggestion-content">
+                        <div className="suggestion-title">{announcement.title}</div>
+                        <div className="suggestion-meta">
+                          <span className="suggestion-category">{announcement.category}</span>
+                          {announcement.location && (
+                            <>
+                              <span className="suggestion-separator">•</span>
+                              <span className="suggestion-location">{announcement.location}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {announcement.price && (
+                        <div className="suggestion-price">
+                          {announcement.price === 0 ? 'Gratuit' : `${announcement.price} RON`}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
           </div>
         ) : (
-          <Box className="mainstage-search-mobile">
+          <Box className="mainstage-search-mobile" ref={searchContainerRef} sx={{ position: 'relative', width: '100%' }}>
             <Stack direction="row" alignItems="center" spacing={1} className="search-bell-wrapper">
-              <Paper elevation={3} className="mobile-search-paper">
+              <Paper elevation={3} className="mobile-search-paper" component="form" onSubmit={handleSearchSubmit}>
                 <IconButton 
                   size="small" 
                   aria-label="Alege locația" 
@@ -401,8 +518,11 @@ export default function MainStage() {
                   className="mobile-search-input"
                   placeholder={t('mainStage.searchPlaceholder')}
                   inputProps={{ 'aria-label': t('mainStage.searchButton') }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
                 />
-                <IconButton color="primary" aria-label={t('mainStage.searchButton')}>
+                <IconButton type="submit" color="primary" aria-label={t('mainStage.searchButton')}>
                   <FaSearch />
                 </IconButton>
               </Paper>
@@ -414,6 +534,46 @@ export default function MainStage() {
                 <HiOutlineBell />
               </IconButton>
             </Stack>
+            
+            {/* Mobile Suggestions Dropdown */}
+            {showSuggestions && searchSuggestions.length > 0 && (
+              <div className="search-suggestions-dropdown mobile-suggestions">
+                {searchSuggestions.map((announcement) => (
+                  <div
+                    key={announcement._id}
+                    className="suggestion-item"
+                    onClick={() => handleSuggestionClick(announcement._id)}
+                  >
+                    <div className="suggestion-image">
+                      {announcement.images && announcement.images.length > 0 ? (
+                        <img src={announcement.images[0]} alt={announcement.title} />
+                      ) : (
+                        <div className="no-image-placeholder">
+                          <FaSearch />
+                        </div>
+                      )}
+                    </div>
+                    <div className="suggestion-content">
+                      <div className="suggestion-title">{announcement.title}</div>
+                      <div className="suggestion-meta">
+                        <span className="suggestion-category">{announcement.category}</span>
+                        {announcement.location && (
+                          <>
+                            <span className="suggestion-separator">•</span>
+                            <span className="suggestion-location">{announcement.location}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {announcement.price && (
+                      <div className="suggestion-price">
+                        {announcement.price === 0 ? 'Gratuit' : `${announcement.price} RON`}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </Box>
         )}
 

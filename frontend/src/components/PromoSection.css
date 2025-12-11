@@ -70,13 +70,12 @@
 /* Dimensiunile și logica grid-ului au rămas EXACT cum erau */
 .promo-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, max-content);
   gap: 1rem;
-  width: 100%;
-  max-width: 1000px;
   padding: 0 1rem;
-  margin-top: -4rem;
-  /* Nu mai forțăm flex:1, lăsăm conținutul să dicteze mărimea în centru */
+  margin: -4rem auto 0;
+  justify-content: center;
+  justify-items: center;
   z-index: 5;
   pointer-events: none;
 }
@@ -84,7 +83,7 @@
 /* --- CARDUL (Containerul imaginii + Animația de intrare) --- */
 .promo-card {
   position: relative;
-  width: 100%;
+  width: auto;
   margin-bottom: 4rem;
   display: flex;
   justify-content: center;
@@ -145,9 +144,9 @@
 
 @media (max-width: 992px) {
   .promo-grid {
-    grid-template-columns: repeat(2, 1fr); 
-    max-width: 800px;
+    grid-template-columns: repeat(2, max-content);
     gap: 1rem;
+    justify-content: center;
   }
   .promo-title { font-size: 2rem; }
 }
