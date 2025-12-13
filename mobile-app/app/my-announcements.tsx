@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ThemedText } from '../components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
@@ -341,7 +343,7 @@ export default function MyAnnouncementsScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={tokens.colors.primary} />
-        <Text style={styles.loadingText}>{t.loading}</Text>
+        <ThemedText style={styles.loadingText}>{t.loading}</ThemedText>
       </View>
     );
   }
@@ -356,7 +358,7 @@ export default function MyAnnouncementsScreen() {
             <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
             </TouchableOpacity>
-            <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.title}</Text>
+            <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.title}</ThemedText>
           </View>
         </View>
 
@@ -375,7 +377,7 @@ export default function MyAnnouncementsScreen() {
             {/* Search Bar */}
             <View style={[styles.searchBar, { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' }]}>
               <Ionicons name="search" size={20} color={tokens.colors.muted} style={styles.searchIcon} />
-              <TextInput
+              <ThemedTextInput
                 style={styles.searchInput}
                 placeholder={t.searchPlaceholder}
                 placeholderTextColor={tokens.colors.placeholder}
@@ -396,12 +398,12 @@ export default function MyAnnouncementsScreen() {
                 onPress={() => setActivePickerType(activePickerType === 'category' ? null : 'category')}
               >
                 <Ionicons name="apps-outline" size={16} color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
-                <Text style={[
+                <ThemedText style={[
                   styles.filterButtonText,
                   activePickerType === 'category' && styles.filterButtonTextActive,
                 ]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                   {categoryFilter === t.all ? t.category : getCategoryLabel(categoryFilter)}
-                </Text>
+                </ThemedText>
                 <Ionicons 
                   name={activePickerType === 'category' ? 'chevron-up' : 'chevron-down'} 
                   size={16} 
@@ -419,12 +421,12 @@ export default function MyAnnouncementsScreen() {
                 onPress={() => setActivePickerType(activePickerType === 'sort' ? null : 'sort')}
               >
                 <Ionicons name="swap-vertical" size={16} color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
-                <Text style={[
+                <ThemedText style={[
                   styles.filterButtonText,
                   activePickerType === 'sort' && styles.filterButtonTextActive,
                 ]} numberOfLines={1}>
                   {t.sort}
-                </Text>
+                </ThemedText>
                 <Ionicons 
                   name={activePickerType === 'sort' ? 'chevron-up' : 'chevron-down'} 
                   size={16} 
@@ -434,7 +436,7 @@ export default function MyAnnouncementsScreen() {
 
               {/* Results Count */}
               <View style={styles.resultsCount}>
-                <Text style={styles.resultsText}>{filteredAndSortedAnnouncements.length} {t.results}</Text>
+                <ThemedText style={styles.resultsText}>{filteredAndSortedAnnouncements.length} {t.results}</ThemedText>
               </View>
             </View>
 
@@ -445,9 +447,9 @@ export default function MyAnnouncementsScreen() {
               <View style={styles.activeFilters}>
                 {searchTerm && (
                   <View style={styles.chip}>
-                    <Text style={styles.chipText}>
+                    <ThemedText style={styles.chipText}>
                       {t.searchLabel}: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
-                    </Text>
+                    </ThemedText>
                     <TouchableOpacity onPress={() => setSearchTerm('')}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
                     </TouchableOpacity>
@@ -455,7 +457,7 @@ export default function MyAnnouncementsScreen() {
                 )}
                 {categoryFilter !== t.all && (
                   <View style={styles.chip}>
-                    <Text style={styles.chipText}>{t.categoryLabel}: {getCategoryLabel(categoryFilter)}</Text>
+                    <ThemedText style={styles.chipText}>{t.categoryLabel}: {getCategoryLabel(categoryFilter)}</ThemedText>
                     <TouchableOpacity onPress={() => setCategoryFilter(t.all)}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
                     </TouchableOpacity>
@@ -470,11 +472,11 @@ export default function MyAnnouncementsScreen() {
         {filteredAndSortedAnnouncements.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="albums-outline" size={64} color={tokens.colors.placeholder} />
-            <Text style={styles.emptyText}>
+            <ThemedText style={styles.emptyText}>
               {searchTerm || categoryFilter !== t.all
                 ? t.noResults
                 : t.noAnnouncements}
-            </Text>
+            </ThemedText>
           </View>
         ) : (
           filteredAndSortedAnnouncements.map((announcement) => {
@@ -543,17 +545,17 @@ export default function MyAnnouncementsScreen() {
                     onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
                   >
                     <View style={styles.cardTopRow}>
-                      <Text style={styles.cardTitle}>
+                      <ThemedText style={styles.cardTitle}>
                         {announcement.title}
-                      </Text>
+                      </ThemedText>
                       <View style={styles.idBadge}>
-                        <Text style={styles.idText}>ID: {announcement._id?.slice(-8) || ''}</Text>
+                        <ThemedText style={styles.idText}>ID: {announcement._id?.slice(-8) || ''}</ThemedText>
                       </View>
                     </View>
 
                     {/* Category badge */}
                     <View style={styles.categoryBadge}>
-                      <Text style={styles.categoryText}>{getCategoryLabel(announcement.category)}</Text>
+                      <ThemedText style={styles.categoryText}>{getCategoryLabel(announcement.category)}</ThemedText>
                     </View>
 
                     {/* Location removed as requested - keep placeholder spacing so buttons stay at bottom */}
@@ -570,13 +572,13 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.equalButtonTwo, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleEdit(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.primaryButtonText}>{t.edit}</Text>
+                            <ThemedText numberOfLines={1} style={styles.primaryButtonText}>{t.edit}</ThemedText>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[styles.actionButton, styles.equalButtonTwo, styles.secondaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>{t.archive}</Text>
+                            <ThemedText numberOfLines={1} style={styles.secondaryButtonText}>{t.archive}</ThemedText>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -584,7 +586,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.equalButtonTwo, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDelete(announcement._id)}
                           >
-                            <Text numberOfLines={1} style={styles.dangerButtonText}>{t.delete}</Text>
+                            <ThemedText numberOfLines={1} style={styles.dangerButtonText}>{t.delete}</ThemedText>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[
@@ -595,7 +597,7 @@ export default function MyAnnouncementsScreen() {
                             ]}
                             onPress={() => handleReactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>{t.refresh}</Text>
+                            <ThemedText numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>{t.refresh}</ThemedText>
                           </TouchableOpacity>
                         </View>
                       </>
@@ -607,13 +609,13 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.fillButton, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleEdit(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.primaryButtonText}>{t.edit}</Text>
+                            <ThemedText numberOfLines={1} style={styles.primaryButtonText}>{t.edit}</ThemedText>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[styles.actionButton, styles.secondaryButton, styles.compactButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDeactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={styles.secondaryButtonText}>{t.archive}</Text>
+                            <ThemedText numberOfLines={1} style={styles.secondaryButtonText}>{t.archive}</ThemedText>
                           </TouchableOpacity>
                         </View>
                         <View style={styles.actionsRow}>
@@ -621,7 +623,7 @@ export default function MyAnnouncementsScreen() {
                             style={[styles.actionButton, styles.fillButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                             onPress={() => handleDelete(announcement._id)}
                           >
-                            <Text numberOfLines={1} style={styles.dangerButtonText}>{t.delete}</Text>
+                            <ThemedText numberOfLines={1} style={styles.dangerButtonText}>{t.delete}</ThemedText>
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[
@@ -632,7 +634,7 @@ export default function MyAnnouncementsScreen() {
                             ]}
                             onPress={() => handleReactivate(announcement)}
                           >
-                            <Text numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>{t.refresh}</Text>
+                            <ThemedText numberOfLines={1} style={[styles.secondaryButtonText, isDark ? { color: tokens.colors.turquoise } : {}]}>{t.refresh}</ThemedText>
                           </TouchableOpacity>
                         </View>
                       </>
@@ -670,9 +672,9 @@ export default function MyAnnouncementsScreen() {
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <ThemedText style={styles.modalTitle}>
                 {activePickerType === 'category' ? t.selectCategory : t.sortBy}
-              </Text>
+              </ThemedText>
               <TouchableOpacity onPress={() => setActivePickerType(null)} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color={tokens.colors.muted} />
               </TouchableOpacity>
@@ -704,14 +706,14 @@ export default function MyAnnouncementsScreen() {
                         ) : (
                           <Ionicons name={(catDef && (catDef.icon as any)) || 'pricetag'} size={20} color={categoryFilter === cat ? tokens.colors.primary : (catDef?.color || tokens.colors.muted)} />
                         )}
-                        <Text
+                        <ThemedText
                           style={[
                             styles.modalOptionText,
                             categoryFilter === cat && styles.modalOptionTextSelected,
                           ]}
                         >
                           {getCategoryLabel(cat)}
-                        </Text>
+                        </ThemedText>
                       </View>
                       {categoryFilter === cat && (
                         <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
@@ -744,14 +746,14 @@ export default function MyAnnouncementsScreen() {
                         size={20} 
                         color={sortFilter === option.value ? tokens.colors.primary : tokens.colors.muted} 
                       />
-                      <Text
+                      <ThemedText
                         style={[
                           styles.modalOptionText,
                           sortFilter === option.value && styles.modalOptionTextSelected,
                         ]}
                       >
                         {option.label}
-                      </Text>
+                      </ThemedText>
                     </View>
                     {sortFilter === option.value && (
                       <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
@@ -1236,3 +1238,4 @@ const createStyles = (tokens: any) => StyleSheet.create({
     includeFontPadding: false,
   },
 });
+

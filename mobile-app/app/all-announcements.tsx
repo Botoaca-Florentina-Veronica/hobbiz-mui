@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ThemedText } from '../components/themed-text';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -94,7 +95,7 @@ export default function AllAnnouncements() {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={[styles.loadingText, { color: colors.muted }]}>{t.loading}</Text>
+        <ThemedText style={[styles.loadingText, { color: colors.muted }]}>{t.loading}</ThemedText>
       </View>
     );
   }
@@ -108,7 +109,7 @@ export default function AllAnnouncements() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Ionicons name="arrow-back" size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{t.title}</Text>
+          <ThemedText style={[styles.headerTitle, { color: colors.text }]}>{t.title}</ThemedText>
         </View>
       </View>
 
@@ -120,7 +121,7 @@ export default function AllAnnouncements() {
         {filteredAnnouncements.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="albums-outline" size={64} color={colors.placeholder} />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>{t.noAnnouncements}</Text>
+            <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>{t.noAnnouncements}</ThemedText>
           </View>
         ) : (
           filteredAnnouncements.map((ann, index) => {
@@ -156,12 +157,12 @@ export default function AllAnnouncements() {
                   )}
                 </View>
                 <View style={styles.squareContent}>
-                  <Text style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</Text>
+                  <ThemedText style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</ThemedText>
                   <View style={[styles.categoryBadgeModern, { backgroundColor: isDarkMode ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)', borderWidth: isDarkMode ? 1 : 0, borderColor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'transparent' }]}>
-                    <Text style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{ann.category}</Text>
+                    <ThemedText style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{ann.category}</ThemedText>
                   </View>
-                  <Text style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</Text>
-                  <Text style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>Postat {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</Text>
+                  <ThemedText style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
+                  <ThemedText style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>Postat {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</ThemedText>
                 </View>
               </Pressable>
             );
@@ -197,3 +198,4 @@ const styles = StyleSheet.create({
   categoryBadgeModern: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.55)' },
   categoryBadgeText: { fontSize: 12, fontWeight: '600' },
 });
+

@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { ThemedText } from '../components/themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import api from '../src/services/api';
@@ -265,11 +266,11 @@ export default function AllReviewsScreen() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Toate evaluările</Text>
+          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Toate evaluările</ThemedText>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={tokens.colors.primary} />
-          <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă evaluările...</Text>
+          <ThemedText style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă evaluările...</ThemedText>
         </View>
       </View>
     );
@@ -284,7 +285,7 @@ export default function AllReviewsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
           <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Evaluările lui {userName}</Text>
+        <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Evaluările lui {userName}</ThemedText>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -293,9 +294,9 @@ export default function AllReviewsScreen() {
           <View style={[styles.statsCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
             <View style={styles.statsHeader}>
               <View style={styles.ratingBox}>
-                <Text style={[styles.ratingNumber, { color: tokens.colors.text }]}>
+                <ThemedText style={[styles.ratingNumber, { color: tokens.colors.text }]}>
                   {reviewStats.averageRating.toFixed(1)}
-                </Text>
+                </ThemedText>
                 <View style={styles.starsRow}>
                   {[1, 2, 3, 4, 5].map(star => (
                     <Ionicons
@@ -306,9 +307,9 @@ export default function AllReviewsScreen() {
                     />
                   ))}
                 </View>
-                <Text style={[styles.totalReviews, { color: tokens.colors.muted }]}>
+                <ThemedText style={[styles.totalReviews, { color: tokens.colors.muted }]}>
                   {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'evaluare' : 'evaluări'}
-                </Text>
+                </ThemedText>
               </View>
 
               <View style={styles.distributionBars}>
@@ -320,7 +321,7 @@ export default function AllReviewsScreen() {
                   const emptyColor = isEmpty ? (isDark ? tokens.colors.borderNeutral : '#d1d5db') : null;
                   return (
                     <View key={star} style={styles.barRow}>
-                      <Text style={[styles.starLabel, { color: isEmpty ? emptyColor : tokens.colors.text }]}>{star}</Text>
+                      <ThemedText style={[styles.starLabel, { color: isEmpty ? emptyColor : tokens.colors.text }]}>{star}</ThemedText>
                       <Ionicons name="star" size={14} color={isEmpty ? emptyColor : tokens.colors.rating} />
                       <View style={[styles.barTrack, { backgroundColor: isEmpty ? emptyColor : tokens.colors.elev }]}>
                         <View 
@@ -333,7 +334,7 @@ export default function AllReviewsScreen() {
                           ]} 
                         />
                       </View>
-                      <Text style={[styles.countLabel, { color: isEmpty ? emptyColor : tokens.colors.muted }]}>{count}</Text>
+                      <ThemedText style={[styles.countLabel, { color: isEmpty ? emptyColor : tokens.colors.muted }]}>{count}</ThemedText>
                     </View>
                   );
                 })}
@@ -344,16 +345,16 @@ export default function AllReviewsScreen() {
 
         {/* All Reviews List */}
         <View style={[styles.reviewsCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
-          <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>
             Toate comentariile ({reviews.length})
-          </Text>
+          </ThemedText>
 
           {reviews.length === 0 ? (
             <View style={styles.emptyState}>
               <Ionicons name="chatbubbles-outline" size={64} color={tokens.colors.placeholder} />
-              <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>
+              <ThemedText style={[styles.emptyText, { color: tokens.colors.muted }]}>
                 Nu există evaluări încă
-              </Text>
+              </ThemedText>
             </View>
           ) : (
             reviews.map((review) => {
@@ -382,22 +383,22 @@ export default function AllReviewsScreen() {
                           </View>
                         )}
                         <View style={styles.reviewerInfo}>
-                          <Text style={[styles.reviewerName, { color: tokens.colors.text }]}> 
+                          <ThemedText style={[styles.reviewerName, { color: tokens.colors.text }]}> 
                             {review.authorName}
-                          </Text>
+                          </ThemedText>
                           <View style={styles.ratingRow}>
                             {renderStars(review.score)}
-                            <Text style={[styles.reviewDate, { color: tokens.colors.muted }]}> 
+                            <ThemedText style={[styles.reviewDate, { color: tokens.colors.muted }]}> 
                               {new Date(review.createdAt).toLocaleDateString('ro-RO')}
-                            </Text>
+                            </ThemedText>
                           </View>
                         </View>
                       </TouchableOpacity>
                     </View>
 
-                    <Text style={[styles.reviewComment, { color: tokens.colors.text }]}> 
+                    <ThemedText style={[styles.reviewComment, { color: tokens.colors.text }]}> 
                       {review.comment}
-                    </Text>
+                    </ThemedText>
 
                     <View style={styles.reviewFooter}>
                       <View style={styles.reviewActions}>
@@ -411,9 +412,9 @@ export default function AllReviewsScreen() {
                             size={18}
                             color={likeState.liked ? tokens.colors.success : tokens.colors.muted}
                           />
-                          <Text style={[styles.actionText, { color: likeState.liked ? tokens.colors.success : tokens.colors.muted }]}> 
+                          <ThemedText style={[styles.actionText, { color: likeState.liked ? tokens.colors.success : tokens.colors.muted }]}> 
                             {review.likesCount || 0}
-                          </Text>
+                          </ThemedText>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -426,9 +427,9 @@ export default function AllReviewsScreen() {
                             size={18}
                             color={likeState.unliked ? '#dc3545' : tokens.colors.muted}
                           />
-                          <Text style={[styles.actionText, { color: likeState.unliked ? '#dc3545' : tokens.colors.muted }]}> 
+                          <ThemedText style={[styles.actionText, { color: likeState.unliked ? '#dc3545' : tokens.colors.muted }]}> 
                             {review.unlikesCount || 0}
-                          </Text>
+                          </ThemedText>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -468,6 +469,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     flex: 1,
+    fontFamily: 'Poppins-Bold',
   },
   loadingContainer: {
     flex: 1,
@@ -477,6 +479,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
+    fontFamily: 'Poppins-Regular',
   },
   scrollView: {
     flex: 1,
@@ -618,3 +621,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

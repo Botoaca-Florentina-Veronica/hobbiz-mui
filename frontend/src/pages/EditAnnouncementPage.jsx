@@ -16,6 +16,7 @@ import { categories } from '../components/Categories.jsx';
 import '../components/Categories.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
+import Toast from '../components/Toast';
 
 const CATEGORIES = [
   'Electronics',
@@ -69,19 +70,21 @@ export default function EditAnnouncementPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   
-  // Adăugăm state-uri pentru validări specifice
-  const [titleError, setTitleError] = useState("");
-  const [categoryError, setCategoryError] = useState("");
-  const [descriptionError, setDescriptionError] = useState("");
-  const [locationError, setLocationError] = useState("");
-  const [contactPersonError, setContactPersonError] = useState("");
-  const [contactEmailError, setContactEmailError] = useState("");
-  const [contactPhoneError, setContactPhoneError] = useState("");
-  const [imageError, setImageError] = useState("");
+  // State-uri pentru toast
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("error");
   
   const navigate = useNavigate();
   const location = useLocation();
   const [announcementId, setAnnouncementId] = useState(null);
+  
+  // Funcție helper pentru a afișa toast-uri
+  const showToast = (message, type = 'error') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
   
   // detectare mobile: folosește același prag ca în pagina de adăugare (sub 500px = mobile)
 
@@ -160,14 +163,14 @@ export default function EditAnnouncementPage() {
     const value = e.target.value;
     setTitle(value);
     setTitleChars(value.length);
-    
-    // Validare în timp real pentru titlu
-    if (value.length < 16) {
-      setTitleError("Titlul trebuie să aibă cel puțin 16 caractere");
-    } else if (value.length > 70) {
-      setTitleError("Titlul nu poate depăși 70 de caractere");
-    } else {
-      setTitleError("");
+  };
+
+  const handleTitleBlur = () => {
+    // Validare numai când utilizatorul iese din câmp
+    if (title.length > 0 && title.length < 16) {
+      showToast("Titlul trebuie să aibă cel puțin 16 caractere");
+    } else if (title.length > 70) {
+      showToast("Titlul nu poate depăși 70 de caractere");
     }
   };
 
@@ -183,56 +186,60 @@ export default function EditAnnouncementPage() {
     return phoneRegex.test(phone);
   };
 
-  // Funcție pentru validarea descrierii
+  // Funcție pentru update descriere
   const handleDescriptionChange = (e) => {
     const value = e.target.value;
     setDescription(value);
     setDescriptionChars(value.length);
-    
-    if (value.length < 40) {
-      setDescriptionError("Descrierea trebuie să aibă cel puțin 40 de caractere");
-    } else if (value.length > 9000) {
-      setDescriptionError("Descrierea nu poate depăși 9000 de caractere");
-    } else {
-      setDescriptionError("");
+  };
+
+  const handleDescriptionBlur = () => {
+    // Validare numai când utilizatorul iese din câmp
+    if (description.length > 0 && description.length < 40) {
+      showToast("Descrierea trebuie să aibă cel puțin 40 de caractere");
+    } else if (description.length > 9000) {
+      showToast("Descrierea nu poate depăși 9000 de caractere");
     }
   };
 
-  // Funcție pentru validarea persoanei de contact
+  // Funcție pentru update persoana de contact
   const handleContactPersonChange = (e) => {
     const value = e.target.value;
     setContactPerson(value);
-    
-    if (value.trim().length < 2) {
-      setContactPersonError("Numele trebuie să aibă cel puțin 2 caractere");
-    } else if (value.trim().length > 50) {
-      setContactPersonError("Numele nu poate depăși 50 de caractere");
-    } else {
-      setContactPersonError("");
+  };
+
+  const handleContactPersonBlur = () => {
+    // Validare numai când utilizatorul iese din câmp
+    if (contactPerson.trim().length > 0 && contactPerson.trim().length < 2) {
+      showToast("Numele trebuie să aibă cel puțin 2 caractere");
+    } else if (contactPerson.trim().length > 50) {
+      showToast("Numele nu poate depăși 50 de caractere");
     }
   };
 
-  // Funcție pentru validarea email-ului de contact
+  // Funcție pentru update email de contact
   const handleContactEmailChange = (e) => {
     const value = e.target.value;
     setContactEmail(value);
-    
-    if (value && !validateEmail(value)) {
-      setContactEmailError("Adresa de email nu este validă");
-    } else {
-      setContactEmailError("");
+  };
+
+  const handleContactEmailBlur = () => {
+    // Validare numai când utilizatorul iese din câmp
+    if (contactEmail && !validateEmail(contactEmail)) {
+      showToast("Adresa de email nu este validă");
     }
   };
 
-  // Funcție pentru validarea telefonului de contact
+  // Funcție pentru update telefon de contact
   const handleContactPhoneChange = (e) => {
     const value = e.target.value;
     setContactPhone(value);
-    
-    if (value && !validatePhone(value)) {
-      setContactPhoneError("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
-    } else {
-      setContactPhoneError("");
+  };
+
+  const handleContactPhoneBlur = () => {
+    // Validare numai când utilizatorul iese din câmp
+    if (contactPhone && !validatePhone(contactPhone)) {
+      showToast("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
     }
   };
 
@@ -265,60 +272,55 @@ export default function EditAnnouncementPage() {
 
     // Validare titlu
     if (!title || title.length < 16) {
-      setTitleError("Titlul trebuie să aibă cel puțin 16 caractere");
+      showToast("Titlul trebuie să aibă cel puțin 16 caractere");
       hasErrors = true;
     } else if (title.length > 70) {
-      setTitleError("Titlul nu poate depăși 70 de caractere");
+      showToast("Titlul nu poate depăși 70 de caractere");
       hasErrors = true;
     }
 
     // Validare categorie
     if (!category) {
-      setCategoryError("Trebuie să selectezi o categorie");
+      showToast("Trebuie să selectezi o categorie");
       hasErrors = true;
-    } else {
-      setCategoryError("");
     }
 
     // Validare descriere
     if (!description || description.length < 40) {
-      setDescriptionError("Descrierea trebuie să aibă cel puțin 40 de caractere");
+      showToast("Descrierea trebuie să aibă cel puțin 40 de caractere");
       hasErrors = true;
     } else if (description.length > 9000) {
-      setDescriptionError("Descrierea nu poate depăși 9000 de caractere");
+      showToast("Descrierea nu poate depăși 9000 de caractere");
       hasErrors = true;
     }
 
     // Validare locație
     if (!selectedJudet && !selectedLocalitate) {
-      setLocationError("Trebuie să selectezi o locație");
+      showToast("Trebuie să selectezi o locație");
       hasErrors = true;
-    } else {
-      setLocationError("");
     }
 
     // Validare persoană de contact
     if (!contactPerson || contactPerson.trim().length < 2) {
-      setContactPersonError("Numele persoanei de contact este obligatoriu");
+      showToast("Numele persoanei de contact este obligatoriu");
       hasErrors = true;
     }
 
     // Validare email (dacă este completat)
     if (contactEmail && !validateEmail(contactEmail)) {
-      setContactEmailError("Adresa de email nu este validă");
+      showToast("Adresa de email nu este validă");
       hasErrors = true;
     }
 
     // Validare telefon (dacă este completat)
     if (contactPhone && !validatePhone(contactPhone)) {
-      setContactPhoneError("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
+      showToast("Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre");
       hasErrors = true;
     }
 
     // Dacă nu există nici email nici telefon
     if (!contactEmail && !contactPhone) {
-      setContactEmailError("Trebuie să completezi cel puțin email-ul sau telefonul");
-      setContactPhoneError("Trebuie să completezi cel puțin email-ul sau telefonul");
+      showToast("Trebuie să completezi cel puțin email-ul sau telefonul");
       hasErrors = true;
     }
 
@@ -375,7 +377,6 @@ export default function EditAnnouncementPage() {
   const handleLocationSelect = (judet, localitate) => {
     setSelectedJudet(judet);
     setSelectedLocalitate(localitate);
-    setLocationError(""); // Resetează eroarea când se selectează o locație
     handleClose();
   };
 
@@ -430,6 +431,7 @@ export default function EditAnnouncementPage() {
           placeholder="ex: Predau lecții de fizică, online"
           value={title}
           onChange={handleTitleChange}
+          onBlur={handleTitleBlur}
           minLength={16}
           maxLength={70}
           required
@@ -438,14 +440,6 @@ export default function EditAnnouncementPage() {
           <div className="add-announcement-helper">Introdu cel puțin 16 caractere</div>
           <div className="add-announcement-charcount">{titleChars}/70</div>
         </div>
-        {titleError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {titleError}
-          </div>
-        )}
         <label className="add-announcement-label">Categoria*</label>
         <input
           className="add-announcement-category-select"
@@ -456,14 +450,6 @@ export default function EditAnnouncementPage() {
           onClick={handleCategoryClick}
           required
         />
-        {categoryError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {categoryError}
-          </div>
-        )}
         <Popover
           id={categoryId}
           open={categoryOpen}
@@ -621,25 +607,18 @@ export default function EditAnnouncementPage() {
         <label className="add-announcement-label">Descriere*</label>
         <textarea
           className="add-announcement-description-input"
-          placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
+          placeholder="Íncearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
           minLength={40}
           maxLength={9000}
           required
           value={description}
           onChange={handleDescriptionChange}
+          onBlur={handleDescriptionBlur}
         />
         <div className="add-announcement-char-helper-row">
           <div className="add-announcement-helper">Introdu cel puțin 40 caractere</div>
           <div className="add-announcement-charcount">{descriptionChars}/9000</div>
         </div>
-        {descriptionError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {descriptionError}
-          </div>
-        )}
       </div>
       <div className="add-announcement-location-section">
         <label className="add-announcement-label">Localitate*</label>
@@ -734,14 +713,6 @@ export default function EditAnnouncementPage() {
             )}
           </Popover>
         </div>
-        {locationError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {locationError}
-          </div>
-        )}
       </div>
       <div className="add-announcement-contact-section">
         <h2 className="add-announcement-subtitle">Informații de contact</h2>
@@ -753,20 +724,13 @@ export default function EditAnnouncementPage() {
             placeholder="Nume și prenume"
             value={contactPerson || ''}
             onChange={handleContactPersonChange}
+            onBlur={handleContactPersonBlur}
             required
           />
           {contactPerson && (
             <span className="add-announcement-location-check">✓</span>
           )}
         </div>
-        {contactPersonError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {contactPersonError}
-          </div>
-        )}
         <label className="add-announcement-label">Adresa de email</label>
         <input
           className="add-announcement-contact-input"
@@ -774,31 +738,17 @@ export default function EditAnnouncementPage() {
           placeholder="ex: exemplu@gmail.com"
           value={contactEmail || ''}
           onChange={handleContactEmailChange}
+          onBlur={handleContactEmailBlur}
         />
-        {contactEmailError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {contactEmailError}
-          </div>
-        )}
-        <label className="add-announcement-label">Numărul de telefon</label>
+        <label className="add-announcement-label">Număr de telefon</label>
         <input
           className="add-announcement-contact-input"
           type="tel"
-          placeholder="ex: 07xxxxxxxx"
+          placeholder="ex: 0712345678"
           value={contactPhone || ''}
           onChange={handleContactPhoneChange}
+          onBlur={handleContactPhoneBlur}
         />
-        {contactPhoneError && (
-          <div className="add-announcement-message add-announcement-error" style={{marginTop: 8}}>
-            <div className="add-announcement-error-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="#d32f2f"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-            </div>
-            {contactPhoneError}
-          </div>
-        )}
       </div>
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
@@ -807,6 +757,13 @@ export default function EditAnnouncementPage() {
           <button type="button" className="add-announcement-submit" onClick={handleSubmit}>Actualizează anunțul</button>
         </div>
       </div>
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onClose={() => setToastVisible(false)}
+        duration={3000}
+      />
     </div>
   );
 }

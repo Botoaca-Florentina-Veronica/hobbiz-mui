@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Linking, Platform, Modal, Share, TextInput } from 'react-native';
+import { ThemedText } from '../components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -227,7 +229,7 @@ export default function AnnouncementDetailsScreen() {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: tokens.colors.bg, paddingTop: insets.top + 40 }]}>        
         <ActivityIndicator size="large" color={tokens.colors.primary} />
-        <Text style={[styles.loadingMessage, { color: tokens.colors.muted, marginTop: 12 }]}>Se încarcă anunțul...</Text>
+        <ThemedText style={[styles.loadingMessage, { color: tokens.colors.muted, marginTop: 12 }]}>Se încarcă anunțul...</ThemedText>
       </View>
     );
   }
@@ -238,10 +240,10 @@ export default function AnnouncementDetailsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
           <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.errorTitle, { color: tokens.colors.text }]}>Eroare</Text>
-        <Text style={[styles.errorMessage, { color: tokens.colors.muted }]}>{fetchError || 'Anunțul nu a fost găsit.'}</Text>
+        <ThemedText style={[styles.errorTitle, { color: tokens.colors.text }]}>Eroare</ThemedText>
+        <ThemedText style={[styles.errorMessage, { color: tokens.colors.muted }]}>{fetchError || 'Anunțul nu a fost găsit.'}</ThemedText>
         <TouchableOpacity onPress={fetchAnnouncement} style={[styles.retryBtn, { backgroundColor: tokens.colors.primary }]}>          
-          <Text style={styles.retryText}>Reîncearcă</Text>
+          <ThemedText style={styles.retryText}>Reîncearcă</ThemedText>
         </TouchableOpacity>
       </View>
     );
@@ -249,7 +251,7 @@ export default function AnnouncementDetailsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: tokens.colors.bg }}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
+      <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
       {/* Header: circular back button + 'înapoi' text on left, placeholder right for balance */}
       <View style={[styles.headerSpacer, { paddingTop: insets.top + 12 }]}>        
         <View style={[styles.headerRow, { alignItems: 'center' }]}>
@@ -261,7 +263,7 @@ export default function AnnouncementDetailsScreen() {
             >
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
             </TouchableOpacity>
-            <Text style={[styles.backText, { color: tokens.colors.text, marginLeft: 12 }]}>înapoi</Text>
+            <ThemedText style={[styles.backText, { color: tokens.colors.text, marginLeft: 12 }]}>înapoi</ThemedText>
           </View>
 
           {/* Placeholder to keep layout balanced */}
@@ -324,12 +326,12 @@ export default function AnnouncementDetailsScreen() {
 
       {/* Title placed above the main card to match preview layout */}
       <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-        <Text style={[styles.title, { color: tokens.colors.text }]}>{announcement.title}</Text>
+        <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{announcement.title}</ThemedText>
       </View>
 
       <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
         <View style={[styles.categoryBadge, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.surface }]}>            
-          <Text style={[styles.categoryText, { color: tokens.colors.primary }]}>{announcement.category}</Text>
+          <ThemedText style={[styles.categoryText, { color: tokens.colors.primary }]}>{announcement.category}</ThemedText>
         </View>
       </View>
 
@@ -378,20 +380,20 @@ export default function AnnouncementDetailsScreen() {
             <Ionicons name="share-social" size={24} color={tokens.colors.primary} />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.postedAt, { color: tokens.colors.muted }]}>Postat {new Date(announcement.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
+        <ThemedText style={[styles.postedAt, { color: tokens.colors.muted }]}>Postat {new Date(announcement.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}</ThemedText>
         
-        <Text style={[styles.sectionHeading, { color: isDark ? '#ffffff' : '#000000' }]}>Descriere</Text>
-        <Text style={[styles.description, { color: isDark ? '#ffffff' : '#000000' }]}>{announcement.description}</Text>
+        <ThemedText style={[styles.sectionHeading, { color: isDark ? '#ffffff' : '#000000' }]}>Descriere</ThemedText>
+        <ThemedText style={[styles.description, { color: isDark ? '#ffffff' : '#000000' }]}>{announcement.description}</ThemedText>
         <View style={[styles.divider, { borderBottomColor: tokens.colors.border }]} />
         <View style={styles.metaRow}>          
-          <Text style={[styles.metaItem, { color: isDark ? '#ffffff' : tokens.colors.muted }]}>ID: {announcement._id.slice(-8)}</Text>
-          {!!announcement.views && <Text style={[styles.metaItem, { color: isDark ? '#ffffff' : tokens.colors.muted }]}>{announcement.views} vizualizări</Text>}
+          <ThemedText style={[styles.metaItem, { color: isDark ? '#ffffff' : tokens.colors.muted }]}>ID: {announcement._id.slice(-8)}</ThemedText>
+          {!!announcement.views && <ThemedText style={[styles.metaItem, { color: isDark ? '#ffffff' : tokens.colors.muted }]}>{announcement.views} vizualizări</ThemedText>}
         </View>
       </View>
 
       {/* Seller Card */}
       <View style={[styles.sellerCard, { backgroundColor: isDark ? '#121212' : '#ffffff', borderColor: tokens.colors.border }]}>        
-        <Text style={[styles.sellerHeading, { color: tokens.colors.text }]}>Informații vânzător</Text>
+        <ThemedText style={[styles.sellerHeading, { color: tokens.colors.text }]}>Informații vânzător</ThemedText>
 
         {/* Avatar + Name + Rating (tap to open seller profile) */}
         <TouchableOpacity
@@ -409,11 +411,11 @@ export default function AnnouncementDetailsScreen() {
                 resizeMode="cover"
               />
             ) : (
-              <Text style={[styles.avatarText, { color: tokens.colors.text }]}>{initials()}</Text>
+              <ThemedText style={[styles.avatarText, { color: tokens.colors.text }]}>{initials()}</ThemedText>
             )}
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.sellerName, { color: tokens.colors.text }]}>{announcement.user?.firstName} {announcement.user?.lastName}</Text>
+            <ThemedText style={[styles.sellerName, { color: tokens.colors.text }]}>{announcement.user?.firstName} {announcement.user?.lastName}</ThemedText>
             {rating > 0 && reviewCount > 0 ? (
               <View style={styles.ratingRow}>
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -424,17 +426,17 @@ export default function AnnouncementDetailsScreen() {
                     color="#FFC107"
                   />
                 ))}
-                <Text style={[styles.ratingValue, { color: tokens.colors.text }]}>{Number(rating).toFixed(1)}</Text>
-                <Text style={[styles.ratingCount, { color: tokens.colors.muted }]}>({reviewCount} recenzii)</Text>
+                <ThemedText style={[styles.ratingValue, { color: tokens.colors.text }]}>{Number(rating).toFixed(1)}</ThemedText>
+                <ThemedText style={[styles.ratingCount, { color: tokens.colors.muted }]}>({reviewCount} recenzii)</ThemedText>
               </View>
             ) : (
               sellerReviewsLoading ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <ActivityIndicator size="small" color={tokens.colors.primary} />
-                  <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>se încarcă recenziile...</Text>
+                  <ThemedText style={[styles.sellerSub, { color: tokens.colors.muted }]}>se încarcă recenziile...</ThemedText>
                 </View>
               ) : (
-                <Text style={[styles.sellerSub, { color: tokens.colors.muted }]}>nu există review-uri</Text>
+                <ThemedText style={[styles.sellerSub, { color: tokens.colors.muted }]}>nu există review-uri</ThemedText>
               )
             )}
           </View>
@@ -442,7 +444,7 @@ export default function AnnouncementDetailsScreen() {
 
         {/* Contact label + Evaluate button */}
         <View style={styles.contactTopRow}>
-          <Text style={[styles.contactLabel, { color: tokens.colors.muted }]}>Persoană de contact:</Text>
+          <ThemedText style={[styles.contactLabel, { color: tokens.colors.muted }]}>Persoană de contact:</ThemedText>
           <TouchableOpacity
             onPress={() => {
               setRatingModalVisible(true);
@@ -451,10 +453,10 @@ export default function AnnouncementDetailsScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="star-outline" size={16} color={tokens.colors.text} style={{ marginRight: 6 }} />
-            <Text style={[styles.evaluateText, { color: tokens.colors.text }]}>Evaluează</Text>
+            <ThemedText style={[styles.evaluateText, { color: tokens.colors.text }]}>Evaluează</ThemedText>
           </TouchableOpacity>
         </View>
-        <Text style={[styles.contactValue, { color: tokens.colors.text }]}>{announcement.contactPerson}</Text>
+        <ThemedText style={[styles.contactValue, { color: tokens.colors.text }]}>{announcement.contactPerson}</ThemedText>
 
         {/* Primary CTA: Send Message */}
         <TouchableOpacity
@@ -463,20 +465,20 @@ export default function AnnouncementDetailsScreen() {
           activeOpacity={0.9}
         >
           <Ionicons name="chatbubble-ellipses-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
-          <Text style={styles.primaryCtaText}>TRIMITE MESAJ</Text>
+          <ThemedText style={styles.primaryCtaText}>TRIMITE MESAJ</ThemedText>
         </TouchableOpacity>
 
         {/* Phone Card */}
         <View style={[styles.phoneCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
           <Ionicons name="call-outline" size={20} color={tokens.colors.primary} style={{ marginRight: 10 }} />
-          <Text style={[styles.phoneValue, { color: tokens.colors.text }]}>
+          <ThemedText style={[styles.phoneValue, { color: tokens.colors.text }]}>
             {showPhone ? (announcement.contactPhone || '—') : 'xxx xxx xxx'}
-          </Text>
+          </ThemedText>
           {!!announcement.contactPhone && (
             <TouchableOpacity onPress={() => setShowPhone((s) => !s)} activeOpacity={0.8}>
-              <Text style={[styles.showPhoneLink, { color: tokens.colors.primary }]}>
+              <ThemedText style={[styles.showPhoneLink, { color: tokens.colors.primary }]}>
                 {showPhone ? 'ASCUNDE' : 'ARATĂ'}
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           )}
         </View>
@@ -487,7 +489,7 @@ export default function AnnouncementDetailsScreen() {
           style={[styles.outlineBtn, { borderColor: tokens.colors.border }]}
           activeOpacity={0.85}
         >
-          <Text style={[styles.outlineBtnText, { color: tokens.colors.text }]}>VIZUALIZARE PROFIL</Text>
+          <ThemedText style={[styles.outlineBtnText, { color: tokens.colors.text }]}>VIZUALIZARE PROFIL</ThemedText>
         </TouchableOpacity>
       </View>
 
@@ -496,7 +498,7 @@ export default function AnnouncementDetailsScreen() {
       {/* Location Section */}
       <View style={styles.locationSection}>
         <View style={styles.locationHeader}>
-          <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>Locație</Text>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Locație</ThemedText>
           <TouchableOpacity
             onPress={() => {
               if (!announcement.location) return;
@@ -505,7 +507,7 @@ export default function AnnouncementDetailsScreen() {
               Linking.openURL(url);
             }}
           >
-            <Text style={{ color: tokens.colors.primary, fontSize: 13, fontWeight: '600' }}>Deschide Harta</Text>
+            <ThemedText style={{ color: tokens.colors.primary, fontSize: 13, fontWeight: '600' }}>Deschide Harta</ThemedText>
           </TouchableOpacity>
         </View>
         {/* Map embed: iframe pe web, WebView pe mobile (funcționează în Expo Go) */}
@@ -572,7 +574,7 @@ export default function AnnouncementDetailsScreen() {
                 return (
                   <View style={[styles.locationMapPlaceholder, { backgroundColor: tokens.colors.elev }]}>
                     <Ionicons name="map-outline" size={48} color={tokens.colors.placeholder} style={{ marginBottom: 8 }} />
-                    <Text style={{ color: tokens.colors.muted, fontSize: 13, textAlign: 'center' }}>Harta nu este disponibilă</Text>
+                    <ThemedText style={{ color: tokens.colors.muted, fontSize: 13, textAlign: 'center' }}>Harta nu este disponibilă</ThemedText>
                   </View>
                 );
               }
@@ -586,7 +588,7 @@ export default function AnnouncementDetailsScreen() {
 
         <View style={styles.locationRow}>
           <Ionicons name="pin" size={16} color={tokens.colors.primary} />
-          <Text style={[styles.locationText, { color: tokens.colors.text, flex: 1 }]}>{announcement.location}</Text>
+          <ThemedText style={[styles.locationText, { color: tokens.colors.text, flex: 1 }]}>{announcement.location}</ThemedText>
         </View>
       </View>
       {/* Image Viewer: reuse shared component that handles native pinch/zoom and swiping */}
@@ -608,18 +610,18 @@ export default function AnnouncementDetailsScreen() {
           style={[StyleSheet.absoluteFill, styles.ratingModalOverlay, { zIndex: 1000 }]}
         >
           <View style={[styles.ratingModalCard, { backgroundColor: isDark ? '#121212' : tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            <Text style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</Text>
+            <ThemedText style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>Evaluează utilizatorul</ThemedText>
             <View style={styles.ratingStarsRow}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <TouchableOpacity key={i} onPress={() => setRatingScore(i + 1)} activeOpacity={0.8}>
                   <Ionicons name={i < ratingScore ? 'star' : 'star-outline'} size={36} color="#FFC107" style={{ marginRight: 6 }} />
                 </TouchableOpacity>
               ))}
-              <Text style={[styles.ratingNumeric, { color: tokens.colors.text }]}>{Number(ratingScore).toFixed(1)}</Text>
+              <ThemedText style={[styles.ratingNumeric, { color: tokens.colors.text }]}>{Number(ratingScore).toFixed(1)}</ThemedText>
             </View>
 
             <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: isDark ? '#1e1e1e' : tokens.colors.elev }]}> 
-              <TextInput
+              <ThemedTextInput
                 multiline
                 numberOfLines={4}
                 onChangeText={setRatingComment}
@@ -632,7 +634,7 @@ export default function AnnouncementDetailsScreen() {
 
             <View style={styles.ratingModalActions}>
               <TouchableOpacity onPress={() => setRatingModalVisible(false)} style={styles.ratingCancelBtn}>
-                <Text style={[styles.ratingCancelText, { color: tokens.colors.primary }]}>ANULEAZĂ</Text>
+                <ThemedText style={[styles.ratingCancelText, { color: tokens.colors.primary }]}>ANULEAZĂ</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
@@ -658,7 +660,7 @@ export default function AnnouncementDetailsScreen() {
                 style={styles.ratingSubmitBtn}
                 activeOpacity={0.9}
               >
-                <Text style={[styles.ratingSubmitText, { color: '#ffffff' }]}>{submittingRating ? 'TRIMITE...' : 'TRIMITE'}</Text>
+                <ThemedText style={[styles.ratingSubmitText, { color: '#ffffff' }]}>{submittingRating ? 'TRIMITE...' : 'TRIMITE'}</ThemedText>
               </TouchableOpacity>
             </View>
           </View>
@@ -765,3 +767,4 @@ const styles = StyleSheet.create({
   ratingSubmitBtn: { backgroundColor: '#f51866', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
   ratingSubmitText: { fontSize: 15, fontWeight: '700' },
 });
+

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Linking } from 'react-native';
+import { ThemedText } from './themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useRouter } from 'expo-router';
 import storage from '../src/services/storage';
@@ -30,6 +31,7 @@ export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: b
         { label: locale === 'en' ? 'Terms and Conditions' : 'Termeni și condiții', url: '/termeni' },
         { label: locale === 'en' ? 'Privacy Policy' : 'Politică de Confidențialitate', url: '/confidentialitate' },
         { label: locale === 'en' ? 'Cookie Policy' : 'Cookie Policy', url: '/cookie' },
+        { label: locale === 'en' ? 'Data Deletion' : 'Ștergerea Datelor', url: '/data-deletion' },
       ],
     },
   ];
@@ -45,6 +47,10 @@ export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: b
     if (url === '/termeni') {
       // the mobile route is /legal
       router.push('/legal');
+      return;
+    }
+    if (url === '/data-deletion') {
+      router.push('/legal/data-deletion');
       return;
     }
     if (url.startsWith('/')) {
@@ -73,9 +79,9 @@ export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: b
               !isTabletOrLarger && sectionIndex > 0 && styles.sectionSpacing,
             ]}
           >
-            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>
+            <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>
               {section.title}
-            </Text>
+            </ThemedText>
             <View style={styles.linksList}>
               {section.links.map((link, linkIndex) => (
                 <TouchableOpacity
@@ -83,9 +89,9 @@ export default function LegalFooter({ hideLegalSection }: { hideLegalSection?: b
                   onPress={() => handleLinkPress(link.url)}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.linkText, { color: tokens.colors.muted }]}>
+                  <ThemedText style={[styles.linkText, { color: tokens.colors.muted }]}>
                     {link.label}
-                  </Text>
+                  </ThemedText>
                 </TouchableOpacity>
               ))}
             </View>
@@ -129,6 +135,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 42,
     marginBottom: 6,
+    fontFamily: 'Poppins-Bold',
   },
   linksList: {
     gap: 6,
@@ -136,5 +143,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 17.92, // 1.12rem ≈ 17.92px
     marginBottom: 6,
+    fontFamily: 'Poppins-Regular',
   },
 });
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar, FlatList, Text, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -601,7 +602,7 @@ export default function ProfileScreen() {
         translucent={true}
       />
       <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header with back button and title */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -790,7 +791,7 @@ export default function ProfileScreen() {
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>{t.lastName}</ThemedText>
                 {isEditingContact ? (
-                  <TextInput
+                  <ThemedTextInput
                     value={editLastName}
                     onChangeText={setEditLastName}
                     style={[styles.editInput, { color: tokens.colors.text, borderColor: tokens.colors.borderNeutral }]}
@@ -811,7 +812,7 @@ export default function ProfileScreen() {
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>{t.firstName}</ThemedText>
                 {isEditingContact ? (
-                  <TextInput
+                  <ThemedTextInput
                     value={editFirstName}
                     onChangeText={setEditFirstName}
                     style={[styles.editInput, { color: tokens.colors.text, borderColor: tokens.colors.borderNeutral }]}
@@ -832,7 +833,7 @@ export default function ProfileScreen() {
               <View style={styles.infoItemContent}>
                 <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>{t.phone}</ThemedText>
                 {isEditingContact ? (
-                  <TextInput
+                  <ThemedTextInput
                     value={editPhone}
                     onChangeText={setEditPhone}
                     style={[styles.editInput, { color: tokens.colors.text, borderColor: tokens.colors.borderNeutral }]}
@@ -902,9 +903,9 @@ export default function ProfileScreen() {
               {/* Rating Summary */}
               <View style={styles.ratingsSummary}>
                 <View style={styles.ratingsLeft}>
-                  <Text style={[styles.ratingScore, { color: tokens.colors.text }]}>
+                  <ThemedText style={[styles.ratingScore, { color: tokens.colors.text }]}>
                     {reviewStats.averageRating.toFixed(1)}
-                  </Text>
+                  </ThemedText>
                   <View style={styles.starsRow}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Ionicons
@@ -915,9 +916,9 @@ export default function ProfileScreen() {
                       />
                     ))}
                   </View>
-                  <Text style={[styles.reviewCount, { color: tokens.colors.muted }]}>
+                  <ThemedText style={[styles.reviewCount, { color: tokens.colors.muted }]}>
                     {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
-                  </Text>
+                  </ThemedText>
                 </View>
 
                 {/* Rating Distribution Bars */}
@@ -930,9 +931,9 @@ export default function ProfileScreen() {
                     
                     return (
                       <View key={rating} style={styles.ratingBar}>
-                        <Text style={[styles.ratingLabel, { color: tokens.colors.text }]}>
+                        <ThemedText style={[styles.ratingLabel, { color: tokens.colors.text }]}>
                           {rating} ★
-                        </Text>
+                        </ThemedText>
                         <View style={[styles.barBackground, { backgroundColor: tokens.colors.borderNeutral }]}>
                           <View 
                             style={[
@@ -944,9 +945,9 @@ export default function ProfileScreen() {
                             ]} 
                           />
                         </View>
-                        <Text style={[styles.ratingCount, { color: tokens.colors.muted }]}>
+                        <ThemedText style={[styles.ratingCount, { color: tokens.colors.muted }]}>
                           {count}
-                        </Text>
+                        </ThemedText>
                       </View>
                     );
                   })}
@@ -983,24 +984,24 @@ export default function ProfileScreen() {
                               }}
                               style={styles.reviewerDetails}
                             >
-                              <Text style={[styles.reviewerName, { color: tokens.colors.text }]}> 
+                              <ThemedText style={[styles.reviewerName, { color: tokens.colors.text }]}> 
                                 {review.reviewerName}
-                              </Text>
-                              <Text style={[styles.reviewDate, { color: tokens.colors.muted }]}>
+                              </ThemedText>
+                              <ThemedText style={[styles.reviewDate, { color: tokens.colors.muted }]}>
                                 {formattedDate}
-                              </Text>
+                              </ThemedText>
                             </TouchableOpacity>
                           </View>
                           <View style={[styles.reviewRatingBadge, { backgroundColor: tokens.colors.rating }]}>
-                            <Text style={[styles.reviewRatingText, { color: tokens.colors.text }]}>
+                            <ThemedText style={[styles.reviewRatingText, { color: tokens.colors.text }]}>
                               {review.rating.toFixed(1)}
-                            </Text>
+                            </ThemedText>
                           </View>
                         </View>
                         
-                        <Text style={[styles.reviewComment, { color: tokens.colors.text }]}>
+                        <ThemedText style={[styles.reviewComment, { color: tokens.colors.text }]}>
                           {review.comment}
-                        </Text>
+                        </ThemedText>
                         
                         {/* Like/Unlike buttons */}
                         <View style={[styles.reviewFooter, { borderTopColor: tokens.colors.borderNeutral }]}>
@@ -1020,7 +1021,7 @@ export default function ProfileScreen() {
                                     : tokens.colors.muted
                                 }
                               />
-                              <Text style={[
+                              <ThemedText style={[
                                 styles.actionCount, 
                                 { 
                                   color: reviewLikeState[review._id]?.liked 
@@ -1029,7 +1030,7 @@ export default function ProfileScreen() {
                                 }
                               ]}>
                                 {review.likesCount || 0}
-                              </Text>
+                              </ThemedText>
                             </TouchableOpacity>
 
                             {/* Unlike button */}
@@ -1047,7 +1048,7 @@ export default function ProfileScreen() {
                                     : tokens.colors.muted
                                 }
                               />
-                              <Text style={[
+                              <ThemedText style={[
                                 styles.actionCount, 
                                 { 
                                   color: reviewLikeState[review._id]?.unliked 
@@ -1056,7 +1057,7 @@ export default function ProfileScreen() {
                                 }
                               ]}>
                                 {review.unlikesCount || 0}
-                              </Text>
+                              </ThemedText>
                             </TouchableOpacity>
                           </View>
                         </View>
@@ -1075,9 +1076,9 @@ export default function ProfileScreen() {
                         });
                       }}
                     >
-                      <Text style={[styles.viewAllText, { color: tokens.colors.primary }]}>
+                      <ThemedText style={[styles.viewAllText, { color: tokens.colors.primary }]}>
                         TOATE COMENTARIILE
-                      </Text>
+                      </ThemedText>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -1086,7 +1087,7 @@ export default function ProfileScreen() {
           ) : (
             <View style={styles.noReviewsContainer}>
               <Ionicons name="star" size={56} color={tokens.colors.muted} style={{ marginBottom: 8 }} />
-              <Text style={[styles.noReviewsText, { color: tokens.colors.muted }]}>Nu există încă review-uri</Text>
+              <ThemedText style={[styles.noReviewsText, { color: tokens.colors.muted }]}>Nu există încă review-uri</ThemedText>
             </View>
           )}
         </View>
@@ -1147,9 +1148,9 @@ export default function ProfileScreen() {
           ) : userAnnouncements.length === 0 ? (
             <View style={styles.emptyAnnouncementsContainer}>
               <Ionicons name="albums-outline" size={40} color={tokens.colors.placeholder} />
-              <Text style={[styles.emptyAnnouncementsText, { color: tokens.colors.muted }]}>
+              <ThemedText style={[styles.emptyAnnouncementsText, { color: tokens.colors.muted }]}>
                 Nu ai încă anunțuri postate
-              </Text>
+              </ThemedText>
             </View>
           ) : (
             <FlatList
@@ -1175,19 +1176,19 @@ export default function ProfileScreen() {
                       style={[styles.announcementImage, { backgroundColor: tokens.colors.placeholderBg }]}
                     />
                     <View style={styles.announcementInfo}>
-                      <Text 
+                      <ThemedText 
                         numberOfLines={2} 
                         style={[styles.announcementTitle, { color: tokens.colors.text }]}
                       >
                         {item.title}
-                      </Text>
-                      <Text 
+                      </ThemedText>
+                      <ThemedText 
                         numberOfLines={1} 
                         style={[styles.announcementLocation, { color: tokens.colors.muted }]}
                       >
                         <Ionicons name="location-outline" size={12} color={tokens.colors.muted} />
                         {' '}{item.location || 'Nedefinit'}
-                      </Text>
+                      </ThemedText>
                     </View>
                   </TouchableOpacity>
                 );
@@ -1588,6 +1589,7 @@ const styles = StyleSheet.create({
   emptyAnnouncementsText: {
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'Poppins-Regular',
   },
   announcementsList: {
     paddingVertical: 16,
@@ -1644,6 +1646,7 @@ const styles = StyleSheet.create({
   noReviewsText: {
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'Poppins-Regular',
   },
   ratingsSummary: {
     flexDirection: 'row',
@@ -1659,6 +1662,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '700',
     marginBottom: 4,
+    fontFamily: 'Poppins-Bold',
   },
   starsRow: {
     flexDirection: 'row',
@@ -1667,6 +1671,7 @@ const styles = StyleSheet.create({
   },
   reviewCount: {
     fontSize: 11,
+    fontFamily: 'Poppins-Regular',
   },
   ratingsRight: {
     flex: 1,
@@ -1680,6 +1685,7 @@ const styles = StyleSheet.create({
   ratingLabel: {
     fontSize: 11,
     width: 30,
+    fontFamily: 'Poppins-Regular',
   },
   barBackground: {
     flex: 1,
@@ -1695,6 +1701,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     width: 20,
     textAlign: 'right',
+    fontFamily: 'Poppins-Regular',
   },
   recentReviewsSection: {
     gap: 12,
@@ -1734,9 +1741,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 2,
+    fontFamily: 'Poppins-SemiBold',
   },
   reviewDate: {
     fontSize: 11,
+    fontFamily: 'Poppins-Regular',
   },
   reviewRatingBadge: {
     paddingHorizontal: 8,
@@ -1750,11 +1759,13 @@ const styles = StyleSheet.create({
   reviewRatingText: {
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
   },
   reviewComment: {
     fontSize: 13,
     lineHeight: 18,
     marginBottom: 8,
+    fontFamily: 'Poppins-Regular',
   },
   reviewFooter: {
     flexDirection: 'row',
@@ -1777,9 +1788,11 @@ const styles = StyleSheet.create({
   actionCount: {
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'Poppins-Medium',
   },
   reviewLikes: {
     fontSize: 11,
+    fontFamily: 'Poppins-Regular',
   },
   viewAllButton: {
     marginTop: 8,
@@ -1793,14 +1806,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
+    fontFamily: 'Poppins-Bold',
   },
   // Location picker modal styles
   categoryOverlay: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, justifyContent: 'flex-end' },
   categorySheet: { maxHeight: '75%', borderTopLeftRadius: 18, borderTopRightRadius: 18, borderWidth: 1, overflow: 'hidden' },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
-  categoryHeaderTitle: { fontSize: 16, fontWeight: '600' },
+  categoryHeaderTitle: { fontSize: 16, fontWeight: '600', fontFamily: 'Poppins-SemiBold' },
   closeBtn: { padding: 6, borderRadius: 8 },
   categoryList: { },
   categoryRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
-  categoryLabel: { fontSize: 15, fontWeight: '500' },
+  categoryLabel: { fontSize: 15, fontWeight: '500', fontFamily: 'Poppins-Medium' },
 });

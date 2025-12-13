@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, Image, Alert, useWindowDimensions, ScrollView } from 'react-native';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -267,7 +268,7 @@ export default function LoginScreen() {
           <ThemedText style={[styles.dividerText, { color: tokens.colors.muted }]}>SAU</ThemedText>
           <View style={[styles.divider, { borderColor: tokens.colors.border }]} />
         </View>
-        <TextInput
+        <ThemedTextInput
           style={[
             styles.input, 
             { 
@@ -286,7 +287,7 @@ export default function LoginScreen() {
           onChangeText={setEmail}
         />
         <View style={styles.passwordWrapper}>
-          <TextInput
+          <ThemedTextInput
             style={[
               styles.input, 
               styles.passwordInput, 
@@ -392,3 +393,4 @@ const styles = StyleSheet.create({
   linksRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
   link: { fontWeight: '500' },
 });
+

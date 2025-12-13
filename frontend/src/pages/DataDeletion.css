@@ -1,0 +1,335 @@
+/* DataDeletion.css - Similar to PrivacyPolicy.css */
+
+.data-deletion {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 2rem 1rem;
+}
+
+.data-deletion__container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-back-btn {
+  color: var(--text-primary) !important;
+}
+
+.mobile-header-title {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.data-deletion__header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #100e9aff 0%, #6366f1 100%);
+  border-radius: 20px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.data-deletion__header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: rgba(252, 194, 46, 0.15);
+  border-radius: 50%;
+}
+
+.data-deletion__icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.data-deletion__header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.data-deletion__date {
+  font-size: 1rem;
+  opacity: 0.95;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.data-deletion__intro {
+  background: linear-gradient(135deg, #fcc22eff 0%, #ffd97d 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 16px rgba(252, 194, 46, 0.15);
+}
+
+.data-deletion__intro-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.data-deletion__intro-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.data-deletion__intro-content strong {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #2c5f7a;
+}
+
+.data-deletion__intro-content p {
+  color: #2c5f7a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.data-deletion__content {
+  margin-bottom: 2.5rem;
+}
+
+.data-deletion__content section {
+  background: var(--surface);
+  padding: 2rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--accent-primary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.data-deletion__content h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: var(--text-primary);
+}
+
+.data-deletion__content h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+  color: var(--text-primary);
+}
+
+.data-deletion__content p {
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.data-deletion__content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.data-deletion__content li {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.data-deletion__content a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.data-deletion__content a:hover {
+  color: var(--accent-secondary);
+  text-decoration: underline;
+}
+
+.note {
+  font-style: italic;
+  background: rgba(100, 116, 139, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem !important;
+}
+
+/* Step cards */
+.step-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.step-header h3 {
+  margin: 0 !important;
+  font-size: 1.1rem;
+  flex: 1;
+}
+
+.step-card ul {
+  margin-left: 2.5rem;
+}
+
+.step-card .note {
+  margin-left: 2.5rem;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin: 1.5rem 0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+  border-left: 3px solid var(--accent-primary);
+  padding-left: 2rem;
+}
+
+.timeline-item:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--bg-primary);
+}
+
+.timeline-content h3 {
+  margin: 0 0 0.5rem 0 !important;
+  font-size: 1.1rem;
+  color: var(--accent-primary);
+}
+
+.timeline-content p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .data-deletion {
+    background: var(--bg-primary);
+  }
+  
+  .data-deletion__intro {
+    background: linear-gradient(135deg, rgba(252, 194, 46, 0.15) 0%, rgba(255, 217, 125, 0.15) 100%);
+  }
+  
+  .data-deletion__intro-content strong,
+  .data-deletion__intro-content p {
+    color: #fcc22eff;
+  }
+  
+  .step-card {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  
+  .note {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .data-deletion {
+    padding: 1rem 0.5rem;
+  }
+  
+  .data-deletion__container {
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .data-deletion__header {
+    padding: 1.5rem;
+  }
+  
+  .data-deletion__header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .data-deletion__intro {
+    padding: 1.5rem;
+  }
+  
+  .data-deletion__intro-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .data-deletion__content section {
+    padding: 1.5rem;
+  }
+  
+  .step-card {
+    padding: 1.25rem;
+  }
+  
+  .step-card ul,
+  .step-card .note {
+    margin-left: 0;
+  }
+  
+  .timeline {
+    padding-left: 1rem;
+  }
+  
+  .timeline-item {
+    padding-left: 1.5rem;
+  }
+}

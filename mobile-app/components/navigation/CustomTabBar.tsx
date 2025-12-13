@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated, Platform, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ThemedText } from '../themed-text';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -143,13 +144,13 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                 {/* Badge pentru mesaje necitite pe tab-ul chat */}
                 {route.name === 'chat' && unreadCount > 0 && (
                   <View style={[styles.badge, { backgroundColor: tokens.colors.primary }, (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : undefined]}>
-                    <Text style={[styles.badgeText, { color: tokens.colors.primaryContrast }]}>
+                    <ThemedText style={[styles.badgeText, { color: tokens.colors.primaryContrast }]}>
                       {unreadCount > 99 ? '99+' : unreadCount}
-                    </Text>
+                    </ThemedText>
                   </View>
                 )}
               </View>
-              <Text
+              <ThemedText
                 style={[
                   styles.label,
                   config.special ? styles.labelSpecial : undefined,
@@ -157,7 +158,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                 ]}
               >
                 {config.label}
-              </Text>
+              </ThemedText>
             </Pressable>
           );
         })}
@@ -190,6 +191,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     letterSpacing: 0.2,
+    fontFamily: 'Poppins-Regular',
   },
   labelSpecial: {
     marginTop: -6,
@@ -234,7 +236,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: -0.2,
+    fontFamily: 'Poppins-Bold',
   },
 });
 
 export default CustomTabBar;
+

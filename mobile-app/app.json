@@ -14,6 +14,9 @@
         "projectId": "0c622d46-639a-4bd4-a4d8-ea36c14062df"
       }
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.verabotoaca.hobbiz"

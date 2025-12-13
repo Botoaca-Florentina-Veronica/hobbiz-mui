@@ -77,7 +77,14 @@ export default function NotificationSettingsScreen() {
   // Initialize settings from user context or fetch if not available
   useEffect(() => {
     if (user?.notificationSettings) {
-      setSettings(user.notificationSettings);
+      setSettings({
+        email: user.notificationSettings.email ?? true,
+        push: user.notificationSettings.push ?? true,
+        messages: user.notificationSettings.messages ?? true,
+        reviews: user.notificationSettings.reviews ?? true,
+        favorites: true,
+        promotions: user.notificationSettings.promotions ?? false
+      });
       setLoading(false);
     } else {
       fetchSettings();

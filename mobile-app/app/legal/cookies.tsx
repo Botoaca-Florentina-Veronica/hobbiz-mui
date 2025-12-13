@@ -71,7 +71,7 @@ const TRANSLATIONS = {
     sec7Title: 'Actualizări ale acestei politici',
     sec7P1: 'Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești această pagină din când în când.',
     sec7Updated: 'Ultima actualizare:',
-    sec7Date: '3 Decembrie 2025',
+    sec7Date: '13 Decembrie 2025',
     sec8Title: 'Contactează-ne',
     sec8P1: 'Dacă ai întrebări despre această politică de cookie-uri sau despre utilizarea datelor pe platforma Hobbiz, te rugăm să ne contactezi:',
     sec8Email: 'Email:',
@@ -141,7 +141,7 @@ const TRANSLATIONS = {
     sec7Title: 'Updates to this policy',
     sec7P1: 'This cookie policy may be updated periodically to reflect changes in our practices or for legal and regulatory reasons. We encourage you to review this page from time to time.',
     sec7Updated: 'Last updated:',
-    sec7Date: 'December 3, 2025',
+    sec7Date: 'December 13, 2025',
     sec8Title: 'Contact us',
     sec8P1: 'If you have questions about this cookie policy or about data usage on the Hobbiz platform, please contact us:',
     sec8Email: 'Email:',
@@ -241,7 +241,7 @@ export default function CookiesScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-  <Animated.ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+  <Animated.ScrollView ref={scrollRef} style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />

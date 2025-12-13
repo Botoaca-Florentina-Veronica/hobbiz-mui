@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedTextInput } from '../../components/themed-text-input';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -518,7 +519,7 @@ export default function SellScreen() {
           <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.describeSection}</ThemedText>
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.titleLabel}</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder={t.titlePlaceholder}
               placeholderTextColor={tokens.colors.muted}
@@ -590,7 +591,7 @@ export default function SellScreen() {
         {/* Section: Descriere mare */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
           <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>{t.descriptionLabel}</ThemedText>
-          <TextInput
+          <ThemedTextInput
             style={[styles.textarea, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
             placeholder={t.descriptionPlaceholder}
             placeholderTextColor={tokens.colors.muted}
@@ -626,7 +627,7 @@ export default function SellScreen() {
           <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.contactSection}</ThemedText>
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.contactNameLabel}</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder={t.contactNamePlaceholder}
               placeholderTextColor={tokens.colors.muted}
@@ -636,7 +637,7 @@ export default function SellScreen() {
           </View>
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.emailLabel}</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder={t.emailPlaceholder}
               placeholderTextColor={tokens.colors.muted}
@@ -648,7 +649,7 @@ export default function SellScreen() {
           </View>
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.phoneLabel}</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder={t.phonePlaceholder}
               placeholderTextColor={tokens.colors.muted}
@@ -904,4 +905,5 @@ const styles = StyleSheet.create({
   errorButton:{ marginTop:4, borderRadius:16, paddingHorizontal:20, paddingVertical:10 },
   errorButtonText:{ fontSize:14, fontWeight:'600' },
 });
+
 

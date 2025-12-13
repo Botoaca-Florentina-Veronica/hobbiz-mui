@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Dimensions,
 } from 'react-native';
+import { ThemedText } from '../../components/themed-text';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTabBar } from '../../src/context/TabBarContext';
@@ -233,8 +234,8 @@ export default function ChatScreen() {
       >
         <View style={styles.listHeaderTopRow}>
           <View>
-            <Text style={styles.listHeaderTitle}>{t.messages} ({totalConversations})</Text>
-            <Text style={styles.listHeaderSubtitle}>{t.continueConversations}</Text>
+            <ThemedText style={styles.listHeaderTitle}>{t.messages} ({totalConversations})</ThemedText>
+            <ThemedText style={styles.listHeaderSubtitle}>{t.continueConversations}</ThemedText>
           </View>
         </View>
 
@@ -257,25 +258,25 @@ export default function ChatScreen() {
                 {hasUnread && conversationFilter !== filterKey && (
                   <View style={styles.filterButtonPulse} />
                 )}
-                <Text
+                <ThemedText
                   style={[
                     styles.filterButtonText,
                     conversationFilter === filterKey && styles.filterButtonTextActive,
                   ]}
                 >
                   {filterKey === 'buying' ? t.buying : t.selling}
-                </Text>
+                </ThemedText>
                 {hasUnread && (
                   <View style={[
                     styles.filterBadge,
                     conversationFilter === filterKey && styles.filterBadgeActive
                   ]}>
-                    <Text style={[
+                    <ThemedText style={[
                       styles.filterBadgeText,
                       conversationFilter === filterKey && styles.filterBadgeTextActive
                     ]}>
                       {unreadCount > 99 ? '99+' : unreadCount}
-                    </Text>
+                    </ThemedText>
                   </View>
                 )}
               </TouchableOpacity>
@@ -294,7 +295,7 @@ export default function ChatScreen() {
           {loading && conversations.length === 0 ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={isDark ? tokens.colors.primary : '#355070'} />
-              <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loadingConversations}</Text>
+              <ThemedText style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loadingConversations}</ThemedText>
             </View>
           ) : filteredConversations.length > 0 ? (
             filteredConversations.map((conv) => (
@@ -346,25 +347,25 @@ export default function ChatScreen() {
                   />
                   {conv.unread && conv.unreadCount && conv.unreadCount > 0 && (
                     <View style={styles.conversationBadge}>
-                      <Text style={styles.conversationBadgeText}>
+                      <ThemedText style={styles.conversationBadgeText}>
                         {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
-                      </Text>
+                      </ThemedText>
                     </View>
                   )}
                 </View>
                 <View style={styles.conversationInfo}>
                   <View style={styles.conversationRowTop}>
-                    <Text style={[styles.conversationName, conv.unread && styles.conversationNameUnread, { color: tokens.colors.text }]} numberOfLines={1}>
+                    <ThemedText style={[styles.conversationName, conv.unread && styles.conversationNameUnread, { color: tokens.colors.text }]} numberOfLines={1}>
                       {conv.participantName}
-                    </Text>
-                    <Text style={[styles.conversationTime, { color: tokens.colors.muted }]}>{conv.time}</Text>
+                    </ThemedText>
+                    <ThemedText style={[styles.conversationTime, { color: tokens.colors.muted }]}>{conv.time}</ThemedText>
                   </View>
-                  <Text style={[styles.conversationSnippet, conv.unread && styles.conversationSnippetUnread, { color: tokens.colors.muted }]} numberOfLines={1}>
+                  <ThemedText style={[styles.conversationSnippet, conv.unread && styles.conversationSnippetUnread, { color: tokens.colors.muted }]} numberOfLines={1}>
                     {conv.lastMessage}
-                  </Text>
-                  <Text style={[styles.conversationTopic, { color: tokens.colors.muted }]} numberOfLines={1}>
+                  </ThemedText>
+                  <ThemedText style={[styles.conversationTopic, { color: tokens.colors.muted }]} numberOfLines={1}>
                     {conv.announcementTitle}
-                  </Text>
+                  </ThemedText>
                 </View>
               </TouchableOpacity>
             ))
@@ -377,8 +378,8 @@ export default function ChatScreen() {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={[styles.chatEmptyText, { color: tokens.colors.text }]}>{t.noConversations} </Text>
-              <Text style={[styles.chatEmptySubtitle, { color: tokens.colors.muted }]}>{t.startWriting}</Text>
+              <ThemedText style={[styles.chatEmptyText, { color: tokens.colors.text }]}>{t.noConversations} </ThemedText>
+              <ThemedText style={[styles.chatEmptySubtitle, { color: tokens.colors.muted }]}>{t.startWriting}</ThemedText>
             </View>
           )}
         </ScrollView>
@@ -642,3 +643,4 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+

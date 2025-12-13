@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ThemedText } from '../themed-text';
 import { useAppTheme } from '../../src/context/ThemeContext';
 
 interface ToastProps {
@@ -152,7 +153,7 @@ export const Toast: React.FC<ToastProps> = ({
           <Ionicons name={getIconName()} size={24} color={getIconColor()} />
         </View>
 
-        <Text
+        <ThemedText
           style={[
             styles.message,
             {
@@ -161,7 +162,7 @@ export const Toast: React.FC<ToastProps> = ({
           ]}
         >
           {message}
-        </Text>
+        </ThemedText>
       </View>
     </Animated.View>
   );
@@ -201,5 +202,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     flexWrap: 'wrap',
     flexShrink: 1,
+    fontFamily: 'Poppins-SemiBold',
   },
 });
+

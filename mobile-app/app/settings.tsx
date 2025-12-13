@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert, Modal, Platform } from 'react-native';
 import { Toast } from '../components/ui/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -374,7 +375,7 @@ export default function SettingsScreen() {
                 <View style={[styles.expandedContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}> 
                   <View style={styles.formGroup}>
                     <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.currentPasswordLabel}</ThemedText>
-                    <TextInput
+                    <ThemedTextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
                       placeholder={t.currentPasswordPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
@@ -385,7 +386,7 @@ export default function SettingsScreen() {
                   </View>
                   <View style={styles.formGroup}>
                     <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.newPasswordLabel}</ThemedText>
-                    <TextInput
+                    <ThemedTextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
                       placeholder={t.newPasswordPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
@@ -410,7 +411,7 @@ export default function SettingsScreen() {
                 <View style={[styles.expandedContent, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}> 
                   <View style={styles.formGroup}>
                     <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.newEmailLabel}</ThemedText>
-                    <TextInput
+                    <ThemedTextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
                       placeholder={t.newEmailPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
@@ -422,7 +423,7 @@ export default function SettingsScreen() {
                   </View>
                   <View style={styles.formGroup}>
                     <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.confirmPasswordLabel}</ThemedText>
-                    <TextInput
+                    <ThemedTextInput
                       style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
                       placeholder={t.confirmPasswordPlaceholder}
                       placeholderTextColor={tokens.colors.muted}
@@ -655,3 +656,4 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 });
+

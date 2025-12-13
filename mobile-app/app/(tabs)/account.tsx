@@ -310,7 +310,7 @@ export default function AccountScreen() {
                   style={[styles.modalBtn, styles.modalBtnCancel]}
                   onPress={() => setConfirmVisible(false)}
                 >
-                  <Text style={{ color: tokens.colors.text }}>{t.cancel}</Text>
+                  <ThemedText style={{ color: tokens.colors.text }}>{t.cancel}</ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modalBtn, styles.modalBtnConfirm, { backgroundColor: palette.emphasisBg }]}
@@ -325,7 +325,7 @@ export default function AccountScreen() {
                     }
                   }}
                 >
-                  <Text style={{ color: '#ffffff' }}>{t.confirmLogout}</Text>
+                  <ThemedText style={{ color: '#ffffff' }}>{t.confirmLogout}</ThemedText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -357,7 +357,7 @@ export default function AccountScreen() {
                       }, 300);
                     }}
                   >
-                    <Text style={{ color: tokens.colors.text, fontSize: 16 }}>Română</Text>
+                    <ThemedText style={{ color: tokens.colors.text, fontSize: 16 }}>Română</ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.modalBtn, { marginBottom: 8 }]}
@@ -371,7 +371,7 @@ export default function AccountScreen() {
                       }, 300);
                     }}
                   >
-                    <Text style={{ color: tokens.colors.text, fontSize: 16 }}>English</Text>
+                    <ThemedText style={{ color: tokens.colors.text, fontSize: 16 }}>English</ThemedText>
                   </TouchableOpacity>
                 </View>
             </View>
@@ -434,7 +434,8 @@ const styles = StyleSheet.create({
   greetingText: 
   {
     fontSize: 40,
-    fontWeight: '800',
+    fontWeight: '900',
+    fontFamily: 'Poppins-Bold',
     lineHeight: 44,
   },
   profileCard: {

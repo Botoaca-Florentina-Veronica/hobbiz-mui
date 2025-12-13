@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,7 +33,7 @@ export default function TermsScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -50,7 +50,7 @@ export default function TermsScreen() {
         <View style={[styles.desktopHeader, { backgroundColor: WEB_PRIMARY }]}>          
           <ThemedText style={styles.headerIcon}>📝</ThemedText>
           <ThemedText style={styles.headerH1}>{locale === 'en' ? 'Terms and Conditions' : 'Termeni și condiții'}</ThemedText>
-          <ThemedText style={styles.headerDate}>{locale === 'en' ? 'Last updated: December 3, 2025' : 'Ultima actualizare: 3 decembrie 2025'}</ThemedText>
+          <ThemedText style={styles.headerDate}>{locale === 'en' ? 'Last updated: December 13, 2025' : 'Ultima actualizare: 13 decembrie 2025'}</ThemedText>
           <View style={styles.radialOverlay} />
         </View>
 
@@ -393,8 +393,8 @@ export default function TermsScreen() {
         <View style={[styles.footerNotice, { backgroundColor: footerBg, borderLeftColor: WEB_PRIMARY }]}>          
           <ThemedText style={[styles.footerParagraph, { color: isDarkMode ? '#888' : '#64748b' }]}>{
             locale === 'en'
-              ? 'This document was updated on December 3, 2025 and is effective immediately for all Hobbiz users. For prior versions of these Terms please contact us at team.hobbiz@gmail.com.'
-              : 'Documentul a fost actualizat la data de 3 decembrie 2025 și intră în vigoare imediat pentru toți utilizatorii platformei Hobbiz. Pentru versiunile anterioare ale acestor termeni, vă rugăm să ne contactați la adresa team.hobbiz@gmail.com.'
+              ? 'This document was updated on December 13, 2025 and is effective immediately for all Hobbiz users. For prior versions of these Terms please contact us at team.hobbiz@gmail.com.'
+              : 'Documentul a fost actualizat la data de 13 decembrie 2025 și intră în vigoare imediat pentru toți utilizatorii platformei Hobbiz. Pentru versiunile anterioare ale acestor termeni, vă rugăm să ne contactați la adresa team.hobbiz@gmail.com.'
           }</ThemedText>
         </View>
 

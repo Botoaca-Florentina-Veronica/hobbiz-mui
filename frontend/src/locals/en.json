@@ -361,7 +361,7 @@
       { "question": "Can I sell both products and services?", "answer": "Absolutely! While Hobbiz is primarily designed for services, you can also sell handmade products, items, vintage goods, vehicles, food and more." },
       { "question": "How does the messaging system work?", "answer": "Our messaging system allows you to communicate directly with other users in real time, negotiate prices and coordinate deliveries securely." }
     ],
-    "lastUpdated": "Last updated: December 3, 2025"
+    "lastUpdated": "Last updated: December 13, 2025"
   },
   "howItWorksPage": {
     "title": "How it works",
@@ -507,7 +507,7 @@
   },
   "terms": {
     "title": "Terms and Conditions",
-    "lastUpdated": "Last updated: December 3, 2025",
+    "lastUpdated": "Last updated: December 13, 2025",
     "intro": {
       "title": "Hobbiz Platform Usage Agreement",
       "text": "By accessing and using the Hobbiz platform, you agree to comply with the terms and conditions presented in this document. Please read these provisions carefully before creating an account or using our services."
@@ -598,11 +598,11 @@
       "p3": "Complaints can be submitted through the integrated platform system, which allows status tracking and automatic notifications. For serious situations, we also accept direct communication via email at the dedicated address team.hobbiz@gmail.com.",
       "p4": "We investigate all complaints in an impartial and transparent manner, respecting the rights of all parties involved. Investigation results are communicated in writing, and for complex cases, we provide detailed explanations of the measures taken."
     },
-    "footer": "This document was last updated on December 3, 2025 and takes effect immediately for all Hobbiz platform users. For previous versions of these terms, please contact us at team.hobbiz@gmail.com."
+    "footer": "This document was last updated on December 13, 2025 and takes effect immediately for all Hobbiz platform users. For previous versions of these terms, please contact us at team.hobbiz@gmail.com."
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: December 3, 2025",
+    "lastUpdated": "Last updated: December 13, 2025",
     "intro": {
       "title": "Transparency and data protection",
       "text": "At Hobbiz, we consider the protection of personal data a fundamental responsibility. This document describes in detail our information management practices, in accordance with the General Data Protection Regulation (GDPR) and applicable Romanian legislation."
@@ -610,7 +610,7 @@
     "s1": {
       "title": "1. Purpose and scope",
       "p1": "This policy applies to all information collected through the Hobbiz platform, including through the website, mobile applications and any other associated interfaces. The document defines the legal and operational framework for the processing of personal data, including the purposes of collection, processing methods, user rights and security measures implemented.",
-      "p2": "The data controller is SC Hobbiz SRL. For any questions regarding the content of this policy, please contact us at: team.hobbiz@gmail.com."
+      "p2": "The platform is operated by an individual based in Romania. For any questions regarding the content of this policy, please contact us at: team.hobbiz@gmail.com."
     },
     "s2": {
       "title": "2. Categories of data processed",
@@ -754,8 +754,8 @@
       "title": "7. Contact and additional information",
       "intro": "If you have any questions or concerns regarding this privacy policy or our data processing practices, please contact us using the following details:",
       "operator": {
-        "title": "Data controller:",
-        "text": "SC Hobbiz SRL. Email: team.hobbiz@gmail.com"
+        "title": "Platform operator:",
+        "text": "Individual (platform administrator). Email: team.hobbiz@gmail.com"
       },
       "dpo": {
         "title": "Data protection officer:",
@@ -870,7 +870,7 @@
       "title": "Updates to this policy",
       "text": "This cookie policy may be updated periodically to reflect changes in our practices or for legal and regulatory reasons. We encourage you to review this page from time to time.",
       "lastUpdatedLabel": "Last updated:",
-      "lastUpdatedDate": "December 3, 2025"
+      "lastUpdatedDate": "December 13, 2025"
     },
     "s8": {
       "title": "Contact us",

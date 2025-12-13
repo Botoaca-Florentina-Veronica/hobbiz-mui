@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Platform, Dimensions } from 'react-native';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -107,6 +107,12 @@ export default function HomeScreen() {
   const [popular, setPopular] = useState<any[]>([]);
   const [popularLoading, setPopularLoading] = useState(false);
   const { locale } = useLocale();
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
@@ -198,17 +204,60 @@ export default function HomeScreen() {
       setPopularLoading(false);
     }
   }, []);
+  
+  // Search effect with debounce
+  useEffect(() => {
+    if (searchTerm.trim().length >= 2) {
+      setIsSearching(true);
+      
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          const res = await api.get(`/api/announcements/search?q=${encodeURIComponent(searchTerm)}`);
+          setSearchResults(Array.isArray(res.data) ? res.data : []);
+          setIsSearching(false);
+        } catch (error) {
+          console.error('Error searching announcements:', error);
+          setSearchResults([]);
+          setIsSearching(false);
+        }
+      }, 300);
+    } else {
+      setSearchResults([]);
+      setIsSearching(false);
+    }
+    
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchTerm]);
 
   return (
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
       <CheckeredBackground />
       <MobileHeader 
         notificationCount={unreadNotificationCount}
-        onSearchFocus={() => {
-          try { router.push('/all-announcements'); } catch (e) { router.push({ pathname: '/all-announcements' }); }
-        }}
+        searchValue={searchTerm}
+        searchSuggestions={searchResults}
+        showSuggestions={searchTerm.trim().length >= 2}
+        isSearching={isSearching}
+        onSearchChange={(text) => setSearchTerm(text)}
         onSearchSubmit={(q) => {
-          try { router.push(q ? `/all-announcements?q=${encodeURIComponent(q)}` : '/all-announcements'); } catch (e) { router.push({ pathname: '/all-announcements', params: q ? { q } : undefined }); }
+          if (q && q.trim()) {
+            router.push(`/all-announcements?q=${encodeURIComponent(q)}`);
+          } else {
+            router.push('/all-announcements');
+          }
+        }}
+        onSuggestionClick={(id) => {
+          setSearchTerm('');
+          setSearchResults([]);
+          router.push(`/announcement-details?id=${id}`);
         }}
         onNotificationClick={() => router.push('/notifications')}
       />
@@ -309,11 +358,11 @@ export default function HomeScreen() {
               accessibilityRole="button"
               activeOpacity={0.8}
             >
-              <Text style={{ color: tokens.colors.primary }}>{t.seeAll}</Text>
+              <ThemedText style={{ color: tokens.colors.primary }}>{t.seeAll}</ThemedText>
             </TouchableOpacity>
           </View>
           {popularLoading ? (
-            <Text style={{ color: tokens.colors.muted }}>{t.loading}</Text>
+            <ThemedText style={{ color: tokens.colors.muted }}>{t.loading}</ThemedText>
           ) : (
             (() => {
               const cols = screenWidth && screenWidth < 360 ? 1 : 2;
@@ -382,7 +431,7 @@ export default function HomeScreen() {
                           }}
                         >
                           <View style={styles.placeholderBox}>
-                            <Text style={[styles.placeholderText, { color: tokens.colors.primary }]}>{t.showAllAnnouncements}</Text>
+                            <ThemedText style={[styles.placeholderText, { color: tokens.colors.primary }]}>{t.showAllAnnouncements}</ThemedText>
                           </View>
                         </TouchableOpacity>
                       );
@@ -398,9 +447,9 @@ export default function HomeScreen() {
                           {/* star button removed per request */}
                         </View>
 
-                        <Text numberOfLines={2} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}> 
+                        <ThemedText numberOfLines={2} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}> 
                           {item.title || item.description || t.announcement}
-                        </Text>
+                        </ThemedText>
 
                         <View style={styles.popularMetaRow}>
                           {item.location ? (
@@ -410,9 +459,9 @@ export default function HomeScreen() {
                                 { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
                               ]}
                             >
-                              <Text numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}> 
+                              <ThemedText numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}> 
                                 {item.location}
-                              </Text>
+                              </ThemedText>
                             </View>
                           ) : null}
                           <View
@@ -421,7 +470,7 @@ export default function HomeScreen() {
                               { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
                             ]}
                           >
-                            <Text numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
+                            <ThemedText numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
                               {item.createdAt
                                 ? new Date(item.createdAt).toLocaleDateString('ro-RO', {
                                     day: '2-digit',
@@ -429,7 +478,7 @@ export default function HomeScreen() {
                                     year: 'numeric',
                                   })
                                 : ''}
-                            </Text>
+                            </ThemedText>
                           </View>
                         </View>
 
@@ -442,7 +491,7 @@ export default function HomeScreen() {
                             { backgroundColor: isDark ? '#f51866' : DESIGN_BLUE },
                           ]}
                         >
-                          <Text style={[styles.detailsButtonText]}>{t.seeDetails}</Text>
+                          <ThemedText style={[styles.detailsButtonText]}>{t.seeDetails}</ThemedText>
                         </TouchableOpacity>
                       </TouchableOpacity>
                     );
@@ -518,7 +567,7 @@ export default function HomeScreen() {
                       ]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
-                      style={[StyleSheet.absoluteFillObject, { borderRadius: 12 }, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
+                      style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
                     />
                     <View style={[styles.imageContainer, { backgroundColor: 'transparent' }]}>
                       <Image 
@@ -604,12 +653,17 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
     minHeight: 100,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   imageContainer: {
     height: 60,
@@ -727,3 +781,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
+

@@ -12,6 +12,8 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import { ThemedText } from '../components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -207,7 +209,7 @@ export default function ArchivedAnnouncementsScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={tokens.colors.primary} />
-        <Text style={styles.loadingText}>Se încarcă anunțurile arhivate...</Text>
+        <ThemedText style={styles.loadingText}>Se încarcă anunțurile arhivate...</ThemedText>
       </View>
     );
   }
@@ -224,7 +226,7 @@ export default function ArchivedAnnouncementsScreen() {
             <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
             </TouchableOpacity>
-            <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Anunțuri arhivate</Text>
+            <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Anunțuri arhivate</ThemedText>
           </View>
         </View>
 
@@ -243,7 +245,7 @@ export default function ArchivedAnnouncementsScreen() {
             {/* Search Bar */}
             <View style={[styles.searchBar, { backgroundColor: isDark ? '#121212' : tokens.colors.bg, borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.colors.borderNeutral : 'transparent' }]}>
               <Ionicons name="search" size={20} color={tokens.colors.muted} style={styles.searchIcon} />
-              <TextInput
+              <ThemedTextInput
                 style={styles.searchInput}
                 placeholder="Caută după titlu, ID sau locație..."
                 placeholderTextColor={tokens.colors.placeholder}
@@ -264,12 +266,12 @@ export default function ArchivedAnnouncementsScreen() {
                 onPress={() => setActivePickerType(activePickerType === 'category' ? null : 'category')}
               >
                 <Ionicons name="apps-outline" size={16} color={activePickerType === 'category' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
-                <Text style={[
+                <ThemedText style={[
                   styles.filterButtonText,
                   activePickerType === 'category' && styles.filterButtonTextActive,
                 ]} numberOfLines={1}>
                   {categoryFilter === 'Toate' ? 'Categorie' : categoryFilter}
-                </Text>
+                </ThemedText>
                 <Ionicons 
                   name={activePickerType === 'category' ? 'chevron-up' : 'chevron-down'} 
                   size={16} 
@@ -287,12 +289,12 @@ export default function ArchivedAnnouncementsScreen() {
                 onPress={() => setActivePickerType(activePickerType === 'sort' ? null : 'sort')}
               >
                 <Ionicons name="swap-vertical" size={16} color={activePickerType === 'sort' ? '#fff' : (isDark ? tokens.colors.primary : '#355070')} />
-                <Text style={[
+                <ThemedText style={[
                   styles.filterButtonText,
                   activePickerType === 'sort' && styles.filterButtonTextActive,
                 ]} numberOfLines={1}>
                   Sortare
-                </Text>
+                </ThemedText>
                 <Ionicons 
                   name={activePickerType === 'sort' ? 'chevron-up' : 'chevron-down'} 
                   size={16} 
@@ -302,7 +304,7 @@ export default function ArchivedAnnouncementsScreen() {
 
               {/* Results Count */}
               <View style={styles.resultsCount}>
-                <Text style={styles.resultsText}>{filteredAndSortedAnnouncements.length} rezultate</Text>
+                <ThemedText style={styles.resultsText}>{filteredAndSortedAnnouncements.length} rezultate</ThemedText>
               </View>
             </View>
 
@@ -313,9 +315,9 @@ export default function ArchivedAnnouncementsScreen() {
               <View style={styles.activeFilters}>
                 {searchTerm && (
                   <View style={styles.chip}>
-                    <Text style={styles.chipText}>
+                    <ThemedText style={styles.chipText}>
                       Căutare: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
-                    </Text>
+                    </ThemedText>
                     <TouchableOpacity onPress={() => setSearchTerm('')}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
                     </TouchableOpacity>
@@ -323,7 +325,7 @@ export default function ArchivedAnnouncementsScreen() {
                 )}
                 {categoryFilter !== 'Toate' && (
                   <View style={styles.chip}>
-                    <Text style={styles.chipText}>Categorie: {categoryFilter}</Text>
+                    <ThemedText style={styles.chipText}>Categorie: {categoryFilter}</ThemedText>
                     <TouchableOpacity onPress={() => setCategoryFilter('Toate')}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />
                     </TouchableOpacity>
@@ -338,11 +340,11 @@ export default function ArchivedAnnouncementsScreen() {
         {filteredAndSortedAnnouncements.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="albums-outline" size={64} color={tokens.colors.placeholder} />
-            <Text style={styles.emptyText}>
+            <ThemedText style={styles.emptyText}>
               {searchTerm || categoryFilter !== 'Toate'
                 ? 'Nu au fost găsite anunțuri cu criteriile selectate'
                 : 'Nu ai încă niciun anunț arhivat'}
-            </Text>
+            </ThemedText>
           </View>
         ) : (
           filteredAndSortedAnnouncements.map((announcement) => {
@@ -411,17 +413,17 @@ export default function ArchivedAnnouncementsScreen() {
                   onPress={() => router.push(`/announcement-details?id=${announcement._id}`)}
                 >
                   <View style={styles.cardTopRow}>
-                    <Text style={styles.cardTitle}>
+                    <ThemedText style={styles.cardTitle}>
                       {announcement.title}
-                    </Text>
+                    </ThemedText>
                     <View style={styles.idBadge}>
-                      <Text style={styles.idText}>ID: {announcement._id?.slice(-8) || ''}</Text>
+                      <ThemedText style={styles.idText}>ID: {announcement._id?.slice(-8) || ''}</ThemedText>
                     </View>
                   </View>
 
                   {/* Category badge */}
                   <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryText}>{announcement.category}</Text>
+                    <ThemedText style={styles.categoryText}>{announcement.category}</ThemedText>
                   </View>
 
                   {/* Location placeholder spacing so buttons stay at bottom */}
@@ -437,7 +439,7 @@ export default function ArchivedAnnouncementsScreen() {
                       handleUnarchive(announcement);
                     }}
                   >
-                    <Text numberOfLines={1} style={styles.primaryButtonText}>Dezarhivează</Text>
+                    <ThemedText numberOfLines={1} style={styles.primaryButtonText}>Dezarhivează</ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.actionButton, styles.fullWidthButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
@@ -446,7 +448,7 @@ export default function ArchivedAnnouncementsScreen() {
                       handleDelete(announcement._id);
                     }}
                   >
-                    <Text numberOfLines={1} style={styles.dangerButtonText}>Șterge</Text>
+                    <ThemedText numberOfLines={1} style={styles.dangerButtonText}>Șterge</ThemedText>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -493,9 +495,9 @@ export default function ArchivedAnnouncementsScreen() {
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <ThemedText style={styles.modalTitle}>
                 {activePickerType === 'category' ? 'Selectează categoria' : 'Sortează după'}
-              </Text>
+              </ThemedText>
               <TouchableOpacity onPress={() => setActivePickerType(null)} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color={tokens.colors.muted} />
               </TouchableOpacity>
@@ -527,14 +529,14 @@ export default function ArchivedAnnouncementsScreen() {
                         ) : (
                           <Ionicons name={(catDef && (catDef.icon as any)) || 'pricetag'} size={20} color={categoryFilter === cat ? tokens.colors.primary : (catDef?.color || tokens.colors.muted)} />
                         )}
-                        <Text
+                        <ThemedText
                           style={[
                             styles.modalOptionText,
                             categoryFilter === cat && styles.modalOptionTextSelected,
                           ]}
                         >
                           {cat}
-                        </Text>
+                        </ThemedText>
                       </View>
                       {categoryFilter === cat && (
                         <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
@@ -567,14 +569,14 @@ export default function ArchivedAnnouncementsScreen() {
                         size={20} 
                         color={sortFilter === option.value ? tokens.colors.primary : tokens.colors.muted} 
                       />
-                      <Text
+                      <ThemedText
                         style={[
                           styles.modalOptionText,
                           sortFilter === option.value && styles.modalOptionTextSelected,
                         ]}
                       >
                         {option.label}
-                      </Text>
+                      </ThemedText>
                     </View>
                     {sortFilter === option.value && (
                       <Ionicons name="checkmark-circle" size={22} color={tokens.colors.primary} />
@@ -1055,3 +1057,4 @@ const createStyles = (tokens: any) => StyleSheet.create({
     includeFontPadding: false,
   },
 });
+

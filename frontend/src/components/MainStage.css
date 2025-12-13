@@ -1,5 +1,5 @@
 /* =============================================================
-   MAINSTAGE STYLES - FINAL (Cu animația de exit restaurată)
+   MAINSTAGE STYLES - FINAL (Cu fix pentru Search in Dark Mode)
    ============================================================= */
 
 /* 1. CONFIGURARE & VARIABILE
@@ -261,6 +261,10 @@ body.dark-mode .main-stage > *,
    ---------------------------------------------------------- */
 .top-bar {
   display: flex; align-items: center; width: 100%; margin-bottom: 24px;
+  /* --- FIX DARK MODE Z-INDEX --- */
+  /* Ridicăm bara de top peste gradientul de fundal (care are z-index: 2) */
+  position: relative;
+  z-index: 20; 
 }
 
 .categories-button {
@@ -498,6 +502,8 @@ body.dark-mode .main-stage > *,
    ---------------------------------------------------------- */
 .search-container {
   display: flex; flex: 1; margin-left: 20px; position: relative;
+  /* --- FIX DARK MODE Z-INDEX --- */
+  z-index: 20;
 }
 
 .search-input {
@@ -553,7 +559,7 @@ body.dark-mode .main-stage > *,
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   max-height: 400px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 1000; /* Asigurat că e mai mare, contextul e controlat de părinte acum */
   border: 1px solid var(--ms-loc-border);
 }
 

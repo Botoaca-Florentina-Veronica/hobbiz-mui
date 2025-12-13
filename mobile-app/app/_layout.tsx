@@ -5,6 +5,13 @@ import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import { TransitionPresets } from '@react-navigation/stack';
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins';
 
 import { JsStack } from '../components/JsStack';
 import { NetworkStatus } from '../components/NetworkStatus';
@@ -22,6 +29,12 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    'Poppins-Regular': Poppins_400Regular,
+    'Poppins-Medium': Poppins_500Medium,
+    'Poppins-SemiBold': Poppins_600SemiBold,
+    'Poppins-Bold': Poppins_700Bold,
+  });
 
   useEffect(() => {
     const cleanup = setupNotificationListeners(
@@ -71,6 +84,10 @@ export default function RootLayout() {
     return cleanup;
   }, []);
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <ThemeProvider>
       <LocaleProvider>
@@ -81,6 +98,7 @@ export default function RootLayout() {
                 <NetworkStatus />
                 <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <JsStack
+                  id="root"
                   screenOptions={{
                     ...TransitionPresets.SlideFromRightIOS,
                     headerShown: false,

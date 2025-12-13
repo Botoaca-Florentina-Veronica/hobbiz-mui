@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -285,7 +286,7 @@ export default function EditAnnouncementScreen() {
           
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Adaugă un titlu clar*</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder="ex: Predau lecții de fizică, online"
               placeholderTextColor={tokens.colors.muted}
@@ -315,7 +316,7 @@ export default function EditAnnouncementScreen() {
 
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Descriere*</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.textarea, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
               placeholderTextColor={tokens.colors.muted}
@@ -406,7 +407,7 @@ export default function EditAnnouncementScreen() {
           
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Persoană de contact*</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder="ex: Ion Popescu"
               placeholderTextColor={tokens.colors.muted}
@@ -417,7 +418,7 @@ export default function EditAnnouncementScreen() {
 
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Email</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder="exemplu@email.com"
               placeholderTextColor={tokens.colors.muted}
@@ -430,7 +431,7 @@ export default function EditAnnouncementScreen() {
 
           <View style={styles.fieldBlock}>
             <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Telefon</ThemedText>
-            <TextInput
+            <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
               placeholder="07xx xxx xxx"
               placeholderTextColor={tokens.colors.muted}
@@ -585,3 +586,4 @@ const styles = StyleSheet.create({
   categoryIconWrap: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   categoryLabel: { fontSize: 15, fontWeight: '500' },
 });
+

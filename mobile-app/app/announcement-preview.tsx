@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, Platform } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, Platform } from 'react-native';import { ThemedText } from '../components/themed-text';import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -41,9 +40,9 @@ export default function AnnouncementPreviewScreen() {
         >
           <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Previzualizare anunț</Text>
+        <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Previzualizare anunț</ThemedText>
         <View style={styles.previewBadge}>
-          <Text style={styles.previewBadgeText}>PREVIEW</Text>
+          <ThemedText style={styles.previewBadgeText}>PREVIEW</ThemedText>
         </View>
       </View>
 
@@ -91,32 +90,32 @@ export default function AnnouncementPreviewScreen() {
         {/* Content */}
         <View style={[styles.contentContainer, { backgroundColor: tokens.colors.bg }]}>
           {/* Title */}
-          <Text style={[styles.title, { color: tokens.colors.text }]}>{title}</Text>
+          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{title}</ThemedText>
 
           {/* Category badge */}
           <View style={[styles.categoryBadge, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.surface }]}>
-            <Text style={[styles.categoryText, { color: tokens.colors.primary }]}>{category}</Text>
+            <ThemedText style={[styles.categoryText, { color: tokens.colors.primary }]}>{category}</ThemedText>
           </View>
 
           {/* Description */}
           <View style={[styles.descriptionCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>Descriere</Text>
-            <Text style={[styles.descriptionText, { color: tokens.colors.text }]}>{description}</Text>
+            <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Descriere</ThemedText>
+            <ThemedText style={[styles.descriptionText, { color: tokens.colors.text }]}>{description}</ThemedText>
           </View>
 
           {/* Seller info */}
           <View style={[styles.sellerCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
             <View style={styles.sellerRow}>
               <View style={[styles.avatarCircle, { backgroundColor: tokens.colors.primary }]}>
-                <Text style={styles.avatarText}>
+                <ThemedText style={styles.avatarText}>
                   {userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
-                </Text>
+                </ThemedText>
               </View>
               <View style={styles.sellerInfo}>
-                <Text style={[styles.sellerName, { color: tokens.colors.text }]}>{userName}</Text>
+                <ThemedText style={[styles.sellerName, { color: tokens.colors.text }]}>{userName}</ThemedText>
                 <View style={styles.ratingRow}>
                   <Ionicons name="star" size={14} color="#FFC107" />
-                  <Text style={[styles.ratingText, { color: tokens.colors.muted }]}>Fără evaluări</Text>
+                  <ThemedText style={[styles.ratingText, { color: tokens.colors.muted }]}>Fără evaluări</ThemedText>
                 </View>
               </View>
             </View>
@@ -124,20 +123,20 @@ export default function AnnouncementPreviewScreen() {
 
           {/* Contact info */}
           <View style={[styles.contactCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            <Text style={[styles.contactLabel, { color: tokens.colors.muted }]}>Persoană de contact:</Text>
-            <Text style={[styles.contactValue, { color: tokens.colors.text }]}>{contactPerson}</Text>
+            <ThemedText style={[styles.contactLabel, { color: tokens.colors.muted }]}>Persoană de contact:</ThemedText>
+            <ThemedText style={[styles.contactValue, { color: tokens.colors.text }]}>{contactPerson}</ThemedText>
 
             {/* Phone */}
             {contactPhone && (
               <View style={[styles.phoneCard, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}>
                 <Ionicons name="call-outline" size={20} color={tokens.colors.primary} style={{ marginRight: 10 }} />
-                <Text style={[styles.phoneValue, { color: tokens.colors.text }]}>
+                <ThemedText style={[styles.phoneValue, { color: tokens.colors.text }]}>
                   {showPhone ? contactPhone : 'xxx xxx xxx'}
-                </Text>
+                </ThemedText>
                 <TouchableOpacity onPress={() => setShowPhone(!showPhone)} activeOpacity={0.8}>
-                  <Text style={[styles.showPhoneLink, { color: tokens.colors.primary }]}>
+                  <ThemedText style={[styles.showPhoneLink, { color: tokens.colors.primary }]}>
                     {showPhone ? 'ASCUNDE' : 'ARATĂ'}
-                  </Text>
+                  </ThemedText>
                 </TouchableOpacity>
               </View>
             )}
@@ -146,26 +145,26 @@ export default function AnnouncementPreviewScreen() {
             {contactEmail && (
               <View style={[styles.emailRow, { borderTopColor: tokens.colors.border }]}>
                 <Ionicons name="mail-outline" size={18} color={tokens.colors.muted} />
-                <Text style={[styles.emailText, { color: tokens.colors.text }]}>{contactEmail}</Text>
+                <ThemedText style={[styles.emailText, { color: tokens.colors.text }]}>{contactEmail}</ThemedText>
               </View>
             )}
           </View>
 
           {/* Location */}
           <View style={[styles.locationCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-            <Text style={[styles.locationHeading, { color: tokens.colors.text }]}>Locație</Text>
+            <ThemedText style={[styles.locationHeading, { color: tokens.colors.text }]}>Locație</ThemedText>
             <View style={styles.locationRow}>
               <Ionicons name="location" size={18} color={tokens.colors.primary} />
-              <Text style={[styles.locationText, { color: tokens.colors.text }]}>{location}</Text>
+              <ThemedText style={[styles.locationText, { color: tokens.colors.text }]}>{location}</ThemedText>
             </View>
           </View>
 
           {/* Preview notice */}
           <View style={[styles.previewNotice, { backgroundColor: isDark ? 'rgba(245, 24, 102, 0.1)' : '#FFF3E0', borderColor: tokens.colors.primary }]}>
             <Ionicons name="information-circle-outline" size={20} color={tokens.colors.primary} style={{ marginRight: 8 }} />
-            <Text style={[styles.previewNoticeText, { color: tokens.colors.text }]}>
+            <ThemedText style={[styles.previewNoticeText, { color: tokens.colors.text }]}>
               Acesta este doar un preview. Anunțul nu a fost încă publicat.
-            </Text>
+            </ThemedText>
           </View>
         </View>
       </ScrollView>
@@ -385,3 +384,4 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
+

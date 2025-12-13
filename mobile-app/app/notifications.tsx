@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image, Platform } from 'react-native';
+import { ThemedText } from '../components/themed-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -168,18 +169,18 @@ export default function NotificationsScreen() {
                 
                 {/* Header: Name & Date */}
                 <View style={styles.headerRow}>
-                    <Text style={[styles.senderName, { color: textColor }]} numberOfLines={1}>
+                    <ThemedText style={[styles.senderName, { color: textColor }]} numberOfLines={1}>
                         {item.senderName || 'Sistem'}
-                    </Text>
-                    <Text style={styles.dateText}>
+                    </ThemedText>
+                    <ThemedText style={styles.dateText}>
                         {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ro-RO', { hour: '2-digit', minute:'2-digit' }) : ''}
-                    </Text>
+                    </ThemedText>
                 </View>
 
                 {/* Message Preview - Immediately underneath */}
-                <Text style={[styles.messageText, { color: subTextColor }]} numberOfLines={3}>
+                <ThemedText style={[styles.messageText, { color: subTextColor }]} numberOfLines={3}>
                     {item.preview || 'Fără conținut.'}
-                </Text>
+                </ThemedText>
 
                 {/* Action Button (Conditional) */}
                 {item.link && (
@@ -188,7 +189,7 @@ export default function NotificationsScreen() {
                         onPress={() => handleReply(item._id)}
                         activeOpacity={0.7}
                     >
-                        <Text style={[styles.miniButtonText, { color: tokens.colors.primary }]}>Răspunde</Text>
+                        <ThemedText style={[styles.miniButtonText, { color: tokens.colors.primary }]}>Răspunde</ThemedText>
                         <Ionicons name="arrow-forward" size={14} color={tokens.colors.primary} />
                     </TouchableOpacity>
                 )}
@@ -220,7 +221,7 @@ export default function NotificationsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: tokens.colors.text }]}>Notificări</Text>
+        <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Notificări</ThemedText>
         <View style={{ width: 24 }} /> 
       </View>
 
@@ -233,7 +234,7 @@ export default function NotificationsScreen() {
         ) : items.length === 0 ? (
           <View style={styles.centerContent}>
              <Ionicons name="notifications-off-outline" size={50} color={tokens.colors.muted} style={{ opacity: 0.4, marginBottom: 12 }} />
-             <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>Nu ai notificări.</Text>
+             <ThemedText style={[styles.emptyText, { color: tokens.colors.muted }]}>Nu ai notificări.</ThemedText>
           </View>
         ) : (
           <FlatList

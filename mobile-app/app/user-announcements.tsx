@@ -109,17 +109,17 @@ export default function UserAnnouncementsScreen() {
 
         <View style={[styles.cardContent, { borderLeftColor: tokens.colors.borderNeutral }]}> 
           <View style={styles.cardHeader}> 
-            <Text numberOfLines={2} style={[styles.cardTitle, { color: tokens.colors.text }]}> 
+            <ThemedText numberOfLines={2} style={[styles.cardTitle, { color: tokens.colors.text }]}> 
               {item.title}
-            </Text>
+            </ThemedText>
           </View>
 
           <View style={styles.cardFooter}> 
             <View style={styles.locationContainer}> 
               <Ionicons name="location-outline" size={14} color={tokens.colors.muted} />
-              <Text numberOfLines={1} style={[styles.cardLocation, { color: tokens.colors.muted, marginLeft: 6 }]}> 
+              <ThemedText numberOfLines={1} style={[styles.cardLocation, { color: tokens.colors.muted, marginLeft: 6 }]}> 
                 {item.location || 'Nedefinit'}
-              </Text>
+              </ThemedText>
             </View>
           </View>
         </View>
@@ -143,9 +143,9 @@ export default function UserAnnouncementsScreen() {
           <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>
             {userId ? `Anunțurile lui ${userName}` : 'Anunțurile Mele'}
           </ThemedText>
-          <Text style={[styles.headerSubtitle, { color: tokens.colors.muted }]}>
+          <ThemedText style={[styles.headerSubtitle, { color: tokens.colors.muted }]}>
             {announcements.length} anunțuri
-          </Text>
+          </ThemedText>
         </View>
       </View>
 
@@ -157,9 +157,9 @@ export default function UserAnnouncementsScreen() {
       ) : announcements.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="albums-outline" size={64} color={tokens.colors.placeholder} />
-          <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>
+          <ThemedText style={[styles.emptyText, { color: tokens.colors.muted }]}>
             Nu există anunțuri postate
-          </Text>
+          </ThemedText>
         </View>
       ) : (
         <FlatList
@@ -289,3 +289,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+

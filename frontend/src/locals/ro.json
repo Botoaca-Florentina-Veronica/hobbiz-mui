@@ -361,7 +361,7 @@
       { "question": "Pot vinde atât produse cât și servicii?", "answer": "Absolut! Chiar dacă Hobbiz este conceput mai mult pentru servicii, poți vinde și produse handmade, obiecte, vechituri, mașini, alimente și multe altele." },
       { "question": "Cum funcționează sistemul de mesagerie?", "answer": "Sistemul nostru de mesagerie îți permite să comunici direct cu alți utilizatori în timp real, să negociezi prețuri și să coordonezi livrări în siguranță." }
     ],
-    "lastUpdated": "Ultima actualizare: 3 decembrie 2025"
+    "lastUpdated": "Ultima actualizare: 13 decembrie 2025"
   },
   "howItWorksPage": {
     "title": "Cum funcționează",
@@ -507,7 +507,7 @@
   },
   "terms": {
     "title": "Termeni și condiții",
-    "lastUpdated": "Ultima actualizare: 3 Decembrie 2025",
+    "lastUpdated": "Ultima actualizare: 13 Decembrie 2025",
     "intro": {
       "title": "Acordul de utilizare a platformei Hobbiz",
       "text": "Prin accesarea și utilizarea platformei Hobbiz, acceptați să respectați termenii și condițiile prezentate în acest document. Vă rugăm să citiți cu atenție aceste prevederi înainte de a crea un cont sau de a utiliza serviciile noastre."
@@ -598,11 +598,11 @@
       "p3": "Reclamațiile se pot depune prin email la team.hobbiz@gmail.com.",
       "p4": "Investigăm toate reclamațiile într-un mod imparțial."
     },
-    "footer": "Documentul a fost actualizat la data de 3 Decembrie 2025 și intră în vigoare imediat. Pentru versiunile anterioare, contactați-ne la team.hobbiz@gmail.com."
+    "footer": "Documentul a fost actualizat la data de 13 Decembrie 2025 și intră în vigoare imediat. Pentru versiunile anterioare, contactați-ne la team.hobbiz@gmail.com."
   },
   "privacy": {
     "title": "Politica de confidențialitate",
-    "lastUpdated": "Ultima actualizare: 3 Decembrie 2025",
+    "lastUpdated": "Ultima actualizare: 13 Decembrie 2025",
     "intro": {
       "title": "Transparență și protecție a datelor",
       "text": "La Hobbiz, considerăm protecția datelor personale o responsabilitate fundamentală. Acest document descrie în detaliu practicile noastre de gestionare a informațiilor, conform Regulamentului General privind Protecția Datelor (GDPR) și legislației românești aplicabile. Ne angajăm să protejăm confidențialitatea utilizatorilor noștri."
@@ -610,7 +610,7 @@
     "s1": {
       "title": "1. Scopul și domeniul de aplicare",
       "p1": "Această politică se aplică tuturor informațiilor colectate prin intermediul platformei Hobbiz, inclusiv prin website, aplicații mobile și orice alte interfețe asociate. Documentul definește cadrul legal și operațional pentru prelucrarea datelor cu caracter personal, inclusiv scopurile de colectare, metodele de procesare, drepturile utilizatorilor și măsurile de securitate implementate.",
-      "p2": "Operatorul de date este SC Hobbiz SRL. Pentru orice nelămuriri referitoare la conținutul acestei politici, vă rugăm să ne contactați la adresa de email: team.hobbiz@gmail.com."
+      "p2": "Operatorul platformei este o persoană fizică din România. Pentru orice nelămuriri referitoare la conținutul acestei politici, vă rugăm să ne contactați la adresa de email: team.hobbiz@gmail.com."
     },
     "s2": {
       "title": "2. Categorii de date prelucrate",
@@ -754,8 +754,8 @@
       "title": "7. Contact și informații suplimentare",
       "intro": "Dacă aveți întrebări sau nelămuriri referitoare la această politică de confidențialitate sau la practicile noastre de prelucrare a datelor, vă rugăm să ne contactați folosind următoarele detalii:",
       "operator": {
-        "title": "Operator de date:",
-        "text": "SC Hobbiz SRL. Email: team.hobbiz@gmail.com"
+        "title": "Operator platformei:",
+        "text": "Persoană fizică (administrator aplicație). Email: team.hobbiz@gmail.com"
       },
       "dpo": {
         "title": "Responsabil cu protecția datelor:",
@@ -870,7 +870,7 @@
       "title": "Actualizări ale acestei politici",
       "text": "Această politică de cookie-uri poate fi actualizată periodic pentru a reflecta modificările în practicile noastre sau din motive legale și de reglementare. Te încurajăm să revizuiești această pagină din când în când.",
       "lastUpdatedLabel": "Ultima actualizare:",
-      "lastUpdatedDate": "3 Decembrie 2025"
+      "lastUpdatedDate": "13 Decembrie 2025"
     },
     "s8": {
       "title": "Contactează-ne",
@@ -994,7 +994,7 @@
     "seeMore": "Vezi mai multe"
   },
   "promoSection": {
-    "title": "Postează oriunde, oricând de pe orice",
+    "title": "Postează oriunde, oricând, de pe orice",
     "subtitle": "Publică rapid și gestionează anunțurile tale de pe orice dispozitiv"
   },
   "notificationSettings": {

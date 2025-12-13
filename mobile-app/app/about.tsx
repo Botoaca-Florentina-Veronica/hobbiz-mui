@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
@@ -64,7 +64,7 @@ const TRANSLATIONS: Record<string, any> = {
       { q: 'Pot vinde atât produse cât și servicii?', a: 'Absolut! Poți promova servicii, produse handmade, obiecte, vechituri, alimente și multe altele.' },
       { q: 'Cum funcționează sistemul de mesagerie?', a: 'Mesageria integrată îți permite discuții directe, negociere și coordonare în siguranță.' },
     ],
-    updateText: 'Ultima actualizare: 3 decembrie 2025',
+    updateText: 'Ultima actualizare: 13 decembrie 2025',
     contactTitle: 'Contactează-ne',
     contactText: 'Pentru întrebări, sugestii sau asistență tehnică (răspunsuri în 2-5 zile):',
     contactEmail: 'Email: team.hobbiz@gmail.com',
@@ -123,7 +123,7 @@ const TRANSLATIONS: Record<string, any> = {
       { q: 'Can I sell both products and services?', a: 'Absolutely! You can promote services, handmade products, items, vintage goods, food and more.' },
       { q: 'How does messaging work?', a: 'Built-in messaging lets you chat directly, negotiate and coordinate safely.' },
     ],
-    updateText: 'Last updated: December 3, 2025',
+    updateText: 'Last updated: December 13, 2025',
     contactTitle: 'Contact Us',
     contactText: 'For questions, suggestions or technical support (replies in 2-5 days):',
     contactEmail: 'Email: team.hobbiz@gmail.com',
@@ -172,7 +172,7 @@ export default function AboutScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
             {/* Header */}
             <View style={styles.headerRow}>
               <TouchableOpacity

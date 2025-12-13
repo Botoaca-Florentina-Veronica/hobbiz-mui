@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, StyleSheet, Animated, Platform } from 'react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
+import { ThemedText } from './themed-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 
@@ -43,9 +44,9 @@ export const NetworkStatus = () => {
         },
       ]}
     >
-      <Text style={[styles.text, { color: '#FFFFFF' }]}>
+      <ThemedText style={[styles.text, { color: '#FFFFFF' }]}>
         Nu există conexiune la internet
-      </Text>
+      </ThemedText>
     </Animated.View>
   );
 };
@@ -66,5 +67,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
+    fontFamily: 'Poppins-SemiBold',
   },
 });
+

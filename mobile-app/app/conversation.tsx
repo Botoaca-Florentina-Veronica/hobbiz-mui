@@ -22,6 +22,8 @@ import {
   ViewStyle,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { ThemedText } from '../components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { Toast } from '../components/ui/Toast';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
@@ -964,7 +966,7 @@ export default function ConversationScreen() {
                   source={{ uri: selectedConversation.participantAvatar || getAvatarFallback(selectedConversation.participantName) }}
                   style={styles.headerAvatarClean}
                 />
-                <Text style={[styles.headerNameClean, isDark ? styles.headerNameCleanDark : undefined]}>{selectedConversation.participantName}</Text>
+                <ThemedText style={[styles.headerNameClean, isDark ? styles.headerNameCleanDark : undefined]}>{selectedConversation.participantName}</ThemedText>
               </TouchableOpacity>
             </View>
 
@@ -984,9 +986,9 @@ export default function ConversationScreen() {
                 style={styles.announcementThumb}
               />
               <View style={styles.announcementInfo}>
-                <Text style={[styles.announcementTitle, isDark ? styles.announcementTitleDark : undefined]} numberOfLines={1}>{selectedConversation.announcementTitle || 'Anunț'}</Text>
+                <ThemedText style={[styles.announcementTitle, isDark ? styles.announcementTitleDark : undefined]} numberOfLines={1}>{selectedConversation.announcementTitle || 'Anunț'}</ThemedText>
                 {selectedConversation.announcementId ? (
-                  <Text style={[styles.announcementId, isDark ? styles.announcementIdDark : undefined]}>ID: {selectedConversation.announcementId}</Text>
+                  <ThemedText style={[styles.announcementId, isDark ? styles.announcementIdDark : undefined]}>ID: {selectedConversation.announcementId}</ThemedText>
                 ) : null}
               </View>
             </TouchableOpacity>
@@ -1006,12 +1008,12 @@ export default function ConversationScreen() {
           {loading && messages.length === 0 ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={tokens.colors.primary} />
-                <Text style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loadingMessages}</Text>
+                <ThemedText style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loadingMessages}</ThemedText>
               </View>
           ) : messages.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Ionicons name="chatbubbles-outline" size={64} color={tokens.colors.border} />
-                <Text style={[styles.emptyText, { color: tokens.colors.muted }]}>{t.noConversation}</Text>
+                <ThemedText style={[styles.emptyText, { color: tokens.colors.muted }]}>{t.noConversation}</ThemedText>
               </View>
           ) : (
             <>
@@ -1035,9 +1037,9 @@ export default function ConversationScreen() {
                     {showDateSeparator && (
                       <View style={styles.dateSeparator}>
                         <View style={styles.dateLine} />
-                        <Text style={styles.dateSeparatorText}>
+                        <ThemedText style={styles.dateSeparatorText}>
                           {new Date(message.createdAt).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }).toUpperCase()}
-                        </Text>
+                        </ThemedText>
                         <View style={styles.dateLine} />
                       </View>
                     )}
@@ -1066,13 +1068,13 @@ export default function ConversationScreen() {
                             >
                               {visible.map((e) => (
                                 <View key={`r-${e.emoji}`} style={styles.reactionBubble}>
-                                  <Text style={styles.reactionEmoji}>{e.emoji}</Text>
-                                  {e.count > 1 && <Text style={styles.reactionCount}>{e.count}</Text>}
+                                  <ThemedText style={styles.reactionEmoji}>{e.emoji}</ThemedText>
+                                  {e.count > 1 && <ThemedText style={styles.reactionCount}>{e.count}</ThemedText>}
                                 </View>
                               ))}
                               {more > 0 && (
                                 <View style={styles.reactionBubble}>
-                                  <Text style={styles.reactionCount}>+{more}</Text>
+                                  <ThemedText style={styles.reactionCount}>+{more}</ThemedText>
                                 </View>
                               )}
                             </View>
@@ -1110,7 +1112,7 @@ export default function ConversationScreen() {
                           ]}
                         >
                           {message.deleted ? (
-                            <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>{t.deletedMessage}</Text>
+                            <ThemedText style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>{t.deletedMessage}</ThemedText>
                           ) : (
                             <>
                               {message.replyTo && message.replyTo.messageId && (
@@ -1120,20 +1122,20 @@ export default function ConversationScreen() {
                                     : 'rgba(0,0,0,0.05)',
                                   borderLeftColor: isDark ? '#000000' : tokens.colors.primary 
                                 }]}> 
-                                  <Text style={[styles.replyInBubbleName, { 
+                                  <ThemedText style={[styles.replyInBubbleName, { 
                                     color: isOwn && isDark ? '#000000' : tokens.colors.primary 
                                   }]}>
                                     {message.replyTo.senderName}
-                                  </Text>
+                                  </ThemedText>
                                   {message.replyTo.text && (
-                                    <Text 
+                                    <ThemedText 
                                       style={[styles.replyInBubbleText, { 
                                         color: isOwn && isDark ? '#000000' : tokens.colors.muted 
                                       }]} 
                                       numberOfLines={1}
                                     >
                                       {message.replyTo.text}
-                                    </Text>
+                                    </ThemedText>
                                   )}
                                   {message.replyTo.image && (
                                     <View style={styles.replyInBubbleImageRow}>
@@ -1142,23 +1144,23 @@ export default function ConversationScreen() {
                                         size={14} 
                                         color={isOwn && isDark ? '#000000' : tokens.colors.muted} 
                                       />
-                                      <Text 
+                                      <ThemedText 
                                         style={[styles.replyInBubbleText, { 
                                           color: isOwn && isDark ? '#000000' : tokens.colors.muted,
                                           marginLeft: 4 
                                         }]}
                                       >
                                         {t.photo}
-                                      </Text>
+                                      </ThemedText>
                                     </View>
                                   )}
                                 </View>
                               )}
                               
                               {message.text && (
-                                <Text style={[styles.messageTextClean, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
+                                <ThemedText style={[styles.messageTextClean, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
                                   {message.text}
-                                </Text>
+                                </ThemedText>
                               )}
                               {message.image && (
                                 <TouchableOpacity
@@ -1186,9 +1188,9 @@ export default function ConversationScreen() {
                               isOwn ? { alignSelf: 'flex-end', marginRight: 12 } : { alignSelf: 'flex-start', marginLeft: 12 }
                             ]}
                           >
-                            <Text style={[styles.messageTimeClean, { color: tokens.colors.muted }] }>
+                            <ThemedText style={[styles.messageTimeClean, { color: tokens.colors.muted }] }>
                               {timeForMessage}
-                            </Text>
+                            </ThemedText>
                           </View>
                         )}
                       </View>
@@ -1204,20 +1206,20 @@ export default function ConversationScreen() {
             <View style={[styles.replyPreviewContainer, { backgroundColor: tokens.colors.elev, borderTopColor: tokens.colors.border }]}> 
               <View style={[styles.replyPreviewBar, { backgroundColor: isDark ? '#000000' : tokens.colors.primary }]} />
               <View style={styles.replyPreviewContent}>
-                <Text style={[styles.replyPreviewName, { color: tokens.colors.primary }]}>
+                <ThemedText style={[styles.replyPreviewName, { color: tokens.colors.primary }]}>
                   {replyTo.senderName}
-                </Text>
+                </ThemedText>
                 {replyTo.text && (
-                  <Text style={[styles.replyPreviewText, { color: tokens.colors.muted }]} numberOfLines={1}>
+                  <ThemedText style={[styles.replyPreviewText, { color: tokens.colors.muted }]} numberOfLines={1}>
                     {replyTo.text}
-                  </Text>
+                  </ThemedText>
                 )}
                 {replyTo.image && (
                   <View style={styles.replyPreviewImageRow}>
                     <Ionicons name="image-outline" size={16} color={tokens.colors.muted} />
-                    <Text style={[styles.replyPreviewText, { color: tokens.colors.muted, marginLeft: 4 }]}>
+                    <ThemedText style={[styles.replyPreviewText, { color: tokens.colors.muted, marginLeft: 4 }]}>
                       {t.photo}
-                    </Text>
+                    </ThemedText>
                   </View>
                 )}
               </View>
@@ -1239,7 +1241,7 @@ export default function ConversationScreen() {
           <TouchableOpacity style={styles.inputIcon} onPress={handlePickFilePress}>
             <Ionicons name="attach-outline" size={26} color={tokens.colors.muted} />
           </TouchableOpacity>
-          <TextInput
+          <ThemedTextInput
             style={[styles.inputClean, isDark ? styles.inputCleanDark : undefined]}
             placeholder={t.writeMessage}
             placeholderTextColor={tokens.colors.placeholder}
@@ -1325,7 +1327,7 @@ export default function ConversationScreen() {
                     {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
                   >
                     {selectedMessage.deleted ? (
-                      <Text style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>{t.deletedMessage}</Text>
+                      <ThemedText style={[styles.messageTextClean, { color: tokens.colors.muted, fontStyle: 'italic' }]}>{t.deletedMessage}</ThemedText>
                     ) : (
                       <>
                         {selectedMessage.replyTo && selectedMessage.replyTo.messageId && (
@@ -1335,20 +1337,20 @@ export default function ConversationScreen() {
                               : 'rgba(0,0,0,0.05)',
                             borderLeftColor: isDark ? '#000000' : tokens.colors.primary 
                           }]}> 
-                            <Text style={[styles.replyInBubbleName, { 
+                            <ThemedText style={[styles.replyInBubbleName, { 
                               color: selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.primary 
                             }]}>
                               {selectedMessage.replyTo.senderName}
-                            </Text>
+                            </ThemedText>
                             {selectedMessage.replyTo.text && (
-                              <Text 
+                              <ThemedText 
                                 style={[styles.replyInBubbleText, { 
                                   color: selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.muted 
                                 }]} 
                                 numberOfLines={1}
                               >
                                 {selectedMessage.replyTo.text}
-                              </Text>
+                              </ThemedText>
                             )}
                             {selectedMessage.replyTo.image && (
                               <View style={styles.replyInBubbleImageRow}>
@@ -1357,23 +1359,23 @@ export default function ConversationScreen() {
                                   size={14} 
                                   color={selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.muted} 
                                 />
-                                <Text 
+                                <ThemedText 
                                   style={[styles.replyInBubbleText, { 
                                     color: selectedMessage.senderId === userId && isDark ? '#000000' : tokens.colors.muted,
                                     marginLeft: 4 
                                   }]}
                                 >
                                   {t.photo}
-                                </Text>
+                                </ThemedText>
                               </View>
                             )}
                           </View>
                         )}
                         
                         {selectedMessage.text && (
-                          <Text style={[styles.messageTextClean, { color: selectedMessage.senderId === userId && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
+                          <ThemedText style={[styles.messageTextClean, { color: selectedMessage.senderId === userId && isDark ? tokens.colors.primaryContrast : tokens.colors.text }] }>
                             {selectedMessage.text}
-                          </Text>
+                          </ThemedText>
                         )}
                         {selectedMessage.image && (
                           <Image source={{ uri: selectedMessage.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
@@ -1426,7 +1428,7 @@ export default function ConversationScreen() {
                 >
                   {['👍', '❤️', '😂', '😮', '😢', '🙏'].map((emoji) => (
                     <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={[styles.quickReactionButton, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }]}>
-                      <Text style={styles.quickReactionEmoji}>{emoji}</Text>
+                      <ThemedText style={styles.quickReactionEmoji}>{emoji}</ThemedText>
                     </TouchableOpacity>
                   ))}
                   <TouchableOpacity onPress={() => setShowReactionPicker((p) => !p)} style={[styles.quickReactionButton, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }]}>
@@ -1436,7 +1438,7 @@ export default function ConversationScreen() {
                     <View style={[styles.reactionPickerDropdown, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }] }>
                       {['🤩','😎','🔥','🎉','😔','🙌','👌','🥳','🤔','🤯'].map((emoji) => (
                           <TouchableOpacity key={emoji} onPress={() => handleReaction(emoji)} style={[styles.reactionPickerButton, { backgroundColor: isDark ? tokens.colors.elev : 'rgba(255,255,255,0.95)' }]}>
-                            <Text style={styles.reactionPickerEmoji}>{emoji}</Text>
+                            <ThemedText style={styles.reactionPickerEmoji}>{emoji}</ThemedText>
                           </TouchableOpacity>
                         ))}
                     </View>
@@ -1480,29 +1482,29 @@ export default function ConversationScreen() {
                       keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                       <View style={[styles.contextMenu, { backgroundColor: isDark ? tokens.colors.surface : '#ffffff' }] }>
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReplyMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.reply}</Text>
+                      <ThemedText style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.reply}</ThemedText>
                       <Ionicons name="arrow-undo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleForwardMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.forward}</Text>
+                      <ThemedText style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.forward}</ThemedText>
                       <Ionicons name="arrow-redo-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleCopyMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.copy}</Text>
+                      <ThemedText style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.copy}</ThemedText>
                       <Ionicons name="copy-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                     <TouchableOpacity style={styles.contextMenuItem} onPress={handleReportMessage}>
-                      <Text style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.report}</Text>
+                      <ThemedText style={[styles.contextMenuText, { color: tokens.colors.text }]}>{t.report}</ThemedText>
                       <Ionicons name="warning-outline" size={20} color={isDark ? tokens.colors.muted : '#333'} />
                     </TouchableOpacity>
                     {String(selectedMessage?.senderId) === String(userId) && !selectedMessage?.deleted ? (
                       <>
                         <View style={[styles.contextMenuDivider, { backgroundColor: tokens.colors.border }]} />
                         <TouchableOpacity style={styles.contextMenuItem} onPress={handleDeleteMessage}>
-                          <Text style={[styles.contextMenuText, { color: '#ff3b30' }]}>{t.deleteBtn}</Text>
+                          <ThemedText style={[styles.contextMenuText, { color: '#ff3b30' }]}>{t.deleteBtn}</ThemedText>
                           <Ionicons name="trash-outline" size={20} color="#ff3b30" />
                         </TouchableOpacity>
                       </>
@@ -1928,3 +1930,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+

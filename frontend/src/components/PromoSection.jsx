@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-// Asigură-te că aceste căi sunt corecte pentru proiectul tău
 import img1 from '../../../device-view_images/1.png';
 import img2 from '../../../device-view_images/2.png';
 import img3 from '../../../device-view_images/3.png';
