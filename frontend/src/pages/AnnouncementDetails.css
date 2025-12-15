@@ -185,6 +185,18 @@ html { scroll-behavior: smooth; }
   box-shadow: var(--ad-card-shadow-hover) !important;
 }
 
+/* Light-mode: ensure detail containers have a thin black outline (match notifications) */
+body:not(.dark-mode) .pf-card,
+body:not(.dark-mode) .seller-card,
+body:not(.dark-mode) .contact-paper,
+body:not(.dark-mode) .announcement-image-container,
+body:not(.dark-mode) .image-carousel-container,
+body:not(.dark-mode) .announcement-hero-overlay,
+body:not(.dark-mode) .announcement-location-map-box,
+body:not(.dark-mode) .MuiCard-root {
+  border-color: #121212 !important;
+}
+
 /* Force inner typography to inherit color (fixes dark mode text) */
 .pf-card .MuiTypography-root,
 .seller-card .MuiTypography-root,

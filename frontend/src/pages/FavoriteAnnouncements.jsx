@@ -66,6 +66,8 @@ export default function FavoriteAnnouncements() {
 
   const [guestAnnouncements, setGuestAnnouncements] = useState([]);
   const [showToast, setShowToast] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   // Listen for favorites updates from other components (same-tab) and refresh guest lists
   useEffect(() => {
@@ -138,6 +140,23 @@ export default function FavoriteAnnouncements() {
     setGuestFavoriteIds(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   };
 
+  // Calculate pagination
+  const favoritesList = isAuthenticated ? fullFavorites : guestAnnouncements;
+  const totalPages = Math.ceil((favoritesList?.length || 0) / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = favoritesList?.slice(startIndex, endIndex) || [];
+
+  // Reset to page 1 when favorites list changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [favoritesList?.length]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <>
       <div className="my-announcements-container">
@@ -167,8 +186,9 @@ export default function FavoriteAnnouncements() {
             <div className="favorites-empty-text">Nu ai anunturi favorite salvate, e timpul să îți adaugi</div>
           </div>
         ) : (
+          <>
           <div className="favorite-announcements-list">
-            {(isAuthenticated ? fullFavorites : guestAnnouncements).map((a) => (
+            {currentItems.map((a) => (
               <div
                 key={a._id}
                 className="favorite-announcement-card"
@@ -213,6 +233,52 @@ export default function FavoriteAnnouncements() {
               </div>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="pagination-container">
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Înapoi
+              </button>
+              <div className="pagination-numbers">
+                {[...Array(totalPages)].map((_, index) => {
+                  const pageNum = index + 1;
+                  // Show first page, last page, current page and adjacent pages
+                  if (
+                    pageNum === 1 ||
+                    pageNum === totalPages ||
+                    (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        key={pageNum}
+                        className={`pagination-number ${currentPage === pageNum ? 'active' : ''}`}
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  } else if (
+                    pageNum === currentPage - 2 ||
+                    pageNum === currentPage + 2
+                  ) {
+                    return <span key={pageNum} className="pagination-dots">...</span>;
+                  }
+                  return null;
+                })}
+              </div>
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Următorul
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
       {/* separatorul este inclus în Footer, nu mai este nevoie aici */}

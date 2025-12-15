@@ -132,7 +132,7 @@
 
 .add-announcement-form > * {
   width: 100%;
-  max-width: 760px;
+  max-width: 100%;
 }
 
 .add-announcement-description-section,

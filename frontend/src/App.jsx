@@ -43,10 +43,34 @@ import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
 import CookieConsent from './components/CookieConsent';
 import ClickSpark from './components/ClickSpark';
 import LoadingOverlay from './components/LoadingOverlay';
+import i18n from './i18n';
 
 function App() {
   // Automatically scroll to top on route changes
   useScrollToTop();
+
+  useEffect(() => {
+    const checkCountry = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        const country = data.country_code;
+        if (country === 'RO') {
+          i18n.changeLanguage('ro');
+        } else {
+          i18n.changeLanguage('en');
+        }
+      } catch (error) {
+        console.error('Error detecting country:', error);
+        // Keep default language
+      }
+    };
+
+    // Only check if no language is stored in localStorage
+    if (!localStorage.getItem('i18nextLng')) {
+      checkCountry();
+    }
+  }, []);
   
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';

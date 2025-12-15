@@ -131,15 +131,25 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
+/* Dark mode: make the notifications page title match accent */
+.dark-mode .notifications-title {
+  color: #f51866;
+}
+
 .notifications-content {
-  background: var(--nt-bg-content);
+  /* Light mode: white surface with subtle dark border to match updated visual language */
+  background: #ffffff;
   border-radius: var(--nt-radius);
   padding: 24px;
   box-shadow: var(--nt-shadow-content);
-  /* Border for dark mode separation */
-  border: 1px solid transparent; 
+  border: 1px solid #121212;
 }
-.dark-mode .notifications-content { border-color: #2a2a2e; }
+
+/* Dark mode: invert to dark surface with white border (preserve previous change) */
+.dark-mode .notifications-content {
+  background: #121212;
+  border-color: #ffffff;
+}
 
 .notifications-list {
   list-style: none;
@@ -148,180 +158,196 @@
 }
 
 
-/* 3. NOTIFICATION ITEMS
+/* 3. NOTIFICATION ITEMS (MOBILE-STYLE LAYOUT)
    ---------------------------------------------------------- */
 .notification-item {
+  /* Light mode default: soft white card with subtle border */
   background: var(--nt-bg-item);
   border: 1px solid var(--nt-border-item);
-  border-radius: var(--nt-radius);
-  padding: 20px 24px;
-  margin-bottom: 16px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .notification-item:last-child { margin-bottom: 0; }
 
-/* Unread State */
+/* Unread State - Border Left */
 .notification-item.unread {
-  background: var(--nt-bg-item-unread);
+  /* highlight unread with accent border */
   border-color: var(--nt-border-unread);
-  box-shadow: var(--nt-shadow-unread);
+}
+
+/* Dark mode card overrides */
+.dark-mode .notification-item {
+  background: #121212;
+  border: 1px solid #ffffff;
 }
 
 /* Read State */
-.notification-item.read { opacity: 0.8; }
+.notification-item.read { opacity: 0.85; }
 
 /* Hover State */
 .notification-item:hover {
-  box-shadow: var(--nt-shadow-hover);
-  border-color: var(--nt-border-hover);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
-/* Accent Bar (Left side) */
-.notification-item::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 4px; height: 100%;
-  background: var(--nt-accent-bar);
-  border-radius: 0 4px 4px 0;
+/* Card Inner - Flex Row Layout */
+.notification-card-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
 }
 
-/* Unread Dot */
-.unread-indicator {
-  position: absolute;
-  top: 12px; left: 12px;
-  width: 8px; height: 8px;
-  background: var(--nt-indicator-color);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-.dark-mode .unread-indicator { box-shadow: 0 0 0 4px rgba(245, 24, 102, 0.18); }
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-
-/* 4. NOTIFICATION CONTENT
-   ---------------------------------------------------------- */
-.notification-content {
-  margin-left: 12px;
-  display: flex; flex-direction: column; flex: 1;
-}
-
-.notification-header {
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
-}
-
-.notification-main-content {
-  flex: 1;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.notification-item.unread .notification-main-content:hover {
-  background: var(--nt-bg-item-hover);
-}
-
-/* Sender & Message */
-.notification-sender {
-  color: var(--nt-text-sender);
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 6px;
-  font-family: 'Poppins', sans-serif !important;
-}
-
-.notification-message-container {
-  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px;
+/* Avatar Container - Left Column */
+.notification-avatar-container {
+  flex-shrink: 0;
+  padding-top: 2px; /* Optical alignment */
 }
 
 .notification-avatar {
-  width: 32px; height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  flex-shrink: 0;
   border: 2px solid var(--nt-avatar-border);
-  box-shadow: 0 2px 8px rgba(53, 80, 112, 0.2);
-  order: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .notification-avatar img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
+/* Content Column - Right */
+.notification-content-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 32px; /* Space for delete button */
+}
+
+/* Header Row: Name & Date */
+.notification-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.notification-sender {
+  color: var(--nt-text-sender);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.3;
+  flex: 1;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.notification-date {
+  font-size: 11px;
+  color: var(--nt-text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.notification-date::before {
+  content: '';
+  display: none; /* Remove clock icon */
+}
+
+/* Message Preview */
 .notification-message {
   color: var(--nt-text-primary);
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 0;
-  font-weight: 500;
-  flex: 1;
-  order: 2;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Date */
-.notification-date {
-  font-size: 0.875rem;
-  color: var(--nt-text-secondary);
-  margin-bottom: 12px;
-  display: flex; align-items: center; gap: 6px;
-  font-family: 'Poppins', sans-serif !important;
-}
-.notification-date::before { content: '🕒'; font-size: 0.75rem; }
-
-/* Action Links */
-.notification-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  color: var(--nt-link-text);
-  text-decoration: none;
-  font-size: 0.9rem; font-weight: 600;
-  padding: 8px 16px;
+/* Action Button - Compact Style */
+.notification-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 6px 10px;
   background: var(--nt-link-bg);
-  border-radius: 20px;
-  transition: all 0.2s ease;
+  color: var(--nt-link-text);
   border: 1px solid var(--nt-link-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
   font-family: 'Poppins', sans-serif !important;
 }
 
-.notification-link:hover {
+.notification-action-btn:hover {
   background: var(--nt-link-hover-bg);
   transform: translateX(2px);
-  text-decoration: none;
-  color: var(--nt-link-text);
 }
-.notification-link::after { content: '→'; transition: transform 0.2s ease; }
-.notification-link:hover::after { transform: translateX(2px); }
 
-/* Delete Button */
+.notification-action-btn .action-arrow {
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.notification-action-btn:hover .action-arrow {
+  transform: translateX(2px);
+}
+
+/* Delete Button - Absolute Top Right */
 .notification-delete-btn {
+  position: absolute;
+  top: -4px;
+  right: -6px;
   background: transparent;
   border: none;
   color: var(--nt-btn-delete-color);
   cursor: pointer;
-  padding: 8px;
+  padding: 6px;
   border-radius: 50%;
   transition: all 0.2s ease;
-  display: flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  opacity: 0.7;
 }
 
-.notification-delete-icon { font-size: 20px; }
+.notification-delete-icon {
+  font-size: 18px !important;
+}
 
 .notification-delete-btn:hover {
   background: var(--nt-btn-delete-hover-bg);
   color: var(--nt-btn-delete-hover-text);
+  opacity: 1;
   transform: scale(1.1);
 }
-.notification-delete-btn:active { transform: scale(0.95); }
+
+.notification-delete-btn:active {
+  transform: scale(0.95);
+}
 
 
 /* 5. UTILITIES (Empty & Loading)

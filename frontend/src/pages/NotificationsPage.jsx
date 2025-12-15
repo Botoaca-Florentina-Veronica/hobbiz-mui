@@ -216,47 +216,57 @@ export default function NotificationsPage() {
               <ul className="notifications-list">
                 {notifications.map(n => (
                   <li key={n._id} className={`notification-item ${!n.read ? 'unread' : 'read'}`}>
-                    <div className="notification-content">
-                      <div className="notification-header">
-                          <div className="notification-main-content" onClick={() => !n.read && deleteNotification(n._id)}>
-                          {!n.read && <div className="unread-indicator"></div>}
+                    <div className="notification-card-inner">
+                      {/* Avatar Column - Left */}
+                      <div className="notification-avatar-container">
+                        <div className="notification-avatar">
+                          <img 
+                            src={n.senderAvatar ? resolveAvatarUrl(n.senderAvatar) : ('https://ui-avatars.com/api/?name=' + encodeURIComponent(n.senderName || 'User') + '&background=355070&color=fff&size=128')}
+                            alt={n.senderName || 'User'} 
+                            onError={(e) => {
+                              console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
+                              const fallbackName = n.senderName || 'User';
+                              e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName) + '&background=355070&color=fff&size=128';
+                            }} 
+                          />
+                        </div>
+                      </div>
+
+                      {/* Content Column - Right */}
+                      <div className="notification-content-column">
+                        {/* Header: Name & Date */}
+                        <div className="notification-header-row">
                           {n.senderName && (
                             <div className="notification-sender">{n.senderName}</div>
                           )}
-                          <div className="notification-message-container">
-                            <div className="notification-avatar">
-                              <img 
-                                src={n.senderAvatar ? resolveAvatarUrl(n.senderAvatar) : ('https://ui-avatars.com/api/?name=' + encodeURIComponent(n.senderName || 'User') + '&background=355070&color=fff&size=128')}
-                                alt={n.senderName || 'User'} 
-                                onError={(e) => {
-                                  console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
-                                  const fallbackName = n.senderName || 'User';
-                                  e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName) + '&background=355070&color=fff&size=128';
-                                }} 
-                              />
-                            </div>
-                            <div className="notification-message">{n.preview}</div>
-                          </div>
                           <div className="notification-date">
-                            {n.createdAt ? new Date(n.createdAt).toLocaleString('ro-RO') : ''}
+                            {n.createdAt ? new Date(n.createdAt).toLocaleDateString('ro-RO', { hour: '2-digit', minute:'2-digit' }) : ''}
                           </div>
-                          {n.link && (
-                            <button 
-                              className="notification-link"
-                              onClick={() => handleChatNavigation(n._id, n.link)}
-                            >
-                              Deschide chat
-                            </button>
-                          )}
                         </div>
-                        <button 
-                          className="notification-delete-btn"
-                          onClick={() => deleteNotification(n._id)}
-                          title="Șterge notificarea"
-                        >
-                          <DeleteIcon className="notification-delete-icon" />
-                        </button>
+
+                        {/* Message Preview */}
+                        <div className="notification-message">{n.preview}</div>
+
+                        {/* Action Button */}
+                        {n.link && (
+                          <button 
+                            className="notification-action-btn"
+                            onClick={() => handleChatNavigation(n._id, n.link)}
+                          >
+                            <span>Răspunde</span>
+                            <span className="action-arrow">→</span>
+                          </button>
+                        )}
                       </div>
+
+                      {/* Delete Button - Absolute Top Right */}
+                      <button 
+                        className="notification-delete-btn"
+                        onClick={() => deleteNotification(n._id)}
+                        title="Șterge notificarea"
+                      >
+                        <DeleteIcon className="notification-delete-icon" />
+                      </button>
                     </div>
                   </li>
                 ))}

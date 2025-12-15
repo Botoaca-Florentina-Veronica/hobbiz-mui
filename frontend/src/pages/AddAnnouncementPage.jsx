@@ -6,10 +6,12 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack } from '@mui/material';
+import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, Card, CardMedia, CardContent, Paper } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
 
@@ -89,6 +91,9 @@ export default function AddAnnouncementPage() {
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("error");
   
+  // State pentru preview modal
+  const [showPreview, setShowPreview] = useState(false);
+  
   const navigate = useNavigate();
   const location = useLocation();
   const [isEdit, setIsEdit] = useState(false);
@@ -99,6 +104,74 @@ export default function AddAnnouncementPage() {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
+  };
+
+  // Funcție comună de validare folosită atât la Publish cât și la Preview
+  const validateForm = () => {
+    let hasErrors = false;
+
+    // Validare titlu
+    if (!title || title.length < 16) {
+      showToast(t('addAnnouncement.errors.titleMin'));
+      hasErrors = true;
+    } else if (title.length > 70) {
+      showToast(t('addAnnouncement.errors.titleMax'));
+      hasErrors = true;
+    }
+
+    // Validare categorie
+    if (!category) {
+      showToast(t('addAnnouncement.errors.categoryRequired'));
+      hasErrors = true;
+    }
+
+    // Validare descriere
+    if (!description || description.length < 40) {
+      showToast(t('addAnnouncement.errors.descriptionMin'));
+      hasErrors = true;
+    } else if (description.length > 9000) {
+      showToast(t('addAnnouncement.errors.descriptionMax'));
+      hasErrors = true;
+    }
+
+    // Validare locație
+    if (!selectedJudet && !selectedLocalitate) {
+      showToast(t('addAnnouncement.errors.locationRequired'));
+      hasErrors = true;
+    }
+
+    // Validare persoană de contact
+    if (!contactPerson || contactPerson.trim().length < 2) {
+      showToast(t('addAnnouncement.errors.contactPersonRequired'));
+      hasErrors = true;
+    }
+
+    // Email: obligatoriu + validare format
+    if (!contactEmail || contactEmail.trim() === '') {
+      showToast(t('addAnnouncement.errors.emailRequired'));
+      hasErrors = true;
+    } else if (!validateEmail(contactEmail)) {
+      showToast(t('addAnnouncement.errors.invalidEmail'));
+      hasErrors = true;
+    }
+
+    // Telefon: obligatoriu + validare format
+    if (!contactPhone || contactPhone.trim() === '') {
+      showToast(t('addAnnouncement.errors.phoneRequired'));
+      hasErrors = true;
+    } else if (!validatePhone(contactPhone)) {
+      showToast(t('addAnnouncement.errors.invalidPhone'));
+      hasErrors = true;
+    }
+
+    return hasErrors;
+  };
+
+  // Handler pentru preview
+  const handlePreview = () => {
+    const hasErrors = validateForm();
+    if (hasErrors) return;
+    setShowPreview(true);
   };
 
   // La inițializare, recuperează datele din localStorage DOAR dacă există și utilizatorul este autentificat
@@ -348,63 +421,8 @@ export default function AddAnnouncementPage() {
       return;
     }
 
-    // Validare completă înainte de submit
-    let hasErrors = false;
-
-    // Validare titlu
-    if (!title || title.length < 16) {
-      showToast(t('addAnnouncement.errors.titleMin'));
-      hasErrors = true;
-    } else if (title.length > 70) {
-      showToast(t('addAnnouncement.errors.titleMax'));
-      hasErrors = true;
-    }
-
-    // Validare categorie
-    if (!category) {
-      showToast(t('addAnnouncement.errors.categoryRequired'));
-      hasErrors = true;
-    }
-
-    // Validare descriere
-    if (!description || description.length < 40) {
-      showToast(t('addAnnouncement.errors.descriptionMin'));
-      hasErrors = true;
-    } else if (description.length > 9000) {
-      showToast(t('addAnnouncement.errors.descriptionMax'));
-      hasErrors = true;
-    }
-
-    // Validare locație
-    if (!selectedJudet && !selectedLocalitate) {
-      showToast(t('addAnnouncement.errors.locationRequired'));
-      hasErrors = true;
-    }
-
-    // Validare persoană de contact
-    if (!contactPerson || contactPerson.trim().length < 2) {
-      showToast(t('addAnnouncement.errors.contactPersonRequired'));
-      hasErrors = true;
-    }
-
-    // Validare email (dacă este completat)
-    if (contactEmail && !validateEmail(contactEmail)) {
-      showToast(t('addAnnouncement.errors.invalidEmail'));
-      hasErrors = true;
-    }
-
-    // Validare telefon (dacă este completat)
-    if (contactPhone && !validatePhone(contactPhone)) {
-      showToast(t('addAnnouncement.errors.invalidPhone'));
-      hasErrors = true;
-    }
-
-    // Dacă nu există nici email nici telefon
-    if (!contactEmail && !contactPhone) {
-      showToast(t('addAnnouncement.errors.emailOrPhoneRequired'));
-      hasErrors = true;
-    }
-
+    // Refolosim validarea comună și afișăm aceleași toast-uri
+    const hasErrors = validateForm();
     if (hasErrors) {
       setError(t('addAnnouncement.errors.fixErrors'));
       return;
@@ -934,7 +952,7 @@ export default function AddAnnouncementPage() {
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
-          <button type="button" className="add-announcement-preview">{t('addAnnouncement.previewButton')}</button>
+          <button type="button" className="add-announcement-preview" onClick={handlePreview}>{t('addAnnouncement.previewButton')}</button>
           <button type="button" className="add-announcement-submit" onClick={handleSubmit}>{isEdit ? t('addAnnouncement.submitButton.update') : t('addAnnouncement.submitButton.create')}</button>
         </div>
       </div>
@@ -945,6 +963,226 @@ export default function AddAnnouncementPage() {
         onClose={() => setToastVisible(false)}
         duration={3000}
       />
+      
+      {/* Preview Modal - Same structure as AnnouncementDetails */}
+      <Dialog
+        open={showPreview}
+        onClose={() => setShowPreview(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#fff',
+            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
+          pb: 2,
+          fontWeight: 600
+        }}>
+          {t('addAnnouncement.previewTitle') || 'Previzualizare Anunț'}
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 2, md: 3 }, overflowY: 'auto' }}>
+          <Grid container spacing={4}>
+            {/* Main Content Column */}
+            <Grid item xs={12} md={8}>
+              {/* Image Card */}
+              {(imagePreviews.length > 0 || mainImagePreview) && (
+                <Card elevation={3} sx={{ mb: 3, overflow: 'hidden', borderRadius: 2 }}>
+                  <Box sx={{ position: 'relative', height: { xs: 300, md: 400 } }}>
+                    <CardMedia
+                      component="img"
+                      image={mainImagePreview || imagePreviews[0]}
+                      alt="Preview"
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
+                      }}
+                    />
+                  </Box>
+                </Card>
+              )}
+
+              {/* Details Card */}
+              <Card elevation={2} sx={{ borderRadius: 2 }}>
+                <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
+                  {/* Header */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h4" component="h1" sx={{ 
+                      color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                      fontWeight: 700,
+                      mb: 2,
+                      fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' },
+                      textAlign: 'center'
+                    }}>
+                      {title}
+                    </Typography>
+                    {category && (
+                      <Chip
+                        label={category}
+                        variant="outlined"
+                        sx={{
+                          borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                          mb: 2
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  <Divider sx={{ mb: 3 }} />
+
+                  {/* Description */}
+                  <Typography variant="h6" sx={{ 
+                    color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                    mb: 2,
+                    fontWeight: 600
+                  }}>
+                    {t('addAnnouncement.preview.description') || t('addAnnouncement.descriptionLabel')}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: (theme) => theme.palette.mode === 'dark' ? '#f5f5f5' : '#2d3748',
+                      lineHeight: 1.7,
+                      whiteSpace: 'pre-line',
+                      fontSize: { xs: '1rem', md: '1.1rem' }
+                    }}
+                  >
+                    {description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Sidebar Column */}
+            <Grid item xs={12} md={4}>
+              {/* Seller Information Card */}
+              <Card elevation={2} sx={{ mb: 3, borderRadius: 2 }}>
+                <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+                  <Typography variant="h6" sx={{ 
+                    color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                    mb: 3,
+                    fontWeight: 600
+                  }}>
+                    {t('addAnnouncement.preview.sellerInfo') || t('addAnnouncement.contactSubtitle')}
+                  </Typography>
+
+                  {/* Contact Person */}
+                  {contactPerson && (
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        {t('addAnnouncement.preview.contactPersonLabel') || (t('addAnnouncement.contactPersonLabel'))}
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {contactPerson}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  <Divider sx={{ mb: 3 }} />
+
+                  {/* Contact Details */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {/* Phone */}
+                    {contactPhone && (
+                      <Paper elevation={1} sx={{ 
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
+                        border: (theme) => theme.palette.mode === 'dark' 
+                          ? '1px solid rgba(255,255,255,0.3)' 
+                          : '1px solid rgba(0,0,0,0.12)'
+                      }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <PhoneIcon sx={{ 
+                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                            fontSize: 20
+                          }} />
+                          <Typography variant="body1">
+                            {contactPhone}
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Email */}
+                    {contactEmail && (
+                      <Paper elevation={1} sx={{ 
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
+                        border: (theme) => theme.palette.mode === 'dark' 
+                          ? '1px solid rgba(255,255,255,0.3)' 
+                          : '1px solid rgba(0,0,0,0.12)'
+                      }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <EmailIcon sx={{ 
+                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                            fontSize: 20
+                          }} />
+                          <Typography variant="body1" sx={{ 
+                            wordBreak: 'break-word',
+                            fontSize: '0.95rem'
+                          }}>
+                            {contactEmail}
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Location Card */}
+              {selectedLocalitate && (
+                <Card elevation={2} sx={{ borderRadius: 2 }}>
+                  <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+                    <Typography variant="h6" sx={{ 
+                      color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                      mb: 2,
+                      fontWeight: 600
+                    }}>
+                      {t('addAnnouncement.preview.location') || t('addAnnouncement.locationLabel')}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <FaMapMarkerAlt style={{ 
+                        color: '#f51866',
+                        fontSize: 20
+                      }} />
+                      <Typography variant="body1">
+                        {selectedLocalitate}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              )}
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ 
+          p: 2,
+          borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`
+        }}>
+          <Button 
+            onClick={() => setShowPreview(false)}
+            sx={{
+              color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#f5f5f5'
+              }
+            }}
+          >
+            {t('common.close') || 'Închide'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

@@ -266,6 +266,8 @@
       "contactPersonRequired": "Contact person's name is required",
       "invalidEmail": "Email address is not valid",
       "invalidPhone": "Phone number must start with 0 and have 10 digits",
+      "emailRequired": "Email address is required",
+      "phoneRequired": "Phone number is required",
       "emailOrPhoneRequired": "You must fill at least email or phone",
       "fixErrors": "Please fix the errors above before publishing",
       "authRequired": "You must be authenticated to publish an announcement",
@@ -274,7 +276,14 @@
     },
     "success": { "updated": "Announcement updated successfully!", "created": "Announcement published successfully!" },
     "labels": { "entireCountry": "Entire country", "mainImage": "Main" },
-    "popover": { "close": "Close", "title": "Choose category", "chooseCountyTitle": "Choose county", "chooseLocalityTitle": "Choose locality", "closeAria": "Close" }
+    "popover": { "close": "Close", "title": "Choose category", "chooseCountyTitle": "Choose county", "chooseLocalityTitle": "Choose locality", "closeAria": "Close" },
+    "previewTitle": "Preview announcement",
+    "preview": {
+      "description": "Description",
+      "sellerInfo": "Seller information",
+      "contactPersonLabel": "Contact person:",
+      "location": "Location"
+    }
   }
   ,
   "legal": {

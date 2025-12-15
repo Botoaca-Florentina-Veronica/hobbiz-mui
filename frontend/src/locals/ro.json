@@ -266,6 +266,8 @@
       "contactPersonRequired": "Numele persoanei de contact este obligatoriu",
       "invalidEmail": "Adresa de email nu este validă",
       "invalidPhone": "Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre",
+      "emailRequired": "Trebuie să completezi adresa de email",
+      "phoneRequired": "Trebuie să completezi numărul de telefon",
       "emailOrPhoneRequired": "Trebuie să completezi cel puțin email-ul sau telefonul",
       "fixErrors": "Te rugăm să corectezi erorile de mai sus înainte de a publica anunțul",
       "authRequired": "Trebuie să fii autentificat pentru a publica un anunț!",
@@ -274,7 +276,14 @@
     },
     "success": { "updated": "Anunț actualizat cu succes!", "created": "Anunțul a fost publicat cu succes!" },
     "labels": { "entireCountry": "Toată țara", "mainImage": "Principală" },
-    "popover": { "close": "Închide", "title": "Alege categoria", "chooseCountyTitle": "Alege județul", "chooseLocalityTitle": "Alege localitatea", "closeAria": "Închide" }
+    "popover": { "close": "Închide", "title": "Alege categoria", "chooseCountyTitle": "Alege județul", "chooseLocalityTitle": "Alege localitatea", "closeAria": "Închide" },
+    "previewTitle": "Previzualizare anunț",
+    "preview": {
+      "description": "Descriere",
+      "sellerInfo": "Informații vânzător",
+      "contactPersonLabel": "Persoană de contact:",
+      "location": "Locație"
+    }
   }
   ,
   "legal": {

@@ -6,7 +6,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, InputAdornment, Divider, Chip } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
@@ -75,6 +75,9 @@ export default function EditAnnouncementPage() {
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("error");
   
+  // State pentru preview modal
+  const [showPreview, setShowPreview] = useState(false);
+  
   const navigate = useNavigate();
   const location = useLocation();
   const [announcementId, setAnnouncementId] = useState(null);
@@ -84,6 +87,23 @@ export default function EditAnnouncementPage() {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
+  };
+  
+  // Handler pentru preview
+  const handlePreview = () => {
+    if (!title.trim()) {
+      showToast('Titlul este obligatoriu');
+      return;
+    }
+    if (!category) {
+      showToast('Categoria este obligatorie');
+      return;
+    }
+    if (!description.trim()) {
+      showToast('Descrierea este obligatorie');
+      return;
+    }
+    setShowPreview(true);
   };
   
   // detectare mobile: folosește același prag ca în pagina de adăugare (sub 500px = mobile)
@@ -753,7 +773,7 @@ export default function EditAnnouncementPage() {
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
-          <button type="button" className="add-announcement-preview">Previzualizați anunțul</button>
+          <button type="button" className="add-announcement-preview" onClick={handlePreview}>Previzualizați anunțul</button>
           <button type="button" className="add-announcement-submit" onClick={handleSubmit}>Actualizează anunțul</button>
         </div>
       </div>
@@ -764,6 +784,123 @@ export default function EditAnnouncementPage() {
         onClose={() => setToastVisible(false)}
         duration={3000}
       />
+      
+      {/* Preview Modal */}
+      <Dialog
+        open={showPreview}
+        onClose={() => setShowPreview(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#fff',
+            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
+          pb: 2
+        }}>
+          Previzualizare Anunț
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          {/* Image preview */}
+          {(imagePreviews.length > 0 || mainImagePreview) && (
+            <Box sx={{ mb: 3, borderRadius: 2, overflow: 'hidden' }}>
+              <img 
+                src={mainImagePreview || imagePreviews[0]} 
+                alt="Preview" 
+                style={{ 
+                  width: '100%', 
+                  maxHeight: '400px', 
+                  objectFit: 'cover',
+                  borderRadius: '8px'
+                }} 
+              />
+            </Box>
+          )}
+          
+          {/* Category chip */}
+          <Chip 
+            label={category} 
+            size="small" 
+            sx={{ 
+              mb: 2,
+              backgroundColor: '#f51866',
+              color: 'white'
+            }} 
+          />
+          
+          {/* Title */}
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+            {title}
+          </Typography>
+          
+          {/* Description */}
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              mb: 3, 
+              whiteSpace: 'pre-wrap',
+              color: (theme) => theme.palette.mode === 'dark' ? '#e0e0e0' : '#575757'
+            }}
+          >
+            {description}
+          </Typography>
+          
+          {/* Location */}
+          {selectedLocalitate && (
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <FaMapMarkerAlt style={{ color: '#f51866' }} />
+              <Typography variant="body2" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#d6d6d6' : '#717171' }}>
+                {selectedLocalitate}
+              </Typography>
+            </Box>
+          )}
+          
+          {/* Contact info */}
+          <Box sx={{ 
+            mt: 3, 
+            p: 2, 
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#f5f5f5',
+            borderRadius: 2
+          }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+              Informații Contact
+            </Typography>
+            {contactPerson && (
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                <strong>Persoana de contact:</strong> {contactPerson}
+              </Typography>
+            )}
+            {contactEmail && (
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                <strong>Email:</strong> {contactEmail}
+              </Typography>
+            )}
+            {contactPhone && (
+              <Typography variant="body2">
+                <strong>Telefon:</strong> {contactPhone}
+              </Typography>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}` }}>
+          <Button 
+            onClick={() => setShowPreview(false)}
+            sx={{
+              color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#f5f5f5'
+              }
+            }}
+          >
+            Închide
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
