@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // Integrare cu AuthContext pentru favorite persistente + fallback guest localStorage
+import { useTranslation } from 'react-i18next';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -27,6 +28,7 @@ function Toast({ message, onClose }) {
 
 export default function FavoriteAnnouncements() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, favorites: authFavoriteIds, fullFavorites, toggleFavorite } = useAuth() || {};
   // Guest localStorage fallback
   const guestUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
@@ -160,7 +162,7 @@ export default function FavoriteAnnouncements() {
   return (
     <>
       <div className="my-announcements-container">
-        {showToast && <Toast message="Șters din favorite" onClose={() => setShowToast(false)} />}
+        {showToast && <Toast message={t('favorites.removed')} onClose={() => setShowToast(false)} />}
         {/* Mobile header: back + title */}
         <div className="mobile-header">
           <IconButton
@@ -168,22 +170,22 @@ export default function FavoriteAnnouncements() {
             className="mobile-back-btn"
             disableRipple
             disableFocusRipple
-            aria-label="Înapoi"
+            aria-label={t('common.back')}
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h5" className="mobile-header-title">Favorite</Typography>
+          <Typography variant="h5" className="mobile-header-title">{t('favorites.title')}</Typography>
         </div>
-        <h1 className="my-announcements-title">Anunturile tale favorite</h1>
+        <h1 className="my-announcements-title">{t('favorites.myFavorites')}</h1>
         <div className="favorite-count">
-          Anunțuri favorite ({(isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length)}/150)
+          {t('favorites.count')} ({(isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length)}/150)
         </div>
         {(isAuthenticated ? (fullFavorites?.length === 0) : (guestAnnouncements.length === 0)) ? (
           <div className="favorites-empty">
             <div className="favorites-empty-icon">
               <img src={gumballSiDarwin} alt="Favorite goale" />
             </div>
-            <div className="favorites-empty-text">Nu ai anunturi favorite salvate, e timpul să îți adaugi</div>
+            <div className="favorites-empty-text">{t('favorites.empty')}</div>
           </div>
         ) : (
           <>
@@ -213,7 +215,7 @@ export default function FavoriteAnnouncements() {
               <div className="favorite-announcement-info">
                 <div className="favorite-info-top">
                   <span className="favorite-date">
-                    {a.createdAt ? `Postat ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}` : ''}
+                    {a.createdAt ? `${t('favorites.posted')} ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}` : ''}
                   </span>
                   <div className={`favorite-heart ${(isAuthenticated ? authFavoriteIds : guestFavoriteIds).includes(a._id) ? 'filled' : ''}`}
                     onClick={ev => { ev.stopPropagation(); handleToggleFavorite(a._id); }}
@@ -240,7 +242,7 @@ export default function FavoriteAnnouncements() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                Înapoi
+                {t('favorites.back')}
               </button>
               <div className="pagination-numbers">
                 {[...Array(totalPages)].map((_, index) => {
@@ -274,7 +276,7 @@ export default function FavoriteAnnouncements() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Următorul
+                {t('favorites.next')}
               </button>
             </div>
           )}

@@ -532,6 +532,244 @@ export default function ProfilePage() {
     </div>
   );
 
+  const renderMobileProfileHeader = () => (
+    <div className="mobile-profile-header-card">
+      <div className="mobile-avatar-container">
+        {profile?.avatar ? (
+          <img src={profile.avatar} alt="Avatar" className="mobile-avatar-image" />
+        ) : (
+          <div className="mobile-avatar-placeholder">
+            <PersonIcon className="mobile-avatar-icon" />
+          </div>
+        )}
+        <button
+          className="mobile-camera-button"
+          onClick={handleAvatarClick}
+          disabled={avatarUploading}
+        >
+          {avatarUploading ? (
+            <CircularProgress size={16} style={{ color: 'white' }} />
+          ) : (
+            <PhotoCameraIcon className="mobile-camera-icon" />
+          )}
+        </button>
+      </div>
+      <div className="mobile-profile-info">
+        <div className="mobile-rating-badge">
+          <span className="mobile-rating-star">★</span>
+          <span className="mobile-rating-text">—</span>
+        </div>
+        <h1 className="mobile-user-name">
+          {(profile?.firstName || '') + (profile?.lastName ? ' ' + profile.lastName : '') || t('profile.mobileTitle')}
+        </h1>
+        <p className="mobile-register-date">
+          {t('profile.memberSince')} {profile?.createdAt
+            ? new Date(profile.createdAt).toLocaleDateString(i18n?.language === 'en' ? 'en-US' : 'ro-RO', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })
+            : ''}
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderMobileLocationSection = () => (
+    <div className="mobile-location-section">
+      <div className="mobile-location-header">
+        <h2 className="mobile-section-title">{t('profile.myLocation')}</h2>
+        <button className="mobile-change-location-btn" onClick={handleLocationEdit}>
+          {t('profile.changeLocation')}
+        </button>
+      </div>
+      <div className="mobile-map-container">
+        {profile?.localitate ? (
+          <iframe
+            title="Locație"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(profile.localitate)}&z=15&output=embed`}
+            className="mobile-map-iframe"
+            loading="lazy"
+          />
+        ) : (
+          <div className="mobile-map-placeholder">
+            <LocationOnIcon style={{ fontSize: 48, color: '#999' }} />
+            <p className="mobile-map-text">{t('profile.unspecified')}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderMobileContactCard = () => (
+    <div className="mobile-contact-card">
+      <div className="mobile-card-header">
+        <h2 className="mobile-card-title">{t('profile.contactInfoTitle')}</h2>
+        {!editMode && (
+          <button className="mobile-edit-button" onClick={handleEdit}>
+            {t('profile.actions.edit')}
+          </button>
+        )}
+      </div>
+      <div className="mobile-contact-grid">
+        {editMode ? (
+          <>
+            <div className="mobile-contact-item">
+              <PersonIcon className="mobile-contact-icon" />
+              <div className="mobile-contact-content">
+                <label className="mobile-contact-label">{t('profile.lastName')}</label>
+                <input
+                  className="mobile-contact-input"
+                  name="lastName"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  placeholder={t('profile.placeholders.lastName')}
+                />
+              </div>
+            </div>
+            <div className="mobile-contact-item">
+              <PersonIcon className="mobile-contact-icon" />
+              <div className="mobile-contact-content">
+                <label className="mobile-contact-label">{t('profile.firstName')}</label>
+                <input
+                  className="mobile-contact-input"
+                  name="firstName"
+                  value={form.firstName}
+                  onChange={handleChange}
+                  placeholder={t('profile.placeholders.firstName')}
+                />
+              </div>
+            </div>
+            <div className="mobile-contact-item">
+              <PhoneIcon className="mobile-contact-icon" />
+              <div className="mobile-contact-content">
+                <label className="mobile-contact-label">{t('profile.phone')}</label>
+                <input
+                  className="mobile-contact-input"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder={t('profile.placeholders.phone')}
+                />
+              </div>
+            </div>
+            <div className="mobile-contact-item">
+              <EmailIcon className="mobile-contact-icon" />
+              <div className="mobile-contact-content">
+                <label className="mobile-contact-label">{t('profile.email')}</label>
+                <div className="mobile-contact-value">{profile?.email || 'N/A'}</div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {renderContactField(<PersonIcon />, t('profile.lastName'), profile?.lastName)}
+            {renderContactField(<PersonIcon />, t('profile.firstName'), profile?.firstName)}
+            {renderContactField(<PhoneIcon />, t('profile.phone'), profile?.phone)}
+            {renderContactField(<EmailIcon />, t('profile.email'), profile?.email)}
+          </>
+        )}
+      </div>
+      {editMode && (
+        <div className="mobile-edit-actions">
+          <button className="mobile-action-button mobile-cancel-button" onClick={handleCancel} disabled={saving}>
+            <CancelIcon className="profile-icon" />
+            {t('profile.actions.cancel')}
+          </button>
+          <button className="mobile-action-button mobile-save-button" onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <CircularProgress size={16} style={{ color: 'white' }} />
+                <span>{t('profile.actions.saving')}</span>
+              </>
+            ) : (
+              <>
+                <SaveIcon className="profile-icon" />
+                {t('profile.actions.save')}
+              </>
+            )}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderAnnouncementCard = (announcement) => (
+    <div
+      key={announcement._id}
+      onClick={() => handleAnnouncementClick(announcement._id)}
+      className="announcement-card-vertical"
+    >
+      {announcement.images && announcement.images.length > 0 ? (
+        <img
+          src={announcement.images[0]}
+          alt={announcement.title}
+          className="announcement-image"
+        />
+      ) : (
+        <div className="announcement-image-placeholder">{t('profile.noImage')}</div>
+      )}
+
+      <div className="announcement-card-body">
+        <h4 className="announcement-title">{announcement.title}</h4>
+
+        {announcement.price && (
+          <p className="announcement-price">{announcement.price} lei</p>
+        )}
+
+        <p className="announcement-location">{announcement.localitate}</p>
+      </div>
+    </div>
+  );
+
+  const renderMobileAnnouncementsCard = () => (
+    <div className="mobile-announcements-card">
+      <div className="mobile-card-header">
+        <h2 className="mobile-card-title">
+          {t('header.myAnnouncements') || 'Anunțurile mele'}
+        </h2>
+        <button
+          className="mobile-view-all-icon"
+          onClick={() => navigate('/my-announcements')}
+          aria-label="Vezi toate"
+        >
+          →
+        </button>
+      </div>
+      <div className="mobile-announcement-stats">
+        <div className="mobile-stat-item">
+          <div className="mobile-stat-value">{userAnnouncements.length}</div>
+          <div className="mobile-stat-label">Active</div>
+        </div>
+        <div className="mobile-stat-divider" />
+        <div className="mobile-stat-item">
+          <div className="mobile-stat-value">{userAnnouncements.length}</div>
+          <div className="mobile-stat-label">Total</div>
+        </div>
+        <div className="mobile-stat-divider" />
+        <div className="mobile-stat-item">
+          <div className="mobile-stat-value">
+            {userAnnouncements.reduce((sum, a) => sum + (a.views || 0), 0)}
+          </div>
+          <div className="mobile-stat-label">Views</div>
+        </div>
+      </div>
+      {announcementsLoading ? (
+        <Box className="mobile-announcements-loading">
+          <CircularProgress size={20} />
+        </Box>
+      ) : userAnnouncements.length === 0 ? (
+        <Box className="mobile-empty-announcements">
+          <p>{t('profile.emptyAnnouncements')}</p>
+        </Box>
+      ) : (
+        <div className="mobile-announcements-horizontal">
+          {userAnnouncements.slice(0, 5).map(renderAnnouncementCard)}
+        </div>
+      )}
+    </div>
+  );
+
   const renderInputField = (name, label, icon, placeholder) => (
     <div className="profile-field-container">
       <div className="profile-field-label">
@@ -639,34 +877,6 @@ export default function ProfilePage() {
     </div>
   );
 
-  const renderAnnouncementCard = (announcement) => (
-    <div
-      key={announcement._id}
-      onClick={() => handleAnnouncementClick(announcement._id)}
-      className="announcement-card-vertical"
-    >
-      {announcement.images && announcement.images.length > 0 ? (
-        <img
-          src={announcement.images[0]}
-          alt={announcement.title}
-          className="announcement-image"
-        />
-      ) : (
-        <div className="announcement-image-placeholder">{t('profile.noImage')}</div>
-      )}
-
-      <div className="announcement-card-body">
-        <h4 className="announcement-title">{announcement.title}</h4>
-
-        {announcement.price && (
-          <p className="announcement-price">{announcement.price} lei</p>
-        )}
-
-        <p className="announcement-location">{announcement.localitate}</p>
-      </div>
-    </div>
-  );
-
   const renderAnnouncementsSidebar = () => (
     <div className="profile-right-column">
       <div className="profile-announcements-sidebar">
@@ -703,16 +913,27 @@ export default function ProfilePage() {
       {renderMobileHeader()}
       {renderAlerts()}
 
-      <div className="profile-two-column-layout">
-        {/* Left column - Main content */}
-        <div className="profile-left-column">
-          {renderProfileHeader()}
-          {renderLocationCard()}
-          {renderContactInfoCard()}
-        </div>
+      {/* Desktop Layout */}
+      <div className="profile-desktop-layout">
+        <div className="profile-two-column-layout">
+          {/* Left column - Main content */}
+          <div className="profile-left-column">
+            {renderProfileHeader()}
+            {renderLocationCard()}
+            {renderContactInfoCard()}
+          </div>
 
-        {/* Right column - Announcements */}
-        {renderAnnouncementsSidebar()}
+          {/* Right column - Announcements */}
+          {renderAnnouncementsSidebar()}
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="profile-mobile-layout">
+        {renderMobileProfileHeader()}
+        {renderMobileLocationSection()}
+        {renderMobileContactCard()}
+        {renderMobileAnnouncementsCard()}
       </div>
 
       {/* Image Crop Modal */}

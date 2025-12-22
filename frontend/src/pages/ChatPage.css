@@ -550,10 +550,20 @@ html, body {
   .chat-sidebar { width: 100%; border: none; }
   
   .chat-main-header { padding-top: calc(env(safe-area-inset-top) + 12px); }
-  .chat-messages-container { padding: 12px; padding-bottom: 80px; }
+  .chat-messages-container { padding: 12px; padding-bottom: 120px; }
   .chat-message { max-width: 85%; }
   
-  .chat-input-container { padding: 10px; padding-bottom: max(env(safe-area-inset-bottom), 10px); }
+  .chat-input-container { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    padding: 10px; 
+    padding-bottom: max(env(safe-area-inset-bottom), 10px); 
+    background: var(--c-input-container-bg);
+    border-top: 1px solid var(--c-sidebar-border);
+    z-index: 10;
+  }
   
   .chat-message-image img { max-width: 220px; max-height: 220px; }
 }

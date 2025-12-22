@@ -70,6 +70,9 @@ export default function EditAnnouncementPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   
+  // State for image validation errors
+  const [imageError, setImageError] = useState("");
+  
   // State-uri pentru toast
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");

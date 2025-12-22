@@ -416,7 +416,11 @@
 
   .mobile-header .MuiSvgIcon-root {
     font-size: 24px !important;
-    color: inherit !important;
+    color: #333333 !important;
+  }
+
+  .dark-mode .mobile-header .MuiSvgIcon-root {
+    color: #ffffff !important;
   }
 
   .mobile-header-title {

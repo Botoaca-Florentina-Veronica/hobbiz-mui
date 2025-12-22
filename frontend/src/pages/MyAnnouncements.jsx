@@ -3,29 +3,26 @@
 // =============================================================================
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
-import ConfirmDialog from './ConfirmDialog';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { 
-  TextField, 
-  InputAdornment, 
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-  Typography,
-  Paper,
-  Chip,
-  Stack,
   CircularProgress,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
 } from '@mui/material';
-import { 
+import {
+  ArrowBack as ArrowBackIcon,
   Search as SearchIcon,
-  Category as CategoryIcon,
-  Schedule as ScheduleIcon,
-  ArrowBack as ArrowBackIcon
+  Apps as AppsIcon,
+  SwapVert as SwapVertIcon,
+  Close as CloseIcon,
+  Image as ImageIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import './MyAnnouncements.css';
 
@@ -33,448 +30,460 @@ import './MyAnnouncements.css';
 // MY ANNOUNCEMENTS COMPONENT
 // =============================================================================
 export default function MyAnnouncements() {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const currentLocale = i18n.language || 'ro';
+  
   // ---------------------------------------------------------------------------
   // 1. STATE MANAGEMENT
   // ---------------------------------------------------------------------------
   
-  // === Announcements Data ===
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // === Delete Confirmation ===
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
-  
-  // === Image Navigation ===
-  const [imageIndexes, setImageIndexes] = useState({});
-  
-  // === Search & Filter State ===
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('Orice categorie');
-  const [dateFilter, setDateFilter] = useState('cea mai recenta');
+  const [categoryFilter, setCategoryFilter] = useState(currentLocale === 'en' ? 'All' : 'Toate');
+  const [sortFilter, setSortFilter] = useState(currentLocale === 'en' ? 'mostRecent' : 'cea mai recenta');
+  const [activePickerType, setActivePickerType] = useState(null); // 'category' | 'sort' | null
   
-  const navigate = useNavigate();
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [announcementToDelete, setAnnouncementToDelete] = useState(null);
+  
+  const [archiveDialogVisible, setArchiveDialogVisible] = useState(false);
+  const [announcementToArchive, setAnnouncementToArchive] = useState(null);
 
   // ---------------------------------------------------------------------------
   // 2. COMPUTED VALUES (useMemo)
   // ---------------------------------------------------------------------------
   
-  // Get unique categories from announcements
   const uniqueCategories = useMemo(() => {
     const categories = announcements.map(a => a.category).filter(Boolean);
-    return [...new Set(categories)];
-  }, [announcements]);
+    const allLabel = currentLocale === 'en' ? 'All' : 'Toate';
+    return [allLabel, ...Array.from(new Set(categories))];
+  }, [announcements, currentLocale]);
 
-  // Filter and sort announcements based on search and filter criteria
   const filteredAndSortedAnnouncements = useMemo(() => {
+    const allLabel = currentLocale === 'en' ? 'All' : 'Toate';
+    
     let filtered = announcements.filter(a => {
-      // Search filter (title, ID, or location)
-      const searchWords = searchTerm.toLowerCase().trim().split(/\s+/).filter(word => word.length > 0);
+      const searchWords = searchTerm.toLowerCase().trim().split(/\s+/).filter(w => w.length > 0);
       let matchesSearch = true;
-      
+
       if (searchWords.length > 0) {
         const titleWords = a.title.toLowerCase();
         const idText = a._id?.toLowerCase() || '';
         const locationText = a.location?.toLowerCase() || '';
-        
-        matchesSearch = searchWords.every(searchWord => 
-          titleWords.includes(searchWord) || 
-          idText.includes(searchWord) || 
-          locationText.includes(searchWord)
+
+        matchesSearch = searchWords.every(sw =>
+          titleWords.includes(sw) || idText.includes(sw) || locationText.includes(sw)
         );
       }
 
-      // Category filter
-      const matchesCategory = categoryFilter === 'Orice categorie' || a.category === categoryFilter;
-      
+      const matchesCategory = categoryFilter === allLabel || a.category === categoryFilter;
       return matchesSearch && matchesCategory;
     });
 
-    // Sort by selected criteria
     filtered.sort((a, b) => {
-      switch (dateFilter) {
+      switch (sortFilter) {
+        case 'oldest':
         case 'cea mai veche':
           return new Date(a.createdAt) - new Date(b.createdAt);
+        case 'mostRecent':
         case 'cea mai recenta':
           return new Date(b.createdAt) - new Date(a.createdAt);
+        case 'titleAZ':
         case 'titlu_a_z':
-          return a.title.localeCompare(b.title, 'ro');
+          return a.title.localeCompare(b.title, currentLocale === 'en' ? 'en' : 'ro');
+        case 'titleZA':
         case 'titlu_z_a':
-          return b.title.localeCompare(a.title, 'ro');
+          return b.title.localeCompare(a.title, currentLocale === 'en' ? 'en' : 'ro');
         default:
           return new Date(b.createdAt) - new Date(a.createdAt);
       }
     });
 
     return filtered;
-  }, [announcements, searchTerm, categoryFilter, dateFilter]);
+  }, [announcements, searchTerm, categoryFilter, sortFilter, currentLocale]);
 
   // ---------------------------------------------------------------------------
   // 3. EFFECTS
   // ---------------------------------------------------------------------------
   
-  // Fetch user's announcements on mount
   useEffect(() => {
-    async function fetchAnnouncements() {
-      try {
-        const res = await apiClient.get('/api/users/my-announcements');
-        setAnnouncements(res.data);
-      } catch (e) {
-        setAnnouncements([]);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchAnnouncements();
   }, []);
+
+  const fetchAnnouncements = async () => {
+    try {
+      setLoading(true);
+      const res = await apiClient.get('/api/users/my-announcements');
+      setAnnouncements(res.data || []);
+    } catch (e) {
+      console.error('Error fetching announcements:', e);
+      setAnnouncements([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // 4. EVENT HANDLERS
   // ---------------------------------------------------------------------------
   
-  /**
-   * Navigate to edit page with announcement data
-   */
   const handleEdit = (announcement) => {
-    localStorage.setItem('editAnnouncement', JSON.stringify(announcement));
-    navigate('/edit-announcement', { state: { announcement } });
+    navigate(`/edit-announcement`, { state: { announcement } });
   };
 
-  /**
-   * Open delete confirmation dialog
-   */
-  const handleDelete = async (id) => {
-    setDeleteId(id);
-    setConfirmOpen(true);
+  const handleDelete = (id) => {
+    setAnnouncementToDelete(id);
+    setDeleteDialogVisible(true);
   };
 
-  /**
-   * Confirm and execute announcement deletion
-   */
-  const handleConfirmDelete = async () => {
+  const confirmDelete = async () => {
+    if (!announcementToDelete) return;
+
     try {
-      await apiClient.delete(`/api/users/my-announcements/${deleteId}`);
-      setAnnouncements(announcements.filter(a => a._id !== deleteId));
+      await apiClient.delete(`/api/users/my-announcements/${announcementToDelete}`);
+      setAnnouncements(announcements.filter(a => a._id !== announcementToDelete));
+      setDeleteDialogVisible(false);
+      setAnnouncementToDelete(null);
+      window.showToast?.(t('myAnnouncements.deleteSuccess'), 'success');
     } catch (e) {
-      alert('Eroare la ștergerea anunțului!');
-    } finally {
-      setConfirmOpen(false);
-      setDeleteId(null);
+      console.error('Delete error:', e);
+      setDeleteDialogVisible(false);
+      setAnnouncementToDelete(null);
+      window.showToast?.(t('myAnnouncements.deleteError'), 'error');
     }
   };
 
-  /**
-   * Navigate to previous image in carousel
-   */
-  const handlePrevImage = (id, imagesLength) => {
-    setImageIndexes(prev => ({
-      ...prev,
-      [id]: prev[id] > 0 ? prev[id] - 1 : imagesLength - 1
-    }));
+  const handleArchive = (announcement) => {
+    setAnnouncementToArchive(announcement._id);
+    setArchiveDialogVisible(true);
   };
 
-  /**
-   * Navigate to next image in carousel
-   */
-  const handleNextImage = (id, imagesLength) => {
-    setImageIndexes(prev => ({
-      ...prev,
-      [id]: prev[id] < imagesLength - 1 ? prev[id] + 1 : 0
-    }));
+  const confirmArchive = async () => {
+    if (!announcementToArchive) return;
+
+    try {
+      await apiClient.put(`/api/users/my-announcements/${announcementToArchive}/archive`);
+      setAnnouncements(announcements.filter(a => a._id !== announcementToArchive));
+      setArchiveDialogVisible(false);
+      setAnnouncementToArchive(null);
+      window.showToast?.(t('myAnnouncements.archiveSuccess'), 'success');
+    } catch (e) {
+      console.error('Archive error:', e);
+      setArchiveDialogVisible(false);
+      setAnnouncementToArchive(null);
+      window.showToast?.(t('myAnnouncements.archiveError'), 'error');
+    }
   };
 
-  /**
-   * Navigate to announcement details page
-   */
-  const handleCardClick = (e, announcementId) => {
-    if (e.target.closest('.my-announcement-btn')) return;
-    window.location.href = `/announcement/${announcementId}`;
+  const handleRefresh = (announcement) => {
+    window.showToast?.(t('myAnnouncements.refreshInfo'), 'info');
+  };
+
+  const getImageSrc = (img) => {
+    if (!img) return null;
+    if (img.startsWith('http')) return img;
+    if (img.startsWith('/uploads')) return img;
+    if (img.startsWith('uploads/')) return `/${img}`;
+    return `/uploads/${img.replace(/^.*[\\/]/, '')}`;
   };
 
   // ---------------------------------------------------------------------------
   // 5. RENDER HELPERS
   // ---------------------------------------------------------------------------
   
-  /**
-   * Render loading state
-   */
-  const renderLoadingState = () => (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column',
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        gap: 2
-      }}
-    >
-      <CircularProgress size={48} sx={{ color: '#355070' }} />
-      <Typography variant="body1" sx={{ color: '#666' }}>
-        Se încarcă anunțurile...
-      </Typography>
-    </Box>
-  );
-
-  /**
-   * Render mobile header with back button
-   */
-  const renderMobileHeader = () => (
-    <div className="mobile-header">
-      <IconButton
-        onClick={() => { 
-          if (window.history.length > 1) { 
-            navigate(-1); 
-          } else { 
-            navigate('/'); 
-          } 
-        }}
-        className="mobile-back-btn"
-        disableRipple
-        disableFocusRipple
-        aria-label="Înapoi"
-      >
-        <ArrowBackIcon />
-      </IconButton>
-      <Typography variant="h5" className="mobile-header-title">
-        Anunțurile mele
-      </Typography>
-    </div>
-  );
-
-  /**
-   * Render search and filter header
-   */
-  const renderSearchHeader = () => (
-    <Paper elevation={1} className="my-announcements-search-header" sx={{ p: 2, mb: 3 }}>
-      <Stack spacing={2}>
-        {/* Search Bar */}
-        <TextField
-          fullWidth
-          placeholder="Caută după titlu, ID sau locație..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          variant="outlined"
-          size="medium"
-        />
-        
-        {/* Filter and View Controls */}
-        <Box className="search-filters-wrap" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-          <Box className="search-filters-left" sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            {/* Category Filter */}
-            <FormControl size="small" sx={{ minWidth: 160 }}>
-              <InputLabel>Categorie</InputLabel>
-              <Select
-                value={categoryFilter}
-                label="Categorie"
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              >
-                <MenuItem value="Orice categorie">
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CategoryIcon sx={{ fontSize: 16 }} />
-                    Toate
-                  </Box>
-                </MenuItem>
-                {uniqueCategories.map(category => (
-                  <MenuItem key={category} value={category}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <CategoryIcon sx={{ fontSize: 16 }} />
-                      {category.length > 20 ? `${category.substring(0, 20)}...` : category}
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            {/* Sort Filter */}
-            <FormControl size="small" sx={{ minWidth: 180 }}>
-              <InputLabel>Sortare</InputLabel>
-              <Select
-                value={dateFilter}
-                label="Sortare"
-                onChange={(e) => setDateFilter(e.target.value)}
-              >
-                <MenuItem value="cea mai recenta">
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ScheduleIcon sx={{ fontSize: 16 }} />
-                    Cele mai recente
-                  </Box>
-                </MenuItem>
-                <MenuItem value="cea mai veche">
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ScheduleIcon sx={{ fontSize: 16 }} />
-                    Cele mai vechi
-                  </Box>
-                </MenuItem>
-                <MenuItem value="titlu_a_z">
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CategoryIcon sx={{ fontSize: 16 }} />
-                    Titlu A-Z
-                  </Box>
-                </MenuItem>
-                <MenuItem value="titlu_z_a">
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CategoryIcon sx={{ fontSize: 16 }} />
-                    Titlu Z-A
-                  </Box>
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          
-          <Box className="search-results-count" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              {filteredAndSortedAnnouncements.length} rezultate
-            </Typography>
-          </Box>
-        </Box>
-        
-        {/* Active Filters */}
-        {(searchTerm || categoryFilter !== 'Orice categorie') && (
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {searchTerm && (
-              <Chip
-                label={`Căutare: "${searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"`}
-                onDelete={() => setSearchTerm('')}
-                size="small"
-              />
-            )}
-            {categoryFilter !== 'Orice categorie' && (
-              <Chip
-                label={`Categorie: ${categoryFilter.length > 15 ? categoryFilter.substring(0, 15) + '...' : categoryFilter}`}
-                onDelete={() => setCategoryFilter('Orice categorie')}
-                size="small"
-              />
-            )}
-          </Box>
-        )}
-      </Stack>
-    </Paper>
-  );
-
-  /**
-   * Get image source URL (handle different formats)
-   */
-  const getImageSrc = (img) => 
-    img.startsWith('http') || img.startsWith('/uploads')
-      ? img
-      : `/uploads/${img.replace(/^.*[\\/]/, '')}`;
-
-  /**
-   * Render single announcement card
-   */
-  const renderAnnouncementCard = (announcement) => {
-    const images = Array.isArray(announcement.images) ? announcement.images : [];
-    
+  if (loading) {
     return (
-      <div 
-        key={announcement._id} 
-        className="my-announcement-card" 
-        style={{ cursor: 'pointer' }}
-        onClick={(e) => handleCardClick(e, announcement._id)}
-      >
-        {/* Card Image */}
-        <div className="my-announcement-image">
-          {images.length > 0 ? (
-            <img
-              src={getImageSrc(images[0])}
-              alt="imagine principala"
-              className="my-announcement-img"
-            />
-          ) : (
-            <div className="my-announcement-img" style={{background: '#eee'}} />
-          )}
-        </div>
-        
-        {/* Card Info */}
-        <div className="my-announcement-info">
-          <div className="my-announcement-header">
-            <div>
-              <h2 className="my-announcement-title">{announcement.title}</h2>
-              <div className="my-announcement-category">{announcement.category}</div>
-              <div className="my-announcement-location">
-                <LocationOnIcon sx={{ fontSize: 26, marginRight: 1 }} />
-                {announcement.location}
-              </div>
-            </div>
-            <div className="my-announcement-id">
-              ID: {announcement._id?.slice(-9) || ''}
-            </div>
-          </div>
-          
-          {/* Card Actions */}
-          <div className="my-announcement-actions">
-            <button className="my-announcement-btn primary" onClick={() => handleEdit(announcement)}>
-              Editează
-            </button>
-            <button className="my-announcement-btn secondary">
-              Reactualizează
-            </button>
-            <button className="my-announcement-btn danger" onClick={() => handleDelete(announcement._id)}>
-              Șterge
-            </button>
-            <button className="my-announcement-btn secondary">
-              Dezactivează
-            </button>
-          </div>
-        </div>
+      <div className="ma-loading-container">
+        <CircularProgress size={48} sx={{ color: 'var(--ma-btn-p-color)' }} />
+        <div className="ma-loading-text">{t('myAnnouncements.loading')}</div>
       </div>
     );
-  };
-
-  /**
-   * Render empty state (no announcements found)
-   */
-  const renderEmptyState = () => (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
-      <Typography variant="h6" color="text.secondary">
-        {searchTerm || categoryFilter !== 'Orice categorie' 
-          ? 'Nu au fost găsite anunțuri cu criteriile selectate'
-          : 'Nu ai încă niciun anunț publicat'}
-      </Typography>
-    </div>
-  );
-
-  // ---------------------------------------------------------------------------
-  // 6. MAIN RENDER
-  // ---------------------------------------------------------------------------
-  
-  if (loading) {
-    return renderLoadingState();
   }
 
-  return (
-    <>
-      <div className="my-announcements-container">
-        {renderMobileHeader()}
-        
-        <h1 className="my-announcements-title">Anunțurile mele</h1>
-        
-        {announcements.length > 0 && renderSearchHeader()}
+  const allLabel = currentLocale === 'en' ? 'All' : 'Toate';
+  
+  const sortOptions = [
+    { value: currentLocale === 'en' ? 'mostRecent' : 'cea mai recenta', label: t('myAnnouncements.sortNewest'), icon: 'arrow-down' },
+    { value: currentLocale === 'en' ? 'oldest' : 'cea mai veche', label: t('myAnnouncements.sortOldest'), icon: 'arrow-up' },
+    { value: currentLocale === 'en' ? 'titleAZ' : 'titlu_a_z', label: t('myAnnouncements.sortTitleAz'), icon: 'text' },
+    { value: currentLocale === 'en' ? 'titleZA' : 'titlu_z_a', label: t('myAnnouncements.sortTitleZa'), icon: 'text' },
+  ];
 
-        {filteredAndSortedAnnouncements.length === 0 ? (
-          renderEmptyState()
-        ) : (
-          <div className="my-announcements-list">
-            {filteredAndSortedAnnouncements.map(renderAnnouncementCard)}
+  return (
+    <div className="ma-container">
+      <div className="ma-scroll-view">
+        {/* Header */}
+        <div className="ma-header">
+          <div className="ma-header-content">
+            <IconButton
+              onClick={() => navigate(-1)}
+              className="ma-back-button"
+              disableRipple
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <div className="ma-header-title">{t('myAnnouncements.title')}</div>
+          </div>
+        </div>
+
+        {/* Search and Filter Section */}
+        {announcements.length > 0 && (
+          <div className="ma-search-section">
+            {/* Search Bar */}
+            <div className="ma-search-bar">
+              <SearchIcon className="ma-search-icon" />
+              <input
+                className="ma-search-input"
+                placeholder={t('myAnnouncements.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Filter Row */}
+            <div className="ma-filter-row">
+              {/* Category Filter */}
+              <button
+                className={`ma-filter-button ${activePickerType === 'category' ? 'active' : ''}`}
+                onClick={() => setActivePickerType(activePickerType === 'category' ? null : 'category')}
+              >
+                <AppsIcon className="ma-filter-icon" />
+                <span className="ma-filter-text">
+                  {categoryFilter === allLabel ? t('myAnnouncements.categoryLabel') : categoryFilter}
+                </span>
+                <svg className="ma-filter-chevron" viewBox="0 0 24 24" fill="currentColor">
+                  <path d={activePickerType === 'category' ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z'} />
+                </svg>
+              </button>
+
+              {/* Sort Filter */}
+              <button
+                className={`ma-filter-button ${activePickerType === 'sort' ? 'active' : ''}`}
+                onClick={() => setActivePickerType(activePickerType === 'sort' ? null : 'sort')}
+              >
+                <SwapVertIcon className="ma-filter-icon" />
+                <span className="ma-filter-text">{t('myAnnouncements.sortLabel')}</span>
+                <svg className="ma-filter-chevron" viewBox="0 0 24 24" fill="currentColor">
+                  <path d={activePickerType === 'sort' ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z'} />
+                </svg>
+              </button>
+
+              {/* Results Count */}
+              <div className="ma-results-count">
+                <span className="ma-results-text">
+                  {filteredAndSortedAnnouncements.length} {t('myAnnouncements.results')}
+                </span>
+              </div>
+            </div>
+
+            {/* Active Filters */}
+            {(searchTerm || categoryFilter !== allLabel) && (
+              <div className="ma-active-filters">
+                {searchTerm && (
+                  <div className="ma-chip">
+                    <span className="ma-chip-text">
+                      {t('myAnnouncements.searchChip')}: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
+                    </span>
+                    <CloseIcon className="ma-chip-close" onClick={() => setSearchTerm('')} />
+                  </div>
+                )}
+                {categoryFilter !== allLabel && (
+                  <div className="ma-chip">
+                    <span className="ma-chip-text">{t('myAnnouncements.categoryChip')}: {categoryFilter}</span>
+                    <CloseIcon className="ma-chip-close" onClick={() => setCategoryFilter(allLabel)} />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
+
+        {/* Announcements List */}
+        {filteredAndSortedAnnouncements.length === 0 ? (
+          <div className="ma-empty-state">
+            <ImageIcon className="ma-empty-icon" />
+            <div className="ma-empty-text">
+              {searchTerm || categoryFilter !== allLabel
+                ? t('myAnnouncements.noResultsFiltered')
+                : t('myAnnouncements.noAnnouncements')}
+            </div>
+          </div>
+        ) : (
+          filteredAndSortedAnnouncements.map((announcement) => {
+            const imageUri = announcement.images?.[0] ? getImageSrc(announcement.images[0]) : null;
+
+            return (
+              <div key={announcement._id} className="ma-card">
+                {/* Image - Left side */}
+                <div
+                  className="ma-card-image"
+                  onClick={() => navigate(`/announcement/${announcement._id}`)}
+                >
+                  {imageUri ? (
+                    <img src={imageUri} alt={announcement.title} className="ma-image" />
+                  ) : (
+                    <div className="ma-image ma-placeholder-image">
+                      <ImageIcon className="ma-placeholder-icon" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Content - Right side */}
+                <div className="ma-card-content">
+                  {/* Top section: Title + ID */}
+                  <div onClick={() => navigate(`/announcement/${announcement._id}`)}>
+                    <div className="ma-card-top-row">
+                      <div className="ma-card-title">{announcement.title}</div>
+                      <div className="ma-id-badge">
+                        <span className="ma-id-text">ID: {announcement._id?.slice(-8) || ''}</span>
+                      </div>
+                    </div>
+
+                    {/* Category badge */}
+                    <div className="ma-category-badge">
+                      <span className="ma-category-text">{announcement.category}</span>
+                    </div>
+
+                    {/* Placeholder spacing */}
+                    <div className="ma-location-placeholder" />
+                  </div>
+
+                  {/* Action buttons - 2x2 grid */}
+                  <div className="ma-actions-grid">
+                    <div className="ma-actions-row">
+                      <button
+                        className="ma-action-button ma-primary-button"
+                        onClick={() => handleEdit(announcement)}
+                      >
+                        {t('myAnnouncements.edit')}
+                      </button>
+                      <button
+                        className="ma-action-button ma-secondary-button"
+                        onClick={() => handleArchive(announcement)}
+                      >
+                        {t('myAnnouncements.archive')}
+                      </button>
+                    </div>
+                    <div className="ma-actions-row">
+                      <button
+                        className="ma-action-button ma-danger-button"
+                        onClick={() => handleDelete(announcement._id)}
+                      >
+                        {t('myAnnouncements.delete')}
+                      </button>
+                      <button
+                        className="ma-action-button ma-secondary-button ma-refresh-button"
+                        onClick={() => handleRefresh(announcement)}
+                      >
+                        {t('myAnnouncements.refresh')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
-      
-      <ConfirmDialog
-        open={confirmOpen}
-        onClose={() => { setConfirmOpen(false); setDeleteId(null); }}
-        onConfirm={handleConfirmDelete}
-        title="Sigur vrei să ștergi acest anunț?"
-        description="Această acțiune nu poate fi anulată."
-      />
-    </>
+
+      {/* Picker Modal Overlay */}
+      {activePickerType && (
+        <div className="ma-modal-overlay" onClick={() => setActivePickerType(null)}>
+          <div className="ma-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="ma-modal-header">
+              <div className="ma-modal-title">
+                {activePickerType === 'category' ? t('myAnnouncements.selectCategory') : t('myAnnouncements.sortBy')}
+              </div>
+              <IconButton onClick={() => setActivePickerType(null)} className="ma-modal-close-button">
+                <CloseIcon />
+              </IconButton>
+            </div>
+
+            <div className="ma-modal-scroll">
+              {activePickerType === 'category' ? (
+                // Category options
+                uniqueCategories.map((cat) => (
+                  <div
+                    key={cat}
+                    className={`ma-modal-option ${categoryFilter === cat ? 'selected' : ''}`}
+                    onClick={() => {
+                      setCategoryFilter(cat);
+                      setActivePickerType(null);
+                    }}
+                  >
+                    <div className="ma-modal-option-left">
+                      <AppsIcon className="ma-modal-option-icon" />
+                      <span className="ma-modal-option-text">{cat}</span>
+                    </div>
+                    {categoryFilter === cat && (
+                      <CheckCircleIcon className="ma-modal-option-check" />
+                    )}
+                  </div>
+                ))
+              ) : (
+                // Sort options
+                sortOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`ma-modal-option ${sortFilter === option.value ? 'selected' : ''}`}
+                    onClick={() => {
+                      setSortFilter(option.value);
+                      setActivePickerType(null);
+                    }}
+                  >
+                    <div className="ma-modal-option-left">
+                      <SwapVertIcon className="ma-modal-option-icon" />
+                      <span className="ma-modal-option-text">{option.label}</span>
+                    </div>
+                    {sortFilter === option.value && (
+                      <CheckCircleIcon className="ma-modal-option-check" />
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogVisible}
+        onClose={() => setDeleteDialogVisible(false)}
+        aria-labelledby="delete-dialog-title"
+      >
+        <DialogTitle id="delete-dialog-title">{t('myAnnouncements.deleteTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('myAnnouncements.deleteMessage')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogVisible(false)}>{t('myAnnouncements.cancel')}</Button>
+          <Button onClick={confirmDelete} color="error" autoFocus>
+            {t('myAnnouncements.deleteBtn')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Archive Confirmation Dialog */}
+      <Dialog
+        open={archiveDialogVisible}
+        onClose={() => setArchiveDialogVisible(false)}
+        aria-labelledby="archive-dialog-title"
+      >
+        <DialogTitle id="archive-dialog-title">{t('myAnnouncements.archiveTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('myAnnouncements.archiveMessage')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setArchiveDialogVisible(false)}>{t('myAnnouncements.no')}</Button>
+          <Button onClick={confirmArchive} color="primary" autoFocus>
+            {t('myAnnouncements.yes')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 }

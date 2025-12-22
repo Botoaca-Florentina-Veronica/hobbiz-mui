@@ -1,0 +1,500 @@
+/* ============================================
+   1. CSS Variables - Customizable theme colors & spacing
+   ============================================ */
+:root {
+  /* Spacing values - adjust for compact/spacious layout */
+  --aa-spacing-xs: 8px;
+  --aa-spacing-sm: 12px;
+  --aa-spacing-md: 16px;
+  --aa-spacing-lg: 20px;
+  --aa-spacing-xl: 24px;
+  --aa-spacing-2xl: 32px;
+
+  /* Border radius - used for cards, buttons, inputs */
+  --aa-border-radius: 8px;
+
+  /* Z-index layering */
+  --aa-z-header: 100;
+
+  /* Transitions - smooth animations for interactions */
+  --aa-transition: all 0.3s ease;
+  --aa-transition-fast: 0.2s ease;
+
+  /* Dark Mode Colors */
+  --aa-dark-bg: #121212;
+  --aa-dark-border: #3f3f3f;
+  --aa-dark-border-hover: rgba(255, 255, 255, 0.4);
+  --aa-dark-accent: #f51866;
+  --aa-dark-accent-hover: #d01456;
+
+  /* Light Mode Colors */
+  --aa-light-bg: #ffffff;
+  --aa-light-border: #121212;
+  --aa-light-border-hover: rgba(53, 80, 112, 0.3);
+  --aa-light-accent: #355070;
+  --aa-light-accent-hover: #2a4058;
+}
+
+/* ============================================
+   2. Page Container - Main wrapper & responsive layout
+   ============================================ */
+.my-announcements-page {
+  min-height: 100vh;
+  background-color: var(--ma-bg-page);
+  padding: 0 0 120px 0;
+}
+
+.all-announcements-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--aa-spacing-md);
+}
+
+@media (min-width: 960px) {
+  .my-announcements-page {
+    padding-top: var(--aa-spacing-2xl);
+  }
+
+  .all-announcements-wrapper {
+    padding: 0 var(--aa-spacing-lg);
+  }
+}
+
+/* ============================================
+   3. Mobile Header - Back button & title (mobile only)
+   ============================================ */
+.mobile-header {
+  display: flex;
+  align-items: center;
+  gap: var(--aa-spacing-md);
+  padding: var(--aa-spacing-xs) var(--aa-spacing-md);
+  position: sticky;
+  top: 0;
+  z-index: var(--aa-z-header);
+}
+
+.mobile-header .MuiIconButton-root {
+  color: var(--ma-text-title);
+}
+
+.dark-mode .mobile-header .MuiIconButton-root {
+  color: #ffffff;
+}
+
+:not(.dark-mode) .mobile-header .MuiIconButton-root {
+  color: #333333;
+}
+
+.mobile-header .MuiTypography-root {
+  font-weight: 600;
+  color: var(--ma-text-title);
+  flex: 1;
+}
+
+.dark-mode .mobile-header {
+  background-color: var(--aa-dark-bg);
+  border-bottom-color: var(--aa-dark-border);
+}
+
+:not(.dark-mode) .mobile-header {
+  background-color: var(--aa-light-bg);
+  border-bottom-color: #e0e0e0;
+}
+
+/* Hide mobile header on desktop */
+@media (min-width: 960px) {
+  .mobile-header {
+    display: none;
+  }
+}
+
+/* ============================================
+   4. Desktop Header - Page title & subtitle (desktop only)
+   ============================================ */
+.page-header {
+  display: none;
+  margin-bottom: var(--aa-spacing-2xl);
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.page-header .MuiTypography-h3 {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: var(--ma-text-title);
+  margin-bottom: var(--aa-spacing-xs);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif;
+}
+
+.dark-mode .page-header .MuiTypography-h3 {
+  color: #f51866;
+}
+
+.page-header .MuiTypography-body1 {
+  color: var(--ma-text-secondary);
+}
+
+/* Show desktop header only on desktop */
+@media (min-width: 960px) {
+  .page-header {
+    display: block;
+  }
+}
+
+/* ============================================
+   5. Search & Filters Bar - Main container
+   ============================================ */
+.search-filters-bar {
+  padding: var(--aa-spacing-lg);
+  margin-bottom: var(--aa-spacing-xl);
+  background-color: var(--ma-card-bg);
+  border-radius: var(--aa-border-radius);
+  box-shadow: var(--ma-card-shadow);
+  max-width: 1060px;
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Light mode - black border */
+  border: 1px solid var(--aa-light-border);
+}
+
+.dark-mode .search-filters-bar {
+  border: 1px solid var(--aa-dark-border);
+}
+
+/* ============================================
+   6. Search Input - Search field styling
+   ============================================ */
+.search-input-wrapper .MuiOutlinedInput-root {
+  background-color: var(--ma-search-input-bg);
+}
+
+.search-input-wrapper .MuiInputBase-input {
+  color: var(--ma-text-primary);
+}
+
+.search-icon {
+  color: var(--ma-text-secondary);
+}
+
+/* Dark Mode - Search Input Borders */
+.dark-mode .search-input-wrapper .MuiOutlinedInput-root {
+  border: 1px solid var(--aa-dark-border);
+}
+
+.dark-mode .search-input-wrapper .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-dark-border);
+}
+
+.dark-mode .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-dark-border-hover);
+}
+
+.dark-mode .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-dark-accent);
+}
+
+/* Light Mode - Search Input Borders */
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root {
+  border: 1px solid var(--aa-light-border);
+}
+
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-light-border);
+}
+
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-light-border-hover);
+}
+
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-light-accent);
+}
+
+/* ============================================
+   7. Filter Controls - Toggle button & view mode
+   ============================================ */
+.filters-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--aa-spacing-md);
+}
+
+.filters-toggle-btn {
+  color: var(--ma-text-title);
+  text-transform: none;
+  font-weight: 600;
+  transition: var(--aa-transition);
+}
+
+/* View Mode Toggle Buttons */
+.view-mode-toggle {
+  border-color: var(--ma-card-border) !important;
+}
+
+.view-mode-button {
+  border-color: var(--ma-card-border);
+  color: var(--ma-text-secondary);
+  transition: var(--aa-transition);
+}
+
+.view-mode-button.active {
+  color: #ffffff;
+}
+
+/* Dark Mode - View Mode Button Styles */
+.dark-mode .view-mode-button.active {
+  background-color: var(--aa-dark-accent) !important;
+}
+
+.dark-mode .view-mode-button.active:hover {
+  background-color: var(--aa-dark-accent-hover) !important;
+}
+
+.dark-mode .view-mode-button:not(.active):hover {
+  background-color: var(--ma-search-input-bg);
+}
+
+/* Light Mode - View Mode Button Styles */
+:not(.dark-mode) .view-mode-button.active {
+  background-color: var(--aa-light-accent) !important;
+}
+
+:not(.dark-mode) .view-mode-button.active:hover {
+  background-color: var(--aa-light-accent-hover) !important;
+}
+
+:not(.dark-mode) .view-mode-button:not(.active):hover {
+  background-color: var(--ma-search-input-bg);
+}
+
+/* ============================================
+   8. Filter Select Fields - Dropdown styling
+   ============================================ */
+.filters-grid {
+  /* Grid automatically handles responsiveness */
+}
+
+.filter-select .MuiOutlinedInput-root {
+  background-color: var(--ma-search-input-bg);
+  color: var(--ma-text-primary);
+  transition: var(--aa-transition);
+}
+
+.filter-select-label {
+  color: var(--ma-text-secondary);
+}
+
+/* Dark Mode - Select Field Borders */
+.dark-mode .filter-select .MuiOutlinedInput-root {
+  border: 1px solid var(--aa-dark-border);
+}
+
+.dark-mode .filter-select .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-dark-border);
+}
+
+.dark-mode .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-dark-border-hover);
+}
+
+.dark-mode .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-dark-accent);
+}
+
+/* Light Mode - Select Field Borders */
+:not(.dark-mode) .filter-select .MuiOutlinedInput-root {
+  border: 1px solid var(--aa-light-border);
+}
+
+:not(.dark-mode) .filter-select .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-light-border);
+}
+
+:not(.dark-mode) .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-light-border-hover);
+}
+
+:not(.dark-mode) .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--aa-light-accent);
+}
+
+/* ============================================
+   9. Empty States - Loading & no results messages
+   ============================================ */
+.results-count {
+  margin-bottom: var(--aa-spacing-md);
+  color: var(--ma-text-secondary);
+  font-weight: 500;
+}
+
+.loading-container,
+.no-results-container {
+  text-align: center;
+  padding: var(--aa-spacing-2xl) 0;
+}
+
+.loading-text,
+.no-results-title,
+.no-results-description {
+  color: var(--ma-text-secondary);
+}
+
+.no-results-title {
+  margin-bottom: var(--aa-spacing-xs);
+}
+
+.no-results-description {
+  opacity: 0.7;
+}
+
+/* ============================================
+   10. Announcements - Card styles
+   
+   NOTE: Announcement card styles are inherited from
+   FavoriteAnnouncements.css to maintain design consistency.
+   Classes used: .favorite-announcements-list, .favorite-announcement-card
+   ============================================ */
+
+.favorite-announcements-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--aa-spacing-lg);
+  margin-bottom: var(--aa-spacing-2xl);
+}
+
+/* ============================================
+   11. Pagination - Page navigation controls
+   ============================================ */
+
+/* Pagination Container - Grid layout for buttons & numbers */
+.pagination-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--aa-spacing-md);
+  margin: var(--aa-spacing-2xl) auto;
+  padding: var(--aa-spacing-lg);
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+}
+
+/* Pagination Buttons - Previous/Next */
+.pagination-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--aa-border-radius);
+  background: var(--ma-card-bg);
+  color: var(--ma-text-title);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--aa-transition);
+  box-shadow: var(--ma-card-shadow);
+}
+
+.pagination-btn:first-child {
+  justify-self: start;
+}
+
+.pagination-btn:last-child {
+  justify-self: end;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--aa-dark-accent);
+  color: white;
+  box-shadow: var(--ma-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Pagination Numbers Container */
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+/* Individual Page Number Buttons */
+.pagination-number {
+  min-width: 40px;
+  height: 40px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--aa-border-radius);
+  background: var(--ma-card-bg);
+  color: var(--ma-text-title);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--aa-transition);
+  box-shadow: var(--ma-card-shadow);
+}
+
+.pagination-number:hover {
+  background: var(--aa-dark-accent);
+  color: white;
+  box-shadow: var(--ma-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.pagination-number.active {
+  background: var(--aa-dark-accent);
+  color: white;
+  box-shadow: var(--ma-card-shadow-hover);
+}
+
+/* Pagination Dots (ellipsis) */
+.pagination-dots {
+  color: var(--ma-text-secondary);
+  font-size: 1.2rem;
+  padding: 0 4px;
+}
+
+/* Dark Mode - Pagination Border Styling */
+.dark-mode .pagination-btn,
+.dark-mode .pagination-number {
+  border: 1px solid rgba(245, 24, 102, 0.3);
+}
+
+.dark-mode .pagination-btn:hover:not(:disabled),
+.dark-mode .pagination-number:hover,
+.dark-mode .pagination-number.active {
+  border-color: rgba(245, 24, 102, 0.5);
+}
+
+/* Mobile - Pagination Responsive */
+@media (max-width: 768px) {
+  .pagination-container {
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--aa-spacing-sm);
+    margin: var(--aa-spacing-xl) auto var(--aa-spacing-sm);
+    padding: var(--aa-spacing-md);
+  }
+
+  .pagination-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+
+  .favorite-announcements-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}

@@ -22,9 +22,8 @@ router.get('/search', async (req, res) => {
     };
 
     const announcements = await Announcement.find(filter)
-      .select('title location category price images')
       .sort({ favoritesCount: -1, createdAt: -1 })
-      .limit(8);
+      .limit(20);
     
     res.json(announcements);
   } catch (error) {

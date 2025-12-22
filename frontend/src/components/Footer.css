@@ -104,7 +104,8 @@
   display: block;
   width: 100%;
   text-align: center;
-  margin-top: 8px;
+  margin-top: -12px;
+  padding: 2px 0;
   background: var(--ft-bg-main);
   color: var(--ft-text-main);
 }
@@ -113,7 +114,7 @@
 .footer-separator {
   width: 100%; height: 1px;
   background: var(--ft-separator);
-  margin: 24px 0; border: none; box-sizing: content-box;
+  margin: 12px 0; border: none; box-sizing: content-box;
 }
 
 /* Utility to force hide desktop on mobile logic */
@@ -360,4 +361,9 @@
   .footer-mobile-buttons .footer-icon span { font-size: 0.75rem; }
   .footer-mobile-buttons .footer-publish-icon { width: 36px; height: 36px; }
   .footer-publish .footer-publish-svg { font-size: 24px; }
+}
+
+/* Hide mobile footer when in chat on mobile */
+.chat-mobile-active .footer-mobile-buttons {
+  display: none !important;
 }

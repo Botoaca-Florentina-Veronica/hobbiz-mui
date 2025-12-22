@@ -643,7 +643,7 @@ export default function AnnouncementDetails() {
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Tooltip 
                       title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
-                      placement="top"
+                      placement="right"
                       arrow
                       enterDelay={300}
                       leaveDelay={200}
@@ -671,7 +671,7 @@ export default function AnnouncementDetails() {
                     </Tooltip>
                     <Tooltip 
                       title="Partajează"
-                      placement="top"
+                      placement="right"
                       arrow
                       enterDelay={300}
                       leaveDelay={200}
@@ -848,7 +848,7 @@ export default function AnnouncementDetails() {
                 </Box>
 
                 {/* Contact Person */}
-                {announcement.contactPerson && (
+                {announcement.contactPerson && !isOwnAnnouncement && (
                   <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import '../pages/LoginSignup.css';
 
 export default function SignupPage() {
+  const { t } = useTranslation();
+  
   useEffect(() => {
     // Align background behavior with LoginPage to avoid white bars on dark mode
     document.body.classList.add('login-page');
@@ -36,9 +39,9 @@ export default function SignupPage() {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/users/register`, formData);
       
       // Redirecționează către login cu mesaj de succes
-      navigate('/login', { state: { success: 'Cont creat cu succes! Te poți autentifica.' } });
+      navigate('/login', { state: { success: t('auth.signupSuccess') } });
     } catch (err) {
-      setError(err.response?.data?.error || 'Înregistrare eșuată');
+      setError(err.response?.data?.error || t('auth.signupError'));
     } finally {
       setLoading(false);
     }
@@ -46,7 +49,7 @@ export default function SignupPage() {
 
   return (
     <div className="login-container signup-container">
-      <h2>Creează cont nou</h2>
+      <h2>{t('auth.createAccount')}</h2>
       
       {error && <div className="error-message">{error}</div>}
 
@@ -54,7 +57,7 @@ export default function SignupPage() {
         <input
           type="text"
           name="firstName"
-          placeholder="Prenume"
+          placeholder={t('auth.placeholders.firstName')}
           value={formData.firstName}
           onChange={handleChange}
           required
@@ -62,7 +65,7 @@ export default function SignupPage() {
         <input
           type="text"
           name="lastName"
-          placeholder="Nume"
+          placeholder={t('auth.placeholders.lastName')}
           value={formData.lastName}
           onChange={handleChange}
           required
@@ -70,7 +73,7 @@ export default function SignupPage() {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder={t('auth.placeholders.email')}
           value={formData.email}
           onChange={handleChange}
           required
@@ -78,7 +81,7 @@ export default function SignupPage() {
         <input
           type="password"
           name="password"
-          placeholder="Parolă"
+          placeholder={t('auth.placeholders.password')}
           value={formData.password}
           onChange={handleChange}
           required
@@ -86,7 +89,7 @@ export default function SignupPage() {
         <input
           type="tel"
           name="phone"
-          placeholder="Telefon"
+          placeholder={t('auth.placeholders.phone')}
           value={formData.phone}
           onChange={handleChange}
         />
@@ -96,12 +99,12 @@ export default function SignupPage() {
           className="submit-btn"
           disabled={loading}
         >
-          {loading ? 'Se încarcă...' : 'Creează cont'}
+          {loading ? t('common.loading') : t('auth.createButton')}
         </button>
       </form>
 
       <div className="login-links">
-        Ai deja cont? <Link to="/login">Autentifică-te</Link>
+        {t('auth.haveAccount')} <Link to="/login">{t('auth.login')}</Link>
       </div>
     </div>
   );

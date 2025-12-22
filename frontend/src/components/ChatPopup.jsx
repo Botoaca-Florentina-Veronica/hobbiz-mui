@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
@@ -6,6 +8,8 @@ import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessag
 import './ChatPopup.css';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [hoveredMsgId, setHoveredMsgId] = useState(null);
   const [deleteHover, setDeleteHover] = useState(false);
   const [attachHover, setAttachHover] = useState(false);
@@ -28,6 +32,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
   const messagesEndRef = useRef(null);
+  const [emojiClosing, setEmojiClosing] = useState(false);
 
   // Obține userId din localStorage dacă nu e pasat ca prop; dacă lipsește dar avem token, încearcă să-l afli din profil
   const [effectiveUserId, setEffectiveUserId] = useState(userId || localStorage.getItem('userId'));
@@ -323,6 +328,15 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     await handleSend(new Event('submit'));
   };
 
+  // Navigate to seller profile page
+  const handleNavigateToProfile = () => {
+    const sellerId = seller?._id || seller?.id;
+    if (sellerId) {
+      onClose(); // Close chat popup
+      navigate(`/profil/${sellerId}`);
+    }
+  };
+
   // Verifică dacă componenta poate fi afișată
   if (!open || !conversationId) return null;
 
@@ -347,7 +361,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
           </>
         )}
         <div className="chat-popup-header">
-          <div className="chat-popup-user">
+          <div className="chat-popup-user" onClick={handleNavigateToProfile} style={{ cursor: 'pointer' }}>
             <div className="chat-popup-avatar">
               {seller?.avatar ? (
                 <img src={seller.avatar} alt="avatar" />
@@ -355,7 +369,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                 <div className="chat-popup-avatar-placeholder">{seller?.firstName?.[0] || 'U'}</div>
               )}
             </div>
-            <span className="chat-popup-username">{seller?.firstName || 'Utilizator'}</span>
+            <span className="chat-popup-username">{seller?.firstName || t('common.user')}</span>
           </div>
           <button className="chat-popup-close" onClick={onClose}>&#10005;</button>
         </div>
@@ -370,11 +384,11 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         <div className="chat-popup-messages">
           {loading ? (
             <div className="chat-popup-status">
-              Se încarcă mesajele...
+              {t('chat.loading')}
             </div>
           ) : messages.length === 0 ? (
             <div className="chat-popup-status">
-              Nicio conversație încă. Scrie primul mesaj!
+              {t('chat.noConversation')}
             </div>
           ) : (
             messages.map((msg, idx) => (
@@ -414,12 +428,12 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                           clearTimeout(window.deleteTooltipTimeout);
                         }}
                         onClick={() => handleDeleteMessage(msg._id)}
-                        title="Șterge mesajul"
+                        title={t('chat.deleteMessage')}
                       >
                         <DeleteIcon sx={{ fontSize: 18 }} />
                       </button>
                       {deleteHover === 'show-' + msg._id && (
-                        <span className="chat-popup-message-delete-tooltip">Șterge</span>
+                        <span className="chat-popup-message-delete-tooltip">{t('chat.delete')}</span>
                       )}
                     </div>
                   )}
@@ -432,7 +446,6 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
                           className="chat-popup-image"
                           onLoad={() => messagesEndRef.current?.scrollIntoView({behavior:'smooth'})}
                         />
-                        {msg.imageFile && <div className="chat-popup-image-filename">{msg.imageFile}</div>}
                       </div>
                     )}
                     {msg.text && <div>{msg.text}</div>}
@@ -484,42 +497,76 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               className="chat-popup-icon-btn chat-popup-emoji-btn"
               onMouseEnter={() => setEmojiHover(true)}
               onMouseLeave={() => setEmojiHover(false)}
-              onClick={e => setEmojiAnchor(e.currentTarget)}
+              onClick={() => {
+                if (emojiAnchor) {
+                  setEmojiClosing(true);
+                  setTimeout(() => {
+                    setEmojiAnchor(null);
+                    setEmojiClosing(false);
+                  }, 250);
+                } else {
+                  setEmojiAnchor('open');
+                }
+              }}
               type="button"
             >
               <InsertEmoticonIcon />
             </button>
-            {emojiHover && (
+            {emojiHover && !emojiAnchor && (
               <div className="chat-popup-attach-tooltip">
                 TRIMITE UN EMOJI
                 <span className="chat-popup-attach-tooltip-arrow" />
               </div>
             )}
-            <Popover
-              open={Boolean(emojiAnchor)}
-              anchorEl={emojiAnchor}
-              onClose={() => setEmojiAnchor(null)}
-              anchorReference="anchorEl"
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-              transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-              PaperProps={{
-                className: 'chat-popup-emoji-popover',
-                style: { zIndex: 99999 }
-              }}
-              sx={{ zIndex: 99999 }}
-              style={{ zIndex: 99999 }}
-            >
-              {emojiList.map(emoji => (
-                <button
-                  key={emoji}
-                  className="chat-popup-emoji-option"
-                  onClick={() => handleEmoji(emoji)}
-                  type="button"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </Popover>
+            {/* Emoji Picker - Positioned above button */}
+            {emojiAnchor && !emojiClosing && (
+              <>
+                {/* Backdrop to close menu on click outside */}
+                <div 
+                  className="chat-popup-emoji-backdrop"
+                  onClick={() => {
+                    setEmojiClosing(true);
+                    setTimeout(() => {
+                      setEmojiAnchor(null);
+                      setEmojiClosing(false);
+                    }, 250);
+                  }}
+                  onMouseDown={(e) => e.preventDefault()}
+                />
+                <div className="chat-popup-emoji-picker chat-popup-emoji-picker-enter">
+                  {emojiList.map(emoji => (
+                    <button
+                      key={emoji}
+                      className="chat-popup-emoji-option"
+                      onClick={() => handleEmoji(emoji)}
+                      type="button"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {/* Emoji Picker closing animation */}
+            {emojiClosing && (
+              <>
+                <div 
+                  className="chat-popup-emoji-backdrop"
+                />
+                <div className="chat-popup-emoji-picker chat-popup-emoji-picker-exit">
+                  {emojiList.map(emoji => (
+                    <button
+                      key={emoji}
+                      className="chat-popup-emoji-option"
+                      type="button"
+                      disabled
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <form onSubmit={handleSend} className="chat-popup-form">
             {selectedFile && (

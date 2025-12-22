@@ -123,6 +123,16 @@
   border: 1px solid var(--border-color);
 }
 
+/* Light-mode: ensure containers have a thin black outline (match other pages) */
+body:not(.dark-mode) .add-announcement-form,
+body:not(.dark-mode) .add-announcement-actions-section,
+body:not(.dark-mode) .add-announcement-description-section,
+body:not(.dark-mode) .add-announcement-location-section,
+body:not(.dark-mode) .add-announcement-contact-section,
+body:not(.dark-mode) .add-announcement-images-section {
+  border-color: #121212 !important;
+}
+
 .add-announcement-form {
   flex-direction: column;
   align-items: center;
@@ -189,6 +199,20 @@
      but original code had 'border: none' for light and 'border: 1px solid' for dark.
      We simulate this via transparent border in light mode variables or override. */
   border: 1px solid var(--border-color); 
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Light-mode: ensure main inputs have a thin black outline */
+body:not(.dark-mode) .add-announcement-title-input,
+body:not(.dark-mode) .add-announcement-category-select,
+body:not(.dark-mode) .add-announcement-description-input {
+  border-color: #121212 !important;
+}
+
+body:not(.dark-mode) .add-announcement-title-input:focus,
+body:not(.dark-mode) .add-announcement-category-select:focus,
+body:not(.dark-mode) .add-announcement-description-input:focus {
+  border-color: transparent !important;
 }
 
 /* Specific Adjustments per Input */
@@ -257,6 +281,18 @@ input, textarea, select {
   min-width: 320px;
   max-width: 600px;
   border: 1px solid var(--border-color);
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+/* Light-mode: ensure input wrappers have a thin black outline */
+body:not(.dark-mode) .add-announcement-location-input-wrapper,
+body:not(.dark-mode) .add-announcement-contact-input-wrapper {
+  border-color: #121212 !important;
+}
+
+body:not(.dark-mode) .add-announcement-location-input-wrapper:focus-within,
+body:not(.dark-mode) .add-announcement-contact-input-wrapper:focus-within {
+  border-color: transparent !important;
 }
 
 .add-announcement-location-input,
@@ -283,6 +319,17 @@ input, textarea, select {
   max-width: 600px;
   border: 1px solid var(--border-color);
   outline: none;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+/* Light-mode: ensure specific contact inputs have a thin black outline */
+body:not(.dark-mode) .add-announcement-contact-input[type="email"],
+body:not(.dark-mode) .add-announcement-contact-input[type="tel"] {
+  border-color: #121212 !important;
+}
+
+body:not(.dark-mode) .add-announcement-contact-input[type="email"]:focus,
+body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
+  border-color: transparent !important;
 }
 /* Revert text color for Light Mode specific if needed to match strictly #5b7a88 */
 :root:not(.dark-mode) .add-announcement-contact-input[type="email"],

@@ -11,6 +11,7 @@ import PromoSection from './components/PromoSection';
 import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
+import Toast from './components/Toast';
 
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
@@ -35,6 +36,7 @@ import CookiePolicy from './pages/CookiePolicy';
 import TermsConditions from './pages/TermsConditions';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
+import AllAnnouncements from './pages/AllAnnouncements.jsx';
 import useScrollToTop from './hooks/useScrollToTop';
 import './App.css';
 import './mediaQueries.css';
@@ -76,7 +78,27 @@ function App() {
     return localStorage.getItem('darkMode') === 'true';
   });
 
-  useEffect(() => {
+  // Global toast state
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'info'
+  });
+
+  // Function to show toast globally
+  window.showToast = (message, type = 'info', duration = 4000) => {
+    setToast({
+      visible: true,
+      message,
+      type
+    });
+    setTimeout(() => {
+      setToast(prev => ({
+        ...prev,
+        visible: false
+      }));
+    }, duration);
+  };  useEffect(() => {
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
@@ -104,6 +126,14 @@ function App() {
             <Header />
             <AnnouncementsByCategory />
             {/* Ascundem secțiunea legal + copyright pe mobil pentru paginile de categorie */}
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/toate-anunturile" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AllAnnouncements />
             <Footer hideOnMobile />
           </>
         } />
@@ -294,6 +324,12 @@ function App() {
     >
       <LoadingOverlay />
       {appView}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        visible={toast.visible}
+        onClose={() => setToast(prev => ({ ...prev, visible: false }))}
+      />
     </ClickSpark>
   );
 }

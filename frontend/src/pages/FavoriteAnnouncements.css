@@ -89,6 +89,12 @@ body:not(.dark-mode) .favorite-announcement-card {
   border: 1px solid #121212;
 }
 
+/* Dark-mode: ensure favorite cards use dark surface and white border */
+body.dark-mode .favorite-announcement-card {
+  background: #121212 !important;
+  border: 1px solid #ffffff !important;
+}
+
 
 /* 3. ELEMENTE INTERNE CARD
    ---------------------------------------------------------- */
@@ -389,6 +395,11 @@ body:not(.dark-mode) .favorite-announcement-card {
     background-color: var(--fav-mobile-btn-bg);
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     margin-top: -2rem !important;
+    color: #333333;
+  }
+
+  .dark-mode .my-announcements-container .mobile-back-btn {
+    color: #ffffff;
   }
   
   .my-announcements-container .mobile-header-title {

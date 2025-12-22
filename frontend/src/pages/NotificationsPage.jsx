@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import './NotificationsPage.css';
 import gumballPeace from '../assets/images/gumballPeace.jpg';
@@ -62,6 +63,7 @@ const getLastMessagePreview = async (convId) => {
 };
 
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const userId = localStorage.getItem('userId');
@@ -74,9 +76,15 @@ export default function NotificationsPage() {
     
     // Extrage conversationId din link
     if (chatLink && chatLink.startsWith('/chat/')) {
-      const conversationId = chatLink.split('/chat/')[1];
-      // Navighează la pagina de chat cu conversationId în state sau ca query param
-      navigate('/chat', { state: { conversationId } });
+      const parts = chatLink.split('/');
+      if (parts.length >= 3) {
+        const conversationId = parts[2];
+        // Navighează la pagina de chat cu conversationId în state sau ca query param
+        navigate('/chat', { state: { conversationId } });
+      } else {
+        // Navighează la pagina de chat generală
+        navigate('/chat');
+      }
     } else {
       // Navighează la pagina de chat generală
       navigate('/chat');
@@ -192,25 +200,25 @@ export default function NotificationsPage() {
               className="mobile-back-btn"
               disableRipple
               disableFocusRipple
-              aria-label="Înapoi"
+              aria-label={t('notifications.back')}
             >
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h5" className="mobile-header-title">Notificări</Typography>
+            <Typography variant="h5" className="mobile-header-title">{t('notifications.title')}</Typography>
           </div>
-          <h1 className="notifications-title">Notificări</h1>
+          <h1 className="notifications-title">{t('notifications.title')}</h1>
           <div className="notifications-content">
             {loading ? (
               <div className="notifications-loading">
                 <div className="loading-spinner"></div>
-                <span>Se încarcă notificările...</span>
+                <span>{t('notifications.loading')}</span>
               </div>
             ) : notifications.length === 0 ? (
               <div className="notifications-empty">
                 <div className="notifications-empty-icon">
-                  <img src={gumballPeace} alt="Fără notificări" />
+                  <img src={gumballPeace} alt={t('notifications.empty')} />
                 </div>
-                <div className="notifications-empty-text">Nu ai notificări noi.</div>
+                <div className="notifications-empty-text">{t('notifications.empty')}</div>
               </div>
             ) : (
               <ul className="notifications-list">
@@ -253,7 +261,7 @@ export default function NotificationsPage() {
                             className="notification-action-btn"
                             onClick={() => handleChatNavigation(n._id, n.link)}
                           >
-                            <span>Răspunde</span>
+                            <span>{t('notifications.reply')}</span>
                             <span className="action-arrow">→</span>
                           </button>
                         )}
@@ -263,7 +271,7 @@ export default function NotificationsPage() {
                       <button 
                         className="notification-delete-btn"
                         onClick={() => deleteNotification(n._id)}
-                        title="Șterge notificarea"
+                        title={t('notifications.deleteNotification')}
                       >
                         <DeleteIcon className="notification-delete-icon" />
                       </button>

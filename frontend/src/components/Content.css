@@ -327,3 +327,49 @@
   
   .popular-announcements-container svg { width: 9px !important; height: 9px !important; }
 }
+
+/* ============================================
+   Explore All Announcements Button
+   ============================================ */
+
+.explore-all-button {
+  padding: 14px 36px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: Poppins, sans-serif;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+/* Light Mode */
+.explore-all-button {
+  color: #355070;
+  background-color: #ffffff;
+  border-color: #355070;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.explore-all-button:hover {
+  color: #ffffff;
+  background-color: #355070;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode */
+.dark-mode .explore-all-button {
+  color: #ffffff;
+  background-color: #1e1e1e;
+  border-color: #f51866;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .explore-all-button:hover {
+  color: #ffffff;
+  background-color: #f51866;
+  border-color: #f51866;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}

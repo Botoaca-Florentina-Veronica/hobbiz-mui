@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
@@ -8,6 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -36,7 +38,7 @@ export default function LoginPage() {
       // Redirect către pagina principală sau dashboard
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Autentificare eșuată');
+      setError(err.response?.data?.error || t('auth.loginError'));
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function LoginPage() {
 
   return (
     <div className="login-container">
-      <h2>Intră în cont</h2>
+      <h2>{t('auth.signIn')}</h2>
       
       {/* Butoane sociale */}
       <div className="social-login">
@@ -53,7 +55,7 @@ export default function LoginPage() {
         <AppleLoginButton onClick={() => console.log('Apple login')} />
       </div>
 
-      <div className="divider">SAU</div>
+      <div className="divider">{t('auth.or')}</div>
 
       {/* Formular clasic */}
       <form onSubmit={handleSubmit} className="email-login">
@@ -61,7 +63,7 @@ export default function LoginPage() {
         
         <input
           type="email"
-          placeholder="Adresa ta de email"
+          placeholder={t('auth.placeholders.emailAddress')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -69,18 +71,18 @@ export default function LoginPage() {
         <div className="password-field-wrapper">
           <input
             type={showPassword ? 'text' : 'password'}
-            placeholder="Parola"
+            placeholder={t('auth.placeholders.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            aria-label="Parola"
+            aria-label={t('auth.placeholders.password')}
             autoComplete="current-password"
           />
           <button
             type="button"
             className="toggle-password-btn"
             aria-pressed={showPassword}
-            aria-label={showPassword ? 'Ascunde parola' : 'Afișează parola'}
+            aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
             onClick={() => setShowPassword(p => !p)}
           >
             {showPassword ? (
@@ -95,13 +97,13 @@ export default function LoginPage() {
           type="submit"
           disabled={loading}
         >
-          {loading ? 'Se încarcă...' : 'Intră în cont'}
+          {loading ? t('common.loading') : t('auth.signInButton')}
         </button>
       </form>
 
       <div className="login-links">
-        <Link to="/forgot-password">Ai uitat parola?</Link>
-        <Link to="/signup">Creează cont</Link>
+        <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
+        <Link to="/signup">{t('auth.createAccount')}</Link>
       </div>
     </div>
   );

@@ -41,6 +41,9 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-family: 'Poppins', sans-serif !important;
+  width: 100%;
+  box-sizing: border-box;
+  height: 44px;
 }
 
 .login-links {
@@ -88,10 +91,12 @@
   position: relative;
   display: flex;
   align-items: stretch;
+  height: 44px;
 }
 .password-field-wrapper input {
   flex: 1;
   padding-right: 44px; /* spațiu pentru buton icon */
+  box-sizing: border-box;
 }
 .toggle-password-btn {
   position: absolute;

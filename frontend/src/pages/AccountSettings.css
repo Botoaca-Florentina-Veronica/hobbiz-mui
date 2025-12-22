@@ -352,6 +352,14 @@
   color: var(--as-mob-header-text);
 }
 
+.mobile-header .MuiIconButton-root {
+  color: #333333;
+}
+
+.dark-mode .mobile-header .MuiIconButton-root {
+  color: #ffffff;
+}
+
 .mobile-back-btn {
   width: 40px;
   height: 40px;

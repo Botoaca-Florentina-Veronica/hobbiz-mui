@@ -97,7 +97,7 @@
   border-radius: 16px !important;
   box-shadow: var(--cp-shadow-box);
   border: 1px solid var(--cp-border); /* Consistent border for dark mode */
-  overflow: visible;
+  overflow: visible !important;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -142,7 +142,24 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
   color: var(--cp-text-primary);
 }
 
-.chat-popup-user { display: flex; align-items: center; gap: 12px; }
+.chat-popup-user { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  border-radius: 8px;
+  padding: 4px 8px;
+  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.chat-popup-user:hover {
+  background: var(--cp-hover-popover);
+  transform: scale(1.02);
+}
+
+.dark-mode .chat-popup-user:hover {
+  background: rgba(245, 24, 102, 0.12);
+}
 
 .chat-popup-avatar {
   width: 48px; height: 48px;
@@ -231,6 +248,33 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
 }
 
 .chat-popup-message-text { margin-bottom: 4px; }
+
+/* Image Wrapper & Optimization */
+.chat-popup-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.chat-popup-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 280px;
+  width: auto;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  object-fit: contain;
+}
+
+.chat-popup-image-filename {
+  font-size: 12px;
+  opacity: 0.8;
+  word-break: break-word;
+  padding: 2px 4px;
+}
+
 .chat-popup-message-time {
   font-size: 11px; opacity: 0.7; text-align: right; margin-top: 2px;
 }
@@ -313,27 +357,101 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
 .chat-popup-file-send:hover { background: var(--cp-accent-hover); }
 
 
-/* 6. POPOVERS & TOOLTIPS
+/* 6. EMOJI PICKER & TOOLTIPS
    ---------------------------------------------------------- */
-.chat-popup-emoji-popover {
-  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
-  border-radius: 12px !important; padding: 10px 8px !important;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-  box-shadow: var(--cp-shadow-popover) !important;
+
+/* Keyframe animations for emoji picker */
+@keyframes emojiPickerEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes emojiPickerExit {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+}
+
+/* Emoji Button Wrapper - Position relative for absolute emoji picker */
+.chat-popup-attach-wrapper {
+  position: relative;
+}
+
+/* Emoji Backdrop - Invisible overlay to capture clicks outside picker */
+.chat-popup-emoji-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  background: transparent;
+  cursor: default;
+}
+
+/* Emoji Picker - Positioned above button */
+.chat-popup-emoji-picker {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  z-index: 999999;
+  background: var(--cp-bg-popover);
+  border: 1px solid var(--cp-border);
+  border-radius: 12px;
+  padding: 10px 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  box-shadow: var(--cp-shadow-popover);
   min-width: 220px;
-  background: var(--cp-bg-popover) !important;
-  border: 1px solid var(--cp-border) !important;
-  z-index: 99999 !important;
-  max-width: 320px; max-height: 208px !important; overflow-y: auto !important;
+  max-width: 320px;
+  max-height: 280px;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+/* Enter animation */
+.chat-popup-emoji-picker-enter {
+  animation: emojiPickerEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Exit animation */
+.chat-popup-emoji-picker-exit {
+  animation: emojiPickerExit 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
 }
 
 .chat-popup-emoji-option {
-  background: none; border: none; font-size: 32px;
-  cursor: pointer; padding: 4px; margin: 0; text-align: center;
-  border-radius: 8px; transition: background 0.15s;
+  background: none;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  padding: 4px;
+  margin: 0;
+  text-align: center;
+  border-radius: 8px;
+  transition: background 0.15s;
   color: var(--cp-text-primary);
+  line-height: 1;
 }
-.chat-popup-emoji-option:hover { background: var(--cp-hover-popover); }
+
+.chat-popup-emoji-option:hover {
+  background: var(--cp-hover-popover);
+}
+
+.chat-popup-emoji-option:disabled {
+  cursor: default;
+}
 
 /* Tooltips */
 .chat-popup-attach-tooltip,
@@ -376,6 +494,7 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
 
 /* 7. RESPONSIVE
    ---------------------------------------------------------- */
+
 @media (max-width: 1024px) {
   .chat-popup-box { width: min(440px, 100vw - 12px); }
 }

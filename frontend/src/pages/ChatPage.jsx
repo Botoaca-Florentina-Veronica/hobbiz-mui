@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
 
 import Header from '../components/Header';
@@ -33,6 +34,7 @@ const getAccentHex = () => (getIsDarkMode() ? 'f51866' : '355070');
 export default function ChatPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const userId = localStorage.getItem('userId');
 
   const messagesEndRef = useRef(null);
@@ -69,6 +71,16 @@ export default function ChatPage() {
   const isDesktop = !isMobile;
 
   const { emitTyping, on, off } = useSocket(userId);
+
+  // Add/remove body class for mobile chat
+  useEffect(() => {
+    if (isChattingOnMobile) {
+      document.body.classList.add('chat-mobile-active');
+    } else {
+      document.body.classList.remove('chat-mobile-active');
+    }
+    return () => document.body.classList.remove('chat-mobile-active');
+  }, [isChattingOnMobile]);
 
   // Socket listeners for online status and typing
   useEffect(() => {
@@ -375,7 +387,7 @@ export default function ChatPage() {
       <Header />
       <div className="chat-mobile-topbar">
         <button type="button" className="chat-mobile-toggle" onClick={() => setIsSidebarOpen(true)}>
-          ☰ Conversații {unreadConvs.length > 0 && `(${unreadConvs.length})`}
+          ☰ {t('chat.conversations')} {unreadConvs.length > 0 && `(${unreadConvs.length})`}
         </button>
       </div>
 
@@ -389,12 +401,12 @@ export default function ChatPage() {
           </Box>
 
           <div className="chat-tabs">
-            <button className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>De cumpărat</button>
-            <button className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>De vândut</button>
+            <button className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>{t('chat.buying')}</button>
+            <button className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>{t('chat.selling')}</button>
           </div>
 
           <div className="chat-conversation-list">
-            {unreadConvs.length > 0 && <div className="chat-section-label">NECITITE</div>}
+            {unreadConvs.length > 0 && <div className="chat-section-label">{t('chat.unread')}</div>}
             {unreadConvs.map(c => (
               <div key={c.conversationId} className={`chat-conversation-item unread ${selectedConversation?.conversationId === c.conversationId ? 'selected' : ''}`} onClick={() => { setSelectedConversation(c); setIsSidebarOpen(false); }}>
                 <img className="chat-avatar" src={c.avatar} alt="av" onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${(c.displayTitle||'U').slice(0,1)}&background=${getAccentHex()}&color=fff`; }}/>
@@ -406,7 +418,7 @@ export default function ChatPage() {
                 <div className="chat-conversation-time">{c.timeFormatted}</div>
               </div>
             ))}
-            {readConvs.length > 0 && <div className="chat-section-label">CITITE</div>}
+            {readConvs.length > 0 && <div className="chat-section-label">{t('chat.read')}</div>}
             {readConvs.map(c => (
               <div key={c.conversationId} className={`chat-conversation-item read ${selectedConversation?.conversationId === c.conversationId ? 'selected' : ''}`} onClick={() => { setSelectedConversation(c); setIsSidebarOpen(false); }}>
                 <img className="chat-avatar" src={c.avatar} alt="av" onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${(c.displayTitle||'U').slice(0,1)}&background=${getAccentHex()}&color=fff`; }}/>
@@ -434,9 +446,9 @@ export default function ChatPage() {
                   <h3>{selectedConversation.participantName}</h3>
                   <p className="chat-user-status">
                     {typingUsers.has(selectedConversation.otherParticipant?.id) ? (
-                      <span className="typing-status">tastează...</span>
+                      <span className="typing-status">{t('chat.typing')}</span>
                     ) : onlineUsers.has(selectedConversation.otherParticipant?.id) ? (
-                      <span className="online-status">● Activ acum</span>
+                      <span className="online-status">{t('chat.online')}</span>
                     ) : (
                       <span className="offline-status">{formatLastSeen(userLastSeen[selectedConversation.otherParticipant?.id])}</span>
                     )}
@@ -470,19 +482,19 @@ export default function ChatPage() {
                       <div className="chat-message-content-group">
                         <div className="chat-bubble-row">
                           <div className="chat-message-bubble">
-                            {msg.replyTo && <div className={`chat-reply-preview ${msg.replyTo.senderId === userId ? 'own' : ''}`}><div className="chat-reply-text">{msg.replyTo.text || 'Imagine'}</div></div>}
+                            {msg.replyTo && <div className={`chat-reply-preview ${msg.replyTo.senderId === userId ? 'own' : ''}`}><div className="chat-reply-text">{msg.replyTo.text || t('chat.image')}</div></div>}
                             {msg.image && <div className="chat-message-image"><img src={msg.image} alt="att" /></div>}
                             {msg.text && <p className="chat-message-text">{msg.text}</p>}
                             
                             {/* ACTIONS HOVER */}
                             {hoveredMessageId === msg._id && reactionTargetId !== msg._id && (
                               <div className="message-actions-bar">
-                                <button className="message-action-btn" onClick={() => setSelectedReply({ messageId: msg._id, senderId: msg.senderId, senderName: isOwn ? 'Tu' : 'Utilizator', text: msg.text, image: msg.image })}><ReplyIcon fontSize="small"/></button>
+                                <button className="message-action-btn" onClick={() => setSelectedReply({ messageId: msg._id, senderId: msg.senderId, senderName: isOwn ? t('common.you') : t('common.user'), text: msg.text, image: msg.image })}><ReplyIcon fontSize="small"/></button>
                                 <button className="message-action-btn" onClick={() => setReactionTargetId(msg._id)}><SentimentSatisfiedAltIcon fontSize="small"/></button>
                                 <button className="message-action-btn copy" onClick={() => { navigator.clipboard.writeText(msg.text||''); setCopiedMessageId(msg._id); setTimeout(()=>setCopiedMessageId(null), 1200); }}>
                                   <ContentCopyIcon fontSize="small"/>
                                   {copiedMessageId === msg._id && (
-                                    <div className="message-copied" role="status" aria-live="polite">Copiat</div>
+                                    <div className="message-copied" role="status" aria-live="polite">{t('chat.copied')}</div>
                                   )}
                                 </button>
                                 {isOwn && <button className="message-action-btn" onClick={() => { apiClient.delete(`/api/messages/${msg._id}`).then(() => setMessages(p => p.filter(m => m._id !== msg._id))); }}><DeleteIcon fontSize="small"/></button>}
@@ -499,7 +511,7 @@ export default function ChatPage() {
                                       key={emoji} 
                                       className={`reaction-chip ${iReacted ? 'mine' : ''}`}
                                       onClick={() => handleReactToMessage(msg._id, emoji)}
-                                      title={iReacted ? 'Șterge reacția' : 'Adaugă reacție'}
+                                      title={iReacted ? t('chat.deleteReaction') : t('chat.addReaction')}
                                     >
                                       <span>{emoji}</span>
                                       {count > 1 && <span style={{marginLeft:2, fontWeight:600}}>{count}</span>}
@@ -531,7 +543,7 @@ export default function ChatPage() {
               <form className="chat-input-container" onSubmit={handleSendMessage}>
                 {selectedReply && (
                   <div className="chat-reply-composer">
-                    <div>Răspuns către {selectedReply.senderName}</div>
+                    <div>{t('chat.replyTo')} {selectedReply.senderName}</div>
                     <button type="button" onClick={() => setSelectedReply(null)}>×</button>
                   </div>
                 )}
@@ -542,7 +554,7 @@ export default function ChatPage() {
                     <button type="button" className="chat-input-button" onClick={() => fileInputRef.current?.click()}>📎</button>
                     <button type="button" className="chat-input-button" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😊</button>
                   </div>
-                  <input className="chat-input" placeholder="Scrie mesajul tău..." value={newMessage} onChange={e => { setNewMessage(e.target.value); emitTyping([userId, selectedConversation.id].sort().join('-'), true); }}/>
+                  <input className="chat-input" placeholder={t('chat.messagePlaceholder')} value={newMessage} onChange={e => { setNewMessage(e.target.value); emitTyping([userId, selectedConversation.id].sort().join('-'), true); }}/>
                   <button type="submit" className="chat-send-button" disabled={!newMessage && !selectedImage}>➤</button>
                 </div>
                 <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleImageSelect} />
@@ -559,8 +571,8 @@ export default function ChatPage() {
           ) : (
             <div className="chat-empty-main">
               <img src={gumballChat} className="chat-empty-img" alt="Chat" />
-              <h3>Selectează o conversație pentru a o citi</h3>
-              <p>Alege o conversație din lista de pe stânga pentru a începe să comunici</p>
+              <h3>{t('chat.selectConversationTitle')}</h3>
+              <p>{t('chat.empty')}</p>
             </div>
           )}
         </main>
