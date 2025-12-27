@@ -629,7 +629,7 @@ export default function AnnouncementDetails() {
                     </Typography>
                     {announcement.category && (
                       <Chip
-                        label={announcement.category}
+                        label={translateCategory(announcement.category, t)}
                         variant="outlined"
                         sx={{
                           borderColor: getAccentCss(),

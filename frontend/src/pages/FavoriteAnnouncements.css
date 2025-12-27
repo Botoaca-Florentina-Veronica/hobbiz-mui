@@ -222,6 +222,39 @@ body.dark-mode .favorite-announcement-card {
   margin: 4px 0;
   line-height: 1.3;
 }
+
+/* Give the announcements list some breathing room under the title */
+.favorite-announcements-list {
+  margin-top: 32px;
+}
+
+/* Title - match Notifications page title (light & dark modes) */
+.my-announcements-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: var(--nt-text-title, #183642); /* fallback to #183642 if var undefined */
+  /* increased bottom margin for clearer separation from announcements list */
+  margin-bottom: 80px;
+  text-align: center;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Count next to title should inherit the same visual style */
+.my-announcements-title-count {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  margin-left: 12px;
+  font-family: inherit;
+}
+
+/* Dark mode override to match Notifications accent */
+.dark-mode .my-announcements-title {
+  color: #f51866;
+}
+
 @media (min-width: 1025px) {
   .favorite-count { margin: 32px 0 24px 0; }
   .my-announcements-title { margin-top: 80px; }

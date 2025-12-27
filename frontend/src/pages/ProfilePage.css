@@ -31,18 +31,20 @@
   --pf-card-shadow: 0 3px 10px rgba(0,0,0,0.1);
 
   /* === Layout Constraints === */
-  --pf-left-max-width: 850px;
-  --pf-left-offset: 5rem;
+  --pf-left-max-width: 1100px; /* increased to allow wider cards */
+  --pf-left-offset: 5rem; /* horizontal gutter used for centering */
   --pf-right-offset: 1rem;
+  --pf-right-width: 480px; /* new variable controlling right column width */
   --pf-gap: 1.5rem;
 
   /* === Container Properties === */
   margin-top: 6rem;
   margin-bottom: 2rem;
-  max-width: 1400px;
+  max-width: 1600px; /* increased overall page max width */
   margin-left: auto;
   margin-right: auto;
-  padding: 0 1rem;
+  /* Use symmetric horizontal gutters so left and right spacing match */
+  padding: 0 var(--pf-left-offset);
   font-family: 'Poppins', sans-serif;
 }
 
@@ -57,23 +59,37 @@
 /* Main two-column layout */
 .profile-two-column-layout {
   display: grid;
-  grid-template-columns: 1fr 380px;
+  grid-template-columns: 1fr var(--pf-right-width);
   gap: 2rem;
   align-items: start;
+}
+
+/* When the right sidebar is intentionally removed, make the layout single-column */
+.profile-two-column-layout.profile-no-right {
+  grid-template-columns: 1fr;
 }
 
 /* Left column - main content */
 .profile-left-column {
   min-width: 0;
-  padding-left: var(--pf-left-offset);
+  /* remove left offset so content aligns with right gutter; centering handled by container padding */
+  padding-left: 0;
 }
 
 .profile-left-column > * {
   max-width: var(--pf-left-max-width);
   width: 100%;
   box-sizing: border-box;
-  margin-left: 0;
+  /* center left-column contents within the symmetric container gutter */
+  margin-left: auto;
   margin-right: auto;
+}
+
+/* Responsive fallback: reduce horizontal gutters on small screens */
+@media (max-width: 1024px) {
+  .profile-page-container {
+    padding: 0 1rem;
+  }
 }
 
 /* Right column - announcements sidebar */
@@ -695,6 +711,26 @@
 /* ============================================
    8. MOBILE RESPONSIVENESS
    ============================================ */
+
+/* Responsive scaling for wider container variables */
+@media (max-width: 1200px) {
+  .profile-page-container {
+    max-width: 1200px;
+    /* scale down the allowed content widths on narrower viewports */
+    --pf-left-max-width: 900px;
+    --pf-right-width: 360px;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 980px) {
+  .profile-page-container {
+    max-width: 900px;
+    --pf-left-max-width: 700px;
+    --pf-right-width: 320px;
+    padding: 0 1rem;
+  }
+}
 
 /* Hide mobile layout by default (shown on mobile) */
 .profile-mobile-layout {

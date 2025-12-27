@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 // Content.css is imported in App.jsx to ensure it is loaded after global styles
 import apiClient from '../api/api';
 import { useNavigate, useLocation } from 'react-router-dom';
+import translateCategory from '../utils/translateCategory';
 
 export default function Content() {
   const carouselRef = useRef(null);
@@ -623,7 +624,7 @@ export default function Content() {
                     {/* Category Badge */}
                     {a.category && (
                       <Chip
-                        label={a.category}
+                        label={translateCategory(a.category, t)}
                         size="small"
                         sx={{
                           position: 'absolute',

@@ -290,8 +290,14 @@
    8. Filter Select Fields - Dropdown styling
    ============================================ */
 .filters-grid {
-  /* Grid automatically handles responsiveness */
-  justify-content: center;
+  /* Ensure grid spans full width and has symmetric outer gutters
+     matching the search bar padding so the outer filters are aligned
+     equally from the container edges. Keeps 4 columns on one row when
+     there is enough horizontal space. */
+  width: 100%;
+  padding: 0 var(--aa-spacing-lg);
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .filter-select .MuiOutlinedInput-root {

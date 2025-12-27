@@ -234,6 +234,8 @@ export default function MyAnnouncements() {
           </div>
         </div>
 
+        <h1 className="ma-page-title">{t('myAnnouncements.title')}</h1>
+
         {/* Search and Filter Section */}
         {announcements.length > 0 && (
           <div className="ma-search-section">
@@ -356,36 +358,35 @@ export default function MyAnnouncements() {
                     <div className="ma-location-placeholder" />
                   </div>
 
-                  {/* Action buttons - 2x2 grid */}
-                  <div className="ma-actions-grid">
-                    <div className="ma-actions-row">
-                      <button
-                        className="ma-action-button ma-primary-button"
-                        onClick={() => handleEdit(announcement)}
-                      >
-                        {t('myAnnouncements.edit')}
-                      </button>
-                      <button
-                        className="ma-action-button ma-secondary-button"
-                        onClick={() => handleArchive(announcement)}
-                      >
-                        {t('myAnnouncements.archive')}
-                      </button>
-                    </div>
-                    <div className="ma-actions-row">
-                      <button
-                        className="ma-action-button ma-danger-button"
-                        onClick={() => handleDelete(announcement._id)}
-                      >
-                        {t('myAnnouncements.delete')}
-                      </button>
-                      <button
-                        className="ma-action-button ma-secondary-button ma-refresh-button"
-                        onClick={() => handleRefresh(announcement)}
-                      >
-                        {t('myAnnouncements.refresh')}
-                      </button>
-                    </div>
+                  {/* Action buttons - single row: 4 equal buttons on wider screens, wrap on small screens */}
+                  <div className="ma-actions-grid ma-actions-single-row">
+                    <button
+                      className="ma-action-button ma-primary-button"
+                      onClick={() => handleEdit(announcement)}
+                    >
+                      {t('myAnnouncements.edit')}
+                    </button>
+
+                    <button
+                      className="ma-action-button ma-secondary-button"
+                      onClick={() => handleArchive(announcement)}
+                    >
+                      {t('myAnnouncements.archive')}
+                    </button>
+
+                    <button
+                      className="ma-action-button ma-danger-button"
+                      onClick={() => handleDelete(announcement._id)}
+                    >
+                      {t('myAnnouncements.delete')}
+                    </button>
+
+                    <button
+                      className="ma-action-button ma-secondary-button ma-refresh-button"
+                      onClick={() => handleRefresh(announcement)}
+                    >
+                      {t('myAnnouncements.refresh')}
+                    </button>
                   </div>
                 </div>
               </div>

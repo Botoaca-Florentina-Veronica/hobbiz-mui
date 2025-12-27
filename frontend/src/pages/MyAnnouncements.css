@@ -54,11 +54,13 @@
    ---------------------------------------------------------- */
 .ma-container {
   position: relative;
-  flex: 1;
+  /* prevent the container from stretching to fill the viewport — size to content */
+  flex: initial;
   background-color: var(--ma-bg);
   height: auto;
   padding-bottom: 12px;
-}
+  margin-bottom: 2rem; /* small bottom spacing */
+} 
 
 .ma-loading-container {
   display: flex;
@@ -97,8 +99,9 @@
   padding: 12px 16px;
   padding-top: max(env(safe-area-inset-top), 12px);
   background-color: var(--ma-bg);
-  border-bottom: 1px solid var(--ma-border);
-  margin: 0 -12px 12px;
+  /* Remove horizontal divider above the title */
+  border-bottom: none;
+  margin: 0 -12px 20px; /* increased bottom margin to give extra space above title */
 }
 
 .ma-header-content {
@@ -136,6 +139,30 @@
   color: var(--ma-text);
 }
 
+/* Page title that mirrors the Notifications page title styling */
+.ma-page-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  /* Use the same title color variable as Notifications page for perfect match */
+  color: var(--nt-text-title, var(--ma-text));
+  margin: 36px 0 32px 0; /* larger top spacing to visually separate the title */
+  text-align: center;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Larger top spacing on wider screens */
+@media (min-width: 1024px) {
+  .ma-page-title {
+    margin-top: 48px;
+  }
+}
+
+/* Dark mode: match Notifications page accent color */
+.dark-mode .ma-page-title {
+  color: #f51866;
+}
 /* 4. SEARCH SECTION
    ---------------------------------------------------------- */
 .ma-search-section {
@@ -148,7 +175,9 @@
 }
 
 .dark-mode .ma-search-section {
-  border: 2px solid var(--ma-border-neutral);
+  /* Match About page: solid dark surface with white contour */
+  background-color: #121212;
+  border: 1px solid #ffffff;
 }
 
 .ma-search-bar {
@@ -322,8 +351,8 @@
 }
 
 .dark-mode .ma-confirm-dialog-paper {
-  background-color: #1e1e1e !important;
-  border: 1px solid rgba(255,255,255,0.06) !important;
+  background-color: #121212 !important;
+  border: 1px solid #ffffff !important;
   box-shadow: 0 12px 40px rgba(0,0,0,0.6) !important;
 }
 
@@ -438,8 +467,10 @@
 }
 
 .dark-mode .ma-card {
-  background-color: var(--ma-dark-container);
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  /* Dark surface and strong white contour like About page */
+  background-color: #121212;
+  border: 1px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
 }
 
 .ma-card-image {
@@ -519,17 +550,23 @@
 
 .ma-category-badge {
   align-self: flex-start;
+  /* Make the badge only as wide as its content */
+  display: inline-flex;
+  align-items: center;
   background-color: var(--ma-elev);
   border-radius: 12px;
-  padding: 2px 8px;
-  margin-bottom: 2px;
+  padding: 4px 10px;
+  margin-bottom: 6px;
   margin-top: 1px;
+  white-space: nowrap; /* keep it on one line */
 }
 
 .ma-category-text {
   font-size: 11px;
   font-weight: 600;
   color: var(--ma-primary);
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .ma-location-placeholder {
@@ -542,27 +579,35 @@
 .ma-actions-grid {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  gap: 4px;
+  /* Keep all action buttons on a single line when space permits */
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: center;
   width: 100%;
-}
+  justify-content: flex-start;
+  /* Push the actions to the bottom of the card and add consistent top spacing */
+  margin-top: auto;
+  padding-top: 24px; /* increased spacing to move buttons lower */
+  box-sizing: border-box;
+} 
 
 .ma-actions-row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  width: 100%;
-  flex-basis: 100%;
+  gap: 8px;
+  width: auto;
+  flex-basis: auto;
+  justify-content: flex-start;
 }
 
 .ma-action-button {
-  padding: 4px 6px;
+  padding: 6px 10px;
   border-radius: 20px;
   border-width: 2px;
   border-style: solid;
-  flex: 1;
+  /* Size to content by default */
+  flex: 0 0 auto;
   min-width: 0;
   align-self: flex-start;
   align-items: center;
@@ -576,14 +621,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: flex;
+  display: inline-flex;
 }
 
 .ma-primary-button {
   border-color: var(--ma-btn-primary-border);
   color: var(--ma-btn-primary-text);
-  flex: 1;
-  margin-right: 6px;
+  /* don't stretch, size to content */
+  flex: 0 0 auto;
 }
 
 .ma-primary-button:hover {
@@ -594,7 +639,7 @@
 .ma-secondary-button {
   border-color: var(--ma-btn-secondary-border);
   color: var(--ma-btn-secondary-text);
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .ma-secondary-button:hover {
@@ -605,8 +650,7 @@
 .ma-danger-button {
   border-color: var(--ma-btn-danger-border);
   color: var(--ma-btn-danger-text);
-  flex: 1;
-  margin-right: 6px;
+  flex: 0 0 auto;
 }
 
 .ma-danger-button:hover {
@@ -626,6 +670,25 @@
 .dark-mode .ma-refresh-button:hover {
   background-color: #6ba3d8;
   color: #1e2a3a;
+}
+
+/* Responsive: allow wrapping on small screens so buttons don't overflow */
+@media (max-width: 520px) {
+  .ma-actions-grid {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ma-actions-row {
+    width: 100%;
+    flex-basis: 100%;
+    justify-content: space-between;
+  }
+
+  .ma-action-button {
+    flex: 1 1 auto; /* allow buttons to stretch in narrow layouts */
+    min-width: 0;
+  }
 }
 
 /* 10. MODAL PICKER
@@ -654,8 +717,8 @@
 }
 
 .dark-mode .ma-modal-content {
-  background-color: var(--ma-dark-container);
-  border: 1px solid var(--ma-border-neutral);
+  background-color: #121212;
+  border: 1px solid #ffffff;
 }
 
 .ma-modal-header {
@@ -771,16 +834,26 @@
 
   .ma-actions-grid {
     flex-direction: row;
-    flex-wrap: wrap;
+    /* keep buttons inline on tablet when there's space */
+    flex-wrap: nowrap;
     gap: 6px;
+    padding-top: 28px; /* more top spacing on tablet */
   }
 
   .ma-actions-row {
-    width: 100%;
+    width: auto;
+    flex-basis: auto;
   }
 
-  .ma-action-button {
-    flex: 1;
+  /* Make 4 buttons equal width when using the single-row layout on tablet */
+  .ma-actions-grid.ma-actions-single-row .ma-action-button {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  /* Fallback for other layouts */
+  .ma-actions-grid:not(.ma-actions-single-row) .ma-action-button {
+    flex: 0 0 auto;
     min-width: 0;
   }
 }
@@ -792,7 +865,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 24px 80px;
-    padding-bottom: 16rem;
+    padding-bottom: 2rem; /* reduce excessive bottom spacing */
   }
 
   .ma-header {
@@ -826,20 +899,33 @@
   .ma-actions-grid {
     margin-top: auto;
     flex-direction: row;
-    flex-wrap: wrap;
+    /* keep buttons inline on desktop when there's space */
+    flex-wrap: nowrap;
     gap: 8px;
+    /* larger top spacing on desktop */
+    padding-top: 36px;
   }
 
   .ma-actions-row {
-    flex: 1;
+    flex: 0 0 auto;
     flex-basis: auto;
     gap: 8px;
     align-items: center;
+    width: auto;
   }
 
-  .ma-action-button {
-    flex: 1;
-    min-width: 100px;
+  /* Make 4 buttons equal width when using the single-row layout on desktop */
+  .ma-actions-grid.ma-actions-single-row .ma-action-button {
+    flex: 1 1 0%;
+    min-width: 0;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  /* Fallback for other layouts */
+  .ma-actions-grid:not(.ma-actions-single-row) .ma-action-button {
+    flex: 0 0 auto;
+    min-width: 0;
     padding: 6px 10px;
     font-size: 13px;
   }
@@ -849,6 +935,6 @@
    ---------------------------------------------------------- */
 @media (max-width: 1024px) {
   .ma-container {
-    margin-bottom: 8rem;
+    margin-bottom: 2rem;
   }
 }

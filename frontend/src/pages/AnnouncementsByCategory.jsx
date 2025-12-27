@@ -28,10 +28,13 @@ import {
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useTranslation } from 'react-i18next';
+import translateCategory from '../utils/translateCategory';
 import './MyAnnouncements.css';
 import './AnnouncementsByCategory.css';
 
 export default function AnnouncementsByCategory() {
+  const { t } = useTranslation();
   const { category } = useParams();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -396,7 +399,7 @@ export default function AnnouncementsByCategory() {
                   <div className="my-announcement-header">
                     <div>
                       <h2 className="my-announcement-title">{a.title}</h2>
-                      <div className="my-announcement-category">{a.category}</div>
+                      <div className="my-announcement-category">{translateCategory(a.category, t)}</div>
                       <div className="my-announcement-location">{a.location}</div>
                       {a.price && (
                         <div className="my-announcement-price" style={{

@@ -3,6 +3,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import translateCategory from '../utils/translateCategory';
 import {
   Box,
   TextField,
@@ -283,7 +284,7 @@ export default function ArchivedAnnouncementsPage() {
                     <InputLabel className="filter-select-label">{t('allAnnouncements.categoryLabel')}</InputLabel>
                     <Select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} label={t('allAnnouncements.categoryLabel')} className="filter-select">
                       <MenuItem value="all">{t('allAnnouncements.allCategories')}</MenuItem>
-                      {uniqueCategories.map(cat => (<MenuItem key={cat} value={cat}>{cat}</MenuItem>))}
+                      {uniqueCategories.map(cat => (<MenuItem key={cat} value={cat}>{translateCategory(cat, t)}</MenuItem>))}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -361,7 +362,7 @@ export default function ArchivedAnnouncementsPage() {
 
                         </div>
                         <h2 className="favorite-announcement-title">{announcement.title}</h2>
-                        <div className="favorite-announcement-category">{announcement.category}</div>
+                        <div className="favorite-announcement-category">{translateCategory(announcement.category, t)}</div>
                         <div className="favorite-announcement-location">{announcement.location}</div>
                         {announcement.price && (
                           <div className="favorite-price">{announcement.price} RON</div>

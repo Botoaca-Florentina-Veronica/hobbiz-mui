@@ -184,10 +184,10 @@ export default function FavoriteAnnouncements() {
           </IconButton>
           <Typography variant="h5" className="mobile-header-title">{t('favorites.title')}</Typography>
         </div>
-        <h1 className="my-announcements-title">{t('favorites.myFavorites')}</h1>
-        <div className="favorite-count">
-          {t('favorites.count')} ({(isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length)}/150)
-        </div>
+        <h1 className="my-announcements-title">
+          {t('favorites.myFavorites')}
+          <span className="my-announcements-title-count">({isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length}/150)</span>
+        </h1>
         {(isAuthenticated ? (fullFavorites?.length === 0) : (guestAnnouncements.length === 0)) ? (
           <div className="favorites-empty">
             <div className="favorites-empty-icon">

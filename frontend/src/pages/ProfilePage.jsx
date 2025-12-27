@@ -915,18 +915,15 @@ export default function ProfilePage() {
 
       {/* Desktop Layout */}
       <div className="profile-desktop-layout">
-        <div className="profile-two-column-layout">
+        <div className="profile-two-column-layout profile-no-right">
           {/* Left column - Main content */}
           <div className="profile-left-column">
             {renderProfileHeader()}
             {renderLocationCard()}
             {renderContactInfoCard()}
           </div>
-
-          {/* Right column - Announcements */}
-          {renderAnnouncementsSidebar()}
         </div>
-      </div>
+      </div> 
 
       {/* Mobile Layout */}
       <div className="profile-mobile-layout">

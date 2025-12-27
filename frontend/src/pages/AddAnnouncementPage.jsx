@@ -37,6 +37,7 @@ import { localitatiPeJudet } from '../assets/comunePeJudet';
 const judete = ["Toată țara", ...Object.keys(localitatiPeJudet)];
 
 import { useTranslation } from 'react-i18next';
+import translateCategory from '../utils/translateCategory';
 
 export default function AddAnnouncementPage() {
   const { t } = useTranslation();
@@ -588,7 +589,7 @@ export default function AddAnnouncementPage() {
           className="add-announcement-category-select"
           type="text"
           placeholder={t('addAnnouncement.categoryPlaceholder')}
-          value={category}
+          value={translateCategory(category, t)}
           readOnly
           onClick={handleCategoryClick}
           required
@@ -1025,7 +1026,7 @@ export default function AddAnnouncementPage() {
                     </Typography>
                     {category && (
                       <Chip
-                        label={category}
+                        label={translateCategory(category, t)}
                         variant="outlined"
                         sx={{
                           borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',

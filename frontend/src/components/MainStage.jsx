@@ -5,6 +5,7 @@ import hobby from '../assets/images/hobby_img.jpg';
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import translateCategory from '../utils/translateCategory';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -483,7 +484,7 @@ export default function MainStage() {
                       <div className="suggestion-content">
                         <div className="suggestion-title">{announcement.title}</div>
                         <div className="suggestion-meta">
-                          <span className="suggestion-category">{announcement.category}</span>
+                          <span className="suggestion-category">{translateCategory(announcement.category, t)}</span>
                           {announcement.location && (
                             <>
                               <span className="suggestion-separator">•</span>
