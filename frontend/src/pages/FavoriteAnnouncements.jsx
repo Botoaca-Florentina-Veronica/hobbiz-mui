@@ -69,7 +69,6 @@ export default function FavoriteAnnouncements() {
   const [guestAnnouncements, setGuestAnnouncements] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
 
   // Listen for favorites updates from other components (same-tab) and refresh guest lists
   useEffect(() => {
@@ -144,10 +143,19 @@ export default function FavoriteAnnouncements() {
 
   // Calculate pagination
   const favoritesList = isAuthenticated ? fullFavorites : guestAnnouncements;
-  const totalPages = Math.ceil((favoritesList?.length || 0) / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = favoritesList?.slice(startIndex, endIndex) || [];
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 1024;
+  const itemsPerPage = 12;
+
+  // On mobile show all favorites in a single long list (no pagination)
+  let totalPages = 1;
+  let currentItems = favoritesList || [];
+
+  if (!isMobile) {
+    totalPages = Math.ceil((favoritesList?.length || 0) / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    currentItems = favoritesList?.slice(startIndex, endIndex) || [];
+  }
 
   // Reset to page 1 when favorites list changes
   useEffect(() => {
@@ -235,7 +243,7 @@ export default function FavoriteAnnouncements() {
               </div>
             ))}
           </div>
-          {totalPages > 1 && (
+          {!isMobile && totalPages > 1 && (
             <div className="pagination-container">
               <button
                 className="pagination-btn"

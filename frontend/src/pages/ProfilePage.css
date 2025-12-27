@@ -1339,6 +1339,74 @@
   .profile-page-container > *:last-child {
     margin-bottom: 0 !important;
   }
+
+  /* Mobile Contact Card Optimizations */
+  .mobile-contact-card {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .mobile-card-header {
+    margin-bottom: 12px;
+  }
+
+  .mobile-card-title {
+    font-size: 14px;
+  }
+
+  .mobile-edit-button {
+    padding: 4px 12px;
+    font-size: 11px;
+  }
+
+  .mobile-contact-grid {
+    gap: 6px;
+  }
+
+  .mobile-contact-item {
+    padding: 8px 10px;
+    gap: 8px;
+    overflow: hidden; /* Prevent content from overflowing */
+  }
+
+  .mobile-contact-icon {
+    font-size: 16px !important;
+  }
+
+  .mobile-contact-content {
+    min-width: 0; /* Allow flex shrinking */
+    flex: 1;
+  }
+
+  .mobile-contact-label {
+    font-size: 10px;
+    margin-bottom: 1px;
+  }
+
+  .mobile-contact-value {
+    font-size: 12px;
+  }
+
+  .mobile-contact-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    min-width: 0; /* Prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-edit-actions {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .mobile-action-button {
+    padding: 10px;
+    font-size: 13px;
+  }
 }
 
 /* Extra small phones (max-width: 480px) */
@@ -1346,12 +1414,66 @@
   .profile-name-title-unified {
     font-size: 1.3rem;
   }
+
+  .mobile-contact-card {
+    padding: 12px;
+  }
+
+  .mobile-contact-item {
+    padding: 6px 8px;
+    overflow: hidden;
+  }
+
+  .mobile-contact-input {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  .mobile-contact-label {
+    font-size: 9px;
+  }
+
+  .mobile-contact-value {
+    font-size: 11px;
+  }
 }
 
 /* Very small phones (max-width: 360px) */
 @media (max-width: 360px) {
   .profile-page-container {
     padding: 0 8px;
+  }
+
+  .mobile-contact-card {
+    padding: 10px;
+  }
+
+  .mobile-contact-item {
+    padding: 4px 6px;
+    gap: 6px;
+    overflow: hidden;
+  }
+
+  .mobile-contact-input {
+    padding: 3px 4px;
+    font-size: 10px;
+  }
+
+  .mobile-contact-label {
+    font-size: 8px;
+  }
+
+  .mobile-contact-value {
+    font-size: 10px;
+  }
+
+  .mobile-edit-actions {
+    gap: 6px;
+  }
+
+  .mobile-action-button {
+    padding: 8px;
+    font-size: 12px;
   }
 }
 

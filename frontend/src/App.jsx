@@ -37,6 +37,7 @@ import TermsConditions from './pages/TermsConditions';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import AllAnnouncements from './pages/AllAnnouncements.jsx';
+import ArchivedAnnouncementsPage from './pages/ArchivedAnnouncementsPage.jsx';
 import useScrollToTop from './hooks/useScrollToTop';
 import './App.css';
 import './mediaQueries.css';
@@ -298,6 +299,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <MyAnnouncements />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/archived-announcements" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <ArchivedAnnouncementsPage />
             <Footer hideOnMobile />
           </>
         } />

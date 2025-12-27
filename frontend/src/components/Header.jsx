@@ -525,7 +525,6 @@ export default function Header() {
                     <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>{t('header.settings')}</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>{t('header.myAnnouncements')}</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>{t('header.profile')}</a>
-                    <a onClick={(e) => { e.preventDefault(); navigate('/plati'); }}>Plăți</a>
                     <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>{t('header.logout')}</a>
                   </div>
                 )}

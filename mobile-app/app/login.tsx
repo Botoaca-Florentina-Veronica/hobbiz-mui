@@ -28,6 +28,9 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [socialLoading, setSocialLoading] = useState(false);
 
+  const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
+  const t = locale === 'en' ? { auth: 'Authentication', authError: 'Error processing authentication' } : { auth: 'Autentificare', authError: 'Eroare la procesarea autentificării' };
+
   // Calculează lățimea cardului în funcție de dimensiunea ecranului
   const getCardWidth = (): number | string => {
     if (width < 600) return '100%'; // mobil
@@ -112,7 +115,7 @@ export default function LoginScreen() {
         await handleOAuthRedirectUrl(url);
       } catch (e: any) {
         console.error('[OAuth] Error in URL handler:', e);
-        Alert.alert('Autentificare', e?.message || 'Eroare la procesarea autentificării');
+        Alert.alert(t.auth, e?.message || t.authError);
       } finally {
         setSocialLoading(false);
       }

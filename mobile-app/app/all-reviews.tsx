@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
-  Text, 
   ScrollView, 
   TouchableOpacity, 
   ActivityIndicator, 
@@ -15,7 +14,33 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../components/themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
+import { useLocale } from '../src/context/LocaleContext';
 import api from '../src/services/api';
+
+const TRANSLATIONS = {
+  ro: {
+    allReviews: 'Toate evaluările',
+    reviewsFor: 'Evaluările lui',
+    loading: 'Se încarcă evaluările...',
+    noReviews: 'Nu există evaluări încă',
+    error: 'Eroare',
+    errorLoading: 'Nu s-au putut încărca evaluările',
+    user: 'Utilizator',
+    review: 'evaluare',
+    reviews: 'evaluări',
+  },
+  en: {
+    allReviews: 'All Reviews',
+    reviewsFor: 'Reviews for',
+    loading: 'Loading reviews...',
+    noReviews: 'No reviews yet',
+    error: 'Error',
+    errorLoading: 'Could not load reviews',
+    user: 'User',
+    review: 'review',
+    reviews: 'reviews',
+  },
+};
 
 interface UserReview {
   _id: string;
@@ -47,6 +72,8 @@ export default function AllReviewsScreen() {
   const insets = useSafeAreaInsets();
   const { userId } = useLocalSearchParams<{ userId?: string }>();
   const { user } = useAuth();
+  const { locale } = useLocale();
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
   const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
 
   const [reviews, setReviews] = useState<UserReview[]>([]);
@@ -57,11 +84,7 @@ export default function AllReviewsScreen() {
 
   const targetUserId = userId || user?.id;
 
-  useEffect(() => {
-    fetchAllReviews();
-  }, [targetUserId]);
-
-  const fetchAllReviews = async () => {
+  const fetchAllReviews = useCallback(async () => {
     if (!targetUserId) return;
     
     try {
@@ -69,7 +92,7 @@ export default function AllReviewsScreen() {
       
       // Fetch user info for name
       const userRes = await api.get(`/api/users/profile/${encodeURIComponent(String(targetUserId))}`);
-      setUserName(`${userRes.data.firstName || ''} ${userRes.data.lastName || ''}`.trim() || 'Utilizator');
+      setUserName(`${userRes.data.firstName || ''} ${userRes.data.lastName || ''}`.trim() || t.user);
       
       // Fetch all reviews
       const reviewsRes = await api.get(`/api/reviews/${encodeURIComponent(String(targetUserId))}`);
@@ -120,11 +143,15 @@ export default function AllReviewsScreen() {
       setReviewLikeState(initialState);
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      Alert.alert('Eroare', 'Nu s-au putut încărca evaluările');
+      Alert.alert(t.error, t.errorLoading);
     } finally {
       setLoading(false);
     }
-  };
+  }, [targetUserId, t.user]);
+
+  useEffect(() => {
+    fetchAllReviews();
+  }, [targetUserId, fetchAllReviews, t.user]);
 
   const handleLike = async (reviewId: string) => {
     if (!user?.id) {
@@ -266,11 +293,11 @@ export default function AllReviewsScreen() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Toate evaluările</ThemedText>
+          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.allReviews}</ThemedText>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={tokens.colors.primary} />
-          <ThemedText style={[styles.loadingText, { color: tokens.colors.muted }]}>Se încarcă evaluările...</ThemedText>
+          <ThemedText style={[styles.loadingText, { color: tokens.colors.muted }]}>{t.loading}</ThemedText>
         </View>
       </View>
     );
@@ -285,7 +312,7 @@ export default function AllReviewsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
           <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
         </TouchableOpacity>
-        <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Evaluările lui {userName}</ThemedText>
+        <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.reviewsFor} {userName}</ThemedText>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -308,7 +335,7 @@ export default function AllReviewsScreen() {
                   ))}
                 </View>
                 <ThemedText style={[styles.totalReviews, { color: tokens.colors.muted }]}>
-                  {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'evaluare' : 'evaluări'}
+                  {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? t.review : t.reviews}
                 </ThemedText>
               </View>
 
@@ -353,7 +380,7 @@ export default function AllReviewsScreen() {
             <View style={styles.emptyState}>
               <Ionicons name="chatbubbles-outline" size={64} color={tokens.colors.placeholder} />
               <ThemedText style={[styles.emptyText, { color: tokens.colors.muted }]}>
-                Nu există evaluări încă
+                {t.noReviews}
               </ThemedText>
             </View>
           ) : (

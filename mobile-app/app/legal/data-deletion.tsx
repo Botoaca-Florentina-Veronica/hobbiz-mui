@@ -104,7 +104,7 @@ export default function DataDeletionScreen() {
 
           <StepCard step="B" title={locale === 'en' ? 'Delete via Email Request' : 'Ștergere prin Cerere Email'}>
             <ThemedText style={[styles.paragraph, { color: isDark ? '#ffffff' : '#4a5568' }]}>
-              {locale === 'en' ? <>Send an email to <ThemedText onPress={() => openMail('team.hobbiz@gmail.com')} style={[styles.link, { color: tokens.colors.primary }]}>team.hobbiz@gmail.com</ThemedText> with the subject line "Data Deletion Request" and include:</> : <>Trimite un email la <ThemedText onPress={() => openMail('team.hobbiz@gmail.com')} style={[styles.link, { color: tokens.colors.primary }]}>team.hobbiz@gmail.com</ThemedText> cu subiectul "Cerere Ștergere Date" și include:</>}
+              {locale === 'en' ? <>Send an email to <ThemedText onPress={() => openMail('team.hobbiz@gmail.com')} style={[styles.link, { color: tokens.colors.primary }]}>team.hobbiz@gmail.com</ThemedText> with the subject line &quot;Data Deletion Request&quot; and include:</> : <>Trimite un email la <ThemedText onPress={() => openMail('team.hobbiz@gmail.com')} style={[styles.link, { color: tokens.colors.primary }]}>team.hobbiz@gmail.com</ThemedText> cu subiectul &quot;Cerere Ștergere Date&quot; și include:</>}
             </ThemedText>
             <Bullet>{locale === 'en' ? 'Your full name as registered on Hobbiz' : 'Numele complet așa cum este înregistrat pe Hobbiz'}</Bullet>
             <Bullet>{locale === 'en' ? 'Your email address associated with your account' : 'Adresa de email asociată contului tău'}</Bullet>

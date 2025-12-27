@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   TextField,
@@ -31,6 +32,7 @@ import './AllAnnouncements.css';
 import './FavoriteAnnouncements.css';
 
 export default function AllAnnouncements() {
+  const { t } = useTranslation();
   // ============================================
   // ROUTING & CONTEXT
   // ============================================
@@ -306,13 +308,13 @@ export default function AllAnnouncements() {
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h6">Toate Anunțurile</Typography>
+        <Typography variant="h6">{t('allAnnouncements.title')}</Typography>
       </Box>
 
       <Box className="all-announcements-wrapper">
         {/* DESKTOP HEADER - PAGE TITLE */}
         <Box className="page-header">
-          <Typography variant="h3">Toate Anunțurile</Typography>
+          <Typography variant="h3">{t('allAnnouncements.title')}</Typography>
         </Box>
 
         {/* SEARCH & FILTERS SECTION */}
@@ -321,7 +323,7 @@ export default function AllAnnouncements() {
             {/* Search Input Field */}
             <TextField
               fullWidth
-              placeholder="Caută anunțuri..."
+              placeholder={t('allAnnouncements.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -349,7 +351,7 @@ export default function AllAnnouncements() {
                 onClick={() => setShowFilters(!showFilters)}
                 className="filters-toggle-btn"
               >
-                {showFilters ? 'Ascunde filtre' : 'Arată filtre'}
+                {showFilters ? t('allAnnouncements.hideFilters') : t('allAnnouncements.showFilters')}
               </Button>
 
               <ButtonGroup size="small" className="view-mode-toggle">
@@ -376,18 +378,18 @@ export default function AllAnnouncements() {
                 {/* Sort Filter */}
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth size="small">
-                    <InputLabel className="filter-select-label">Sortează</InputLabel>
+                    <InputLabel className="filter-select-label">{t('allAnnouncements.sortLabel')}</InputLabel>
                     <Select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      label="Sortează"
+                      label={t('allAnnouncements.sortLabel')}
                       className="filter-select"
                     >
-                      <MenuItem value="recent">Cele mai recente</MenuItem>
-                      <MenuItem value="oldest">Cele mai vechi</MenuItem>
-                      <MenuItem value="price-low">Preț crescător</MenuItem>
-                      <MenuItem value="price-high">Preț descrescător</MenuItem>
-                      <MenuItem value="title">Alfabetic</MenuItem>
+                      <MenuItem value="recent">{t('allAnnouncements.recent')}</MenuItem>
+                      <MenuItem value="oldest">{t('allAnnouncements.oldest')}</MenuItem>
+                      <MenuItem value="price-low">{t('allAnnouncements.priceLow')}</MenuItem>
+                      <MenuItem value="price-high">{t('allAnnouncements.priceHigh')}</MenuItem>
+                      <MenuItem value="title">{t('allAnnouncements.titleSort')}</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -395,14 +397,14 @@ export default function AllAnnouncements() {
                 {/* Category Filter */}
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth size="small">
-                    <InputLabel className="filter-select-label">Categorie</InputLabel>
+                    <InputLabel className="filter-select-label">{t('allAnnouncements.categoryLabel')}</InputLabel>
                     <Select
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
-                      label="Categorie"
+                      label={t('allAnnouncements.categoryLabel')}
                       className="filter-select"
                     >
-                      <MenuItem value="all">Toate categoriile</MenuItem>
+                      <MenuItem value="all">{t('allAnnouncements.allCategories')}</MenuItem>
                       {uniqueCategories.map(cat => (
                         <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                       ))}
@@ -413,18 +415,18 @@ export default function AllAnnouncements() {
                 {/* Price Filter */}
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth size="small">
-                    <InputLabel className="filter-select-label">Preț</InputLabel>
+                    <InputLabel className="filter-select-label">{t('allAnnouncements.priceLabel')}</InputLabel>
                     <Select
                       value={priceFilter}
                       onChange={(e) => setPriceFilter(e.target.value)}
-                      label="Preț"
+                      label={t('allAnnouncements.priceLabel')}
                       className="filter-select"
                     >
-                      <MenuItem value="all">Toate prețurile</MenuItem>
-                      <MenuItem value="free">Gratuit</MenuItem>
-                      <MenuItem value="under50">Sub 50 RON</MenuItem>
-                      <MenuItem value="under100">50-100 RON</MenuItem>
-                      <MenuItem value="over100">Peste 100 RON</MenuItem>
+                      <MenuItem value="all">{t('allAnnouncements.allPrices')}</MenuItem>
+                      <MenuItem value="free">{t('allAnnouncements.free')}</MenuItem>
+                      <MenuItem value="under50">{t('allAnnouncements.under50')}</MenuItem>
+                      <MenuItem value="under100">{t('allAnnouncements.under100')}</MenuItem>
+                      <MenuItem value="over100">{t('allAnnouncements.over100')}</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -432,14 +434,14 @@ export default function AllAnnouncements() {
                 {/* Location Filter */}
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth size="small">
-                    <InputLabel className="filter-select-label">Locație</InputLabel>
+                    <InputLabel className="filter-select-label">{t('allAnnouncements.locationLabel')}</InputLabel>
                     <Select
                       value={locationFilter}
                       onChange={(e) => setLocationFilter(e.target.value)}
-                      label="Locație"
+                      label={t('allAnnouncements.locationLabel')}
                       className="filter-select"
                     >
-                      <MenuItem value="all">Toate locațiile</MenuItem>
+                      <MenuItem value="all">{t('allAnnouncements.allLocations')}</MenuItem>
                       {uniqueLocations.map(loc => (
                         <MenuItem key={loc} value={loc}>{loc}</MenuItem>
                       ))}
@@ -455,16 +457,16 @@ export default function AllAnnouncements() {
         {loading ? (
           // Loading State
           <Box className="loading-container">
-            <Typography className="loading-text">Se încarcă anunțurile...</Typography>
+            <Typography className="loading-text">{t('allAnnouncements.loading')}</Typography>
           </Box>
         ) : filteredAndSortedAnnouncements.length === 0 ? (
           // Empty Results State
           <Box className="no-results-container">
             <Typography variant="h6" className="no-results-title">
-              Nu au fost găsite anunțuri
+              {t('allAnnouncements.noResults')}
             </Typography>
             <Typography variant="body2" className="no-results-description">
-              Încearcă să modifici criteriile de căutare
+              {t('allAnnouncements.noResultsDescription')}
             </Typography>
           </Box>
         ) : (
@@ -537,7 +539,7 @@ export default function AllAnnouncements() {
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
-                  Înapoi
+                  {t('allAnnouncements.previous')}
                 </button>
                 <div className="pagination-numbers">
                   {[...Array(totalPages)].map((_, index) => {
@@ -572,7 +574,7 @@ export default function AllAnnouncements() {
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >
-                  Următorul
+                  {t('allAnnouncements.next')}
                 </button>
               </div>
             )}

@@ -1,7 +1,7 @@
 .notification-settings-container {
   padding-top: 20px;
   padding-bottom: 40px;
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,6 +46,57 @@
 
 .setting-item:last-child {
   border-bottom: none !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 1024px) {
+  .notification-settings-container {
+    padding-top: 20px;
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 20px);
+    min-height: 100dvh;
+  }
+
+  .notification-title {
+    font-size: 2.2rem;
+    margin: 2rem 0 1rem 0;
+  }
+
+  .settings-paper {
+    max-width: 100%;
+    margin: 16px 0;
+    border-radius: 12px !important;
+  }
+
+  .setting-item {
+    padding: 12px 14px !important;
+  }
+
+  .setting-item .MuiListItemText-primary {
+    font-size: 1rem !important;
+  }
+}
+
+/* Extra small screens: make buttons fill width with equal side padding */
+@media (max-width: 600px) {
+  .notification-settings-container {
+    align-items: stretch;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .settings-paper {
+    width: 100%;
+    max-width: none;
+    margin: 16px 0;
+  }
+
+  .setting-item {
+    padding: 12px 14px !important;
+  }
+
+  .setting-item .MuiListItemText-primary {
+    font-size: 1rem !important;
+  }
 }
 
 /* Responsive design for larger screens */

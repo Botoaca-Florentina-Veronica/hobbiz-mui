@@ -16,19 +16,64 @@ import { ProtectedRoute } from '../src/components/ProtectedRoute';
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
 
-const CATEGORIES: Category[] = [
-  { key: 'fotografie', label: 'Fotografie', icon: 'camera-outline', color: '#FF6B6B' },
-  { key: 'prajituri', label: 'Prăjituri', icon: 'ice-cream-outline', color: '#4ECDC4' },
-  { key: 'muzica', label: 'Muzică', icon: 'musical-notes-outline', color: '#45B7D1' },
-  { key: 'reparatii', label: 'Reparații', icon: 'construct-outline', color: '#96CEB4' },
-  { key: 'dans', label: 'Dans', icon: 'woman-outline', color: '#FFEAA7' },
-  { key: 'curatenie', label: 'Curățenie', icon: 'sparkles-outline', color: '#DDA0DD' },
-  { key: 'gradinarit', label: 'Grădinărit', icon: 'leaf-outline', color: '#98D8C8' },
-  { key: 'sport', label: 'Sport', icon: 'barbell-outline', color: '#F7DC6F' },
-  { key: 'arta', label: 'Artă', icon: 'color-palette-outline', color: '#BB8FCE' },
-  { key: 'tehnologie', label: 'Tehnologie', icon: 'laptop-outline', color: '#85C1E9' },
-  { key: 'auto', label: 'Auto', icon: 'car-sport-outline', color: '#F8C471' },
-  { key: 'meditatii', label: 'Meditații', icon: 'school-outline', color: '#82E0AA' },
+const TRANSLATIONS = {
+  ro: {
+    error: 'Eroare',
+    authRequired: 'Trebuie să fii autentificat pentru a edita un anunț.',
+    invalidId: 'ID anunț invalid.',
+    loadError: 'Nu am putut încărca datele anunțului.',
+    permissionTitle: 'Permisiune necesară',
+    permissionMessage: 'Te rog permite accesul la galerie pentru a selecta imagini.',
+    formatError: 'Format neacceptat',
+    formatMessage: 'Te rog selectează fișiere JPG (jpeg).',
+    selectError: 'Nu am putut selecta imaginile.',
+    validationTitle: 'Validare',
+    titleTooShort: 'Titlul trebuie să aibă cel puțin 16 caractere.',
+    titleTooLong: 'Titlul nu poate depăși 70 de caractere.',
+    noCategory: 'Trebuie să selectezi o categorie.',
+    descriptionTooShort: 'Descrierea trebuie să aibă cel puțin 40 de caractere.',
+    descriptionTooLong: 'Descrierea nu poate depăși 9000 de caractere.',
+    contactRequired: 'Numele persoanei de contact este obligatoriu.',
+    contactIncomplete: 'Trebuie să completezi cel puțin email-ul sau telefonul.',
+    saveError: 'Nu s-a putut salva anunțul.',
+  },
+  en: {
+    error: 'Error',
+    authRequired: 'You must be authenticated to edit an announcement.',
+    invalidId: 'Invalid announcement ID.',
+    loadError: 'Could not load announcement data.',
+    permissionTitle: 'Permission required',
+    permissionMessage: 'Please allow gallery access to select images.',
+    formatError: 'Unsupported format',
+    formatMessage: 'Please select JPG files.',
+    selectError: 'Could not select images.',
+    validationTitle: 'Validation',
+    titleTooShort: 'Title must be at least 16 characters.',
+    titleTooLong: 'Title cannot exceed 70 characters.',
+    noCategory: 'You must select a category.',
+    descriptionTooShort: 'Description must be at least 40 characters.',
+    descriptionTooLong: 'Description cannot exceed 9000 characters.',
+    contactRequired: 'Contact person name is required.',
+    contactIncomplete: 'You must provide at least email or phone.',
+    saveError: 'Could not save the announcement.',
+  }
+};
+
+import { translateCategory } from '../src/constants/categories';
+
+const getCategories = (locale: string): Category[] => [
+  { key: 'fotografie', label: translateCategory('fotografie', locale), icon: 'camera-outline', color: '#FF6B6B' },
+  { key: 'prajituri', label: translateCategory('prajituri', locale), icon: 'ice-cream-outline', color: '#4ECDC4' },
+  { key: 'muzica', label: translateCategory('muzica', locale), icon: 'musical-notes-outline', color: '#45B7D1' },
+  { key: 'reparatii', label: translateCategory('reparatii', locale), icon: 'construct-outline', color: '#96CEB4' },
+  { key: 'dans', label: translateCategory('dans', locale), icon: 'woman-outline', color: '#FFEAA7' },
+  { key: 'curatenie', label: translateCategory('curatenie', locale), icon: 'sparkles-outline', color: '#DDA0DD' },
+  { key: 'gradinarit', label: translateCategory('gradinarit', locale), icon: 'leaf-outline', color: '#98D8C8' },
+  { key: 'sport', label: translateCategory('sport', locale), icon: 'barbell-outline', color: '#F7DC6F' },
+  { key: 'arta', label: translateCategory('arta', locale), icon: 'color-palette-outline', color: '#BB8FCE' },
+  { key: 'tehnologie', label: translateCategory('tehnologie', locale), icon: 'laptop-outline', color: '#85C1E9' },
+  { key: 'auto', label: translateCategory('auto', locale), icon: 'car-sport-outline', color: '#F8C471' },
+  { key: 'meditatii', label: translateCategory('meditatii', locale), icon: 'school-outline', color: '#82E0AA' },
 ];
 
 export default function EditAnnouncementScreen() {
@@ -38,6 +83,9 @@ export default function EditAnnouncementScreen() {
   const { isAuthenticated } = useAuth();
   const params = useLocalSearchParams();
   const announcementId = params.id as string;
+
+  const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -70,12 +118,12 @@ export default function EditAnnouncementScreen() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      Alert.alert('Eroare', 'Trebuie să fii autentificat pentru a edita un anunț.');
+      Alert.alert(t.error, t.authRequired);
       router.replace('/login');
       return;
     }
     if (!announcementId) {
-      Alert.alert('Eroare', 'ID anunț invalid.');
+      Alert.alert(t.error, t.invalidId);
       router.back();
       return;
     }
@@ -102,7 +150,7 @@ export default function EditAnnouncementScreen() {
       }
     } catch (error) {
       console.error('Error fetching announcement:', error);
-      Alert.alert('Eroare', 'Nu am putut încărca datele anunțului.');
+      Alert.alert(t.error, t.loadError);
       router.back();
     } finally {
       setLoading(false);
@@ -113,7 +161,7 @@ export default function EditAnnouncementScreen() {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permisiune necesară', 'Te rog permite accesul la galerie pentru a selecta imagini.');
+        Alert.alert(t.permissionTitle, t.permissionMessage);
         return;
       }
 
@@ -136,7 +184,7 @@ export default function EditAnnouncementScreen() {
       });
 
       if (jpgAssets.length === 0) {
-        Alert.alert('Format neacceptat', 'Te rog selectează fișiere JPG (jpeg).');
+        Alert.alert(t.formatError, t.formatMessage);
         return;
       }
 
@@ -147,7 +195,7 @@ export default function EditAnnouncementScreen() {
       setImages(prev => [...prev, ...newImages]);
     } catch (e) {
       console.error('pickImages error', e);
-      Alert.alert('Eroare', 'Nu am putut selecta imaginile.');
+      Alert.alert(t.error, t.selectError);
     }
   }
 
@@ -162,31 +210,31 @@ export default function EditAnnouncementScreen() {
   const handleSubmit = async () => {
     // Validare
     if (title.length < 16) {
-      Alert.alert('Validare', 'Titlul trebuie să aibă cel puțin 16 caractere.');
+      Alert.alert(t.validationTitle, t.titleTooShort);
       return;
     }
     if (title.length > 70) {
-      Alert.alert('Validare', 'Titlul nu poate depăși 70 de caractere.');
+      Alert.alert(t.validationTitle, t.titleTooLong);
       return;
     }
     if (!category) {
-      Alert.alert('Validare', 'Trebuie să selectezi o categorie.');
+      Alert.alert(t.validationTitle, t.noCategory);
       return;
     }
     if (description.length < 40) {
-      Alert.alert('Validare', 'Descrierea trebuie să aibă cel puțin 40 de caractere.');
+      Alert.alert(t.validationTitle, t.descriptionTooShort);
       return;
     }
     if (description.length > 9000) {
-      Alert.alert('Validare', 'Descrierea nu poate depăși 9000 de caractere.');
+      Alert.alert(t.validationTitle, t.descriptionTooLong);
       return;
     }
     if (!contactName.trim()) {
-      Alert.alert('Validare', 'Numele persoanei de contact este obligatoriu.');
+      Alert.alert(t.validationTitle, t.contactRequired);
       return;
     }
     if (!email.trim() && !phone.trim()) {
-      Alert.alert('Validare', 'Trebuie să completezi cel puțin email-ul sau telefonul.');
+      Alert.alert(t.validationTitle, t.contactIncomplete);
       return;
     }
 
@@ -235,7 +283,7 @@ export default function EditAnnouncementScreen() {
     } catch (error: any) {
       console.error('Error updating announcement:', error);
       const errorMsg = error.response?.data?.error || 'Eroare la actualizarea anunțului.';
-      Alert.alert('Eroare', errorMsg);
+      Alert.alert(t.error, errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -479,7 +527,7 @@ export default function EditAnnouncementScreen() {
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
-              {CATEGORIES.map(cat => (
+              {getCategories(locale).map(cat => (
                 <TouchableOpacity
                   key={cat.key}
                   onPress={() => { setCategory(cat.label); setCategoryModalOpen(false); }}

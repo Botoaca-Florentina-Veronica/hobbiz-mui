@@ -1,26 +1,36 @@
 /* Color tokens for Account page (light + dark via CSS vars) */
 :root {
-  --acc-bg: #f3f5f6;
+  --acc-bg: #f8f9fa;
   --acc-card: #ffffff;
+  --acc-user-card: #2c2c2e;
   --acc-border: #e5e7eb;
   --acc-text: #1a1a1a;
   --acc-title: #1a1a1a;
   --acc-primary: #355070; /* Primary a0 */
-  --acc-primary-alt: #355070; /* Primary a10 */
+  --acc-primary-alt: #f51866; /* Primary a10 */
   --acc-divider: #e5e7eb;
   --acc-hover: #f8fafc;
+  --acc-avatar-bg: #5a8db8;
+  --acc-avatar-icon: #ffffff;
+  --acc-user-name: #ffffff;
+  --acc-user-info: #9ca3af;
 }
 
 .dark-mode {
-  --acc-bg: #121212;      /* Surface a0 */
-  --acc-card: #282828;    /* Surface a10 */
-  --acc-border: #3f3f3f;  /* Surface a20 */
-  --acc-text: #8b8b8b;    /* Surface a50 as readable text */
-  --acc-title: #ffabb7;   /* Primary a50 for headings */
+  --acc-bg: #000000;      /* Surface a0 */
+  --acc-card: #2c2c2e;    /* Surface a10 */
+  --acc-user-card: #2c2c2e;
+  --acc-border: #3a3a3c;  /* Surface a20 */
+  --acc-text: #ffffff;    /* Surface a50 as readable text */
+  --acc-title: #ffffff;   /* Primary a50 for headings */
   --acc-primary: #f51866; /* Primary a0 */
-  --acc-primary-alt: #fa4875; /* Primary a10 */
-  --acc-divider: #575757; /* Surface a30 */
-  --acc-hover: #3f3f3f;   /* Surface a20 */
+  --acc-primary-alt: #f51866; /* Primary a10 */
+  --acc-divider: #3a3a3c; /* Surface a30 */
+  --acc-hover: #3a3a3c;   /* Surface a20 */
+  --acc-avatar-bg: #3a3a3c;
+  --acc-avatar-icon: #5a8db8;
+  --acc-user-name: #ffffff;
+  --acc-user-info: #9ca3af;
 }
 
 .mobile-account-menu {
@@ -28,6 +38,7 @@
   margin: 0 auto;
   padding: 16px 16px calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
   min-height: 100dvh; /* ensure full height on mobile with dynamic viewport */
+  font-family: 'Poppins', sans-serif;
 }
 
 .mobile-account-menu__header {
@@ -72,6 +83,101 @@
 @media (max-width: 1024px) {
   .mobile-account-menu__list [data-menu-key="/contul-tau"] {
     display: none !important;
+  }
+}
+
+/* Apply mobile-specific styles only on small screens */
+@media (max-width: 1024px) {
+  /* Mobile header gradient visible */
+  .mobile-account-header-gradient {
+    display: block !important;
+  }
+
+  /* Mobile user info card styling */
+  .mobile-account-user-card {
+    display: flex !important;
+  }
+
+  /* Adjust padding for mobile */
+  .mobile-menu-items-wrapper {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Ensure body background matches on mobile */
+  body {
+    background-color: var(--acc-bg) !important;
+  }
+
+  /* Smaller gap between cards on mobile */
+  .mobile-account-menu__list {
+    gap: 8px !important;
+  }
+}
+
+/* For very small phones */
+@media (max-width: 480px) {
+  /* Smaller font for greeting text */
+  .mobile-account-greeting {
+    font-size: 1.5rem !important;
+  }
+
+  /* Smaller avatar on very small screens */
+  .mobile-account-avatar {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  /* Reduce padding in cards */
+  .mobile-account-menu__list .MuiCardContent-root {
+    padding: 10px 12px !important;
+  }
+}
+
+/* For extra small phones */
+@media (max-width: 360px) {
+  .mobile-account-greeting {
+    font-size: 1.3rem !important;
+  }
+
+  .mobile-account-avatar {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  /* Smaller padding on very small screens */
+  .mobile-menu-items-wrapper {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  /* Further reduce padding in cards */
+  .mobile-account-menu__list .MuiCardContent-root {
+    padding: 8px 10px !important;
+  }
+}
+
+/* On larger screens, use simpler layout */
+@media (min-width: 1025px) {
+  /* Hide mobile-specific gradient header */
+  .mobile-account-header-gradient {
+    display: none !important;
+  }
+
+  /* Hide or adjust mobile user card */
+  .mobile-account-user-card {
+    display: none !important;
+  }
+
+  /* Show simple header on desktop */
+  .desktop-account-header {
+    display: flex !important;
+  }
+
+  /* Add padding back for desktop */
+  .mobile-menu-items-wrapper {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
   }
 }
 

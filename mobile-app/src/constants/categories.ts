@@ -23,10 +23,51 @@ export const CATEGORY_DEFS: CategoryDef[] = [
   { key: 'meditatii', label: 'Meditații', icon: 'school-outline', color: '#82E0AA', image: require('../../assets/images/carte.png') },
 ];
 
+export const CATEGORY_TRANSLATIONS = {
+  ro: {
+    fotografie: 'Fotografie',
+    prajituri: 'Prăjituri',
+    muzica: 'Muzică',
+    reparatii: 'Reparații',
+    dans: 'Dans',
+    curatenie: 'Curățenie',
+    gradinarit: 'Grădinărit',
+    sport: 'Sport',
+    arta: 'Artă',
+    tehnologie: 'Tehnologie',
+    auto: 'Auto',
+    meditatii: 'Meditații',
+  },
+  en: {
+    fotografie: 'Photography',
+    prajituri: 'Cakes',
+    muzica: 'Music',
+    reparatii: 'Repairs',
+    dans: 'Dance',
+    curatenie: 'Cleaning',
+    gradinarit: 'Gardening',
+    sport: 'Sports',
+    arta: 'Art',
+    tehnologie: 'Technology',
+    auto: 'Auto',
+    meditatii: 'Tutoring',
+  }
+};
+
+export function translateCategory(categoryKey: string, locale: string = 'ro'): string {
+  const translations = CATEGORY_TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  return translations[categoryKey] || categoryKey;
+}
+
 export function findCategoryByLabel(label?: string): CategoryDef | undefined {
   if (!label) return undefined;
   const normalized = label.trim().toLowerCase();
   return CATEGORY_DEFS.find(c => c.label.toLowerCase() === normalized || c.key.toLowerCase() === normalized);
+}
+
+export function getCategoryKeyByLabel(label?: string): string | undefined {
+  const category = findCategoryByLabel(label);
+  return category?.key;
 }
 
 export default CATEGORY_DEFS;

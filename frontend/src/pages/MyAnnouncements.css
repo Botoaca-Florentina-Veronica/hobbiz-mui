@@ -77,8 +77,15 @@
 
 .ma-scroll-view {
   flex: 1;
-  padding: 12px;
-  padding-bottom: 12px;
+  padding: 16px;
+  padding-bottom: 16px;
+}
+
+/* Mobile: add more padding for better centering */
+@media (max-width: 768px) {
+  .ma-scroll-view {
+    padding: 16px;
+  }
 }
 
 /* 3. HEADER
@@ -99,6 +106,10 @@
   flex-direction: row;
   align-items: center;
   gap: 12px;
+}
+
+.ma-archived-button {
+  margin-left: auto;
 }
 
 .ma-back-button {
@@ -131,13 +142,13 @@
   padding: 12px;
   margin-bottom: 16px;
   background-color: var(--ma-dark-container);
-  border: 1px solid transparent;
+  border: 2px solid #ffffff;
   border-radius: 12px;
   overflow: hidden;
 }
 
 .dark-mode .ma-search-section {
-  border-color: var(--ma-border-neutral);
+  border: 2px solid var(--ma-border-neutral);
 }
 
 .ma-search-bar {
@@ -148,12 +159,12 @@
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 12px;
-  border: 1px solid transparent;
+  border: 2px solid #ffffff;
 }
 
 .dark-mode .ma-search-bar {
   background-color: #121212;
-  border-color: var(--ma-border-neutral);
+  border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .ma-search-icon {
@@ -296,6 +307,108 @@
   padding: 60px 20px;
 }
 
+/* ===============================
+   CONFIRM DIALOG (Archive/Delete) - Web styles
+   Mimics mobile ConfirmDialog appearance
+   =============================== */
+.ma-confirm-dialog-paper {
+  border-radius: 20px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background-color: var(--ma-surface) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+  max-width: 440px;
+}
+
+.dark-mode .ma-confirm-dialog-paper {
+  background-color: #1e1e1e !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6) !important;
+}
+
+.ma-confirm-dialog-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ma-dialog-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  background-color: rgba(0,0,0,0.04);
+}
+
+.dark-mode .ma-dialog-icon {
+  background-color: rgba(255,255,255,0.06);
+}
+
+.ma-dialog-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+  color: var(--ma-text);
+}
+
+.dark-mode .ma-dialog-title {
+  color: #ffffff;
+}
+
+.ma-dialog-message {
+  font-size: 15px;
+  text-align: center;
+  color: var(--ma-muted);
+  margin-bottom: 20px;
+}
+
+.dark-mode .ma-dialog-message {
+  color: rgba(255,255,255,0.78);
+}
+
+.ma-confirm-dialog-actions {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+}
+
+.ma-confirm-dialog-actions .ma-dialog-cancel,
+.ma-confirm-dialog-actions .ma-dialog-confirm {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.ma-confirm-dialog-actions .ma-dialog-cancel {
+  background-color: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: var(--ma-text);
+}
+
+.dark-mode .ma-confirm-dialog-actions .ma-dialog-cancel {
+  background-color: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #ffffff;
+}
+
+.ma-confirm-dialog-actions .ma-dialog-confirm {
+  background-color: var(--ma-primary);
+  color: #ffffff;
+  border: none;
+}
+
+.dark-mode .ma-confirm-dialog-actions .ma-dialog-confirm {
+  background-color: #f51866;
+}
+
 .ma-empty-icon {
   font-size: 64px;
   color: var(--ma-placeholder);
@@ -313,28 +426,31 @@
 .ma-card {
   background-color: var(--ma-surface);
   border-radius: 20px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  height: 170px;
+  height: auto;
+  min-height: 180px;
+  border: 2px solid #ffffff;
 }
 
 .dark-mode .ma-card {
   background-color: var(--ma-dark-container);
-  border: 1px solid var(--ma-border-neutral);
+  border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .ma-card-image {
   width: 42%;
-  height: 170px;
+  min-height: 180px;
   background-color: var(--ma-border);
   cursor: pointer;
   flex-shrink: 0;
   min-width: 0;
   border-radius: 0;
+  display: flex;
 }
 
 .ma-image {
@@ -357,8 +473,8 @@
 
 .ma-card-content {
   flex: 1;
-  padding: 6px;
-  padding-top: 8px;
+  padding: 8px;
+  padding-top: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -442,7 +558,7 @@
 }
 
 .ma-action-button {
-  padding: 1px 4px;
+  padding: 4px 6px;
   border-radius: 20px;
   border-width: 2px;
   border-style: solid;

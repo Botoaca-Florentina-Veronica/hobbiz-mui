@@ -11,7 +11,7 @@
   --aa-spacing-2xl: 32px;
 
   /* Border radius - used for cards, buttons, inputs */
-  --aa-border-radius: 8px;
+  --aa-border-radius: 12px;
 
   /* Z-index layering */
   --aa-z-header: 100;
@@ -33,6 +33,16 @@
   --aa-light-border-hover: rgba(53, 80, 112, 0.3);
   --aa-light-accent: #355070;
   --aa-light-accent-hover: #2a4058;
+
+  /* MA Variables - Light Mode */
+  --ma-bg-page: #ffffff;
+  --ma-card-bg: #ffffff;
+  --ma-search-input-bg: #ffffff;
+  --ma-card-border: #e8ecef;
+  --ma-card-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --ma-text-primary: #1a1a1a;
+  --ma-text-secondary: #6b7280;
+  --ma-text-title: #183642;
 }
 
 /* ============================================
@@ -113,8 +123,8 @@
    ============================================ */
 .page-header {
   display: none;
-  margin-bottom: var(--aa-spacing-2xl);
-  margin-top: 4rem;
+  margin-bottom: 4rem;
+  margin-top: 6rem;
   text-align: center;
 }
 
@@ -148,11 +158,11 @@
    ============================================ */
 .search-filters-bar {
   padding: var(--aa-spacing-lg);
-  margin-bottom: var(--aa-spacing-xl);
+  margin-bottom: 60px;
   background-color: var(--ma-card-bg);
-  border-radius: var(--aa-border-radius);
+  border-radius: var(--aa-border-radius) !important;
   box-shadow: var(--ma-card-shadow);
-  max-width: 1060px;
+  max-width: 1168px;
   margin-left: auto;
   margin-right: auto;
 
@@ -161,7 +171,20 @@
 }
 
 .dark-mode .search-filters-bar {
-  border: 1px solid var(--aa-dark-border);
+  --ma-card-bg: #121212;
+  background-color: var(--ma-card-bg);
+  border: 1px solid #fff;
+}
+
+.dark-mode {
+  --ma-bg-page: #121212;
+  --ma-card-bg: #121212;
+  --ma-search-input-bg: #121212;
+  --ma-card-border: #fff;
+  --ma-card-shadow: none;
+  --ma-text-primary: #eceeef;
+  --ma-text-secondary: #b0b0b0;
+  --ma-text-title: #ffffff;
 }
 
 /* ============================================
@@ -180,27 +203,19 @@
 }
 
 /* Dark Mode - Search Input Borders */
-.dark-mode .search-input-wrapper .MuiOutlinedInput-root {
-  border: 1px solid var(--aa-dark-border);
-}
-
 .dark-mode .search-input-wrapper .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-dark-border);
+  border-color: #fff !important;
 }
 
 .dark-mode .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-dark-border-hover);
+  border-color: #fff !important;
 }
 
 .dark-mode .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-dark-accent);
+  border-color: #fff !important;
 }
 
 /* Light Mode - Search Input Borders */
-:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root {
-  border: 1px solid var(--aa-light-border);
-}
-
 :not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-notchedOutline {
   border-color: var(--aa-light-border);
 }
@@ -276,6 +291,7 @@
    ============================================ */
 .filters-grid {
   /* Grid automatically handles responsiveness */
+  justify-content: center;
 }
 
 .filter-select .MuiOutlinedInput-root {
@@ -288,28 +304,37 @@
   color: var(--ma-text-secondary);
 }
 
-/* Dark Mode - Select Field Borders */
-.dark-mode .filter-select .MuiOutlinedInput-root {
-  border: 1px solid var(--aa-dark-border);
+/* Dark Mode - Select Field Labels */
+.dark-mode .filter-select-label {
+  color: #fff;
 }
 
+/* Dark Mode - Select displayed value and input text */
+.dark-mode .filter-select .MuiSelect-select,
+.dark-mode .filter-select .MuiInputBase-input,
+.dark-mode .filter-select .MuiSelect-outlined {
+  color: #fff !important;
+}
+
+/* Dark Mode - Dropdown items (MenuItem) */
+.dark-mode .filter-select .MuiList-root .MuiMenuItem-root {
+  color: #fff !important;
+}
+
+/* Dark Mode - Select Field Borders */
 .dark-mode .filter-select .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-dark-border);
+  border-color: #fff !important;
 }
 
 .dark-mode .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-dark-border-hover);
+  border-color: #fff !important;
 }
 
 .dark-mode .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-dark-accent);
+  border-color: #fff !important;
 }
 
 /* Light Mode - Select Field Borders */
-:not(.dark-mode) .filter-select .MuiOutlinedInput-root {
-  border: 1px solid var(--aa-light-border);
-}
-
 :not(.dark-mode) .filter-select .MuiOutlinedInput-notchedOutline {
   border-color: var(--aa-light-border);
 }

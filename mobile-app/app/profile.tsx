@@ -95,7 +95,14 @@ export default function ProfileScreen() {
       saveInfo: 'Informațiile au fost actualizate',
       saveFailed: 'Nu s-au putut actualiza informațiile. Încearcă din nou',
       cancelBtn: 'Anulează',
-      saveBtn: 'Salvează'
+      saveBtn: 'Salvează',
+      error: 'Eroare',
+      imageSelectError: 'A apărut o eroare la selectarea imaginii',
+      reactionSaveError: 'Nu s-a putut salva reacția. Încearcă din nou.',
+      authRequiredLike: 'Autentificare necesară',
+      authRequiredUnlike: 'Autentificare necesară',
+      authMessageLike: 'Trebuie să fii conectat pentru a da like.',
+      authMessageUnlike: 'Trebuie să fii conectat pentru a da unlike.'
     },
     en: {
       permissionTitle: 'Permission',
@@ -126,7 +133,14 @@ export default function ProfileScreen() {
       saveInfo: 'Information updated',
       saveFailed: 'Could not update information. Please try again',
       cancelBtn: 'Cancel',
-      saveBtn: 'Save'
+      saveBtn: 'Save',
+      error: 'Error',
+      imageSelectError: 'An error occurred while selecting the image',
+      reactionSaveError: 'Could not save the reaction. Please try again.',
+      authRequiredLike: 'Authentication required',
+      authRequiredUnlike: 'Authentication required',
+      authMessageLike: 'You must be logged in to like.',
+      authMessageUnlike: 'You must be logged in to unlike.'
     }
   };
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
@@ -386,7 +400,7 @@ export default function ProfileScreen() {
       );
     } catch (err) {
       console.error('handlePickAvatar error:', err);
-      Alert.alert('Eroare', 'A apărut o eroare la selectarea imaginii');
+      Alert.alert(t.error, t.imageSelectError);
     }
   };
 
@@ -568,14 +582,14 @@ export default function ProfileScreen() {
         likesCount: prevCounts.likesCount || 0,
         unlikesCount: prevCounts.unlikesCount || 0,
       } : r));
-      Alert.alert('Eroare', 'Nu s-a putut salva reacția. Încearcă din nou.');
+      Alert.alert(t.error, t.reactionSaveError);
     }
   };
 
   // Handle like toggle for a review (uses unified endpoint)
   const handleToggleLike = async (reviewId: string) => {
     if (!user?.id) {
-      Alert.alert('Autentificare necesară', 'Trebuie să fii conectat pentru a da like.');
+      Alert.alert(t.authRequiredLike, t.authMessageLike);
       return;
     }
     const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };
@@ -586,7 +600,7 @@ export default function ProfileScreen() {
   // Handle unlike toggle for a review (uses unified endpoint)
   const handleToggleUnlike = async (reviewId: string) => {
     if (!user?.id) {
-      Alert.alert('Autentificare necesară', 'Trebuie să fii conectat pentru a da unlike.');
+      Alert.alert(t.authRequiredUnlike, t.authMessageUnlike);
       return;
     }
     const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };

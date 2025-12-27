@@ -75,6 +75,7 @@ const TRANSLATIONS = {
     archiveError: 'Nu s-a putut arhiva anunțul. Încearcă din nou',
     navigationError: 'Nu s-a putut naviga la pagina de editare.',
     errorTitle: 'Eroare',
+    refreshAnnouncement: 'Reactualizează anunț',
   },
   en: {
     title: 'My Announcements',
@@ -112,6 +113,7 @@ const TRANSLATIONS = {
     archiveError: 'Could not archive the announcement. Please try again',
     navigationError: 'Could not navigate to the edit page.',
     errorTitle: 'Error',
+    refreshAnnouncement: 'Refresh announcement',
   },
 };
 
@@ -293,7 +295,7 @@ export default function MyAnnouncementsScreen() {
   };
 
   const handleReactivate = (announcement: Announcement) => {
-    Alert.alert('Reactualizează', `Reactualizare anunț: ${announcement.title}`);
+    Alert.alert(t.refresh, `${t.refreshAnnouncement}: ${announcement.title}`);
   };
 
   const handleDeactivate = (announcement: Announcement) => {
@@ -448,7 +450,7 @@ export default function MyAnnouncementsScreen() {
                 {searchTerm && (
                   <View style={styles.chip}>
                     <ThemedText style={styles.chipText}>
-                      {t.searchLabel}: "{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}"
+                      {t.searchLabel}: &quot;{searchTerm.length > 15 ? searchTerm.substring(0, 15) + '...' : searchTerm}&quot;
                     </ThemedText>
                     <TouchableOpacity onPress={() => setSearchTerm('')}>
                       <Ionicons name="close-circle" size={16} color={tokens.colors.primary} />

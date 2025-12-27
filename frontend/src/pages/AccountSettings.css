@@ -272,7 +272,7 @@
   .account-settings-container {
     padding: clamp(24px, 5vh, 48px) 12px 16px;
     margin-top: 0;
-    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 16px);
     min-height: 100dvh;
   }
 
@@ -290,8 +290,8 @@
   }
 
   .settings-item {
-    padding: 14px 16px;
-    font-size: 1rem;
+    padding: 12px 14px;
+    font-size: 0.95rem;
     border-radius: 10px;
     margin-bottom: 10px;
   }
@@ -313,8 +313,8 @@
 
   .email-change-section button {
     width: 100%;
-    padding: 12px 16px;
-    font-size: 1rem;
+    padding: 10px 14px;
+    font-size: 0.95rem;
   }
 
   .message { font-size: 0.95rem; }
@@ -324,8 +324,8 @@
 @media (max-width: 1000px) {
   .settings-item {
     width: 100%;
-    padding: 16px 18px;
-    font-size: 1.05rem;
+    padding: 12px 14px;
+    font-size: 0.95rem;
     box-sizing: border-box;
   }
   
@@ -334,6 +334,24 @@
   .settings-menu .MuiButton-root {
     width: 100%;
     min-width: 0;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+  }
+}
+
+/* Extra small screens (<600px) - smaller buttons */
+@media (max-width: 600px) {
+  .settings-item {
+    padding: 12px 14px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  .email-change-section button,
+  .settings-menu button,
+  .settings-menu .MuiButton-root {
+    padding: 12px 14px;
+    font-size: 1rem;
   }
 }
 

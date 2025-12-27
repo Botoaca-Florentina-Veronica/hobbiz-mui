@@ -176,10 +176,11 @@ export default function AccountSettings() {
       {/* Change Password */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem button onClick={handlePasswordChangeClick} className="setting-item" style={{ borderBottom: showPasswordChange ? '1px solid #000' : 'none' }}>
+          <ListItem button onClick={handlePasswordChangeClick} className="setting-item mobile-setting-item" style={{ borderBottom: showPasswordChange ? '1px solid #000' : 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.changePassword')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>
@@ -212,10 +213,11 @@ export default function AccountSettings() {
       {/* Change Email */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem button onClick={handleEmailChangeClick} className="setting-item" style={{ borderBottom: showEmailChange ? '1px solid #000' : 'none' }}>
+          <ListItem button onClick={handleEmailChangeClick} className="setting-item mobile-setting-item" style={{ borderBottom: showEmailChange ? '1px solid #000' : 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.changeEmail')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>
@@ -240,10 +242,24 @@ export default function AccountSettings() {
       {/* My Announcements */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem button onClick={() => navigate('/anunturile-mele')} className="setting-item" style={{ borderBottom: 'none' }}>
+          <ListItem button onClick={() => navigate('/anunturile-mele')} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.myAnnouncements')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Archived Announcements */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={() => navigate('/archived-announcements')} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.archivedAnnouncements') || t('myAnnouncements.archived')} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>
@@ -252,10 +268,11 @@ export default function AccountSettings() {
       {/* Notifications */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem button onClick={() => navigate('/setari-notificari')} className="setting-item" style={{ borderBottom: 'none' }}>
+          <ListItem button onClick={() => navigate('/setari-notificari')} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.notifications')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>
@@ -264,10 +281,11 @@ export default function AccountSettings() {
       {/* Billing */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem button onClick={handleDownloadData} className="setting-item" style={{ borderBottom: 'none' }}>
+          <ListItem button onClick={handleDownloadData} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.billing')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>
@@ -276,10 +294,11 @@ export default function AccountSettings() {
       {/* Logout All */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem className="setting-item" style={{ borderBottom: 'none' }}>
+          <ListItem className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.logoutAll')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem' }} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>
@@ -288,10 +307,11 @@ export default function AccountSettings() {
       {/* Delete Account */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem button onClick={() => setShowDeleteDialog(true)} className="setting-item" style={{ borderBottom: 'none' }}>
+          <ListItem button onClick={() => setShowDeleteDialog(true)} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.deleteAccount')} 
-              primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1.25rem', color: 'error.main' }} 
+              primaryTypographyProps={{ fontWeight: 'bold', color: 'error.main' }} 
+              className="mobile-setting-text"
             />
           </ListItem>
         </List>

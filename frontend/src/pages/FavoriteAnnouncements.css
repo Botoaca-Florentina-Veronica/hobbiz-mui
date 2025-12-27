@@ -191,6 +191,29 @@ body.dark-mode .favorite-announcement-card {
   margin-top: 12px;
 }
 
+/* Actions placed at bottom of the card */
+.favorite-announcement-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.favorite-announcement-actions .MuiButton-root {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+/* Actions used in list view */
+.announcement-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.announcement-actions .MuiButton-root {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
 /* Page Header Elements */
 .favorite-count {
   text-align: center;
@@ -252,6 +275,7 @@ body.dark-mode .favorite-announcement-card {
   .favorite-announcement-card {
     width: 100%;
     max-width: 100%;
+    height: auto;
     min-height: 130px;
     flex-direction: row; /* Orizontal pe mobil */
     align-items: stretch;
@@ -259,6 +283,15 @@ body.dark-mode .favorite-announcement-card {
     gap: 12px;
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(63,63,63,0.12);
+  }
+
+  /* Mobile: white border for light mode */
+  body:not(.dark-mode) .favorite-announcement-card {
+    border: 2px solid #ffffff;
+  }
+
+  body.dark-mode .favorite-announcement-card {
+    border: 2px solid rgba(255, 255, 255, 0.15);
   }
 
   .favorite-announcement-card:hover {
@@ -423,6 +456,7 @@ body.dark-mode .favorite-announcement-card {
   
   .favorite-announcement-card {
     padding: 8px;
+    height: auto;
     min-height: 110px;
   }
   

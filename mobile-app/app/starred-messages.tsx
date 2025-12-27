@@ -1,20 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import storage from '../src/services/storage';
 import { useAuth } from '../src/context/AuthContext';
+import { useLocale } from '../src/context/LocaleContext';
 import { Ionicons } from '@expo/vector-icons';
+
+const TRANSLATIONS = {
+  ro: {
+    title: 'Mesaje cu stea',
+    image: 'Imagine',
+    message: 'Mesaj',
+    noMessages: 'Nu ai mesaje salvate cu stea.',
+    error: 'Eroare',
+    loadError: 'Nu s-au putut încărca mesajele favorite.',
+  },
+  en: {
+    title: 'Starred Messages',
+    image: 'Image',
+    message: 'Message',
+    noMessages: 'You have no saved starred messages.',
+    error: 'Error',
+    loadError: 'Could not load favorite messages.',
+  },
+};
 
 export default function StarredMessagesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
-  const { tokens, isDark } = useAppTheme();
+  const { tokens } = useAppTheme();
   const { user } = useAuth();
+  const { locale } = useLocale();
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
   const [items, setItems] = useState<any[]>([]);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user?.id) return;
     try {
       const raw = await storage.getItemAsync(`starredMessages:${user.id}`);
@@ -22,16 +44,16 @@ export default function StarredMessagesScreen({ navigation }: any) {
       setItems(list.reverse());
     } catch (err) {
       console.error('Failed loading starred messages', err);
-      Alert.alert('Eroare', 'Nu s-au putut încărca mesajele favorite.');
+      Alert.alert(t.error, t.loadError);
     }
-  };
+  }, [user?.id, t.error, t.loadError]);
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => { load(); }, [load]);
   useFocusEffect(
     React.useCallback(() => {
       load();
       return () => {};
-    }, [user])
+    }, [load])
   );
 
   const renderItem = ({ item }: { item: any }) => (
@@ -40,7 +62,7 @@ export default function StarredMessagesScreen({ navigation }: any) {
         <Image source={{ uri: item.image || undefined }} style={styles.thumb} />
       </View>
       <View style={styles.center}>
-        <ThemedText style={styles.text} numberOfLines={2}>{item.text || (item.image ? 'Imagine' : 'Mesaj')}</ThemedText>
+        <ThemedText style={styles.text} numberOfLines={2}>{item.text || (item.image ? t.image : t.message)}</ThemedText>
         <ThemedText style={styles.meta}>{new Date(item.createdAt).toLocaleString()}</ThemedText>
       </View>
       <TouchableOpacity style={styles.action} onPress={async () => {
@@ -64,7 +86,7 @@ export default function StarredMessagesScreen({ navigation }: any) {
   return (
     <View style={[styles.container, { paddingTop: insets.top + 12, backgroundColor: tokens.colors.bg }] }>
       <View style={styles.header}>
-        <ThemedText style={styles.title}>Mesaje cu stea</ThemedText>
+        <ThemedText style={styles.title}>{t.title}</ThemedText>
       </View>
       <FlatList
         data={items}
@@ -73,7 +95,7 @@ export default function StarredMessagesScreen({ navigation }: any) {
         contentContainerStyle={{ padding: 12 }}
         ListEmptyComponent={() => (
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <ThemedText style={{ color: '#666' }}>Nu ai mesaje salvate cu stea.</ThemedText>
+            <ThemedText style={{ color: '#666' }}>{t.noMessages}</ThemedText>
           </View>
         )}
       />

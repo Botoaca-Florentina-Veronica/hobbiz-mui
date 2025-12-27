@@ -19,6 +19,7 @@ import {
   ArrowBack as ArrowBackIcon,
   Search as SearchIcon,
   Apps as AppsIcon,
+  Archive as ArchiveIcon,
   SwapVert as SwapVertIcon,
   Close as CloseIcon,
   Image as ImageIcon,
@@ -226,6 +227,10 @@ export default function MyAnnouncements() {
               <ArrowBackIcon />
             </IconButton>
             <div className="ma-header-title">{t('myAnnouncements.title')}</div>
+          </div>
+
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            <Button onClick={() => navigate('/archived-announcements')} variant="outlined" size="small">{t('myAnnouncements.archived')}</Button>
           </div>
         </div>
 
@@ -472,17 +477,34 @@ export default function MyAnnouncements() {
         open={archiveDialogVisible}
         onClose={() => setArchiveDialogVisible(false)}
         aria-labelledby="archive-dialog-title"
+        PaperProps={{ className: 'ma-confirm-dialog-paper' }}
       >
-        <DialogTitle id="archive-dialog-title">{t('myAnnouncements.archiveTitle')}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{t('myAnnouncements.archiveMessage')}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setArchiveDialogVisible(false)}>{t('myAnnouncements.no')}</Button>
-          <Button onClick={confirmArchive} color="primary" autoFocus>
-            {t('myAnnouncements.yes')}
-          </Button>
-        </DialogActions>
+        <div className="ma-confirm-dialog-content">
+          <div className="ma-dialog-icon">
+            <ArchiveIcon />
+          </div>
+
+          <div className="ma-dialog-title">{t('myAnnouncements.archiveTitle')}</div>
+
+          <div className="ma-dialog-message">{t('myAnnouncements.archiveMessage')}</div>
+
+          <div className="ma-confirm-dialog-actions">
+            <Button
+              onClick={() => setArchiveDialogVisible(false)}
+              className="ma-dialog-cancel"
+            >
+              {t('myAnnouncements.no')}
+            </Button>
+
+            <Button
+              onClick={confirmArchive}
+              className="ma-dialog-confirm"
+              autoFocus
+            >
+              {t('myAnnouncements.yes')}
+            </Button>
+          </div>
+        </div>
       </Dialog>
     </div>
   );

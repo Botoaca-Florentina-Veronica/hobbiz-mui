@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../components/themed-text';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
@@ -7,17 +7,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import api from '../src/services/api';
 import { LinearGradient } from 'expo-linear-gradient';
+import { translateCategory, getCategoryKeyByLabel } from '../src/constants/categories';
 
 const TRANSLATIONS = {
   ro: {
     title: 'Toate anunțurile',
     loading: 'Se încarcă anunțurile...',
     noAnnouncements: 'Nu există anunțuri',
+    posted: 'Postat',
   },
   en: {
     title: 'All announcements',
     loading: 'Loading announcements...',
     noAnnouncements: 'No announcements found',
+    posted: 'Posted',
   }
 };
 
@@ -104,72 +107,75 @@ export default function AllAnnouncements() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={[styles.container, { backgroundColor: tokens.colors.bg || colors.bg }]}> 
-      <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Ionicons name="arrow-back" size={20} color={colors.text} />
-          </TouchableOpacity>
-          <ThemedText style={[styles.headerTitle, { color: colors.text }]}>{t.title}</ThemedText>
-        </View>
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-      >
-        {filteredAnnouncements.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="albums-outline" size={64} color={colors.placeholder} />
-            <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>{t.noAnnouncements}</ThemedText>
+        <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border, flexShrink: 0 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Ionicons name="arrow-back" size={20} color={colors.text} />
+            </TouchableOpacity>
+            <ThemedText style={[styles.headerTitle, { color: colors.text }]}>{t.title}</ThemedText>
           </View>
-        ) : (
-          filteredAnnouncements.map((ann, index) => {
-            const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
-            const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
-            const isDarkMode = isDark;
-            const cardBg = isDarkMode ? '#121212' : '#fff';
-            return (
-              <Pressable
-                key={ann._id}
-                onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
-                style={({ pressed }) => [
-                  styles.modernCard,
-                  styles.modernRow,
-                  {
-                    backgroundColor: cardBg,
-                    opacity: pressed ? 0.96 : 1,
-                    borderWidth: isDarkMode ? 1 : 0,
-                    borderColor: isDarkMode ? '#575757' : 'transparent',
-                  },
-                ]}
-              >
-                {!isDarkMode && (
-                  <LinearGradient colors={[tokens.colors.primary || '#355070', '#ffd']} style={styles.leftAccent} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
-                )}
-                <View style={[styles.squareImageWrapper, { marginLeft: isDarkMode ? 0 : 22 }]}>
-                  {firstImage ? (
-                    <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
-                  ) : (
-                    <View style={styles.squareImagePlaceholder}>
-                      <Ionicons name="image-outline" size={32} color={isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
+        </View>
+
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+        >
+          {filteredAnnouncements.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="albums-outline" size={64} color={colors.placeholder} />
+              <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>{t.noAnnouncements}</ThemedText>
+            </View>
+          ) : (
+            filteredAnnouncements.map((ann, index) => {
+              const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
+              const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
+              const isDarkMode = isDark;
+              const cardBg = isDarkMode ? '#121212' : '#fff';
+              return (
+                <View key={ann._id} style={{ marginBottom: index === filteredAnnouncements.length - 1 ? 0 : 12 }}>
+                  <Pressable
+                    onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
+                    style={({ pressed }) => [
+                      styles.modernCard,
+                      styles.modernRow,
+                      {
+                        backgroundColor: cardBg,
+                        opacity: pressed ? 0.96 : 1,
+                        borderWidth: isDarkMode ? 1 : 0,
+                        borderColor: isDarkMode ? '#575757' : 'transparent',
+                      },
+                    ]}
+                  >
+                    {!isDarkMode && (
+                      <LinearGradient colors={[tokens.colors.primary || '#355070', '#ffd']} style={styles.leftAccent} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+                    )}
+                    <View style={[styles.squareImageWrapper, { marginLeft: isDarkMode ? 0 : 22 }]}>
+                      {firstImage ? (
+                        <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
+                      ) : (
+                        <View style={styles.squareImagePlaceholder}>
+                          <Ionicons name="image-outline" size={32} color={isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
+                        </View>
+                      )}
                     </View>
-                  )}
+                    <View style={styles.squareContent}>
+                      <ThemedText style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</ThemedText>
+                      <View style={[styles.categoryBadgeModern, { backgroundColor: isDarkMode ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)', borderWidth: isDarkMode ? 1 : 0, borderColor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'transparent' }]}>
+                        <ThemedText style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{translateCategory(getCategoryKeyByLabel(ann.category) || ann.category, locale)}</ThemedText>
+                      </View>
+                      <ThemedText style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
+                      <ThemedText style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>{t.posted} {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : 'ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</ThemedText>
+                    </View>
+                  </Pressable>
                 </View>
-                <View style={styles.squareContent}>
-                  <ThemedText style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</ThemedText>
-                  <View style={[styles.categoryBadgeModern, { backgroundColor: isDarkMode ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)', borderWidth: isDarkMode ? 1 : 0, borderColor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'transparent' }]}>
-                    <ThemedText style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{ann.category}</ThemedText>
-                  </View>
-                  <ThemedText style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
-                  <ThemedText style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>Postat {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</ThemedText>
-                </View>
-              </Pressable>
-            );
-          })
-        )}
-      </ScrollView>
-    </View>
+              );
+            })
+          )}
+        </ScrollView>
+      </View>
     </>
   );
 }
@@ -181,8 +187,8 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   headerTitle: { fontSize: 24, fontWeight: '600' },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
+  scrollView: { flex: 1, width: '100%' },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 16 },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24 },
   emptyTitle: { fontSize: 20, fontWeight: '700', marginTop: 16 },
   modernCard: { borderRadius: 26, paddingVertical: 16, paddingHorizontal: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
