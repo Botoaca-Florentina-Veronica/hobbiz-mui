@@ -12,6 +12,8 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
 
@@ -84,6 +86,7 @@ export default function AddAnnouncementPage() {
   // Preview pentru toate imaginile
   const [imagePreviews, setImagePreviews] = useState([]);
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   
@@ -491,11 +494,16 @@ export default function AddAnnouncementPage() {
   };
 
   const handleCategoryClick = (event) => {
-    setCategoryAnchorEl(event.currentTarget);
+    if (isMobile) {
+      setShowCategoryModal(true);
+    } else {
+      setCategoryAnchorEl(event.currentTarget);
+    }
   };
 
   const handleCategoryClose = () => {
     setCategoryAnchorEl(null);
+    setShowCategoryModal(false);
   };
 
   const handleCategorySelect = (selectedCategory) => {
@@ -530,7 +538,7 @@ export default function AddAnnouncementPage() {
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
   // Mobile category menu for widths under 500px; desktop popover from 500px+
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 500;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
 
   return (
     <div className="add-announcement-container">
@@ -585,22 +593,40 @@ export default function AddAnnouncementPage() {
           <div className="add-announcement-charcount">{titleChars}/70</div>
         </div>
         <label className="add-announcement-label">{t('addAnnouncement.categoryLabel')}</label>
-        <input
-          className="add-announcement-category-select"
-          type="text"
-          placeholder={t('addAnnouncement.categoryPlaceholder')}
-          value={translateCategory(category, t)}
-          readOnly
-          onClick={handleCategoryClick}
-          required
-        />
+        {isMobile ? (
+          <button
+            type="button"
+            className="add-announcement-category-select-button"
+            onClick={handleCategoryClick}
+            aria-haspopup="dialog"
+            aria-expanded={showCategoryModal}
+            aria-label={t('addAnnouncement.categoryPlaceholder')}
+            required
+          >
+            {translateCategory(category, t) || t('addAnnouncement.categoryPlaceholder')}
+          </button>
+        ) : (
+          <input
+            className="add-announcement-category-select"
+            type="text"
+            placeholder={t('addAnnouncement.categoryPlaceholder')}
+            value={translateCategory(category, t)}
+            readOnly
+            onClick={handleCategoryClick}
+            role="button"
+            aria-haspopup="dialog"
+            aria-expanded={showCategoryModal}
+            required
+          />
+        )}
+        {!isMobile && (
         <Popover
           id={categoryId}
           open={categoryOpen}
           anchorEl={categoryAnchorEl}
           onClose={handleCategoryClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: isMobile ? 'center' : 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'left' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           BackdropProps={{
             sx: {
               backdropFilter: 'blur(6px)',
@@ -610,25 +636,19 @@ export default function AddAnnouncementPage() {
           }}
           PaperProps={{ 
             sx: {
-              // Mobile: responsive width using clamp(min, preferred, max)
-              width: isMobile ? 'clamp(280px, calc(100vw - 64px), 420px)' : 'min(92vw, 1100px)',
-              // For desktop/tablet widths (>=500px), keep a flexible max
-              maxWidth: isMobile ? undefined : 1200,
-              minHeight: isMobile ? '50vh' : 440,
-              maxHeight: isMobile ? '78vh' : 'calc(100vh - 72px)',
-              // Keep scroll on mobile, hide scrollbar on desktop
+              width: 'min(92vw, 1100px)',
+              maxWidth: 1200,
+              minHeight: 440,
+              maxHeight: 'calc(100vh - 72px)',
               overflowY: 'auto',
-              ...(isMobile ? {} : {
-                scrollbarWidth: 'none',          // Firefox
-                msOverflowStyle: 'none',          // IE/Edge
-                '&::-webkit-scrollbar': {         // WebKit
-                  width: 0,
-                  height: 0
-                }
-              }),
-              borderRadius: isMobile ? 10 : 8,
-              // Add interior padding on desktop for visible margins
-              p: isMobile ? 0 : 'clamp(12px, 3vw, 24px)',
+              scrollbarWidth: 'none',          // Firefox
+              msOverflowStyle: 'none',          // IE/Edge
+              '&::-webkit-scrollbar': {         // WebKit
+                width: 0,
+                height: 0
+              },
+              borderRadius: 8,
+              p: 'clamp(12px, 3vw, 24px)',
               zIndex: (theme) => theme.zIndex.modal + 1,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
               color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
@@ -644,51 +664,69 @@ export default function AddAnnouncementPage() {
             <span className="categories-popover-title">{t('addAnnouncement.popover.title')}</span>
             <button type="button" className="categories-popover-close" onClick={handleCategoryClose} aria-label={t('addAnnouncement.popover.closeAria')}>✕</button>
           </div>
-              {isMobile ? (
-            <List className="categories-list-mobile">
-              {categories.map((cat, index) => (
-                <ListItemButton
-                  key={index}
-                  className="category-row-mobile"
-                  onClick={() => handleCategorySelect(cat.description)}
-                >
-                  {cat.image && (
-                    <img src={cat.image} alt="" className="category-row-icon" />
+          <div className="categories-grid-popover">
+            {categories.map((cat, index) => (
+              <div
+                key={index}
+                className="category-card-popover"
+                onClick={() => handleCategorySelect(cat.description)}
+              >
+                <div className="image-container-popover">
+                  {cat.image ? (
+                    <img
+                      src={cat.image}
+                      alt={t(`categories.${cat.key}`)}
+                      className="category-image-popover"
+                    />
+                  ) : (
+                    <div className="image-placeholder" />
                   )}
-                  <ListItemText
-                    primary={t(`categories.${cat.key}`)}
-                    primaryTypographyProps={{ noWrap: true }}
-                  />
-                </ListItemButton>
-              ))}
-            </List>
-          ) : (
-            <div className="categories-grid-popover">
-              {categories.map((cat, index) => (
-                <div
-                  key={index}
-                  className="category-card-popover"
-                  onClick={() => handleCategorySelect(cat.description)}
-                >
-                  <div className="image-container-popover">
-                    {cat.image ? (
-                      <img
-                        src={cat.image}
-                        alt={t(`categories.${cat.key}`)}
-                        className="category-image-popover"
-                      />
-                    ) : (
-                      <div className="image-placeholder" />
+                </div>
+                <div className="category-title-popover">{t(`categories.${cat.key}`)}</div>
+                <div className="category-description-popover">{t(`categories.${cat.key}`)}</div>
+                <p className="category-hint-popover">{t(`addAnnouncement.categoryHints.${cat.key}`)}</p>
+              </div>
+            ))}
+          </div>
+        </Popover>
+        )}
+
+        {/* Category Modal for Mobile */}
+        {showCategoryModal && (
+          <div className="ma-modal-overlay" onClick={() => setShowCategoryModal(false)}>
+            <div className="ma-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="ma-modal-header">
+                <div className="ma-modal-title">{t('addAnnouncement.popover.title')}</div>
+                <IconButton onClick={() => setShowCategoryModal(false)} className="ma-modal-close-button">
+                  <CloseIcon />
+                </IconButton>
+              </div>
+
+              <div className="ma-modal-scroll">
+                {categories.map((cat, index) => (
+                  <div
+                    key={index}
+                    className={`ma-modal-option ${category === cat.description ? 'selected' : ''}`}
+                    onClick={() => {
+                      handleCategorySelect(cat.description);
+                      setShowCategoryModal(false);
+                    }}
+                  >
+                    <div className="ma-modal-option-left">
+                      {cat.image && (
+                        <img src={cat.image} alt="" className="ma-modal-option-icon category-row-icon" />
+                      )}
+                      <span className="ma-modal-option-text">{t(`categories.${cat.key}`)}</span>
+                    </div>
+                    {category === cat.description && (
+                      <CheckCircleIcon className="ma-modal-option-check" />
                     )}
                   </div>
-                  <div className="category-title-popover">{t(`categories.${cat.key}`)}</div>
-                  <div className="category-description-popover">{t(`categories.${cat.key}`)}</div>
-                  <p className="category-hint-popover">{t(`addAnnouncement.categoryHints.${cat.key}`)}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          )}
-        </Popover>
+          </div>
+        )}
       </form>
       <div className="add-announcement-images-section">
         <h2 className="add-announcement-subtitle">{t('addAnnouncement.imagesSubtitle')}</h2>

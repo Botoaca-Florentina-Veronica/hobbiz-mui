@@ -45,6 +45,14 @@
   --fav-icon-heart-filled: #f51866;
 }
 
+/* Main Container - Ensure it allows full expansion on mobile */
+.my-announcements-container {
+  min-height: auto; /* Allow content to determine height */
+  height: auto; /* Remove any fixed height */
+  overflow: visible; /* Ensure content is not clipped */
+  padding-bottom: 40px; /* Increased space at bottom for last card */
+}
+
 
 /* 2. LAYOUT PRINCIPAL (DESKTOP FIRST)
    ---------------------------------------------------------- */
@@ -57,6 +65,7 @@
   margin: 0 auto;
   padding: 0 16px;
   gap: 24px;
+  overflow: visible; /* Ensure content is not clipped */
 }
 
 /* Card Base Style (Desktop: Vertical) */
@@ -299,9 +308,11 @@ body.dark-mode .favorite-announcement-card {
   /* --- List Layout --- */
   .favorite-announcements-list {
     gap: 12px;
-    padding: 0 12px;
+    padding: 0 12px 40px; /* Increased bottom padding */
     flex-direction: column; /* Listă verticală */
     max-width: 100%;
+    margin-top: 16px; /* Reduce margin on mobile */
+    margin-bottom: 20px; /* Extra margin for safety */
   }
 
   /* --- Card Layout (Switch to Row) --- */
@@ -483,8 +494,10 @@ body.dark-mode .favorite-announcement-card {
    ---------------------------------------------------------- */
 @media (max-width: 480px) {
   .favorite-announcements-list {
-    padding: 0 8px;
+    padding: 0 8px 40px; /* Increased bottom padding */
     gap: 10px;
+    margin-top: 12px; /* Further reduce margin on small screens */
+    margin-bottom: 20px; /* Extra margin for safety */
   }
   
   .favorite-announcement-card {
@@ -534,8 +547,8 @@ body.dark-mode .favorite-announcement-card {
   padding: 40px 16px;
   color: #6b7280;
   text-align: center;
-  margin-top: 5rem;
-  margin-bottom: -9rem;
+  margin-top: 2rem; /* Reduced from 5rem */
+  margin-bottom: 2rem; /* Changed from -9rem to positive */
 }
 
 .favorites-empty-icon img {
@@ -570,10 +583,9 @@ body.dark-mode .favorite-announcement-card {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 12px;
-  margin: 40px auto 8px; 
-  margin-bottom: -8rem;
-  padding: 20px;
+  gap: 10px;
+  margin: 16px auto 8px;
+  padding: 12px 8px;
   width: 100%;
   max-width: 1200px;
   box-sizing: border-box;
@@ -669,8 +681,8 @@ body.dark-mode .favorite-announcement-card {
   .pagination-container {
     grid-template-columns: 1fr auto 1fr;
     gap: 8px;
-    margin: 30px auto 8px; /* reduced bottom margin on tablet */
-    padding: 10px 20px;
+    margin: 20px auto 6px;
+    padding: 8px 12px;
   }
 
   .pagination-btn {
@@ -690,8 +702,8 @@ body.dark-mode .favorite-announcement-card {
   .pagination-container {
     grid-template-columns: auto 1fr auto;
     gap: 6px;
-    margin: 20px auto 6px; /* reduced bottom margin on small screens */
-    padding: 10px;
+    margin: 12px auto 6px; /* reduced vertical spacing on small screens */
+    padding: 6px 8px;
   }
 
   .pagination-btn {

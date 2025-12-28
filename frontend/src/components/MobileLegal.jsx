@@ -10,7 +10,11 @@ export default function MobileLegal() {
 
   const go = (e, to) => {
     e.preventDefault();
-    navigate(to);
+    if (window.innerWidth <= 600) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate(to);
+    }
   };
 
   return (

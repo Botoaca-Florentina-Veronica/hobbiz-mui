@@ -409,7 +409,7 @@ export default function EditAnnouncementPage() {
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
   // Keep mobile category UI below 500px for consistency with Add page
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 500;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
 
   return (
     <div className="add-announcement-container">

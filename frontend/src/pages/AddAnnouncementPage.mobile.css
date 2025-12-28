@@ -1,6 +1,6 @@
-/* AddAnnouncementPage.mobile.css - Stiluri dedicate pentru mobile (max-width: 499px) */
+/* AddAnnouncementPage.mobile.css - Stiluri dedicate pentru mobile (max-width: 599px) */
 
-@media (max-width: 499px) {
+@media (max-width: 599px) {
   /* Ensure no child overflows its container due to padding/border */
   .add-announcement-container,
   .add-announcement-container * {
@@ -207,12 +207,38 @@
   }
 
   /* Treat the initial form block (subtitle, title, category) as a container on mobile */
-  .add-announcement-form {
-    background: var(--app-surface);
-    border-radius: 12px;
-    padding: 0.5rem 16px;
-    margin-bottom: 0.9rem !important; /* override inline */
-    box-shadow: none;
+  /* Make mobile containers visually match desktop: background, border, radius and shadow */
+  .add-announcement-form,
+  .add-announcement-actions-section,
+  .add-announcement-description-section,
+  .add-announcement-location-section,
+  .add-announcement-contact-section,
+  .add-announcement-images-section,
+  .add-announcement-title-section,
+  .add-announcement-category-section {
+    background: var(--bg-surface);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 0 0 0.9rem 0;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Dark-mode explicit overrides requested: background #121212 and white border */
+  body.dark-mode .add-announcement-form,
+  body.dark-mode .add-announcement-actions-section,
+  body.dark-mode .add-announcement-description-section,
+  body.dark-mode .add-announcement-location-section,
+  body.dark-mode .add-announcement-contact-section,
+  body.dark-mode .add-announcement-images-section,
+  body.dark-mode .add-announcement-title-section,
+  body.dark-mode .add-announcement-category-section {
+    background: #121212 !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(255,255,255,0.03) !important;
   }
   .add-announcement-actions-right {
     display: flex;
@@ -704,5 +730,163 @@
     color: #ff7e95 !important;
     border-bottom-color: #ff7e95 !important;
     background: none !important;
+  }
+}
+
+/* Category Modal Styles for Mobile */
+@media (max-width: 599px) {
+  .ma-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    z-index: 1000;
+  }
+
+  .ma-modal-content {
+    background-color: var(--app-surface);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    /* Increased so the last category is visible on small phones */
+    max-height: 82%;
+    width: 100%;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  .dark-mode .ma-modal-content {
+    background-color: #121212;
+    border: 1px solid #ffffff;
+  }
+
+  .ma-modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  .ma-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--app-text);
+  }
+
+  .ma-modal-close-button {
+    padding: 4px;
+    color: var(--app-muted);
+  }
+
+  .ma-modal-scroll {
+    padding: 8px 20px;
+    /* Match the modal height and add extra bottom padding so the last item is reachable */
+    max-height: calc(82vh - 70px);
+    overflow-y: auto;
+    padding-bottom: 20px;
+  }
+
+  .ma-modal-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    margin: 4px 0;
+    border-radius: 12px;
+    background-color: var(--bg-hover);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .dark-mode .ma-modal-option {
+    background-color: #1c1c1f;
+    border-color: var(--app-border);
+  }
+
+  .ma-modal-option.selected {
+    background-color: var(--app-elev);
+    border-color: var(--primary);
+  }
+
+  .ma-modal-option:hover {
+    background-color: var(--app-elev);
+  }
+
+  .ma-modal-option-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .ma-modal-option-icon {
+    font-size: 20px;
+    color: var(--app-muted);
+  }
+
+  .ma-modal-option.selected .ma-modal-option-icon {
+    color: var(--primary);
+  }
+
+  .ma-modal-option-text {
+    font-size: 15px;
+    color: var(--app-text);
+    font-weight: 500;
+  }
+
+  .ma-modal-option.selected .ma-modal-option-text {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .ma-modal-option-check {
+    font-size: 22px;
+    color: var(--primary);
+  }
+
+  .category-row-icon {
+    width: 20px !important;
+    height: 20px !important;
+    object-fit: contain !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Make the mobile category opener visually identical to the desktop input */
+  .add-announcement-category-select-button {
+    width: 100%;
+    padding: 18px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: var(--bg-input);
+    color: var(--app-text);
+    border: 1px solid var(--app-border);
+    text-align: left;
+    box-sizing: border-box;
+    min-height: 3.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .add-announcement-category-select-button:focus {
+    outline: 2px solid var(--border-focus);
+    background: var(--bg-input-focus);
+  }
+
+  .dark-mode .add-announcement-category-select-button {
+    background: #3f3f3f !important;
+    color: #ffffff !important;
+    border: 1px solid #575757 !important;
   }
 }

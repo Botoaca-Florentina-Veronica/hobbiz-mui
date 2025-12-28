@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Box, 
   TextField, 
@@ -36,6 +36,7 @@ import './AnnouncementsByCategory.css';
 export default function AnnouncementsByCategory() {
   const { t } = useTranslation();
   const { category } = useParams();
+  const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -379,7 +380,7 @@ export default function AnnouncementsByCategory() {
               <div key={a._id} className="abc-announcement-card my-announcement-card" style={{ position: 'relative', cursor: 'pointer' }}
                 onClick={e => {
                   if (e.target.closest('.favorite-heart')) return;
-                  window.location.href = `/announcement/${a._id}`;
+                  navigate(`/announcement/${a._id}`);
                 }}
               >
                 <div className="my-announcement-image">

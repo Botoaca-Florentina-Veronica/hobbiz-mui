@@ -42,6 +42,7 @@ export default function ChatPage() {
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(380);
+  const longPressTimersRef = useRef({});
 
   const [activeTab, setActiveTab] = useState('buying');
   const [conversations, setConversations] = useState([]);
@@ -157,21 +158,33 @@ export default function ChatPage() {
     };
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
+
+    // Cleanup long-press timers on unmount
     return () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      // clear any residual long press timers
+      Object.values(longPressTimersRef.current || {}).forEach(tm => { try { clearTimeout(tm); } catch(e){} });
+      longPressTimersRef.current = {};
     };
   }, []);
 
   // Click outside handlers
   useEffect(() => {
     const handleDocClick = (e) => {
-      if (e.target.closest('.reaction-picker') || e.target.closest('.message-action-btn')) return;
+      // If clicking/touching inside reaction picker or message action buttons, keep state
+      if (e.target.closest('.reaction-picker') || e.target.closest('.message-action-btn') || e.target.closest('.message-actions-bar')) return;
       if (reactionTargetId) setReactionTargetId(null);
+      if (hoveredMessageId) setHoveredMessageId(null);
+      if (copiedMessageId) setCopiedMessageId(null);
     };
     document.addEventListener('mousedown', handleDocClick);
-    return () => document.removeEventListener('mousedown', handleDocClick);
-  }, [reactionTargetId]);
+    document.addEventListener('touchstart', handleDocClick);
+    return () => {
+      document.removeEventListener('mousedown', handleDocClick);
+      document.removeEventListener('touchstart', handleDocClick);
+    };
+  }, [reactionTargetId, hoveredMessageId, copiedMessageId]);
 
   // Fetch Data
   useEffect(() => {
@@ -478,7 +491,25 @@ export default function ChatPage() {
                           <span className="chat-date-separator-text">{formatDateSeparator(msg.createdAt)}</span>
                         </div>
                       )}
-                    <div className={`chat-message ${isOwn ? 'own' : ''}`} onMouseEnter={() => setHoveredMessageId(msg._id)} onMouseLeave={() => setHoveredMessageId(null)}>
+                    <div
+                      className={`chat-message ${isOwn ? 'own' : ''}`}
+                      onMouseEnter={() => setHoveredMessageId(msg._id)}
+                      onMouseLeave={() => setHoveredMessageId(null)}
+                      onContextMenu={(e) => { e.preventDefault(); setHoveredMessageId(msg._id); }}
+                      onTouchStart={(e) => {
+                        // Start long press timer
+                        if (e.touches && e.touches.length > 1) return; // ignore multi-touch
+                        longPressTimersRef.current[msg._id] = setTimeout(() => { setHoveredMessageId(msg._id); }, 500);
+                      }}
+                      onTouchEnd={(e) => {
+                        // Cancel long press timer if released quickly
+                        if (longPressTimersRef.current[msg._id]) { clearTimeout(longPressTimersRef.current[msg._id]); delete longPressTimersRef.current[msg._id]; }
+                      }}
+                      onTouchMove={(e) => {
+                        // If the finger moved, cancel long-press
+                        if (longPressTimersRef.current[msg._id]) { clearTimeout(longPressTimersRef.current[msg._id]); delete longPressTimersRef.current[msg._id]; }
+                      }}
+                    >
                       <div className="chat-message-content-group">
                         <div className="chat-bubble-row">
                           <div className="chat-message-bubble">
@@ -486,7 +517,7 @@ export default function ChatPage() {
                             {msg.image && <div className="chat-message-image"><img src={msg.image} alt="att" /></div>}
                             {msg.text && <p className="chat-message-text">{msg.text}</p>}
                             
-                            {/* ACTIONS HOVER */}
+                            {/* ACTIONS (hover or long-press on mobile) */}
                             {hoveredMessageId === msg._id && reactionTargetId !== msg._id && (
                               <div className="message-actions-bar">
                                 <button className="message-action-btn" onClick={() => setSelectedReply({ messageId: msg._id, senderId: msg.senderId, senderName: isOwn ? t('common.you') : t('common.user'), text: msg.text, image: msg.image })}><ReplyIcon fontSize="small"/></button>

@@ -163,6 +163,68 @@
 .dark-mode .ma-page-title {
   color: #f51866;
 }
+
+/* Mobile: hide the small header (back + small title from desktop header) and show compact mobile header */
+.ma-mobile-header { display: none; }
+
+@media (max-width: 600px) {
+  .ma-header { display: none !important; }
+
+  .ma-page-title { display: none; } /* hide the large centered H1 on small screens (mobile header will be used) */
+
+  .ma-mobile-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px; /* reduce gap so title more likely fits */
+    padding: 12px;
+    padding-top: max(env(safe-area-inset-top), 12px);
+    background-color: var(--ma-bg);
+    border-bottom: none;
+    /* make space similar to the previous H1 margin */
+    margin-bottom: 8px;
+  }
+
+  .ma-mobile-back {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ma-border);
+    background-color: var(--ma-surface);
+    color: var(--ma-text);
+    cursor: pointer;
+    padding: 6px;
+    flex: none;
+  }
+
+  .ma-mobile-title {
+    font-size: 1.8rem; /* slightly smaller so the title fits on one line */
+    font-weight: 700;
+    color: var(--ma-text);
+    flex: 1;
+    text-align: center; /* keep centered even with back button */
+    padding: 0 8px;
+    line-height: 1.1;
+    white-space: nowrap; /* prevent wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* gracefully truncate if needed */
+  }
+
+  .ma-mobile-spacer {
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+
+  .dark-mode .ma-mobile-title {
+    color: #f51866;
+  }
+
+  .ma-container { padding-top: env(safe-area-inset-top); }
+}
 /* 4. SEARCH SECTION
    ---------------------------------------------------------- */
 .ma-search-section {

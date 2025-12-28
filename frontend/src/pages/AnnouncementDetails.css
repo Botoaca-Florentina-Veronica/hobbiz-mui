@@ -355,9 +355,10 @@ body:not(.dark-mode) .MuiCard-root {
 }
 
 @media (max-width: 600px) {
-  .announcement-meta-footer { overflow: hidden; }
+  /* Ensure footer meta area remains readable and doesn't clip content on very small screens */
+  .announcement-meta-footer { overflow: visible; }
   .announcement-meta-footer .MuiTypography-caption { 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    white-space: normal; overflow: visible; text-overflow: initial; 
   }
   .announcement-meta-footer .MuiButton-root { 
     min-height: 28px; line-height: 1.2; 
@@ -366,4 +367,12 @@ body:not(.dark-mode) .MuiCard-root {
   .announcement-meta-footer .MuiButton-root svg { 
     margin-right: 2px; 
   }
+
+  /* Small-screen adjustments to avoid content being pushed out of view */
+  .announcement-hero-overlay { padding: 12px; }
+  .announcement-image-container, .image-carousel-container { height: auto; max-height: 60vh; }
+  .announcement-image-container img, .image-carousel-container img, .MuiCardMedia-root { width: 100%; height: auto; object-fit: cover; display: block; }
+  .sidebar-sticky { position: static; }
+  .MuiContainer-root { padding-left: 12px !important; padding-right: 12px !important; }
+  .announcement-details-page { min-height: auto; padding-bottom: calc(var(--footer-height,65px) + env(safe-area-inset-bottom)); }
 }

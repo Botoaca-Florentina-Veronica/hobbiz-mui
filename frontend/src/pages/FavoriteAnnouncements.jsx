@@ -204,7 +204,7 @@ export default function FavoriteAnnouncements() {
                 className="favorite-announcement-card"
                 onClick={e => {
                   if (e.target.closest('.favorite-heart')) return;
-                  window.location.href = `/announcement/${a._id}`;
+                  navigate(`/announcement/${a._id}`);
                 }}
               >
               <div className="favorite-announcement-image">

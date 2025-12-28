@@ -41,6 +41,7 @@ import {
   TextField,
   Rating
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
@@ -59,8 +60,34 @@ import StarIcon from '@mui/icons-material/Star';
 import apiClient from '../api/api';
 import './AnnouncementDetails.css';
 import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
+import translateCategory from '../utils/translateCategory';
 // Header and Footer are provided by the App.jsx route layout
 import ChatPopup from '../components/ChatPopup';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    console.error('ErrorBoundary caught error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Container sx={{ mt: 12, mb: 4, textAlign: 'center' }}>
+          <Typography variant="h5" color="error" gutterBottom>Ceva nu a mers — încearcă să reîncarci pagina.</Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom style={{ marginBottom: 12 }}>{this.state.error?.message}</Typography>
+          <Button variant="contained" onClick={() => window.location.reload()}>Reîncarcă pagina</Button>
+        </Container>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function AnnouncementDetails() {
   // ========== Routing & Navigation ==========
@@ -191,6 +218,9 @@ export default function AnnouncementDetails() {
   const getAccentCss = () => (isDarkMode ? '#f51866' : '#355070');
   const getAccentHover = () => (isDarkMode ? '#fa4875' : '#406b92');
 
+  // i18n
+  const { t } = useTranslation();
+
   // Tooltip simplu și centrat pentru butoanele de acțiune
   const getTooltipStyles = () => ({
     tooltip: {
@@ -226,8 +256,10 @@ export default function AnnouncementDetails() {
       setLoading(true);
       try {
         const res = await apiClient.get(`/api/announcements/${id}`);
+        console.log('Announcement fetched:', res.data);
         setAnnouncement(res.data);
       } catch (e) {
+        console.error('Error fetching announcement:', e);
         setAnnouncement(null);
       } finally {
         setLoading(false);
@@ -357,7 +389,7 @@ export default function AnnouncementDetails() {
 
   if (loading) {
     return (
-      <>
+      <ErrorBoundary>
         <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
           <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
@@ -371,13 +403,13 @@ export default function AnnouncementDetails() {
             </Grid>
           </Grid>
         </Container>
-      </>
+      </ErrorBoundary>
     );
   }
 
   if (!announcement) {
     return (
-      <>
+      <ErrorBoundary>
         <Container maxWidth="lg" sx={{ mt: 12, mb: 4, textAlign: 'center' }}>
           <Typography variant="h4" color="error" gutterBottom>
             Anunțul nu a fost găsit
@@ -391,7 +423,7 @@ export default function AnnouncementDetails() {
             Înapoi la pagina principală
           </Button>
         </Container>
-      </>
+      </ErrorBoundary>
     );
   }
 
@@ -450,7 +482,7 @@ export default function AnnouncementDetails() {
   };
 
   return (
-    <>
+    <ErrorBoundary>
       <Container
         className="announcement-details-page"
         maxWidth="lg"
@@ -1077,6 +1109,6 @@ export default function AnnouncementDetails() {
         isOwnAnnouncement,
       })}
       
-    </>
+    </ErrorBoundary>
   );
 }

@@ -380,6 +380,9 @@ export default function Header() {
           location.pathname.startsWith('/termeni') ||
           // Hide MobileHeader on notifications page as well
           location.pathname.startsWith('/notificari') ||
+          // Hide MobileHeader on All Announcements page on mobile (English and Romanian routes)
+          location.pathname.startsWith('/all-announcements') ||
+          location.pathname.startsWith('/toate-anunturile') ||
           // Hide MobileHeader on announcement details and category pages on mobile
           location.pathname.startsWith('/announcement/') ||
           location.pathname.startsWith('/anunturi-categorie') ||
