@@ -270,36 +270,44 @@
 /* Standard Mobile & Tablet (<1024px) */
 @media (max-width: 1024px) {
   .account-settings-container {
-    padding: clamp(24px, 5vh, 48px) 12px 16px;
+    padding: clamp(16px, 4vh, 28px) 12px 16px;
     margin-top: 0;
     padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 16px);
     min-height: 100dvh;
   }
 
+  /* Mobile header visible on mobile */
+  .mobile-header { display: flex; }
+
   /* Hide Desktop Title */
   .settings-title { display: none; }
 
+  /* Make menu and items use full available width and responsive padding */
   .settings-menu {
     width: 100%;
     max-width: 100%;
-    padding: 16px;
-    border-radius: 10px;
-    gap: 16px;
+    padding: clamp(12px, 4vw, 20px);
+    border-radius: 12px;
+    gap: 14px;
     box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-    margin-bottom: 12px;
+    margin: 0 0 12px 0;
+    box-sizing: border-box;
   }
 
   .settings-item {
-    padding: 12px 14px;
-    font-size: 0.95rem;
+    width: 100%;
+    padding: clamp(12px, 3.5vw, 16px);
+    font-size: 1rem;
     border-radius: 10px;
-    margin-bottom: 10px;
+    margin: 0 0 10px 0;
+    display: block;
+    box-sizing: border-box;
   }
 
   .email-change-section {
-    padding: 14px;
+    padding: clamp(12px, 3.5vw, 16px);
     gap: 12px;
-    margin-top: -8px;
+    margin-top: 0;
   }
 
   .email-change-section label { font-size: 1rem; }
@@ -309,15 +317,39 @@
     width: 100%;
     padding: 12px 14px;
     font-size: 1rem;
+    box-sizing: border-box;
   }
 
-  .email-change-section button {
+  .email-change-section button,
+  .settings-menu button,
+  .settings-menu .MuiButton-root {
     width: 100%;
     padding: 10px 14px;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    min-width: 0;
   }
 
   .message { font-size: 0.95rem; }
+
+  /* Respect safe-area insets and use full viewport width on notched devices */
+  .account-settings-container, .settings-menu { padding-left: env(safe-area-inset-left, 12px); padding-right: env(safe-area-inset-right, 12px); }
+}
+
+/* Very small screens (<420px) - tighter spacing */
+@media (max-width: 420px) {
+  .settings-menu {
+    padding: 10px;
+    border-radius: 8px;
+    gap: 10px;
+  }
+
+  .settings-item {
+    padding: 10px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .email-change-section { padding: 10px; }
 }
 
 /* Touch Optimizations (<1000px) */

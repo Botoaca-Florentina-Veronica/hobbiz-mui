@@ -128,7 +128,7 @@ html, body {
   height: calc(100vh - var(--chat-header-height));
   max-width: 1300px;
   margin: 0 auto;
-  margin-top: var(--chat-header-height);
+  margin-top: var(--header-height);
   background: var(--c-sidebar-bg);
   border-radius: var(--chat-radius);
   box-shadow: var(--c-shadow-container);
@@ -549,7 +549,7 @@ html, body {
   .chat-separator { display: none; }
   .chat-sidebar { width: 100%; border: none; }
   
-  .chat-main-header { padding-top: calc(env(safe-area-inset-top) + 12px); }
+  .chat-main-header { padding-top: 0; height: 50px; }
   .chat-messages-container { padding: 12px; padding-bottom: 160px; }
   .chat-message { max-width: 85%; }
   

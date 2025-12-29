@@ -113,6 +113,14 @@
   .mobile-account-menu__list {
     gap: 8px !important;
   }
+
+  /* Fix double scrollbars on small screens: let the body handle scrolling
+     and avoid forcing a full 100dvh container which can cause extra scrollbars */
+  .mobile-account-menu {
+    min-height: auto !important;
+    overflow-y: visible !important;
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom)) !important;
+  }
 }
 
 /* For very small phones */

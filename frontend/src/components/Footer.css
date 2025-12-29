@@ -300,6 +300,18 @@
   }
   .mobile-legal__list a:hover { color: var(--primary); text-decoration: underline; }
   
+  .mobile-legal-link {
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: none;
+    color: var(--app-muted);
+    font-size: var(--mobile-legal-link-font-size);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .mobile-legal-link:hover { color: var(--primary); text-decoration: underline; }
+  
   /* Legacy Desktop Legal Override hide */
   .legal-section { display: none !important; }
 }

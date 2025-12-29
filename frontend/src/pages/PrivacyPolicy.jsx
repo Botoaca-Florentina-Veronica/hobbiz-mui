@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton, Typography } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
@@ -8,13 +8,6 @@ import './PrivacyPolicy.css';
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 600) {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    }
-  }, []);
-
   return (
   <div className="privacy-policy">
     <div className="privacy-policy__container">

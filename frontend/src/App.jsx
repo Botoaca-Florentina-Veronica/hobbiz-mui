@@ -36,6 +36,7 @@ import CookiePolicy from './pages/CookiePolicy';
 import TermsConditions from './pages/TermsConditions';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
+import InformatiiLegale from './pages/InformatiiLegale.jsx';
 import AllAnnouncements from './pages/AllAnnouncements.jsx';
 import ArchivedAnnouncementsPage from './pages/ArchivedAnnouncementsPage.jsx';
 import useScrollToTop from './hooks/useScrollToTop';
@@ -219,9 +220,16 @@ function App() {
               <PromoSection />
               <Categories />
               <CallToAction />
-            <Footer />
+            <Footer hideLegalUpTo1200 />
             <CookieConsent />
           </div>
+        } />
+        <Route path="/informatii-legale" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <InformatiiLegale />
+            <Footer hideLegal />
+          </>
         } />
         <Route path="/*" element={
           <div className="homepage">

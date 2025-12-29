@@ -398,6 +398,16 @@
   
   .add-button { padding: 8px 12px; font-size: 0.85rem; margin-right: 8px; }
   .favorite-btn { font-size: 1.4rem; margin-right: 8px; padding: 6px; }
+}
+
+/* Hide fixed desktop header on small screens to avoid duplicate/black header */
+@media screen and (max-width: 768px) {
+  .header.fixed-header { display: none !important; }
+  /* defensive: hide any header bar entirely on mobile */
+  .header { display: none !important; }
+  .fixed-header { display: none !important; }
+}
+
   
   .user-account-container { margin-right: 0.5rem; }
   .user-account-btn { margin-right: 0; font-size: 1rem; padding: 0.25rem 0.5rem; }

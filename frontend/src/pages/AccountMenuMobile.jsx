@@ -16,52 +16,53 @@ import {
   Settings, 
   Campaign, 
   Person, 
-  AccountCircle, 
-  Notifications,
+  InfoOutlined,
+  Gavel,
   Logout,
   DarkMode
 } from '@mui/icons-material';
 import apiClient from '../api/api';
-import './AccountMenuMobile.css';
+import './AccountMenuMobile.v2.css';
 
 export default function AccountMenuMobile() {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await apiClient.get('/api/users/auth/check');
-        setIsAuthenticated(response.data.isAuthenticated);
-        if (!response.data.isAuthenticated) {
+        const authed = response.data?.isAuthenticated;
+        setIsAuthenticated(authed);
+        if (!authed) {
           navigate('/login');
         }
-      } catch (e) {
+      } catch (err) {
         setIsAuthenticated(false);
         navigate('/login');
       }
     };
     checkAuth();
+  }, [navigate]);
 
-    // Fetch user profile
+  useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await apiClient.get('/api/users/profile');
-        setUserProfile(response.data);
+        setUserProfile(response.data || null);
       } catch (err) {
-        console.error('Failed to fetch profile:', err);
+        // silent fail
       }
     };
     fetchProfile();
-  }, [navigate]);
+  }, []);
 
-  // Initialize dark mode once from localStorage/body
   useEffect(() => {
     const body = document.body;
     const saved = localStorage.getItem('darkMode');
-    const initial = saved === 'true' ? true : saved === 'false' ? false : body.classList.contains('dark-mode');
+    const initial = saved === 'true' || body.classList.contains('dark-mode');
     body.classList.toggle('dark-mode', initial);
     setIsDarkMode(initial);
   }, []);
@@ -70,392 +71,100 @@ export default function AccountMenuMobile() {
     const body = document.body;
     const next = !body.classList.contains('dark-mode');
     body.classList.toggle('dark-mode', next);
-    localStorage.setItem('darkMode', next ? 'true' : 'false');
+    try { localStorage.setItem('darkMode', next ? 'true' : 'false'); } catch {}
     setIsDarkMode(next);
   };
 
-  const handleLogout = () => {
-    import('../api/api').then(({ logout }) => {
-      logout().finally(() => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        navigate('/');
-        window.location.reload();
-      });
-    });
+  const handleLogout = async () => {
+    try {
+      const { logout } = await import('../api/api');
+      await logout();
+    } catch (err) {
+      // ignore
+    } finally {
+      try { localStorage.removeItem('token'); } catch {}
+      try { localStorage.removeItem('userId'); } catch {}
+      navigate('/');
+      window.location.reload();
+    }
   };
-  if (!isAuthenticated) return null;
+
+  // While we determine auth, don't render the page
+  if (isAuthenticated === null) return null;
+  if (!isAuthenticated) return null; // redirect in effect
 
   const displayFirstName = userProfile?.firstName || 'Utilizator';
-  const displayLastName = userProfile?.lastName || 'Hobbiz';
+  const displayLastName = userProfile?.lastName || '';
   const displayPhone = userProfile?.phone || '\u2014';
-  const displayEmail = userProfile?.email || '\u2014';
 
   const menuItems = [
     { icon: <Settings />, label: 'Setări', path: '/setari-cont' },
     { icon: <Campaign />, label: 'Anunțurile mele', path: '/anunturile-mele' },
     { icon: <Person />, label: 'Profil', path: '/profil' },
-    { icon: <Notifications />, label: 'Notificări', path: '/notificari' },
-    { icon: <AccountCircle />, label: 'Contul tău', path: '/contul-tau' }
+    { icon: <InfoOutlined />, label: 'Despre noi', path: '/despre' },
+    { icon: <Gavel />, label: 'Informații legale', path: '/informatii-legale' }
   ];
 
   return (
-    <Box sx={{ 
-      maxWidth: { xs: '100%', sm: 720 }, 
-      margin: '0 auto', 
-      px: { xs: 2, sm: 0 },
-      pt: 0,
-      pb: 'calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 12px)',
-      minHeight: '100dvh',
-      backgroundColor: 'var(--acc-bg)',
-      overflowY: 'auto',
-      transition: 'background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out',
-      willChange: 'background-color, color, border-color'
-    }}>
-      {/* Mobile Header with gradient background - Only on small screens */}
-      <Box className="mobile-account-header-gradient" sx={{ 
-        background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
-        paddingX: 0,
-        paddingTop: 'calc(16px + env(safe-area-inset-top))',
-        paddingBottom: 8,
-        position: 'relative',
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        display: { xs: 'block', lg: 'none' }
-      }}>
-        {/* Decorative sun and cloud removed for cleaner mobile header */}
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, px: 2 }}>
-          <IconButton 
-            onClick={() => navigate(-1)}
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              backdropFilter: 'blur(10px)',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.3)'
-              }
-            }}
-            disableRipple
-          >
+    <div className="account-mobile">
+      <div className="account-mobile__header">
+        <div className="account-mobile__header-inner">
+          <button className="account-mobile__backbtn" onClick={() => navigate(-1)} aria-label="inapoi">
             <ArrowBack />
-          </IconButton>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
-            Profil
-          </Typography>
-        </Box>
+          </button>
+          <div className="account-mobile__title">Profil</div>
+        </div>
 
-        {/* User greeting text */}
-        <Typography
-          className="mobile-account-greeting"
-          variant="h4"
-          sx={{
-            fontWeight: 900,
-            color: 'white',
-            mb: 0,
-            px: 2,
-            // much larger sizes for emphasis on mobile
-            fontSize: { xs: '3.6rem', sm: '5rem' },
-            lineHeight: 1.02,
-            wordBreak: 'normal'
-          }}
-        >
-          Ceau <span style={{ color: '#000000', fontWeight: 900 }}>{displayFirstName} {displayLastName}!</span>
-        </Typography>
-      </Box>
+        <div className="account-mobile__greeting">Ceau <span className="account-mobile__greeting-name">{displayFirstName} {displayLastName}!</span></div>
+      </div>
 
-      {/* Desktop Header - Only on large screens */}
-      <Box className="desktop-account-header" sx={{ 
-        display: { xs: 'none', lg: 'flex' }, 
-        alignItems: 'center', 
-        gap: 1.5, 
-        mb: 2,
-        pt: 1.5,
-        px: 1.5
-      }}>
-        <IconButton 
-          onClick={() => navigate(-1)}
-          sx={{
-            backgroundColor: 'var(--acc-card)',
-            border: '1px solid var(--acc-border)',
-            boxShadow: 'none',
-            '&:hover': {
-              backgroundColor: 'var(--acc-hover)'
-            }
-          }}
-          disableRipple
-        >
-          <ArrowBack />
-        </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--acc-title)' }}>
-          Contul tău
-        </Typography>
-      </Box>
-
-      {/* User Info Card - Only on mobile */}
-      <Box className="mobile-account-user-card" sx={{ 
-        px: 0, 
-        mt: -6, 
-        position: 'relative',
-        zIndex: 1,
-        display: { xs: 'block', lg: 'none' }
-      }}>
-        <Card sx={{
-          borderRadius: 3,
-          backgroundColor: 'var(--acc-user-card)',
-          border: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          mb: 2,
-          width: '92%',
-          maxWidth: 440,
-          margin: '0 auto'
-        }}>
-          <CardContent sx={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center',
-            py: 2.5,
-            px: 2
-          }}>
-            {/* Avatar */}
-            <Box 
-              className="mobile-account-avatar"
-              sx={{
-                width: { xs: 64, sm: 80 },
-                height: { xs: 64, sm: 80 },
-                borderRadius: '50%',
-                backgroundColor: 'var(--acc-avatar-bg)',
-                border: '3px solid var(--acc-bg)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mb: 1.5,
-                overflow: 'hidden'
-              }}
-            >
+      <main className="account-mobile__content">
+        <section className="account-mobile__usercard">
+          <div className="account-mobile__avatar-wrap">
+            <div className="account-mobile__avatar">
               {userProfile?.avatar ? (
-                <img 
-                  src={userProfile.avatar} 
-                  alt="Avatar" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+                <img src={userProfile.avatar} alt="avatar" />
               ) : (
-                <Person sx={{ fontSize: 40, color: 'var(--acc-avatar-icon)' }} />
+                <Person />
               )}
-            </Box>
+            </div>
+          </div>
 
-            {/* User name */}
-            <Typography variant="h6" sx={{ 
-              fontWeight: 700, 
-              color: 'var(--acc-user-name)',
-              mb: 0.5,
-              textAlign: 'center'
-            }}>
-              {displayFirstName} {displayLastName}
-            </Typography>
+          <div className="account-mobile__info">
+            <div className="account-mobile__name">{displayFirstName} {displayLastName}</div>
+            <div className="account-mobile__phone">{displayPhone}</div>
+            <div className="account-mobile__email">{userProfile?.email || '\u2014'}</div>
+          </div>
+        </section>
 
-            {/* Phone */}
-            <Typography variant="body2" sx={{ 
-              color: 'var(--acc-user-info)',
-              mb: 0.25
-            }}>
-              {displayPhone}
-            </Typography>
+        <ul className="account-mobile__menu" role="menu">
+          {menuItems.map((item) => (
+            <li key={item.path} role="none">
+              <button role="menuitem" className="account-mobile__menu-btn" onClick={() => navigate(item.path)}>
+                <span className="account-mobile__menu-icon" aria-hidden>{item.icon}</span>
+                <span className="account-mobile__menu-label">{item.label}</span>
+              </button>
+            </li>
+          ))}
 
-            {/* Email */}
-            <Typography variant="body2" sx={{ 
-              color: 'var(--acc-user-info)',
-              fontSize: '0.875rem'
-            }}>
-              {displayEmail}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Box>
+          <li>
+            <div className="account-mobile__menu-row">
+              <div className="account-mobile__menu-icon" aria-hidden><DarkMode /></div>
+              <div className="account-mobile__menu-label">{isDarkMode ? 'Mod luminos' : 'Mod întunecat'}</div>
+              <div className="account-mobile__menu-control"><Switch checked={isDarkMode} onChange={toggleDarkMode} /></div>
+            </div>
+          </li>
 
-      {/* Menu Items */}
-      <Box className="mobile-account-menu__list mobile-menu-items-wrapper" sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: 1, 
-        mb: 2, 
-        px: 0,
-        width: '100%',
-        boxSizing: 'border-box'
-      }}>
-        {menuItems.map((item, index) => (
-          <Card
-            key={index}
-            data-menu-key={item.path}
-            onClick={() => navigate(item.path)}
-            sx={{
-              width: '100%',
-              boxSizing: 'border-box',
-              cursor: 'pointer',
-              borderRadius: 2.5,
-              backgroundColor: 'var(--acc-card)',
-              border: '1px solid var(--acc-border)',
-              boxShadow: 'none',
-              transition: 'background-color 140ms ease-out, transform 140ms ease-out',
-              willChange: 'background-color, transform',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                backgroundColor: 'var(--acc-hover)'
-              }
-            }}
-          >
-            <CardContent sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              py: { xs: 1.5, sm: 1.75, md: 1.75 },
-              minHeight: { xs: 52, sm: 56, md: 56 },
-              '&:last-child': { pb: { xs: 1.5, sm: 1.75, md: 1.75 } }
-            }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 1.75 }, flex: 1 }}>
-                <Box sx={{ 
-                  width: { xs: 36, sm: 40 },
-                  height: { xs: 36, sm: 40 },
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255,255,255,0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--acc-primary)'
-                }}>
-                  {item.icon}
-                </Box>
-                <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: 'var(--acc-text)' }}>
-                  {item.label}
-                </Typography>
-              </Box>
-              <Box sx={{ ml: 1 }}>
-                <span style={{
-                  display: 'inline-block',
-                  width: 0,
-                  height: 0,
-                  borderTop: '5px solid transparent',
-                  borderBottom: '5px solid transparent',
-                  borderLeft: '6px solid var(--acc-text)'
-                }} />
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+          <li>
+            <button className="account-mobile__menu-btn account-mobile__logout" onClick={handleLogout}>
+              <span className="account-mobile__menu-icon" aria-hidden><Logout /></span>
+              <span className="account-mobile__menu-label">Deconectează-te</span>
+            </button>
+          </li>
+        </ul>
+      </main>
 
-        {/* Dark Mode Toggle */}
-        <Card sx={{
-          width: '100%',
-          boxSizing: 'border-box',
-          borderRadius: 2.5,
-          backgroundColor: 'var(--acc-card)',
-          border: '1px solid var(--acc-border)',
-          boxShadow: 'none'
-        }}>
-          <CardContent sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between',
-            py: { xs: 1.5, sm: 1.75, md: 1.75 },
-            minHeight: { xs: 52, sm: 56, md: 56 },
-            '&:last-child': { pb: { xs: 1.5, sm: 1.75, md: 1.75 } }
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 1.75 }, flex: 1 }}>
-              <Box sx={{ 
-                width: { xs: 36, sm: 40 },
-                height: { xs: 36, sm: 40 },
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.06)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--acc-primary)',
-                fontSize: '1.25rem'
-              }}>
-                <DarkMode sx={{ fontSize: '1.25rem' }} />
-              </Box>
-              <Typography variant="body1" noWrap sx={{ fontWeight: 500, color: 'var(--acc-text)' }}>
-                {isDarkMode ? 'Mod luminos' : 'Mod întunecat'}
-              </Typography>
-            </Box>
-            <Switch
-              checked={isDarkMode}
-              onChange={toggleDarkMode}
-              sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: 'var(--acc-primary)'
-                },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: 'var(--acc-primary)'
-                }
-              }}
-              disableRipple
-            />
-          </CardContent>
-        </Card>
-      </Box>
-
-      <Divider sx={{ my: 2.5, borderColor: 'var(--acc-divider)', mx: 0 }} />
-
-      {/* Logout Item - styled like the other menu cards */}
-      <Box sx={{ px: 0, width: '100%', boxSizing: 'border-box' }}>
-        <Card
-          onClick={handleLogout}
-          sx={{
-            width: '100%',
-            boxSizing: 'border-box',
-            mt: 1,
-            cursor: 'pointer',
-            borderRadius: 2.5,
-            backgroundColor: 'var(--acc-card)',
-            border: '1px solid var(--acc-border)',
-            boxShadow: 'none',
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              backgroundColor: 'var(--acc-hover)'
-            }
-          }}
-          aria-label="Deconectează-te"
-        >
-          <CardContent sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1.5,
-            py: { xs: 1.5, sm: 1.75, md: 1.75 },
-            minHeight: { xs: 52, sm: 56, md: 56 },
-            '&:last-child': { pb: { xs: 1.5, sm: 1.75, md: 1.75 } }
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 1.75 }, flex: 1 }}>
-              <Box sx={{ 
-                width: { xs: 36, sm: 40 },
-                height: { xs: 36, sm: 40 },
-                borderRadius: '50%',
-                backgroundColor: 'rgba(245,24,102,0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--acc-primary-alt)'
-              }}>
-                <Logout />
-              </Box>
-              <Typography variant="body1" noWrap sx={{ fontWeight: 600, color: 'var(--acc-primary-alt)' }}>
-                Deconectează-te
-              </Typography>
-            </Box>
-            <Box sx={{ ml: 1 }}>
-              <span style={{
-                display: 'inline-block',
-                width: 0,
-                height: 0,
-                borderTop: '5px solid transparent',
-                borderBottom: '5px solid transparent',
-                borderLeft: '6px solid var(--acc-primary-alt)'
-              }} />
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
-    </Box>
+      <div className="account-mobile__footer-spacer" />
+    </div>
   );
 }

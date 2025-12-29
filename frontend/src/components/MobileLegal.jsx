@@ -10,10 +10,43 @@ export default function MobileLegal() {
 
   const go = (e, to) => {
     e.preventDefault();
-    if (window.innerWidth <= 600) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      navigate(to);
+    // Navigate in SPA
+    navigate(to);
+
+    // If already on the same path, attempt to scroll immediately
+    try {
+      if (typeof window !== 'undefined' && window.location && window.location.pathname === to) {
+        window.scrollTo(0, 0);
+        const d = document.scrollingElement || document.documentElement || document.body;
+        if (d) d.scrollTop = 0;
+      }
+    } catch (err) {
+      // ignore
+    }
+
+    // On small screens, re-try scrolling after a short delay to handle route render timing
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      // immediate attempt
+      try {
+        window.scrollTo(0, 0);
+        const d = document.scrollingElement || document.documentElement || document.body;
+        if (d) d.scrollTop = 0;
+      } catch (err) {}
+
+      setTimeout(() => {
+        try {
+          const scEl = document.scrollingElement || document.documentElement || document.body;
+          if (scEl && typeof scEl.scrollTo === 'function') scEl.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // Some pages use an inner scroll container; try common selectors
+          const main = document.querySelector('.privacy-policy__container, .content, .ma-scroll-view, .add-announcement-form, .homepage, .main-stage');
+          if (main && typeof main.scrollTo === 'function') {
+            main.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        } catch (err) {
+          // ignore scrolling errors
+        }
+      }, 200);
     }
   };
 
