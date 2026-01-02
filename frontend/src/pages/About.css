@@ -12,7 +12,8 @@
   --ab-radius-sm: 12px;
   
   /* --- Colors (Light Mode Default) --- */
-  --ab-bg-page: var(--app-bg);
+  /* Use secondary background (white in light mode) to avoid large-screen theme overrides */
+  --ab-bg-page: var(--bg-secondary);
   
   /* Hero */
   --ab-bg-hero: linear-gradient(135deg, #355070 0%, #406b92 100%);
@@ -20,8 +21,8 @@
   --ab-text-hero: #ffffff;
   --ab-badge-bg: rgba(255, 255, 255, 0.15);
   --ab-badge-border: rgba(255, 255, 255, 0.2);
-  --ab-hero-highlight: linear-gradient(45deg, #F8B195, #ffd89b);
-  --ab-hero-stat-num: #F8B195;
+  --ab-hero-highlight: linear-gradient(45deg, #ffffff, #ffd89b);
+  --ab-hero-stat-num: #ffffff;
   --ab-hero-stat-label: rgba(255, 255, 255, 0.8);
   --ab-hero-divider: rgba(255, 255, 255, 0.3);
 
@@ -41,16 +42,16 @@
   --ab-icon-bg: linear-gradient(135deg, #355070, #406b92);
   --ab-icon-color: #ffffff;
   --ab-accent-primary: #355070;
-  --ab-accent-secondary: #F8B195;
-  --ab-gradient-bar: linear-gradient(90deg, #355070, #F8B195);
+  --ab-accent-secondary: #ffffff;
+  --ab-gradient-bar: linear-gradient(90deg, #355070, #ffffff);
   
   /* Value Cards Borders (Light) */
   --ab-val-border-1: #355070;
   --ab-val-border-2: #406b92;
-  --ab-val-border-3: #F8B195;
+  --ab-val-border-3: #ffffff;
 
   /* CTA */
-  --ab-bg-cta: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
+  --ab-bg-cta: linear-gradient(135deg, #ffffff 0%, #f4a261 100%);
   --ab-text-cta: #ffffff;
   --ab-btn-bg: #ffffff;
   --ab-btn-text: #355070;
@@ -586,7 +587,7 @@
   position: absolute;
   top: 30px; left: 60px; right: 60px;
   height: 2px;
-  background: linear-gradient(90deg, #355070, #406b92, #F8B195);
+  background: linear-gradient(90deg, #355070, #406b92, #ffffff);
   z-index: 1;
 }
 .dark-mode .timeline-line { background: linear-gradient(90deg, #f51866, #fa4875, #fe6585); }

@@ -98,28 +98,30 @@ export default function NotificationSettingsPage() {
   );
 
   return (
-    <Container maxWidth="lg" className="notification-settings-container">
-      <Box display="flex" alignItems="center" justifyContent="center" mb={3} mt={2} className="settings-header">
-        <h1 className="notification-title">{t('notificationSettings.title')}</h1>
-      </Box>
+    <div className="notification-settings-page-wrapper">
+      <Container maxWidth="lg" className="notification-settings-container">
+        <Box display="flex" alignItems="center" justifyContent="center" mb={3} mt={2} className="settings-header">
+          <h1 className="notification-title">{t('notificationSettings.title')}</h1>
+        </Box>
 
-      <Paper elevation={0} className="settings-paper">
-        <List disablePadding>
-          {renderSettingItem('push', 'notificationSettings.push', 'notificationSettings.pushDesc')}
-          {renderSettingItem('email', 'notificationSettings.email', 'notificationSettings.emailDesc')}
-          {renderSettingItem('messages', 'notificationSettings.messages', 'notificationSettings.messagesDesc')}
-          {renderSettingItem('reviews', 'notificationSettings.reviews', 'notificationSettings.reviewsDesc')}
-          {renderSettingItem('favorites', 'notificationSettings.favorites', 'notificationSettings.favoritesDesc')}
-          {renderSettingItem('promotions', 'notificationSettings.promotions', 'notificationSettings.promotionsDesc')}
-        </List>
-      </Paper>
+        <Paper elevation={0} className="settings-paper">
+          <List disablePadding>
+            {renderSettingItem('push', 'notificationSettings.push', 'notificationSettings.pushDesc')}
+            {renderSettingItem('email', 'notificationSettings.email', 'notificationSettings.emailDesc')}
+            {renderSettingItem('messages', 'notificationSettings.messages', 'notificationSettings.messagesDesc')}
+            {renderSettingItem('reviews', 'notificationSettings.reviews', 'notificationSettings.reviewsDesc')}
+            {renderSettingItem('favorites', 'notificationSettings.favorites', 'notificationSettings.favoritesDesc')}
+            {renderSettingItem('promotions', 'notificationSettings.promotions', 'notificationSettings.promotionsDesc')}
+          </List>
+        </Paper>
 
-      <Toast 
-        message={toastData.message} 
-        type={toastData.type} 
-        visible={toastVisible} 
-        onClose={() => setToastVisible(false)} 
-      />
-    </Container>
+        <Toast 
+          message={toastData.message} 
+          type={toastData.type} 
+          visible={toastVisible} 
+          onClose={() => setToastVisible(false)} 
+        />
+      </Container>
+    </div>
   );
 }

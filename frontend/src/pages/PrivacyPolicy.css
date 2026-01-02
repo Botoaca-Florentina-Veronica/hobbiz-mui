@@ -13,7 +13,8 @@
   --pp-spacing-top-desktop: 4rem;
 
   /* --- Colors (Light Mode Default) --- */
-  --pp-bg-page: var(--app-bg);
+  /* Use secondary background (white in light mode) to avoid large-screen theme overrides */
+  --pp-bg-page: var(--bg-secondary);
   
   /* Header / Hero */
   --pp-bg-header: #355070;
@@ -23,7 +24,7 @@
   /* Infobox */
   --pp-bg-infobox: rgba(255, 255, 255, 0.15);
   --pp-border-infobox: rgba(255, 255, 255, 0.2);
-  --pp-text-infobox-accent: #F8B195;
+  --pp-text-infobox-accent: #ffffff;
 
   /* Intro Section */
   --pp-bg-intro: #b3d9e8;
@@ -35,14 +36,14 @@
   /* Content Body */
   --pp-bg-content: #ffffff;
   --pp-border-content: transparent;
-  --pp-gradient-top: linear-gradient(90deg, #355070, #F8B195);
+  --pp-gradient-top: linear-gradient(90deg, #355070, #ffffff);
   
   /* Text & Typography */
   --pp-text-heading: #355070;
   --pp-text-body: #4a5568;
   --pp-text-strong: #355070;
   --pp-text-link: #355070;
-  --pp-text-link-hover: #F8B195;
+  --pp-text-link-hover: #ffffff;
   --pp-list-bullet: #355070;
   
   /* Icons & Decor */

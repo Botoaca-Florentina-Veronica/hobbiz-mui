@@ -47,10 +47,18 @@
 
 /* Main Container - Ensure it allows full expansion on mobile */
 .my-announcements-container {
-  min-height: auto; /* Allow content to determine height */
+  background-color: var(--fav-bg-page, #ffffff);
+  min-height: 100vh;
   height: auto; /* Remove any fixed height */
   overflow: visible; /* Ensure content is not clipped */
   padding-bottom: 40px; /* Increased space at bottom for last card */
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: 100px; /* Clear header */
+}
+
+.dark-mode .my-announcements-container {
+  background-color: #121212;
 }
 
 
@@ -722,4 +730,8 @@ body.dark-mode .favorite-announcement-card {
   .pagination-dots {
     font-size: 1rem;
   }
+}
+
+.dark-mode .my-announcements-container {
+  background-color: #121212;
 }

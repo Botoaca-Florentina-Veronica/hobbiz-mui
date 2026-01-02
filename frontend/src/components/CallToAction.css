@@ -1,12 +1,13 @@
 /* Stiluri pentru CallToAction */
 .hole-action {
-  background-color: #f3f5f6;
+  background-color: #ffffff;
 }
 
 .call-to-action {
   display: flex;
   border-radius: 15px;
-  background-color: #F8B195;
+  /* Use elevated surface (white in light mode) for CTA background */
+  background-color: var(--bg-elevated);
   color: #1a237e;
   align-items: center;
   justify-content: space-between;

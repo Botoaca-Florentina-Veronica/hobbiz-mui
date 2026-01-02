@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton, Typography } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
@@ -10,6 +10,13 @@ import './CookiePolicy.css';
 export default function CookiePolicy() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Page-scoped body class so we can target global header/mobile-header styles
+  useEffect(() => {
+    document.body.classList.add('cookie-page');
+    return () => document.body.classList.remove('cookie-page');
+  }, []);
+
   return (
     <>
       <Header />

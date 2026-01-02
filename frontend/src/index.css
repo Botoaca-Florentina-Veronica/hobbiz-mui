@@ -122,7 +122,24 @@ a, .btn {
 
 /* login page */
 body.login-page {
-  background-color: var(--app-bg) !important; /* use the darkest background tone */
+  /* Light mode: force pure white background on login page */
+  background-color: #ffffff !important;
   margin: 0;
   min-height: 100vh;
+}
+
+/* Keep dark mode behavior intact (if .dark-mode is set on a parent element) */
+.dark-mode body.login-page {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Ensure the top-level app wrapper also uses white on the login page at large screens
+   (prevents global theme overrides like the @media setting for --bg-primary) */
+body.login-page .app {
+  background: #ffffff !important;
+}
+
+/* Preserve dark mode when applicable */
+.dark-mode body.login-page .app {
+  background: var(--bg-primary) !important;
 }

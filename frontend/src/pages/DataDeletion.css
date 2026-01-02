@@ -9,7 +9,8 @@
 .data-deletion__container {
   max-width: 900px;
   margin: 0 auto;
-  background: var(--bg-primary);
+  /* Use elevated surface background (white in light mode) to keep legal pages white */
+  background: var(--bg-elevated);
   border-radius: 16px;
   padding: 3rem 2.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);

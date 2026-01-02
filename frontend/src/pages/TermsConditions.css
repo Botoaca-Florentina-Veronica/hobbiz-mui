@@ -12,7 +12,8 @@
   --tc-spacing-top: 60px;
 
   /* --- Colors (Light Mode Default) --- */
-  --tc-bg-page: var(--app-bg);
+  /* Use secondary background (white in light mode) to avoid large-screen theme overrides */
+  --tc-bg-page: var(--bg-secondary);
   
   /* Header */
   --tc-bg-header: #355070;

@@ -2,7 +2,8 @@
 .categories-container {
   padding: 2rem;
   text-align: center;
-  background-color: var(--bg-primary);
+  /* Use secondary background (white in light mode) so Explore section stays white on desktop */
+  background-color: var(--bg-secondary);
   height: auto;
   min-height: auto;
   padding-bottom: 4rem;
@@ -24,12 +25,51 @@
     margin-bottom: 1.5rem;
     margin-top: 1rem;
   }
+  /* Tighter grid and smaller visuals for very small screens */
   .categories-grid {
-    gap: 0.75rem;
+    gap: 0.6rem;
+    /* If CSS grid is used elsewhere, prefer 3 columns on small phones */
+    grid-template-columns: repeat(3, 1fr);
   }
   .category-description {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
   }
+
+  /* Reduce image area so the label has more vertical room */
+  .category-image-box,
+  .image-container {
+    height: 72px !important;
+    padding: 0.5rem !important;
+  }
+
+  .category-image {
+    max-width: 72px !important;
+    max-height: 72px !important;
+  }
+
+  /* Ensure labels remain on a single line and show full text without ellipsis.
+     Use responsive font-size to keep text readable but fitting the card width. */
+  .category-text-area {
+    padding: 0.2rem 0.25rem !important;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible !important;
+  }
+
+  .category-name {
+    /* Responsive scaling: small on tiny viewports, slightly larger on larger phones */
+    font-size: clamp(0.62rem, 3.2vw, 0.78rem) !important;
+    line-height: 1 !important;
+    white-space: nowrap !important; /* force single line */
+    overflow: visible !important; /* show full text rather than clipping */
+    text-overflow: clip !important;
+    display: block;
+    padding: 0 6px;
+  }
+
+  .category-card-modern { border-radius: 12px !important; overflow: visible; }
 }
 
 .categories-title {

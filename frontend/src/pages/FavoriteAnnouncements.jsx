@@ -162,6 +162,12 @@ export default function FavoriteAnnouncements() {
     setCurrentPage(1);
   }, [favoritesList?.length]);
 
+  // Add page-specific body class while this page is mounted so global elements (Header) can be styled per-page
+  useEffect(() => {
+    document.body.classList.add('page-favorites');
+    return () => { document.body.classList.remove('page-favorites'); };
+  }, []);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });

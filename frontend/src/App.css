@@ -27,6 +27,15 @@
   color: var(--text-primary);
 }
 
+/* Homepage specific: force white background in light mode */
+.homepage {
+  background: #ffffff;
+}
+
+.dark-mode .homepage {
+  background: #121212;
+}
+
 /* Spațiu pentru conținutul de sub header */
 .main-stage, 
 .content, 
@@ -71,6 +80,8 @@
   max-width: 1400px;
   margin-left: 70px;
   margin-right:20px;
+  background: #ffffff;
+  border-radius: 8px;
 }
 
 .search-input {
@@ -82,6 +93,11 @@
   outline: none;
   color: var(--text-primary);
   background: var(--bg-primary);
+}
+
+/* Override search bar background to white in light mode */
+.search-input {
+  background: #ffffff !important;
 }
 
 .search-button {

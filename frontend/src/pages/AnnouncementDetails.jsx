@@ -129,6 +129,12 @@ export default function AnnouncementDetails() {
   const [sellerProfile, setSellerProfile] = useState(null);
   const [sellerReviewsLoading, setSellerReviewsLoading] = useState(false);
 
+  // Ensure full white background behind the fixed Header on large screens
+  useEffect(() => {
+    document.body.classList.add('page-announcement-details');
+    return () => document.body.classList.remove('page-announcement-details');
+  }, []);
+
   // ========== Rating handlers ==========
   const handleRateClick = (e) => {
     e?.stopPropagation();

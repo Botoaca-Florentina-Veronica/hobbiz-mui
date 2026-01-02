@@ -156,9 +156,10 @@ export default function AccountSettings() {
   };
 
   return (
-    <Container maxWidth="lg" className="notification-settings-container">
-      {/* Mobile header: back + title */}
-      <div className="mobile-header">
+    <div className="account-settings-page-container">
+      <Container maxWidth="lg" className="notification-settings-container">
+        {/* Mobile header: back + title */}
+        <div className="mobile-header">
         <IconButton
           onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
           className="mobile-back-btn"
@@ -335,6 +336,7 @@ export default function AccountSettings() {
         onClose={() => setToastVisible(false)}
         duration={3000}
       />
-    </Container>
+      </Container>
+    </div>
   );
 }

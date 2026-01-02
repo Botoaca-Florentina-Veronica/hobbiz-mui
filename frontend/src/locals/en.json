@@ -505,7 +505,7 @@
       {
         "title": "Integrated chat",
         "description": "Communicate quickly with announcement authors. Normalized avatars and fallback with initials.",
-        "color": "#F8B195"
+        "color": "#ffffff"
       },
       {
         "title": "Clear notifications",
@@ -520,7 +520,7 @@
       {
         "title": "Security and trust",
         "description": "URL image normalization, contact data protection and good UI/UX practices.",
-        "color": "#F8B195"
+        "color": "#ffffff"
       }
     ],
     "cta": {

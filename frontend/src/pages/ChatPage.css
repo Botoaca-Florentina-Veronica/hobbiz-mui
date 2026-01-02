@@ -9,7 +9,8 @@
   --chat-radius: 8px;
 
   /* --- Colors (Light Mode) --- */
-  --c-bg-page: var(--app-bg, #ffffff);
+  /* Use secondary background (white in light mode) to avoid large-screen theme overrides */
+  --c-bg-page: var(--bg-secondary, #ffffff);
   
   /* Sidebar */
   --c-sidebar-bg: #ffffff;
@@ -107,7 +108,8 @@
 }
 
 /* Ensure the page background flips when a dark-mode class is present on html/body or an app wrapper */
-html.dark-mode, body.dark-mode, .dark-mode {
+/* Ensure the page background flips when a dark-mode class is present and when chat page is active */
+html.dark-mode body.chat-page, body.dark-mode.chat-page, .dark-mode body.chat-page {
   background-color: var(--c-bg-page) !important;
 }
 
@@ -116,8 +118,42 @@ html, body, #root {
   height: 100%;
 }
 
-html, body {
-  background-color: var(--c-bg-page);
+/* Ensure chat page has a full-viewport white background in light mode */
+body.chat-page {
+  background-color: #ffffff !important;
+}
+
+/* Add full-viewport pseudo-element to avoid any background bleeding from larger theme overrides */
+body.chat-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  pointer-events: none;
+  z-index: -9999;
+}
+
+/* Preserve dark mode behavior */
+.dark-mode body.chat-page,
+.dark-mode body.chat-page::before {
+  background-color: var(--c-bg-page) !important;
+  background: var(--c-bg-page) !important;
+}
+
+/* Force common app/main containers to be white on Chat page in light mode to avoid theme bleed */
+body.chat-page .app,
+body.chat-page .main-stage,
+body.chat-page .content,
+body.chat-page .homepage,
+body.chat-page .hero,
+body.chat-page .promo-section,
+body.chat-page .main-stage,
+body.chat-page .about-page,
+body.chat-page .privacy-policy,
+body.chat-page .cookie-policy,
+body.chat-page .terms-conditions {
+  background: #ffffff !important;
+  background-image: none !important;
 }
 
 /* =========================================================
@@ -128,7 +164,7 @@ html, body {
   height: calc(100vh - var(--chat-header-height));
   max-width: 1300px;
   margin: 0 auto;
-  margin-top: var(--header-height);
+  margin-top: var(--chat-header-height);
   background: var(--c-sidebar-bg);
   border-radius: var(--chat-radius);
   box-shadow: var(--c-shadow-container);
@@ -549,7 +585,7 @@ html, body {
   .chat-separator { display: none; }
   .chat-sidebar { width: 100%; border: none; }
   
-  .chat-main-header { padding-top: 0; height: 50px; }
+  .chat-main-header { padding-top: calc(env(safe-area-inset-top) + 12px); }
   .chat-messages-container { padding: 12px; padding-bottom: 160px; }
   .chat-message { max-width: 85%; }
   

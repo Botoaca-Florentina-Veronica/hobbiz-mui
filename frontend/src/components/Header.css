@@ -7,6 +7,12 @@
   /* --- Header Base --- */
   --hdr-bg: var(--primary);
   --hdr-text: var(--primary-contrast);
+
+  /* --- Shared Light Mode Header Tokens --- */
+  --hdr-bg-light: rgba(53,80,112,0.28); /* frosted blue tint (homepage look) */
+  --hdr-gradient-light: linear-gradient(rgba(53,80,112,0.24), rgba(53,80,112,0.18));
+  --hdr-border-light: rgba(53,80,112,0.08);
+  --hdr-shadow-light: 0 6px 18px rgba(0,0,0,0.06);
   
   /* --- Language Selector --- */
   --lang-btn-color: #355070;
@@ -79,7 +85,12 @@
 .header {
   font-size: 18px;
   height: 72px;
-  background-color: var(--hdr-bg) !important;
+  /* Frosted blue-tinted background in light mode (shared tokens used to ensure consistency) */
+  background-color: var(--hdr-bg-light) !important;
+  background-image: var(--hdr-gradient-light);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  backdrop-filter: blur(8px) saturate(120%);
+  border-bottom: 1px solid var(--hdr-border-light);
   color: var(--hdr-text);
   display: flex;
   justify-content: space-between;
@@ -93,9 +104,15 @@
   transform: translateY(-20px);
 }
 
-/* Umbră specifică dark mode pentru header */
+/* Dark mode: frosted, translucent header for all devices */
 .dark-mode .header {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  /* translucent dark tint + subtle gradient for depth */
+  background-color: rgba(18, 18, 18, 0.48) !important;
+  background-image: linear-gradient(rgba(18,18,18,0.44), rgba(18,18,18,0.36));
+  -webkit-backdrop-filter: blur(10px) saturate(125%);
+  backdrop-filter: blur(10px) saturate(125%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
 }
 
 @keyframes headerSlideIn {
@@ -109,6 +126,9 @@
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+/* --- PAGE-SPECIFIC OVERRIDES --- */
+/* Removed white background override - Favorites page now uses default blurry header */
 
 .header ul {
   list-style-type: none;

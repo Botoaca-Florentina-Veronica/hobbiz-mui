@@ -7,7 +7,7 @@
   --hw-radius-sm: 12px;
   
   /* Colors (Light Mode Default) */
-  --hw-bg-page: var(--app-bg);
+  --hw-bg-page: #ffffff;
   
   /* Hero */
   --hw-bg-hero: linear-gradient(135deg, #355070 0%, #406b92 100%);
@@ -15,8 +15,8 @@
   --hw-text-hero: #ffffff;
   --hw-badge-bg: rgba(255, 255, 255, 0.15);
   --hw-badge-border: rgba(255, 255, 255, 0.2);
-  --hw-hero-highlight: linear-gradient(45deg, #F8B195, #ffd89b);
-  --hw-hero-stat-num: #F8B195;
+  --hw-hero-highlight: linear-gradient(45deg, #ffffff, #ffd89b);
+  --hw-hero-stat-num: #ffffff;
   --hw-hero-stat-label: rgba(255, 255, 255, 0.8);
   --hw-hero-divider: rgba(255, 255, 255, 0.3);
 
@@ -36,11 +36,11 @@
   --hw-icon-bg: linear-gradient(135deg, #355070, #406b92);
   --hw-icon-color: #ffffff;
   --hw-accent-primary: #355070;
-  --hw-accent-secondary: #F8B195;
-  --hw-gradient-bar: linear-gradient(90deg, #355070, #F8B195);
+  --hw-accent-secondary: #ffffff;
+  --hw-gradient-bar: linear-gradient(90deg, #355070, #ffffff);
   
   /* CTA */
-  --hw-bg-cta: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
+  --hw-bg-cta: linear-gradient(135deg, #ffffff 0%, #f4a261 100%);
   --hw-text-cta: #ffffff;
   --hw-btn-bg: #ffffff;
   --hw-btn-text: #355070;
@@ -255,7 +255,8 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #355070, #F8B195);
+  /* Use white at the end so the page background remains white in light mode */
+  background: linear-gradient(90deg, #355070, var(--bg-secondary));
 }
 
 .section-header {
@@ -298,7 +299,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #F8B195, #355070);
+  background: linear-gradient(90deg, var(--bg-secondary), #355070);
 }
 
 .feature-card-mui {
@@ -316,14 +317,21 @@
 
 /* CTA Section */
 .cta-section {
-  background: linear-gradient(135deg, #F8B195 0%, #f4a261 100%);
-  color: white;
+  /* Replace pink background with neutral surface in light mode */
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 60px 40px;
   border-radius: 20px;
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(248, 181, 149, 0.3);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+}
+/* Keep a strong colored CTA in dark mode */
+.dark-mode .cta-section {
+  background: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  color: white;
+  box-shadow: 0 12px 48px rgba(245,24,102,0.25);
 }
 
 .cta-section::before {
@@ -393,7 +401,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #355070, #F8B195);
+  background: linear-gradient(90deg, #355070, #ffffff);
   transform: scaleX(0);
   transition: transform 0.3s ease;
   transform-origin: left;

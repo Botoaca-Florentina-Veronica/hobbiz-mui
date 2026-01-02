@@ -18,6 +18,8 @@
    1. CSS VARIABLES & BASE CONTAINER
    ============================================ */
 .profile-page-container {
+  background-color: #ffffff;
+  min-height: 100vh;
   /* === Color Palette === */
   --pf-primary: #355070;
   --pf-primary-hover: #1e3a4e;
@@ -38,14 +40,15 @@
   --pf-gap: 1.5rem;
 
   /* === Container Properties === */
-  margin-top: 6rem;
-  margin-bottom: 2rem;
-  max-width: 1600px; /* increased overall page max width */
-  margin-left: auto;
-  margin-right: auto;
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
   /* Use symmetric horizontal gutters so left and right spacing match */
-  padding: 0 var(--pf-left-offset);
+  padding-left: var(--pf-left-offset);
+  padding-right: var(--pf-left-offset);
   font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
 }
 
 .profile-page-container * {

@@ -64,7 +64,7 @@ export default function Categories() {
           justifyContent="center"
         >
           {categories.map((category, index) => (
-            <Grid item xs={3} sm={4} md={3} lg={2} key={index}>
+            <Grid item xs={4} sm={4} md={3} lg={2} key={index}>
               <Card
                 className="category-card-modern"
                 onClick={() => navigate(`/anunturi-categorie/${encodeURIComponent(category.description)}`)}

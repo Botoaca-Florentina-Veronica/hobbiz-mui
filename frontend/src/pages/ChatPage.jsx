@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
 
-import Header from '../components/Header';
 import TypingIndicator from '../components/TypingIndicator';
 import useSocket from '../hooks/useSocket';
 import apiClient from '../api/api';
@@ -82,6 +81,12 @@ export default function ChatPage() {
     }
     return () => document.body.classList.remove('chat-mobile-active');
   }, [isChattingOnMobile]);
+
+  // Ensure the chat page is scoped so page-level background rules don't leak globally
+  useEffect(() => {
+    document.body.classList.add('chat-page');
+    return () => document.body.classList.remove('chat-page');
+  }, []);
 
   // Socket listeners for online status and typing
   useEffect(() => {
@@ -397,7 +402,6 @@ export default function ChatPage() {
 
   return (
     <>
-      <Header />
       <div className="chat-mobile-topbar">
         <button type="button" className="chat-mobile-toggle" onClick={() => setIsSidebarOpen(true)}>
           ☰ {t('chat.conversations')} {unreadConvs.length > 0 && `(${unreadConvs.length})`}

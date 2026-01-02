@@ -10,7 +10,7 @@
   --as-container-padding-top: 4rem;
   
   /* --- Colors (Light Mode Default) --- */
-  --as-bg-page: #f5f7f8;
+  --as-bg-page: #ffffff;
   
   /* Text */
   --as-text-title: #183642;
@@ -443,4 +443,10 @@
 
 @media (max-width: 1024px) {
   .mobile-header { display: flex; }
+}
+
+.account-settings-page-container {
+  background-color: var(--as-bg-page);
+  min-height: 100vh;
+  width: 100%;
 }

@@ -179,7 +179,7 @@ export default function HowItWorks() {
                     onClick={() => navigate('/login')}
                     sx={{
                       mt: 1,
-                      bgcolor: '#F8B195',
+                      bgcolor: '#ffffff',
                       color: '#355070',
                       '&:hover': { bgcolor: '#f4a261' }
                     }}

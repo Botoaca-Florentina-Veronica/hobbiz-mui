@@ -10,7 +10,7 @@
   --aa-muted: #5b7a88;
 
   /* --- Dynamic Theme Variables (Light Mode Defaults) --- */
-  --bg-app: var(--app-bg, #f3f5f6);
+  --bg-app: #ffffff;
   --bg-surface: #ffffff;
   --bg-input: #f3f5f6;
   --bg-input-focus: #f8fafb;
@@ -92,8 +92,11 @@
   padding: 40px 0;
   color: var(--text-main);
   /* Desktop margin default */
-  margin-top: 4rem;
+  margin-top: 0;
+  padding-top: 4rem;
   font-family: 'Poppins', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .add-announcement-container * {

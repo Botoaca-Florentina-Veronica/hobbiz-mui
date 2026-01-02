@@ -9,8 +9,13 @@
   align-items: center;
   justify-content: space-between;
   padding: calc(env(safe-area-inset-top) + 4px) 16px 6px !important; /* și mai compact top padding */
-  background: #f3f5f6 !important; /* unificare fundal */
-  box-shadow: none;
+  /* Use shared header look for light mode to match homepage header */
+  background-color: var(--hdr-bg-light) !important;
+  background-image: var(--hdr-gradient-light);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-bottom: 1px solid var(--hdr-border-light);
+  box-shadow: var(--hdr-shadow-light);
   /* On mobile, let the header scroll away instead of staying fixed/sticky */
   position: static;
   top: auto;
@@ -18,9 +23,25 @@
   gap: 12px;
 }
 
-/* Dark mode background fix */
+/* Favorites page light-mode override for mobile header */
+body.page-favorites:not(.dark-mode) .mobile-header {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+  box-shadow: none !important;
+  color: #183642;
+}
+
+/* Dark mode: frosted, translucent dark background */
 .dark-mode .mobile-header {
-  background: var(--app-bg) !important;
+  background-color: rgba(18,18,18,0.42) !important;
+  background-image: linear-gradient(rgba(18,18,18,0.36), rgba(18,18,18,0.28));
+  -webkit-backdrop-filter: blur(10px) saturate(125%);
+  backdrop-filter: blur(10px) saturate(125%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
 }
 
 .mobile-header-spacer {
@@ -166,9 +187,15 @@
 /* Media queries pentru dispozitive foarte mici */
 @media (max-width: 480px) {
   .mobile-header {
-    padding: calc(env(safe-area-inset-top) + 4px) 12px 6px !important; /* compactare suplimentară */
+    padding: calc(env(safe-area-inset-top) + 4px) 12px 6px !important; /* compacted for small screens */
     gap: 8px !important;
-    background: #f3f5f6 !important; /* asigurare consistentă */
+    /* Use shared header tokens on small devices too */
+    background-color: var(--hdr-bg-light) !important;
+    background-image: var(--hdr-gradient-light);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+    border-bottom: 1px solid var(--hdr-border-light) !important;
+    box-shadow: var(--hdr-shadow-light) !important;
   }
   
   .mobile-search-container {
@@ -199,7 +226,13 @@
   .mobile-header {
     padding: calc(env(safe-area-inset-top) + 2px) 8px 4px !important; /* minim păstrând safe-area */
     gap: 6px !important;
-    background: #f3f5f6 !important;
+    /* Use the shared header tokens for very small screens too */
+    background-color: var(--hdr-bg-light) !important;
+    background-image: var(--hdr-gradient-light);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+    border-bottom: 1px solid var(--hdr-border-light) !important;
+    box-shadow: var(--hdr-shadow-light) !important;
   }
   
   .mobile-search-container {

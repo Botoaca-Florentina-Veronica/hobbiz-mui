@@ -505,7 +505,7 @@
       {
         "title": "Chat integrat",
         "description": "Comunică rapid cu autorii anunțurilor. Avatare normalizate și fallback cu inițiale.",
-        "color": "#F8B195"
+        "color": "#ffffff"
       },
       {
         "title": "Notificări clare",
@@ -520,7 +520,7 @@
       {
         "title": "Siguranță și încredere",
         "description": "Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.",
-        "color": "#F8B195"
+        "color": "#ffffff"
       }
     ],
     "cta": {
