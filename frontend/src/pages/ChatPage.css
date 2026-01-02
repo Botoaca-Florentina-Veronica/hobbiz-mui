@@ -11,6 +11,8 @@
   /* --- Colors (Light Mode) --- */
   /* Use secondary background (white in light mode) to avoid large-screen theme overrides */
   --c-bg-page: var(--bg-secondary, #ffffff);
+  /* Background for small popups/panels inside chat (emoji picker, reaction picker) */
+  --c-bg-container: #ffffff;
   
   /* Sidebar */
   --c-sidebar-bg: #ffffff;
@@ -101,6 +103,9 @@
   --c-input-border: #3f3f46;
   --c-input-focus: #f51866;
   
+  /* Dark mode popup background for chat containers */
+  --c-bg-container: #121212;
+  
   --c-btn-primary-bg: #f51866;
   
   --c-shadow-container: 0 4px 24px rgba(0,0,0,0.5);
@@ -121,6 +126,9 @@ html, body, #root {
 /* Ensure chat page has a full-viewport white background in light mode */
 body.chat-page {
   background-color: #ffffff !important;
+  background: #ffffff !important;
+  /* Disable any background transitions to prevent flash */
+  transition: none !important;
 }
 
 /* Add full-viewport pseudo-element to avoid any background bleeding from larger theme overrides */
@@ -128,16 +136,20 @@ body.chat-page::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: #ffffff;
+  background: #ffffff !important;
   pointer-events: none;
   z-index: -9999;
 }
 
-/* Preserve dark mode behavior */
-.dark-mode body.chat-page,
-.dark-mode body.chat-page::before {
-  background-color: var(--c-bg-page) !important;
-  background: var(--c-bg-page) !important;
+/* Dark mode: force #121212 on chat page */
+body.dark-mode.chat-page {
+  background-color: #121212 !important;
+  background: #121212 !important;
+}
+
+body.dark-mode.chat-page::before {
+  background-color: #121212 !important;
+  background: #121212 !important;
 }
 
 /* Force common app/main containers to be white on Chat page in light mode to avoid theme bleed */
@@ -154,6 +166,23 @@ body.chat-page .cookie-policy,
 body.chat-page .terms-conditions {
   background: #ffffff !important;
   background-image: none !important;
+  transition: none !important;
+}
+
+/* In dark mode, override the above to keep chat page fully #121212 */
+body.dark-mode.chat-page .app,
+body.dark-mode.chat-page .main-stage,
+body.dark-mode.chat-page .content,
+body.dark-mode.chat-page .homepage,
+body.dark-mode.chat-page .hero,
+body.dark-mode.chat-page .promo-section,
+body.dark-mode.chat-page .about-page,
+body.dark-mode.chat-page .privacy-policy,
+body.dark-mode.chat-page .cookie-policy,
+body.dark-mode.chat-page .terms-conditions {
+  background: #121212 !important;
+  background-image: none !important;
+  transition: none !important;
 }
 
 /* =========================================================
@@ -502,6 +531,25 @@ body.chat-page .terms-conditions {
   transition: transform 0.2s;
 }
 .reaction-option:hover { transform: scale(1.3); background: var(--c-item-hover); }
+
+/* Dark mode: ensure emoji/reaction picker has #121212 background to match chat */
+body.dark-mode.chat-page .reaction-picker {
+  background: #121212;
+  border-color: var(--c-reaction-border);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+body.dark-mode.chat-page .reaction-picker .reaction-option {
+  color: var(--c-bubble-other-text);
+}
+body.dark-mode.chat-page .reaction-option:hover { background: #1f1f23; }
+
+/* Emoji picker (inline) - ensure it gets a solid dark background in dark mode */
+body.dark-mode.chat-page .chat-emoji-picker {
+  background: #121212 !important;
+  border: 1px solid var(--c-sidebar-border);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6) !important;
+}
+body.dark-mode.chat-page .chat-emoji-picker button { color: var(--c-bubble-other-text); }
 
 /* =========================================================
    4. INPUT AREA

@@ -125,6 +125,11 @@
   top: 0; left: 0; width: 100%;
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.dark-mode .fixed-header {
+  background-color: transparent;
 }
 
 /* --- PAGE-SPECIFIC OVERRIDES --- */
@@ -426,8 +431,6 @@
   /* defensive: hide any header bar entirely on mobile */
   .header { display: none !important; }
   .fixed-header { display: none !important; }
-}
-
   
   .user-account-container { margin-right: 0.5rem; }
   .user-account-btn { margin-right: 0; font-size: 1rem; padding: 0.25rem 0.5rem; }

@@ -43,6 +43,16 @@
   margin-top: 72px; /* Înălțimea header-ului */
 }
 
+/* Fundal alb pentru main-stage în light mode */
+.main-stage {
+  background-color: #ffffff !important;
+}
+
+/* Fundal alb pentru main-stage în dark mode */
+.dark-mode .main-stage {
+  background-color: var(--ms-bg-stage);
+}
+
 /* ---- SEARCH BAR & BUTTONS (păstrate aici pentru uz global) ---- */
 .top-bar {
   display: flex;

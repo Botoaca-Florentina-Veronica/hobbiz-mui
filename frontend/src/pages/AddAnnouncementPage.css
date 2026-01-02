@@ -523,6 +523,27 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   background: #f51866; color: #ffffff; border-color: #f51866;
 }
 
+/* Preview Dialog - ensure dark background when dark-mode is active */
+.add-announcement-preview-paper {
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif !important;
+} 
+
+.dark-mode .add-announcement-preview-paper {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+  border: 1px solid #3f3f3f !important;
+}
+
+.dark-mode .add-announcement-preview-paper .MuiDialogContent-root,
+.dark-mode .add-announcement-preview-paper .MuiDialogTitle-root,
+.dark-mode .add-announcement-preview-paper .MuiDialogActions-root {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
 /* Submit Button */
 .add-announcement-submit {
   background: #355070; color: #f9faf8; border: 2px solid #355070;

@@ -9,6 +9,7 @@
     "settings": "Account Settings",
     "payments": "Payments",
     "logout": "Log Out",
+    "logoutSuccess": "You have been logged out.",
     "login": "Log In",
     "signup": "Sign Up",
     "account": "Your Account"
@@ -353,7 +354,8 @@
       "description": "Description",
       "sellerInfo": "Seller information",
       "contactPersonLabel": "Contact person:",
-      "location": "Location"
+      "location": "Location",
+      "imageAlt": "Preview image"
     }
   }
   ,

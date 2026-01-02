@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
@@ -83,9 +83,15 @@ export default function ChatPage() {
   }, [isChattingOnMobile]);
 
   // Ensure the chat page is scoped so page-level background rules don't leak globally
-  useEffect(() => {
+  // Use useLayoutEffect to apply synchronously before browser paint
+  useLayoutEffect(() => {
+    // Add the chat-page class IMMEDIATELY - CSS will handle the white background
+    // This prevents any flash by letting CSS take over before any JS paint
     document.body.classList.add('chat-page');
-    return () => document.body.classList.remove('chat-page');
+
+    return () => {
+      document.body.classList.remove('chat-page');
+    };
   }, []);
 
   // Socket listeners for online status and typing

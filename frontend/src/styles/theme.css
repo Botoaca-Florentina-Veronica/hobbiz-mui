@@ -71,14 +71,14 @@
   --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
   
   /* --- ALTELE --- */
-  --hero-bg: #F8B195;              /* Fundal secțiune hero */
+  --hero-bg: #ffffff;              /* Fundal secțiune hero */
   --seen-tick-color: #34B7F1;      /* Culoare tick-uri văzute (messenger style) */
 }
 
 /* Override pentru ecrane mari în light mode */
 @media (min-width: 1024px) {
   :root {
-    --bg-primary: #F8B195;
+    --bg-primary: #ffffff;
   }
 }
 

@@ -1010,20 +1010,32 @@ export default function AddAnnouncementPage() {
         maxWidth="lg"
         fullWidth
         PaperProps={{
+          className: 'add-announcement-preview-paper',
           sx: {
             borderRadius: 3,
             backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#fff',
             color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
-            maxHeight: '90vh'
+            maxHeight: '90vh',
+            boxShadow: (theme) => theme.palette.mode === 'dark' 
+              ? '0 20px 60px rgba(0,0,0,0.8)' 
+              : '0 20px 60px rgba(0,0,0,0.2)'
+          }
+        }}
+        BackdropProps={{
+          sx: {
+            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
           }
         }}
       >
         <DialogTitle sx={{ 
           borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
           pb: 2,
-          fontWeight: 600
+          fontWeight: 600,
+          fontSize: '1.5rem',
+          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070'
         }}>
-          {t('addAnnouncement.previewTitle') || 'Previzualizare Anunț'}
+          {t('addAnnouncement.previewTitle')}
         </DialogTitle>
         <DialogContent sx={{ p: { xs: 2, md: 3 }, overflowY: 'auto' }}>
           <Grid container spacing={4}>
@@ -1031,17 +1043,27 @@ export default function AddAnnouncementPage() {
             <Grid item xs={12} md={8}>
               {/* Image Card */}
               {(imagePreviews.length > 0 || mainImagePreview) && (
-                <Card elevation={3} sx={{ mb: 3, overflow: 'hidden', borderRadius: 2 }}>
+                <Card elevation={3} sx={{ 
+                  mb: 3, 
+                  overflow: 'hidden', 
+                  borderRadius: 2,
+                  border: (theme) => theme.palette.mode === 'dark' 
+                    ? '1px solid #3f3f3f' 
+                    : '1px solid #e5e7eb',
+                  boxShadow: (theme) => theme.palette.mode === 'dark'
+                    ? '0 4px 20px rgba(0,0,0,0.5)'
+                    : '0 4px 20px rgba(0,0,0,0.1)'
+                }}>
                   <Box sx={{ position: 'relative', height: { xs: 300, md: 400 } }}>
                     <CardMedia
                       component="img"
                       image={mainImagePreview || imagePreviews[0]}
-                      alt="Preview"
+                      alt={t('addAnnouncement.preview.imageAlt') || 'Preview'}
                       sx={{
                         width: '100%',
                         height: '100%',
                         objectFit: 'contain',
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f8f8'
                       }}
                     />
                   </Box>
@@ -1049,7 +1071,13 @@ export default function AddAnnouncementPage() {
               )}
 
               {/* Details Card */}
-              <Card elevation={2} sx={{ borderRadius: 2 }}>
+              <Card elevation={2} sx={{ 
+                borderRadius: 2,
+                border: (theme) => theme.palette.mode === 'dark' 
+                  ? '1px solid #3f3f3f' 
+                  : '1px solid #e5e7eb',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
+              }}>
                 <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
                   {/* Header */}
                   <Box sx={{ mb: 3 }}>
@@ -1063,19 +1091,25 @@ export default function AddAnnouncementPage() {
                       {title}
                     </Typography>
                     {category && (
-                      <Chip
-                        label={translateCategory(category, t)}
-                        variant="outlined"
-                        sx={{
-                          borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                          mb: 2
-                        }}
-                      />
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Chip
+                          label={translateCategory(category, t)}
+                          variant="outlined"
+                          sx={{
+                            borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                            fontWeight: 600,
+                            fontSize: '0.875rem'
+                          }}
+                        />
+                      </Box>
                     )}
                   </Box>
 
-                  <Divider sx={{ mb: 3 }} />
+                  <Divider sx={{ 
+                    mb: 3,
+                    borderColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : '#e5e7eb'
+                  }} />
 
                   {/* Description */}
                   <Typography variant="h6" sx={{ 
@@ -1103,29 +1137,46 @@ export default function AddAnnouncementPage() {
             {/* Sidebar Column */}
             <Grid item xs={12} md={4}>
               {/* Seller Information Card */}
-              <Card elevation={2} sx={{ mb: 3, borderRadius: 2 }}>
+              <Card elevation={2} sx={{ 
+                mb: 3, 
+                borderRadius: 2,
+                border: (theme) => theme.palette.mode === 'dark' 
+                  ? '1px solid #3f3f3f' 
+                  : '1px solid #e5e7eb',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
+              }}>
                 <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                   <Typography variant="h6" sx={{ 
                     color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
                     mb: 3,
                     fontWeight: 600
                   }}>
-                    {t('addAnnouncement.preview.sellerInfo') || t('addAnnouncement.contactSubtitle')}
+                    {t('addAnnouncement.preview.sellerInfo')}
                   </Typography>
 
                   {/* Contact Person */}
                   {contactPerson && (
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {t('addAnnouncement.preview.contactPersonLabel') || (t('addAnnouncement.contactPersonLabel'))}
+                      <Typography variant="body2" sx={{ 
+                        mb: 1,
+                        color: (theme) => theme.palette.mode === 'dark' ? '#b0b0b0' : '#6b7280',
+                        fontWeight: 500
+                      }}>
+                        {t('addAnnouncement.preview.contactPersonLabel')}
                       </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      <Typography variant="body1" sx={{ 
+                        fontWeight: 500,
+                        color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
+                      }}>
                         {contactPerson}
                       </Typography>
                     </Box>
                   )}
 
-                  <Divider sx={{ mb: 3 }} />
+                  <Divider sx={{ 
+                    mb: 3,
+                    borderColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : '#e5e7eb'
+                  }} />
 
                   {/* Contact Details */}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1134,17 +1185,25 @@ export default function AddAnnouncementPage() {
                       <Paper elevation={1} sx={{ 
                         p: 2,
                         borderRadius: 2,
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                         border: (theme) => theme.palette.mode === 'dark' 
-                          ? '1px solid rgba(255,255,255,0.3)' 
-                          : '1px solid rgba(0,0,0,0.12)'
+                          ? '1px solid #3f3f3f' 
+                          : '1px solid #e5e7eb',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          boxShadow: (theme) => theme.palette.mode === 'dark'
+                            ? '0 4px 12px rgba(245, 24, 102, 0.2)'
+                            : '0 4px 12px rgba(53, 80, 112, 0.15)'
+                        }
                       }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <PhoneIcon sx={{ 
                             color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
                             fontSize: 20
                           }} />
-                          <Typography variant="body1">
+                          <Typography variant="body1" sx={{
+                            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
+                          }}>
                             {contactPhone}
                           </Typography>
                         </Box>
@@ -1156,10 +1215,16 @@ export default function AddAnnouncementPage() {
                       <Paper elevation={1} sx={{ 
                         p: 2,
                         borderRadius: 2,
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
                         border: (theme) => theme.palette.mode === 'dark' 
-                          ? '1px solid rgba(255,255,255,0.3)' 
-                          : '1px solid rgba(0,0,0,0.12)'
+                          ? '1px solid #3f3f3f' 
+                          : '1px solid #e5e7eb',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          boxShadow: (theme) => theme.palette.mode === 'dark'
+                            ? '0 4px 12px rgba(245, 24, 102, 0.2)'
+                            : '0 4px 12px rgba(53, 80, 112, 0.15)'
+                        }
                       }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <EmailIcon sx={{ 
@@ -1168,7 +1233,8 @@ export default function AddAnnouncementPage() {
                           }} />
                           <Typography variant="body1" sx={{ 
                             wordBreak: 'break-word',
-                            fontSize: '0.95rem'
+                            fontSize: '0.95rem',
+                            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
                           }}>
                             {contactEmail}
                           </Typography>
@@ -1181,21 +1247,29 @@ export default function AddAnnouncementPage() {
 
               {/* Location Card */}
               {selectedLocalitate && (
-                <Card elevation={2} sx={{ borderRadius: 2 }}>
+                <Card elevation={2} sx={{ 
+                  borderRadius: 2,
+                  border: (theme) => theme.palette.mode === 'dark' 
+                    ? '1px solid #3f3f3f' 
+                    : '1px solid #e5e7eb',
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
+                }}>
                   <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                     <Typography variant="h6" sx={{ 
                       color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
                       mb: 2,
                       fontWeight: 600
                     }}>
-                      {t('addAnnouncement.preview.location') || t('addAnnouncement.locationLabel')}
+                      {t('addAnnouncement.preview.location')}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <FaMapMarkerAlt style={{ 
                         color: '#f51866',
                         fontSize: 20
                       }} />
-                      <Typography variant="body1">
+                      <Typography variant="body1" sx={{
+                        color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
+                      }}>
                         {selectedLocalitate}
                       </Typography>
                     </Box>
@@ -1207,18 +1281,26 @@ export default function AddAnnouncementPage() {
         </DialogContent>
         <DialogActions sx={{ 
           p: 2,
-          borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`
+          borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
+          bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
         }}>
           <Button 
             onClick={() => setShowPreview(false)}
+            variant="outlined"
             sx={{
-              color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
+              color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+              borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+              fontWeight: 600,
+              px: 3,
               '&:hover': {
-                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#f5f5f5'
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(245, 24, 102, 0.1)' 
+                  : 'rgba(53, 80, 112, 0.05)',
+                borderColor: (theme) => theme.palette.mode === 'dark' ? '#fa4875' : '#2a4059'
               }
             }}
           >
-            {t('common.close') || 'Închide'}
+            {t('common.close')}
           </Button>
         </DialogActions>
       </Dialog>

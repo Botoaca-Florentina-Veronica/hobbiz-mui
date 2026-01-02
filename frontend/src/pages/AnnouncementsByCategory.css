@@ -13,7 +13,7 @@
   --abc-spacing-desktop: 80px;
   
   /* Colors - Light Mode */
-  --abc-bg-page: transparent;
+  --abc-bg-page: #ffffff;
   --abc-bg-card: #ffffff;
   --abc-bg-search: #ffffff;
   --abc-text-primary: #23484a;
@@ -35,6 +35,7 @@
 
 /* Dark Mode Variable Overrides */
 .dark-mode {
+  --abc-bg-page: #121212;
   --abc-bg-card: #121212;
   --abc-bg-search: #121212;
   --abc-text-primary: #ffffff;
@@ -49,10 +50,12 @@
    ---------------------------------------------------------- */
 .announcements-by-category.my-announcements-container {
   /* outer container no longer adds large horizontal offset; inner `.abc-align-container` handles spacing */
+  background-color: var(--abc-bg-page);
   padding-left: 0;
   padding-right: 0;
   box-sizing: border-box;
   width: 100%;
+  min-height: 100vh;
 }
 
 /* Align the page title with the inner `.abc-align-container` so it lines up with searchbar and cards */
@@ -77,7 +80,7 @@
 
 @media (min-width: 901px) {
   .announcements-by-category.my-announcements-container {
-    margin-top: 80px;
+    padding-top: 80px;
   }
 }
 

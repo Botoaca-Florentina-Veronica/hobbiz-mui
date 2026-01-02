@@ -1527,6 +1527,9 @@ body.dark-mode .profile-page-container {
   --pf-text-muted: #8b8b8b;
   --pf-divider: #575757;
   --pf-card-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  /* Page background for dark mode */
+  --pf-card-bg: #121212;
+  background-color: #121212;
 }
 
 /* Cards & Containers */

@@ -14,6 +14,7 @@ import './Header.css';
 import MobileHeader from './MobileHeader';
 import './MobileHeader.css';
 import { useTranslation } from 'react-i18next';
+import Toast from './Toast';
 
 const MOBILE_BREAKPOINT = 1024;
 
@@ -34,6 +35,7 @@ export default function Header() {
   const auth = useAuth();
   const [avatarError, setAvatarError] = useState(false);
   const [avatarIdx, setAvatarIdx] = useState(0);
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
 
   // Helper: rezolvă URL relativ (ex: "/uploads/...") la URL absolut către backend
   const resolveAvatarUrl = (url) => {
@@ -321,9 +323,12 @@ export default function Header() {
         setUnreadCount(0);
         setChatUnreadCount(0);
         setAvatarError(false);
-        setOpenSnackbar(true);
+        window.dispatchEvent(new Event('logout'));
+        setShowLogoutToast(true);
         navigate('/');
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       });
     });
   };
@@ -544,6 +549,12 @@ export default function Header() {
               Ai fost deconectat din cont.
             </Alert>
           </Snackbar>
+          <Toast
+            message={t('header.logoutSuccess')}
+            type="info"
+            visible={showLogoutToast}
+            onClose={() => setShowLogoutToast(false)}
+          />
         </>
       )}
     </>

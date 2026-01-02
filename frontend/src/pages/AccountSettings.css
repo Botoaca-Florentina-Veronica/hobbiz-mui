@@ -144,6 +144,20 @@
   border: var(--as-border-menu);
 }
 
+/* Light mode: thin black border to match AnnouncementDetails */
+body:not(.dark-mode) .settings-menu,
+body:not(.dark-mode) .settings-paper {
+  border: 1px solid #121212 !important;
+}
+
+/* Note: individual items should not have an extra outline — container border is used for the page look */
+body:not(.dark-mode) .settings-item,
+body:not(.dark-mode) .setting-item,
+body:not(.dark-mode) .mobile-setting-item {
+  border: none !important;
+  border-radius: var(--as-radius);
+}
+
 
 /* 3. SETTINGS ITEMS
    ---------------------------------------------------------- */

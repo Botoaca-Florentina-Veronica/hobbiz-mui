@@ -6,6 +6,7 @@ import FooterPublishButton from './FooterPublishButton';
 import './Footer.css';
 import LegalSection from './LegalSection';
 import MobileLegal from './MobileLegal';
+import Toast from './Toast';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
@@ -19,6 +20,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
   const [showDropdown, setShowDropdown] = useState(false);
   const [googleAvatar, setGoogleAvatar] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -191,13 +193,19 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
                 <a onClick={(e) => { e.preventDefault(); toggleDarkMode(); }}>
                   {isDarkMode ? t('common.lightMode') : t('common.darkMode')}
                 </a>
-                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); navigate('/'); window.location.reload(); }}>{t('header.logout')}</a>
+                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); window.dispatchEvent(new Event('logout')); setShowLogoutToast(true); setTimeout(() => { navigate('/'); window.location.reload(); }, 2000); }}>{t('header.logout')}</a>
               </div>
             )}
           </div>
         </div>
       </div>
   {/* MobileLegal include și copyright-ul pe mobil */}
+    <Toast
+      message={t('header.logoutSuccess')}
+      type="info"
+      visible={showLogoutToast}
+      onClose={() => setShowLogoutToast(false)}
+    />
     </div>
   );
 }

@@ -9,6 +9,7 @@
     "settings": "Setări cont",
     "payments": "Plăți",
     "logout": "Deconectează-te",
+    "logoutSuccess": "Ai fost deconectat din cont.",
     "login": "Autentificare",
     "signup": "Înregistrare",
     "account": "Contul tău"
@@ -353,7 +354,8 @@
       "description": "Descriere",
       "sellerInfo": "Informații vânzător",
       "contactPersonLabel": "Persoană de contact:",
-      "location": "Locație"
+      "location": "Locație",
+      "imageAlt": "Previzualizare imagine"
     }
   }
   ,

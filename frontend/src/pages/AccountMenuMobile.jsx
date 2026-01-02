@@ -22,13 +22,17 @@ import {
   DarkMode
 } from '@mui/icons-material';
 import apiClient from '../api/api';
+import Toast from '../components/Toast';
+import { useTranslation } from 'react-i18next';
 import './AccountMenuMobile.v2.css';
 
 export default function AccountMenuMobile() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -84,8 +88,12 @@ export default function AccountMenuMobile() {
     } finally {
       try { localStorage.removeItem('token'); } catch {}
       try { localStorage.removeItem('userId'); } catch {}
-      navigate('/');
-      window.location.reload();
+      window.dispatchEvent(new Event('logout'));
+      setShowLogoutToast(true);
+      setTimeout(() => {
+        navigate('/');
+        window.location.reload();
+      }, 2000);
     }
   };
 
@@ -165,6 +173,12 @@ export default function AccountMenuMobile() {
       </main>
 
       <div className="account-mobile__footer-spacer" />
+      <Toast
+        message={t('header.logoutSuccess')}
+        type="info"
+        visible={showLogoutToast}
+        onClose={() => setShowLogoutToast(false)}
+      />
     </div>
   );
 }
