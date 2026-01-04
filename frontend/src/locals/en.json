@@ -58,7 +58,15 @@
       "emailAddress": "Your email address",
       "password": "Password",
       "phone": "Phone"
-    }
+    },
+    "resetTitle": "Reset password",
+    "resetCode": "Reset code",
+    "resetNewPassword": "New password",
+    "resetSend": "Send code",
+    "resetConfirm": "Reset password",
+    "resetSent": "If an account exists, a code was sent.",
+    "resetDone": "Password reset successfully. You can sign in.",
+    "resetBack": "Back to login"
   },
   "mobileHeader": {
     "searchPlaceholder": "What are you looking for?",

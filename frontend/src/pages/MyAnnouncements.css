@@ -7,7 +7,8 @@
 :root {
   font-family: 'Poppins', sans-serif;
   /* Colors Light Mode */
-  --ma-bg: #f8f9fa;
+  /* Use pure white background for the page in light mode */
+  --ma-bg: #ffffff;
   --ma-surface: #ffffff;
   --ma-text: #183642;
   --ma-muted: #6b7280;
@@ -58,9 +59,29 @@
   flex: initial;
   background-color: var(--ma-bg);
   height: auto;
+  /* Ensure content never sits under the global fixed header on desktop */
+  padding-top: calc(40px + 4rem);
   padding-bottom: 12px;
   margin-bottom: 2rem; /* small bottom spacing */
 } 
+
+/* On small screens the global Header is hidden for this route; keep space for the local mobile header to avoid content appearing under it */
+@media (max-width: 600px) {
+  .ma-container {
+    padding-top: calc(56px + env(safe-area-inset-top));
+  }
+  /* Ensure the scroll view has a small top offset as well */
+  .ma-scroll-view {
+    padding-top: 8px;
+  }
+}
+
+/* On larger screens, reset padding since we're using the global header */
+@media (min-width: 601px) {
+  .ma-container {
+    padding-top: 0;
+  }
+}
 
 .ma-loading-container {
   display: flex;
@@ -93,16 +114,9 @@
 /* 3. HEADER
    ---------------------------------------------------------- */
 .ma-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 12px 16px;
-  padding-top: max(env(safe-area-inset-top), 12px);
-  background-color: var(--ma-bg);
-  /* Remove horizontal divider above the title */
-  border-bottom: none;
-  margin: 0 -12px 20px; /* increased bottom margin to give extra space above title */
+  display: none !important;
 }
+
 
 .ma-header-content {
   display: flex;
@@ -183,6 +197,11 @@
     border-bottom: none;
     /* make space similar to the previous H1 margin */
     margin-bottom: 8px;
+    /* Keep mobile header above overlays and prevent bleed-through */
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   }
 
   .ma-mobile-back {
@@ -231,9 +250,16 @@
   padding: 12px;
   margin-bottom: 16px;
   background-color: var(--ma-dark-container);
-  border: 2px solid #ffffff;
+  /* Container border handled in light-mode selector to match Account Settings style */
+  border: none;
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+/* Match Account Settings light-mode contour for search/filter container */
+body:not(.dark-mode) .ma-search-section {
+  border: 1px solid #121212;
 }
 
 .dark-mode .ma-search-section {
@@ -250,7 +276,23 @@
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 12px;
-  border: 2px solid #ffffff;
+  /* Base neutral border removed; light-mode border applied via body selector below */
+  border: none;
+}
+
+/* In light mode, inner containers should use the same thin dark contour as Account Settings */
+body:not(.dark-mode) .ma-search-bar,
+body:not(.dark-mode) .ma-filter-button,
+body:not(.dark-mode) .ma-active-filters,
+body:not(.dark-mode) .ma-chip {
+  border: 1px solid #121212;
+}
+
+/* Adjust radius and subtle shadow for consistency */
+body:not(.dark-mode) .ma-search-bar,
+body:not(.dark-mode) .ma-filter-button {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
 .dark-mode .ma-search-bar {
@@ -525,7 +567,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   height: auto;
   min-height: 180px;
-  border: 2px solid #ffffff;
+  /* Card border handled in light-mode selector to match Account Settings style */
+  border: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+/* Match Account Settings light-mode contour for announcements cards */
+body:not(.dark-mode) .ma-card {
+  border: 1px solid #121212;
 }
 
 .dark-mode .ma-card {

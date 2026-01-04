@@ -58,7 +58,15 @@
       "emailAddress": "Adresa ta de email",
       "password": "Parolă",
       "phone": "Telefon"
-    }
+    },
+    "resetTitle": "Resetare parolă",
+    "resetCode": "Cod de resetare",
+    "resetNewPassword": "Parola nouă",
+    "resetSend": "Trimite cod",
+    "resetConfirm": "Resetează parola",
+    "resetSent": "Dacă există un cont, a fost trimis un cod.",
+    "resetDone": "Parola a fost resetată. Te poți autentifica.",
+    "resetBack": "Înapoi la login"
   },
   "mobileHeader": {
     "searchPlaceholder": "Ce anume cauți?",

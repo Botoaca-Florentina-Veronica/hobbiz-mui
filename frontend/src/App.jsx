@@ -18,6 +18,7 @@ import SignupPage from './pages/SignupPage';
 import AccountSettings from './pages/AccountSettings';
 import NotificationSettingsPage from './pages/NotificationSettingsPage';
 import OAuthSuccess from './pages/OAuthSuccess';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
@@ -120,6 +121,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/oauth-success" element={<OAuthSuccess />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Rute pentru pagini cu layout complet */}
         <Route path="/anunturi-categorie/:category" element={
