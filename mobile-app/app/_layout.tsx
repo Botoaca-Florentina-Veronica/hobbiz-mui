@@ -1,10 +1,11 @@
 import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { TransitionPresets } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   useFonts,
   Poppins_400Regular,
@@ -15,6 +16,7 @@ import {
 
 import { JsStack } from '../components/JsStack';
 import { NetworkStatus } from '../components/NetworkStatus';
+import { PrivacyTermsModal } from '../components/PrivacyTermsModal';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
@@ -23,18 +25,61 @@ import { NotificationProvider } from '../src/context/NotificationContext';
 import { LocaleProvider } from '../src/context/LocaleContext';
 import { setupNotificationListeners } from '../src/services/notificationService';
 
+const PRIVACY_TERMS_ACCEPTED_KEY = '@hobbiz_privacy_terms_accepted';
+
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
   const [fontsLoaded] = useFonts({
     'Poppins-Regular': Poppins_400Regular,
     'Poppins-Medium': Poppins_500Medium,
     'Poppins-SemiBold': Poppins_600SemiBold,
     'Poppins-Bold': Poppins_700Bold,
   });
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [isCheckingPrivacy, setIsCheckingPrivacy] = useState(true);
+  const [needsAcceptance, setNeedsAcceptance] = useState(false);
+
+  // Check if user has accepted privacy terms
+  useEffect(() => {
+    checkPrivacyAcceptance();
+  }, []);
+
+  const checkPrivacyAcceptance = async () => {
+    try {
+      const accepted = await AsyncStorage.getItem(PRIVACY_TERMS_ACCEPTED_KEY);
+      if (accepted !== 'true') {
+        setShowPrivacyModal(true);
+        setNeedsAcceptance(true);
+      }
+    } catch (error) {
+      console.error('Error checking privacy acceptance:', error);
+      // Show modal by default if there's an error
+      setShowPrivacyModal(true);
+      setNeedsAcceptance(true);
+    } finally {
+      setIsCheckingPrivacy(false);
+    }
+  };
+
+  const handlePrivacyAccept = async () => {
+    try {
+      await AsyncStorage.setItem(PRIVACY_TERMS_ACCEPTED_KEY, 'true');
+      setShowPrivacyModal(false);
+      setNeedsAcceptance(false);
+    } catch (error) {
+      console.error('Error saving privacy acceptance:', error);
+    }
+  };
+
+  // Don't show the acceptance popup on the 2 document pages.
+  // It will re-appear automatically after the user exits them.
+  const isPrivacyOrTermsPage = pathname === '/legal/privacy' || pathname === '/legal/terms';
+  const privacyModalVisible = showPrivacyModal && !isPrivacyOrTermsPage;
 
   useEffect(() => {
     const cleanup = setupNotificationListeners(
@@ -84,7 +129,7 @@ export default function RootLayout() {
     return cleanup;
   }, []);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || isCheckingPrivacy) {
     return null;
   }
 
@@ -111,6 +156,8 @@ export default function RootLayout() {
                 >
                 <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <JsStack.Screen name="login" options={{ headerShown: false }} />
+                <JsStack.Screen name="signup" options={{ headerShown: false }} />
+                <JsStack.Screen name="forgot-password" options={{ headerShown: false }} />
                 <JsStack.Screen name="oauth" options={{ headerShown: false }} />
                 <JsStack.Screen name="settings" options={{ headerShown: false }} />
                 <JsStack.Screen name="notification-settings" options={{ headerShown: false }} />
@@ -126,6 +173,11 @@ export default function RootLayout() {
               </JsStack>
                 <StatusBar style="auto" />
               </NavThemeProvider>
+              {/* Privacy & Terms Modal */}
+              <PrivacyTermsModal
+                visible={privacyModalVisible}
+                onAccept={handlePrivacyAccept}
+              />
             </SafeAreaProvider>
           </ChatNotificationProvider>
         </NotificationProvider>

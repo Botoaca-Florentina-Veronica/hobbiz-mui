@@ -190,6 +190,7 @@ body.login-page::before {
 }
 
 /* In dark mode, use the themed app background */
-.dark-mode body.login-page::before {
-  background: var(--app-bg);
+.dark-mode body.login-page::before,
+body.login-page.dark-mode::before {
+  background: #121212;
 }

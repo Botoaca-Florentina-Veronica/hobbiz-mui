@@ -129,8 +129,9 @@ body.login-page {
 }
 
 /* Keep dark mode behavior intact (if .dark-mode is set on a parent element) */
-.dark-mode body.login-page {
-  background-color: var(--bg-primary) !important;
+.dark-mode body.login-page,
+body.login-page.dark-mode { /* also matches when body itself has dark-mode */
+  background-color: #121212 !important;
 }
 
 /* Ensure the top-level app wrapper also uses white on the login page at large screens
@@ -139,7 +140,8 @@ body.login-page .app {
   background: #ffffff !important;
 }
 
-/* Preserve dark mode when applicable */
-.dark-mode body.login-page .app {
-  background: var(--bg-primary) !important;
+/* Preserve dark mode when applicable (covers dark-mode on an ancestor or on the .app itself) */
+.dark-mode body.login-page .app,
+body.login-page .app.dark-mode {
+  background: #121212 !important;
 }

@@ -31,7 +31,11 @@ const userSchema = new mongoose.Schema({
     reviews: { type: Boolean, default: true },
     favorites: { type: Boolean, default: true },
     promotions: { type: Boolean, default: false }
-  }
+  },
+
+  // Password reset (email code)
+  passwordResetCodeHash: { type: String },
+  passwordResetExpires: { type: Date }
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

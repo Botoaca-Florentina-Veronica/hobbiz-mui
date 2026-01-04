@@ -81,10 +81,15 @@ export default function LoginScreen() {
     }
   }
 
-  if (isAuthenticated) {
-    // Already logged; redirect silently
-    setTimeout(() => router.replace('/(tabs)'), 0);
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, router]);
+
+  const onForgotPassword = () => {
+    router.push('/forgot-password');
+  };
 
   // Extract token from an oauth redirect URL and finalize login
   const handleOAuthRedirectUrl = async (url?: string) => {
@@ -340,12 +345,12 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
         <View style={styles.linksRow}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onForgotPassword}>
             <ThemedText style={[styles.link, { color: tokens.colors.primary, fontSize: responsiveSizes.linkFontSize }]}>
               Ai uitat parola?
             </ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/signup')}>
             <ThemedText style={[styles.link, { color: tokens.colors.primary, fontSize: responsiveSizes.linkFontSize }]}>
               Creează cont
             </ThemedText>

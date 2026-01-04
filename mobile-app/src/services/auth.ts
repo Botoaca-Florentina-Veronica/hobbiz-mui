@@ -11,6 +11,22 @@ export async function loginWithCredentials(email: string, password: string) {
   }
 }
 
+export async function registerWithCredentials(payload: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone?: string;
+}) {
+  try {
+    const res = await api.post('/api/users/register', payload);
+    return res.data;
+  } catch (e: any) {
+    const msg = e?.response?.data?.error || 'Eroare la înregistrare';
+    throw new Error(msg);
+  }
+}
+
 export async function saveToken(token: string) {
   await storage.setItemAsync('userToken', token);
 }

@@ -7,6 +7,14 @@ const multer = require('multer');
 const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
 const mongoose = require('mongoose');
+const crypto = require('crypto');
+const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
+require('dotenv').config();
+
+// --- CONFIGURARE MAILERSEND ---
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY,
+});
 
 // Upload avatar utilizator
 const uploadAvatar = async (req, res) => {
@@ -81,6 +89,37 @@ const deleteCover = async (req, res) => {
 // Utilitare pentru email normalization & duplicate merge
 const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 const escapeRegex = (str='') => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// --- MAILERSEND EMAIL HELPER ---
+async function sendPasswordResetEmail(to, code, userName = 'Utilizator') {
+  if (!process.env.MAILERSEND_API_KEY || !process.env.SENDER_EMAIL) {
+    console.error('[PasswordReset] MailerSend not configured (MAILERSEND_API_KEY or SENDER_EMAIL missing)');
+    throw new Error('Serviciul de email nu este configurat.');
+  }
+
+  const appName = process.env.APP_NAME || 'Hobbiz';
+  const sentFrom = new Sender(process.env.SENDER_EMAIL, appName);
+  const recipients = [new Recipient(to, userName)];
+
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject(`Codul tău de resetare - ${appName}`)
+    .setHtml(
+      `<h3>Codul tău de resetare este: <br><strong>${code}</strong></h3>
+       <p>Expiră în 15 minute.</p>
+       <p>Dacă nu ai solicitat resetarea parolei, poți ignora acest mesaj.</p>`
+    )
+    .setText(`Codul tău de resetare: ${code}. Expiră în 15 minute.`);
+
+  try {
+    await mailerSend.email.send(emailParams);
+    console.log(`[PasswordReset] Email trimis cu succes la ${to}`);
+  } catch (error) {
+    console.error('[PasswordReset] MailerSend error:', error?.message || error);
+    throw new Error('Nu am putut trimite emailul de resetare.');
+  }
+}
 
 async function mergeDuplicateUsersByEmail(normalizedEmail) {
   if (!normalizedEmail) return null;
@@ -387,6 +426,82 @@ const updatePassword = async (req, res) => {
   } catch (error) {
     console.error('Eroare la schimbarea parolei:', error);
     res.status(500).json({ error: 'Eroare server la schimbarea parolei' });
+  }
+};
+
+// Request password reset (send code to email)
+const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail) {
+      return res.status(400).json({ error: 'Emailul este obligatoriu' });
+    }
+
+    // Do not leak if the account exists; respond with 200 either way.
+    const user = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
+
+    // Generate a 6-digit code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const codeHash = crypto.createHash('sha256').update(code).digest('hex');
+
+    if (user) {
+      user.passwordResetCodeHash = codeHash;
+      user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
+      await user.save();
+    }
+
+    // If mailer isn't configured, fail explicitly so the client can show a useful message.
+    try {
+      const userName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Utilizator' : 'Utilizator';
+      await sendPasswordResetEmail(normalizedEmail, code, userName);
+    } catch (mailErr) {
+      console.error('[PasswordReset] Email send failed:', mailErr?.message || mailErr);
+      return res.status(500).json({ error: 'Serviciul de email nu este configurat. Încearcă mai târziu.' });
+    }
+
+    return res.json({ message: 'Dacă există un cont cu acest email, vei primi un cod de resetare.' });
+  } catch (error) {
+    console.error('Eroare la requestPasswordReset:', error);
+    return res.status(500).json({ error: 'Eroare server la resetarea parolei' });
+  }
+};
+
+// Confirm password reset (verify code and set new password)
+const confirmPasswordReset = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body || {};
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail || !code || !newPassword) {
+      return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii' });
+    }
+
+    const user = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
+    if (!user || !user.passwordResetCodeHash || !user.passwordResetExpires) {
+      return res.status(400).json({ error: 'Cod invalid sau expirat' });
+    }
+
+    if (new Date(user.passwordResetExpires).getTime() < Date.now()) {
+      user.passwordResetCodeHash = undefined;
+      user.passwordResetExpires = undefined;
+      try { await user.save(); } catch (_) {}
+      return res.status(400).json({ error: 'Cod invalid sau expirat' });
+    }
+
+    const incomingHash = crypto.createHash('sha256').update(String(code)).digest('hex');
+    if (incomingHash !== user.passwordResetCodeHash) {
+      return res.status(400).json({ error: 'Cod invalid sau expirat' });
+    }
+
+    user.password = newPassword;
+    user.passwordResetCodeHash = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    return res.json({ message: 'Parola a fost resetată cu succes' });
+  } catch (error) {
+    console.error('Eroare la confirmPasswordReset:', error);
+    return res.status(500).json({ error: 'Eroare server la resetarea parolei' });
   }
 };
 
@@ -707,6 +822,8 @@ module.exports = {
   getProfile,
   updateEmail,
   updatePassword,
+  requestPasswordReset,
+  confirmPasswordReset,
   addAnnouncement,
   getMyAnnouncements,
   getMyAnnouncementById,

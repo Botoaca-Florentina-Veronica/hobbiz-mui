@@ -98,7 +98,8 @@ const HERO_IMAGE_CONFIG = {
 export default function HomeScreen() {
   const { tokens, isDark } = useAppTheme();
   // shared border style for inner container-like cards (used in popular cards)
-  const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
+  // In light mode: black border; in dark mode: white border
+  const containerBorderStyle = { borderWidth: 1, borderColor: isDark ? '#ffffff' : '#000000' } as const;
   const { columnsForCategories, width: screenWidth, isPhone, isTablet, isLargeTablet, scale } = useResponsive();
   const insets = useSafeAreaInsets();
   const router = useRouter();
