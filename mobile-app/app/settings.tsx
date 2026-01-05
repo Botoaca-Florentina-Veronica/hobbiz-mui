@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
-import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Alert, Modal, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, TextInput, Modal, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { Toast } from '../components/ui/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,6 +35,7 @@ export default function SettingsScreen() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const { locale } = useLocale();
 
@@ -234,30 +236,24 @@ export default function SettingsScreen() {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      t.deleteAccountTitle,
-      t.deleteAccountMessage,
-      [
-        { text: t.cancel, style: 'cancel' },
-        {
-          text: t.delete,
-          style: 'destructive',
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              await deleteAccount();
-              await logout();
-              Alert.alert(t.accountDeletedTitle, t.accountDeletedMessage);
-              router.replace('/login');
-            } catch (e: any) {
-              Alert.alert(t.error, e?.message || t.error);
-            } finally {
-              setIsLoading(false);
-            }
-          }
-        }
-      ]
-    );
+    setDeleteModalVisible(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    setDeleteModalVisible(false);
+    setIsLoading(true);
+    try {
+      await deleteAccount();
+      await logout();
+      showToast(t.accountDeletedMessage, 'success');
+      setTimeout(() => {
+        router.replace('/login');
+      }, 1500);
+    } catch (e: any) {
+      showToast(e?.message || t.error, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDownloadData = async () => {
@@ -460,9 +456,16 @@ export default function SettingsScreen() {
         visible={logoutModalVisible}
         transparent
         animationType="fade"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent={true}
         onRequestClose={() => setLogoutModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <BlurView
+          intensity={80}
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.modalOverlay, { zIndex: 1000 }]}
+        >
           <View style={[styles.logoutModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
             {/* Icon and Title */}
             <View style={[styles.modalIconContainer, { backgroundColor: isDark ? 'rgba(245, 24, 102, 0.15)' : 'rgba(245, 24, 102, 0.1)' }]}>
@@ -501,7 +504,61 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </BlurView>
+      </Modal>
+
+      {/* Delete Account Modal */}
+      <Modal
+        visible={deleteModalVisible}
+        transparent
+        animationType="fade"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent={true}
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <BlurView
+          intensity={80}
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.modalOverlay, { zIndex: 1000 }]}
+        >
+          <View style={[styles.deleteModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            {/* Icon and Title */}
+            <View style={[styles.modalIconContainer, { backgroundColor: isDark ? 'rgba(244, 67, 54, 0.15)' : 'rgba(244, 67, 54, 0.1)' }]}>
+              <Ionicons name="trash-outline" size={32} color={isDark ? '#f44336' : '#c62828'} />
+            </View>
+            
+            <ThemedText style={[styles.modalTitle, { color: tokens.colors.text }]}>
+              {t.deleteAccountTitle}
+            </ThemedText>
+            
+            <ThemedText style={[styles.modalMessage, { color: tokens.colors.muted }]}>
+              {t.deleteAccountMessage}
+            </ThemedText>
+
+            {/* Action Buttons */}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg, borderColor: tokens.colors.border }]}
+                onPress={() => setDeleteModalVisible(false)}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.modalButtonText, { color: tokens.colors.text }]}>{t.cancel}</ThemedText>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm, { backgroundColor: isDark ? '#f44336' : '#c62828' }]}
+                onPress={confirmDeleteAccount}
+                activeOpacity={0.8}
+                disabled={isLoading}
+              >
+                <ThemedText style={[styles.modalButtonText, { color: '#ffffff', fontWeight: '700' }]}>
+                  {isLoading ? (locale === 'ro' ? 'Se procesează...' : 'Processing...') : t.delete}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BlurView>
       </Modal>
     </ThemedView>
   );
@@ -588,45 +645,64 @@ const styles = StyleSheet.create({
   // Custom Logout Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+  },
+  blurOverlay: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   logoutModalCard: {
     width: '100%',
-    maxWidth: 420,
-    borderRadius: 24,
-    padding: 28,
+    maxWidth: 340,
+    borderRadius: 20,
+    padding: 24,
     borderWidth: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 10,
+    alignItems: 'center',
+  },
+  deleteModalCard: {
+    width: '100%',
+    maxWidth: 340,
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
     elevation: 10,
     alignItems: 'center',
   },
   modalIconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
     letterSpacing: 0.3,
   },
   modalMessage: {
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 28,
-    paddingHorizontal: 8,
+    marginBottom: 24,
+    paddingHorizontal: 4,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -635,8 +711,8 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 13,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -645,13 +721,13 @@ const styles = StyleSheet.create({
   },
   modalButtonConfirm: {
     shadowColor: '#F51866',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowRadius: 6,
+    elevation: 5,
   },
   modalButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     letterSpacing: 0.3,
   },

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -17,13 +18,14 @@ import api from '../src/services/api';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
+import { Toast } from '../components/ui/Toast';
 
 export const options = {
   headerShown: false,
 };
 
 export default function ForgotPasswordScreen() {
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const { width } = useWindowDimensions();
 
@@ -35,6 +37,9 @@ export default function ForgotPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState('');
   const [error, setError] = useState('');
+  
+  // Success modal state
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
   const copy = useMemo(() => {
@@ -108,7 +113,7 @@ export default function ForgotPasswordScreen() {
         code: code.trim(),
         newPassword,
       });
-      Alert.alert(copy.doneTitle, copy.doneMsg, [{ text: 'OK', onPress: () => router.replace('/login') }]);
+      setSuccessModalVisible(true);
     } catch (e: any) {
       setError(e?.response?.data?.error || e?.message || 'Eroare');
     } finally {
@@ -242,6 +247,55 @@ export default function ForgotPasswordScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Success Modal */}
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent={true}
+        onRequestClose={() => {
+          setSuccessModalVisible(false);
+          router.replace('/login');
+        }}
+      >
+        <BlurView
+          intensity={80}
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.modalOverlay, { zIndex: 1000 }]}
+        >
+          <View style={[styles.successModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            {/* Icon and Title */}
+            <View style={[styles.modalIconContainer, { backgroundColor: isDark ? 'rgba(76, 175, 80, 0.15)' : 'rgba(76, 175, 80, 0.1)' }]}>
+              <Ionicons name="checkmark-circle" size={32} color={isDark ? '#4CAF50' : '#2E7D32'} />
+            </View>
+            
+            <ThemedText style={[styles.modalTitle, { color: tokens.colors.text }]}>
+              {copy.doneTitle}
+            </ThemedText>
+            
+            <ThemedText style={[styles.modalMessage, { color: tokens.colors.muted }]}>
+              {copy.doneMsg}
+            </ThemedText>
+
+            {/* Action Button */}
+            <TouchableOpacity
+              style={[styles.modalButton, { backgroundColor: tokens.colors.primary }]}
+              onPress={() => {
+                setSuccessModalVisible(false);
+                router.replace('/login');
+              }}
+              activeOpacity={0.8}
+            >
+              <ThemedText style={[styles.modalButtonText, { color: tokens.colors.primaryContrast, fontWeight: '700' }]}>
+                OK
+              </ThemedText>
+            </TouchableOpacity>
+            </View>
+        </BlurView>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -281,4 +335,70 @@ const styles = StyleSheet.create({
   link: { fontWeight: '500', textAlign: 'center' },
   info: { marginTop: -6, textAlign: 'center' },
   error: { marginTop: -6, textAlign: 'center' },
+  // Success Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  blurOverlay: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  successModalCard: {
+    width: '100%',
+    maxWidth: 340,
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 10,
+    alignItems: 'center',
+  },
+  modalIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 10,
+    letterSpacing: 0.3,
+  },
+  modalMessage: {
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+  modalButton: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.4,
+  },
 });

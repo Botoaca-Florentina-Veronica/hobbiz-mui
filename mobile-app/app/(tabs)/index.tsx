@@ -99,7 +99,7 @@ export default function HomeScreen() {
   const { tokens, isDark } = useAppTheme();
   // shared border style for inner container-like cards (used in popular cards)
   // In light mode: black border; in dark mode: white border
-  const containerBorderStyle = { borderWidth: 1, borderColor: isDark ? '#ffffff' : '#000000' } as const;
+  const containerBorderStyle = { borderWidth: isDark ? 1 : 0.5, borderColor: isDark ? '#ffffff' : '#000000' } as const;
   const { columnsForCategories, width: screenWidth, isPhone, isTablet, isLargeTablet, scale } = useResponsive();
   const insets = useSafeAreaInsets();
   const router = useRouter();

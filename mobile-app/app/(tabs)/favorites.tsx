@@ -111,7 +111,7 @@ export default function FavoritesScreen() {
         <ThemedText style={[styles.emptyMessage, { color: colors.muted }]}>Pentru a vedea anunțurile tale favorite</ThemedText>
         <TouchableOpacity
           style={[styles.loginButton, { backgroundColor: colors.primary }]}
-          onPress={() => router.push('/login')}
+          onPress={() => router.replace('/login')}
         >
           <ThemedText style={{ color: '#ffffff', fontWeight: '600' }}>Mergi la autentificare</ThemedText>
         </TouchableOpacity>

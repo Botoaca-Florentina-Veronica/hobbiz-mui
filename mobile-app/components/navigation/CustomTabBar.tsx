@@ -88,10 +88,10 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
             // Dacă nu e autentificat și nu este tab-ul Explorează (index), redirecționează la login (folosim router.push pentru ruta absolută)
             if (!loading && !isAuthenticated && route.name !== 'index') {
               try {
-                router.push('/login');
+                router.replace('/login');
               } catch (e) {
                 // fallback la navigation în caz că router nu funcționează (rare)
-                navigation.navigate('login' as any);
+                navigation.replace('login' as any);
               }
               return;
             }
