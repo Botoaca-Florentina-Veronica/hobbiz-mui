@@ -1,9 +1,9 @@
 <div align="center">
 
-<a href="https://hobbiz.netlify.app" target="_blank"><img src="./frontend/src/assets/images/puzzle.png" height="70" alt="Hobbiz" /></a>
+<a href="https://hobbiz.ro" target="_blank"><img src="./frontend/src/assets/images/puzzle.png" height="70" alt="Hobbiz" /></a>
 
 # Hobbiz
-https://hobbiz.netlify.app/
+www.hobbiz.ro
 Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API Node/Express + aplicație mobilă Expo/React Native
 </div>
 
