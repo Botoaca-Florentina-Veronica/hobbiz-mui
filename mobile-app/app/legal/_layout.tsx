@@ -10,7 +10,7 @@ export default function LegalLayout() {
 	const { tokens } = useAppTheme();
 	const insets = useSafeAreaInsets();
 	return (
-		<ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }, Platform.OS === 'web' && { height: '100vh' }]}>
+		<ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }, Platform.OS === 'web' ? ({ height: '100vh' } as any) : undefined]}>
 			<Slot />
 		</ThemedView>
 	);

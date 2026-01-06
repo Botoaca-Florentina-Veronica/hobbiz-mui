@@ -240,8 +240,8 @@ export default function CookiesScreen() {
   }
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-  <Animated.ScrollView ref={scrollRef} style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
+  <Animated.ScrollView ref={scrollRef} style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
@@ -432,7 +432,7 @@ export default function CookiesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 40, gap: 16 },
+  scroll: { paddingTop: 8, paddingHorizontal: 16, paddingBottom: 40, gap: 16 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 20, fontWeight: '700' },

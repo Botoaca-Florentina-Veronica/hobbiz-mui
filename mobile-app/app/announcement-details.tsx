@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Linking, Platform, Modal, Share, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Linking, Platform, Modal, Share, TextInput, Alert } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useAppTheme } from '../src/context/ThemeContext';
+import { useAuth } from '../src/context/AuthContext';
 import api from '../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ImageViewing from '../src/components/ImageViewer';
@@ -61,6 +62,11 @@ const TRANSLATIONS = {
     loadingReviews: 'se încarcă recenziile...',
     noReviews: 'nu există review-uri',
     reviews: 'recenzii',
+    loginRequired: 'Autentificare necesară',
+    loginToFavorite: 'Trebuie să te autentifici pentru a adăuga la favorite.',
+    favoriteAdded: 'Adăugat la favorite',
+    favoriteRemoved: 'Eliminat din favorite',
+    favoriteFailed: 'Nu am putut actualiza favorite. Încearcă din nou.',
   },
   en: {
     posted: 'Posted',
@@ -93,12 +99,18 @@ const TRANSLATIONS = {
     loadingReviews: 'loading reviews...',
     noReviews: 'no reviews',
     reviews: 'reviews',
+    loginRequired: 'Login Required',
+    loginToFavorite: 'You need to login to add favorites.',
+    favoriteAdded: 'Added to favorites',
+    favoriteRemoved: 'Removed from favorites',
+    favoriteFailed: 'Could not update favorites. Please try again.',
   }
 };
 
 export default function AnnouncementDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { tokens, isDark } = useAppTheme();
+  const { isAuthenticated } = useAuth();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -322,7 +334,7 @@ export default function AnnouncementDetailsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: tokens.colors.bg }}>
-      <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
+      <ScrollView style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
       {/* Header: circular back button + 'înapoi' text on left, placeholder right for balance */}
       <View style={[styles.headerSpacer, { paddingTop: insets.top + 12 }]}>        
         <View style={[styles.headerRow, { alignItems: 'center' }]}>
@@ -412,6 +424,15 @@ export default function AnnouncementDetailsScreen() {
         <View style={styles.cardActions}>
           <TouchableOpacity
             onPress={async () => {
+              // Check authentication first
+              if (!isAuthenticated) {
+                Alert.alert(t.loginRequired, t.loginToFavorite, [
+                  { text: t.cancel, style: 'cancel' },
+                  { text: 'Login', onPress: () => router.push('/login') }
+                ]);
+                return;
+              }
+
               try {
                 if (!favorited) {
                   const r = await api.post(`/api/favorites/${id}`);
@@ -428,6 +449,7 @@ export default function AnnouncementDetailsScreen() {
                 }
               } catch (err) {
                 console.warn('Favorite toggle failed', err);
+                Alert.alert(t.error, t.favoriteFailed);
               }
             }}
             style={styles.actionCircle}

@@ -22,7 +22,7 @@ export default function LegalMenu() {
   ];
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
@@ -54,7 +54,7 @@ export default function LegalMenu() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 40, gap: 16 },
+  scroll: { paddingTop: 8, paddingHorizontal: 16, paddingBottom: 40, gap: 16 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700' },

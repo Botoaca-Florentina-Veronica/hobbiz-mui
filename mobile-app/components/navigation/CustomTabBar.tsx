@@ -91,7 +91,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                 router.replace('/login');
               } catch (e) {
                 // fallback la navigation în caz că router nu funcționează (rare)
-                navigation.replace('login' as any);
+                (navigation as any).replace('login');
               }
               return;
             }

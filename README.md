@@ -57,69 +57,105 @@ Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** �
 
 ## 🧱 Arhitectură (Monorepo)
 
-Proiectul este organizat ca un monorepo cu trei subproiecte principale (frontend, backend, mobile) și câteva utilitare/support files la rădăcină. Structura relevantă (rezumat):
+Proiectul este organizat ca un **monorepo** cu trei subproiecte principale:
+- **Backend** (Express + Node.js): API REST + WebSocket (Socket.IO) + email
+- **Frontend** (React + Vite + MUI): Web app (desktop & responsive)
+- **Mobile** (Expo + React Native): Native app pentru iOS & Android
+
+Structura:
 
 ```
 hobbiz-mui/
-│  README.md
-│  app.json
-│  eas.json
-│  hobbiz-mui.sln
-│  netlify.toml
-│  render.yaml
-│  LICENSE
-│  observatii.txt
-│  schiță-db.md
-│  package.json
-│  README.md
 │
-├─ backend/                      # API REST + WebSocket (Express + Socket.IO)
-│  ├─ server.js                  # bootstrap server
-│  ├─ package.json
-│  ├─ build.sh
-│  ├─ config/                    # config (db, cloudinary, multer, passport)
-│  │  ├─ db.js
-│  │  ├─ cloudinary.js
-│  │  └─ cloudinaryMulter.js
-│  ├─ controllers/               # controller logic (User, Message, Notification, Review, ...)
-│  ├─ models/                    # Mongoose schemas (User, Announcement, Message, Notification, Review...)
-│  ├─ routes/                    # express routes (userRoutes, messageRoutes, notificationRoutes, ...)
-│  ├─ middleware/                # auth, optionalAuth etc.
-│  ├─ services/                  # backend helper/services
-│  └─ scripts/                   # seed & maintenance scripts
+├─ backend/                                  # Node.js + Express API Server
+│  ├─ server.js                              # Entry point
+│  ├─ config/
+│  │  ├─ db.js                               # MongoDB Mongoose connection
+│  │  ├─ cloudinary.js                       # Image upload (Cloudinary)
+│  │  ├─ cloudinaryMulter.js                 # Multer middleware
+│  │  └─ passport.js                         # OAuth (Google) + JWT strategies
+│  ├─ controllers/                           # Business logic
+│  │  ├─ UserController.js                   # Auth, profile, password reset
+│  │  ├─ MessageController.js                # Chat messages + reactions
+│  │  ├─ NotificationController.js           # User notifications
+│  │  ├─ ReviewController.js                 # Recenzii & rating
+│  │  └─ ...
+│  ├─ models/                                # Mongoose Schemas
+│  │  ├─ User.js                             # user data + avatar + favorites
+│  │  ├─ Announcement.js                     # hobby postings
+│  │  ├─ Message.js                          # chat messages + reactions
+│  │  ├─ Notification.js                     # system notifications
+│  │  ├─ Review.js                           # user reviews/ratings
+│  │  └─ ...
+│  ├─ routes/                                # API Endpoints
+│  │  ├─ authRoutes.js                       # /auth/login, /auth/forgot-password, etc.
+│  │  ├─ userRoutes.js                       # /api/users/*
+│  │  ├─ messageRoutes.js                    # /api/messages/*
+│  │  ├─ notificationRoutes.js               # /api/notifications/*
+│  │  └─ ...
+│  ├─ middleware/                            # Auth, validation
+│  │  ├─ auth.js                             # JWT protection
+│  │  └─ optionalAuth.js                     # Optional JWT
+│  ├─ services/
+│  │  └─ UserService.js                      # Helper functions
+│  └─ scripts/                               # DB seeding, migrations
 │
-├─ frontend/                     # Web client (React + Vite + MUI)
+├─ frontend/                                 # React 19 + Vite Web App
 │  ├─ package.json
 │  ├─ vite.config.js
 │  ├─ index.html
-│  ├─ public/                     # static assets served by web (uploads used at runtime)
-│  └─ src/
-│     ├─ api/                    # axios instances & API helpers
-│     ├─ assets/                 # site images / static data
-│     ├─ components/             # UI components
-│     ├─ context/                # React contexts
-│     ├─ pages/                  # routed pages
-│     └─ styles/
+│  ├─ src/
+│  │  ├─ api/                                # Axios instances
+│  │  ├─ assets/                             # Images, icons
+│  │  ├─ components/                         # Reusable UI (buttons, cards, etc.)
+│  │  ├─ context/                            # React Context (auth, theme, etc.)
+│  │  ├─ pages/                              # Route pages (home, profile, etc.)
+│  │  ├─ services/                           # API helpers
+│  │  └─ styles/                             # CSS, theme
+│  └─ public/                                # Static files
 │
-├─ mobile-app/                   # Mobile client (Expo + React Native + expo-router)
+├─ mobile-app/                               # Expo + React Native App
 │  ├─ package.json
-│  ├─ app/                       # expo-router routes (settings, notifications, chat, profile, tabs, etc.)
-│  │  ├─ _layout.tsx
-│  │  ├─ settings.tsx
-│  │  ├─ notifications.tsx
-│  │  ├─ (tabs)/                 # tabbed routes (chat under (tabs)/chat.tsx)
-│  │  └─ ...                     # many route files used by the mobile app
-│  ├─ src/                       # mobile-specific services, context, hooks
-│  ├─ components/                # mobile UI primitives (Toast, ThemedView/Text, ImageViewer ...)
-│  ├─ assets/                    # images, poster.png, fonts
-│  └─ android_old/               # legacy Android build files (kept for reference)
+│  ├─ app/                                   # expo-router file-based routes
+│  │  ├─ _layout.tsx                         # Root layout
+│  │  ├─ (tabs)/                             # Tab-based navigation
+│  │  │  ├─ index.tsx                        # Explore (home)
+│  │  │  ├─ chat.tsx                         # Chat tab
+│  │  │  ├─ favorites.tsx                    # Favorites tab
+│  │  │  ├─ sell.tsx                         # Post announcement tab
+│  │  │  └─ account.tsx                      # Account/Profile tab
+│  │  ├─ login.tsx                           # Auth pages
+│  │  ├─ signup.tsx                          # Registration
+│  │  ├─ announcement-details.tsx            # Detail view
+│  │  ├─ conversation.tsx                    # Chat thread
+│  │  └─ ...
+│  ├─ src/
+│  │  ├─ context/                            # State (auth, theme, notifications)
+│  │  ├─ services/                           # API client, storage
+│  │  ├─ hooks/                              # Custom React hooks
+│  │  └─ utils/                              # Helper functions
+│  ├─ components/                            # Mobile UI components
+│  │  ├─ themed-text.tsx
+│  │  ├─ themed-view.tsx
+│  │  ├─ ui/                                 # Custom modals, dialogs, etc.
+│  │  └─ ...
+│  └─ assets/                                # Images, fonts
+│
+├─ device-view_images/                      # Screenshots for README
+├─ scripts/                                  # Root-level utilities
+├─ DATA_SAFETY_PLAYSTORE.md
+├─ LICENSE
+├─ README.md
+└─ ...
+```
 
-├─ device-view_images/           # screenshots used in README
-├─ scripts/                      # misc scripts (listReviews.js, test-reaction.js)
-
-``` 
-
-Notă: secțiunile mai detaliate (subfolderele controllers, models, routes etc.) reflectă modul în care backend-ul este structurat pentru a păstra separarea responsabilităților (business logic în controllers, schema în models, rutare în routes). Mobilul folosește `expo-router` pentru a păstra rutele într-un folder `app/`, iar web-ul este un proiect Vite + React separat în folderul `frontend/`.
+**Principii Arhitecturale:**
+- **Monorepo**: Frontend, Backend, Mobile în același repo pentru sincronizare ușoară
+- **Separare Responsabilități**: Controllers (logic), Models (schema), Routes (endpoints)
+- **expo-router**: File-based routing pentru mobile (asemănător Next.js)
+- **Mongoose**: Single source of truth pentru schema datelor
+- **Socket.IO**: Real-time communication (chat, notifications, active users)
+- **Cloudinary**: Media storage (imagini anunțuri & avatare)
 
 ---
 
@@ -140,6 +176,16 @@ Socket.IO pentru:
 - Mapare userId -> socketId (activeUsers) pentru mesaje țintite (favoritesUpdated etc.)
 - Indicator typing per conversație (`conversationId` compus userId1-userId2)
 - Notificări actualizare favorite / mesaje / notificări.
+
+---
+
+## 🔐 Resetarea Parolei via Email
+Utilizatorii pot reseta parola în siguranță prin:
+- Cerere de resetare parolă (endpoint `/api/auth/forgot-password`)
+- Primire cod de verificare pe email (trimis via **MailerSend**)
+- Setare parolă nouă cu codul primit
+- **Limita gratuită**: 500 emailuri/lună (MailerSend free tier)
+- Criptare parolă cu bcryptjs; tokeni de resetare cu TTL scurt
 
 ---
 
@@ -203,39 +249,66 @@ Health & Utilitare
 
 ## 🧩 Tech Stack
 
-Frontend:
+**Frontend (Web):**
 - React 19 + Vite 6
 - React Router DOM 7
 - Material UI 5 + Emotion
 - Axios, jwt-decode
 - Socket.IO client (chat & notificări)
 
-Backend:
+**Backend (API):**
 - Node.js 18+, Express 4
 - MongoDB Atlas + Mongoose 8
 - JWT (jsonwebtoken) + bcryptjs
 - Passport + passport-google-oauth20 + express-session
 - Multer + Cloudinary (multer-storage-cloudinary)
 - Socket.IO 4
+- **MailerSend** (email service: password reset, notifications)
 
-Mobile (Expo):
+**Mobile (Expo):**
 - Expo SDK 54, React Native 0.81
-- expo-router pentru navigație declarativă
-- axios pentru API, expo-secure-store pentru token
+- expo-router (file-based declarative routing)
+- axios pentru API calls
+- expo-secure-store pentru token storage
+- Linear Gradient, Safe Area context
 
-Dev / Tooling:
-- ESLint (web & mobile) + configurări dedicate
-- Nodemon (backend dev)
+**DevOps & Hosting:**
+- **Frontend**: Netlify (auto-deploy from git)
+- **Backend**: Render.com (Node.js server)
+- **Database**: MongoDB Atlas (cloud)
+- **Media**: Cloudinary (CDN)
+- **Email**: MailerSend (transactional email, 500 free/month)
+
+**Dev Tools:**
+- TypeScript (type safety)
+- ESLint + Prettier
+- Nodemon (backend dev server)
+- expo CLI (mobile development)
 
 ---
 
-## 🗺 Roadmap (Next)
-- Rate limiting (express-rate-limit) & helmet
-- Validare schemă request (Zod/Joi)
-- Reset parolă via email
-- Push Notifications (Web Push + Expo Notifications)
+## 🗺 Roadmap (In Progress & Next)
+
+**✅ Completed:**
+- Reset parolă via email (MailerSend) + verificare cod
+- OAuth Google (Passport)
+- Chat real-time (Socket.IO)
+- Notificări (in-app + Socket.IO)
+- Image upload (Cloudinary)
+- Mobile app (Expo)
+- Reviews & ratings
+
+**🔄 In Progress:**
+- Rate limiting (express-rate-limit) & helmet (security)
+- Validare request bodies (Zod/Joi)
+- Push Notifications (Expo Notifications)
+
+**📋 Future:**
 - Căutare full-text (MongoDB Atlas Search)
 - Admin dashboard (moderare recenzii/anunțuri)
+- Two-factor authentication (2FA)
+- Payment processing (Stripe integration)
+- Advanced analytics & statistics
 
 ---
 
@@ -252,7 +325,7 @@ Dev / Tooling:
 ---
 
 ## ⚖️ Licență
-Copyright (c) 2025 Hobbiz. All rights reserved.
+Copyright (c) 2026 Hobbiz. All rights reserved.
 
 ---
 

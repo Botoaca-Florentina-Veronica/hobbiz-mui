@@ -32,8 +32,8 @@ export default function TermsScreen() {
   const strongColor = isDarkMode ? '#e0e0e0' : WEB_TEXT_DARK;
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
+      <ScrollView style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -405,7 +405,7 @@ export default function TermsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 80, gap: 24 },
+  scroll: { paddingTop: 8, paddingHorizontal: 16, paddingBottom: 80, gap: 24 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   pageTitle: { fontSize: 22, fontWeight: '700' },

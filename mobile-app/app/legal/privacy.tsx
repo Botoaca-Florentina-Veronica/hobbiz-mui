@@ -43,8 +43,8 @@ export default function PrivacyScreen() {
   );
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView style={Platform.OS === 'web' ? { height: '100vh' } : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
+      <ScrollView style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Top header with back */}
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
@@ -183,7 +183,7 @@ export default function PrivacyScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 48, gap: 20 },
+  scroll: { paddingTop: 8, paddingHorizontal: 16, paddingBottom: 48, gap: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 4 },
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700' },
