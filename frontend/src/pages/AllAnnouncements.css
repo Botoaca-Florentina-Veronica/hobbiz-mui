@@ -397,6 +397,135 @@
   margin-bottom: var(--aa-spacing-2xl);
 }
 
+/* LIST VIEW (desktop & tablet): make each announcement a full-width horizontal row */
+.favorite-announcements-list.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aa-spacing-lg);
+  margin-bottom: var(--aa-spacing-2xl);
+}
+
+/* Each card becomes a row with image on left and content on right */
+.favorite-announcements-list.list-view .favorite-announcement-card {
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  gap: 16px;
+  border-radius: 12px;
+  box-shadow: var(--ma-card-shadow);
+}
+
+.favorite-announcements-list.list-view .favorite-announcement-image {
+  width: 220px;
+  height: 120px;
+  flex: 0 0 220px;
+}
+
+.favorite-announcements-list.list-view .favorite-announcement-img {
+  width: 220px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.favorite-announcements-list.list-view .favorite-announcement-info {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Reposition heart inside info area for list view */
+.favorite-announcements-list.list-view .favorite-heart {
+  position: static;
+  margin-left: auto;
+  margin-top: 0;
+  width: 36px;
+  height: 36px;
+}
+
+/* Adjust text and spacing for list view */
+.favorite-announcements-list.list-view .favorite-announcement-title {
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.favorite-announcements-list.list-view .favorite-price {
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+/* Make sure mobile overrides still apply below; list-view on mobile keeps row layout but with smaller image */
+@media (max-width: 1024px) {
+  .favorite-announcements-list.list-view .favorite-announcement-card {
+    flex-direction: row;
+    padding: 12px;
+    gap: 12px;
+  }
+  .favorite-announcements-list.list-view .favorite-announcement-image,
+  .favorite-announcements-list.list-view .favorite-announcement-img {
+    width: 90px;
+    height: 90px;
+    flex: 0 0 90px;
+    border-radius: 10px;
+  }
+}
+
+/* ============================================
+   10b. View Modes - Grid vs List
+   ============================================ */
+
+/* Grid View - Cards in grid layout (default) */
+.favorite-announcements-list.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--aa-spacing-lg);
+}
+
+.favorite-announcements-list.grid-view .favorite-announcement-card {
+  flex-direction: column;
+  height: auto;
+  min-height: 320px;
+}
+
+.favorite-announcements-list.grid-view .favorite-announcement-image {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--aa-border-radius) var(--aa-border-radius) 0 0;
+}
+
+/* List View - Cards displayed as rows */
+.favorite-announcements-list.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aa-spacing-md);
+}
+
+.favorite-announcements-list.list-view .favorite-announcement-card {
+  flex-direction: row;
+  gap: var(--aa-spacing-md);
+  padding: var(--aa-spacing-md);
+  height: auto;
+  min-height: auto;
+}
+
+.favorite-announcements-list.list-view .favorite-announcement-image {
+  width: 160px;
+  min-width: 160px;
+  height: 140px;
+  border-radius: var(--aa-border-radius);
+}
+
+.favorite-announcements-list.list-view .favorite-announcement-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 /* ============================================
    11. Pagination - Page navigation controls
    ============================================ */
@@ -527,5 +656,18 @@
 
   .favorite-announcements-list {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  /* Responsive List View */
+  .favorite-announcements-list.list-view .favorite-announcement-card {
+    flex-direction: column;
+    gap: var(--aa-spacing-sm);
+  }
+
+  .favorite-announcements-list.list-view .favorite-announcement-image {
+    width: 100%;
+    min-width: unset;
+    height: 160px;
+    border-radius: var(--aa-border-radius) var(--aa-border-radius) 0 0;
   }
 }

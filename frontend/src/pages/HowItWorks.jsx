@@ -1,60 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography,
   Button,
   Card,
   CardContent,
-  Box,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  Avatar,
   Grid,
-  Paper,
-  IconButton
+  IconButton,
+  Stack
 } from '@mui/material';
 import {
-  Search as SearchIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
   Chat as ChatIcon,
+  DarkMode as DarkModeIcon,
   Favorite as FavoriteIcon,
   Notifications as NotificationsIcon,
+  PersonAddAlt1 as PersonAddAlt1Icon,
+  Search as SearchIcon,
   Shield as ShieldIcon,
-  Nightlight as NightlightIcon,
-  Publish as PublishIcon,
-  Category as CategoryIcon,
-  Person as PersonIcon,
-  Assignment as AssignmentIcon,
-  CheckCircle as CheckCircleIcon,
-  ArrowForward as ArrowForwardIcon,
-  ArrowBack as ArrowBackIcon
+  StarRate as StarRateIcon,
+  UploadFile as UploadFileIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import './HowItWorks.css';
 
 export default function HowItWorks() {
-  const [activeStep, setActiveStep] = useState(0);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const heroStats = t('howItWorksPage.hero.stats', { returnObjects: true });
   const steps = t('howItWorksPage.steps.list', { returnObjects: true });
+  const capabilities = t('howItWorksPage.capabilities.list', { returnObjects: true });
+  const trustPoints = t('howItWorksPage.trust.points', { returnObjects: true });
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
+  const iconByKey = {
+    account: <PersonAddAlt1Icon />,
+    search: <SearchIcon />,
+    publish: <UploadFileIcon />,
+    chat: <ChatIcon />,
+    favorite: <FavoriteIcon />,
+    notifications: <NotificationsIcon />,
+    darkmode: <DarkModeIcon />,
+    trust: <ShieldIcon />,
+    reviews: <StarRateIcon />
   };
 
   return (
     <>
-      <div className="how-it-works-page">
+      <div className="how-it-works-page hw-v2">
         <div className="how-it-works-container">
           {/* Mobile header: back + title */}
           <div className="mobile-header">
@@ -63,216 +57,115 @@ export default function HowItWorks() {
               className="mobile-back-btn"
               disableRipple
               disableFocusRipple
-              aria-label="Înapoi"
+              aria-label="Back"
             >
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h5" className="mobile-header-title">{t('howItWorksPage.title')}</Typography>
           </div>
-          
-          {/* Hero Section */}
-          <div className="how-it-works-hero">
-            <div className="hero-badge">
-              <span className="hero-badge-icon">🚀</span>
-              {t('howItWorksPage.hero.badge')}
-            </div>
-            <h1 className="hero-title" dangerouslySetInnerHTML={{ __html: t('howItWorksPage.hero.title') }}></h1>
-            <p className="hero-description">
-              {t('howItWorksPage.hero.description')}
-            </p>
-            <div className="hero-stats">
-              <div className="stat-item">
-                <span className="stat-number">10K+</span>
-                <span className="stat-label">{t('howItWorksPage.hero.stats.members')}</span>
-              </div>
-              <div className="stat-divider"></div>
-              <div className="stat-item">
-                <span className="stat-number">2K+</span>
-                <span className="stat-label">{t('howItWorksPage.hero.stats.conversations')}</span>
-              </div>
-              <div className="stat-divider"></div>
-              <div className="stat-item">
-                <span className="stat-number">50+</span>
-                <span className="stat-label">{t('howItWorksPage.hero.stats.categories')}</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Interactive Stepper Section */}
-          <div className="interactive-stepper-section">
-            <div className="section-header">
-              <h2>{t('howItWorksPage.steps.header')}</h2>
-              <p>{t('howItWorksPage.steps.subtitle')}</p>
-            </div>
-            
-            <Box sx={{ maxWidth: 800, margin: '0 auto' }}>
-              <Stepper activeStep={activeStep} orientation="vertical">
-                {steps.map((step, index) => (
-                  <Step key={step.label}>
-                    <StepLabel
-                      icon={
-                        <Avatar sx={{ 
-                          bgcolor: index <= activeStep ? '#355070' : '#e0e0e0',
-                          width: 40,
-                          height: 40
-                        }}>
-                          {index === 0 ? <AssignmentIcon /> : index === 1 ? <PublishIcon /> : index === 2 ? <FavoriteIcon /> : <ChatIcon />}
-                        </Avatar>
-                      }
-                    >
-                      <Typography variant="h6" sx={{ color: '#355070', fontWeight: 600 }}>
-                        {step.label}
-                      </Typography>
-                    </StepLabel>
-                    <StepContent>
-                      <Card sx={{ mt: 2, mb: 2 }}>
-                        <CardContent>
-                          <Typography variant="body1" sx={{ mb: 2, color: '#4a5568' }}>
-                            {step.description}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: '#718096', lineHeight: 1.6 }}>
-                            {step.details}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                      <Box sx={{ mb: 2 }}>
-                        <div>
-                          <Button
-                            variant="contained"
-                            onClick={handleNext}
-                            sx={{
-                              mt: 1,
-                              mr: 1,
-                              bgcolor: '#355070',
-                              '&:hover': { bgcolor: '#406b92' }
-                            }}
-                            endIcon={index === steps.length - 1 ? <CheckCircleIcon /> : <ArrowForwardIcon />}
-                          >
-                            {index === steps.length - 1 ? t('howItWorksPage.steps.buttons.finish') : t('howItWorksPage.steps.buttons.continue')}
-                          </Button>
-                          <Button
-                            disabled={index === 0}
-                            onClick={handleBack}
-                            sx={{ mt: 1, mr: 1 }}
-                          >
-                            {t('howItWorksPage.steps.buttons.back')}
-                          </Button>
-                        </div>
-                      </Box>
-                    </StepContent>
-                  </Step>
-                ))}
-              </Stepper>
-              {activeStep === steps.length && (
-                <Paper square elevation={0} sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography variant="h6" sx={{ color: '#355070', mb: 2 }}>
-                    {t('howItWorksPage.steps.completion.message')}
-                  </Typography>
-                  <Button 
-                    onClick={handleReset} 
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    {t('howItWorksPage.steps.completion.reset')}
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/login')}
-                    sx={{
-                      mt: 1,
-                      bgcolor: '#ffffff',
-                      color: '#355070',
-                      '&:hover': { bgcolor: '#f4a261' }
-                    }}
-                  >
-                    Începe acum
-                  </Button>
-                </Paper>
-              )}
-            </Box>
-          </div>
+          {/* Hero */}
+          <section className="hw-hero">
+            <div className="hw-hero-badge">{t('howItWorksPage.hero.badge')}</div>
+            <h1 className="hw-hero-title" dangerouslySetInnerHTML={{ __html: t('howItWorksPage.hero.title') }} />
+            <p className="hw-hero-description">{t('howItWorksPage.hero.description')}</p>
 
-          {/* Features Grid */}
-          <div className="features-showcase">
-            <div className="section-header">
-              <h2>De ce să alegi Hobbiz?</h2>
-              <p>Funcționalități care fac diferența pentru experiența ta</p>
+            <Stack className="hw-hero-actions" direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <Button variant="contained" size="large" endIcon={<ArrowForwardIcon />} onClick={() => navigate('/signup')} className="hw-primary-btn">
+                {t('howItWorksPage.hero.actions.primary')}
+              </Button>
+              <Button variant="outlined" size="large" onClick={() => navigate('/toate-anunturile')} className="hw-secondary-btn">
+                {t('howItWorksPage.hero.actions.secondary')}
+              </Button>
+            </Stack>
+
+            <div className="hw-hero-stats">
+              {Array.isArray(heroStats) && heroStats.map((s, idx) => (
+                <div className="hw-stat" key={idx}>
+                  <span className="hw-stat-value">{s.value}</span>
+                  <span className="hw-stat-label">{s.label}</span>
+                </div>
+              ))}
             </div>
-            
-            <Grid container spacing={3} sx={{ mt: 2 }}>
-              {t('howItWorksPage.features', { returnObjects: true }).map((feature, index) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
-                  <Card className="feature-card-mui" sx={{ height: '100%' }}>
-                    <CardContent sx={{ textAlign: 'center', p: 3 }}>
-                      <Avatar
-                        sx={{
-                          bgcolor: feature.color,
-                          width: 60,
-                          height: 60,
-                          margin: '0 auto 16px auto'
-                        }}
-                      >
-                        {index === 0 ? <CategoryIcon /> : index === 1 ? <FavoriteIcon /> : index === 2 ? <ChatIcon /> : index === 3 ? <NotificationsIcon /> : index === 4 ? <NightlightIcon /> : <ShieldIcon />}
-                      </Avatar>
-                      <Typography variant="h6" sx={{ color: '#355070', fontWeight: 600, mb: 2 }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#4a5568', lineHeight: 1.6 }}>
-                        {feature.description}
-                      </Typography>
+          </section>
+
+          {/* Steps */}
+          <section className="hw-section">
+            <header className="hw-section-header">
+              <h2 className="hw-h2">{t('howItWorksPage.steps.title')}</h2>
+              <p className="hw-subtitle">{t('howItWorksPage.steps.subtitle')}</p>
+            </header>
+
+            <Grid container spacing={2}>
+              {Array.isArray(steps) && steps.map((step, idx) => (
+                <Grid item xs={12} md={6} key={idx}>
+                  <Card className="hw-card">
+                    <CardContent className="hw-card-content">
+                      <div className="hw-card-top">
+                        <div className="hw-icon">{iconByKey[step.icon] || <ArrowForwardIcon />}</div>
+                        <div className="hw-step-number">{String(idx + 1).padStart(2, '0')}</div>
+                      </div>
+                      <Typography variant="h6" className="hw-card-title">{step.title}</Typography>
+                      <Typography variant="body2" className="hw-card-text">{step.description}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
             </Grid>
-          </div>
+          </section>
 
-          {/* CTA Section */}
-          <div className="cta-section">
-            <h2>{t('howItWorksPage.cta.title')}</h2>
-            <p>{t('howItWorksPage.cta.description')}</p>
-            <div className="cta-buttons">
-              <Button
-                variant="contained"
-                size="large"
-                onClick={() => navigate('/login')}
-                sx={{
-                  bgcolor: 'white',
-                  color: '#355070',
-                  fontWeight: 600,
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: '50px',
-                  mr: 2,
-                  '&:hover': {
-                    bgcolor: '#f8f9fa',
-                    transform: 'translateY(-2px)'
-                  }
-                }}
-              >
-                {t('howItWorksPage.cta.buttons.create')}
-              </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={() => navigate('/')}
-                sx={{
-                  color: 'white',
-                  borderColor: 'white',
-                  fontWeight: 600,
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: '50px',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.1)',
-                    borderColor: 'white',
-                    transform: 'translateY(-2px)'
-                  }
-                }}
-              >
-                {t('howItWorksPage.cta.buttons.explore')}
-              </Button>
+          {/* Capabilities */}
+          <section className="hw-section hw-section-alt">
+            <header className="hw-section-header">
+              <h2 className="hw-h2">{t('howItWorksPage.capabilities.title')}</h2>
+              <p className="hw-subtitle">{t('howItWorksPage.capabilities.subtitle')}</p>
+            </header>
+
+            <Grid container spacing={2}>
+              {Array.isArray(capabilities) && capabilities.map((item, idx) => (
+                <Grid item xs={12} md={6} lg={4} key={idx}>
+                  <Card className="hw-card hw-card-hover">
+                    <CardContent className="hw-card-content">
+                      <div className="hw-icon">{iconByKey[item.icon] || <ArrowForwardIcon />}</div>
+                      <Typography variant="h6" className="hw-card-title">{item.title}</Typography>
+                      <Typography variant="body2" className="hw-card-text">{item.description}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </section>
+
+          {/* Trust */}
+          <section className="hw-section">
+            <header className="hw-section-header">
+              <h2 className="hw-h2">{t('howItWorksPage.trust.title')}</h2>
+              <p className="hw-subtitle">{t('howItWorksPage.trust.subtitle')}</p>
+            </header>
+
+            <Card className="hw-card hw-trust">
+              <CardContent className="hw-card-content">
+                <div className="hw-trust-grid">
+                  {Array.isArray(trustPoints) && trustPoints.map((p, idx) => (
+                    <div className="hw-trust-item" key={idx}>
+                      <div className="hw-trust-icon">{iconByKey.trust}</div>
+                      <div className="hw-trust-text">{p}</div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* CTA */}
+          <section className="hw-cta">
+            <h2 className="hw-cta-title">{t('howItWorksPage.cta.title')}</h2>
+            <p className="hw-cta-text">{t('howItWorksPage.cta.description')}</p>
+            <div className="hw-cta-actions">
+              <Button variant="contained" size="large" onClick={() => navigate('/signup')} className="hw-primary-btn">{t('howItWorksPage.cta.buttons.create')}</Button>
+              <Button variant="outlined" size="large" onClick={() => navigate('/toate-anunturile')} className="hw-secondary-btn">{t('howItWorksPage.cta.buttons.explore')}</Button>
             </div>
-          </div>
+          </section>
 
         </div>
       </div>

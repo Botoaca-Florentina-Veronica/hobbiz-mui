@@ -43,14 +43,39 @@ export default function AnnouncementsByCategory() {
   const [sortBy, setSortBy] = useState('recent');
   const [priceFilter, setPriceFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState(() => {
+    try {
+      return localStorage.getItem('announcementsByCategoryView') || 'grid';
+    } catch (e) {
+      return 'grid';
+    }
+  });
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('announcementsByCategoryView', viewMode);
+    } catch (e) {}
+  }, [viewMode]);
   
-  const userId = localStorage.getItem('userId');
-  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+  const legacyUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+  const GUEST_FAVORITES_KEY = 'favoriteAnnouncements_guest';
+  const LEGACY_GUEST_FAVORITES_KEY = legacyUserId ? `favoriteAnnouncements_${legacyUserId}` : null;
+
+  const readGuestFavoritesRaw = () => {
+    const rawGuest = typeof window !== 'undefined' ? localStorage.getItem(GUEST_FAVORITES_KEY) : null;
+    if (rawGuest) return rawGuest;
+    const rawLegacy = LEGACY_GUEST_FAVORITES_KEY ? localStorage.getItem(LEGACY_GUEST_FAVORITES_KEY) : null;
+    if (rawLegacy) {
+      localStorage.setItem(GUEST_FAVORITES_KEY, rawLegacy);
+      if (LEGACY_GUEST_FAVORITES_KEY) localStorage.removeItem(LEGACY_GUEST_FAVORITES_KEY);
+      return rawLegacy;
+    }
+    return null;
+  };
   const { user, favorites: authFavorites, toggleFavorite } = useAuth() || {};
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
+    const stored = readGuestFavoritesRaw();
     if (!stored) return [];
 
     try {
@@ -79,32 +104,45 @@ export default function AnnouncementsByCategory() {
   // Listen for favorites updates (storage + custom event) so UI stays in sync across app
   useEffect(() => {
     const handleFavoritesUpdated = () => {
-      const stored = localStorage.getItem(FAVORITES_KEY);
+      const stored = readGuestFavoritesRaw();
       if (!stored) {
         setFavoriteIds([]);
+        setGuestFavoriteObjects([]);
         return;
       }
       try {
         const parsed = JSON.parse(stored || '[]');
         if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
           setFavoriteIds(parsed);
+          setGuestFavoriteObjects(parsed.map(id => ({ id, addedAt: Date.now() })));
         } else if (Array.isArray(parsed)) {
           setFavoriteIds(parsed.map(item => item.id).filter(Boolean));
+          setGuestFavoriteObjects(parsed);
         } else {
           setFavoriteIds([]);
+          setGuestFavoriteObjects([]);
         }
       } catch {
         setFavoriteIds([]);
+        setGuestFavoriteObjects([]);
       }
     };
 
-    window.addEventListener('favorites:updated', handleFavoritesUpdated);
+    const wrapper = (e) => {
+      if (e?.detail?.favoriteIds) {
+        setFavoriteIds(Array.isArray(e.detail.favoriteIds) ? e.detail.favoriteIds : []);
+        setGuestFavoriteObjects(prev => prev.filter(p => e.detail.favoriteIds.includes(p.id)));
+        return;
+      }
+      handleFavoritesUpdated();
+    };
+    window.addEventListener('favorites:updated', wrapper);
     window.addEventListener('storage', handleFavoritesUpdated);
     return () => {
-      window.removeEventListener('favorites:updated', handleFavoritesUpdated);
+      window.removeEventListener('favorites:updated', wrapper);
       window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [FAVORITES_KEY]);
+  }, [GUEST_FAVORITES_KEY, LEGACY_GUEST_FAVORITES_KEY]);
 
   // Get unique locations from announcements
   const uniqueLocations = useMemo(() => {
@@ -430,11 +468,14 @@ export default function AnnouncementsByCategory() {
                     transition: 'transform 0.2s',
                     zIndex: 2
                   }}
-                  onClick={ev => {
+                  onClick={async (ev) => {
                       ev.stopPropagation();
                       // If user is authenticated, use AuthContext toggle which syncs with backend
                       if (user) {
-                        toggleFavorite?.(a._id);
+                        const result = await toggleFavorite?.(a._id);
+                        if (result?.error) {
+                          console.error('Eroare la toggle favorite:', result.error);
+                        }
                         return;
                       }
                       // Guest/localStorage path

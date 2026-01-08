@@ -26,7 +26,10 @@ export function FacebookLoginButton() {
     window.FB.login(function(response) {
       if (response.authResponse) {
         // Trimite tokenul la backend pentru validare și login
-        fetch(`${import.meta.env.VITE_API_URL || 'https://hobbiz-mui.onrender.com'}/api/auth/facebook/token`, {
+          const rawBase = import.meta.env.VITE_API_URL || 'https://hobbiz-mui.onrender.com';
+          const base = typeof rawBase === 'string' ? rawBase.split('#')[0].trim() : rawBase;
+          const normalizedBase = typeof base === 'string' && base.endsWith('/') ? base.slice(0, -1) : base;
+          fetch(`${normalizedBase}/api/auth/facebook/token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ access_token: response.authResponse.accessToken })

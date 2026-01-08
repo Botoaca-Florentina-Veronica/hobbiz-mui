@@ -66,11 +66,25 @@ export default function AllAnnouncements() {
   // STATE: FAVORITES & LOCAL STORAGE
   // ============================================
   const itemsPerPage = 12;
-  const userId = localStorage.getItem('userId');
-  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+  const legacyUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+  const GUEST_FAVORITES_KEY = 'favoriteAnnouncements_guest';
+  const LEGACY_GUEST_FAVORITES_KEY = legacyUserId ? `favoriteAnnouncements_${legacyUserId}` : null;
+
+  const readGuestFavoritesRaw = () => {
+    const rawGuest = typeof window !== 'undefined' ? localStorage.getItem(GUEST_FAVORITES_KEY) : null;
+    if (rawGuest) return rawGuest;
+    const rawLegacy = LEGACY_GUEST_FAVORITES_KEY ? localStorage.getItem(LEGACY_GUEST_FAVORITES_KEY) : null;
+    if (rawLegacy) {
+      // migrate legacy -> guest for consistency
+      localStorage.setItem(GUEST_FAVORITES_KEY, rawLegacy);
+      if (LEGACY_GUEST_FAVORITES_KEY) localStorage.removeItem(LEGACY_GUEST_FAVORITES_KEY);
+      return rawLegacy;
+    }
+    return null;
+  };
 
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
+    const stored = readGuestFavoritesRaw();
     if (!stored) return [];
 
     try {
@@ -86,6 +100,17 @@ export default function AllAnnouncements() {
     }
   });
 
+  // Wrapper to update favorite IDs (used by storage event or payloaded events)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e?.detail?.favoriteIds) {
+        setFavoriteIds(Array.isArray(e.detail.favoriteIds) ? e.detail.favoriteIds : []);
+      }
+    };
+    window.addEventListener('favorites:updated', handler);
+    return () => window.removeEventListener('favorites:updated', handler);
+  }, []);
+
   // ============================================
   // EFFECTS: FAVORITES SYNC WITH AUTH
   // ============================================
@@ -100,7 +125,7 @@ export default function AllAnnouncements() {
   // ============================================
   useEffect(() => {
     const handleFavoritesUpdated = () => {
-      const stored = localStorage.getItem(FAVORITES_KEY);
+      const stored = readGuestFavoritesRaw();
       if (!stored) {
         setFavoriteIds([]);
         return;
@@ -119,13 +144,22 @@ export default function AllAnnouncements() {
       }
     };
 
-    window.addEventListener('favorites:updated', handleFavoritesUpdated);
+    const wrapper = (e) => {
+      if (e?.detail?.favoriteIds) {
+        // Use payload for instant update
+        setFavoriteIds(Array.isArray(e.detail.favoriteIds) ? e.detail.favoriteIds : []);
+        return;
+      }
+      handleFavoritesUpdated();
+    };
+
+    window.addEventListener('favorites:updated', wrapper);
     window.addEventListener('storage', handleFavoritesUpdated);
     return () => {
-      window.removeEventListener('favorites:updated', handleFavoritesUpdated);
+      window.removeEventListener('favorites:updated', wrapper);
       window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [FAVORITES_KEY]);
+  }, [GUEST_FAVORITES_KEY, LEGACY_GUEST_FAVORITES_KEY]);
 
   // ============================================
   // EFFECTS: RESET PAGINATION ON FILTER CHANGE
@@ -265,7 +299,7 @@ export default function AllAnnouncements() {
       // ========== GUEST USER FAVORITES ==========
       let localFavorites = [];
       try {
-        const stored = localStorage.getItem(FAVORITES_KEY);
+        const stored = readGuestFavoritesRaw();
         const parsed = JSON.parse(stored || '[]');
         if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
           localFavorites = parsed;
@@ -282,15 +316,18 @@ export default function AllAnnouncements() {
         updatedFavorites = [...localFavorites, announcementId];
       }
 
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
+      // persist and dispatch via util for instant payloaded event
+      try { writeGuestFavorites(updatedFavorites.map(id => ({ id, addedAt: Date.now() }))); } catch {}
       setFavoriteIds(updatedFavorites);
-      window.dispatchEvent(new Event('favorites:updated'));
       return;
     }
 
     // ========== AUTHENTICATED USER FAVORITES ==========
     if (toggleFavorite) {
-      await toggleFavorite(announcementId);
+      const result = await toggleFavorite(announcementId);
+      if (result?.error) {
+        console.error('Eroare la toggle favorite:', result.error);
+      }
     }
   };
 
@@ -473,7 +510,7 @@ export default function AllAnnouncements() {
         ) : (
           // Announcements Cards & Pagination
           <>
-            <div className="favorite-announcements-list">
+            <div className={`favorite-announcements-list ${viewMode === 'list' ? 'list-view' : 'grid-view'}`}>
               {currentItems.map((announcement) => (
                 <div
                   key={announcement._id}
@@ -508,13 +545,13 @@ export default function AllAnnouncements() {
                           : ''}
                       </span>
                       <div
-                        className={`favorite-heart ${favoriteIds.includes(announcement._id) ? 'filled' : ''}`}
+                        className={`favorite-heart ${(user ? (authFavorites || []).includes(announcement._id) : favoriteIds.includes(announcement._id)) ? 'filled' : ''}`}
                         onClick={ev => {
                           ev.stopPropagation();
                           handleToggleFavorite(announcement._id, ev);
                         }}
                       >
-                        {favoriteIds.includes(announcement._id) ? (
+                        {(user ? (authFavorites || []).includes(announcement._id) : favoriteIds.includes(announcement._id)) ? (
                           <FavoriteIcon />
                         ) : (
                           <FavoriteBorderIcon />

@@ -456,83 +456,91 @@
   "howItWorksPage": {
     "title": "Cum funcționează",
     "hero": {
-      "badge": "Simplu și eficient",
+      "badge": "Ghid rapid, dintr-o privire",
       "title": "Cum funcționează <span class=\"highlight\">Hobbiz</span>?",
-      "description": "Descoperă cum poți să-ți găsești rapid persoane cu aceleași pasiuni și să participi la activități captivante. Procesul nostru în 4 pași te va ghida pas cu pas.",
-      "stats": {
-        "members": "10K+ Membri activi",
-        "conversations": "2K+ Conversații lunare",
-        "categories": "50+ Categorii hobby"
-      }
+      "description": "Hobbiz conectează persoane care oferă sau caută produse și servicii. Creezi un cont, explorezi anunțuri, discuți direct în chat și primești notificări când apare ceva important.",
+      "actions": {
+        "primary": "Creează cont",
+        "secondary": "Vezi anunțuri"
+      },
+      "stats": [
+        { "value": "Anunțuri", "label": "Publică și gestionează rapid" },
+        { "value": "Chat", "label": "Comunicare directă între utilizatori" },
+        { "value": "Notificări", "label": "Rămâi la curent cu noutățile" }
+      ]
     },
     "steps": {
-      "header": "Pașii pentru a începe",
-      "subtitle": "Urmează acești pași simpli pentru a te alătura comunității noastre",
+      "title": "Cum începi",
+      "subtitle": "În câteva minute poți folosi funcțiile principale ale platformei.",
       "list": [
         {
-          "label": "Creează-ți contul",
-          "description": "Înregistrează-te rapid cu emailul sau intră ca invitat și personalizează-ți profilul.",
-          "details": "Completezi informațiile de bază și, opțional, adaugi avatar și o scurtă descriere. Poți porni în modul invitat și să îți creezi contul mai târziu."
+          "icon": "account",
+          "title": "Creează cont și intră în platformă",
+          "description": "Te poți autentifica cu email și parolă sau prin Google, apoi îți completezi profilul."
         },
         {
-          "label": "Publică sau caută anunțuri",
-          "description": "Publică ușor un anunț sau explorează categoriile și filtrele pentru a găsi ce te interesează.",
-          "details": "Folosește filtre (preț, locație, dată, popularitate) și sortări, sau adaugă rapid un anunț cu imagini, categorie și detalii clare."
+          "icon": "search",
+          "title": "Explorează anunțurile",
+          "description": "Navighează pe categorii și găsește rapid ce te interesează folosind căutarea."
         },
         {
-          "label": "Salvează în Favorite și revino",
-          "description": "Apasă inimioara pentru a salva anunțurile preferate și a le accesa ulterior.",
-          "details": "Favoritele se salvează pe dispozitiv, separate pe utilizator sau invitat, și pot fi regăsite în pagina „Favorite”."
+          "icon": "publish",
+          "title": "Publică și gestionează anunțuri",
+          "description": "Adaugă imagini și detalii, editează ulterior, arhivează anunțurile vechi și păstrează totul organizat."
         },
         {
-          "label": "Discută și primește notificări",
-          "description": "Deschide chatul cu autorul anunțului și urmărește actualizările în „Notificări”.",
-          "details": "Chat integrat pentru întrebări rapide. Primești notificări despre mesaje noi sau activitate pe anunțurile tale."
+          "icon": "chat",
+          "title": "Discută în chat și urmărește notificările",
+          "description": "Vorbești direct cu ceilalți utilizatori și primești notificări despre mesajele și activitatea relevantă."
         }
-      ],
-      "buttons": {
-        "continue": "Continuă",
-        "finish": "Finalizează",
-        "back": "Înapoi",
-        "reset": "Resetează"
-      },
-      "completion": {
-        "message": "Gata! Acum poți începe să explorezi platforma 🎉",
-        "reset": "Resetează"
-      }
+      ]
     },
-    "features": [
-      {
-        "title": "Categorii și filtre puternice",
-        "description": "Navigare pe categorii, căutare după cuvinte cheie, sortări și filtre pentru rezultate relevante.",
-        "color": "#355070"
-      },
-      {
-        "title": "Favorite sincronizate local",
-        "description": "Salvează ce-ți place și revino oricând. Stocare pe dispozitiv și separare pe utilizator/guest.",
-        "color": "#406b92"
-      },
-      {
-        "title": "Chat integrat",
-        "description": "Comunică rapid cu autorii anunțurilor. Avatare normalizate și fallback cu inițiale.",
-        "color": "#ffffff"
-      },
-      {
-        "title": "Notificări clare",
-        "description": "Vezi noutățile importante, cu avatare, linkuri către anunțuri și evidențiere pentru elementele necitite.",
-        "color": "#355070"
-      },
-      {
-        "title": "Dark mode elegant",
-        "description": "Paletă dark rafinată și accente roz, cu contrast și lizibilitate optimizate pe toate paginile.",
-        "color": "#406b92"
-      },
-      {
-        "title": "Siguranță și încredere",
-        "description": "Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.",
-        "color": "#ffffff"
-      }
-    ],
+    "capabilities": {
+      "title": "Ce poți face în Hobbiz",
+      "subtitle": "Funcționalități gândite pentru o experiență rapidă, clară și sigură.",
+      "list": [
+        {
+          "icon": "search",
+          "title": "Categorii + căutare",
+          "description": "Găsești anunțuri prin categorii și cuvinte cheie, fără pași complicați."
+        },
+        {
+          "icon": "publish",
+          "title": "Publicare ușoară",
+          "description": "Creezi anunțuri cu imagini și detalii, apoi le administrezi din contul tău."
+        },
+        {
+          "icon": "favorite",
+          "title": "Favorite",
+          "description": "Salvezi anunțurile care îți plac și revii la ele oricând."
+        },
+        {
+          "icon": "chat",
+          "title": "Chat integrat",
+          "description": "Comunici rapid cu autorii anunțurilor, direct din platformă."
+        },
+        {
+          "icon": "notifications",
+          "title": "Notificări",
+          "description": "Primești actualizări vizibile pentru lucrurile importante, ca să nu pierzi discuțiile."
+        },
+        {
+          "icon": "darkmode",
+          "title": "Mod întunecat",
+          "description": "Poți comuta între light și dark pentru confort vizual, pe toate paginile."
+        }
+      ]
+    },
+    "trust": {
+      "title": "Siguranță și control",
+      "subtitle": "Câteva lucruri care te ajută să folosești platforma cu încredere.",
+      "points": [
+        "Autentificare securizată și token-uri pentru sesiune",
+        "Resetare parolă prin cod trimis pe email",
+        "Datele de profil pot fi actualizate oricând (email/parolă/poze)",
+        "Conversațiile sunt separate pe utilizatori și ușor de urmărit"
+      ]
+    },
     "cta": {
       "title": "Gata să începi?",
       "description": "Alătură-te comunității noastre de oameni pasionați și descoperă noi oportunități.",

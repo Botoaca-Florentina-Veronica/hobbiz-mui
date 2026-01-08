@@ -133,10 +133,23 @@ export default function ArchivedAnnouncementsPage() {
   };
 
   // Favorites (same behavior as AllAnnouncements)
-  const userId = localStorage.getItem('userId');
-  const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
+  const legacyUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+  const GUEST_FAVORITES_KEY = 'favoriteAnnouncements_guest';
+  const LEGACY_GUEST_FAVORITES_KEY = legacyUserId ? `favoriteAnnouncements_${legacyUserId}` : null;
+
+  const readGuestFavoritesRaw = () => {
+    const rawGuest = typeof window !== 'undefined' ? localStorage.getItem(GUEST_FAVORITES_KEY) : null;
+    if (rawGuest) return rawGuest;
+    const rawLegacy = LEGACY_GUEST_FAVORITES_KEY ? localStorage.getItem(LEGACY_GUEST_FAVORITES_KEY) : null;
+    if (rawLegacy) {
+      localStorage.setItem(GUEST_FAVORITES_KEY, rawLegacy);
+      if (LEGACY_GUEST_FAVORITES_KEY) localStorage.removeItem(LEGACY_GUEST_FAVORITES_KEY);
+      return rawLegacy;
+    }
+    return null;
+  };
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem(FAVORITES_KEY) : null;
+    const stored = readGuestFavoritesRaw();
     if (!stored) return [];
     try {
       const parsed = JSON.parse(stored);
@@ -152,7 +165,7 @@ export default function ArchivedAnnouncementsPage() {
 
   useEffect(() => {
     const handleFavoritesUpdated = () => {
-      const stored = localStorage.getItem(FAVORITES_KEY);
+      const stored = readGuestFavoritesRaw();
       if (!stored) { setFavoriteIds([]); return; }
       try {
         const parsed = JSON.parse(stored || '[]');
@@ -168,7 +181,7 @@ export default function ArchivedAnnouncementsPage() {
       window.removeEventListener('favorites:updated', handleFavoritesUpdated);
       window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [FAVORITES_KEY]);
+  }, [GUEST_FAVORITES_KEY, LEGACY_GUEST_FAVORITES_KEY]);
 
   const handleToggleFavorite = async (announcementId, e) => {
     e.stopPropagation();
@@ -176,7 +189,7 @@ export default function ArchivedAnnouncementsPage() {
     if (!user) {
       let localFavorites = [];
       try {
-        const stored = localStorage.getItem(FAVORITES_KEY);
+        const stored = readGuestFavoritesRaw();
         const parsed = JSON.parse(stored || '[]');
         if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') localFavorites = parsed;
         else if (Array.isArray(parsed)) localFavorites = parsed.map(item => item.id).filter(Boolean);
@@ -184,13 +197,18 @@ export default function ArchivedAnnouncementsPage() {
 
       const isFav = localFavorites.includes(announcementId);
       const updatedFavorites = isFav ? localFavorites.filter(id => id !== announcementId) : [...localFavorites, announcementId];
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
+      localStorage.setItem(GUEST_FAVORITES_KEY, JSON.stringify(updatedFavorites));
       setFavoriteIds(updatedFavorites);
       window.dispatchEvent(new Event('favorites:updated'));
       return;
     }
 
-    if (toggleFavorite) await toggleFavorite(announcementId);
+    if (toggleFavorite) {
+      const result = await toggleFavorite(announcementId);
+      if (result?.error) {
+        console.error('Eroare la toggle favorite:', result.error);
+      }
+    }
   };
 
   // Unarchive an announcement

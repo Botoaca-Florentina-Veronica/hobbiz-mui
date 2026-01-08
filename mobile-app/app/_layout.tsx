@@ -22,7 +22,7 @@ import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
 import { ChatNotificationProvider } from '../src/context/ChatNotificationContext';
 import { NotificationProvider } from '../src/context/NotificationContext';
-import { LocaleProvider } from '../src/context/LocaleContext';
+import { LocaleProvider, useLocaleLoading } from '../src/context/LocaleContext';
 import { setupNotificationListeners } from '../src/services/notificationService';
 
 const PRIVACY_TERMS_ACCEPTED_KEY = '@hobbiz_privacy_terms_accepted';
@@ -31,7 +31,8 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
-export default function RootLayout() {
+// Separate component to consume useLocaleLoading inside LocaleProvider
+function RootLayoutInner() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
   const [fontsLoaded] = useFonts({
@@ -43,6 +44,7 @@ export default function RootLayout() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [isCheckingPrivacy, setIsCheckingPrivacy] = useState(true);
   const [needsAcceptance, setNeedsAcceptance] = useState(false);
+  const localeLoading = useLocaleLoading();
 
   // Check if user has accepted privacy terms
   useEffect(() => {
@@ -129,60 +131,66 @@ export default function RootLayout() {
     return cleanup;
   }, []);
 
-  if (!fontsLoaded || isCheckingPrivacy) {
+  if (!fontsLoaded || isCheckingPrivacy || localeLoading) {
     return null;
   }
 
   return (
     <ThemeProvider>
-      <LocaleProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <ChatNotificationProvider>
-              <SafeAreaProvider>
-                <NetworkStatus />
-                <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <JsStack
-                  id="root"
-                  screenOptions={{
-                    ...TransitionPresets.SlideFromRightIOS,
-                    headerShown: false,
-                    gestureEnabled: true,
-                    gestureDirection: 'horizontal',
-                    cardStyle: {
-                      backgroundColor: colorScheme === 'dark' ? '#000000' : '#ffffff',
-                    },
-                  }}
-                >
-                <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <JsStack.Screen name="login" options={{ headerShown: false }} />
-                <JsStack.Screen name="signup" options={{ headerShown: false }} />
-                <JsStack.Screen name="forgot-password" options={{ headerShown: false }} />
-                <JsStack.Screen name="oauth" options={{ headerShown: false }} />
-                <JsStack.Screen name="settings" options={{ headerShown: false }} />
-                <JsStack.Screen name="notification-settings" options={{ headerShown: false }} />
-                <JsStack.Screen name="about" options={{ headerShown: false }} />
-                <JsStack.Screen name="legal" options={{ headerShown: false }} />
-                <JsStack.Screen name="notifications" options={{ headerShown: false }} />
-                <JsStack.Screen name="conversation" options={{ headerShown: false }} />
-                <JsStack.Screen name="profile" options={{ headerShown: false }} />
-                <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
-                <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />
-                <JsStack.Screen name="post-success" options={{ headerShown: false }} />
-                <JsStack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              </JsStack>
-                <StatusBar style="auto" />
-              </NavThemeProvider>
-              {/* Privacy & Terms Modal */}
-              <PrivacyTermsModal
-                visible={privacyModalVisible}
-                onAccept={handlePrivacyAccept}
-              />
-            </SafeAreaProvider>
-          </ChatNotificationProvider>
-        </NotificationProvider>
-      </AuthProvider>
-      </LocaleProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <ChatNotificationProvider>
+            <SafeAreaProvider>
+              <NetworkStatus />
+              <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <JsStack
+                id="root"
+                screenOptions={{
+                  ...TransitionPresets.SlideFromRightIOS,
+                  headerShown: false,
+                  gestureEnabled: true,
+                  gestureDirection: 'horizontal',
+                  cardStyle: {
+                    backgroundColor: colorScheme === 'dark' ? '#000000' : '#ffffff',
+                  },
+                }}
+              >
+              <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <JsStack.Screen name="login" options={{ headerShown: false }} />
+              <JsStack.Screen name="signup" options={{ headerShown: false }} />
+              <JsStack.Screen name="forgot-password" options={{ headerShown: false }} />
+              <JsStack.Screen name="oauth" options={{ headerShown: false }} />
+              <JsStack.Screen name="settings" options={{ headerShown: false }} />
+              <JsStack.Screen name="notification-settings" options={{ headerShown: false }} />
+              <JsStack.Screen name="about" options={{ headerShown: false }} />
+              <JsStack.Screen name="legal" options={{ headerShown: false }} />
+              <JsStack.Screen name="notifications" options={{ headerShown: false }} />
+              <JsStack.Screen name="conversation" options={{ headerShown: false }} />
+              <JsStack.Screen name="profile" options={{ headerShown: false }} />
+              <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
+              <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />
+              <JsStack.Screen name="post-success" options={{ headerShown: false }} />
+              <JsStack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            </JsStack>
+              <StatusBar style="auto" />
+            </NavThemeProvider>
+            {/* Privacy & Terms Modal */}
+            <PrivacyTermsModal
+              visible={privacyModalVisible}
+              onAccept={handlePrivacyAccept}
+            />
+          </SafeAreaProvider>
+        </ChatNotificationProvider>
+      </NotificationProvider>
+    </AuthProvider>
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <LocaleProvider>
+      <RootLayoutInner />
+    </LocaleProvider>
   );
 }

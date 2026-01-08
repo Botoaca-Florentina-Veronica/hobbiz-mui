@@ -10,6 +10,7 @@ interface LocaleContextType {
 }
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
+const LocaleLoadingContext = createContext<boolean>(true);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('ro');
@@ -43,9 +44,11 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, isLoading }}>
-      {children}
-    </LocaleContext.Provider>
+    <LocaleLoadingContext.Provider value={isLoading}>
+      <LocaleContext.Provider value={{ locale, setLocale, isLoading }}>
+        {children}
+      </LocaleContext.Provider>
+    </LocaleLoadingContext.Provider>
   );
 }
 
@@ -55,4 +58,8 @@ export function useLocale() {
     throw new Error('useLocale must be used within a LocaleProvider');
   }
   return context;
+}
+
+export function useLocaleLoading() {
+  return useContext(LocaleLoadingContext);
 }
