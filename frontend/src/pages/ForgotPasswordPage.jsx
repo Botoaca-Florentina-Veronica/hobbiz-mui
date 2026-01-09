@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import '../pages/LoginSignup.css';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation();
@@ -14,7 +12,6 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState('');
   const [error, setError] = useState('');
@@ -78,25 +75,13 @@ export default function ForgotPasswordPage() {
               onChange={(e) => setCode(e.target.value)}
               required
             />
-            <div className="password-field-wrapper">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder={t('auth.resetNewPassword')}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                aria-label={t('auth.resetNewPassword')}
-              />
-              <button
-                type="button"
-                className="toggle-password-btn"
-                aria-pressed={showPassword}
-                aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
-                onClick={() => setShowPassword(p => !p)}
-              >
-                {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
-              </button>
-            </div>
+            <input
+              type="password"
+              placeholder={t('auth.resetNewPassword')}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
           </>
         )}
 

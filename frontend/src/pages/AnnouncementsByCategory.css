@@ -61,31 +61,10 @@
 /* Align the page title with the inner `.abc-align-container` so it lines up with searchbar and cards */
 .announcements-by-category .my-announcements-title {
   max-width: 1200px;
-  /* top, horizontal, bottom */
-  margin: 40px auto 32px;
+  margin: 0 auto 24px;
   padding: 0 14px;
   box-sizing: border-box;
-  text-align: center;
-
-  /* Match Notifications page title style */
-  font-size: 2.8rem;
-  font-weight: 700;
-  color: var(--nt-text-title, var(--abc-text-primary));
-  letter-spacing: -1px;
-  line-height: 1.1;
-  font-family: 'Poppins', sans-serif !important;
-}
-
-/* Dark mode: make the announcements title match notifications accent */
-.dark-mode .announcements-by-category .my-announcements-title {
-  color: #f51866;
-}
-
-/* Small screens: reduce top spacing so it doesn't feel too large on mobile */
-@media (max-width: 768px) {
-  .announcements-by-category .my-announcements-title {
-    margin-top: 20px;
-  }
+  text-align: left;
 }
 
 .announcements-by-category .abc-align-container {
@@ -290,7 +269,7 @@
 .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
   width: 30%;
   min-width: 30%;
-  height: 150px;
+  height: auto;
   border-radius: var(--abc-radius) 0 0 var(--abc-radius);
 }
 
@@ -510,7 +489,6 @@
   .announcements-by-category .my-announcement-info { padding: 10px; }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 35%;
-    height: 140px;
   }
 }
 
@@ -534,7 +512,6 @@
   }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 40%;
-    height: 130px;
   }
   .announcements-by-category .my-announcement-title { font-size: 0.95rem; }
 }
@@ -558,7 +535,6 @@
   }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 45%;
-    height: 120px;
   }
   .announcements-by-category .my-announcement-title {
     font-size: 0.9rem; max-width: 100%; padding-right: 0;

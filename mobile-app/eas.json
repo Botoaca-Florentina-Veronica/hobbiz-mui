@@ -7,7 +7,6 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "node": "22.12.0",
       "android": {
         "gradleCommand": ":app:assembleDebug",
         "buildType": "apk"
@@ -18,14 +17,11 @@
     },
     "preview": {
       "distribution": "internal",
-      "node": "22.12.0",
       "android": {
         "buildType": "apk"
       }
     },
-    "production": {
-      "node": "22.12.0"
-    }
+    "production": {}
   },
   "submit": {
     "production": {}

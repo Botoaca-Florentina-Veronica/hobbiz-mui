@@ -307,11 +307,6 @@ export default function AnnouncementDetails() {
   useEffect(() => {
     if (!announcement?._id) return;
     if (user) {
-      // If the announcement is archived, do not mark as favorite
-      if (announcement?.archived) {
-        setIsFavorite(false);
-        return;
-      }
       setIsFavorite(favorites?.includes(announcement._id));
     } else {
       // guest fallback: still read localStorage legacy key
@@ -332,15 +327,10 @@ export default function AnnouncementDetails() {
   }, [announcement?._id, favorites, user]);
 
   // ========== Action handlers ==========
-  const handleToggleFavorite = async () => {
+  const handleToggleFavorite = () => {
     if (!announcement?._id) return;
     if (user) {
-      const result = await toggleFavorite?.(announcement._id);
-      if (result?.error) {
-        console.error('Eroare la toggle favorite:', result.error);
-        // Revert local state if error
-        return;
-      }
+      toggleFavorite?.(announcement._id);
       setIsFavorite(prev => !prev);
     } else {
       // guest localStorage handling unchanged for now
@@ -358,8 +348,12 @@ export default function AnnouncementDetails() {
       } catch { list = []; }
       const exists = list.some(item => item.id === announcement._id);
       const updated = exists ? list.filter(i => i.id !== announcement._id) : [...list, { id: announcement._id, addedAt: Date.now() }];
-      try { writeGuestFavorites(updated); } catch { localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated)); }
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       setIsFavorite(!exists);
+      // Notifică header-ul (și alte componente) că s-a schimbat numărul de favorite
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('favorites:updated'));
+      }
     }
   };
 

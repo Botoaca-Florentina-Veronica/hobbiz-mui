@@ -16,13 +16,6 @@ import axios from 'axios';
 // - În dev: folosește localhost dacă VITE_API_URL nu e setat
 // - În producție (Netlify): cere VITE_API_URL; fără ea, deduce din origin (același host) ca fallback sigur
 let API_URL = import.meta.env.VITE_API_URL;
-// Defensive: `.env` values sometimes contain inline comments or trailing spaces (e.g. "... # comment")
-// which can break URL parsing in browsers/axios.
-if (typeof API_URL === 'string') {
-  API_URL = API_URL.split('#')[0].trim();
-  // Avoid double slashes when callers use absolute paths
-  if (API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1);
-}
 if (!API_URL) {
   const isDev = import.meta.env.MODE === 'development';
   if (isDev) {
