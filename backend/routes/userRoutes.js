@@ -4,6 +4,7 @@ const auth = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
+const uploadDocuments = require('../config/cloudinaryDocuments');
 const { register, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
@@ -60,7 +61,7 @@ router.delete('/push-token', auth, deletePushToken);
 // --- VERIFICATION SYSTEM ROUTES ---
 
 // User routes - upload and manage their own documents
-router.post('/documents', auth, upload.single('document'), uploadVerificationDocument);
+router.post('/documents', auth, uploadDocuments.single('document'), uploadVerificationDocument);
 router.get('/documents', auth, getUserDocuments);
 router.delete('/documents/:documentId', auth, deleteUserDocument);
 

@@ -39,12 +39,27 @@ export const uploadDocument = async (
   // Extract filename from URI
   const filename = documentUri.split('/').pop() || 'document.pdf';
   
+  // Detect MIME type from file extension
+  const extensionMatch = /\.([a-zA-Z0-9]+)$/.exec(filename);
+  const extension = extensionMatch ? extensionMatch[1].toLowerCase() : 'pdf';
+  
+  let mimeType = 'application/octet-stream';
+  if (extension === 'pdf') {
+    mimeType = 'application/pdf';
+  } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
+    mimeType = `image/${extension === 'jpg' ? 'jpeg' : extension}`;
+  } else if (extension === 'doc') {
+    mimeType = 'application/msword';
+  } else if (extension === 'docx') {
+    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  }
+  
   // @ts-ignore - FormData in React Native accepts this format
   formData.append('document', {
     uri: documentUri,
-    type: 'application/pdf', // or detect mime type
+    type: mimeType,
     name: filename,
-  });
+  } as any);
   
   formData.append('type', type);
   formData.append('name', name);
