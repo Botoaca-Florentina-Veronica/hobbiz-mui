@@ -14,7 +14,11 @@ const adminAuth = async (req, res, next) => {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
     }
 
-    if (!user.isAdmin) {
+    // Hardcoded admin ID check - ensure consistency with frontend AuthContext
+    const ADMIN_ID = '6808bf9a48e492acb8db7173';
+    const isHardcodedAdmin = String(user._id) === ADMIN_ID;
+
+    if (!user.isAdmin && !isHardcodedAdmin) {
       return res.status(403).json({ error: 'Acces interzis. Necesită drepturi de administrator.' });
     }
 

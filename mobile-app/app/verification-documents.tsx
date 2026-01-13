@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Modal, TextInput, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { ThemedView } from '../components/themed-view';
 import { ThemedText } from '../components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
 import { useAuth } from '../src/context/AuthContext';
+import { Toast } from '../components/ui/Toast';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { 
   getUserDocuments, 
   getUserDocumentsAdmin,
@@ -21,7 +24,7 @@ import {
 export default function VerificationDocumentsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   const { user } = useAuth();
   const params = useLocalSearchParams();
   
@@ -35,6 +38,31 @@ export default function VerificationDocumentsScreen() {
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
 
+  // Toast state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
+  // Modal states for Upload
+  const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const [pickedUri, setPickedUri] = useState<string | null>(null);
+  const [newDocName, setNewDocName] = useState('');
+  const [newDocType, setNewDocType] = useState('certificate');
+  const [newDocDesc, setNewDocDesc] = useState('');
+
+  // Modal states for Admin Rejection
+  const [rejectionModalVisible, setRejectionModalVisible] = useState(false);
+  const [rejectingDocId, setRejectingDocId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+
+  // Confirmation Dialog states
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const [confirmIcon, setConfirmIcon] = useState('alert-circle-outline');
+  const [confirmColor, setConfirmColor] = useState<string | undefined>(undefined);
+
   // Document type options
   const documentTypes = [
     { value: 'certificate', label: 'Certificat' },
@@ -47,6 +75,12 @@ export default function VerificationDocumentsScreen() {
   useEffect(() => {
     fetchDocuments();
   }, []);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   const fetchDocuments = async () => {
     try {
@@ -64,7 +98,7 @@ export default function VerificationDocumentsScreen() {
       }
     } catch (error) {
       console.error('Error fetching documents:', error);
-      Alert.alert('Eroare', 'Nu s-au putut încărca documentele.');
+      showToast('Nu s-au putut încărca documentele.', 'error');
     } finally {
       setLoading(false);
     }
@@ -75,115 +109,110 @@ export default function VerificationDocumentsScreen() {
       const uri = await pickDocument();
       if (!uri) return;
 
-      // Show dialog to select type and enter name
-      Alert.prompt(
-        'Nume document',
-        'Introdu un nume pentru acest document:',
-        async (name) => {
-          if (!name) return;
-          
-          Alert.alert(
-            'Tip document',
-            'Selectează tipul documentului:',
-            documentTypes.map(type => ({
-              text: type.label,
-              onPress: async () => {
-                try {
-                  setUploading(true);
-                  await uploadDocument(uri, type.value, name);
-                  Alert.alert('Succes', 'Document încărcat cu succes și trimis spre verificare.');
-                  fetchDocuments();
-                } catch (error) {
-                  console.error('Error uploading document:', error);
-                  Alert.alert('Eroare', 'Nu s-a putut încărca documentul.');
-                } finally {
-                  setUploading(false);
-                }
-              },
-            })).concat([{ text: 'Anulează' } as any])
-          );
-        }
-      );
+      setPickedUri(uri);
+      setNewDocName('');
+      setNewDocDesc('');
+      setUploadModalVisible(true);
     } catch (error) {
       console.error('Error picking document:', error);
-      Alert.alert('Eroare', 'Nu s-a putut selecta documentul.');
+      showToast('Nu s-a putut selecta documentul.', 'error');
+    }
+  };
+
+  const confirmUpload = async () => {
+    if (!pickedUri) return;
+    if (!newDocName.trim()) {
+      showToast('Te rugăm să introduci un nume pentru document.', 'info');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      await uploadDocument(pickedUri, newDocType, newDocName, newDocDesc);
+      setUploadModalVisible(false);
+      showToast('Document încărcat cu succes și trimis spre verificare.');
+      fetchDocuments();
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      showToast('Nu s-a putut încărca documentul.', 'error');
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleDeleteDocument = (documentId: string) => {
     // Only allow deletion if not in admin view
     if (isAdminView) {
-      Alert.alert('Info', 'Doar utilizatorul poate șterge propriile documente.');
+      showToast('Doar utilizatorul poate șterge propriile documente.', 'info');
       return;
     }
     
-    Alert.alert(
-      'Confirmare',
-      'Sigur vrei să ștergi acest document?',
-      [
-        { text: 'Anulează', style: 'cancel' },
-        {
-          text: 'Șterge',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteDocument(documentId);
-              Alert.alert('Succes', 'Document șters cu succes.');
-              fetchDocuments();
-            } catch (error) {
-              console.error('Error deleting document:', error);
-              Alert.alert('Eroare', 'Nu s-a putut șterge documentul.');
-            }
-          },
-        },
-      ]
-    );
+    setConfirmTitle('Ștergere Document');
+    setConfirmMessage('Sigur vrei să ștergi acest document? Această acțiune este permanentă.');
+    setConfirmIcon('trash-outline');
+    setConfirmColor('#F44336');
+    setConfirmAction(() => async () => {
+      try {
+        await deleteDocument(documentId);
+        showToast('Document șters cu succes.', 'info');
+        fetchDocuments();
+      } catch (error) {
+        console.error('Error deleting document:', error);
+        showToast('Nu s-a putut șterge documentul.', 'error');
+      } finally {
+        setConfirmVisible(false);
+      }
+    });
+    setConfirmVisible(true);
   };
 
   const handleVerifyDocumentAdmin = async (documentId: string, status: 'verified' | 'rejected') => {
     if (!isAdminView || !targetUserId) return;
     
     if (status === 'rejected') {
-      Alert.prompt(
-        'Motiv respingere',
-        'Introdu motivul pentru care respingi acest document:',
-        async (reason) => {
-          if (!reason) return;
-          await performVerification(documentId, status, reason);
-        }
-      );
+      setRejectingDocId(documentId);
+      setRejectionReason('');
+      setRejectionModalVisible(true);
     } else {
-      Alert.alert(
-        'Confirmare',
-        'Sigur vrei să verifici acest document ca fiind autentic?',
-        [
-          { text: 'Anulează', style: 'cancel' },
-          { text: 'Verifică', onPress: () => performVerification(documentId, status) }
-        ]
-      );
+      setConfirmTitle('Verificare Document');
+      setConfirmMessage('Sigur vrei să verifici acest document ca fiind autentic?');
+      setConfirmIcon('checkmark-shield-outline');
+      setConfirmColor(tokens.colors.primary);
+      setConfirmAction(() => () => performVerification(documentId, status));
+      setConfirmVisible(true);
     }
+  };
+
+  const confirmRejection = async () => {
+    if (!rejectingDocId || !rejectionReason.trim()) {
+      showToast('Te rugăm să introduci un motiv pentru respingere.', 'info');
+      return;
+    }
+    await performVerification(rejectingDocId, 'rejected', rejectionReason);
+    setRejectionModalVisible(false);
   };
 
   const performVerification = async (
     documentId: string,
     status: 'verified' | 'rejected',
-    rejectionReason?: string
+    rejectionReasonText?: string
   ) => {
     if (!targetUserId) return;
     
     try {
       setProcessing(true);
-      await verifyDocument(targetUserId, documentId, status, rejectionReason);
-      Alert.alert(
-        'Succes',
-        `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`
+      await verifyDocument(targetUserId, documentId, status, rejectionReasonText);
+      showToast(
+        `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`,
+        status === 'verified' ? 'success' : 'info'
       );
       fetchDocuments();
     } catch (error) {
       console.error('Error verifying document:', error);
-      Alert.alert('Eroare', 'Nu s-a putut procesa documentul.');
+      showToast('Nu s-a putut procesa documentul.', 'error');
     } finally {
       setProcessing(false);
+      setConfirmVisible(false);
     }
   };
 
@@ -378,6 +407,60 @@ export default function VerificationDocumentsScreen() {
       alignItems: 'center',
       justifyContent: 'center',
     },
+    // Modal Styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '80%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: tokens.colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+    },
+    inputLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 8,
+      marginTop: 16,
+    },
+    modalInput: {
+      borderRadius: 10,
+      padding: 12,
+      fontSize: 16,
+    },
+    textArea: {
+      height: 100,
+      textAlignVertical: 'top',
+    },
+    typeSelector: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    typeOption: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: tokens.colors.border,
+    },
+    typeOptionText: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
   });
 
   if (loading) {
@@ -470,6 +553,24 @@ export default function VerificationDocumentsScreen() {
                     <Text style={styles.documentDate}>
                       Încărcat: {new Date(doc.uploadedAt).toLocaleDateString('ro-RO')}
                     </Text>
+                    
+                    <TouchableOpacity 
+                      style={{ 
+                        flexDirection: 'row', 
+                        alignItems: 'center', 
+                        marginTop: 10,
+                        backgroundColor: tokens.colors.primary + '15',
+                        padding: 8,
+                        borderRadius: 6,
+                        alignSelf: 'flex-start'
+                      }}
+                      onPress={() => Linking.openURL(doc.url)}
+                    >
+                      <Ionicons name="eye-outline" size={18} color={tokens.colors.primary} />
+                      <Text style={{ color: tokens.colors.primary, marginLeft: 6, fontWeight: '600', fontSize: 13 }}>
+                        Vezi Fișier Document
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: getStatusColor(doc.status) }]}>
                     <View style={[styles.statusDot, { backgroundColor: '#fff' }]} />
@@ -527,6 +628,149 @@ export default function VerificationDocumentsScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Upload Document Details Modal */}
+      <Modal
+        visible={uploadModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setUploadModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>Detalii Document</ThemedText>
+              <TouchableOpacity onPress={() => setUploadModalVisible(false)}>
+                <Ionicons name="close" size={24} color={tokens.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={{ padding: 20 }}>
+              <ThemedText style={styles.inputLabel}>Nume Document</ThemedText>
+              <ThemedTextInput
+                value={newDocName}
+                onChangeText={setNewDocName}
+                placeholder="Ex: Diplomă Bac, Certificat Google..."
+                placeholderTextColor={tokens.colors.muted}
+                style={[styles.modalInput, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
+              />
+
+              <ThemedText style={styles.inputLabel}>Tip Document</ThemedText>
+              <View style={styles.typeSelector}>
+                {documentTypes.map((type) => (
+                  <TouchableOpacity
+                    key={type.value}
+                    style={[
+                      styles.typeOption,
+                      newDocType === type.value && { backgroundColor: tokens.colors.primary, borderColor: tokens.colors.primary }
+                    ]}
+                    onPress={() => setNewDocType(type.value)}
+                  >
+                    <ThemedText style={[
+                      styles.typeOptionText,
+                      newDocType === type.value && { color: '#fff' }
+                    ]}>
+                      {type.label}
+                    </ThemedText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <ThemedText style={styles.inputLabel}>Descriere (opțional)</ThemedText>
+              <ThemedTextInput
+                value={newDocDesc}
+                onChangeText={setNewDocDesc}
+                placeholder="Adaugă detalii suplimentare..."
+                placeholderTextColor={tokens.colors.muted}
+                multiline
+                numberOfLines={3}
+                style={[styles.modalInput, styles.textArea, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
+              />
+
+              <TouchableOpacity
+                style={[styles.uploadButton, { marginHorizontal: 0, marginTop: 20 }]}
+                onPress={confirmUpload}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <Ionicons name="cloud-upload" size={20} color="#fff" style={{ marginRight: 8 }} />
+                    <Text style={styles.uploadButtonText}>Confirmă Încărcarea</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </ThemedView>
+        </View>
+      </Modal>
+
+      {/* Admin Rejection Reason Modal */}
+      <Modal
+        visible={rejectionModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRejectionModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>Motiv Respingere</ThemedText>
+              <TouchableOpacity onPress={() => setRejectionModalVisible(false)}>
+                <Ionicons name="close" size={24} color={tokens.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ padding: 20 }}>
+              <ThemedText style={styles.inputLabel}>De ce respingi acest document?</ThemedText>
+              <ThemedTextInput
+                value={rejectionReason}
+                onChangeText={setRejectionReason}
+                placeholder="Ex: Document neclar, expirat..."
+                placeholderTextColor={tokens.colors.muted}
+                multiline
+                numberOfLines={4}
+                style={[styles.modalInput, styles.textArea, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
+              />
+
+              <TouchableOpacity
+                style={[styles.deleteButton, { 
+                  backgroundColor: '#F44336', 
+                  marginTop: 20, 
+                  justifyContent: 'center',
+                  paddingVertical: 14 
+                }]}
+                onPress={confirmRejection}
+                disabled={processing}
+              >
+                {processing ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={[styles.deleteButtonText, { color: '#fff' }]}>Confirmă Respingerea</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </ThemedView>
+        </View>
+      </Modal>
+      <ConfirmDialog
+        visible={confirmVisible}
+        title={confirmTitle}
+        message={confirmMessage}
+        icon={confirmIcon}
+        confirmColor={confirmColor}
+        onConfirm={() => confirmAction?.()}
+        onCancel={() => setConfirmVisible(false)}
+      />
+
+      <Toast 
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        duration={5000}
+        onHide={() => setToastVisible(false)}
+      />
     </ThemedView>
   );
 }

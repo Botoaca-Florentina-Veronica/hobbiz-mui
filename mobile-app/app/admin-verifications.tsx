@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Image, Linking, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { ThemedView } from '../components/themed-view';
 import { ThemedText } from '../components/themed-text';
+import { ThemedTextInput } from '../components/themed-text-input';
+import { Toast } from '../components/ui/Toast';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { 
   getPendingVerifications, 
   verifyDocument, 
@@ -18,16 +21,40 @@ import {
 export default function AdminVerificationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { tokens } = useAppTheme();
+  const { tokens, isDark } = useAppTheme();
   
   const [users, setUsers] = useState<UserWithDocuments[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithDocuments | null>(null);
 
+  // Toast state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
+  // Confirmation Dialog states
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const [confirmIcon, setConfirmIcon] = useState('alert-circle-outline');
+  const [confirmColor, setConfirmColor] = useState<string | undefined>(undefined);
+
+  // Rejection Modal states
+  const [rejectionModalVisible, setRejectionModalVisible] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [targetDoc, setTargetDoc] = useState<{ userId: string; docId: string } | null>(null);
+
   useEffect(() => {
     fetchPendingVerifications();
   }, []);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   const fetchPendingVerifications = async () => {
     try {
@@ -37,10 +64,10 @@ export default function AdminVerificationsScreen() {
     } catch (error: any) {
       console.error('Error fetching pending verifications:', error);
       if (error?.response?.status === 403) {
-        Alert.alert('Acces refuzat', 'Nu ai permisiuni de administrator.');
+        showToast('Nu ai permisiuni de administrator.', 'error');
         router.back();
       } else {
-        Alert.alert('Eroare', 'Nu s-au putut încărca verificările pendinte.');
+        showToast('Nu s-au putut încărca verificările în așteptare.', 'error');
       }
     } finally {
       setLoading(false);
@@ -49,66 +76,75 @@ export default function AdminVerificationsScreen() {
 
   const handleVerifyDocument = async (userId: string, documentId: string, status: 'verified' | 'rejected') => {
     if (status === 'rejected') {
-      Alert.prompt(
-        'Motiv respingere',
-        'Introdu motivul pentru care respingi acest document:',
-        async (reason) => {
-          if (!reason) return;
-          await performVerification(userId, documentId, status, reason);
-        }
-      );
+      setTargetDoc({ userId, docId: documentId });
+      setRejectionReason('');
+      setRejectionModalVisible(true);
     } else {
-      await performVerification(userId, documentId, status);
+      setConfirmTitle('Verificare Document');
+      setConfirmMessage('Sigur vrei să verifici acest document ca fiind autentic?');
+      setConfirmIcon('checkmark-shield-outline');
+      setConfirmColor(tokens.colors.primary);
+      setConfirmAction(() => () => performVerification(userId, documentId, status));
+      setConfirmVisible(true);
     }
+  };
+
+  const confirmRejection = async () => {
+    if (!targetDoc || !rejectionReason.trim()) {
+      showToast('Te rugăm să introduci un motiv pentru respingere.', 'info');
+      return;
+    }
+    await performVerification(targetDoc.userId, targetDoc.docId, 'rejected', rejectionReason);
+    setRejectionModalVisible(false);
   };
 
   const performVerification = async (
     userId: string, 
     documentId: string, 
     status: 'verified' | 'rejected',
-    rejectionReason?: string
+    rejectionReasonText?: string
   ) => {
     try {
       setProcessing(true);
-      await verifyDocument(userId, documentId, status, rejectionReason);
-      Alert.alert(
-        'Succes', 
-        `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`
+      await verifyDocument(userId, documentId, status, rejectionReasonText);
+      showToast(
+        `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`,
+        status === 'verified' ? 'success' : 'info'
       );
       fetchPendingVerifications();
       setSelectedUser(null);
     } catch (error) {
       console.error('Error verifying document:', error);
-      Alert.alert('Eroare', 'Nu s-a putut procesa documentul.');
+      showToast('Nu s-a putut procesa documentul.', 'error');
     } finally {
       setProcessing(false);
+      setConfirmVisible(false);
     }
   };
 
   const handleToggleVerificationBadge = async (userId: string, currentStatus: boolean) => {
-    Alert.alert(
-      'Confirmare',
-      `Sigur vrei să ${currentStatus ? 'elimini' : 'acorzi'} badge-ul de verificare acestui utilizator?`,
-      [
-        { text: 'Anulează', style: 'cancel' },
-        {
-          text: 'Confirmă',
-          onPress: async () => {
-            try {
-              setProcessing(true);
-              await toggleUserVerification(userId, !currentStatus);
-              Alert.alert('Succes', `Badge ${!currentStatus ? 'acordat' : 'eliminat'} cu succes.`);
-              fetchPendingVerifications();
-            } catch (error) {
-              console.error('Error toggling verification badge:', error);
-              Alert.alert('Eroare', 'Nu s-a putut actualiza badge-ul.');
-            } finally {
-              setProcessing(false);
-            }
-          },
-        },
-      ]
-    );
+    setConfirmTitle(currentStatus ? 'Eliminare Badge' : 'Acordare Badge');
+    setConfirmMessage(`Sigur vrei să ${currentStatus ? 'elimini' : 'acorzi'} badge-ul de verificare acestui utilizator?`);
+    setConfirmIcon(currentStatus ? 'close-circle-outline' : 'checkmark-circle-outline');
+    setConfirmColor(currentStatus ? '#F44336' : tokens.colors.primary);
+    setConfirmAction(() => async () => {
+      try {
+        setProcessing(true);
+        await toggleUserVerification(userId, !currentStatus);
+        showToast(
+          `Badge ${!currentStatus ? 'acordat' : 'eliminat'} cu succes.`,
+          !currentStatus ? 'success' : 'info'
+        );
+        fetchPendingVerifications();
+      } catch (error) {
+        console.error('Error toggling verification badge:', error);
+        showToast('Nu s-a putut actualiza badge-ul.', 'error');
+      } finally {
+        setProcessing(false);
+        setConfirmVisible(false);
+      }
+    });
+    setConfirmVisible(true);
   };
 
   const handleViewUserDocuments = async (user: UserWithDocuments) => {
@@ -118,7 +154,7 @@ export default function AdminVerificationsScreen() {
       setSelectedUser(response.user);
     } catch (error) {
       console.error('Error fetching user documents:', error);
-      Alert.alert('Eroare', 'Nu s-au putut încărca documentele utilizatorului.');
+      showToast('Nu s-au putut încărca documentele utilizatorului.', 'error');
     } finally {
       setProcessing(false);
     }
@@ -269,6 +305,52 @@ export default function AdminVerificationsScreen() {
       fontWeight: '600',
       color: '#fff',
     },
+    // Modal Styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '80%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: tokens.colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+    },
+    inputLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 8,
+      marginTop: 16,
+    },
+    modalInput: {
+      borderRadius: 10,
+      padding: 12,
+      fontSize: 16,
+    },
+    textArea: {
+      height: 100,
+      textAlignVertical: 'top',
+    },
+    rejectConfirmButton: {
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    rejectConfirmButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+    },
     documentActions: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -380,7 +462,7 @@ export default function AdminVerificationsScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Verificări Pendinte</Text>
+          <Text style={styles.headerTitle}>Verificări în așteptare</Text>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={tokens.colors.primary} />
@@ -458,6 +540,24 @@ export default function AdminVerificationsScreen() {
                   <Text style={[styles.documentType, { marginTop: 4 }]}>
                     Încărcat: {new Date(doc.uploadedAt).toLocaleDateString('ro-RO')}
                   </Text>
+                  
+                  <TouchableOpacity 
+                    style={{ 
+                      flexDirection: 'row', 
+                      alignItems: 'center', 
+                      marginTop: 10,
+                      backgroundColor: tokens.colors.primary + '15',
+                      padding: 8,
+                      borderRadius: 6,
+                      alignSelf: 'flex-start'
+                    }}
+                    onPress={() => Linking.openURL(doc.url)}
+                  >
+                    <Ionicons name="eye-outline" size={18} color={tokens.colors.primary} />
+                    <Text style={{ color: tokens.colors.primary, marginLeft: 6, fontWeight: '600', fontSize: 13 }}>
+                      Vezi Fișier Document
+                    </Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(doc.status) }]}>
                   <View style={[styles.statusDot, { backgroundColor: '#fff' }]} />
@@ -498,6 +598,72 @@ export default function AdminVerificationsScreen() {
             </View>
           ))}
         </ScrollView>
+
+        <ConfirmDialog
+          visible={confirmVisible}
+          title={confirmTitle}
+          message={confirmMessage}
+          icon={confirmIcon}
+          confirmColor={confirmColor}
+          onConfirm={() => confirmAction?.()}
+          onCancel={() => setConfirmVisible(false)}
+        />
+
+        <Modal
+          visible={rejectionModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setRejectionModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <ThemedView style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <ThemedText style={styles.modalTitle}>Motiv Respingere</ThemedText>
+                <TouchableOpacity onPress={() => setRejectionModalVisible(false)}>
+                  <Ionicons name="close" size={24} color={tokens.colors.text} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={{ padding: 20, paddingBottom: 40 }}>
+                <ThemedText style={styles.inputLabel}>De ce respingi acest document?</ThemedText>
+                <ThemedTextInput
+                  value={rejectionReason}
+                  onChangeText={setRejectionReason}
+                  placeholder="Ex: Document neclar, expirat..."
+                  placeholderTextColor={tokens.colors.muted}
+                  multiline
+                  numberOfLines={4}
+                  style={[styles.modalInput, styles.textArea, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
+                />
+
+                <TouchableOpacity
+                  style={[styles.rejectConfirmButton, { 
+                    backgroundColor: '#F44336', 
+                    marginTop: 20, 
+                    justifyContent: 'center',
+                    paddingVertical: 14 
+                  }]}
+                  onPress={confirmRejection}
+                  disabled={processing}
+                >
+                  {processing ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={[styles.rejectConfirmButtonText, { color: '#fff' }]}>Confirmă Respingerea</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </ThemedView>
+          </View>
+        </Modal>
+
+        <Toast 
+          visible={toastVisible}
+          message={toastMessage}
+          type={toastType}
+          duration={5000}
+          onHide={() => setToastVisible(false)}
+        />
       </ThemedView>
     );
   }
@@ -508,7 +674,7 @@ export default function AdminVerificationsScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verificări Pendinte</Text>
+        <Text style={styles.headerTitle}>Verificări în așteptare</Text>
       </View>
 
       <ScrollView style={styles.content}>
@@ -516,7 +682,7 @@ export default function AdminVerificationsScreen() {
           <View style={styles.emptyState}>
             <Ionicons name="checkmark-done-circle-outline" size={64} color={tokens.colors.muted} />
             <ThemedText style={styles.emptyStateText}>
-              Nu există verificări pendinte.
+              Nu există verificări în așteptare.
             </ThemedText>
           </View>
         ) : (
@@ -539,7 +705,7 @@ export default function AdminVerificationsScreen() {
                 </Text>
                 <Text style={styles.userEmail}>{user.email}</Text>
                 <Text style={styles.pendingCount}>
-                  {user.pendingDocuments?.length || 0} documente pendinte
+                  {user.pendingDocuments?.length || 0} documente în așteptare
                 </Text>
               </View>
               {user.isVerified && (
@@ -553,6 +719,71 @@ export default function AdminVerificationsScreen() {
           ))
         )}
       </ScrollView>
+      <ConfirmDialog
+        visible={confirmVisible}
+        title={confirmTitle}
+        message={confirmMessage}
+        icon={confirmIcon}
+        confirmColor={confirmColor}
+        onConfirm={() => confirmAction?.()}
+        onCancel={() => setConfirmVisible(false)}
+      />
+
+      <Modal
+        visible={rejectionModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRejectionModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>Motiv Respingere</ThemedText>
+              <TouchableOpacity onPress={() => setRejectionModalVisible(false)}>
+                <Ionicons name="close" size={24} color={tokens.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ padding: 20, paddingBottom: 40 }}>
+              <ThemedText style={styles.inputLabel}>De ce respingi acest document?</ThemedText>
+              <ThemedTextInput
+                value={rejectionReason}
+                onChangeText={setRejectionReason}
+                placeholder="Ex: Document neclar, expirat..."
+                placeholderTextColor={tokens.colors.muted}
+                multiline
+                numberOfLines={4}
+                style={[styles.modalInput, styles.textArea, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}
+              />
+
+              <TouchableOpacity
+                style={[styles.rejectConfirmButton, { 
+                  backgroundColor: '#F44336', 
+                  marginTop: 20, 
+                  justifyContent: 'center',
+                  paddingVertical: 14 
+                }]}
+                onPress={confirmRejection}
+                disabled={processing}
+              >
+                {processing ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={[styles.rejectConfirmButtonText, { color: '#fff' }]}>Confirmă Respingerea</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </ThemedView>
+        </View>
+      </Modal>
+
+      <Toast 
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        duration={5000}
+        onHide={() => setToastVisible(false)}
+      />
     </ThemedView>
   );
 }

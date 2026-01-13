@@ -14,6 +14,7 @@ import Constants from 'expo-constants';
 import api from '../src/services/api';
 import { useLocale } from '../src/context/LocaleContext';
 import { Toast } from '../components/ui/Toast';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
 interface UserAnnouncement {
@@ -155,6 +156,14 @@ export default function ProfileScreen() {
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
   const [toastType, setToastType] = React.useState<'success' | 'error' | 'info'>('success');
+
+  // Confirmation Dialog states
+  const [confirmVisible, setConfirmVisible] = React.useState(false);
+  const [confirmTitle, setConfirmTitle] = React.useState('');
+  const [confirmMessage, setConfirmMessage] = React.useState('');
+  const [confirmAction, setConfirmAction] = React.useState<(() => void) | null>(null);
+  const [confirmIcon, setConfirmIcon] = React.useState('alert-circle-outline');
+  const [confirmColor, setConfirmColor] = React.useState<string | undefined>(undefined);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMessage(message);
@@ -981,27 +990,27 @@ export default function ProfileScreen() {
                   width: '100%' 
                 }]}
                 onPress={async () => {
-                  Alert.alert(
-                    'Confirmare',
-                    `Sigur vrei să ${publicProfile.isVerified ? 'elimini' : 'acorzi'} badge-ul de verificare pentru ${publicProfile.firstName}?`,
-                    [
-                      { text: 'Anulează', style: 'cancel' },
-                      {
-                        text: 'Confirmă',
-                        onPress: async () => {
-                          try {
-                            const { toggleUserVerification } = await import('../src/services/verificationService');
-                            await toggleUserVerification(String(publicProfile._id), !publicProfile.isVerified);
-                            Alert.alert('Succes', `Badge ${!publicProfile.isVerified ? 'acordat' : 'eliminat'} cu succes.`);
-                            // Refresh profile
-                            router.replace(`/profile?userId=${publicProfile._id}`);
-                          } catch (error) {
-                            Alert.alert('Eroare', 'Nu s-a putut actualiza badge-ul de verificare.');
-                          }
-                        }
-                      }
-                    ]
-                  );
+                  setConfirmTitle(publicProfile.isVerified ? 'Eliminare Badge' : 'Acordare Badge');
+                  setConfirmMessage(`Sigur vrei să ${publicProfile.isVerified ? 'elimini' : 'acorzi'} badge-ul de verificare pentru ${publicProfile.firstName}?`);
+                  setConfirmIcon(publicProfile.isVerified ? 'close-circle-outline' : 'checkmark-circle-outline');
+                  setConfirmColor(publicProfile.isVerified ? '#F44336' : tokens.colors.primary);
+                  setConfirmAction(() => async () => {
+                    try {
+                      const { toggleUserVerification } = await import('../src/services/verificationService');
+                      await toggleUserVerification(String(publicProfile._id), !publicProfile.isVerified);
+                      showToast(
+                        `Badge ${!publicProfile.isVerified ? 'acordat' : 'eliminat'} cu succes.`,
+                        !publicProfile.isVerified ? 'success' : 'info'
+                      );
+                      // Refresh profile
+                      router.replace(`/profile?userId=${publicProfile._id}`);
+                    } catch (error) {
+                      showToast('Nu s-a putut actualiza badge-ul de verificare.', 'error');
+                    } finally {
+                      setConfirmVisible(false);
+                    }
+                  });
+                  setConfirmVisible(true);
                 }}
                 activeOpacity={0.8}
               >
@@ -1416,11 +1425,21 @@ export default function ProfileScreen() {
       </View>
     )}
 
+    <ConfirmDialog
+      visible={confirmVisible}
+      title={confirmTitle}
+      message={confirmMessage}
+      icon={confirmIcon}
+      confirmColor={confirmColor}
+      onConfirm={() => confirmAction?.()}
+      onCancel={() => setConfirmVisible(false)}
+    />
+
     <Toast
       visible={toastVisible}
       message={toastMessage}
       type={toastType}
-      duration={3000}
+      duration={5000}
       onHide={() => setToastVisible(false)}
     />
     </>

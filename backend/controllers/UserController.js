@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { execFile } = require('child_process');
@@ -6,6 +7,7 @@ const Announcement = require('../models/Announcement');
 const multer = require('multer');
 const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
+const cloudinary = require('../config/cloudinary');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
@@ -850,6 +852,7 @@ const uploadVerificationDocument = async (req, res) => {
 
     const newDocument = {
       url: req.file.path,
+      publicId: req.file.filename || req.file.public_id, // Store Cloudinary public ID
       type,
       name,
       description: description || '',
@@ -906,6 +909,44 @@ const deleteUserDocument = async (req, res) => {
       return res.status(404).json({ error: 'Document negăsit.' });
     }
 
+    const document = user.documents[documentIndex];
+
+    // Delete from Cloudinary if publicId exists or can be extracted from URL
+    let publicIdToDelete = document.publicId;
+    
+    // Fallback: extract publicId from URL if missing (for legacy documents)
+    if (!publicIdToDelete && document.url) {
+      try {
+        // Example URL: https://res.cloudinary.com/demo/image/upload/v12345/hobbiz-documents/sample.jpg
+        // We want: hobbiz-documents/sample
+        const urlParts = document.url.split('/');
+        const fileNameWithExtension = urlParts[urlParts.length - 1];
+        const fileName = fileNameWithExtension.split('.')[0];
+        
+        // Find if there's a folder (like hobbiz-documents)
+        // Usually it's after 'upload/v...' or just 'upload/'
+        const uploadIndex = urlParts.findIndex(part => part === 'upload');
+        if (uploadIndex !== -1) {
+          // Join everything after the version (v12345) until the filename
+          // version is usually the part after 'upload'
+          const folderParts = urlParts.slice(uploadIndex + 2, urlParts.length - 1);
+          publicIdToDelete = folderParts.length > 0 
+            ? `${folderParts.join('/')}/${fileName}` 
+            : fileName;
+        }
+      } catch (err) {
+        console.error('Eroare la extragerea publicId din URL:', err);
+      }
+    }
+
+    if (publicIdToDelete) {
+      try {
+        await cloudinary.uploader.destroy(publicIdToDelete);
+      } catch (cloudinaryError) {
+        console.error('Eroare la eliminarea documentului din Cloudinary:', cloudinaryError);
+      }
+    }
+
     user.documents.splice(documentIndex, 1);
     await user.save();
 
@@ -937,7 +978,7 @@ const getPendingVerifications = async (req, res) => {
 
     res.json({ users: usersWithPendingDocs });
   } catch (error) {
-    console.error('Eroare la obținerea documentelor pendinte:', error);
+    console.error('Eroare la obținerea documentelor în așteptare:', error);
     res.status(500).json({ error: 'Eroare server.' });
   }
 };
@@ -1002,6 +1043,36 @@ const verifyDocument = async (req, res) => {
 
     await user.save();
 
+    // Notificare pentru utilizator despre statusul documentului
+    try {
+      let notificationMessage = '';
+      if (status === 'verified') {
+        notificationMessage = `Documentul tău "${document.title || 'Certificare'}" a fost verificat cu succes.`;
+      } else if (status === 'rejected') {
+        notificationMessage = `Documentul tău "${document.title || 'Certificare'}" a fost respins. Motiv: ${rejectionReason || 'Nu a fost specificat.'}`;
+      }
+
+      if (notificationMessage) {
+        await Notification.create({
+          userId: user._id,
+          message: notificationMessage,
+          link: '/verification-documents'
+        });
+
+        // Emit Socket.IO event
+        const io = req.app.get('io');
+        const activeUsers = req.app.get('activeUsers');
+        if (io && activeUsers) {
+          const sid = activeUsers.get(String(user._id));
+          if (sid) {
+            io.to(sid).emit('newNotification', { userId: String(user._id) });
+          }
+        }
+      }
+    } catch (notifError) {
+      console.error('Eroare la trimiterea notificării de document:', notifError);
+    }
+
     res.json({ 
       message: `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`,
       document
@@ -1036,9 +1107,65 @@ const toggleUserVerification = async (req, res) => {
     } else {
       user.verifiedAt = null;
       user.verifiedBy = null;
+      
+      // Clear documents and remove them from Cloudinary when un-verifying user
+      if (user.documents && user.documents.length > 0) {
+        for (const doc of user.documents) {
+          let idToDelete = doc.publicId;
+          
+          // Legacy fallback
+          if (!idToDelete && doc.url) {
+            try {
+              const urlParts = doc.url.split('/');
+              const fileWithExt = urlParts[urlParts.length - 1];
+              const fName = fileWithExt.split('.')[0];
+              const upIndex = urlParts.findIndex(p => p === 'upload');
+              if (upIndex !== -1) {
+                const fParts = urlParts.slice(upIndex + 2, urlParts.length - 1);
+                idToDelete = fParts.length > 0 ? `${fParts.join('/')}/${fName}` : fName;
+              }
+            } catch (err) {}
+          }
+
+          if (idToDelete) {
+            try {
+              await cloudinary.uploader.destroy(idToDelete);
+            } catch (err) {
+              console.error(`Eroare la ștergerea documentului ${idToDelete} din Cloudinary:`, err);
+            }
+          }
+        }
+        user.documents = [];
+      }
     }
 
     await user.save();
+
+    // Trimite notificare utilizatorului dacă a primit badge-ul
+    if (isVerified) {
+      try {
+        const notificationMessage = 'Felicitări! Contul tău a fost verificat și ai primit badge-ul de utilizator de încredere.';
+        const link = '/profile';
+        
+        await Notification.create({
+          userId: user._id,
+          message: notificationMessage,
+          link: link
+        });
+
+        // Emit Socket.IO event for real-time notification
+        const io = req.app.get('io');
+        const activeUsers = req.app.get('activeUsers');
+        if (io && activeUsers) {
+          const sid = activeUsers.get(String(user._id));
+          if (sid) {
+            io.to(sid).emit('newNotification', { userId: String(user._id) });
+          }
+        }
+      } catch (notifError) {
+        console.error('Eroare la trimiterea notificării de verificare:', notifError);
+      }
+    }
 
     res.json({ 
       message: `Utilizator ${isVerified ? 'verificat' : 'neverificat'} cu succes.`,

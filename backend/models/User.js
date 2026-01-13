@@ -42,6 +42,7 @@ const userSchema = new mongoose.Schema({
   // Professional documents (certificates, diplomas, authorizations, etc.)
   documents: [{
     url: { type: String, required: true },
+    publicId: { type: String },
     type: { type: String, required: true }, // e.g., 'certificate', 'diploma', 'authorization'
     name: { type: String, required: true },
     description: { type: String },

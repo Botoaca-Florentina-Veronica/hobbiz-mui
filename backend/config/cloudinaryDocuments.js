@@ -6,6 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'hobbiz-documents',
+    resource_type: 'auto', // Important: allow PDF and other non-image files
     // Accept images and documents (PDF, Word, etc.)
     allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'txt'],
   },
