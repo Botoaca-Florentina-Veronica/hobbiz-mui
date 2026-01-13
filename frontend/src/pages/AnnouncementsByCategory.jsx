@@ -206,7 +206,7 @@ export default function AnnouncementsByCategory() {
       </div>
       <div className="abc-align-container">
         <Typography variant="h4" className="my-announcements-title" gutterBottom>
-          {category}
+          {translateCategory(category, t)}
         </Typography>
         {/* Searchbar și filtre */}
         <div className="abc-searchbar">
@@ -403,12 +403,7 @@ export default function AnnouncementsByCategory() {
                       <div className="my-announcement-category">{translateCategory(a.category, t)}</div>
                       <div className="my-announcement-location">{a.location}</div>
                       {a.price && (
-                        <div className="my-announcement-price" style={{
-                          color: '#f51866',
-                          fontWeight: 'bold',
-                          fontSize: '1.1rem',
-                          marginTop: '8px'
-                        }}>
+                        <div className="my-announcement-price">
                           {parseFloat(a.price) === 0 ? 'Gratuit' : `${a.price} RON`}
                         </div>
                       )}
@@ -421,15 +416,7 @@ export default function AnnouncementsByCategory() {
                   </div>
                 </div>
                 <div
-                  className="favorite-heart"
-                  style={{
-                    position: 'absolute',
-                    right: 16,
-                    bottom: 16,
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    zIndex: 2
-                  }}
+                  className={`favorite-heart ${(user ? (authFavorites || []).includes(a._id) : favoriteIds.includes(a._id)) ? 'filled' : ''}`}
                   onClick={ev => {
                       ev.stopPropagation();
                       // If user is authenticated, use AuthContext toggle which syncs with backend
@@ -468,13 +455,11 @@ export default function AnnouncementsByCategory() {
                         }
                       });
                     }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   {(user ? (authFavorites || []).includes(a._id) : favoriteIds.includes(a._id)) ? (
-                    <FavoriteIcon sx={{ color: 'red', fontSize: 28 }} />
+                    <FavoriteIcon sx={{ fontSize: 20 }} />
                   ) : (
-                    <FavoriteBorderIcon sx={{ color: '#23484a', fontSize: 28 }} />
+                    <FavoriteBorderIcon sx={{ fontSize: 20 }} />
                   )}
                 </div>
               </div>

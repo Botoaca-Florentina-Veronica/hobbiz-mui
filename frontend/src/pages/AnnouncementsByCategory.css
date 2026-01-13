@@ -61,10 +61,23 @@
 /* Align the page title with the inner `.abc-align-container` so it lines up with searchbar and cards */
 .announcements-by-category .my-announcements-title {
   max-width: 1200px;
-  margin: 0 auto 24px;
+  margin: 16px auto 32px;
   padding: 0 14px;
   box-sizing: border-box;
   text-align: left;
+
+  /* Match Notifications page title styles */
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--abc-text-primary);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Dark mode: use notifications accent color */
+.dark-mode .announcements-by-category .my-announcements-title {
+  color: #f51866;
 }
 
 .announcements-by-category .abc-align-container {
@@ -186,8 +199,8 @@
 /* Grid View */
 .announcements-by-category .favorite-announcements-list.grid-view {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--abc-grid-gap);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
   width: 100%;
   justify-items: start; /* align cards to the left of the grid area */
   margin: 0 auto; /* center the grid within the align container */
@@ -218,6 +231,17 @@
   overflow: hidden;
 }
 
+/* Light-mode: thin black border */
+body:not(.dark-mode) .announcements-by-category .my-announcement-card {
+  border: 1px solid #121212;
+}
+
+/* Dark-mode: white border */
+body.dark-mode .announcements-by-category .my-announcement-card {
+  background: #121212 !important;
+  border: 1px solid #ffffff !important;
+}
+
 /* List View Card Layout */
 .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
   flex-direction: row;
@@ -228,8 +252,9 @@
 
 /* Grid View Card Layout */
 .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-  min-height: 340px;
-  max-width: 320px;
+  min-height: 300px;
+  max-height: 340px;
+  max-width: 280px;
 }
 
 /* Focus State */
@@ -262,7 +287,7 @@
 
 .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
   width: 100%;
-  height: 200px;
+  height: 140px;
   border-radius: var(--abc-radius) var(--abc-radius) 0 0;
 }
 
@@ -296,7 +321,7 @@
 /* 7. CARD CONTENT - INFO
    ---------------------------------------------------------- */
 .announcements-by-category .my-announcement-info {
-  padding: 12px;
+  padding: 12px 12px 14px 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -309,26 +334,27 @@
 
 /* Title */
 .announcements-by-category .my-announcement-title {
-  margin-bottom: 4px;
-  font-weight: 600;
+  margin-bottom: 6px;
+  font-weight: 700;
   display: block;
   overflow: visible;
   max-height: none;
   white-space: normal;
   flex-shrink: 0;
   color: var(--abc-text-primary);
-}
-
-.announcements-by-category .favorite-announcements-list.grid-view .my-announcement-title {
-  max-width: 65%;
-  padding-right: 140px;
+  font-size: 15px;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Category Badge */
 .announcements-by-category .my-announcement-category {
   font-weight: 500;
   color: var(--abc-text-primary);
-  margin-bottom: 3px;
+  margin-bottom: 6px;
   font-size: 12px;
   flex-shrink: 0;
 }
@@ -345,15 +371,19 @@
 .announcements-by-category .my-announcement-location {
   color: var(--abc-text-primary);
   margin-bottom: 3px;
-  font-size: 12px;
+  font-size: 13px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Price */
 .announcements-by-category .my-announcement-price {
   color: var(--abc-text-accent);
-  font-weight: 600;
-  margin-top: auto;
+  font-weight: 700;
+  font-size: 22px;
+  margin-top: 12px;
   flex-shrink: 0;
 }
 
@@ -366,43 +396,60 @@
   padding: 2px 6px;
   font-size: 10px;
   font-weight: 600;
+  flex-shrink: 0;
+  z-index: 2;
+  display: none;
+}
+
+.announcements-by-category .favorite-announcements-list.list-view .my-announcement-id {
+  display: block;
   position: absolute;
   top: 8px;
   right: 8px;
-  flex-shrink: 0;
-  z-index: 2;
 }
 
 /* Favorite Heart */
 .announcements-by-category .favorite-heart {
   position: absolute;
-  bottom: 12px;
+  top: 12px;
   right: 12px;
-  background: transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  z-index: 3;
+  color: var(--abc-text-secondary);
+  background: rgba(255,255,255,0.95);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 2;
 }
 
-.announcements-by-category .favorite-heart:hover {
-  transform: scale(1.1);
+.announcements-by-category .favorite-heart:hover { 
+  transform: translateY(-2px) scale(1.05); 
 }
 
-.dark-mode .announcements-by-category .favorite-heart svg {
-  /* In dark mode, make the favorite heart pink to match the accent color */
-  color: #f51866 !important;
+.announcements-by-category .favorite-heart.filled { 
+  color: #f51866; 
 }
 
-/* Ensure outlined heart (not-favorited) also uses a softer pink tint in dark mode */
-.dark-mode .announcements-by-category .favorite-heart svg path {
-  fill: currentColor !important;
-  stroke: currentColor !important;
+.announcements-by-category .favorite-heart .MuiSvgIcon-root { 
+  font-size: 20px; 
+}
+
+/* Dark Mode Heart Icon Styling */
+.dark-mode .announcements-by-category .favorite-heart {
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .announcements-by-category .favorite-heart:not(.filled) {
+  color: #e0e0e0;
+}
+
+.dark-mode .announcements-by-category .favorite-heart.filled {
+  color: #f51866;
 }
 
 
@@ -413,13 +460,13 @@
 @media (min-width: 1700px) {
   .announcements-by-category .abc-align-container { max-width: 1600px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 380px; max-width: 350px;
+    min-height: 330px; max-width: 100%;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 220px;
+    height: 160px;
   }
   .announcements-by-category .abc-searchbar { padding: 28px; }
   .announcements-by-category .mobile-back-container { display: none; }
@@ -429,13 +476,13 @@
 @media (min-width: 1400px) and (max-width: 1699px) {
   .announcements-by-category .abc-align-container { max-width: 1320px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 360px; max-width: 330px;
+    min-height: 320px; max-width: 100%;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 210px;
+    height: 150px;
   }
   .announcements-by-category .mobile-back-container { display: none; }
 }
@@ -444,13 +491,13 @@
 @media (min-width: 1200px) and (max-width: 1399px) {
   .announcements-by-category .abc-align-container { max-width: 1140px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 350px; max-width: 300px;
+    min-height: 310px; max-width: 100%;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 190px;
+    height: 140px;
   }
   .announcements-by-category .mobile-back-container { display: none; }
 }
@@ -475,13 +522,13 @@
   .announcements-by-category .abc-searchbar { padding: 20px; margin-bottom: 28px; }
   
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 320px; max-width: 100%;
+    min-height: 290px; max-width: 100%;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 180px;
+    height: 130px;
   }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
     margin-bottom: 12px;
@@ -502,13 +549,13 @@
     padding: 18px; margin-bottom: 24px; flex-wrap: wrap;
   }
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 300px;
+    min-height: 280px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 160px;
+    height: 120px;
   }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 40%;
@@ -525,13 +572,13 @@
   .announcements-by-category .abc-searchbar { padding: 16px; margin-bottom: 20px; }
   
   .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 280px;
+    min-height: 260px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 140px;
+    height: 110px;
   }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 45%;

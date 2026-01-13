@@ -56,7 +56,10 @@ export default function ProfilePage() {
     firstName: '',
     lastName: '',
     localitate: '',
-    phone: ''
+    phone: '',
+    website: '',
+    social: '',
+    bio: ''
   });
 
   // Loading & UI states
@@ -117,7 +120,10 @@ export default function ProfilePage() {
           firstName: res.data.firstName || '',
           lastName: res.data.lastName || '',
           localitate: res.data.localitate || '',
-          phone: res.data.phone || ''
+          phone: res.data.phone || '',
+          website: res.data.website || '',
+          social: res.data.social || '',
+          bio: res.data.bio || ''
         });
       } catch (e) {
         setError('profile.messages.errorLoadingProfile');
@@ -188,7 +194,10 @@ export default function ProfilePage() {
       firstName: profile?.firstName || '',
       lastName: profile?.lastName || '',
       localitate: profile?.localitate || '',
-      phone: profile?.phone || ''
+      phone: profile?.phone || '',
+      website: profile?.website || '',
+      social: profile?.social || '',
+      bio: profile?.bio || ''
     });
   };
 
@@ -446,7 +455,23 @@ export default function ProfilePage() {
 
     return (
       <div className="profile-name-section">
-        <h1 className="profile-name-title-unified">{fullName}</h1>
+        <div className="profile-name-header">
+          <div className="profile-name-info">
+            <h1 className="profile-name-title-unified">{fullName}</h1>
+            <div className="profile-verified-badge">
+              <span className="profile-verified-icon">✓</span>
+              <span className="profile-verified-text">{t('profile.verifiedMember')}</span>
+            </div>
+            <div className="profile-member-since">
+              {t('profile.memberSince')} {profile?.createdAt
+                ? new Date(profile.createdAt).getFullYear()
+                : ''}
+            </div>
+          </div>
+          <button className="profile-edit-profile-button" onClick={handleEdit}>
+            {t('profile.editProfile')}
+          </button>
+        </div>
       </div>
     );
   };
@@ -486,7 +511,7 @@ export default function ProfilePage() {
 
   const renderContactField = (icon, label, value) => (
     <div className="contact-row">
-      <div className="contact-icon">{icon}</div>
+      <div className="contact-icon-wrapper">{icon}</div>
       <div className="contact-field">
         <div className="contact-label">{label}</div>
         <div className={`contact-value ${!value ? 'unspecified' : ''}`}>
@@ -499,14 +524,9 @@ export default function ProfilePage() {
   const renderContactReadMode = () => (
     <div className="contact-list">
       {renderContactField(
-        <PersonIcon />,
-        t('profile.lastName'),
-        profile?.lastName
-      )}
-      {renderContactField(
-        <PersonIcon />,
-        t('profile.firstName'),
-        profile?.firstName
+        <EmailIcon />,
+        t('profile.email'),
+        profile?.email
       )}
       {renderContactField(
         <PhoneIcon />,
@@ -514,20 +534,18 @@ export default function ProfilePage() {
         profile?.phone
       )}
       {renderContactField(
-        <EmailIcon />,
-        t('profile.email'),
-        profile?.email
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>,
+        t('profile.website'),
+        profile?.website
       )}
       {renderContactField(
-        <CalendarMonthIcon />,
-        t('profile.memberSince'),
-        profile?.createdAt
-          ? new Date(profile.createdAt).toLocaleDateString(i18n?.language === 'en' ? 'en-US' : 'ro-RO', {
-              year: 'numeric',
-              month: 'long',
-              day: '2-digit'
-            })
-          : null
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>,
+        t('profile.social'),
+        profile?.social
       )}
     </div>
   );
@@ -722,53 +740,7 @@ export default function ProfilePage() {
     </div>
   );
 
-  const renderMobileAnnouncementsCard = () => (
-    <div className="mobile-announcements-card">
-      <div className="mobile-card-header">
-        <h2 className="mobile-card-title">
-          {t('header.myAnnouncements') || 'Anunțurile mele'}
-        </h2>
-        <button
-          className="mobile-view-all-icon"
-          onClick={() => navigate('/my-announcements')}
-          aria-label="Vezi toate"
-        >
-          →
-        </button>
-      </div>
-      <div className="mobile-announcement-stats">
-        <div className="mobile-stat-item">
-          <div className="mobile-stat-value">{userAnnouncements.length}</div>
-          <div className="mobile-stat-label">Active</div>
-        </div>
-        <div className="mobile-stat-divider" />
-        <div className="mobile-stat-item">
-          <div className="mobile-stat-value">{userAnnouncements.length}</div>
-          <div className="mobile-stat-label">Total</div>
-        </div>
-        <div className="mobile-stat-divider" />
-        <div className="mobile-stat-item">
-          <div className="mobile-stat-value">
-            {userAnnouncements.reduce((sum, a) => sum + (a.views || 0), 0)}
-          </div>
-          <div className="mobile-stat-label">Views</div>
-        </div>
-      </div>
-      {announcementsLoading ? (
-        <Box className="mobile-announcements-loading">
-          <CircularProgress size={20} />
-        </Box>
-      ) : userAnnouncements.length === 0 ? (
-        <Box className="mobile-empty-announcements">
-          <p>{t('profile.emptyAnnouncements')}</p>
-        </Box>
-      ) : (
-        <div className="mobile-announcements-horizontal">
-          {userAnnouncements.slice(0, 5).map(renderAnnouncementCard)}
-        </div>
-      )}
-    </div>
-  );
+
 
   const renderInputField = (name, label, icon, placeholder) => (
     <div className="profile-field-container">
@@ -855,6 +827,78 @@ export default function ProfilePage() {
     </>
   );
 
+  const renderProfileStats = () => {
+    const total = userAnnouncements.length;
+    const active = userAnnouncements.filter(a => a.status === 'active').length;
+    const views = userAnnouncements.reduce((sum, a) => sum + (a.views || 0), 0);
+    const viewsFormatted = views > 999 ? `${(views / 1000).toFixed(1)}k` : views;
+
+    return (
+      <div className="profile-stats-card">
+        <h2 className="profile-stats-title">{t('profile.profileStats')}</h2>
+        <div className="profile-stats-list">
+          <div className="profile-stat-row">
+            <div className="profile-stat-left">
+              <div className="profile-stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+              </div>
+              <div className="profile-stat-label">{t('profile.totalListings')}</div>
+            </div>
+            <div className="profile-stat-value-right">{total}</div>
+          </div>
+
+          <div className="profile-stat-row">
+            <div className="profile-stat-left">
+              <div className="profile-stat-icon profile-stat-icon-green">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+              </div>
+              <div className="profile-stat-label">{t('profile.activeSales')}</div>
+            </div>
+            <div className="profile-stat-value-right">{active}</div>
+          </div>
+
+          <div className="profile-stat-row">
+            <div className="profile-stat-left">
+              <div className="profile-stat-icon profile-stat-icon-purple">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+              </div>
+              <div className="profile-stat-label">{t('profile.profileViews')}</div>
+            </div>
+            <div className="profile-stat-value-right">{viewsFormatted}</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAboutMe = () => (
+    <div className="profile-about-card">
+      <h2 className="profile-about-title">{t('profile.aboutMe')}</h2>
+      <p className="profile-about-text">
+        {profile?.bio || (editMode ? (
+          <textarea
+            className="profile-about-textarea"
+            name="bio"
+            value={form.bio || ''}
+            onChange={handleChange}
+            placeholder={t('profile.placeholders.bio')}
+            rows={4}
+          />
+        ) : (
+          t('profile.noBio')
+        ))}
+      </p>
+    </div>
+  );
+
+
+
   const renderContactInfoCard = () => (
     <div className="profile-info-main-card">
       <div className="profile-info-content">
@@ -880,9 +924,10 @@ export default function ProfilePage() {
   const renderAnnouncementsSidebar = () => (
     <div className="profile-right-column">
       <div className="profile-announcements-sidebar">
-        <h3 className="profile-section-title">
-          Anunțurile mele ({userAnnouncements.length})
-        </h3>
+        <div className="profile-announcements-header">
+          <h3 className="profile-section-title">{t('profile.myAnnouncements')} ({userAnnouncements.length})</h3>
+          <button className="profile-view-all-button" onClick={() => navigate('/my-announcements')}>{t('profile.viewAll')}</button>
+        </div>
 
         {announcementsLoading ? (
           <Box className="profile-announcements-loading">
@@ -893,7 +938,19 @@ export default function ProfilePage() {
           <Box className="profile-empty-state">{t('profile.emptyAnnouncements')}</Box>
         ) : (
           <div className="profile-announcements-vertical">
-            {userAnnouncements.map(renderAnnouncementCard)}
+            {userAnnouncements
+              .slice()
+              .sort((a, b) => (b.favoritesCount || 0) - (a.favoritesCount || 0))
+              .slice(0, 3)
+              .map(renderAnnouncementCard)
+            }
+          </div>
+        )}
+        {!announcementsLoading && (
+          <div className="profile-announcements-footer">
+            <button className="profile-create-listing-button" onClick={() => navigate('/add-announcement')}>
+              {t('profile.createNewListing')}
+            </button>
           </div>
         )}
       </div>
@@ -915,12 +972,23 @@ export default function ProfilePage() {
 
       {/* Desktop Layout */}
       <div className="profile-desktop-layout">
-        <div className="profile-two-column-layout profile-no-right">
+        {renderProfileHeader()}
+        <div className="profile-two-column-layout">
           {/* Left column - Main content */}
           <div className="profile-left-column">
-            {renderProfileHeader()}
-            {renderLocationCard()}
-            {renderContactInfoCard()}
+            <div className="profile-left-main">
+              <div className="profile-grid-left">
+                {renderContactInfoCard()}
+                {renderAboutMe()}
+              </div>
+              {renderLocationCard()}
+            </div>
+          </div>
+
+          {/* Right column - Sidebar */}
+          <div className="profile-right-column">
+            {renderProfileStats()}
+            {renderAnnouncementsSidebar()}
           </div>
         </div>
       </div> 
@@ -930,7 +998,6 @@ export default function ProfilePage() {
         {renderMobileProfileHeader()}
         {renderMobileLocationSection()}
         {renderMobileContactCard()}
-        {renderMobileAnnouncementsCard()}
       </div>
 
       {/* Image Crop Modal */}

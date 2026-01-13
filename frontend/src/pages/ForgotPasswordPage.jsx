@@ -25,7 +25,10 @@ export default function ForgotPasswordPage() {
       setInfo(t('auth.resetSent'));
       setStep(2);
     } catch (e) {
-      setError(e?.response?.data?.error || e?.message || t('common.error'));
+      const msg = e?.response?.data?.error || e?.message || t('common.error');
+      window.showToast(msg, 'error');
+      setError('');
+      setInfo('');
     } finally {
       setLoading(false);
     }
@@ -44,7 +47,10 @@ export default function ForgotPasswordPage() {
       window.showToast(t('auth.resetDone'), 'success');
       navigate('/login');
     } catch (e) {
-      setError(e?.response?.data?.error || e?.message || t('common.error'));
+      const msg = e?.response?.data?.error || e?.message || t('common.error');
+      window.showToast(msg, 'error');
+      setError('');
+      setInfo('');
     } finally {
       setLoading(false);
     }

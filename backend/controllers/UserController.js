@@ -441,25 +441,35 @@ const requestPasswordReset = async (req, res) => {
     // Do not leak if the account exists; respond with 200 either way.
     const user = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
 
-    // Generate a 6-digit code
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    const codeHash = crypto.createHash('sha256').update(code).digest('hex');
-
+    // Only proceed if user exists
     if (user) {
+      // Generate a 6-digit code
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const codeHash = crypto.createHash('sha256').update(code).digest('hex');
+
       user.passwordResetCodeHash = codeHash;
       user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
       await user.save();
+
+      // Try to send email
+      try {
+        const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Utilizator';
+        await sendPasswordResetEmail(normalizedEmail, code, userName);
+        console.log(`[PasswordReset] Email sent successfully to ${normalizedEmail}`);
+      } catch (mailErr) {
+        console.error('[PasswordReset] Email send failed:', mailErr?.message || mailErr);
+        // Clear the reset code since we couldn't send the email
+        user.passwordResetCodeHash = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save();
+        return res.status(500).json({ error: 'Nu am putut trimite emailul de resetare. Te rugăm să încerci din nou mai târziu.' });
+      }
+    } else {
+      // User doesn't exist, but don't reveal this fact
+      console.log(`[PasswordReset] No user found for email: ${normalizedEmail}`);
     }
 
-    // If mailer isn't configured, fail explicitly so the client can show a useful message.
-    try {
-      const userName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Utilizator' : 'Utilizator';
-      await sendPasswordResetEmail(normalizedEmail, code, userName);
-    } catch (mailErr) {
-      console.error('[PasswordReset] Email send failed:', mailErr?.message || mailErr);
-      return res.status(500).json({ error: 'Serviciul de email nu este configurat. Încearcă mai târziu.' });
-    }
-
+    // Always return the same message for security (don't leak if account exists)
     return res.json({ message: 'Dacă există un cont cu acest email, vei primi un cod de resetare.' });
   } catch (error) {
     console.error('Eroare la requestPasswordReset:', error);

@@ -81,7 +81,13 @@ export default function PromoSection() {
                 className={`promo-card ${isVisible ? 'visible' : ''}`}
                 style={style}
               >
-                <img src={src} alt={`Device view ${index + 1}`} />
+                <img
+                  src={src}
+                  alt={`Device view ${index + 1}`}
+                  draggable={false}
+                  onDragStart={(e) => e.preventDefault()}
+                  onContextMenu={(e) => e.preventDefault()}
+                />
               </div>
             );
           })}

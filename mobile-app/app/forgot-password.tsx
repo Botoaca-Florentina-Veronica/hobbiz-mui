@@ -38,6 +38,11 @@ export default function ForgotPasswordScreen() {
   const [info, setInfo] = useState('');
   const [error, setError] = useState('');
   
+  // Toast state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success'|'error'|'info'>('error');
+
   // Success modal state
   const [successModalVisible, setSuccessModalVisible] = useState(false);
 
@@ -97,7 +102,12 @@ export default function ForgotPasswordScreen() {
       setInfo(copy.sent);
       setStep(2);
     } catch (e: any) {
-      setError(e?.response?.data?.error || e?.message || 'Eroare');
+      const msg = e?.response?.data?.error || e?.message || 'Eroare';
+      setToastMessage(msg);
+      setToastType('error');
+      setToastVisible(true);
+      setError('');
+      setInfo('');
     } finally {
       setLoading(false);
     }
@@ -115,7 +125,12 @@ export default function ForgotPasswordScreen() {
       });
       setSuccessModalVisible(true);
     } catch (e: any) {
-      setError(e?.response?.data?.error || e?.message || 'Eroare');
+      const msg = e?.response?.data?.error || e?.message || 'Eroare';
+      setToastMessage(msg);
+      setToastType('error');
+      setToastVisible(true);
+      setError('');
+      setInfo('');
     } finally {
       setLoading(false);
     }
@@ -249,6 +264,13 @@ export default function ForgotPasswordScreen() {
       </ScrollView>
 
       {/* Success Modal */}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
+      />
+
       <Modal
         visible={successModalVisible}
         transparent

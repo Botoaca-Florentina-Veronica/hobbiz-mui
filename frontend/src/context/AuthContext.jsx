@@ -21,10 +21,30 @@ export const AuthProvider = ({ children }) => {
   const [fullFavorites, setFullFavorites] = useState([]); // obiecte populate
   const [loading, setLoading] = useState(true);
   const lastHydrateRef = useRef(0);
+  
+  // Ref pentru a urmări acțiunile "în zbor" (optimistic toggle)
+  // Cheie: announcementId, Valoare: 'added' | 'removed'
+  const pendingTogglesRef = useRef(new Map());
+  
+  // Ref pentru a ignora socket events "vechi" după ce am făcut un toggle cu succes
+  // După un toggle API reușit, setez acest timestamp și ignor socket events mai vechi
+  const ignoreSocketEventsUntilRef = useRef(0);
 
   // Obține userId curent pentru socket după ce user este setat
   const userId = user?._id;
   const { on, off } = useSocket(userId || null);
+
+  // Helper pentru a aplica pending toggles peste o listă venită de la server
+  const applyPendingToggles = useCallback((serverIds) => {
+    if (pendingTogglesRef.current.size === 0) return serverIds;
+    
+    const set = new Set(serverIds);
+    pendingTogglesRef.current.forEach((action, id) => {
+      if (action === 'added') set.add(id);
+      else if (action === 'removed') set.delete(id);
+    });
+    return Array.from(set);
+  }, []);
 
   const hydrate = useCallback(async (opts = {}) => {
     const now = Date.now();
@@ -32,13 +52,35 @@ export const AuthProvider = ({ children }) => {
     if (!opts.force && now - lastHydrateRef.current < 3000) return;
     lastHydrateRef.current = now;
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
     if (!token) {
       setUser(null);
-      setFavorites([]);
+      
+      // Guest logic: load from localStorage
+      try {
+        const local = localStorage.getItem('favoriteAnnouncements_guest');
+        if (local) {
+          const parsed = JSON.parse(local);
+          // Standardize to array of IDs
+          if (Array.isArray(parsed)) {
+            const ids = parsed.map(item => (typeof item === 'object' && item !== null ? item.id : item));
+            setFavorites(ids);
+          } else {
+             setFavorites([]);
+          }
+        } else {
+          setFavorites([]);
+        }
+      } catch (err) {
+        console.warn('Error parsing guest favorites:', err);
+        setFavorites([]);
+      }
+
       setFullFavorites([]);
       setLoading(false);
       return;
     }
+    
     try {
       const [profileRes, favRes] = await Promise.all([
         getProfile(),
@@ -46,8 +88,13 @@ export const AuthProvider = ({ children }) => {
       ]);
       const profile = profileRes.data;
       const favData = favRes.data || {};
+      
       setUser(profile);
-      setFavorites(favData.favoriteIds || []);
+      
+      // Aplică pending toggles peste ce vine de la server ca să nu facă revert la UI
+      const finalIds = applyPendingToggles(favData.favoriteIds || []);
+      setFavorites(finalIds);
+      
       setFullFavorites(favData.favorites || []);
     } catch (e) {
       console.warn('Hydrate failed:', e.response?.data || e.message);
@@ -60,7 +107,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applyPendingToggles]);
 
   // Hydrate inițial
   useEffect(() => {
@@ -74,13 +121,22 @@ export const AuthProvider = ({ children }) => {
     };
     const handleFocus = () => hydrate();
     const handleOnline = () => hydrate();
+    const handleStorage = (e) => {
+       // Dacă se modifică cheia favoriteAnnouncements_guest în alt tab si nu suntem logați
+       if (e.key === 'favoriteAnnouncements_guest' && !localStorage.getItem('token')) {
+          hydrate();
+       }
+    };
+
     window.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('focus', handleFocus);
     window.addEventListener('online', handleOnline);
+    window.addEventListener('storage', handleStorage);
     return () => {
       window.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('online', handleOnline);
+      window.removeEventListener('storage', handleStorage);
     };
   }, [hydrate]);
 
@@ -97,9 +153,18 @@ export const AuthProvider = ({ children }) => {
     if (!userId) return; // așteaptă user autentificat
 
     const handleFavoritesUpdated = (payload) => {
+      // Ignora socket events dacă recent am făcut un toggle confirm la server
+      // Asta previne ca datele "vechi" din socket să rescrie starea nou-actualizată
+      if (Date.now() < ignoreSocketEventsUntilRef.current) {
+        console.debug('Ignoring stale socket event');
+        return;
+      }
+
       // payload: { favoriteIds? } - dacă nu există, facem hydrate complet
       if (payload?.favoriteIds) {
-        setFavorites(payload.favoriteIds);
+        // Din nou, protejăm modificările "în zbor"
+        const finalIds = applyPendingToggles(payload.favoriteIds);
+        setFavorites(finalIds);
         window.dispatchEvent(new Event('favorites:updated'));
       } else {
         hydrate();
@@ -121,25 +186,83 @@ export const AuthProvider = ({ children }) => {
       off('announcementCreated', handleAnnouncementCreated);
       off('announcementDeleted', handleAnnouncementDeleted);
     };
-  }, [userId, on, off, hydrate]);
+  }, [userId, on, off, hydrate, applyPendingToggles]);
 
-  // Toggle favorite (optimistic)
+  // Toggle favorite (optimistic + support guest + pending logic)
   const toggleFavorite = async (announcementId) => {
-    if (!user) return { error: 'Neautentificat' };
     const isFav = favorites.includes(announcementId);
-    // Optimistic update
-    setFavorites((prev) => isFav ? prev.filter(id => id !== announcementId) : [...prev, announcementId]);
+    
+    // Urmărim acțiunea
+    pendingTogglesRef.current.set(announcementId, isFav ? 'removed' : 'added');
+
+    // 1. Optimistic Update State
+    setFavorites((prev) => {
+      return isFav ? prev.filter(id => id !== announcementId) : [...prev, announcementId];
+    });
+
+    // 2. Persist
+    if (!user) {
+      // Guest logic (no API call, just local storage sync)
+      try {
+        const local = localStorage.getItem('favoriteAnnouncements_guest');
+        let parsed = [];
+        if (local) {
+           parsed = JSON.parse(local);
+           if (!Array.isArray(parsed)) parsed = [];
+        }
+
+        if (isFav) {
+          // Remove
+          parsed = parsed.filter(item => {
+             const id = (typeof item === 'object' && item) ? item.id : item;
+             return id !== announcementId;
+          });
+        } else {
+          // Add
+          // Check duplicate
+          const exists = parsed.some(item => {
+              const id = (typeof item === 'object' && item) ? item.id : item;
+              return id === announcementId;
+          });
+          if (!exists) {
+             parsed.push({ id: announcementId, addedAt: new Date() });
+          }
+        }
+        localStorage.setItem('favoriteAnnouncements_guest', JSON.stringify(parsed));
+        window.dispatchEvent(new Event('favorites:updated'));
+      } catch (e) {
+        console.error("Error updating guest favorites", e);
+      }
+      // Guest calls are "instant", clean up pending immediately
+      pendingTogglesRef.current.delete(announcementId);
+      return;
+    }
+
+    // Logic pentru User Autentificat (API)
     try {
       if (isFav) {
         await apiClient.delete(`/api/favorites/${announcementId}`);
       } else {
         await apiClient.post(`/api/favorites/${announcementId}`);
       }
-      // Optionally refresh counts for that announcement elsewhere
+
+      // API success! Semnalizez că recent am schimbat ceva, deci ignor socket events
+      // Astea "vechi" pt următoarele 800ms. Asta previne race condition unde serverul
+      // emite stare cached/veche pe socket înainte de a vedea schimbarea.
+      ignoreSocketEventsUntilRef.current = Date.now() + 800;
+      
+      // Acum curăț pending și emit pentru ca paginile dependente să se reîncarchie (daca nu e socket)
+      pendingTogglesRef.current.delete(announcementId);
       window.dispatchEvent(new Event('favorites:updated'));
     } catch (e) {
       // Revert on error
-      setFavorites((prev) => prev);
+      console.error("Favorites toggle error", e);
+      pendingTogglesRef.current.delete(announcementId);
+      
+      setFavorites((prev) => {
+         // Logic invers pentru revert
+         return isFav ? [...prev, announcementId] : prev.filter(id => id !== announcementId);
+      });
       return { error: e.response?.data?.error || 'Eroare la actualizare favorite' };
     }
   };

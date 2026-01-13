@@ -25,7 +25,8 @@ import {
   FilterList as FilterIcon,
   GridView as GridViewIcon,
   ViewList as ListViewIcon,
-  ArrowBack as ArrowBackIcon
+  ArrowBack as ArrowBackIcon,
+  LocationOn as LocationOnIcon
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -299,6 +300,23 @@ export default function AllAnnouncements() {
   // ============================================
   const isDarkMode = document.body.classList.contains('dark-mode');
 
+  // Helper: human-readable relative time (e.g., '2h ago', '3d ago')
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    const diff = Math.max(0, now - then);
+    const minutes = Math.floor(diff / (1000 * 60));
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' });
+  };
+
   // ============================================
   // RENDER
   // ============================================
@@ -496,37 +514,16 @@ export default function AllAnnouncements() {
                       <div className="favorite-announcement-img placeholder" />
                     )}
                   </div>
+                  <div className={`favorite-heart ${favoriteIds.includes(announcement._id) ? 'filled' : ''}`} onClick={ev => { ev.stopPropagation(); handleToggleFavorite(announcement._id, ev); }}>
+                    {favoriteIds.includes(announcement._id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                  </div>
                   <div className="favorite-announcement-info">
-                    <div className="favorite-info-top">
-                      <span className="favorite-date">
-                        {announcement.createdAt
-                          ? new Date(announcement.createdAt).toLocaleDateString('ro-RO', {
-                            day: '2-digit',
-                            month: 'long',
-                            year: 'numeric'
-                          })
-                          : ''}
-                      </span>
-                      <div
-                        className={`favorite-heart ${favoriteIds.includes(announcement._id) ? 'filled' : ''}`}
-                        onClick={ev => {
-                          ev.stopPropagation();
-                          handleToggleFavorite(announcement._id, ev);
-                        }}
-                      >
-                        {favoriteIds.includes(announcement._id) ? (
-                          <FavoriteIcon />
-                        ) : (
-                          <FavoriteBorderIcon />
-                        )}
-                      </div>
-                    </div>
                     <h2 className="favorite-announcement-title">{announcement.title}</h2>
                     <div className="favorite-announcement-category">{translateCategory(announcement.category, t)}</div>
-                    <div className="favorite-announcement-location">{announcement.location}</div>
-                    {announcement.price && (
-                      <div className="favorite-price">{announcement.price} RON</div>
-                    )}
+                    <div className="favorite-meta">
+                      <div className="favorite-announcement-location"><LocationOnIcon className="meta-location-icon" />{announcement.location}</div>
+                      <span className="favorite-date">{timeAgo(announcement.createdAt)}</span>
+                    </div>
                   </div>
                 </div>
               ))}

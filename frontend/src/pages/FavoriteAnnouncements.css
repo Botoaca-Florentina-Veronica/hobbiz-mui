@@ -6,16 +6,16 @@
    ---------------------------------------------------------- */
 :root {
   /* Dimensiuni & Layout */
-  --fav-card-width: 280px;
-  --fav-card-radius: 12px;
+  --fav-card-width: 300px;
+  --fav-card-radius: 18px;
   
   /* Culori Light Mode (Default) */
   --fav-bg-card: #ffffff;
-  --fav-border: transparent; /* sau 1px solid transparent dacă e cazul */
-  --fav-shadow: 0 2px 12px rgba(63,63,63,0.12);
-  --fav-shadow-hover: 0 4px 18px rgba(63,63,63,0.18);
+  --fav-border: 1px solid rgba(0,0,0,0.06);
+  --fav-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  --fav-shadow-hover: 0 8px 24px rgba(0,0,0,0.08);
   
-  --fav-text-title: #3f3f3f;
+  --fav-text-title: #183642;
   --fav-text-category: #575757;
   --fav-text-meta: #717171; /* Locație, Dată */
   --fav-text-price: #3f3f3f; /* Desktop default */
@@ -26,7 +26,7 @@
   /* Mobile Header specific */
   --fav-mobile-header-text: var(--chat-text, #3f3f3f);
   --fav-mobile-btn-bg: var(--chat-elev, #f5f5f5);
-}
+} 
 
 /* Dark Mode Overrides */
 .dark-mode {
@@ -89,11 +89,13 @@
   border: var(--fav-border);
   border-radius: var(--fav-card-radius);
   box-shadow: var(--fav-shadow);
-  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .favorite-announcement-card:hover {
+  transform: translateY(-6px);
   box-shadow: var(--fav-shadow-hover);
 }
 /* Dark mode border hover specific */
@@ -101,16 +103,16 @@
   border-color: var(--fav-border-hover-color);
 }
 
-/* Light-mode: match AnnouncementDetails — thin black border on favorite cards */
+/* Light-mode: subtle border on favorite cards */
 body:not(.dark-mode) .favorite-announcement-card {
-  border: 1px solid #121212;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
 /* Dark-mode: ensure favorite cards use dark surface and white border */
 body.dark-mode .favorite-announcement-card {
   background: #121212 !important;
-  border: 1px solid #ffffff !important;
-}
+  border: 1px solid rgba(255,255,255,0.08) !important;
+} 
 
 
 /* 3. ELEMENTE INTERNE CARD
@@ -126,11 +128,12 @@ body.dark-mode .favorite-announcement-card {
 
 .favorite-announcement-img {
   width: 100%;
-  height: 140px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 8px;
   display: block;
-}
+  border-top-left-radius: var(--fav-card-radius);
+  border-top-right-radius: var(--fav-card-radius);
+} 
 
 .favorite-announcement-img.placeholder {
   background: #ffebf0;
@@ -138,10 +141,11 @@ body.dark-mode .favorite-announcement-card {
 
 /* Info Container */
 .favorite-announcement-info {
-  padding: 10px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
+  gap: 6px;
 }
 
 .favorite-info-top {
@@ -151,42 +155,49 @@ body.dark-mode .favorite-announcement-card {
   margin-bottom: 4px;
 }
 
-/* Heart Icon - Poziționare Desktop (Absolută) */
+/* Heart Icon - Poziționare Desktop (Absolută) */ 
 .favorite-heart {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
+  top: 12px;
+  right: 12px;
   cursor: pointer;
-  transition: transform 0.2s;
-  z-index: 2;
+  transition: transform 0.18s ease;
+  z-index: 3;
   color: var(--fav-icon-heart);
-  /* Resetări pentru a preveni stiluri moștenite nedorite */
-  background: transparent;
-  border: none;
+  background: #ffffff;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.04);
   padding: 0;
 }
 
-.favorite-heart:hover { transform: scale(1.2); }
-.favorite-heart.filled { color: var(--fav-icon-heart-filled); }
-.favorite-heart .MuiSvgIcon-root { font-size: 32px; }
+.favorite-heart:hover { transform: scale(1.05); }
+.favorite-heart.filled { color: var(--fav-icon-heart-filled); background: #ffffff; box-shadow: 0 6px 20px rgba(245,24,102,0.08); }
+.favorite-heart .MuiSvgIcon-root { font-size: 22px; } 
 
 /* Typography */
 .favorite-announcement-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 6px 0 6px 0;
   color: var(--fav-text-title);
+  line-height: 1.2;
 }
 
 .favorite-announcement-category {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--fav-text-category);
   margin-bottom: 4px;
 }
 
 .favorite-announcement-location {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--fav-text-meta);
   margin-bottom: 4px;
 }
