@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '../components/themed-view';
+import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar, FlatList, Text, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -95,14 +95,7 @@ export default function ProfileScreen() {
       saveInfo: 'Informațiile au fost actualizate',
       saveFailed: 'Nu s-au putut actualiza informațiile. Încearcă din nou',
       cancelBtn: 'Anulează',
-      saveBtn: 'Salvează',
-      error: 'Eroare',
-      imageSelectError: 'A apărut o eroare la selectarea imaginii',
-      reactionSaveError: 'Nu s-a putut salva reacția. Încearcă din nou.',
-      authRequiredLike: 'Autentificare necesară',
-      authRequiredUnlike: 'Autentificare necesară',
-      authMessageLike: 'Trebuie să fii conectat pentru a da like.',
-      authMessageUnlike: 'Trebuie să fii conectat pentru a da unlike.'
+      saveBtn: 'Salvează'
     },
     en: {
       permissionTitle: 'Permission',
@@ -133,14 +126,7 @@ export default function ProfileScreen() {
       saveInfo: 'Information updated',
       saveFailed: 'Could not update information. Please try again',
       cancelBtn: 'Cancel',
-      saveBtn: 'Save',
-      error: 'Error',
-      imageSelectError: 'An error occurred while selecting the image',
-      reactionSaveError: 'Could not save the reaction. Please try again.',
-      authRequiredLike: 'Authentication required',
-      authRequiredUnlike: 'Authentication required',
-      authMessageLike: 'You must be logged in to like.',
-      authMessageUnlike: 'You must be logged in to unlike.'
+      saveBtn: 'Save'
     }
   };
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
@@ -340,16 +326,23 @@ export default function ProfileScreen() {
 
   const handlePickAvatar = async () => {
     try {
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (permission.status !== 'granted') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
         Alert.alert(t.permissionTitle, t.permissionGallery);
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.8, allowsEditing: true });
-      // expo-image-picker v13 returns { canceled, assets }
-      if ((result as any).canceled) return;
-      const asset: any = (result as any).assets ? (result as any).assets[0] : result;
+      const result = await ImagePicker.launchImageLibraryAsync({ 
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+        quality: 0.8, 
+        allowsEditing: true,
+        allowsMultipleSelection: false
+      });
+      
+      // expo-image-picker v17+ returns { canceled, assets }
+      if (result.canceled) return;
+      
+      const asset = result.assets && result.assets[0];
       if (!asset || !asset.uri) return;
 
       // Ask for confirmation before uploading
@@ -366,13 +359,20 @@ export default function ProfileScreen() {
               const fileName = asset.fileName || uri.split('/').pop() || `avatar_${Date.now()}.jpg`;
               const extMatch = /\.([a-zA-Z0-9]+)$/.exec(fileName);
               const ext = extMatch ? extMatch[1] : 'jpg';
-              const mimeType = asset.type ? `${asset.type}/${ext}` : `image/${ext}`;
+              const mimeType = asset.mimeType || (asset.type ? `${asset.type}/${ext}` : `image/${ext}`);
               const form = new FormData();
-              // @ts-ignore
-              form.append('avatar', { uri, name: fileName, type: mimeType });
-                try {
+              // @ts-ignore - FormData in React Native accepts this format
+              form.append('avatar', { 
+                uri, 
+                name: fileName, 
+                type: mimeType 
+              });
+              
+              try {
                 setAvatarUploading(true);
-                const res = await api.post('/api/users/avatar', form as any, { headers: { 'Content-Type': 'multipart/form-data' } });
+                const res = await api.post('/api/users/avatar', form as any, { 
+                  headers: { 'Content-Type': 'multipart/form-data' } 
+                });
                 // server should return the updated avatar URL; fall back to local uri
                 const newAvatar = res?.data?.avatar || res?.data?.url || uri;
                 setCurrentAvatar(newAvatar);
@@ -400,7 +400,7 @@ export default function ProfileScreen() {
       );
     } catch (err) {
       console.error('handlePickAvatar error:', err);
-      Alert.alert(t.error, t.imageSelectError);
+      Alert.alert('Eroare', 'A apărut o eroare la selectarea imaginii');
     }
   };
 
@@ -582,14 +582,14 @@ export default function ProfileScreen() {
         likesCount: prevCounts.likesCount || 0,
         unlikesCount: prevCounts.unlikesCount || 0,
       } : r));
-      Alert.alert(t.error, t.reactionSaveError);
+      Alert.alert('Eroare', 'Nu s-a putut salva reacția. Încearcă din nou.');
     }
   };
 
   // Handle like toggle for a review (uses unified endpoint)
   const handleToggleLike = async (reviewId: string) => {
     if (!user?.id) {
-      Alert.alert(t.authRequiredLike, t.authMessageLike);
+      Alert.alert('Autentificare necesară', 'Trebuie să fii conectat pentru a da like.');
       return;
     }
     const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };
@@ -600,13 +600,15 @@ export default function ProfileScreen() {
   // Handle unlike toggle for a review (uses unified endpoint)
   const handleToggleUnlike = async (reviewId: string) => {
     if (!user?.id) {
-      Alert.alert(t.authRequiredUnlike, t.authMessageUnlike);
+      Alert.alert('Autentificare necesară', 'Trebuie să fii conectat pentru a da unlike.');
       return;
     }
     const currentState = reviewLikeState[reviewId] || { liked: false, unliked: false };
     const desired: 'like' | 'unlike' | 'none' = currentState.unliked ? 'none' : 'unlike';
     await setReviewReaction(reviewId, desired);
   };
+
+  const scrollStyle = Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 };
 
   return (
     <>
@@ -616,7 +618,7 @@ export default function ProfileScreen() {
         translucent={true}
       />
       <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-        <ScrollView style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView style={scrollStyle} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header with back button and title */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -679,6 +681,11 @@ export default function ProfileScreen() {
 
             <ThemedText style={[styles.userName, { color: tokens.colors.text }]}>
               {profileToShow?.firstName && profileToShow?.lastName ? `${profileToShow.firstName} ${profileToShow.lastName}` : 'Utilizator'}
+              {profileToShow?.isVerified && (
+                <View style={{ marginLeft: 6, position: 'relative', top: 2 }}>
+                  <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+                </View>
+              )}
             </ThemedText>
             
             <ThemedText style={[styles.registerDate, { color: tokens.colors.muted }]}>
@@ -706,9 +713,14 @@ export default function ProfileScreen() {
               (() => {
                 const encoded = encodeURIComponent(profileToShow.localitate);
                 const key = (Constants?.expoConfig?.extra?.VITE_GOOGLE_MAPS_KEY as string) || (Constants?.manifest?.extra?.VITE_GOOGLE_MAPS_KEY as string) || process.env?.EXPO_PUBLIC_GOOGLE_MAPS_KEY || process.env?.VITE_GOOGLE_MAPS_KEY;
-                const mapUrl = key
-                  ? `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encoded}`
+                // Use embed API on web only; native uses maps.google.com embed to avoid referrer/API issues
+                const mapUrl = Platform.OS === 'web'
+                  ? (key ? `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encoded}` : `https://maps.google.com/maps?q=${encoded}&z=15&output=embed`)
                   : `https://maps.google.com/maps?q=${encoded}&z=15&output=embed`;
+
+                if (key && Platform.OS !== 'web') {
+                  console.warn('[profile] Google Maps API key is set but will not be used on native WebView to avoid referrer/billing issues.');
+                }
 
                 if (Platform.OS === 'web') {
                   return (
@@ -721,6 +733,8 @@ export default function ProfileScreen() {
                 try {
                   // eslint-disable-next-line @typescript-eslint/no-var-requires
                   const { WebView } = require('react-native-webview');
+
+                  // Create HTML with iframe for Google Maps Embed API
                   const htmlContent = `
                     <!DOCTYPE html>
                     <html>
@@ -747,7 +761,7 @@ export default function ProfileScreen() {
                         javaScriptEnabled
                         domStorageEnabled
                         renderLoading={() => (
-                          <View style={[styles.locationMapPlaceholder, { backgroundColor: tokens.colors.elev }]}>
+                          <View style={[styles.locationMapPlaceholder, { backgroundColor: tokens.colors.elev }]}> 
                             <ActivityIndicator size="small" color={tokens.colors.primary} />
                           </View>
                         )}
@@ -901,6 +915,130 @@ export default function ProfileScreen() {
             </View>
           )}
         </View>
+
+        {/* Verification Documents Section (Only for own profile or if admin) */}
+        {isViewingOwnProfile && user && (
+          <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
+            <View style={styles.dashboardHeader}>
+              <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>
+                Verificare Profesională
+              </ThemedText>
+            </View>
+
+            <View style={{ padding: 16 }}>
+              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted, marginBottom: 16 }]}>
+                Încarcă documente care atestă abilitățile tale profesionale pentru a primi un badge de verificare pe profil.
+              </ThemedText>
+              
+              <TouchableOpacity
+                style={[styles.editButton, { backgroundColor: tokens.colors.primary, borderWidth: 0, width: '100%' }]}
+                onPress={() => router.push('/verification-documents')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="document-text" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
+                  Gestionează Documente
+                </ThemedText>
+              </TouchableOpacity>
+
+              {/* Admin Button */}
+              {user?.isAdmin && (
+                <TouchableOpacity
+                  style={[styles.editButton, { backgroundColor: '#FF9800', borderWidth: 0, width: '100%', marginTop: 12 }]}
+                  onPress={() => router.push('/admin-verifications')}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="shield-checkmark" size={18} color="#fff" style={{ marginRight: 8 }} />
+                  <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
+                    Panou Admin Verificări
+                  </ThemedText>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* Admin Controls - Show when viewing another user's profile */}
+        {!isViewingOwnProfile && user?.isAdmin && publicProfile && (
+          <View style={[styles.dashboardCard, { backgroundColor: isDark ? '#2C1810' : '#FFF3E0', ...containerBorderStyle, borderColor: '#FF9800', borderWidth: 2 }]}>
+            <View style={styles.dashboardHeader}>
+              <Ionicons name="shield-checkmark" size={24} color="#FF9800" style={{ marginRight: 8 }} />
+              <ThemedText style={[styles.dashboardTitle, { color: '#FF9800' }]}>
+                Controale Administrator
+              </ThemedText>
+            </View>
+
+            <View style={{ padding: 16 }}>
+              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted, marginBottom: 16 }]}>
+                Gestionează verificarea și documentele pentru {publicProfile.firstName} {publicProfile.lastName}
+              </ThemedText>
+              
+              {/* Toggle Verification Badge */}
+              <TouchableOpacity
+                style={[styles.editButton, { 
+                  backgroundColor: publicProfile.isVerified ? '#F44336' : '#4CAF50', 
+                  borderWidth: 0, 
+                  width: '100%' 
+                }]}
+                onPress={async () => {
+                  Alert.alert(
+                    'Confirmare',
+                    `Sigur vrei să ${publicProfile.isVerified ? 'elimini' : 'acorzi'} badge-ul de verificare pentru ${publicProfile.firstName}?`,
+                    [
+                      { text: 'Anulează', style: 'cancel' },
+                      {
+                        text: 'Confirmă',
+                        onPress: async () => {
+                          try {
+                            const { toggleUserVerification } = await import('../src/services/verificationService');
+                            await toggleUserVerification(String(publicProfile._id), !publicProfile.isVerified);
+                            Alert.alert('Succes', `Badge ${!publicProfile.isVerified ? 'acordat' : 'eliminat'} cu succes.`);
+                            // Refresh profile
+                            router.replace(`/profile?userId=${publicProfile._id}`);
+                          } catch (error) {
+                            Alert.alert('Eroare', 'Nu s-a putut actualiza badge-ul de verificare.');
+                          }
+                        }
+                      }
+                    ]
+                  );
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name={publicProfile.isVerified ? "close-circle" : "checkmark-circle"} size={18} color="#fff" style={{ marginRight: 8 }} />
+                <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
+                  {publicProfile.isVerified ? 'Elimină Verificare' : 'Acordă Verificare'}
+                </ThemedText>
+              </TouchableOpacity>
+
+              {/* View User Documents */}
+              <TouchableOpacity
+                style={[styles.editButton, { backgroundColor: '#2196F3', borderWidth: 0, width: '100%', marginTop: 12 }]}
+                onPress={() => {
+                  router.push(`/verification-documents?userId=${publicProfile._id}&adminView=true`);
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="documents" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
+                  Vezi Documente Utilizator
+                </ThemedText>
+              </TouchableOpacity>
+
+              {/* Go to Admin Panel */}
+              <TouchableOpacity
+                style={[styles.editButton, { backgroundColor: '#FF9800', borderWidth: 0, width: '100%', marginTop: 12 }]}
+                onPress={() => router.push('/admin-verifications')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="settings" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
+                  Panou Admin Complet
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {/* Reviews Dashboard */}
   <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>

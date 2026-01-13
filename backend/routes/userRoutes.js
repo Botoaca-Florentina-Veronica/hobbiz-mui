@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
-const { register, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken } = require('../controllers/UserController');
+const { register, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
 router.delete('/avatar', auth, deleteAvatar);
@@ -55,5 +56,18 @@ router.get('/auth/check', auth, async (req, res) => {
 // Push token endpoints - store / remove Expo push token for authenticated user
 router.post('/push-token', auth, setPushToken);
 router.delete('/push-token', auth, deletePushToken);
+
+// --- VERIFICATION SYSTEM ROUTES ---
+
+// User routes - upload and manage their own documents
+router.post('/documents', auth, upload.single('document'), uploadVerificationDocument);
+router.get('/documents', auth, getUserDocuments);
+router.delete('/documents/:documentId', auth, deleteUserDocument);
+
+// Admin routes - view and verify documents
+router.get('/admin/verifications/pending', auth, adminAuth, getPendingVerifications);
+router.get('/admin/users/:userId/documents', auth, adminAuth, getUserDocumentsAdmin);
+router.put('/admin/users/:userId/documents/:documentId/verify', auth, adminAuth, verifyDocument);
+router.put('/admin/users/:userId/verification-badge', auth, adminAuth, toggleUserVerification);
 
 module.exports = router;

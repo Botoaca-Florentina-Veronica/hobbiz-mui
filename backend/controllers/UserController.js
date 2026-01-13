@@ -90,6 +90,13 @@ const deleteCover = async (req, res) => {
 const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 const escapeRegex = (str='') => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// Validare simplă a formatului email-ului
+const validateEmail = (email) => {
+  if (!email) return false;
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
+
 // --- MAILERSEND EMAIL HELPER ---
 async function sendPasswordResetEmail(to, code, userName = 'Utilizator') {
   if (!process.env.MAILERSEND_API_KEY || !process.env.SENDER_EMAIL) {
@@ -438,39 +445,34 @@ const requestPasswordReset = async (req, res) => {
       return res.status(400).json({ error: 'Emailul este obligatoriu' });
     }
 
-    // Do not leak if the account exists; respond with 200 either way.
-    const user = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
-
-    // Only proceed if user exists
-    if (user) {
-      // Generate a 6-digit code
-      const code = String(Math.floor(100000 + Math.random() * 900000));
-      const codeHash = crypto.createHash('sha256').update(code).digest('hex');
-
-      user.passwordResetCodeHash = codeHash;
-      user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
-      await user.save();
-
-      // Try to send email
-      try {
-        const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Utilizator';
-        await sendPasswordResetEmail(normalizedEmail, code, userName);
-        console.log(`[PasswordReset] Email sent successfully to ${normalizedEmail}`);
-      } catch (mailErr) {
-        console.error('[PasswordReset] Email send failed:', mailErr?.message || mailErr);
-        // Clear the reset code since we couldn't send the email
-        user.passwordResetCodeHash = undefined;
-        user.passwordResetExpires = undefined;
-        await user.save();
-        return res.status(500).json({ error: 'Nu am putut trimite emailul de resetare. Te rugăm să încerci din nou mai târziu.' });
-      }
-    } else {
-      // User doesn't exist, but don't reveal this fact
-      console.log(`[PasswordReset] No user found for email: ${normalizedEmail}`);
+    if (!validateEmail(normalizedEmail)) {
+      return res.status(400).json({ error: 'Email invalid' });
     }
 
-    // Always return the same message for security (don't leak if account exists)
-    return res.json({ message: 'Dacă există un cont cu acest email, vei primi un cod de resetare.' });
+    // Find the user; return explicit error if not found so the client can show it
+    const user = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
+    if (!user) {
+      return res.status(404).json({ error: 'Nu există niciun cont înregistrat cu acest email' });
+    }
+
+    // Generate a 6-digit code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const codeHash = crypto.createHash('sha256').update(code).digest('hex');
+
+    user.passwordResetCodeHash = codeHash;
+    user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+
+    // If mailer isn't configured, fail explicitly so the client can show a useful message.
+    try {
+      const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Utilizator';
+      await sendPasswordResetEmail(normalizedEmail, code, userName);
+    } catch (mailErr) {
+      console.error('[PasswordReset] Email send failed:', mailErr?.message || mailErr);
+      return res.status(500).json({ error: 'Serviciul de email nu este configurat. Încearcă mai târziu.' });
+    }
+
+    return res.json({ message: 'Un cod de resetare a fost trimis la adresa ta de email.' });
   } catch (error) {
     console.error('Eroare la requestPasswordReset:', error);
     return res.status(500).json({ error: 'Eroare server la resetarea parolei' });
@@ -825,6 +827,233 @@ const deletePushToken = async (req, res) => {
   }
 };
 
+// --- VERIFICATION SYSTEM ---
+
+// Upload document for verification (user)
+const uploadVerificationDocument = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { type, name, description } = req.body;
+
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ error: 'Niciun document încărcat.' });
+    }
+
+    if (!type || !name) {
+      return res.status(400).json({ error: 'Tip și nume document sunt obligatorii.' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    const newDocument = {
+      url: req.file.path,
+      type,
+      name,
+      description: description || '',
+      status: 'pending',
+      uploadedAt: new Date()
+    };
+
+    user.documents.push(newDocument);
+    await user.save();
+
+    res.json({ 
+      message: 'Document încărcat cu succes și trimis spre verificare.',
+      document: newDocument
+    });
+  } catch (error) {
+    console.error('Eroare la upload document:', error);
+    res.status(500).json({ error: 'Eroare server la upload document.' });
+  }
+};
+
+// Get user's own documents
+const getUserDocuments = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId).select('documents');
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    res.json({ documents: user.documents || [] });
+  } catch (error) {
+    console.error('Eroare la obținerea documentelor:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
+// Delete user's own document
+const deleteUserDocument = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { documentId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    const documentIndex = user.documents.findIndex(
+      doc => doc._id.toString() === documentId
+    );
+
+    if (documentIndex === -1) {
+      return res.status(404).json({ error: 'Document negăsit.' });
+    }
+
+    user.documents.splice(documentIndex, 1);
+    await user.save();
+
+    res.json({ message: 'Document șters cu succes.' });
+  } catch (error) {
+    console.error('Eroare la ștergerea documentului:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
+// --- ADMIN FUNCTIONS ---
+
+// Get all users with pending documents (admin only)
+const getPendingVerifications = async (req, res) => {
+  try {
+    const users = await User.find({
+      'documents.status': 'pending'
+    }).select('firstName lastName email avatar documents isVerified');
+
+    const usersWithPendingDocs = users.map(user => ({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      avatar: user.avatar,
+      isVerified: user.isVerified,
+      pendingDocuments: user.documents.filter(doc => doc.status === 'pending')
+    })).filter(user => user.pendingDocuments.length > 0);
+
+    res.json({ users: usersWithPendingDocs });
+  } catch (error) {
+    console.error('Eroare la obținerea documentelor pendinte:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
+// Get all documents for a specific user (admin only)
+const getUserDocumentsAdmin = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId).select('firstName lastName email avatar documents isVerified verifiedAt verifiedBy');
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    res.json({ 
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        avatar: user.avatar,
+        isVerified: user.isVerified,
+        verifiedAt: user.verifiedAt,
+        documents: user.documents
+      }
+    });
+  } catch (error) {
+    console.error('Eroare la obținerea documentelor utilizatorului:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
+// Verify or reject a document (admin only)
+const verifyDocument = async (req, res) => {
+  try {
+    const adminId = req.userId;
+    const { userId, documentId } = req.params;
+    const { status, rejectionReason } = req.body;
+
+    if (!['verified', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Status invalid. Folosește "verified" sau "rejected".' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    const document = user.documents.id(documentId);
+    if (!document) {
+      return res.status(404).json({ error: 'Document negăsit.' });
+    }
+
+    document.status = status;
+    document.verifiedAt = new Date();
+    document.verifiedBy = adminId;
+    
+    if (status === 'rejected' && rejectionReason) {
+      document.rejectionReason = rejectionReason;
+    }
+
+    await user.save();
+
+    res.json({ 
+      message: `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`,
+      document
+    });
+  } catch (error) {
+    console.error('Eroare la verificarea documentului:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
+// Toggle user verification badge (admin only)
+const toggleUserVerification = async (req, res) => {
+  try {
+    const adminId = req.userId;
+    const { userId } = req.params;
+    const { isVerified } = req.body;
+
+    if (typeof isVerified !== 'boolean') {
+      return res.status(400).json({ error: 'isVerified trebuie să fie boolean.' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    user.isVerified = isVerified;
+    
+    if (isVerified) {
+      user.verifiedAt = new Date();
+      user.verifiedBy = adminId;
+    } else {
+      user.verifiedAt = null;
+      user.verifiedBy = null;
+    }
+
+    await user.save();
+
+    res.json({ 
+      message: `Utilizator ${isVerified ? 'verificat' : 'neverificat'} cu succes.`,
+      user: {
+        _id: user._id,
+        isVerified: user.isVerified,
+        verifiedAt: user.verifiedAt
+      }
+    });
+  } catch (error) {
+    console.error('Eroare la actualizarea verificării utilizatorului:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
 module.exports = {
   deleteAccount,
   register,
@@ -849,5 +1078,13 @@ module.exports = {
   getArchivedAnnouncements,
   unarchiveAnnouncement
   ,setPushToken,
-  deletePushToken
+  deletePushToken,
+  // Verification system
+  uploadVerificationDocument,
+  getUserDocuments,
+  deleteUserDocument,
+  getPendingVerifications,
+  getUserDocumentsAdmin,
+  verifyDocument,
+  toggleUserVerification
 };

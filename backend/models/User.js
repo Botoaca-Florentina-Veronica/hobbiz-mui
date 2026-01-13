@@ -33,6 +33,29 @@ const userSchema = new mongoose.Schema({
     promotions: { type: Boolean, default: false }
   },
 
+  // Verification system
+  isAdmin: { type: Boolean, default: false },
+  isVerified: { type: Boolean, default: false },
+  verifiedAt: { type: Date },
+  verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  
+  // Professional documents (certificates, diplomas, authorizations, etc.)
+  documents: [{
+    url: { type: String, required: true },
+    type: { type: String, required: true }, // e.g., 'certificate', 'diploma', 'authorization'
+    name: { type: String, required: true },
+    description: { type: String },
+    status: { 
+      type: String, 
+      enum: ['pending', 'verified', 'rejected'], 
+      default: 'pending' 
+    },
+    uploadedAt: { type: Date, default: Date.now },
+    verifiedAt: { type: Date },
+    verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    rejectionReason: { type: String }
+  }],
+
   // Password reset (email code)
   passwordResetCodeHash: { type: String },
   passwordResetExpires: { type: Date }
