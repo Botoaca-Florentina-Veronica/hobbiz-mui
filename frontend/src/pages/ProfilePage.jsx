@@ -458,10 +458,17 @@ export default function ProfilePage() {
         <div className="profile-name-header">
           <div className="profile-name-info">
             <h1 className="profile-name-title-unified">{fullName}</h1>
-            <div className="profile-verified-badge">
-              <span className="profile-verified-icon">✓</span>
-              <span className="profile-verified-text">{t('profile.verifiedMember')}</span>
-            </div>
+            {profile?.isAdmin && (
+              <div className="profile-admin-badge">
+                <span className="profile-admin-badge-text">Admin</span>
+              </div>
+            )}
+            {profile?.isVerified && (
+              <div className="profile-verified-badge">
+                <span className="profile-verified-icon">✓</span>
+                <span className="profile-verified-text">{t('profile.verifiedMember')}</span>
+              </div>
+            )}
             <div className="profile-member-since">
               {t('profile.memberSince')} {profile?.createdAt
                 ? new Date(profile.createdAt).getFullYear()

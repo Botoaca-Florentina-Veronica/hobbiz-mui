@@ -34,6 +34,14 @@ export function FacebookLoginButton() {
         .then(res => res.json())
         .then(data => {
           if (data.token) {
+            // IMPORTANT: Șterge token-urile vechi ÎNAINTE de a seta noul token
+            try {
+              localStorage.removeItem('token');
+              localStorage.removeItem('userId');
+              localStorage.removeItem('lastAvatarUrl');
+            } catch (e) {
+              console.warn('Failed to clear old tokens:', e);
+            }
             localStorage.setItem('token', data.token);
             window.location.href = '/';
           } else {

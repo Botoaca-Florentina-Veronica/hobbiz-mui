@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './SellerDetails.css';
 import ChatPopup from './ChatPopup';
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 export default function SellerDetails({ user, contactPhone, contactEmail, announcement }) {
   const [showPhone, setShowPhone] = useState(false);
@@ -35,7 +36,15 @@ export default function SellerDetails({ user, contactPhone, contactEmail, announ
             )}
           </div>
           <div className="seller-info">
-            <div className="seller-name">{user.firstName || ''} {user.lastName || ''}</div>
+            <div className="seller-name">
+              {user.firstName || ''} {user.lastName || ''}
+              {user.isVerified && (
+                <VerifiedIcon 
+                  color="primary" 
+                  sx={{ ml: 0.5, fontSize: '1rem', verticalAlign: 'middle' }} 
+                />
+              )}
+            </div>
             {/* Numele de contact la publicarea anunțului */}
             <div className="seller-joined">Nume de contact: {user.contactPerson || user.firstName || user.lastName || user.email || 'Utilizator'}</div>
           </div>

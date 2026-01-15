@@ -51,7 +51,13 @@ export const AuthProvider = ({ children }) => {
     // Throttling: dacă apelurile sunt prea dese (<3s) și nu e forced
     if (!opts.force && now - lastHydrateRef.current < 3000) return;
     lastHydrateRef.current = now;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    let token = null;
+    try {
+      token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    } catch (e) {
+      console.warn('Failed to get token from localStorage:', e);
+    }
     
     if (!token) {
       setUser(null);
@@ -99,10 +105,17 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       console.warn('Hydrate failed:', e.response?.data || e.message);
       if (e.response?.status === 401) {
-        // token invalid
-        localStorage.removeItem('token');
+        // token invalid - șterge toate datele de autentificare
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('lastAvatarUrl');
+        } catch (clearErr) {
+          console.warn('Failed to clear invalid tokens:', clearErr);
+        }
         setUser(null);
         setFavorites([]);
+        window.dispatchEvent(new Event('logout'));
       }
     } finally {
       setLoading(false);

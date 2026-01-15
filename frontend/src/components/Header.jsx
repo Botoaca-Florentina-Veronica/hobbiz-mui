@@ -312,19 +312,23 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    // Deconectare completă: și local, și server (cookie/session)
+    // IMPORTANT: Șterge token-urile IMEDIAT și SINCRONIC pentru a preveni probleme de securitate
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    try { localStorage.removeItem('lastAvatarUrl'); } catch {}
+    
+    // Actualizează starea UI imediat
+    setIsAuthenticated(false);
+    setAvatar(null);
+    setUnreadCount(0);
+    setChatUnreadCount(0);
+    setAvatarError(false);
+    window.dispatchEvent(new Event('logout'));
+    setShowLogoutToast(true);
+
+    // Apoi apelează logout pe server (pentru cookie/session)
     import('../api/api').then(({ logout }) => {
       logout().finally(() => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        try { localStorage.removeItem('lastAvatarUrl'); } catch {}
-        setIsAuthenticated(false);
-        setAvatar(null);
-        setUnreadCount(0);
-        setChatUnreadCount(0);
-        setAvatarError(false);
-        window.dispatchEvent(new Event('logout'));
-        setShowLogoutToast(true);
         navigate('/');
         setTimeout(() => {
           window.location.reload();
@@ -533,6 +537,11 @@ export default function Header() {
                     <a onClick={(e) => { e.preventDefault(); navigate('/setari-cont'); }}>{t('header.settings')}</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>{t('header.myAnnouncements')}</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>{t('header.profile')}</a>
+                    {auth?.user?.isAdmin && (
+                      <a onClick={(e) => { e.preventDefault(); navigate('/admin/verificari'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
+                        Verificări Admin
+                      </a>
+                    )}
                     <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>{t('header.logout')}</a>
                   </div>
                 )}

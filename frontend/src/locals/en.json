@@ -24,6 +24,7 @@
     "search": "Search",
     "close": "Close",
     "save": "Save",
+    "confirmTitle": "Are you sure?",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -1196,5 +1197,56 @@
     "refreshInfo": "Refresh functionality will be added soon",
     "selectCategory": "Select category",
     "sortBy": "Sort by"
+  },
+  "verification": {
+    "title": "Verification Documents",
+    "infoTitle": "Why verify your profile?",
+    "infoText": "Uploading professional documents (diplomas, certifications, authorizations) helps build trust with clients. After verification, you will receive a 'Verified User' badge.",
+    "uploadButton": "Upload Document",
+    "viewDocument": "View Document",
+    "noDocuments": "You haven't uploaded any documents yet.",
+    "documentType": "Document Type",
+    "documentName": "Document Name",
+    "description": "Description (optional)",
+    "status": {
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "types": {
+      "certificate": "Certificate",
+      "diploma": "Diploma",
+      "authorization": "Authorization",
+      "license": "License",
+      "other": "Other"
+    },
+    "messages": {
+      "fetchError": "Could not load documents.",
+      "uploadSuccess": "Document uploaded successfully and sent for verification.",
+      "uploadError": "Could not upload document.",
+      "deleteSuccess": "Document deleted successfully.",
+      "deleteError": "Could not delete document.",
+      "enterName": "Please enter a name for the document.",
+      "pickError": "Could not select document."
+    },
+    "deleteConfirm": {
+      "title": "Delete Document",
+      "message": "Are you sure you want to delete this document? This action is permanent."
+    },
+    "admin": {
+      "pendingTitle": "Pending Verifications",
+      "rejectionTitle": "Reject Document",
+      "rejectionReason": "Rejection reason",
+      "rejectionPlaceholder": "E.g.: Document unclear or expired...",
+      "verifySuccess": "Document verified successfully.",
+      "rejectSuccess": "Document rejected.",
+      "badgeSuccess": "Badge status updated successfully."
+    },
+    "notifications": {
+      "documentUploaded": "uploaded a verification document",
+      "documentVerified": "verified your document",
+      "documentRejected": "rejected your document",
+      "userVerified": "verified and approved your account"
+    }
   }
 }

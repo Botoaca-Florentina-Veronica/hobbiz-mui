@@ -29,7 +29,7 @@
   box-sizing: border-box;
   
   /* Light Mode Colors */
-  --pf-bg: #f5f6fa;
+  --pf-bg: #ffffff;
   --pf-card-bg: #ffffff;
   --pf-text: #1a1a1a;
   --pf-text-muted: #6b7280;
@@ -42,6 +42,7 @@
   --pf-shadow: 0 1px 3px rgba(0,0,0,0.1);
   --pf-shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
   --pf-card-radius: 16px;
+  --pf-light-border: 1px solid #121212;
   
   /* Layout */
   --pf-left-max-width: 1100px;
@@ -57,6 +58,7 @@
 .profile-page-container * {
   font-family: 'Poppins', sans-serif !important;
 }
+
 
 /* ============================================
    2. LAYOUT (TWO-COLUMN GRID)
@@ -117,6 +119,11 @@
   overflow: hidden;
   margin-bottom: 1.5rem;
   border: 1px solid var(--pf-divider);
+}
+
+/* Light mode: add black border */
+body:not(.dark-mode) .profile-header-unified {
+  border: var(--pf-light-border) !important;
 }
 
 /* === Cover Image Section === */
@@ -268,6 +275,28 @@
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 8px;
+  margin-right: 8px;
+}
+
+.profile-admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f51866;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  margin-right: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-admin-badge-text {
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .profile-verified-icon {
@@ -331,6 +360,11 @@
   background: var(--pf-card-bg);
   border: 1px solid var(--pf-divider);
   margin-bottom: 1rem;
+}
+
+/* Light mode: add black border to main containers */
+body:not(.dark-mode) .profile-info-main-card {
+  border: var(--pf-light-border) !important;
 }
 
 .profile-info-content {
@@ -460,6 +494,11 @@
   margin-bottom: 1rem;
 }
 
+/* Light mode: add black border */
+body:not(.dark-mode) .profile-location-card {
+  border: var(--pf-light-border) !important;
+}
+
 .profile-location-header {
   padding: 24px 32px 16px 32px;
   display: flex;
@@ -494,8 +533,9 @@
 
 .profile-announcements-sidebar {
   background: var(--pf-card-bg);
-  border: 1px solid var(--pf-border);
+  border: none;
   border-radius: var(--pf-card-radius);
+}
   box-shadow: var(--pf-shadow);
   padding: 1.25rem;
   margin-right: var(--pf-right-offset);
@@ -670,6 +710,11 @@
   border: 1px solid var(--pf-border);
 }
 
+/* Light mode: add black border */
+body:not(.dark-mode) .profile-stats-card {
+  border: var(--pf-light-border) !important;
+}
+
 .profile-stats-title {
   font-size: 13px;
   font-weight: 700;
@@ -787,6 +832,29 @@
   box-shadow: var(--pf-shadow);
   border: 1px solid var(--pf-border);
   margin-bottom: 2rem; /* increased spacing below description */
+}
+
+/* Light mode: add black border */
+body:not(.dark-mode) .profile-about-card {
+  border: var(--pf-light-border) !important;
+}
+
+/* Dark mode: make About Me container darker */
+.dark-mode .profile-about-card {
+  background-color: #121212 !important;
+  /* Match other profile containers */
+  border-color: #3f3f3f !important;
+}
+
+.dark-mode .profile-about-title,
+.dark-mode .profile-about-text {
+  color: #ffffff !important;
+}
+
+.dark-mode .profile-about-textarea {
+  background: #0d0d0d !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.06) !important;
 }
 
 .profile-about-title {

@@ -158,15 +158,15 @@ export default function NotificationsPage() {
             console.log('✅ Enriched chat notification:', enrichedNotif);
             return enrichedNotif;
           }
-          // Non-chat: încercăm să deducem un posibil sender id
-          const possibleSenderId = notif.senderId || notif.fromUserId || notif.userId || null;
+          // Non-chat: încercăm să deducem sender-ul din fromUserId
+          const possibleSenderId = notif.fromUserId || notif.senderId || notif.userId || null;
           if (possibleSenderId) {
             try {
               const userData = await getUserData(possibleSenderId);
               const enrichedNonChat = {
                 ...notif,
                 senderName: userData.name || '',
-                preview: notif.message || '',
+                preview: notif.actionDescription || notif.message || '',
                 senderAvatar: userData.avatar || null
               };
               console.log('✅ Enriched non-chat notification with sender:', enrichedNonChat);
@@ -255,8 +255,8 @@ export default function NotificationsPage() {
                         {/* Message Preview */}
                         <div className="notification-message">{n.preview}</div>
 
-                        {/* Action Button */}
-                        {n.link && (
+                        {/* Action Button (only for chat links) */}
+                        {n.link && typeof n.link === 'string' && n.link.startsWith('/chat/') && (
                           <button 
                             className="notification-action-btn"
                             onClick={() => handleChatNavigation(n._id, n.link)}

@@ -17,6 +17,7 @@ import {
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import PersonIcon from '@mui/icons-material/Person';
@@ -305,6 +306,12 @@ export default function PublicProfile() {
               <div className="profile-name-section">
                 <h1 className="profile-name-title-unified">
                   {(profile?.firstName || '') + (profile?.lastName ? ' ' + profile.lastName : '') || 'Profil utilizator'}
+                  {profile?.isVerified && (
+                    <VerifiedIcon 
+                      color="primary" 
+                      sx={{ ml: 1, verticalAlign: 'middle', fontSize: '1.2rem' }} 
+                    />
+                  )}
                 </h1>
               </div>
             </div>

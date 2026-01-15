@@ -17,6 +17,7 @@ interface UserProfile {
   createdAt?: string;
   isVerified?: boolean;
   isAdmin?: boolean;
+  collaborations?: string[];
   notificationSettings?: {
     email: boolean;
     push: boolean;
@@ -74,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           createdAt: res.data.createdAt,
           isVerified: res.data.isVerified || false,
           isAdmin: isHardcodedAdmin || res.data.isAdmin || false,
+          collaborations: res.data.collaborations || [],
           notificationSettings: res.data.notificationSettings || {
             email: true,
             push: true,

@@ -50,13 +50,33 @@ apiClient.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
-// Optional: Avoid global redirects on 401; let callers decide
-apiClient.interceptors.response?.use(
+// Interceptor pentru răspunsuri - gestionează 401 (token invalid/expirat)
+apiClient.interceptors.response.use(
   (resp) => resp,
   (error) => {
-    // Pass through 401 without redirecting
+    // Dacă primim 401 (Unauthorized), curăță token-urile invalide
+    if (error.response?.status === 401) {
+      try {
+        const currentToken = localStorage.getItem('token');
+        // Doar dacă există un token (pentru a evita looping)
+        if (currentToken) {
+          console.warn('Token invalid sau expirat - curățare automată');
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('lastAvatarUrl');
+          // Dispatch logout event pentru a actualiza UI-ul
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('logout'));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to clear invalid token:', e);
+      }
+    }
     return Promise.reject(error);
   }
 );
@@ -69,6 +89,21 @@ export const updateEmail = (newEmailData) => apiClient.put('/api/users/update-em
 export const updatePassword = (passwordData) => apiClient.put('/api/users/update-password', passwordData);
 export const updateProfile = (profileData) => apiClient.put('/api/users/profile', profileData);
 export const detectMitm = () => apiClient.get('/api/mitm/detect-mitm');
+
+// --- VERIFICATION SYSTEM ---
+// User functions
+export const uploadVerificationDocument = (formData) => 
+  apiClient.post('/api/users/documents', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const getUserDocuments = () => apiClient.get('/api/users/documents');
+export const deleteUserDocument = (documentId) => apiClient.delete(`/api/users/documents/${documentId}`);
+
+// Admin functions
+export const getPendingVerifications = () => apiClient.get('/api/users/admin/verifications/pending');
+export const getUserDocumentsAdmin = (userId) => apiClient.get(`/api/users/admin/users/${userId}/documents`);
+export const verifyDocument = (userId, documentId, data) => 
+  apiClient.put(`/api/users/admin/users/${userId}/documents/${documentId}/verify`, data);
+export const toggleUserVerification = (userId, data) => 
+  apiClient.put(`/api/users/admin/users/${userId}/verification-badge`, data);
 
 // Announcement search for autocomplete suggestions
 export const searchAnnouncements = (searchQuery) => apiClient.get(`/api/announcements/search?q=${encodeURIComponent(searchQuery)}`);

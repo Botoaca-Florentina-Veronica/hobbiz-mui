@@ -1,0 +1,24 @@
+.dark-mode .admin-table-header {
+  background-color: transparent;
+}
+
+.dark-mode .admin-table-header-cell {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.dark-mode .admin-table-header-cell {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .admin-verification-dialog .MuiPaper-root {
+  background-color: #121212 !important;
+}
+
+.dark-mode .admin-verification-dialog .MuiDialogTitle-root,
+.dark-mode .admin-verification-dialog .MuiDialogContent-root,
+.dark-mode .admin-verification-dialog .MuiTypography-root,
+.dark-mode .admin-verification-dialog .MuiListItemText-primary,
+.dark-mode .admin-verification-dialog .MuiListItemText-secondary {
+  color: #ffffff !important;
+}

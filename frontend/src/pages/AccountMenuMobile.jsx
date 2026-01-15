@@ -19,7 +19,8 @@ import {
   InfoOutlined,
   Gavel,
   Logout,
-  DarkMode
+  DarkMode,
+  VerifiedUser
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
@@ -80,21 +81,28 @@ export default function AccountMenuMobile() {
   };
 
   const handleLogout = async () => {
+    // IMPORTANT: Șterge token-urile IMEDIAT și SINCRONIC pentru a preveni probleme de securitate
+    try { localStorage.removeItem('token'); } catch {}
+    try { localStorage.removeItem('userId'); } catch {}
+    try { localStorage.removeItem('lastAvatarUrl'); } catch {}
+    
+    // Dispatch logout event imediat
+    window.dispatchEvent(new Event('logout'));
+    setShowLogoutToast(true);
+
+    // Apoi apelează logout pe server (pentru cookie/session)
     try {
       const { logout } = await import('../api/api');
       await logout();
     } catch (err) {
-      // ignore
-    } finally {
-      try { localStorage.removeItem('token'); } catch {}
-      try { localStorage.removeItem('userId'); } catch {}
-      window.dispatchEvent(new Event('logout'));
-      setShowLogoutToast(true);
-      setTimeout(() => {
-        navigate('/');
-        window.location.reload();
-      }, 2000);
+      // ignore server logout errors
     }
+    
+    // Redirecționează și reîncarcă
+    setTimeout(() => {
+      navigate('/');
+      window.location.reload();
+    }, 2000);
   };
 
   // While we determine auth, don't render the page
@@ -109,6 +117,8 @@ export default function AccountMenuMobile() {
     { icon: <Settings />, label: 'Setări', path: '/setari-cont' },
     { icon: <Campaign />, label: 'Anunțurile mele', path: '/anunturile-mele' },
     { icon: <Person />, label: 'Profil', path: '/profil' },
+    { icon: <VerifiedUser />, label: 'Verificare Documente', path: '/verificare-documente' },
+    ...(userProfile?.isAdmin ? [{ icon: <VerifiedUser />, label: 'Verificări Admin', path: '/admin/verificari', style: { color: '#f51866' } }] : []),
     { icon: <InfoOutlined />, label: 'Despre noi', path: '/despre' },
     { icon: <Gavel />, label: 'Informații legale', path: '/informatii-legale' }
   ];
@@ -148,7 +158,7 @@ export default function AccountMenuMobile() {
         <ul className="account-mobile__menu" role="menu">
           {menuItems.map((item) => (
             <li key={item.path} role="none">
-              <button role="menuitem" className="account-mobile__menu-btn" onClick={() => navigate(item.path)}>
+              <button role="menuitem" className="account-mobile__menu-btn" onClick={() => navigate(item.path)} style={item.style}>
                 <span className="account-mobile__menu-icon" aria-hidden>{item.icon}</span>
                 <span className="account-mobile__menu-label">{item.label}</span>
               </button>

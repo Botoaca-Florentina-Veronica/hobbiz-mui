@@ -31,7 +31,11 @@ export default function AccountSettings() {
       await logout();
       setShowDeleteDialog(false);
       setSuccessDelete(true);
+      // IMPORTANT: Șterge toate token-urile
       localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      try { localStorage.removeItem('lastAvatarUrl'); } catch {}
+      window.dispatchEvent(new Event('logout'));
       setTimeout(() => {
         setSuccessDelete(false);
         navigate('/');
@@ -272,6 +276,19 @@ export default function AccountSettings() {
           <ListItem button onClick={() => navigate('/setari-notificari')} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.notifications')} 
+              primaryTypographyProps={{ fontWeight: 'bold' }} 
+              className="mobile-setting-text"
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Verification Documents */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
+          <ListItem button onClick={() => navigate('/verificare-documente')} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('verification.title')} 
               primaryTypographyProps={{ fontWeight: 'bold' }} 
               className="mobile-setting-text"
             />

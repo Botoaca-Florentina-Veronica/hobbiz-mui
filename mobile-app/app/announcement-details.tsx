@@ -67,6 +67,9 @@ const TRANSLATIONS = {
     favoriteAdded: 'Adăugat la favorite',
     favoriteRemoved: 'Eliminat din favorite',
     favoriteFailed: 'Nu am putut actualiza favorite. Încearcă din nou.',
+    noCollaborationTitle: 'Colaborare necesară',
+    noCollaborationMessage: 'Poți lăsa o recenzie doar utilizatorilor cu care ai colaborat oficial pe platformă.',
+    understood: 'AM ÎNȚELES',
   },
   en: {
     posted: 'Posted',
@@ -104,13 +107,16 @@ const TRANSLATIONS = {
     favoriteAdded: 'Added to favorites',
     favoriteRemoved: 'Removed from favorites',
     favoriteFailed: 'Could not update favorites. Please try again.',
+    noCollaborationTitle: 'Collaboration Required',
+    noCollaborationMessage: 'You can only leave a review for users you have officially collaborated with on the platform.',
+    understood: 'UNDERSTOOD',
   }
 };
 
 export default function AnnouncementDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { tokens, isDark } = useAppTheme();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user: currentUser } = useAuth();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -129,6 +135,7 @@ export default function AnnouncementDetailsScreen() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showPhone, setShowPhone] = useState(false);
   const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [noCollabModalVisible, setNoCollabModalVisible] = useState(false);
   const [ratingScore, setRatingScore] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
   const [submittingRating, setSubmittingRating] = useState(false);
@@ -540,6 +547,21 @@ export default function AnnouncementDetailsScreen() {
           <ThemedText style={[styles.contactLabel, { color: tokens.colors.muted }]}>{t.contactPerson}</ThemedText>
           <TouchableOpacity
             onPress={() => {
+              if (!isAuthenticated) {
+                Alert.alert(t.loginRequired, t.loginToFavorite, [
+                  { text: t.cancel, style: 'cancel' },
+                  { text: 'Login', onPress: () => router.push('/login') }
+                ]);
+                return;
+              }
+
+              // Check collaboration
+              const hasCollaboration = currentUser?.collaborations?.includes(announcement.user?._id || '');
+              if (!hasCollaboration) {
+                setNoCollabModalVisible(true);
+                return;
+              }
+
               setRatingModalVisible(true);
             }}
             style={[styles.evaluateBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
@@ -726,8 +748,11 @@ export default function AnnouncementDetailsScreen() {
             </View>
 
             <View style={styles.ratingModalActions}>
-              <TouchableOpacity onPress={() => setRatingModalVisible(false)} style={styles.ratingCancelBtn}>
-                <ThemedText style={[styles.ratingCancelText, { color: tokens.colors.primary }]}>{t.cancel}</ThemedText>
+              <TouchableOpacity 
+                onPress={() => setRatingModalVisible(false)} 
+                style={[styles.ratingCancelBtn, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg, borderColor: tokens.colors.border }]}
+              >
+                <ThemedText style={[styles.ratingCancelText, { color: tokens.colors.text }]}>{t.cancel}</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
@@ -750,12 +775,39 @@ export default function AnnouncementDetailsScreen() {
                     setSubmittingRating(false);
                   }
                 }}
-                style={styles.ratingSubmitBtn}
+                style={[styles.ratingSubmitBtn, { backgroundColor: tokens.colors.primary }]}
                 activeOpacity={0.9}
               >
                 <ThemedText style={[styles.ratingSubmitText, { color: '#ffffff' }]}>{submittingRating ? t.sending : t.send}</ThemedText>
               </TouchableOpacity>
             </View>
+          </View>
+        </BlurView>
+    )}
+
+    {/* No Collaboration Modal Overlay */}
+    {noCollabModalVisible && (
+        <BlurView 
+          intensity={90} 
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.ratingModalOverlay, { zIndex: 1001 }]}
+        >
+          <View style={[styles.statusModalCard, { backgroundColor: isDark ? '#121212' : tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            <View style={[styles.modalIconContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }]}> 
+                <Ionicons name="shield-checkmark-outline" size={36} color={tokens.colors.primary} />
+            </View>
+            
+            <ThemedText style={[styles.statusModalTitle, { color: tokens.colors.text }]}>{t.noCollaborationTitle}</ThemedText>
+            <ThemedText style={[styles.statusModalMessage, { color: tokens.colors.muted }]}>{t.noCollaborationMessage}</ThemedText>
+            
+            <TouchableOpacity 
+              onPress={() => setNoCollabModalVisible(false)} 
+              style={[styles.statusModalButton, { backgroundColor: tokens.colors.primary }]}
+              activeOpacity={0.8}
+            >
+              <ThemedText style={styles.statusModalButtonText}>{t.understood}</ThemedText>
+            </TouchableOpacity>
           </View>
         </BlurView>
     )}
@@ -848,16 +900,23 @@ const styles = StyleSheet.create({
   locationText: { fontSize: 14, fontWeight: '600' },
   /* Rating modal */
   ratingModalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
-  ratingModalCard: { width: '100%', maxWidth: 520, borderRadius: 10, padding: 18, borderWidth: 1, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 6 }, elevation: 6 },
-  ratingModalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  ratingStarsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  ratingNumeric: { marginLeft: 8, fontWeight: '700' },
-  ratingInputWrapper: { borderWidth: 1, borderRadius: 8, padding: 12, minHeight: 90, marginBottom: 12 },
-  ratingInput: { minHeight: 64, textAlignVertical: 'top', padding: 0, margin: 0 },
-  ratingModalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, alignItems: 'center' },
-  ratingCancelBtn: { paddingHorizontal: 12, paddingVertical: 8 },
+  ratingModalCard: { width: '90%', maxWidth: 500, borderRadius: 24, padding: 24, borderWidth: 1, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
+  ratingModalTitle: { fontSize: 20, fontWeight: '800', marginBottom: 16, textAlign: 'center' },
+  ratingStarsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  ratingNumeric: { marginLeft: 12, fontSize: 18, fontWeight: '800' },
+  ratingInputWrapper: { borderWidth: 1, borderRadius: 16, padding: 12, minHeight: 100, marginBottom: 20 },
+  ratingInput: { minHeight: 80, textAlignVertical: 'top', padding: 0, margin: 0, fontSize: 15 },
+  ratingModalActions: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, alignItems: 'center' },
+  ratingCancelBtn: { flex: 1, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1 },
   ratingCancelText: { fontSize: 15, fontWeight: '700' },
-  ratingSubmitBtn: { backgroundColor: '#f51866', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
+  ratingSubmitBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   ratingSubmitText: { fontSize: 15, fontWeight: '700' },
+  /* Collaboration modal styles */
+  statusModalCard: { width: '90%', maxWidth: 400, borderRadius: 24, padding: 24, borderWidth: 1, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
+  modalIconContainer: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  statusModalTitle: { fontSize: 20, fontWeight: '800', marginBottom: 12, textAlign: 'center' },
+  statusModalMessage: { fontSize: 15, lineHeight: 22, textAlign: 'center', marginBottom: 24, paddingHorizontal: 8 },
+  statusModalButton: { width: '100%', paddingVertical: 14, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  statusModalButtonText: { color: '#ffffff', fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
 });
 

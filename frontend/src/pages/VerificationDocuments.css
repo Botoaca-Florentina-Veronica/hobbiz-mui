@@ -1,0 +1,65 @@
+.doc-list-item {
+  padding: 16px !important;
+  transition: background-color 0.2s;
+}
+
+.doc-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark-mode .doc-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .doc-list-item svg {
+  color: #b0b0b0 !important;
+}
+
+.dark-mode .status-chip-verified,
+.dark-mode .status-chip-verified.MuiChip-root,
+.dark-mode .status-chip-verified.MuiChip-outlined {
+  color: #4caf50 !important;
+  border-color: #4caf50 !important;
+  background-color: transparent !important;
+}
+
+.dark-mode .status-chip-verified .MuiChip-label,
+.dark-mode .status-chip-verified svg {
+  color: #4caf50 !important;
+}
+
+.dark-mode .status-chip-pending,
+.dark-mode .status-chip-pending.MuiChip-root,
+.dark-mode .status-chip-pending.MuiChip-outlined {
+  color: #ff9800 !important;
+  border-color: #ff9800 !important;
+  background-color: transparent !important;
+}
+
+.dark-mode .status-chip-pending .MuiChip-label,
+.dark-mode .status-chip-pending svg {
+  color: #ff9800 !important;
+}
+
+.upload-doc-btn {
+  box-shadow: 0 4px 12px rgba(11, 45, 90, 0.2);
+}
+
+.upload-doc-btn:hover {
+  box-shadow: 0 6px 16px rgba(11, 45, 90, 0.3);
+}
+
+@media (max-width: 600px) {
+  .notification-title {
+    display: none;
+  }
+  
+  .info-card-paper {
+    margin: 10px !important;
+  }
+  
+  .upload-doc-btn {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+}

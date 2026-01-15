@@ -22,6 +22,8 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import AddAnnouncementPage from './pages/AddAnnouncementPage';
 import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
+import VerificationDocuments from './pages/VerificationDocuments';
+import AdminVerifications from './pages/AdminVerifications';
 import PublicProfile from './pages/PublicProfile';
 import PublicProfileAllReviews from './pages/PublicProfileAllReviews';
 import MyAnnouncements from './pages/MyAnnouncements';
@@ -261,6 +263,21 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <NotificationSettingsPage />
+            <Footer hideOnMobile />
+          </>
+        } />        <Route path="/verificare-documente" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <VerificationDocuments />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/admin/verificari" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AdminVerifications />
             <Footer hideOnMobile />
           </>
         } />

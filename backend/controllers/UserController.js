@@ -863,6 +863,38 @@ const uploadVerificationDocument = async (req, res) => {
     user.documents.push(newDocument);
     await user.save();
 
+    // Notificare pentru admini că a fost încărcat un document
+    try {
+      const admins = await User.find({ isAdmin: true }).select('_id');
+      const documentTypeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+      
+      for (const admin of admins) {
+        await Notification.create({
+          userId: admin._id,
+          message: `${user.firstName || 'Utilizator'} ${user.lastName || ''} a încărcat un ${documentTypeLabel} pentru verificare.`,
+          link: '/admin/verificari',
+          type: 'document',
+          fromUserId: userId,
+          actionDescription: `a încărcat un document de verificare (${documentTypeLabel}: ${name})`,
+          relatedDocumentId: newDocument._id
+        });
+      }
+
+      // Emit Socket.IO event pentru admini
+      const io = req.app.get('io');
+      const activeUsers = req.app.get('activeUsers');
+      if (io && activeUsers) {
+        for (const admin of admins) {
+          const sid = activeUsers.get(String(admin._id));
+          if (sid) {
+            io.to(sid).emit('newNotification', { userId: String(admin._id) });
+          }
+        }
+      }
+    } catch (notifError) {
+      console.error('Eroare la trimiterea notificării de document la admini:', notifError);
+    }
+
     res.json({ 
       message: 'Document încărcat cu succes și trimis spre verificare.',
       document: newDocument
@@ -1023,6 +1055,7 @@ const verifyDocument = async (req, res) => {
       return res.status(400).json({ error: 'Status invalid. Folosește "verified" sau "rejected".' });
     }
 
+    const admin = await User.findById(adminId).select('firstName lastName');
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
@@ -1032,6 +1065,9 @@ const verifyDocument = async (req, res) => {
     if (!document) {
       return res.status(404).json({ error: 'Document negăsit.' });
     }
+
+    const documentTypeName = document.type.charAt(0).toUpperCase() + document.type.slice(1);
+    const adminName = `${admin?.firstName || 'Admin'} ${admin?.lastName || ''}`.trim();
 
     document.status = status;
     document.verifiedAt = new Date();
@@ -1046,17 +1082,26 @@ const verifyDocument = async (req, res) => {
     // Notificare pentru utilizator despre statusul documentului
     try {
       let notificationMessage = '';
+      let actionDescription = '';
+
       if (status === 'verified') {
-        notificationMessage = `Documentul tău "${document.title || 'Certificare'}" a fost verificat cu succes.`;
+        notificationMessage = `Documentul tău "${document.name}" (${documentTypeName}) a fost verificat cu succes de ${adminName}.`;
+        actionDescription = `a verificat documentul tău "${document.name}"`;
       } else if (status === 'rejected') {
-        notificationMessage = `Documentul tău "${document.title || 'Certificare'}" a fost respins. Motiv: ${rejectionReason || 'Nu a fost specificat.'}`;
+        const reasonText = rejectionReason ? ` Motiv: ${rejectionReason}` : '.';
+        notificationMessage = `Documentul tău "${document.name}" (${documentTypeName}) a fost respins de ${adminName}.${reasonText}`;
+        actionDescription = `a respins documentul tău "${document.name}"`;
       }
 
       if (notificationMessage) {
         await Notification.create({
           userId: user._id,
           message: notificationMessage,
-          link: '/verification-documents'
+          link: '/verificare-documente',
+          type: 'verification',
+          fromUserId: adminId,
+          actionDescription: actionDescription,
+          relatedDocumentId: documentId
         });
 
         // Emit Socket.IO event
@@ -1094,10 +1139,13 @@ const toggleUserVerification = async (req, res) => {
       return res.status(400).json({ error: 'isVerified trebuie să fie boolean.' });
     }
 
+    const admin = await User.findById(adminId).select('firstName lastName');
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
     }
+
+    const adminName = `${admin?.firstName || 'Admin'} ${admin?.lastName || ''}`.trim();
 
     user.isVerified = isVerified;
     
@@ -1141,16 +1189,19 @@ const toggleUserVerification = async (req, res) => {
 
     await user.save();
 
-    // Trimite notificare utilizatorului dacă a primit badge-ul
+    // Trimite notificare utilizatorului
     if (isVerified) {
       try {
-        const notificationMessage = 'Felicitări! Contul tău a fost verificat și ai primit badge-ul de utilizator de încredere.';
+        const notificationMessage = `Felicitări! Contul tău a fost verificat de ${adminName} și ai primit badge-ul de utilizator de încredere.`;
         const link = '/profile';
         
         await Notification.create({
           userId: user._id,
           message: notificationMessage,
-          link: link
+          link: link,
+          type: 'verification',
+          fromUserId: adminId,
+          actionDescription: `a verificat și aprobat contul tău`
         });
 
         // Emit Socket.IO event for real-time notification

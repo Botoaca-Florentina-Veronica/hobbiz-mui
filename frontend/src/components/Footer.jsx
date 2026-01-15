@@ -193,7 +193,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
                 <a onClick={(e) => { e.preventDefault(); toggleDarkMode(); }}>
                   {isDarkMode ? t('common.lightMode') : t('common.darkMode')}
                 </a>
-                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); setShowDropdown(false); window.dispatchEvent(new Event('logout')); setShowLogoutToast(true); setTimeout(() => { navigate('/'); window.location.reload(); }, 2000); }}>{t('header.logout')}</a>
+                <a onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('userId'); try { localStorage.removeItem('lastAvatarUrl'); } catch {} setShowDropdown(false); window.dispatchEvent(new Event('logout')); setShowLogoutToast(true); setTimeout(() => { navigate('/'); window.location.reload(); }, 2000); }}>{t('header.logout')}</a>
               </div>
             )}
           </div>

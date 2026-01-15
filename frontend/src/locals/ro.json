@@ -24,6 +24,7 @@
     "search": "Caută",
     "close": "Închide",
     "save": "Salvează",
+    "confirmTitle": "Ești sigur?",
     "cancel": "Anulează",
     "delete": "Șterge",
     "edit": "Editează",
@@ -1196,5 +1197,56 @@
     "refreshInfo": "Funcționalitatea de reactualizare va fi adăugată în curând",
     "selectCategory": "Selectează categoria",
     "sortBy": "Sortează după"
+  },
+  "verification": {
+    "title": "Verificări documente",
+    "infoTitle": "De ce să îți verifici profilul?",
+    "infoText": "Încărcarea documentelor profesionale (diplome, certificări, atestate) ajută la construirea încrederii în rândul clienților. După verificare, vei primi un badge de 'Utilizator Verificat'.",
+    "uploadButton": "Încarcă Document",
+    "viewDocument": "Vezi Document",
+    "noDocuments": "Nu ai încărcat niciun document.",
+    "documentType": "Tip Document",
+    "documentName": "Nume Document",
+    "description": "Descriere (opțional)",
+    "status": {
+      "pending": "În așteptare",
+      "verified": "Verificat",
+      "rejected": "Respins"
+    },
+    "types": {
+      "certificate": "Certificat",
+      "diploma": "Diplomă",
+      "authorization": "Autorizație",
+      "license": "Licență",
+      "other": "Altele"
+    },
+    "messages": {
+      "fetchError": "Nu s-au putut încărca documentele.",
+      "uploadSuccess": "Document încărcat cu succes și trimis spre verificare.",
+      "uploadError": "Nu s-a putut încărca documentul.",
+      "deleteSuccess": "Document șters cu succes.",
+      "deleteError": "Nu s-a putut șterge documentul.",
+      "enterName": "Te rugăm să introduci un nume pentru document.",
+      "pickError": "Nu s-a putut selecta documentul."
+    },
+    "deleteConfirm": {
+      "title": "Ștergere Document",
+      "message": "Sigur vrei să ștergi acest document? Această acțiune este permanentă."
+    },
+    "admin": {
+      "pendingTitle": "Verificări în așteptare",
+      "rejectionTitle": "Respingere Document",
+      "rejectionReason": "Motivul respingerii",
+      "rejectionPlaceholder": "Ex: Document neclar sau expirat...",
+      "verifySuccess": "Document verificat cu succes.",
+      "rejectSuccess": "Document respins.",
+      "badgeSuccess": "Status badge actualizat cu succes."
+    },
+    "notifications": {
+      "documentUploaded": "a încărcat un document de verificare",
+      "documentVerified": "a verificat documentul tău",
+      "documentRejected": "a respins documentul tău",
+      "userVerified": "a verificat și aprobat contul tău"
+    }
   }
 }
