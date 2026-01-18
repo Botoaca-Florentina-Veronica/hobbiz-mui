@@ -47,6 +47,7 @@ import ImageViewing from '../src/components/ImageViewer';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
 import { useLocale } from '../src/context/LocaleContext';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import negotiationService from '../src/services/negotiationService';
 
 // NOTE: Pentru a evita eroarea html2canvas (folosită intern de react-native-view-shot pe web),
 // NU importăm direct view-shot; vom crea un loader lazy doar pentru platformele native.
@@ -122,6 +123,7 @@ const TRANSLATIONS = {
     deleteMessage: 'Șterge mesaj',
     deleteConfirm: 'Ești sigur că vrei să ștergi acest mesaj?',
     cancel: 'Anulează',
+    send: 'Trimite',
     delete: 'Șterge',
     copied: 'Copiat',
     messageCopied: 'Mesajul a fost copiat.',
@@ -170,6 +172,22 @@ const TRANSLATIONS = {
     collaborationAlreadyAccepted: 'Colaborarea este deja confirmată.',
     accept: 'Acceptă',
     decline: 'Refuză',
+    
+    // Negotiation translations
+    finalizeDeal: 'Finalizează',
+    negotiationOffer: 'Ofertă de preț',
+    counterOffer: 'Contraofertă',
+    priceOffered: 'Preț oferit',
+    acceptOffer: 'Acceptă',
+    rejectOffer: 'Refuză',
+    sendCounterOffer: 'Trimite contraofertă',
+    enterNewPrice: 'Introdu un preț nou (RON)',
+    offerAccepted: 'Ofertă acceptată!',
+    offerRejected: 'Ofertă refuzată',
+    dealFinalized: 'Tranzacție finalizată!',
+    finalizeDealConfirm: 'Ești sigur că vrei să finalizezi această negociere? Prețul va fi adăugat în balanța vânzătorului.',
+    balanceUpdated: 'Balanța ta a fost actualizată cu',
+    negotiationError: 'Eroare la procesarea negocierii.',
   },
   en: {
     loadingMessages: 'Loading messages...',
@@ -192,6 +210,7 @@ const TRANSLATIONS = {
     deleteMessage: 'Delete message',
     deleteConfirm: 'Are you sure you want to delete this message?',
     cancel: 'Cancel',
+    send: 'Send',
     delete: 'Delete',
     copied: 'Copied',
     messageCopied: 'The message has been copied.',
@@ -240,13 +259,29 @@ const TRANSLATIONS = {
     collaborationAlreadyAccepted: 'Collaboration is already confirmed.',
     accept: 'Accept',
     decline: 'Decline',
+    
+    // Negotiation translations
+    finalizeDeal: 'Finalize',
+    negotiationOffer: 'Price offer',
+    counterOffer: 'Counter offer',
+    priceOffered: 'Price offered',
+    acceptOffer: 'Accept',
+    rejectOffer: 'Reject',
+    sendCounterOffer: 'Send counter offer',
+    enterNewPrice: 'Enter a new price (RON)',
+    offerAccepted: 'Offer accepted!',
+    offerRejected: 'Offer rejected',
+    dealFinalized: 'Deal finalized!',
+    finalizeDealConfirm: 'Are you sure you want to finalize this negotiation? The price will be added to the seller\'s balance.',
+    balanceUpdated: 'Your balance has been updated with',
+    negotiationError: 'Error processing negotiation.',
   },
 };
 
 export default function ConversationScreen() {
   const { tokens, isDark } = useAppTheme();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = (TRANSLATIONS[locale === 'en' ? 'en' : 'ro'] as (typeof TRANSLATIONS)['ro']);
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -287,6 +322,12 @@ export default function ConversationScreen() {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const [confirmCollabVisible, setConfirmCollabVisible] = useState(false);
   const [sendingCollab, setSendingCollab] = useState(false);
+  
+  // Negotiation states
+  const [activeNegotiation, setActiveNegotiation] = useState<any>(null);
+  const [counterOfferModalVisible, setCounterOfferModalVisible] = useState(false);
+  const [counterOfferPrice, setCounterOfferPrice] = useState('');
+  const [loadingNegotiation, setLoadingNegotiation] = useState(false);
 
   const width = Dimensions.get('window').width;
 
@@ -414,6 +455,151 @@ export default function ConversationScreen() {
       console.error('Collaboration response error:', err);
       Alert.alert(t.error, t.sendMessageError);
     }
+  };
+
+  // Negotiation functions
+  const loadActiveNegotiation = useCallback(async () => {
+    if (!selectedConversation?.announcementId) return;
+    try {
+      setLoadingNegotiation(true);
+      const response = await negotiationService.getAnnouncementNegotiations(selectedConversation.announcementId);
+      const negotiations = response.negotiations || [];
+      // Find the active negotiation between current user and the other participant
+      const active = negotiations.find((neg: any) => 
+        (neg.buyer._id === userId || neg.seller._id === userId) &&
+        ['pending', 'counter_offer', 'accepted'].includes(neg.status)
+      );
+      setActiveNegotiation(active || null);
+    } catch (error) {
+      const status = error?.response?.status;
+      if (status === 404) {
+        // No negotiation yet (or backend not deployed with this route) -> keep UI clean
+        setActiveNegotiation(null);
+      } else {
+        console.error('Error loading negotiation:', error);
+      }
+    } finally {
+      setLoadingNegotiation(false);
+    }
+  }, [selectedConversation?.announcementId, userId]);
+
+  useEffect(() => {
+    if (selectedConversation?.announcementId) {
+      loadActiveNegotiation();
+    }
+  }, [selectedConversation?.announcementId, loadActiveNegotiation]);
+
+  const handleAcceptOffer = async () => {
+    if (!activeNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      await negotiationService.acceptOffer(activeNegotiation._id);
+      setToastMessage(t.offerAccepted);
+      setToastType('success');
+      setToastVisible(true);
+      await loadActiveNegotiation();
+    } catch (error: any) {
+      console.error('Error accepting offer:', error);
+      Alert.alert(t.error, error?.response?.data?.message || t.negotiationError);
+    } finally {
+      setLoadingNegotiation(false);
+    }
+  };
+
+  const handleRejectOffer = async () => {
+    if (!activeNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      await negotiationService.rejectOffer(activeNegotiation._id);
+      setToastMessage(t.offerRejected);
+      setToastType('info');
+      setToastVisible(true);
+      await loadActiveNegotiation();
+    } catch (error: any) {
+      console.error('Error rejecting offer:', error);
+      Alert.alert(t.error, error?.response?.data?.message || t.negotiationError);
+    } finally {
+      setLoadingNegotiation(false);
+    }
+  };
+
+  const handleSendCounterOffer = async () => {
+    if (!activeNegotiation || !counterOfferPrice) return;
+    const price = parseFloat(counterOfferPrice);
+    if (isNaN(price) || price <= 0) {
+      Alert.alert(t.error, 'Te rog introdu un preț valid.');
+      return;
+    }
+
+    try {
+      setLoadingNegotiation(true);
+      setCounterOfferModalVisible(false);
+      
+      const isSeller = String(userId) === String(activeNegotiation.seller._id);
+      if (isSeller) {
+        await negotiationService.counterOffer(activeNegotiation._id, { counterPrice: price });
+      } else {
+        await negotiationService.buyerCounterOffer(activeNegotiation._id, { newPrice: price });
+      }
+      
+      setToastMessage(t.counterOffer);
+      setToastType('success');
+      setToastVisible(true);
+      setCounterOfferPrice('');
+      await loadActiveNegotiation();
+    } catch (error: any) {
+      console.error('Error sending counter offer:', error);
+      Alert.alert(t.error, error?.response?.data?.message || t.negotiationError);
+    } finally {
+      setLoadingNegotiation(false);
+    }
+  };
+
+  const handleAcceptCounterOffer = async () => {
+    if (!activeNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      await negotiationService.acceptCounterOffer(activeNegotiation._id);
+      setToastMessage(t.offerAccepted);
+      setToastType('success');
+      setToastVisible(true);
+      await loadActiveNegotiation();
+    } catch (error: any) {
+      console.error('Error accepting counter offer:', error);
+      Alert.alert(t.error, error?.response?.data?.message || t.negotiationError);
+    } finally {
+      setLoadingNegotiation(false);
+    }
+  };
+
+  const handleFinalizeDeal = async () => {
+    if (!activeNegotiation) return;
+    
+    Alert.alert(
+      t.finalizeDeal,
+      t.finalizeDealConfirm,
+      [
+        { text: t.cancel, style: 'cancel' },
+        {
+          text: t.finalizeDeal,
+          onPress: async () => {
+            try {
+              setLoadingNegotiation(true);
+              const response = await negotiationService.finalizeNegotiation(activeNegotiation._id);
+              setToastMessage(`${t.dealFinalized} ${t.balanceUpdated} ${activeNegotiation.currentPrice} RON`);
+              setToastType('success');
+              setToastVisible(true);
+              await loadActiveNegotiation();
+            } catch (error: any) {
+              console.error('Error finalizing deal:', error);
+              Alert.alert(t.error, error?.response?.data?.message || t.negotiationError);
+            } finally {
+              setLoadingNegotiation(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const renderCollaborationBody = (message: Message, isOwn: boolean) => {
@@ -1225,14 +1411,31 @@ export default function ConversationScreen() {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                onPress={handleSendCollaborationRequest}
-                disabled={sendingCollab}
-                activeOpacity={0.85}
-                style={[styles.headerActionBtn, { opacity: sendingCollab ? 0.5 : 1 }]}
-              >
-                <Ionicons name="people-outline" size={22} color={tokens.colors.text} />
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {/* Finalize Deal Button - only for buyer when negotiation is accepted */}
+                {activeNegotiation && 
+                 activeNegotiation.status === 'accepted' && 
+                 String(activeNegotiation.buyer._id) === String(userId) && (
+                  <TouchableOpacity
+                    onPress={handleFinalizeDeal}
+                    disabled={loadingNegotiation}
+                    activeOpacity={0.85}
+                    style={[styles.headerActionBtn, { opacity: loadingNegotiation ? 0.5 : 1, backgroundColor: tokens.colors.primary }]}
+                  >
+                    <Ionicons name="checkmark-done-outline" size={22} color={tokens.colors.primaryContrast} />
+                  </TouchableOpacity>
+                )}
+
+                {/* Collaborate Button */}
+                <TouchableOpacity
+                  onPress={handleSendCollaborationRequest}
+                  disabled={sendingCollab}
+                  activeOpacity={0.85}
+                  style={[styles.headerActionBtn, { opacity: sendingCollab ? 0.5 : 1 }]}
+                >
+                  <Ionicons name="people-outline" size={22} color={tokens.colors.text} />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={[styles.headerSeparator, isDark ? styles.headerSeparatorDark : undefined]} />
@@ -1259,6 +1462,92 @@ export default function ConversationScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Active Negotiation Bar */}
+        {activeNegotiation && activeNegotiation.status !== 'finalized' && (
+          <View style={[styles.negotiationBar, { backgroundColor: tokens.colors.surface, borderBottomWidth: 1, borderBottomColor: tokens.colors.border }]}>
+            <View style={styles.negotiationContent}>
+              <Ionicons name="pricetag" size={20} color={tokens.colors.primary} />
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <ThemedText style={[styles.negotiationTitle, { color: tokens.colors.text }]}>
+                  {activeNegotiation.status === 'pending' && String(activeNegotiation.buyer._id) === String(userId)
+                    ? t.negotiationOffer
+                    : activeNegotiation.status === 'counter_offer'
+                    ? t.counterOffer
+                    : activeNegotiation.status === 'accepted'
+                    ? t.offerAccepted
+                    : t.negotiationOffer}
+                </ThemedText>
+                <ThemedText style={[styles.negotiationPrice, { color: tokens.colors.primary }]}>
+                  {activeNegotiation.currentPrice} RON
+                </ThemedText>
+              </View>
+            </View>
+
+            {/* Action buttons based on role and status */}
+            {String(activeNegotiation.seller._id) === String(userId) && 
+             ['pending', 'counter_offer'].includes(activeNegotiation.status) && (
+              <View style={styles.negotiationActions}>
+                <TouchableOpacity
+                  onPress={handleAcceptOffer}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationBtn, { backgroundColor: tokens.colors.primary }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.primaryContrast }]}>
+                    {t.acceptOffer}
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setCounterOfferModalVisible(true)}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationBtn, { backgroundColor: tokens.colors.surface, borderWidth: 1, borderColor: tokens.colors.border }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.text }]}>
+                    {t.sendCounterOffer}
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleRejectOffer}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: tokens.colors.border }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.muted }]}>
+                    {t.rejectOffer}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {String(activeNegotiation.buyer._id) === String(userId) && 
+             activeNegotiation.status === 'counter_offer' && (
+              <View style={styles.negotiationActions}>
+                <TouchableOpacity
+                  onPress={handleAcceptCounterOffer}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationBtn, { backgroundColor: tokens.colors.primary }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.primaryContrast }]}>
+                    {t.acceptOffer}
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setCounterOfferModalVisible(true)}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationBtn, { backgroundColor: tokens.colors.surface, borderWidth: 1, borderColor: tokens.colors.border }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.text }]}>
+                    {t.sendCounterOffer}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
 
         <ScrollView
           ref={messagesEndRef}
@@ -1812,6 +2101,65 @@ export default function ConversationScreen() {
           onConfirm={confirmSendCollaborationRequest}
           onCancel={() => setConfirmCollabVisible(false)}
         />
+
+        {/* Counter Offer Modal */}
+        <Modal
+          visible={counterOfferModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setCounterOfferModalVisible(false)}
+        >
+          <Pressable 
+            style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }]}
+            onPress={() => setCounterOfferModalVisible(false)}
+          >
+            <Pressable 
+              style={[styles.counterOfferModal, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <ThemedText style={[styles.counterOfferTitle, { color: tokens.colors.text }]}>
+                {t.sendCounterOffer}
+              </ThemedText>
+              <View style={[styles.counterOfferInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}>
+                <ThemedText style={[{ color: tokens.colors.muted, fontSize: 12, fontWeight: '600', marginBottom: 6 }]}>
+                  {t.enterNewPrice}
+                </ThemedText>
+                <TextInput
+                  style={[styles.counterOfferInput, { color: tokens.colors.text }]}
+                  placeholder="0.00"
+                  placeholderTextColor={tokens.colors.placeholder}
+                  value={counterOfferPrice}
+                  onChangeText={setCounterOfferPrice}
+                  keyboardType="decimal-pad"
+                />
+              </View>
+              <View style={styles.counterOfferActions}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setCounterOfferModalVisible(false);
+                    setCounterOfferPrice('');
+                  }}
+                  style={[styles.counterOfferBtn, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.surface }]}
+                  activeOpacity={0.8}
+                >
+                  <ThemedText style={[styles.counterOfferBtnText, { color: tokens.colors.text }]}>
+                    {t.cancel}
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleSendCounterOffer}
+                  style={[styles.counterOfferBtn, { backgroundColor: tokens.colors.primary }]}
+                  activeOpacity={0.8}
+                  disabled={loadingNegotiation}
+                >
+                  <ThemedText style={[styles.counterOfferBtnText, { color: tokens.colors.primaryContrast }]}>
+                    {t.send}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Pressable>
+        </Modal>
       </KeyboardAvoidingView>
     </ProtectedRoute>
   );
@@ -2250,5 +2598,86 @@ const styles = StyleSheet.create({
   replyInBubbleImageRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  
+  // Negotiation styles
+  negotiationBar: {
+    padding: 16,
+    gap: 12,
+  },
+  negotiationContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  negotiationTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  negotiationPrice: {
+    fontSize: 18,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  negotiationActions: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+    flexWrap: 'wrap',
+  },
+  negotiationBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    flex: 1,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  negotiationBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  counterOfferModal: {
+    width: '85%',
+    maxWidth: 400,
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+  },
+  counterOfferTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  counterOfferInputWrapper: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+  },
+  counterOfferInput: {
+    fontSize: 16,
+    fontWeight: '600',
+    padding: 8,
+  },
+  counterOfferActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  counterOfferBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  counterOfferBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
   },
 });

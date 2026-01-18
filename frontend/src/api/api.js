@@ -35,7 +35,7 @@ if (!API_URL) {
 // Configurare instanță Axios
 const apiClient = axios.create({
   baseURL: API_URL,
-  withCredentials: false,
+  withCredentials: true,
 });
 
 // Debug baseURL once

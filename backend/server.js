@@ -30,6 +30,7 @@ const path = require('path');
 const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const negotiationRoutes = require('./routes/negotiationRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -228,6 +229,7 @@ app.use('/api/announcements', announcementRoutes); // Rute pentru anunturi publi
 app.use('/api/favorites', favoriteRoutes); // Rute pentru favorite persistente
 app.use('/api/messages', messageRoutes); // Rute pentru mesaje chat
 app.use('/api/reviews', reviewRoutes); // Rute pentru recenzii (create/list)
+app.use('/api/negotiations', negotiationRoutes); // Rute pentru negocieri
 
 // Servire imagini uploadate din frontend/public/uploads
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));

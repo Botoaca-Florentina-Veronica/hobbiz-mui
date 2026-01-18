@@ -1200,6 +1200,7 @@
   },
   "verification": {
     "title": "Verificări documente",
+    "uploadTitle": "Încarcă document nou",
     "infoTitle": "De ce să îți verifici profilul?",
     "infoText": "Încărcarea documentelor profesionale (diplome, certificări, atestate) ajută la construirea încrederii în rândul clienților. După verificare, vei primi un badge de 'Utilizator Verificat'.",
     "uploadButton": "Încarcă Document",

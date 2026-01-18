@@ -1200,6 +1200,7 @@
   },
   "verification": {
     "title": "Verification Documents",
+    "uploadTitle": "Upload new document",
     "infoTitle": "Why verify your profile?",
     "infoText": "Uploading professional documents (diplomas, certifications, authorizations) helps build trust with clients. After verification, you will receive a 'Verified User' badge.",
     "uploadButton": "Upload Document",

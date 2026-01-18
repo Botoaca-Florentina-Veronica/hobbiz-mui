@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import apiClient from '../api/api';
 import '../pages/LoginSignup.css';
 
 export default function SignupPage() {
@@ -36,7 +36,7 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/users/register`, formData);
+      const response = await apiClient.post('/api/users/register', formData);
       
       // Redirecționează către login cu mesaj de succes
       navigate('/login', { state: { success: t('auth.signupSuccess') } });

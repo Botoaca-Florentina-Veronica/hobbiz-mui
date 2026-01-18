@@ -47,6 +47,16 @@ import './AccountSettings.css'; // Reuse some layout styles
 export default function VerificationDocuments() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const poppinsFont = { fontFamily: 'Poppins, sans-serif' };
+  const floatingLabelSx = {
+    ...poppinsFont,
+    px: 1,
+    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : '#fff',
+    transformOrigin: 'top left',
+    '&.MuiInputLabel-shrink': {
+      transform: 'translate(14px, -6px) scale(0.75)',
+    },
+  };
   
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -83,12 +93,9 @@ export default function VerificationDocuments() {
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0] || null;
     if (file) {
       setSelectedFile(file);
-      if (!docName) {
-        setDocName(file.name.split('.')[0]);
-      }
     }
   };
 
@@ -112,7 +119,6 @@ export default function VerificationDocuments() {
       await uploadVerificationDocument(formData);
       if (window.showToast) window.showToast(t('verification.messages.uploadSuccess'), 'success');
       setUploadModalOpen(false);
-      // Reset form
       setSelectedFile(null);
       setDocName('');
       setDocType('certificate');
@@ -127,6 +133,7 @@ export default function VerificationDocuments() {
   };
 
   const handleDelete = async () => {
+    if (!deleteId) return;
     try {
       await deleteUserDocument(deleteId);
       if (window.showToast) window.showToast(t('verification.messages.deleteSuccess'), 'success');
@@ -140,46 +147,57 @@ export default function VerificationDocuments() {
   };
 
   const getStatusChip = (status) => {
+    const baseSx = {
+      ...poppinsFont,
+      fontWeight: 600,
+      textTransform: 'none',
+      borderRadius: 999,
+    };
+
     switch (status) {
       case 'verified':
-        return <Chip 
-          icon={<VerifiedIcon />} 
-          label={t('verification.status.verified')} 
-          color="success" 
-          variant="outlined" 
-          size="small"
-          className="status-chip-verified"
-          sx={{
-            color: '#4caf50',
-            borderColor: '#4caf50'
-          }}
-        />;
+        return (
+          <Chip
+            icon={<VerifiedIcon />}
+            label={t('verification.status.verified')}
+            size="small"
+            variant="outlined"
+            sx={{
+              ...baseSx,
+              color: '#4caf50',
+              borderColor: '#4caf50',
+            }}
+          />
+        );
       case 'rejected':
-        return <Chip 
-          icon={<ErrorOutlineIcon />} 
-          label={t('verification.status.rejected')} 
-          color="error" 
-          variant="outlined" 
-          size="small"
-          sx={{
-            color: '#f44336',
-            borderColor: '#f44336'
-          }}
-        />;
+        return (
+          <Chip
+            icon={<ErrorOutlineIcon />}
+            label={t('verification.status.rejected')}
+            size="small"
+            variant="outlined"
+            sx={{
+              ...baseSx,
+              color: '#f44336',
+              borderColor: '#f44336',
+            }}
+          />
+        );
       case 'pending':
       default:
-        return <Chip 
-          icon={<PendingIcon />} 
-          label={t('verification.status.pending')} 
-          color="warning" 
-          variant="outlined" 
-          size="small"
-          className="status-chip-pending"
-          sx={{
-            color: '#ff9800',
-            borderColor: '#ff9800'
-          }}
-        />;
+        return (
+          <Chip
+            icon={<PendingIcon />}
+            label={t('verification.status.pending')}
+            size="small"
+            variant="outlined"
+            sx={{
+              ...baseSx,
+              color: '#ff9800',
+              borderColor: '#ff9800',
+            }}
+          />
+        );
     }
   };
 
@@ -195,10 +213,10 @@ export default function VerificationDocuments() {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h5" className="mobile-header-title">{t('verification.title')}</Typography>
+          <Typography variant="h5" className="mobile-header-title" sx={poppinsFont}>{t('verification.title')}</Typography>
         </div>
 
-        <h1 className="notification-title">{t('verification.title')}</h1>
+        <h1 className="notification-title" style={{ fontFamily: 'Poppins, sans-serif' }}>{t('verification.title')}</h1>
 
         <Paper 
           elevation={0} 
@@ -216,9 +234,9 @@ export default function VerificationDocuments() {
         >
           <Box display="flex" alignItems="center" gap={1}>
             <InfoIcon color="primary" />
-            <Typography variant="h6" color="primary">{t('verification.infoTitle')}</Typography>
+            <Typography variant="h6" color="primary" sx={poppinsFont}>{t('verification.infoTitle')}</Typography>
           </Box>
-          <Typography variant="body2" style={{ marginTop: '8px' }}>
+          <Typography variant="body2" sx={{ ...poppinsFont, marginTop: '8px' }}>
             {t('verification.infoText')}
           </Typography>
         </Paper>
@@ -230,6 +248,7 @@ export default function VerificationDocuments() {
             onClick={() => setUploadModalOpen(true)}
             className="upload-doc-btn"
             sx={{
+              ...poppinsFont,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#4a7bb0' : '#0B2D5A',
               color: '#fff',
               textTransform: 'none',
@@ -250,7 +269,7 @@ export default function VerificationDocuments() {
             </Box>
           ) : documents.length === 0 ? (
             <Box p={4} textAlign="center">
-              <Typography color="textSecondary">{t('verification.noDocuments')}</Typography>
+              <Typography color="textSecondary" sx={poppinsFont}>{t('verification.noDocuments')}</Typography>
             </Box>
           ) : (
             <List>
@@ -262,14 +281,19 @@ export default function VerificationDocuments() {
                     </Box>
                     <ListItemText 
                       primary={doc.name} 
+                      primaryTypographyProps={{ sx: poppinsFont }}
                       secondary={
                         <Box>
-                          <Typography variant="caption" display="block">
+                          <Typography variant="caption" display="block" sx={poppinsFont}>
                             {t(`verification.types.${doc.type}`)} • {new Date(doc.uploadedAt).toLocaleDateString()}
                           </Typography>
-                          {doc.description && <Typography variant="body2" color="textSecondary">{doc.description}</Typography>}
+                          {doc.description && (
+                            <Typography variant="body2" color="textSecondary" sx={{ ...poppinsFont, marginTop: '4px' }}>
+                              {doc.description}
+                            </Typography>
+                          )}
                           {doc.status === 'rejected' && doc.rejectionReason && (
-                            <Typography variant="body2" color="error" style={{ marginTop: '4px', fontWeight: 'bold' }}>
+                            <Typography variant="body2" color="error" sx={{ ...poppinsFont, marginTop: '4px', fontWeight: 'bold' }}>
                               {t('verification.admin.rejectionReason')}: {doc.rejectionReason}
                             </Typography>
                           )}
@@ -280,13 +304,14 @@ export default function VerificationDocuments() {
                               variant="text"
                               startIcon={<VisibilityIcon />}
                               onClick={() => window.open(doc.url, '_blank')}
-                              style={{ textTransform: 'none' }}
+                              sx={{ ...poppinsFont, textTransform: 'none' }}
                             >
                               {t('verification.viewDocument') || 'Vezi Document'}
                             </Button>
                           </Box>
                         </Box>
                       }
+                      secondaryTypographyProps={{ sx: poppinsFont }}
                     />
                     <ListItemSecondaryAction>
                       <Tooltip title={t('common.delete')} placement="top" arrow>
@@ -314,7 +339,7 @@ export default function VerificationDocuments() {
           sx: {
             borderRadius: 4,
             backgroundImage: 'none',
-            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#121212' : 'white',
             border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : 'none',
             boxShadow: (theme) => theme.palette.mode === 'dark' 
               ? '0 20px 60px rgba(0,0,0,0.6)' 
@@ -331,16 +356,29 @@ export default function VerificationDocuments() {
           }
         }}
       >
-        <DialogTitle sx={{ fontWeight: 700, pt: 3 }}>{t('verification.uploadTitle')}</DialogTitle>
-        <DialogContent>
-          <Box display="flex" flexDirection="column" gap={2} pt={1}>
+        <DialogTitle sx={{ fontWeight: 700, pt: 3, ...poppinsFont }}>{t('verification.uploadTitle')}</DialogTitle>
+        <DialogContent sx={{ ...poppinsFont }}>
+          <Box
+            sx={{
+              ...poppinsFont,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              pt: 1,
+            }}
+          >
             <Button
               variant="outlined"
               component="label"
               fullWidth
               disabled={uploading}
               startIcon={<FilePresentIcon />}
-              style={{ padding: '12px', borderStyle: 'dashed' }}
+              sx={{
+                ...poppinsFont,
+                padding: '12px',
+                borderStyle: 'dashed',
+                textTransform: 'none',
+              }}
             >
               {selectedFile ? selectedFile.name : t('verification.messages.pickError')}
               <input type="file" hidden onChange={handleFileChange} accept=".pdf,image/*" />
@@ -353,21 +391,24 @@ export default function VerificationDocuments() {
               value={docName}
               onChange={(e) => setDocName(e.target.value)}
               disabled={uploading}
+              InputLabelProps={{ sx: floatingLabelSx }}
+              sx={{ ...poppinsFont }}
             />
 
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>{t('verification.documentType')}</InputLabel>
+            <FormControl fullWidth variant="outlined" sx={{ ...poppinsFont }}>
+              <InputLabel sx={floatingLabelSx}>{t('verification.documentType')}</InputLabel>
               <Select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
                 label={t('verification.documentType')}
                 disabled={uploading}
+                sx={poppinsFont}
               >
-                <MenuItem value="certificate">{t('verification.types.certificate')}</MenuItem>
-                <MenuItem value="diploma">{t('verification.types.diploma')}</MenuItem>
-                <MenuItem value="authorization">{t('verification.types.authorization')}</MenuItem>
-                <MenuItem value="license">{t('verification.types.license')}</MenuItem>
-                <MenuItem value="other">{t('verification.types.other')}</MenuItem>
+                <MenuItem sx={poppinsFont} value="certificate">{t('verification.types.certificate')}</MenuItem>
+                <MenuItem sx={poppinsFont} value="diploma">{t('verification.types.diploma')}</MenuItem>
+                <MenuItem sx={poppinsFont} value="authorization">{t('verification.types.authorization')}</MenuItem>
+                <MenuItem sx={poppinsFont} value="license">{t('verification.types.license')}</MenuItem>
+                <MenuItem sx={poppinsFont} value="other">{t('verification.types.other')}</MenuItem>
               </Select>
             </FormControl>
 
@@ -380,11 +421,13 @@ export default function VerificationDocuments() {
               value={docDescription}
               onChange={(e) => setDocDescription(e.target.value)}
               disabled={uploading}
+              InputLabelProps={{ sx: floatingLabelSx }}
+              sx={{ ...poppinsFont }}
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setUploadModalOpen(false)} disabled={uploading}>
+        <DialogActions sx={{ ...poppinsFont }}>
+          <Button sx={{ ...poppinsFont, textTransform: 'none' }} onClick={() => setUploadModalOpen(false)} disabled={uploading}>
             {t('common.cancel')}
           </Button>
           <Button 
@@ -392,7 +435,9 @@ export default function VerificationDocuments() {
             variant="contained" 
             disabled={!selectedFile || !docName.trim() || uploading}
             sx={{ 
+              ...poppinsFont,
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#4a7bb0' : '#0B2D5A',
+              textTransform: 'none',
               '&:hover': {
                 backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#5a8bc0' : '#0a2550'
               }

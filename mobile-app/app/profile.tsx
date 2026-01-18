@@ -82,6 +82,8 @@ export default function ProfileScreen() {
       myLocation: 'Locația mea',
       changeLocation: 'Schimbă locația',
       noLocationText: "Nu ți-ai setat încă locația, dc?",
+      balance: 'Balanță',
+      ron: 'RON',
       contactInfo: 'Informații de Contact',
       edit: 'Editează',
       lastName: 'Nume',
@@ -113,6 +115,8 @@ export default function ProfileScreen() {
       myLocation: 'My location',
       changeLocation: 'Change location',
       noLocationText: "You haven't set your location yet.",
+      balance: 'Balance',
+      ron: 'RON',
       contactInfo: 'Contact Information',
       edit: 'Edit',
       lastName: 'Last name',
@@ -700,6 +704,19 @@ export default function ProfileScreen() {
             <ThemedText style={[styles.registerDate, { color: tokens.colors.muted }]}>
               {t.memberSince} {formatMemberDate(profileToShow?.createdAt)}
             </ThemedText>
+
+            {/* Balance display - only for own profile */}
+            {isViewingOwnProfile && (
+              <View style={[styles.balanceContainer, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}>
+                <Ionicons name="wallet-outline" size={20} color={tokens.colors.primary} />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <ThemedText style={[styles.balanceLabel, { color: tokens.colors.muted }]}>{t.balance}</ThemedText>
+                  <ThemedText style={[styles.balanceValue, { color: tokens.colors.primary }]}>
+                    {(profileToShow?.balance || 0).toFixed(2)} {t.ron}
+                  </ThemedText>
+                </View>
+              </View>
+            )}
           </View>
         </View>
 
@@ -1568,6 +1585,25 @@ const styles = StyleSheet.create({
   },
   registerDate: {
     fontSize: 12,
+  },
+  balanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    marginTop: 12,
+    borderWidth: 1,
+  },
+  balanceLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  balanceValue: {
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: 2,
   },
 
   // Location Section

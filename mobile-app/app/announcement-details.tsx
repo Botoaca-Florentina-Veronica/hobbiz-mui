@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ImageViewing from '../src/components/ImageViewer';
 import Constants from 'expo-constants';
 import { translateCategory, getCategoryKeyByLabel } from '../src/constants/categories';
+import negotiationService from '../src/services/negotiationService';
 
 interface Announcement {
   _id: string;
@@ -70,6 +71,13 @@ const TRANSLATIONS = {
     noCollaborationTitle: 'Colaborare necesară',
     noCollaborationMessage: 'Poți lăsa o recenzie doar utilizatorilor cu care ai colaborat oficial pe platformă.',
     understood: 'AM ÎNȚELES',
+    proposePrice: 'PROPUNE UN PREȚ',
+    proposePriceTitle: 'Propune un preț',
+    yourOffer: 'Oferta ta (RON)',
+    messageOptional: 'Mesaj (opțional)',
+    proposePriceError: 'Nu am putut trimite oferta. Încearcă din nou.',
+    proposePriceSuccess: 'Oferta a fost trimisă cu succes!',
+    enterValidPrice: 'Te rog introdu un preț valid.',
   },
   en: {
     posted: 'Posted',
@@ -110,6 +118,13 @@ const TRANSLATIONS = {
     noCollaborationTitle: 'Collaboration Required',
     noCollaborationMessage: 'You can only leave a review for users you have officially collaborated with on the platform.',
     understood: 'UNDERSTOOD',
+    proposePrice: 'PROPOSE A PRICE',
+    proposePriceTitle: 'Propose a price',
+    yourOffer: 'Your offer (RON)',
+    messageOptional: 'Message (optional)',
+    proposePriceError: 'Could not send offer. Please try again.',
+    proposePriceSuccess: 'Offer sent successfully!',
+    enterValidPrice: 'Please enter a valid price.',
   }
 };
 
@@ -143,6 +158,12 @@ export default function AnnouncementDetailsScreen() {
   const [sellerRating, setSellerRating] = useState<number | null>(null);
   const [sellerReviewCount, setSellerReviewCount] = useState<number>(0);
   const [sellerReviewsLoading, setSellerReviewsLoading] = useState<boolean>(false);
+  
+  // Price negotiation states
+  const [priceModalVisible, setPriceModalVisible] = useState(false);
+  const [proposedPrice, setProposedPrice] = useState('');
+  const [priceMessage, setPriceMessage] = useState('');
+  const [submittingPrice, setSubmittingPrice] = useState(false);
 
   const width = Dimensions.get('window').width;
   const isLarge = width >= 768;
@@ -274,6 +295,32 @@ export default function AnnouncementDetailsScreen() {
     fetchSellerReviews();
     return () => { cancelled = true; };
   }, [announcement?.user?._id]);
+
+  const handleProposePrice = async () => {
+    if (!proposedPrice || parseFloat(proposedPrice) <= 0) {
+      Alert.alert(t.error, t.enterValidPrice);
+      return;
+    }
+
+    setSubmittingPrice(true);
+    try {
+      await negotiationService.createNegotiation({
+        announcementId: announcement!._id,
+        proposedPrice: parseFloat(proposedPrice),
+        message: priceMessage || undefined
+      });
+      
+      Alert.alert(t.send, t.proposePriceSuccess);
+      setPriceModalVisible(false);
+      setProposedPrice('');
+      setPriceMessage('');
+    } catch (error: any) {
+      console.error('Error proposing price:', error);
+      Alert.alert(t.error, error?.response?.data?.message || t.proposePriceError);
+    } finally {
+      setSubmittingPrice(false);
+    }
+  };
 
   const goToChat = () => {
     try {
@@ -583,6 +630,25 @@ export default function AnnouncementDetailsScreen() {
           <ThemedText style={styles.primaryCtaText}>{t.sendMessage}</ThemedText>
         </TouchableOpacity>
 
+        {/* Secondary CTA: Propose Price */}
+        <TouchableOpacity
+          onPress={() => {
+            if (!isAuthenticated) {
+              Alert.alert(t.loginRequired, t.loginToFavorite, [
+                { text: t.cancel, style: 'cancel' },
+                { text: 'Login', onPress: () => router.push('/login') }
+              ]);
+              return;
+            }
+            setPriceModalVisible(true);
+          }}
+          style={[styles.outlineBtn, { borderColor: tokens.colors.primary, marginTop: 12 }]}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="pricetag-outline" size={16} color={tokens.colors.primary} style={{ marginRight: 8 }} />
+          <ThemedText style={[styles.outlineBtnText, { color: tokens.colors.primary }]}>{t.proposePrice}</ThemedText>
+        </TouchableOpacity>
+
         {/* Phone Card */}
         <View style={[styles.phoneCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
           <Ionicons name="call-outline" size={20} color={tokens.colors.primary} style={{ marginRight: 10 }} />
@@ -715,6 +781,69 @@ export default function AnnouncementDetailsScreen() {
         HeaderComponent={viewerHeaderComponent}
       />
     </ScrollView>
+
+    {/* Price Proposal Modal Overlay */}
+    {priceModalVisible && (
+        <BlurView 
+          intensity={80} 
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.ratingModalOverlay, { zIndex: 1000 }]}
+        >
+          <View style={[styles.ratingModalCard, { backgroundColor: isDark ? '#121212' : tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            <ThemedText style={[styles.ratingModalTitle, { color: tokens.colors.text }]}>{t.proposePriceTitle}</ThemedText>
+            
+            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}>
+              <ThemedText style={[{ color: tokens.colors.muted, fontSize: 12, fontWeight: '600', marginBottom: 6 }]}>{t.yourOffer}</ThemedText>
+              <TextInput
+                style={[styles.ratingInput, { color: tokens.colors.text, minHeight: 50 }]}
+                placeholder="0.00"
+                placeholderTextColor={tokens.colors.placeholder}
+                value={proposedPrice}
+                onChangeText={setProposedPrice}
+                keyboardType="decimal-pad"
+              />
+            </View>
+
+            <View style={[styles.ratingInputWrapper, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}>
+              <ThemedText style={[{ color: tokens.colors.muted, fontSize: 12, fontWeight: '600', marginBottom: 6 }]}>{t.messageOptional}</ThemedText>
+              <TextInput
+                style={[styles.ratingInput, { color: tokens.colors.text }]}
+                placeholder={t.messageOptional}
+                placeholderTextColor={tokens.colors.placeholder}
+                value={priceMessage}
+                onChangeText={setPriceMessage}
+                multiline
+                maxLength={300}
+              />
+            </View>
+
+            <View style={styles.ratingModalActions}>
+              <TouchableOpacity
+                onPress={() => {
+                  setPriceModalVisible(false);
+                  setProposedPrice('');
+                  setPriceMessage('');
+                }}
+                style={[styles.ratingCancelBtn, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.surface }]}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.ratingCancelText, { color: tokens.colors.text }]}>{t.cancel}</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleProposePrice}
+                style={[styles.ratingSubmitBtn, { backgroundColor: tokens.colors.primary, opacity: submittingPrice ? 0.6 : 1 }]}
+                activeOpacity={0.8}
+                disabled={submittingPrice}
+              >
+                <ThemedText style={[styles.ratingSubmitText, { color: '#ffffff' }]}>
+                  {submittingPrice ? t.sending : t.send}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BlurView>
+    )}
 
     {/* Rating Modal Overlay */}
     {ratingModalVisible && (

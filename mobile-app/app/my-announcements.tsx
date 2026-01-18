@@ -357,7 +357,7 @@ export default function MyAnnouncementsScreen() {
   {/* Remove default header bottom border on this screen to avoid a visible line above the search container */}
   <View style={[styles.header, { paddingTop: insets.top, borderBottomWidth: 0, borderBottomColor: 'transparent' }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            <TouchableOpacity onPress={() => { try { router.back(); } catch (e) { try { router.push('/'); } catch (_) {} } }} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
             </TouchableOpacity>
             <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.title}</ThemedText>

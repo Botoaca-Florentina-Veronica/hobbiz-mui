@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   // Collaborations - stores user IDs with whom this user has agreed to collaborate
   collaborations: [{ type: String }],
+  
+  // Balance from finalized negotiations (in the platform's currency)
+  balance: { type: Number, default: 0 },
+  
   notificationSettings: {
     email: { type: Boolean, default: true },
     push: { type: Boolean, default: true },

@@ -27,18 +27,9 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    // IMPORTANT: Șterge token-urile vechi ÎNAINTE de login pentru a preveni probleme de securitate
     try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('lastAvatarUrl');
-    } catch (e) {
-      console.warn('Failed to clear old tokens:', e);
-    }
-
-    try {
-  // Trimite cererea la backend folosind apiClient (gestionează automat baseURL și token)
-  const response = await apiClient.post('/api/users/login', { email, password });
+      // Trimite cererea la backend folosind apiClient (gestionează automat baseURL și token)
+      const response = await apiClient.post('/api/users/login', { email, password });
 
       // Salvează NOUL token în localStorage
       localStorage.setItem('token', response.data.token);
