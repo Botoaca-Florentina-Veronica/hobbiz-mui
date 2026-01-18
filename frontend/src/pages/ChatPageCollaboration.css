@@ -1,0 +1,295 @@
+/* =============================================================
+   CHAT PAGE - COLLABORATION STYLES
+   ============================================================= */
+
+/* Collaboration Message Bubble */
+.collaboration-message {
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  max-width: 100%;
+}
+
+.dark-mode .collaboration-message {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+  border-color: #3b5a7f;
+}
+
+.collaboration-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #0369a1;
+  font-size: 15px;
+}
+
+.dark-mode .collaboration-header {
+  color: #7dd3fc;
+}
+
+.collaboration-header svg {
+  flex-shrink: 0;
+}
+
+.collaboration-status {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.dark-mode .collaboration-status {
+  color: #94a3b8;
+}
+
+.collaboration-hint {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.dark-mode .collaboration-hint {
+  color: #94a3b8;
+}
+
+.collaboration-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.collab-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.collab-btn.accept {
+  background: #0ea5e9;
+  color: #ffffff;
+}
+
+.collab-btn.accept:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.collab-btn.decline {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.collab-btn.decline:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.dark-mode .collab-btn.decline {
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+.dark-mode .collab-btn.decline:hover {
+  background: #1e293b;
+  border-color: #64748b;
+}
+
+/* Collaboration Confirmation Dialog */
+.collab-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.collab-dialog {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: dialogSlideIn 0.3s ease-out;
+}
+
+.dark-mode .collab-dialog {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+@keyframes dialogSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.collab-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: #0369a1;
+}
+
+.dark-mode .collab-dialog-header {
+  color: #7dd3fc;
+}
+
+.collab-dialog-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: inherit;
+}
+
+.collab-dialog-message {
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.dark-mode .collab-dialog-message {
+  color: #cbd5e1;
+}
+
+.collab-dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.collab-dialog-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.collab-dialog-btn.cancel {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.collab-dialog-btn.cancel:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.collab-dialog-btn.confirm {
+  background: #0ea5e9;
+  color: #ffffff;
+}
+
+.collab-dialog-btn.confirm:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.dark-mode .collab-dialog-btn.cancel {
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+.dark-mode .collab-dialog-btn.cancel:hover {
+  background: #334155;
+  border-color: #64748b;
+}
+
+/* Collaboration Status Dialog (simpler, info-only) */
+.collab-status-dialog {
+  text-align: center;
+  padding: 32px 24px 24px 24px;
+}
+
+.collab-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  margin: 0 auto 20px auto;
+}
+
+.dark-mode .collab-status-icon {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+  color: #93c5fd;
+}
+
+/* Semantic variants */
+.collab-status-icon.success {
+  background: linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%);
+  color: #166534;
+}
+.dark-mode .collab-status-icon.success {
+  background: linear-gradient(135deg,#072f17 0%,#08331a 100%);
+  color: #bbf7d0;
+}
+
+.collab-status-icon.pending {
+  background: linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%);
+  color: #92400e;
+}
+.dark-mode .collab-status-icon.pending {
+  background: linear-gradient(135deg,#3a2a12 0%,#402f15 100%);
+  color: #ffdba4;
+}
+
+.collab-status-icon.info {
+  background: linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);
+  color: #1e40af;
+}
+.dark-mode .collab-status-icon.info {
+  background: linear-gradient(135deg,#1e3a5f 0%,#2d4a6f 100%);
+  color: #93c5fd;
+}
+
+.collab-status-message {
+  color: #1e293b;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  font-weight: 500;
+}
+
+.dark-mode .collab-status-message {
+  color: #e2e8f0;
+}
+
+.collab-dialog-btn.full-width {
+  width: 100%;
+  padding: 12px 20px;
+}

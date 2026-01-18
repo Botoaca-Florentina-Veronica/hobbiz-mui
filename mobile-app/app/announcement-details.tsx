@@ -592,62 +592,70 @@ export default function AnnouncementDetailsScreen() {
         {/* Contact label + Evaluate button */}
         <View style={styles.contactTopRow}>
           <ThemedText style={[styles.contactLabel, { color: tokens.colors.muted }]}>{t.contactPerson}</ThemedText>
-          <TouchableOpacity
-            onPress={() => {
-              if (!isAuthenticated) {
-                Alert.alert(t.loginRequired, t.loginToFavorite, [
-                  { text: t.cancel, style: 'cancel' },
-                  { text: 'Login', onPress: () => router.push('/login') }
-                ]);
-                return;
-              }
+          {/* Nu afișa butonul de evaluare dacă utilizatorul vizualizează propriul anunț */}
+          {currentUser?.id !== announcement.user?._id && (
+            <TouchableOpacity
+              onPress={() => {
+                if (!isAuthenticated) {
+                  Alert.alert(t.loginRequired, t.loginToFavorite, [
+                    { text: t.cancel, style: 'cancel' },
+                    { text: 'Login', onPress: () => router.push('/login') }
+                  ]);
+                  return;
+                }
 
-              // Check collaboration
-              const hasCollaboration = currentUser?.collaborations?.includes(announcement.user?._id || '');
-              if (!hasCollaboration) {
-                setNoCollabModalVisible(true);
-                return;
-              }
+                // Check collaboration
+                const hasCollaboration = currentUser?.collaborations?.includes(announcement.user?._id || '');
+                if (!hasCollaboration) {
+                  setNoCollabModalVisible(true);
+                  return;
+                }
 
-              setRatingModalVisible(true);
-            }}
-            style={[styles.evaluateBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="star-outline" size={16} color={tokens.colors.text} style={{ marginRight: 6 }} />
-            <ThemedText style={[styles.evaluateText, { color: tokens.colors.text }]}>{t.evaluate}</ThemedText>
-          </TouchableOpacity>
+                setRatingModalVisible(true);
+              }}
+              style={[styles.evaluateBtn, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="star-outline" size={16} color={tokens.colors.text} style={{ marginRight: 6 }} />
+              <ThemedText style={[styles.evaluateText, { color: tokens.colors.text }]}>{t.evaluate}</ThemedText>
+            </TouchableOpacity>
+          )}
         </View>
         <ThemedText style={[styles.contactValue, { color: tokens.colors.text }]}>{announcement.contactPerson}</ThemedText>
 
-        {/* Primary CTA: Send Message */}
-        <TouchableOpacity
-          onPress={goToChat}
-          style={[styles.primaryCta, { backgroundColor: tokens.colors.primary }]}
-          activeOpacity={0.9}
-        >
-          <Ionicons name="chatbubble-ellipses-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
-          <ThemedText style={styles.primaryCtaText}>{t.sendMessage}</ThemedText>
-        </TouchableOpacity>
+        {/* Nu afișa butoanele de mesaj și negociere pentru propriile anunțuri */}
+        {currentUser?.id !== announcement.user?._id && (
+          <>
+            {/* Primary CTA: Send Message */}
+            <TouchableOpacity
+              onPress={goToChat}
+              style={[styles.primaryCta, { backgroundColor: tokens.colors.primary }]}
+              activeOpacity={0.9}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+              <ThemedText style={styles.primaryCtaText}>{t.sendMessage}</ThemedText>
+            </TouchableOpacity>
 
-        {/* Secondary CTA: Propose Price */}
-        <TouchableOpacity
-          onPress={() => {
-            if (!isAuthenticated) {
-              Alert.alert(t.loginRequired, t.loginToFavorite, [
-                { text: t.cancel, style: 'cancel' },
-                { text: 'Login', onPress: () => router.push('/login') }
-              ]);
-              return;
-            }
-            setPriceModalVisible(true);
-          }}
-          style={[styles.outlineBtn, { borderColor: tokens.colors.primary, marginTop: 12 }]}
-          activeOpacity={0.85}
-        >
-          <Ionicons name="pricetag-outline" size={16} color={tokens.colors.primary} style={{ marginRight: 8 }} />
-          <ThemedText style={[styles.outlineBtnText, { color: tokens.colors.primary }]}>{t.proposePrice}</ThemedText>
-        </TouchableOpacity>
+            {/* Secondary CTA: Propose Price */}
+            <TouchableOpacity
+              onPress={() => {
+                if (!isAuthenticated) {
+                  Alert.alert(t.loginRequired, t.loginToFavorite, [
+                    { text: t.cancel, style: 'cancel' },
+                    { text: 'Login', onPress: () => router.push('/login') }
+                  ]);
+                  return;
+                }
+                setPriceModalVisible(true);
+              }}
+              style={[styles.outlineBtn, { borderColor: tokens.colors.primary, marginTop: 12 }]}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="pricetag-outline" size={16} color={tokens.colors.primary} style={{ marginRight: 8 }} />
+              <ThemedText style={[styles.outlineBtnText, { color: tokens.colors.primary }]}>{t.proposePrice}</ThemedText>
+            </TouchableOpacity>
+          </>
+        )}
 
         {/* Phone Card */}
         <View style={[styles.phoneCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          

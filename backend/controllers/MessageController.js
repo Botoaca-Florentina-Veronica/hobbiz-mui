@@ -321,11 +321,42 @@ const createMessage = async (req, res) => {
         });
 
         if (!existingNotification) {
+          // Obține numele expeditorului și titlul anunțului pentru un mesaj mai clar
+          let senderName = 'Cineva';
+          let announcementTitle = '';
+          
+          try {
+            const senderUser = await User.findById(senderId).select('firstName lastName');
+            if (senderUser) {
+              senderName = `${senderUser.firstName || ''} ${senderUser.lastName || ''}`.trim() || 'Cineva';
+            }
+          } catch (e) {
+            console.warn('Nu s-a putut obține numele expeditorului:', e.message);
+          }
+
+          if (announcementId) {
+            try {
+              const Announcement = require('../models/Announcement');
+              const announcement = await Announcement.findById(announcementId).select('title');
+              if (announcement) {
+                announcementTitle = announcement.title;
+              }
+            } catch (e) {
+              console.warn('Nu s-a putut obține titlul anunțului:', e.message);
+            }
+          }
+
+          // Creează un mesaj mai explicit
+          let notificationMessage = `${senderName} ți-a trimis un mesaj`;
+          if (announcementTitle) {
+            notificationMessage += ` despre anunțul "${announcementTitle}"`;
+          } else if (announcementId) {
+            notificationMessage += ` la anunțul #${announcementId}`;
+          }
+
           await Notification.create({
             userId: destinatarId,
-            message: `Ai primit un mesaj nou${
-              announcementId ? ` la anunțul #${announcementId}` : ""
-            }`,
+            message: notificationMessage,
             link,
           });
         }

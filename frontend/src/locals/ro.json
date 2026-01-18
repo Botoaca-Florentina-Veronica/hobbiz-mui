@@ -1142,7 +1142,21 @@
     "loading": "Se încarcă mesajele...",
     "noConversation": "Nicio conversație încă. Scrie primul mesaj!",
     "deleteMessage": "Șterge mesajul",
-    "delete": "Șterge"
+    "delete": "Șterge",
+    "collaborate": "Colaborează",
+    "collaborateConfirmTitle": "Cerere de colaborare",
+    "collaborateConfirmMessage": "Vrei să trimiți o cerere de colaborare? După ce este acceptată de amândoi, veți putea lăsa recenzii unul altuia.",
+    "collaborationRequestText": "Vrei să colaborăm?",
+    "collaborationPending": "În așteptare",
+    "collaborationAccepted": "Confirmată",
+    "collaborationDeclined": "Refuzată",
+    "collaborationYouAcceptedWaiting": "Ai acceptat. Așteptăm confirmarea celuilalt utilizator.",
+    "collaborationAlreadyPending": "Există deja o cerere de colaborare în așteptare.",
+    "collaborationAlreadyAccepted": "Colaborarea este deja confirmată.",
+    "accept": "Acceptă",
+    "decline": "Refuză",
+    "cancel": "Anulează",
+    "sendMessageError": "Eroare la trimiterea mesajului"
   },
   "notifications": {
     "title": "Notificări",

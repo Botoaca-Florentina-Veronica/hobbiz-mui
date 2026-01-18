@@ -13,9 +13,13 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import gumballChat from '../assets/images/gumballChat.jpg';
 
 import './ChatPage.css';
+import './ChatPageCollaboration.css';
 
 const resolveAvatarUrl = (src) => {
   if (!src) return '';
@@ -62,6 +66,9 @@ export default function ChatPage() {
   const [sidebarWidth, setSidebarWidth] = useState(380);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   const [userLastSeen, setUserLastSeen] = useState({});
+  const [sendingCollab, setSendingCollab] = useState(false);
+  const [confirmCollabDialog, setConfirmCollabDialog] = useState(false);
+  const [collabStatusDialog, setCollabStatusDialog] = useState({ open: false, message: '', type: 'info' });
 
   const MOBILE_BREAKPOINT = 1024;
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= MOBILE_BREAKPOINT);
@@ -275,6 +282,118 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // --- Collaboration Helpers ---
+  const isCollaborationRequestMessage = (msg) => {
+    return msg.messageType === 'collaboration_request' || 
+           String(msg.text || '').trim() === 'COLLABORATION_REQUEST';
+  };
+
+  const getCollaborationStatus = (msg) => {
+    const acceptedBy = (msg.collaborationData?.acceptedBy || []).map(String);
+    const declinedBy = (msg.collaborationData?.declinedBy || []).map(String);
+    const isAccepted = acceptedBy.length >= 2;
+    const isDeclined = declinedBy.length > 0;
+    return { acceptedBy, declinedBy, isAccepted, isDeclined };
+  };
+
+  const findExistingCollaborationRequest = () => {
+    const collabMessages = messages.filter(m => isCollaborationRequestMessage(m));
+    if (collabMessages.length === 0) {
+      return { latest: null, accepted: false, pending: false };
+    }
+    const latest = collabMessages[collabMessages.length - 1];
+    const accepted = collabMessages.some(m => getCollaborationStatus(m).isAccepted);
+    const pending = !accepted && collabMessages.some(m => {
+      const s = getCollaborationStatus(m);
+      return !s.isAccepted && !s.isDeclined;
+    });
+    return { latest, accepted, pending };
+  };
+
+  const handleSendCollaborationRequest = () => {
+    if (!selectedConversation || sendingCollab) return;
+    const existing = findExistingCollaborationRequest();
+    if (existing.accepted) {
+      setCollabStatusDialog({ open: true, message: t('chat.collaborationAlreadyAccepted'), type: 'success' });
+      return;
+    }
+    if (existing.pending) {
+      setCollabStatusDialog({ open: true, message: t('chat.collaborationAlreadyPending'), type: 'pending' });
+      return;
+    }
+    setConfirmCollabDialog(true);
+  };
+
+  const confirmSendCollaborationRequest = async () => {
+    if (!selectedConversation || sendingCollab) return;
+    setConfirmCollabDialog(false);
+    setSendingCollab(true);
+
+    const otherId = selectedConversation.otherParticipant.id;
+    const tempId = `tmp-collab-${Date.now()}`;
+    const tempMessage = {
+      _id: tempId,
+      conversationId: selectedConversation.conversationId,
+      senderId: userId,
+      destinatarId: otherId,
+      text: t('chat.collaborationRequestText'),
+      createdAt: new Date().toISOString(),
+      senderInfo: { firstName: 'Tu', avatar: currentUserAvatar },
+      messageType: 'collaboration_request',
+      collaborationData: {
+        participants: [String(userId), String(otherId)],
+        acceptedBy: [String(userId)],
+        declinedBy: []
+      }
+    };
+
+    setMessages(prev => [...prev, tempMessage]);
+
+    try {
+      const payload = {
+        conversationId: selectedConversation.conversationId,
+        senderId: userId,
+        destinatarId: otherId,
+        text: 'COLLABORATION_REQUEST',
+        messageType: 'collaboration_request',
+        collaborationData: {
+          participants: [String(userId), String(otherId)],
+          acceptedBy: [String(userId)],
+          declinedBy: []
+        }
+      };
+
+      if (selectedConversation.announcementId) {
+        payload.announcementId = selectedConversation.announcementId;
+      }
+
+      const response = await apiClient.post('/api/messages', payload);
+      if (response.data && response.data._id) {
+        setMessages(prev => prev.map(m => m._id === tempId ? { ...response.data, senderInfo: tempMessage.senderInfo } : m));
+      }
+    } catch (error) {
+      console.error('Error sending collaboration request:', error);
+      setMessages(prev => prev.filter(m => m._id !== tempId));
+      alert(t('chat.sendMessageError'));
+    } finally {
+      setSendingCollab(false);
+    }
+  };
+
+  const handleCollaborationResponse = async (messageId, accept) => {
+    if (!messageId) return;
+    try {
+      const res = await apiClient.post(`/api/messages/${encodeURIComponent(String(messageId))}/collaboration-response`, { accept });
+      const updated = res.data;
+      if (updated && updated._id) {
+        setMessages(prev => prev.map(m => m._id === updated._id ? { ...m, ...updated } : m));
+      }
+    } catch (err) {
+      console.error('Collaboration response error:', err);
+      alert(t('chat.sendMessageError'));
+    }
+  };
+
   // --- Handlers ---
 
   const handleSendMessage = async (e) => {
@@ -477,6 +596,25 @@ export default function ChatPage() {
                     )}
                   </p>
                 </div>
+                {/* Collaboration Button - aligned to right */}
+                <IconButton 
+                  onClick={handleSendCollaborationRequest}
+                  disabled={sendingCollab}
+                  sx={{ 
+                    marginLeft: 'auto',
+                    color: 'var(--c-text-primary)',
+                    opacity: sendingCollab ? 0.5 : 1,
+                    '&:hover': { backgroundColor: 'var(--c-hover-bg)' }
+                  }}
+                  title={t('chat.collaborate')}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </IconButton>
               </div>
 
               <div className="chat-messages-container">
@@ -524,8 +662,63 @@ export default function ChatPage() {
                         <div className="chat-bubble-row">
                           <div className="chat-message-bubble">
                             {msg.replyTo && <div className={`chat-reply-preview ${msg.replyTo.senderId === userId ? 'own' : ''}`}><div className="chat-reply-text">{msg.replyTo.text || t('chat.image')}</div></div>}
-                            {msg.image && <div className="chat-message-image"><img src={msg.image} alt="att" /></div>}
-                            {msg.text && <p className="chat-message-text">{msg.text}</p>}
+                            
+                            {/* Collaboration Request Message */}
+                            {isCollaborationRequestMessage(msg) ? (
+                              <div className="collaboration-message">
+                                <div className="collaboration-header">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                  </svg>
+                                  <strong>{t('chat.collaborationRequestText')}</strong>
+                                </div>
+                                {(() => {
+                                  const { acceptedBy, declinedBy, isAccepted, isDeclined } = getCollaborationStatus(msg);
+                                  const iAccepted = acceptedBy.includes(String(userId));
+                                  const iDeclined = declinedBy.includes(String(userId));
+                                  const canRespond = !isAccepted && !isDeclined && !iAccepted && !iDeclined;
+                                  
+                                  let statusText = isAccepted 
+                                    ? t('chat.collaborationAccepted')
+                                    : isDeclined 
+                                      ? t('chat.collaborationDeclined')
+                                      : `${t('chat.collaborationPending')} (${acceptedBy.length}/2)`;
+
+                                  return (
+                                    <>
+                                      <div className="collaboration-status">{statusText}</div>
+                                      {iAccepted && !isAccepted && !isDeclined && (
+                                        <div className="collaboration-hint">{t('chat.collaborationYouAcceptedWaiting')}</div>
+                                      )}
+                                      {canRespond && (
+                                        <div className="collaboration-buttons">
+                                          <button 
+                                            className="collab-btn accept"
+                                            onClick={() => handleCollaborationResponse(msg._id, true)}
+                                          >
+                                            {t('chat.accept')}
+                                          </button>
+                                          <button 
+                                            className="collab-btn decline"
+                                            onClick={() => handleCollaborationResponse(msg._id, false)}
+                                          >
+                                            {t('chat.decline')}
+                                          </button>
+                                        </div>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            ) : (
+                              <>
+                                {msg.image && <div className="chat-message-image"><img src={msg.image} alt="att" /></div>}
+                                {msg.text && <p className="chat-message-text">{msg.text}</p>}
+                              </>
+                            )}
                             
                             {/* ACTIONS (hover or long-press on mobile) */}
                             {hoveredMessageId === msg._id && reactionTargetId !== msg._id && (
@@ -618,6 +811,62 @@ export default function ChatPage() {
           )}
         </main>
       </div>
+
+      {/* Collaboration Confirmation Dialog */}
+      {confirmCollabDialog && (
+        <div className="collab-dialog-overlay" onClick={() => setConfirmCollabDialog(false)}>
+          <div className="collab-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="collab-dialog-header">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <h3>{t('chat.collaborateConfirmTitle')}</h3>
+            </div>
+            <p className="collab-dialog-message">{t('chat.collaborateConfirmMessage')}</p>
+            <div className="collab-dialog-actions">
+              <button 
+                className="collab-dialog-btn cancel"
+                onClick={() => setConfirmCollabDialog(false)}
+              >
+                {t('chat.cancel')}
+              </button>
+              <button 
+                className="collab-dialog-btn confirm"
+                onClick={confirmSendCollaborationRequest}
+              >
+                {t('chat.collaborate')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Collaboration Status Dialog */}
+      {collabStatusDialog.open && (
+        <div className="collab-dialog-overlay" onClick={() => setCollabStatusDialog({ open: false, message: '' })}>
+          <div className="collab-dialog collab-status-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className={`collab-status-icon ${collabStatusDialog.type || 'info'}`}>
+              {collabStatusDialog.type === 'success' ? (
+                <CheckCircleOutlineIcon style={{ fontSize: 48 }} />
+              ) : collabStatusDialog.type === 'pending' ? (
+                <AccessTimeIcon style={{ fontSize: 48 }} />
+              ) : (
+                <InfoOutlinedIcon style={{ fontSize: 48 }} />
+              )}
+            </div>
+            <p className="collab-status-message">{collabStatusDialog.message}</p>
+            <button 
+              className="collab-dialog-btn confirm full-width"
+              onClick={() => setCollabStatusDialog({ open: false, message: '' })}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

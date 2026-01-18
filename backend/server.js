@@ -59,6 +59,8 @@ const io = socketIo(server, {
         const isDigitalOcean = /\.ondigitalocean\.app$/.test(hostname);
         const allowedOrigins = [
           process.env.FRONTEND_URL,
+          'https://hobbiz.ro',
+          'https://www.hobbiz.ro',
           'https://hobbiz-app-kkull.ondigitalocean.app/',
           'https://hobbiz.netlify.app',
           'https://hobbiz-mui.netlify.app',
@@ -166,8 +168,9 @@ app.set('activeUsers', activeUsers);
 // CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify și DigitalOcean
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://hobbiz.ro',
+  'https://www.hobbiz.ro',
   'https://hobbiz.netlify.app',
-  'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.netlify.app',
   'https://hobbiz-mui.onrender.com',
   'https://hobbiz-app-kkull.ondigitalocean.app/',
