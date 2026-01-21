@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import api from '../../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { useAuth } from '../../src/context/AuthContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
@@ -217,7 +218,8 @@ export default function ChatScreen() {
 
   return (
     <ProtectedRoute>
-    <View style={[styles.listContainer, { backgroundColor: tokens.colors.bg }]}> 
+      <GuestModeRestriction allowedRoutes={[]}>
+        <View style={[styles.listContainer, { backgroundColor: tokens.colors.bg }]}> 
       <LinearGradient
         colors={
           isDark
@@ -385,6 +387,7 @@ export default function ChatScreen() {
         </ScrollView>
       </View>
     </View>
+      </GuestModeRestriction>
     </ProtectedRoute>
   );
 }

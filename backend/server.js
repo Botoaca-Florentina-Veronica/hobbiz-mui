@@ -97,6 +97,15 @@ io.on('connection', (socket) => {
     activeUsers.set(userId, socket.id);
     socket.userId = userId;
     console.log(`👤 User ${userId} joined with socket ${socket.id}`);
+    io.emit('userStatus', { userId, status: 'online' });
+  });
+
+  // Check user status
+  socket.on('checkStatus', (targetUserId, callback) => {
+    const isOnline = activeUsers.has(targetUserId);
+    if (typeof callback === 'function') {
+      callback({ status: isOnline ? 'online' : 'offline' });
+    }
   });
 
   // Handle typing events
@@ -135,6 +144,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     if (socket.userId) {
       activeUsers.delete(socket.userId);
+      io.emit('userStatus', { userId: socket.userId, status: 'offline' });
       // Remove from all typing conversations
       typingUsers.forEach((typingSet, conversationId) => {
         if (typingSet.has(socket.userId)) {

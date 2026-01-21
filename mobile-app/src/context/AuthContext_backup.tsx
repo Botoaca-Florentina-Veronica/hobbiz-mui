@@ -56,9 +56,9 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
-  const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -185,6 +185,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       await doLogout();
       setUser(null);
+      setToken(null);
       setIsGuest(false);
     } finally {
       setLoading(false);

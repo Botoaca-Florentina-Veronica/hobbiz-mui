@@ -66,11 +66,14 @@ export default function MobileHeader({
           styles.searchBar, 
           { 
             backgroundColor: tokens.colors.surface,
-            borderColor: tokens.colors.border,
+            borderColor: isDark ? tokens.colors.border : '#E0E0E0',
           },
           // Use boxShadow on web to avoid deprecated RN shadow props being forwarded
-          (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : { shadowColor: tokens.colors.text }
+          (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : { shadowColor: '#000' }
         ]}>
+          <View style={styles.searchIconWrapper}>
+            <Ionicons name="search-outline" size={20} color={tokens.colors.muted} />
+          </View>
           <ThemedTextInput
             style={[
               styles.searchInput,
@@ -98,7 +101,7 @@ export default function MobileHeader({
               if (onSearchSubmit) onSearchSubmit(q);
             }}
           >
-            <Ionicons name="search" size={20} color={tokens.colors.primaryContrast} />
+            <Ionicons name="search" size={22} color={tokens.colors.primaryContrast} />
           </TouchableOpacity>
         </View>
       </View>
@@ -291,32 +294,41 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flex: 1,
-    maxWidth: '85%',
-  },
-  searchBar: {
+    maxWidth: '86%',
+  },  searchIconWrapper: {
+    position: 'absolute',
+    left: 14,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },  searchBar: {
     flexDirection: 'row',
-    borderRadius: 10,
+    borderRadius: 14,
     overflow: 'hidden',
     borderWidth: 1,
-    minHeight: 44,
+    height: 52,
     alignItems: 'center',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 4,
   },
   searchInput: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingLeft: 44,
+    paddingRight: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    fontWeight: '500',
   },
   searchButton: {
-    paddingHorizontal: 16,
-    height: 44,
+    paddingHorizontal: 18,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-    minWidth: 50,
+    minWidth: 56,
   },
   notificationButton: {
     padding: 8,

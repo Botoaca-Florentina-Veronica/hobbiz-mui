@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
+import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { Toast } from '../../components/ui/Toast';
 
 const TRANSLATIONS = {
@@ -128,7 +129,8 @@ export default function AccountScreen() {
 
   return (
     <ProtectedRoute>
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
+      <GuestModeRestriction allowedRoutes={[]}>
+        <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
       <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
         {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
         <View
@@ -406,6 +408,7 @@ export default function AccountScreen() {
         onHide={() => setToastVisible(false)}
       />
     </ThemedView>
+      </GuestModeRestriction>
     </ProtectedRoute>
   );
 }

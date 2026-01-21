@@ -15,8 +15,14 @@ const MessageSchema = new mongoose.Schema({
   // Tip de mesaj pentru mesaje speciale
   messageType: {
     type: String,
-    enum: ["text", "collaboration_request"],
+    enum: ["text", "collaboration_request", "negotiation"],
     default: "text",
+  },
+  // Date pentru negociere (mesaje care reflectă o propunere/contraofertă/decizie)
+  negotiation: {
+    negotiationId: { type: String, required: false },
+    price: { type: Number, required: false },
+    action: { type: String, enum: ["offer", "counter_offer", "accept", "reject"], required: false },
   },
   // Date pentru colaborare
   collaborationData: {

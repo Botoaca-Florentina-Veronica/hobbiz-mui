@@ -93,7 +93,8 @@ interface Message {
   replyTo?: { messageId: string; senderId: string; senderName: string; text?: string; image?: string };
   reactions?: Array<{ userId: string; emoji: string }>;
   deleted?: boolean;
-  messageType?: 'text' | 'collaboration_request';
+  messageType?: 'text' | 'collaboration_request' | 'negotiation';
+  negotiation?: { negotiationId?: string; price?: number; action?: string };
   collaborationData?: {
     participants?: string[];
     acceptedBy?: string[];
@@ -285,11 +286,16 @@ export default function ConversationScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
-  const { decrementUnreadCount } = useChatNotifications();
+  const { decrementUnreadCount, socket } = useChatNotifications();
   
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const [isOtherUserOnline, setIsOtherUserOnline] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
@@ -330,6 +336,71 @@ export default function ConversationScreen() {
   const [loadingNegotiation, setLoadingNegotiation] = useState(false);
 
   const width = Dimensions.get('window').width;
+
+  // Socket effect
+  useEffect(() => {
+    if (!socket || !selectedConversation || !userId) return;
+
+    // Check initial status
+    const otherUserId = selectedConversation.otherParticipant?.id;
+    if (otherUserId) {
+        // Emitere event cu ack callback
+        socket.emit('checkStatus', otherUserId, (response: { status: string }) => {
+            setIsOtherUserOnline(response.status === 'online');
+        });
+    }
+
+    const handleNewMessage = (newMsg: Message) => {
+      // Only process if it belongs to current conversation
+      if (newMsg.conversationId === selectedConversation.conversationId) {
+           setMessages((prev) => {
+               if (prev.some(m => m._id === newMsg._id)) return prev;
+               return [...prev, newMsg];
+           });
+      }
+    };
+
+    const handleUserTyping = (data: { conversationId: string; userId: string; isTyping: boolean }) => {
+        if (data.conversationId === selectedConversation.conversationId && data.userId !== userId) {
+            setIsOtherUserTyping(data.isTyping);
+        }
+    };
+    
+    const handleUserStatus = (data: { userId: string; status: string }) => {
+        if (selectedConversation.otherParticipant?.id === data.userId) {
+            setIsOtherUserOnline(data.status === 'online');
+        }
+    }
+
+    socket.on('newMessage', handleNewMessage);
+    socket.on('userTyping', handleUserTyping);
+    socket.on('userStatus', handleUserStatus);
+
+    return () => {
+        socket.off('newMessage', handleNewMessage);
+        socket.off('userTyping', handleUserTyping);
+        socket.off('userStatus', handleUserStatus);
+    };
+  }, [socket, selectedConversation, userId]);
+
+  // Typing handler
+  const handleTypingInput = (text: string) => {
+    setNewMessage(text);
+    
+    if (!socket || !selectedConversation) return;
+    
+    if (!isTyping) {
+        setIsTyping(true);
+        socket.emit('typing', { conversationId: selectedConversation.conversationId, isTyping: true });
+    }
+    
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    
+    typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        socket.emit('typing', { conversationId: selectedConversation.conversationId, isTyping: false });
+    }, 2000);
+  };
 
   const getCollaborationMessageStatus = useCallback((message: Message) => {
     const acceptedBy = (message.collaborationData?.acceptedBy || []).map(String);
@@ -514,6 +585,8 @@ export default function ConversationScreen() {
       setToastMessage(t.offerRejected);
       setToastType('info');
       setToastVisible(true);
+      // Ascunde bara de negociere după refuz
+      setActiveNegotiation(null);
       await loadActiveNegotiation();
     } catch (error: any) {
       console.error('Error rejecting offer:', error);
@@ -570,6 +643,38 @@ export default function ConversationScreen() {
     } finally {
       setLoadingNegotiation(false);
     }
+  };
+
+  const handleCancelAcceptedOffer = async () => {
+    if (!activeNegotiation) return;
+
+    const title = t.rejectOffer;
+    const body = locale === 'ro'
+      ? 'Ești sigur că vrei să anulezi această ofertă acceptată?'
+      : 'Are you sure you want to cancel this accepted offer?';
+
+    Alert.alert(title, body, [
+      { text: t.cancel, style: 'cancel' },
+      {
+        text: t.rejectOffer,
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            setLoadingNegotiation(true);
+            await negotiationService.cancelNegotiation(activeNegotiation._id);
+            setToastMessage(t.offerRejected);
+            setToastType('info');
+            setToastVisible(true);
+            await loadActiveNegotiation();
+          } catch (error: any) {
+            console.error('Error cancelling accepted offer:', error);
+            Alert.alert(t.error, error?.response?.data?.message || t.negotiationError);
+          } finally {
+            setLoadingNegotiation(false);
+          }
+        },
+      },
+    ]);
   };
 
   const handleFinalizeDeal = async () => {
@@ -684,6 +789,53 @@ export default function ConversationScreen() {
             </TouchableOpacity>
           </View>
         ) : null}
+      </View>
+    );
+  };
+
+  const renderNegotiationBody = (message: Message, isOwn: boolean) => {
+    const price = message.negotiation?.price ?? null;
+    const action = message.negotiation?.action ?? null;
+
+    return (
+      <View style={styles.collabContainer}>
+        <ThemedText
+          style={[
+            styles.collabTitle,
+            { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text },
+          ]}
+        >
+          {t.negotiationOffer}
+        </ThemedText>
+        <ThemedText
+          style={[
+            styles.collabStatus,
+            { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.muted },
+          ]}
+        >
+          {price ? `${t.priceOffered}: ${price} RON` : t.negotiationOffer}
+        </ThemedText>
+        {message.text ? (
+          <ThemedText
+            style={[styles.collabHint, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.muted }]}
+          >
+            {message.text}
+          </ThemedText>
+        ) : null}
+        <View style={{ marginTop: 6 }} />
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => {
+            // Navigate to negotiation details if available
+            const nid = message.negotiation?.negotiationId;
+            if (nid) {
+              try { router.push((`/negotiations/${encodeURIComponent(String(nid))}`) as any); } catch (e) {}
+            }
+          }}
+          style={[styles.collabBtn, { backgroundColor: 'transparent', borderColor: tokens.colors.border }]}
+        >
+          <ThemedText style={{ color: tokens.colors.text }}>{t.priceOffered}</ThemedText>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -1405,9 +1557,21 @@ export default function ConversationScreen() {
                     source={{ uri: selectedConversation.participantAvatar || getAvatarFallback(selectedConversation.participantName) }}
                     style={styles.headerAvatarClean}
                   />
-                  <ThemedText style={[styles.headerNameClean, isDark ? styles.headerNameCleanDark : undefined]} numberOfLines={1}>
-                    {selectedConversation.participantName}
-                  </ThemedText>
+                  <View style={{ justifyContent: 'center' }}>
+                    <ThemedText style={[styles.headerNameClean, isDark ? styles.headerNameCleanDark : undefined]} numberOfLines={1}>
+                      {selectedConversation.participantName}
+                    </ThemedText>
+                    {(isOtherUserOnline || isOtherUserTyping) && (
+                      <Text style={{ 
+                          fontSize: 10, 
+                          color: isOtherUserTyping ? (isDark ? '#F51866' : tokens.colors.primary) : '#4CAF50',
+                          marginLeft: 12, // Match likely margin of headerNameClean
+                          marginTop: -2
+                      }}>
+                          {isOtherUserTyping ? (locale === 'ro' ? 'scrie...' : 'typing...') : 'Online'}
+                      </Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               </View>
 
@@ -1482,6 +1646,20 @@ export default function ConversationScreen() {
                   {activeNegotiation.currentPrice} RON
                 </ThemedText>
               </View>
+              {/* Buton de refuză poziționat pe același rând cu oferta */}
+              {(String(activeNegotiation.seller._id) === String(userId) || String(activeNegotiation.buyer._id) === String(userId)) && 
+               ['pending', 'counter_offer', 'accepted'].includes(activeNegotiation.status) && (
+                <TouchableOpacity
+                  onPress={handleRejectOffer}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationRejectBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: tokens.colors.border }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationRejectBtnText, { color: tokens.colors.muted }]}>
+                    {t.rejectOffer}
+                  </ThemedText>
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Action buttons based on role and status */}
@@ -1508,18 +1686,10 @@ export default function ConversationScreen() {
                     {t.sendCounterOffer}
                   </ThemedText>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleRejectOffer}
-                  disabled={loadingNegotiation}
-                  style={[styles.negotiationBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: tokens.colors.border }]}
-                  activeOpacity={0.85}
-                >
-                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.muted }]}>
-                    {t.rejectOffer}
-                  </ThemedText>
-                </TouchableOpacity>
               </View>
             )}
+
+
 
             {String(activeNegotiation.buyer._id) === String(userId) && 
              activeNegotiation.status === 'counter_offer' && (
@@ -1546,6 +1716,8 @@ export default function ConversationScreen() {
                 </TouchableOpacity>
               </View>
             )}
+
+
           </View>
         )}
 
@@ -1707,8 +1879,10 @@ export default function ConversationScreen() {
                                 </View>
                               )}
                               
-                              {isCollaborationRequestMessage(message) ? (
+                                                      {isCollaborationRequestMessage(message) ? (
                                 renderCollaborationBody(message, isOwn)
+                              ) : message.messageType === 'negotiation' ? (
+                                renderNegotiationBody(message, isOwn)
                               ) : (
                                 <>
                                   {message.text && (
@@ -1802,7 +1976,7 @@ export default function ConversationScreen() {
             placeholder={t.writeMessage}
             placeholderTextColor={tokens.colors.placeholder}
             value={newMessage}
-            onChangeText={setNewMessage}
+            onChangeText={handleTypingInput}
             multiline
           />
           <TouchableOpacity
@@ -2635,6 +2809,18 @@ const styles = StyleSheet.create({
   negotiationBtnText: {
     fontSize: 13,
     fontWeight: '700',
+  },
+  negotiationRejectBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  negotiationRejectBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   counterOfferModal: {
     width: '85%',

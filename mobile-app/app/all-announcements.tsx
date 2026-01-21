@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../components/themed-text';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
@@ -116,65 +116,64 @@ export default function AllAnnouncements() {
           </View>
         </View>
 
-        <ScrollView
+        <FlatList
+          data={filteredAnnouncements}
+          keyExtractor={(item) => item._id}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
           showsVerticalScrollIndicator={true}
-          nestedScrollEnabled={true}
-        >
-          {filteredAnnouncements.length === 0 ? (
+          ListEmptyComponent={
             <View style={styles.emptyState}>
               <Ionicons name="albums-outline" size={64} color={colors.placeholder} />
               <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>{t.noAnnouncements}</ThemedText>
             </View>
-          ) : (
-            filteredAnnouncements.map((ann, index) => {
-              const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
-              const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
-              const isDarkMode = isDark;
-              const cardBg = isDarkMode ? '#121212' : '#fff';
-              return (
-                <View key={ann._id} style={{ marginBottom: index === filteredAnnouncements.length - 1 ? 0 : 12 }}>
-                  <Pressable
-                    onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
-                    style={({ pressed }) => [
-                      styles.modernCard,
-                      styles.modernRow,
-                      {
-                        backgroundColor: cardBg,
-                        opacity: pressed ? 0.96 : 1,
-                        borderWidth: isDarkMode ? 1 : 0,
-                        borderColor: isDarkMode ? '#575757' : 'transparent',
-                      },
-                    ]}
-                  >
-                    {!isDarkMode && (
-                      <LinearGradient colors={[tokens.colors.primary || '#355070', '#ffd']} style={styles.leftAccent} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
-                    )}
-                    <View style={[styles.squareImageWrapper, { marginLeft: isDarkMode ? 0 : 22 }]}>
-                      {firstImage ? (
-                        <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
-                      ) : (
-                        <View style={styles.squareImagePlaceholder}>
-                          <Ionicons name="image-outline" size={32} color={isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
-                        </View>
-                      )}
-                    </View>
-                    <View style={styles.squareContent}>
-                      <ThemedText style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</ThemedText>
-                      <View style={[styles.categoryBadgeModern, { backgroundColor: isDarkMode ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)', borderWidth: isDarkMode ? 1 : 0, borderColor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'transparent' }]}>
-                        <ThemedText style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{translateCategory(getCategoryKeyByLabel(ann.category) || ann.category, locale)}</ThemedText>
+          }
+          renderItem={({ item: ann, index }) => {
+            const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
+            const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
+            const isDarkMode = isDark;
+            const cardBg = isDarkMode ? '#121212' : '#fff';
+            return (
+              <View style={{ marginBottom: index === filteredAnnouncements.length - 1 ? 0 : 12 }}>
+                <Pressable
+                  onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
+                  style={({ pressed }) => [
+                    styles.modernCard,
+                    styles.modernRow,
+                    {
+                      backgroundColor: cardBg,
+                      opacity: pressed ? 0.96 : 1,
+                      borderWidth: isDarkMode ? 1 : 0,
+                      borderColor: isDarkMode ? '#575757' : 'transparent',
+                    },
+                  ]}
+                >
+                  {!isDarkMode && (
+                    <LinearGradient colors={[tokens.colors.primary || '#355070', '#ffd']} style={styles.leftAccent} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+                  )}
+                  <View style={[styles.squareImageWrapper, { marginLeft: isDarkMode ? 0 : 22 }]}>
+                    {firstImage ? (
+                      <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
+                    ) : (
+                      <View style={styles.squareImagePlaceholder}>
+                        <Ionicons name="image-outline" size={32} color={isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
                       </View>
-                      <ThemedText style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
-                      <ThemedText style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>{t.posted} {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : 'ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</ThemedText>
+                    )}
+                  </View>
+                  <View style={styles.squareContent}>
+                    <ThemedText style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</ThemedText>
+                    <View style={[styles.categoryBadgeModern, { backgroundColor: isDarkMode ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)', borderWidth: isDarkMode ? 1 : 0, borderColor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'transparent' }]}>
+                      <ThemedText style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{translateCategory(getCategoryKeyByLabel(ann.category) || ann.category, locale)}</ThemedText>
                     </View>
-                  </Pressable>
-                </View>
-              );
-            })
-          )}
-        </ScrollView>
+                    <ThemedText style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
+                    <ThemedText style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>{t.posted} {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : 'ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</ThemedText>
+                  </View>
+                </Pressable>
+              </View>
+            );
+          }}
+        />
       </View>
     </>
   );

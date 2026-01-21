@@ -32,12 +32,16 @@ const TAB_LABELS: Record<string, { ro: string; en: string }> = {
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const { tokens, isDark } = useAppTheme();
   const webBox = (tokens as any)?.shadow?.elev2?.boxShadow;
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, isGuest, loading, user } = useAuth();
   const { hidden } = useTabBar();
   const { unreadCount } = useChatNotifications();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
   const router = useRouter();
+  
+  // In guest mode, only show the 'index' (explore) tab
+  const allowedTabsInGuest = ['index'];
+  
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
   const activeColor = isDark ? tokens.colors.primary : '#355070';
   const inactiveColor = tokens.colors.muted;

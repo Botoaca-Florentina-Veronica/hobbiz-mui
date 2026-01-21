@@ -14,6 +14,7 @@ import { localitatiPeJudet } from '../../assets/comunePeJudet';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
+import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { Toast } from '../../components/ui/Toast';
 
 interface ImageItem { 
@@ -500,7 +501,8 @@ export default function SellScreen() {
 
   return (
   <ProtectedRoute>
-  <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
+    <GuestModeRestriction allowedRoutes={[]}>
+      <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.headerRow}>
@@ -828,8 +830,7 @@ export default function SellScreen() {
         onHide={() => setToastVisible(false)}
       />
       
-    </ThemedView>
-    </ProtectedRoute>
+    </ThemedView>    </GuestModeRestriction>    </ProtectedRoute>
   );
 }
 

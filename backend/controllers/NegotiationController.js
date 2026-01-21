@@ -2,6 +2,7 @@
 const Negotiation = require('../models/Negotiation');
 const Announcement = require('../models/Announcement');
 const User = require('../models/User');
+const Message = require('../models/Message');
 const mongoose = require('mongoose');
 
 // Create a new negotiation (buyer proposes a price)
@@ -65,6 +66,99 @@ exports.createNegotiation = async (req, res) => {
       { path: 'seller', select: 'firstName lastName avatar' },
       { path: 'announcement', select: 'title images' }
     ]);
+
+    // Create a chat message that reflects the negotiation offer so it appears in both chats
+    try {
+      // Build deterministic conversationId scoped by announcement
+      let conversationId;
+      try {
+        const ownerId = String(announcement.user);
+        const otherId = String(buyerId);
+        conversationId = [ownerId, otherId, announcementId].join('-');
+      } catch (e) {
+        conversationId = [String(buyerId), String(sellerId)].sort().join('-');
+      }
+
+      const messageData = {
+        conversationId,
+        senderId: buyerId,
+        senderRole: 'cumparator',
+        destinatarId: sellerId,
+        text: `Propunere: ${proposedPrice} RON${message ? '\n' + String(message) : ''}`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: proposedPrice, action: 'offer' },
+        announcementId: announcementId
+      };
+
+      const sysMsg = await new Message(messageData).save();
+
+      // Try to emit real-time message to both participants
+      try {
+        const io = req.app && req.app.get ? req.app.get('io') : null;
+        const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+        let senderInfo = null;
+        try {
+          const buyerUser = await User.findById(buyerId).select('firstName lastName avatar');
+          if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar };
+        } catch (_) {}
+
+        if (io && activeUsers) {
+          const sellerSocket = activeUsers.get(String(sellerId));
+          const buyerSocket = activeUsers.get(String(buyerId));
+          if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...sysMsg.toObject(), senderInfo });
+          if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...sysMsg.toObject(), senderInfo });
+        }
+      } catch (_) {}
+    } catch (e) {
+      console.warn('Nu s-a putut crea mesajul de negociere:', e?.message || e);
+    }
+
+    // Create a notification for the seller and attempt to send push (fire-and-forget)
+    (async () => {
+      try {
+        const Notification = require('../models/Notification');
+        const seller = await User.findById(sellerId).select('pushToken firstName lastName');
+        const buyerUser = await User.findById(buyerId).select('firstName lastName');
+        const buyerName = buyerUser ? (`${buyerUser.firstName || ''} ${buyerUser.lastName || ''}`).trim() || 'Utilizator' : 'Utilizator';
+        const notifMessage = `${buyerName} ți-a propus un preț pentru anunțul "${announcement.title || ''}"`;
+
+        await Notification.create({
+          userId: sellerId,
+          message: notifMessage,
+          link: `/negotiations/${negotiation._id}`,
+          title: 'Propunere de preț'
+        });
+
+        // Try to emit socket event for real-time delivery (if Socket.IO configured)
+        try {
+          const io = req.app && req.app.get ? req.app.get('io') : null;
+          const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+          if (io && activeUsers) {
+            const sid = activeUsers.get(String(sellerId));
+            if (sid) io.to(sid).emit('newNotification', { userId: sellerId });
+          }
+        } catch (_) {}
+
+        // Send push notification if seller has Expo push token
+        if (seller && seller.pushToken && /^ExponentPushToken\[.+\]$/.test(seller.pushToken)) {
+          const doFetch = (url, opts) => typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts);
+          await doFetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: seller.pushToken,
+              title: 'Propunere de preț',
+              body: notifMessage.slice(0, 120),
+              data: { link: `/negotiations/${negotiation._id}` },
+              priority: 'high',
+              sound: 'default'
+            })
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('⚠️ Eroare la crearea notificării pentru negociere:', e?.message || e);
+      }
+    })();
 
     res.status(201).json({ 
       message: 'Negotiation created successfully', 
@@ -216,6 +310,38 @@ exports.acceptOffer = async (req, res) => {
 
     await negotiation.save();
 
+    // add system message indicating acceptance
+    try {
+      let conversationId;
+      try {
+        const ownerId = String(negotiation.announcement.user || negotiation.seller);
+        const otherId = String(negotiation.buyer);
+        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+      } catch (e) {
+        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+      }
+      const msg = await new Message({
+        conversationId,
+        senderId: userId,
+        senderRole: 'vanzator',
+        destinatarId: negotiation.buyer,
+        text: `Oferta acceptată: ${negotiation.currentPrice} RON`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
+        announcementId: String(negotiation.announcement)
+      }).save();
+      const io = req.app && req.app.get ? req.app.get('io') : null;
+      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+      if (io && activeUsers) {
+        const buyerSocket = activeUsers.get(String(negotiation.buyer));
+        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        let senderInfo = null;
+        try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
+        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+      }
+    } catch (e) { console.warn('Nu s-a putut crea mesaj pentru acceptare:', e?.message || e); }
+
     res.json({ 
       message: 'Offer accepted successfully', 
       negotiation 
@@ -264,6 +390,38 @@ exports.rejectOffer = async (req, res) => {
     });
 
     await negotiation.save();
+
+    // add system message indicating rejection
+    try {
+      let conversationId;
+      try {
+        const ownerId = String(negotiation.announcement.user || negotiation.seller);
+        const otherId = String(negotiation.buyer);
+        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+      } catch (e) {
+        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+      }
+      const msg = await new Message({
+        conversationId,
+        senderId: userId,
+        senderRole: 'vanzator',
+        destinatarId: negotiation.buyer,
+        text: `Oferta refuzată: ${negotiation.currentPrice} RON${message ? '\n' + String(message) : ''}`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
+        announcementId: String(negotiation.announcement)
+      }).save();
+      const io = req.app && req.app.get ? req.app.get('io') : null;
+      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+      if (io && activeUsers) {
+        const buyerSocket = activeUsers.get(String(negotiation.buyer));
+        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        let senderInfo = null;
+        try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
+        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+      }
+    } catch (e) { console.warn('Nu s-a putut crea mesaj pentru refuz:', e?.message || e); }
 
     res.json({ 
       message: 'Offer rejected', 
@@ -319,6 +477,38 @@ exports.counterOffer = async (req, res) => {
 
     await negotiation.save();
 
+    // add system message for counter offer
+    try {
+      let conversationId;
+      try {
+        const ownerId = String(negotiation.announcement.user || negotiation.seller);
+        const otherId = String(negotiation.buyer);
+        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+      } catch (e) {
+        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+      }
+      const msg = await new Message({
+        conversationId,
+        senderId: userId,
+        senderRole: 'vanzator',
+        destinatarId: negotiation.buyer,
+        text: `Contraofertă: ${counterPrice} RON${message ? '\n' + String(message) : ''}`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: counterPrice, action: 'counter_offer' },
+        announcementId: String(negotiation.announcement)
+      }).save();
+      const io = req.app && req.app.get ? req.app.get('io') : null;
+      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+      if (io && activeUsers) {
+        const buyerSocket = activeUsers.get(String(negotiation.buyer));
+        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        let senderInfo = null;
+        try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
+        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+      }
+    } catch (e) { console.warn('Nu s-a putut crea mesaj pentru contraoferta:', e?.message || e); }
+
     res.json({ 
       message: 'Counter offer sent successfully', 
       negotiation 
@@ -365,6 +555,38 @@ exports.acceptCounterOffer = async (req, res) => {
     });
 
     await negotiation.save();
+
+    // add system message indicating acceptance of counter
+    try {
+      let conversationId;
+      try {
+        const ownerId = String(negotiation.announcement.user || negotiation.seller);
+        const otherId = String(negotiation.buyer);
+        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+      } catch (e) {
+        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+      }
+      const msg = await new Message({
+        conversationId,
+        senderId: userId,
+        senderRole: 'cumparator',
+        destinatarId: negotiation.seller,
+        text: `Contraofertă acceptată: ${negotiation.currentPrice} RON`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
+        announcementId: String(negotiation.announcement)
+      }).save();
+      const io = req.app && req.app.get ? req.app.get('io') : null;
+      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+      if (io && activeUsers) {
+        const buyerSocket = activeUsers.get(String(negotiation.buyer));
+        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        let senderInfo = null;
+        try { const buyerUser = await User.findById(userId).select('firstName lastName avatar'); if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar }; } catch (_) {}
+        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+      }
+    } catch (e) { console.warn('Nu s-a putut crea mesaj pentru accept counter:', e?.message || e); }
 
     res.json({ 
       message: 'Counter offer accepted successfully', 
@@ -419,6 +641,38 @@ exports.buyerCounterOffer = async (req, res) => {
     });
 
     await negotiation.save();
+
+    // add system message for buyer new offer
+    try {
+      let conversationId;
+      try {
+        const ownerId = String(negotiation.announcement.user || negotiation.seller);
+        const otherId = String(negotiation.buyer);
+        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+      } catch (e) {
+        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+      }
+      const msg = await new Message({
+        conversationId,
+        senderId: userId,
+        senderRole: 'cumparator',
+        destinatarId: negotiation.seller,
+        text: `Contraofertă (buyer): ${newPrice} RON${message ? '\n' + String(message) : ''}`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: newPrice, action: 'counter_offer' },
+        announcementId: String(negotiation.announcement)
+      }).save();
+      const io = req.app && req.app.get ? req.app.get('io') : null;
+      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+      if (io && activeUsers) {
+        const buyerSocket = activeUsers.get(String(negotiation.buyer));
+        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        let senderInfo = null;
+        try { const buyerUser = await User.findById(userId).select('firstName lastName avatar'); if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar }; } catch (_) {}
+        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+      }
+    } catch (e) { console.warn('Nu s-a putut crea mesaj pentru oferta noua:', e?.message || e); }
 
     res.json({ 
       message: 'New offer sent successfully', 
@@ -505,8 +759,57 @@ exports.cancelNegotiation = async (req, res) => {
     negotiation.status = 'rejected';
     negotiation.lastActionBy = userId;
     negotiation.lastActionAt = new Date();
+    // Add history entry
+    negotiation.offerHistory.push({
+      offeredBy: userId,
+      price: negotiation.currentPrice,
+      action: 'reject', 
+      message: 'Cancelled after acceptance'
+    });
 
     await negotiation.save();
+
+     // Create a chat message that reflects the cancellation
+    try {
+      let conversationId;
+      try {
+        const ownerId = String(negotiation.announcement.user || negotiation.seller);
+        const otherId = String(negotiation.buyer);
+        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+      } catch (e) {
+        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+      }
+
+      const msg = await new Message({
+        conversationId,
+        senderId: userId,
+        senderRole: userId === String(negotiation.buyer) ? 'cumparator' : 'vanzator',
+        destinatarId: userId === String(negotiation.buyer) ? negotiation.seller : negotiation.buyer,
+        text: `Negociere anulată.`,
+        messageType: 'negotiation',
+        negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
+        announcementId: String(negotiation.announcement)
+      }).save();
+
+      const io = req.app && req.app.get ? req.app.get('io') : null;
+      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+      if (io && activeUsers) {
+        const destId = userId === String(negotiation.buyer) ? String(negotiation.seller) : String(negotiation.buyer);
+        const sourceSocket = activeUsers.get(String(userId));
+        const destSocket = activeUsers.get(destId);
+        
+        let senderInfo = null;
+        try { 
+            const u = await User.findById(userId).select('firstName lastName avatar'); 
+            if (u) senderInfo = { firstName: u.firstName, lastName: u.lastName, avatar: u.avatar }; 
+        } catch (_) {}
+
+        if (sourceSocket) io.to(sourceSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        if (destSocket) io.to(destSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+      }
+    } catch (e) {
+      console.warn('Nu s-a putut crea mesajul de anulare negociere:', e?.message || e);
+    }
 
     res.json({ 
       message: 'Negotiation cancelled', 

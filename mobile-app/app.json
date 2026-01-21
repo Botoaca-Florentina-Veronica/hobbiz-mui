@@ -51,6 +51,14 @@
           }
         }
       ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/puzzle_safe.png",
+          "color": "#ffffff",
+          "sounds": []
+        }
+      ],
       "expo-web-browser"
     ],
     "experiments": {

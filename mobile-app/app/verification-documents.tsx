@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
+import { useLocale } from '../src/context/LocaleContext';
 import { ThemedView } from '../components/themed-view';
 import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
@@ -25,8 +26,40 @@ export default function VerificationDocumentsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { tokens, isDark } = useAppTheme();
+  const { locale } = useLocale();
   const { user } = useAuth();
   const params = useLocalSearchParams();
+
+  const TRANSLATIONS = {
+    ro: {
+      verifyWhyTitle: 'De ce să îți verifici profilul?',
+      verifyWhyBody: "Încărcarea documentelor profesionale (diplome, certificări, atestate) ajută la construirea încrederii în rândul clienților. După verificare, vei primi un badge de 'Utilizator Verificat'.",
+      documentsHeader: 'Documente de Verificare',
+      documentsHeaderAdminPrefix: 'Documente',
+      uploadButtonText: 'Încarcă Document',
+      adminModeTitle: 'Mod Administrator',
+      adminViewing: 'Vizualizezi documentele utilizatorului',
+      verificationStatus: 'Status verificare',
+      verifiedLabel: 'Verificat',
+      notVerifiedLabel: 'Neverificat',
+      user: 'Utilizator'
+    },
+    en: {
+      verifyWhyTitle: 'Why verify your profile?',
+      verifyWhyBody: "Uploading professional documents (diplomas, certificates, authorizations) helps build trust with customers. After verification, you'll receive a 'Verified User' badge.",
+      documentsHeader: 'Verification Documents',
+      documentsHeaderAdminPrefix: 'Documents',
+      uploadButtonText: 'Upload Document',
+      adminModeTitle: 'Admin Mode',
+      adminViewing: "You're viewing the user's documents",
+      verificationStatus: 'Verification status',
+      verifiedLabel: 'Verified',
+      notVerifiedLabel: 'Not verified',
+      user: 'User'
+    }
+  };
+
+  const t = (TRANSLATIONS[locale === 'en' ? 'en' : 'ro'] as typeof TRANSLATIONS['ro']);
   
   // Check if this is admin view
   const isAdminView = params.adminView === 'true';
@@ -269,10 +302,21 @@ export default function VerificationDocumentsScreen() {
     infoCard: {
       margin: 16,
       padding: 16,
-      backgroundColor: tokens.colors.primary + '20',
       borderRadius: 12,
       borderLeftWidth: 4,
       borderLeftColor: tokens.colors.primary,
+    },
+    infoIconWrap: {
+      width: 36,
+      height: 36,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+    },
+    infoCardTitle: {
+      fontSize: 16,
+      fontWeight: '700',
     },
     infoText: {
       fontSize: 14,
@@ -485,7 +529,7 @@ export default function VerificationDocumentsScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Documente de Verificare</Text>
+          <Text style={styles.headerTitle}>{t.documentsHeader}</Text>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={tokens.colors.primary} />
@@ -501,33 +545,39 @@ export default function VerificationDocumentsScreen() {
           <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {isAdminView ? `Documente - ${targetUser?.firstName || 'Utilizator'}` : 'Documente de Verificare'}
+          {isAdminView ? `${t.documentsHeaderAdminPrefix} - ${targetUser?.firstName || t.user}` : t.documentsHeader}
         </Text>
       </View>
 
       <ScrollView style={styles.content}>
         {isAdminView && targetUser && (
-          <View style={[styles.infoCard, { backgroundColor: '#FF980020', borderLeftColor: '#FF9800' }]}>
+          <View style={[styles.infoCard, isDark ? { backgroundColor: tokens.colors.surface } : { backgroundColor: tokens.colors.primary + '10' }, { borderLeftColor: tokens.colors.primary }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-              <Ionicons name="shield-checkmark" size={20} color="#FF9800" style={{ marginRight: 8 }} />
+              <Ionicons name="shield-checkmark" size={20} color={tokens.colors.primary} style={{ marginRight: 8 }} />
               <ThemedText style={[styles.infoText, { fontWeight: '600' }]}>
-                Mod Administrator
+                {t.adminModeTitle}
               </ThemedText>
             </View>
             <ThemedText style={styles.infoText}>
-              Vizualizezi documentele utilizatorului {targetUser.firstName} {targetUser.lastName}.
-              {'\n'}Status verificare: {targetUser.isVerified ? '✅ Verificat' : '❌ Neverificat'}
+              {t.adminViewing} {targetUser.firstName} {targetUser.lastName}.
+              {'\n'}{t.verificationStatus}: {targetUser.isVerified ? `✅ ${t.verifiedLabel}` : `❌ ${t.notVerifiedLabel}`}
             </ThemedText>
           </View>
         )}
 
         {!isAdminView && (
           <>
-            <View style={styles.infoCard}>
-              <ThemedText style={styles.infoText}>
-                Încarcă documente care atestă abilitățile tale profesionale (certificate, diplome, autorizații, etc.). 
-                Administratorul platformei va verifica autenticitatea acestora. După verificare, vei primi un badge de verificare pe profil.
-              </ThemedText>
+            <View style={[styles.infoCard, isDark ? { backgroundColor: tokens.colors.surface } : { backgroundColor: '#F7FAFB' }, { borderLeftColor: tokens.colors.primary }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <View style={[styles.infoIconWrap, { borderColor: tokens.colors.primary, backgroundColor: tokens.colors.primary + '10' }]}>
+                  <Ionicons name="information-circle-outline" size={20} color={tokens.colors.primary} />
+                </View>
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <ThemedText style={[styles.infoCardTitle, { color: tokens.colors.text }]}>{t.verifyWhyTitle}</ThemedText>
+                  <View style={{ height: 6 }} />
+                  <ThemedText style={[styles.infoText, { color: tokens.colors.muted }]}>{t.verifyWhyBody}</ThemedText>
+                </View>
+              </View>
             </View>
 
             <TouchableOpacity 
@@ -540,7 +590,7 @@ export default function VerificationDocumentsScreen() {
               ) : (
                 <>
                   <Ionicons name="cloud-upload" size={24} color="#fff" />
-                  <Text style={styles.uploadButtonText}>Încarcă Document</Text>
+                  <Text style={styles.uploadButtonText}>{t.uploadButtonText}</Text>
                 </>
               )}
             </TouchableOpacity>

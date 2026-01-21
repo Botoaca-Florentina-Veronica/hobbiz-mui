@@ -9,6 +9,7 @@ interface ChatNotificationContextType {
   decrementUnreadCount: (amount?: number) => void;
   incrementUnreadCount: (amount?: number) => void;
   setUnreadCount: (n: number) => void;
+  socket: Socket | null;
 }
 
 const ChatNotificationContext = createContext<ChatNotificationContextType | undefined>(undefined);
@@ -16,6 +17,7 @@ const ChatNotificationContext = createContext<ChatNotificationContextType | unde
 export const ChatNotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   const refreshUnreadCount = useCallback(async () => {
@@ -69,26 +71,28 @@ export const ChatNotificationProvider: React.FC<{ children: React.ReactNode }> =
     const socketUrl = base || 'http://localhost:5000';
 
     // connect
-    const socket = io(socketUrl, { transports: ['websocket'], autoConnect: true });
-    socketRef.current = socket;
+    const newSocket = io(socketUrl, { transports: ['websocket'], autoConnect: true });
+    socketRef.current = newSocket;
+    setSocket(newSocket);
 
-    socket.on('connect', () => {
+    newSocket.on('connect', () => {
       // join with user id so server maps socket id
-      socket.emit('join', String(user.id));
+      newSocket.emit('join', String(user.id));
     });
 
-    socket.on('newMessage', (payload: any) => {
+    newSocket.on('newMessage', (payload: any) => {
       // payload might contain conversationId and unread delta
       setUnreadCount((prev) => prev + 1);
     });
 
-    socket.on('disconnect', () => {
+    newSocket.on('disconnect', () => {
       // noop
     });
 
     return () => {
-      try { socket.disconnect(); } catch (_) {}
+      try { newSocket.disconnect(); } catch (_) {}
       socketRef.current = null;
+      setSocket(null);
     };
   }, [isAuthenticated, user?.id]);
 
@@ -111,6 +115,7 @@ export const ChatNotificationProvider: React.FC<{ children: React.ReactNode }> =
         decrementUnreadCount,
         incrementUnreadCount,
         setUnreadCount,
+        socket
       }}
     >
       {children}

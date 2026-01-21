@@ -14,6 +14,7 @@ import ImageViewing from '../src/components/ImageViewer';
 import Constants from 'expo-constants';
 import { translateCategory, getCategoryKeyByLabel } from '../src/constants/categories';
 import negotiationService from '../src/services/negotiationService';
+import { Toast } from '../components/ui/Toast';
 
 interface Announcement {
   _id: string;
@@ -165,6 +166,16 @@ export default function AnnouncementDetailsScreen() {
   const [priceMessage, setPriceMessage] = useState('');
   const [submittingPrice, setSubmittingPrice] = useState(false);
 
+  // Toast state for short messages
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
+
   const width = Dimensions.get('window').width;
   const isLarge = width >= 768;
   const imageScrollRef = useRef<ScrollView | null>(null);
@@ -304,19 +315,27 @@ export default function AnnouncementDetailsScreen() {
 
     setSubmittingPrice(true);
     try {
-      await negotiationService.createNegotiation({
+      const res = await negotiationService.createNegotiation({
         announcementId: announcement!._id,
         proposedPrice: parseFloat(proposedPrice),
         message: priceMessage || undefined
       });
       
-      Alert.alert(t.send, t.proposePriceSuccess);
+      // Show a short toast to confirm the offer was sent ✅
+      showToast(t.proposePriceSuccess, 'success');
+
       setPriceModalVisible(false);
       setProposedPrice('');
       setPriceMessage('');
+
+      // Optionally: the server now creates a notification for the announcement owner.
+      // We don't need to call the notifications API here because the backend will handle it,
+      // but keep `res` in case future client-side actions are needed.
+
     } catch (error: any) {
       console.error('Error proposing price:', error);
-      Alert.alert(t.error, error?.response?.data?.message || t.proposePriceError);
+      const msg = error?.response?.data?.message || t.proposePriceError;
+      showToast(msg, 'error');
     } finally {
       setSubmittingPrice(false);
     }
@@ -948,6 +967,7 @@ export default function AnnouncementDetailsScreen() {
           </View>
         </BlurView>
     )}
+    <Toast visible={toastVisible} message={toastMessage} type={toastType} onHide={() => setToastVisible(false)} />
     </View>
   );
 }
@@ -1024,7 +1044,7 @@ const styles = StyleSheet.create({
   phoneCard: { marginTop: 6, borderWidth: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   phoneValue: { flex: 1, fontSize: 15, fontWeight: '700' },
   showPhoneLink: { fontSize: 13, fontWeight: '800', letterSpacing: 0.3 },
-  outlineBtn: { marginTop: 6, borderWidth: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center', justifyContent: 'center' },
+  outlineBtn: { marginTop: 6, borderWidth: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   outlineBtnText: { fontSize: 14, fontWeight: '700' },
   locationSection: { marginHorizontal: 16, marginBottom: 40 },
   locationHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },

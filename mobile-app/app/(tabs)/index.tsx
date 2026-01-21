@@ -14,6 +14,7 @@ import { useNotifications } from '../../src/context/NotificationContext';
 import api from '../../src/services/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Text } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
@@ -133,7 +134,7 @@ export default function HomeScreen() {
   }, []);
 
   // Checkered background grid component for dark mode
-  const CheckeredBackground = () => {
+  const checkeredBackground = React.useMemo(() => {
     if (!isDark) return null;
     
     return (
@@ -177,7 +178,7 @@ export default function HomeScreen() {
         ))}
       </View>
     );
-  };
+  }, [isDark]);
 
 
 
@@ -242,7 +243,7 @@ export default function HomeScreen() {
 
   return (
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
-      <CheckeredBackground />
+      {checkeredBackground}
       <MobileHeader 
         notificationCount={unreadNotificationCount}
         searchValue={searchTerm}
@@ -374,7 +375,8 @@ export default function HomeScreen() {
               const gap = 12; // marginRight between cards
               const cardWidth = Math.floor((Math.max(screenWidth || 360, 360) - horizontalPadding - (cols - 1) * gap) / cols);
               const listData = (() => {
-                const arr = Array.isArray(popular) ? popular.slice(0) : [];
+                // Limit to 8 items to improve performance
+                const arr = Array.isArray(popular) ? popular.slice(0, 8) : [];
                 if (cols > 1) {
                   const rem = arr.length % cols;
                   if (rem !== 0) {
@@ -444,9 +446,11 @@ export default function HomeScreen() {
                     return (
                       <TouchableOpacity activeOpacity={0.9} style={itemStyle} onPress={() => router.push(`/announcement-details?id=${item._id}`)}>
                         <View style={[styles.popularImageWrap, { height: computedImageHeight }]}> 
-                          <Image
+                          <ExpoImage
                             source={{ uri: item.images && item.images[0] ? item.images[0] : undefined }}
                             style={[styles.popularImage, { height: '100%' }]}
+                            contentFit="cover"
+                            transition={200}
                           />
                           {/* star button removed per request */}
                         </View>

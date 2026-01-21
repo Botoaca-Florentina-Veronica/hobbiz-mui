@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { router, usePathname } from 'expo-router';
+import { router, usePathname, useSegments, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -19,13 +19,56 @@ import { NetworkStatus } from '../components/NetworkStatus';
 import { PrivacyTermsModal } from '../components/PrivacyTermsModal';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
-import { AuthProvider } from '../src/context/AuthContext';
+import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { ChatNotificationProvider } from '../src/context/ChatNotificationContext';
 import { NotificationProvider } from '../src/context/NotificationContext';
 import { LocaleProvider } from '../src/context/LocaleContext';
 import { setupNotificationListeners } from '../src/services/notificationService';
 
 const PRIVACY_TERMS_ACCEPTED_KEY = '@hobbiz_privacy_terms_accepted';
+
+function NavigationWrapper({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isGuest, loading } = useAuth();
+  const segments = useSegments();
+  const navigationState = useRootNavigationState();
+  const [hasNavigated, setHasNavigated] = useState(false);
+
+  useEffect(() => {
+    if (!navigationState?.key || loading) return;
+
+    // Don't navigate if we've already done initial navigation
+    if (hasNavigated) return;
+
+    const inAuthGroup = segments[0] === '(tabs)';
+    const inWelcome = segments[0] === 'welcome';
+    const inAuthPages = segments[0] === 'login' || segments[0] === 'signup' || segments[0] === 'forgot-password';
+    const inOAuth = segments[0] === 'oauth';
+
+    // Initial navigation on app launch
+    if (segments.length === 0 || (segments.length === 1 && segments[0] === 'index')) {
+      if (isAuthenticated || isGuest) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/welcome');
+      }
+      setHasNavigated(true);
+      return;
+    }
+
+    // Redirect authenticated/guest users away from welcome/auth pages
+    if ((isAuthenticated || isGuest) && (inWelcome || (inAuthPages && !inOAuth))) {
+      router.replace('/(tabs)');
+      setHasNavigated(true);
+    }
+    // Redirect unauthenticated users trying to access tabs (but not guests)
+    else if (!isAuthenticated && !isGuest && inAuthGroup && !inWelcome && !inAuthPages) {
+      router.replace('/welcome');
+      setHasNavigated(true);
+    }
+  }, [isAuthenticated, isGuest, loading, segments, navigationState?.key, hasNavigated]);
+
+  return <>{children}</>;
+}
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -142,35 +185,39 @@ export default function RootLayout() {
               <SafeAreaProvider>
                 <NetworkStatus />
                 <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <JsStack
-                  id="root"
-                  screenOptions={{
-                    ...TransitionPresets.SlideFromRightIOS,
-                    headerShown: false,
-                    gestureEnabled: true,
-                    gestureDirection: 'horizontal',
-                    cardStyle: {
-                      backgroundColor: colorScheme === 'dark' ? '#000000' : '#ffffff',
-                    },
-                  }}
-                >
-                <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <JsStack.Screen name="login" options={{ headerShown: false }} />
-                <JsStack.Screen name="signup" options={{ headerShown: false }} />
-                <JsStack.Screen name="forgot-password" options={{ headerShown: false }} />
-                <JsStack.Screen name="oauth" options={{ headerShown: false }} />
-                <JsStack.Screen name="settings" options={{ headerShown: false }} />
-                <JsStack.Screen name="notification-settings" options={{ headerShown: false }} />
-                <JsStack.Screen name="about" options={{ headerShown: false }} />
-                <JsStack.Screen name="legal" options={{ headerShown: false }} />
-                <JsStack.Screen name="notifications" options={{ headerShown: false }} />
-                <JsStack.Screen name="conversation" options={{ headerShown: false }} />
-                <JsStack.Screen name="profile" options={{ headerShown: false }} />
-                <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
-                <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />
-                <JsStack.Screen name="post-success" options={{ headerShown: false }} />
-                <JsStack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              </JsStack>
+                <NavigationWrapper>
+                  <JsStack
+                    id="root"
+                    initialRouteName="welcome"
+                    screenOptions={{
+                      ...TransitionPresets.SlideFromRightIOS,
+                      headerShown: false,
+                      gestureEnabled: true,
+                      gestureDirection: 'horizontal',
+                      cardStyle: {
+                        backgroundColor: colorScheme === 'dark' ? '#000000' : '#ffffff',
+                      },
+                    }}
+                  >
+                  <JsStack.Screen name="welcome" options={{ headerShown: false }} />
+                  <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <JsStack.Screen name="login" options={{ headerShown: false }} />
+                  <JsStack.Screen name="signup" options={{ headerShown: false }} />
+                  <JsStack.Screen name="forgot-password" options={{ headerShown: false }} />
+                  <JsStack.Screen name="oauth" options={{ headerShown: false }} />
+                  <JsStack.Screen name="settings" options={{ headerShown: false }} />
+                  <JsStack.Screen name="notification-settings" options={{ headerShown: false }} />
+                  <JsStack.Screen name="about" options={{ headerShown: false }} />
+                  <JsStack.Screen name="legal" options={{ headerShown: false }} />
+                  <JsStack.Screen name="notifications" options={{ headerShown: false }} />
+                  <JsStack.Screen name="conversation" options={{ headerShown: false }} />
+                  <JsStack.Screen name="profile" options={{ headerShown: false }} />
+                  <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
+                  <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />
+                  <JsStack.Screen name="post-success" options={{ headerShown: false }} />
+                  <JsStack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                </JsStack>
+                </NavigationWrapper>
                 <StatusBar style="auto" />
               </NavThemeProvider>
               {/* Privacy & Terms Modal */}
