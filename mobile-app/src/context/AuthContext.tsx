@@ -105,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setToken(stored);
         try {
           await fetchProfile();
+          setIsGuest(false); // User is authenticated, not a guest
           // After profile is available, register for push notifications
           try {
             const tokenValue = await registerForPushNotificationsAsync();
@@ -136,6 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     setLoading(true);
+    setIsGuest(false); // Immediately clear guest mode
     try {
       const data = await loginWithCredentials(email, password);
       if (data?.token) {
@@ -201,7 +203,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ loading, user, token, isAuthenticated: !!user && !!token, isGuest, login, logout, restore, setGuestMode }}>
+    <AuthContext.Provider value={{ loading, user, token, isAuthenticated: !!user && !!token && !isGuest, isGuest, login, logout, restore, setGuestMode }}>
       {children}
     </AuthContext.Provider>
   );

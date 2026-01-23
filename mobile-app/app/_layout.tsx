@@ -28,7 +28,7 @@ import { setupNotificationListeners } from '../src/services/notificationService'
 const PRIVACY_TERMS_ACCEPTED_KEY = '@hobbiz_privacy_terms_accepted';
 
 function NavigationWrapper({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isGuest, loading } = useAuth();
+  const { isAuthenticated, isGuest, loading, user } = useAuth();
   const segments = useSegments();
   const navigationState = useRootNavigationState();
   const [hasNavigated, setHasNavigated] = useState(false);
@@ -46,17 +46,25 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
 
     // Initial navigation on app launch
     if (segments.length === 0 || (segments.length === 1 && segments[0] === 'index')) {
-      if (isAuthenticated || isGuest) {
+      // Only redirect if we have a clear authentication state
+      if (isAuthenticated && user) {
         router.replace('/(tabs)');
-      } else {
+      } else if (isGuest) {
+        router.replace('/(tabs)');
+      } else if (!loading) {
         router.replace('/welcome');
       }
       setHasNavigated(true);
       return;
     }
 
-    // Redirect authenticated/guest users away from welcome/auth pages
-    if ((isAuthenticated || isGuest) && (inWelcome || (inAuthPages && !inOAuth))) {
+    // Redirect authenticated users away from welcome/auth pages
+    if (isAuthenticated && user && (inWelcome || (inAuthPages && !inOAuth))) {
+      router.replace('/(tabs)');
+      setHasNavigated(true);
+    }
+    // Redirect guest users away from welcome/auth pages
+    else if (isGuest && !isAuthenticated && (inWelcome || (inAuthPages && !inOAuth))) {
       router.replace('/(tabs)');
       setHasNavigated(true);
     }
@@ -65,7 +73,7 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
       router.replace('/welcome');
       setHasNavigated(true);
     }
-  }, [isAuthenticated, isGuest, loading, segments, navigationState?.key, hasNavigated]);
+  }, [isAuthenticated, isGuest, loading, segments, navigationState?.key, hasNavigated, user]);
 
   return <>{children}</>;
 }

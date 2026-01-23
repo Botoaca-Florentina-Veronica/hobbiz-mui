@@ -35,19 +35,20 @@ const TRANSLATIONS = {
  * Shows a restriction message for disallowed routes.
  */
 export function GuestModeRestriction({ children, allowedRoutes = ['index'] }: GuestModeRestrictionProps) {
-  const { isGuest, isAuthenticated } = useAuth();
+  const { isGuest, isAuthenticated, user, token } = useAuth();
   const { tokens } = useAppTheme();
   const { locale } = useLocale();
   const router = useRouter();
   const t = TRANSLATIONS[locale];
 
-  // If user is authenticated (not guest), allow full access
-  if (isAuthenticated && !isGuest) {
+  // If user is authenticated (has token and user data), allow full access
+  // This check is more explicit to prevent false negatives
+  if (isAuthenticated || (user && token && !isGuest)) {
     return <>{children}</>;
   }
 
-  // If user is guest, check if current route is allowed
-  if (isGuest) {
+  // If user is guest (or not authenticated), check if current route is allowed
+  if (isGuest || !isAuthenticated) {
     // For now, we'll allow the index route (explore page) and block others
     // You can extend this logic based on current route detection
     const currentRoute = 'index'; // This should be dynamically determined

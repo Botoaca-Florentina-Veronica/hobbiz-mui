@@ -1,4 +1,4 @@
-/* Stiluri pentru containerul de login/signup */
+ /* Stiluri pentru containerul de login/signup */
 .login-container {
   background-color: white;
   max-width: 400px;
@@ -184,16 +184,77 @@
   color: #ffffff;
 }
 
+/* New layout: center intro image and login form side-by-side on wide screens */
+/* Compensate for the fixed header (72px) so centering is visually correct */
+.login-page-main {
+  height: calc(100vh - 72px); /* available viewport under header */
+  margin-top: 72px; /* push below fixed header */
+  display: flex;
+  align-items: center; /* vertical centering within available area */
+  justify-content: center; /* horizontal centering */
+  gap: 0;
+  padding: 2rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.login-page-main .login-container {
+  margin: 0;
+  max-width: 420px;
+  width: 100%;
+  border-radius: 0 8px 8px 0;
+}
+
+.login-intro-image {
+  max-width: 460px;
+  width: auto;
+  height: auto; /* dynamic height is set via JS on wide screens */
+  object-fit: cover;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.06);
+  display: block;
+  max-height: 90vh;
+}
+
+/* Responsive: stack vertically on small screens */
+@media (max-width: 900px) {
+  .login-page-main {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  /* Hide the intro image on small screens to save space */
+  .login-intro-image {
+    display: none !important;
+  }
+  .login-page-main .login-container {
+    max-width: 520px;
+    border-radius: 8px; /* full rounded corners when image is hidden */
+  }
+}
+
 /* Ensure the login/signup pages always have a full-viewport themed background
    (fixes cases where html zoom or layout causes a white/incorrect strip at the bottom) */
 body.login-page::before {
   content: '';
   position: fixed;
   inset: 0;
-  /* Force white in light mode so large-screen overrides don't leak through */
-  background: #ffffff;
+  /* Subtle bluish tint for light mode so containers pop against the background */
+  background: #f4f8ff;
   pointer-events: none;
   z-index: -9999;
+}
+
+/* Override footer colors when on the login page to keep visual consistency */
+body.login-page .footer,
+body.login-page .desktop-footer,
+body.login-page .footer-mobile-buttons,
+body.login-page .mobile-legal {
+  background: #f4f8ff !important;
+}
+
+body.login-page .footer-separator {
+  background: rgba(53,80,112,0.06) !important; /* subtle bluish divider */
 }
 
 /* In dark mode, use the themed app background */
