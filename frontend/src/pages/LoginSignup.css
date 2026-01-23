@@ -206,7 +206,7 @@
 }
 
 .login-intro-image {
-  max-width: 460px;
+  max-width: 500px;
   width: auto;
   height: auto; /* dynamic height is set via JS on wide screens */
   object-fit: cover;
