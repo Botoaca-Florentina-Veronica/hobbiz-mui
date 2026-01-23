@@ -172,10 +172,12 @@ export default function AccountScreen() {
                 <>
                   <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{firstName || t.user}</ThemedText>
                   {lastName ? <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{' \n'}{lastName}</ThemedText> : null}
+                  <ThemedText style={[styles.greetingText, { color: palette.headerText }]}>{' '}</ThemedText>
                   <ThemedText style={[styles.greetingText, { color: palette.headerText }]}>{'!'}</ThemedText>
+                  <ThemedText style={[styles.greetingText, { color: palette.headerText }]} accessibilityLabel="emoji-hand">👋</ThemedText>
                 </>
               ) : (
-                <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{(firstName || lastName) ? `${firstName} ${lastName}`.trim() : t.user}!</ThemedText>
+                <ThemedText style={[styles.greetingText, { color: palette.nameAccent }]}>{(firstName || lastName) ? `${firstName} ${lastName}`.trim() : t.user}!👋</ThemedText>
               )}
             </ThemedText>
           </View>

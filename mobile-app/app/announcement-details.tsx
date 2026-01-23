@@ -200,14 +200,16 @@ export default function AnnouncementDetailsScreen() {
   const res = await api.get(`/api/announcements/${id}`);
       setAnnouncement(res.data);
       // after loading announcement, check if it's in user's favorites
-      try {
-        const favRes = await api.get('/api/favorites');
-        const favIds = favRes?.data?.favoriteIds || favRes?.data?.favorites || [];
-        if (Array.isArray(favIds)) {
-          setFavorited(favIds.some((f: any) => String(f) === String(id)));
+      if (isAuthenticated) {
+        try {
+          const favRes = await api.get('/api/favorites');
+          const favIds = favRes?.data?.favoriteIds || favRes?.data?.favorites || [];
+          if (Array.isArray(favIds)) {
+            setFavorited(favIds.some((f: any) => String(f) === String(id)));
+          }
+        } catch (favErr) {
+          console.warn('Could not fetch favorites:', favErr);
         }
-      } catch (favErr) {
-        // ignore if not authenticated or any error
       }
     } catch (e: any) {
       console.error('Error loading announcement details:', e?.message || e);
@@ -215,7 +217,7 @@ export default function AnnouncementDetailsScreen() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   useEffect(() => {
     fetchAnnouncement();
@@ -506,23 +508,33 @@ export default function AnnouncementDetailsScreen() {
                 return;
               }
 
+              console.log('[Favorites] Current state:', { favorited, announcementId: id, isAuthenticated });
+
               try {
                 if (!favorited) {
+                  console.log('[Favorites] Adding to favorites...');
                   const r = await api.post(`/api/favorites/${id}`);
+                  console.log('[Favorites] POST response:', r.data);
                   setFavorited(true);
                   if (r?.data?.favoritesCount !== undefined) {
                     setAnnouncement(prev => prev ? { ...prev, favoritesCount: r.data.favoritesCount } : prev);
                   }
+                  showToast(t.favoriteAdded, 'success');
                 } else {
+                  console.log('[Favorites] Removing from favorites...');
                   const r = await api.delete(`/api/favorites/${id}`);
+                  console.log('[Favorites] DELETE response:', r.data);
                   setFavorited(false);
                   if (r?.data?.favoritesCount !== undefined) {
                     setAnnouncement(prev => prev ? { ...prev, favoritesCount: r.data.favoritesCount } : prev);
                   }
+                  showToast(t.favoriteRemoved, 'success');
                 }
-              } catch (err) {
-                console.warn('Favorite toggle failed', err);
-                Alert.alert(t.error, t.favoriteFailed);
+              } catch (err: any) {
+                console.error('[Favorites] Toggle failed:', err);
+                console.error('[Favorites] Error response:', err?.response?.data);
+                const errorMsg = err?.response?.data?.error || err?.response?.data?.message || t.favoriteFailed;
+                showToast(errorMsg, 'error');
               }
             }}
             style={styles.actionCircle}
@@ -1009,8 +1021,8 @@ const styles = StyleSheet.create({
   carouselCounterBubble: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 999, alignItems: 'center', justifyContent: 'center', minWidth: 0 },
   paginationDotsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   counter: { fontSize: 13, fontWeight: '600' },
-  cardActions: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', gap: 12 },
-  actionCircle: { width: 52, height: 52, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 0, backgroundColor: 'transparent' },
+  cardActions: { position: 'absolute', top: 12, right: 24, flexDirection: 'row', gap: 12 },
+  actionCircle: { width: 72, height: 72, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 0, backgroundColor: 'transparent' },
   mainCard: { marginHorizontal: 16, borderWidth: 1, borderRadius: 18, padding: 20, marginBottom: 20, gap: 12 },
   postedAt: { fontSize: 12, fontWeight: '600' },
   title: { fontSize: 24, fontWeight: '700' },

@@ -14,6 +14,7 @@ import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocale } from '@/src/context/LocaleContext';
 
 const TRANSLATIONS = {
@@ -35,6 +36,36 @@ const TRANSLATIONS = {
   },
 };
 
+// Logo configuration - easy to modify
+const LOGO_CONFIG = {
+  // Values chosen to lift the logo higher but keep it visible across device sizes
+  small: { width: 320, height: 210, marginTop: -160, marginBottom: -10 },
+  large: { width: 480, height: 280, marginTop: -140, marginBottom: 12 },
+};
+
+
+const BUTTONS_CONFIG = {
+  gap: 2, 
+  loginButton: {
+    marginBottom: 5, // Space after login button
+    marginTop: 2
+  },
+  guestButton: {
+    marginBottom: 2, // Space after guest button
+  },
+  signupLink: {
+    marginTop: 0, 
+    marginBottom: 2,
+  },
+};
+
+// Image configuration - easy to modify intro image height ratios
+const IMAGE_CONFIG = {
+  small: 0.55, // 55% of device height for small devices
+  medium: 0.58, // 58% of device height for medium devices
+  large: 0.6, // 60% of device height for large devices
+};
+
 export const options = {
   headerShown: false,
 };
@@ -52,14 +83,15 @@ export default function WelcomeScreen() {
   const isMediumDevice = width >= 600 && width < 900;
 
   const responsiveSizes = {
-    // Reduced heights to avoid cropping image edges
-    imageHeight: isSmallDevice ? height * 0.55 : isMediumDevice ? height * 0.58 : height * 0.6,
+    // Image height based on device type - configured in IMAGE_CONFIG
+    imageHeight: isSmallDevice ? height * IMAGE_CONFIG.small : isMediumDevice ? height * IMAGE_CONFIG.medium : height * IMAGE_CONFIG.large,
     titleSize: isSmallDevice ? 32 : isMediumDevice ? 38 : 42,
     subtitleSize: isSmallDevice ? 16 : isMediumDevice ? 18 : 20,
     buttonPadding: isSmallDevice ? 16 : isMediumDevice ? 18 : 20,
     buttonFontSize: isSmallDevice ? 16 : isMediumDevice ? 18 : 20,
     contentPadding: isSmallDevice ? 24 : isMediumDevice ? 32 : 40,
     linkFontSize: isSmallDevice ? 14 : isMediumDevice ? 16 : 18,
+    buttonsMarginTop: height * (isSmallDevice ? 0.12 : isMediumDevice ? 0.17 : 0.20),
   };
 
   const handleLogin = () => {
@@ -76,44 +108,58 @@ export default function WelcomeScreen() {
     router.push('/(tabs)');
   };
 
+  // Calculate gradient height to be responsive
+  const gradientHeight = Math.min(480, height * 0.45);
+
+  // Logo and decorative texts removed per request
+
+
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
-      {/* Image Section - Fixed at top (covers into status bar) */}
+      {/* Image Section - Background (covers entire screen) */}
       <View
-        style={[
-          styles.imageContainer,
-          {
-            height: responsiveSizes.imageHeight + insets.top,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-          },
-        ]}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
+        }}
       >
         <Image
-          source={require('../assets/images/intro-image.png')}
-          style={[styles.image, { marginTop: -insets.top }]}
+          source={require('../assets/images/intro.png')}
+          style={styles.image}
           resizeMode="cover"
         />
       </View>
 
-      {/* Content Section - Scrollable (offset below image) */}
+      {/* Bottom Gradient overlay (between image and content) */}
+      <View style={[styles.bottomGradient, { height: gradientHeight }]} pointerEvents="none">
+        <LinearGradient
+          colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.85)"]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.gradient}
+        />
+      </View>
+
+
+
+
+
+
+
+
+
+      {/* Content Section - Scrollable (overlay on image) */}
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { marginTop: responsiveSizes.imageHeight + insets.top }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + responsiveSizes.contentPadding }]}
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        <View style={[styles.content, { padding: responsiveSizes.contentPadding }]}>
-          {/* HOBBIZ Logo */}
-          <View style={[styles.logoWrapper, { marginTop: isSmallDevice ? -200 : -300, marginBottom: isSmallDevice ? 12 : 18 }]}>
-            <Image
-              source={isDark ? require('../assets/images/logo-dark-mode.png') : require('../assets/images/logo.jpg')}
-              style={[styles.logo, { width: isSmallDevice ? 1240 : 2360, height: isSmallDevice ? 300 : 480 }]}
-              resizeMode="contain"
-              accessibilityLabel="Hobbiz logo"
-            />
-          </View>
+        <View style={{ minHeight: 1 }}>{false && (<>
 
           {/* Login Button */}
           <TouchableOpacity
@@ -122,6 +168,7 @@ export default function WelcomeScreen() {
               {
                 backgroundColor: tokens.colors.primary,
                 paddingVertical: responsiveSizes.buttonPadding,
+                marginBottom: BUTTONS_CONFIG.loginButton.marginBottom,
               },
             ]}
             onPress={handleLogin}
@@ -147,6 +194,7 @@ export default function WelcomeScreen() {
               {
                 borderColor: tokens.colors.border,
                 paddingVertical: responsiveSizes.buttonPadding,
+                marginBottom: BUTTONS_CONFIG.guestButton.marginBottom,
               },
             ]}
             onPress={handleGuestMode}
@@ -166,7 +214,7 @@ export default function WelcomeScreen() {
           </TouchableOpacity>
 
           {/* Sign up link */}
-          <View style={styles.signupContainer}>
+          <View style={[styles.signupContainer, { marginBottom: insets.bottom + 8, marginTop: BUTTONS_CONFIG.signupLink.marginTop }]}>
             <ThemedText
               style={[
                 styles.signupText,
@@ -192,8 +240,66 @@ export default function WelcomeScreen() {
               </ThemedText>
             </TouchableOpacity>
           </View>
+        </>) }
         </View>
       </ScrollView>
+      {/* Buttons anchored to bottom using safe area insets for consistent placement */}
+      <View style={{
+        position: 'absolute',
+        left: responsiveSizes.contentPadding,
+        right: responsiveSizes.contentPadding,
+        bottom: insets.bottom + (isSmallDevice ? 16 : isMediumDevice ? 20 : 24),
+        zIndex: 10,
+        gap: BUTTONS_CONFIG.gap,
+      }}>
+        {/* Login Button */}
+        <TouchableOpacity
+          style={[
+            styles.loginButton,
+            {
+              backgroundColor: tokens.colors.primary,
+              paddingVertical: responsiveSizes.buttonPadding,
+              marginBottom: BUTTONS_CONFIG.loginButton.marginBottom,
+            },
+          ]}
+          onPress={handleLogin}
+          activeOpacity={0.8}
+        >
+          <ThemedText style={[styles.loginButtonText, { fontSize: responsiveSizes.buttonFontSize, color: '#FFFFFF' }]}>
+            {t.login}
+          </ThemedText>
+        </TouchableOpacity>
+
+        {/* Guest Mode Button */}
+        <TouchableOpacity
+          style={[
+            styles.guestButton,
+            {
+              borderColor: tokens.colors.border,
+              paddingVertical: responsiveSizes.buttonPadding,
+              marginBottom: BUTTONS_CONFIG.guestButton.marginBottom,
+            },
+          ]}
+          onPress={handleGuestMode}
+          activeOpacity={0.8}
+        >
+          <ThemedText style={[styles.guestButtonText, { fontSize: responsiveSizes.buttonFontSize, color: tokens.colors.text }]}>
+            {t.guestMode}
+          </ThemedText>
+        </TouchableOpacity>
+
+        {/* Sign up link */}
+        <View style={[styles.signupContainer, { marginBottom: insets.bottom + 8, marginTop: BUTTONS_CONFIG.signupLink.marginTop }]}> 
+          <ThemedText style={[styles.signupText, { fontSize: responsiveSizes.linkFontSize, color: tokens.colors.muted }]}>
+            {t.noAccount}{' '}
+          </ThemedText>
+          <TouchableOpacity onPress={handleSignup} activeOpacity={0.7}>
+            <ThemedText style={[styles.signupLink, { fontSize: responsiveSizes.linkFontSize, color: tokens.colors.primary }]}>
+              {t.signup}
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+      </View>
     </ThemedView>
   );
 }
@@ -213,6 +319,17 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+  },
+  bottomGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: 'hidden',
+  },
+  gradient: {
+    flex: 1,
+    width: '100%',
   },
   content: {
     justifyContent: 'center',

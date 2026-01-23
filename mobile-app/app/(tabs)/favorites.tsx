@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../../components/themed-text';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
+import { useLocale } from '../../src/context/LocaleContext';
 import api from '../../src/services/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
+import { translateCategory, getCategoryKeyByLabel } from '../../src/constants/categories';
 
 interface Announcement {
   _id: string;
@@ -21,8 +24,37 @@ interface Announcement {
   user?: { _id: string; firstName?: string; lastName?: string };
 }
 
+const TRANSLATIONS = {
+  ro: {
+    favorites: 'Favorite',
+    back: 'înapoi',
+    favoriteAnnouncements: 'Anunțuri favorite',
+    loading: 'Se încarcă favorite...',
+    loginRequired: 'Autentifică-te',
+    loginMessage: 'Pentru a vedea anunțurile tale favorite',
+    goToLogin: 'Mergi la autentificare',
+    noFavorites: 'Niciun anunț favorit',
+    noFavoritesMessage: 'Știi ce înseamnă asta, e timpul să îți adaugi!',
+    posted: 'POSTAT',
+  },
+  en: {
+    favorites: 'Favorite',
+    back: 'back',
+    favoriteAnnouncements: 'Favorite Announcements',
+    loading: 'Loading favorites...',
+    loginRequired: 'Login Required',
+    loginMessage: 'To see your favorite announcements',
+    goToLogin: 'Go to Login',
+    noFavorites: 'No favorite announcements',
+    noFavoritesMessage: 'You know what that means, time to add some!',
+    posted: 'POSTED',
+  },
+};
+
 export default function FavoritesScreen() {
   const { tokens, isDark } = useAppTheme();
+  const { locale } = useLocale();
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
   // Dark-mode palette (from attachment): use only these surface tints + pink primary and white for contrast
   const darkPalette = {
     bg: '#121212', // a10
@@ -44,10 +76,16 @@ export default function FavoritesScreen() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const isTwoColumn = width > 700;
 
   const [favorites, setFavorites] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  // Track items removed during this session (they should remain visible but button updates)
+  const [removedFavorites, setRemovedFavorites] = useState<Set<string>>(new Set());
+  // Track IDs currently being processed to disable button / show spinner
+  const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
 
   const fetchFavorites = useCallback(async () => {
     if (!isAuthenticated) {
@@ -58,6 +96,9 @@ export default function FavoritesScreen() {
       setLoading(true);
       const res = await api.get('/api/favorites');
       setFavorites(res.data?.favorites || []);
+      // reset local optimistic state on fresh fetch
+      setRemovedFavorites(new Set());
+      setRemovingIds(new Set());
     } catch (e) {
       console.error('Error fetching favorites:', e);
       setFavorites([]);
@@ -72,16 +113,43 @@ export default function FavoritesScreen() {
     setRefreshing(false);
   }, [fetchFavorites]);
 
-  useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+  // Fetch favorites only when screen comes into focus (user navigates to this tab)
+  // This allows removed items to stay visible until page refresh or navigation away
+  useFocusEffect(
+    useCallback(() => {
+      fetchFavorites();
+    }, [fetchFavorites])
+  );
 
   const handleRemoveFavorite = async (id: string) => {
+    // Optimistic UI for the favorite button: mark as removing immediately
+    setRemovingIds(prev => new Set(Array.from(prev).concat(id)));
+
     try {
       await api.delete(`/api/favorites/${id}`);
-      setFavorites(prev => prev.filter(f => f._id !== id));
+      // Mark as removed locally so button updates, but keep item visible
+      setRemovedFavorites(prev => {
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
     } catch (e) {
       console.error('Error removing favorite:', e);
+      // revert removing state
+      setRemovingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      // fallback to informing the user
+      try { Alert.alert('Error', 'Could not remove favorite.'); } catch (_) {}
+    } finally {
+      // clear removing flag
+      setRemovingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
@@ -97,24 +165,24 @@ export default function FavoritesScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.bg, paddingTop: insets.top }]}> 
-        <ActivityIndicator size="large" color={colors.primary} />
-        <ThemedText style={[styles.loadingText, { color: colors.muted }]}>Se încarcă favorite...</ThemedText>
+      <View style={[styles.loadingContainer, { backgroundColor: isDark ? '#000000' : '#ffffff', paddingTop: insets.top }]}> 
+        <ActivityIndicator size="large" color={isDark ? '#f51866' : tokens.colors.primary} />
+        <ThemedText style={[styles.loadingText, { color: isDark ? '#8b8b8b' : tokens.colors.muted }]}>{t.loading}</ThemedText>
       </View>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <View style={[styles.emptyContainer, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
-        <Ionicons name="heart-outline" size={64} color={colors.placeholder} />
-        <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>Autentifică-te</ThemedText>
-        <ThemedText style={[styles.emptyMessage, { color: colors.muted }]}>Pentru a vedea anunțurile tale favorite</ThemedText>
+      <View style={[styles.emptyContainer, { backgroundColor: isDark ? '#000000' : '#ffffff', paddingTop: insets.top }]}>
+        <Ionicons name="heart-outline" size={64} color={isDark ? '#3f3f3f' : tokens.colors.placeholder} />
+        <ThemedText style={[styles.emptyTitle, { color: isDark ? '#ffffff' : tokens.colors.text }]}>{t.loginRequired}</ThemedText>
+        <ThemedText style={[styles.emptyMessage, { color: isDark ? '#8b8b8b' : tokens.colors.muted }]}>{t.loginMessage}</ThemedText>
         <TouchableOpacity
-          style={[styles.loginButton, { backgroundColor: colors.primary }]}
+          style={[styles.loginButton, { backgroundColor: isDark ? '#f51866' : tokens.colors.primary }]}
           onPress={() => router.replace('/login')}
         >
-          <ThemedText style={{ color: '#ffffff', fontWeight: '600' }}>Mergi la autentificare</ThemedText>
+          <ThemedText style={{ color: '#ffffff', fontWeight: '600' }}>{t.goToLogin}</ThemedText>
         </TouchableOpacity>
       </View>
     );
@@ -123,106 +191,155 @@ export default function FavoritesScreen() {
   return (
     <ProtectedRoute>
       <GuestModeRestriction allowedRoutes={[]}>
-        <View style={[styles.container, { backgroundColor: tokens.colors.bg }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Ionicons name="arrow-back" size={20} color={colors.text} />
-          </TouchableOpacity>
-          <ThemedText style={[styles.headerTitle, { color: colors.text }]}>Favorite</ThemedText>
+      <View style={[styles.header, { 
+        paddingTop: insets.top + 12, 
+        backgroundColor: isDark ? '#000000' : '#ffffff',
+        borderBottomWidth: 0
+      }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <TouchableOpacity 
+              onPress={() => router.back()} 
+              style={[styles.backButton, { 
+                backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
+                borderWidth: 0
+              }]}
+            >
+              <Ionicons name="arrow-back" size={20} color={isDark ? '#ffffff' : tokens.colors.text} />
+            </TouchableOpacity>
+            <ThemedText style={[styles.headerTitle, { color: isDark ? '#ffffff' : tokens.colors.text }]}>
+              {t.favorites}
+            </ThemedText>
+          </View>
+          <ThemedText style={[styles.countBadge, { color: isDark ? '#f51866' : '#E0245E' }]}>
+            {favorites.length}/150
+          </ThemedText>
         </View>
-      </View>
-
-      {/* Subtitle */}
-      <View style={styles.subtitleContainer}>
-        <ThemedText style={[styles.subtitle, { color: colors.text }]}>Anunțuri favorite ({favorites.length}/150)</ThemedText>
       </View>
 
       {/* List */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isTwoColumn && styles.scrollContentTwoColumn
+        ]}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={isDark ? '#f51866' : tokens.colors.primary} 
+          />
+        }
       >
         {favorites.length === 0 ? (
           <View style={styles.emptyState}>
-            <Image source={require('../../assets/images/gumballSiDarwin.png')} style={styles.emptyImage} resizeMode="contain" />
-            <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>Niciun anunț favorit</ThemedText>
-            <ThemedText style={[styles.emptyMessage, { color: colors.muted }]}>Știi ce înseamnă asta, e timpul să îți adaugi!</ThemedText>
+            <Image 
+              source={require('../../assets/images/gumballSiDarwin.png')} 
+              style={styles.emptyImage} 
+              resizeMode="contain" 
+            />
+            <ThemedText style={[styles.emptyTitle, { color: isDark ? '#ffffff' : tokens.colors.text }]}>
+              {t.noFavorites}
+            </ThemedText>
+            <ThemedText style={[styles.emptyMessage, { color: isDark ? '#8b8b8b' : tokens.colors.muted }]}>
+              {t.noFavoritesMessage}
+            </ThemedText>
           </View>
         ) : (
-          favorites.map((ann, index) => {
+          favorites.map((ann) => {
             const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
-            const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
-            const palettes = [
-              { bg: '#FFE2D5', g1: '#FFB996', g2: '#FFCDB0', text: '#3A2E2A' },
-              { bg: '#D9EEF2', g1: '#8AC6D1', g2: '#B5E4EB', text: '#15393F' },
-              { bg: '#FFE8BC', g1: '#FFD079', g2: '#FFE1A3', text: '#563C05' },
-              { bg: '#D8E0F5', g1: '#425D9E', g2: '#6E85C4', text: '#1C2844' },
-              { bg: '#E9DCF6', g1: '#A678E0', g2: '#C2A3EE', text: '#35224B' },
-              { bg: '#E4F7D9', g1: '#89C46C', g2: '#B3E29A', text: '#234314' },
-            ];
-            const palette = palettes[index % palettes.length];
-            // For dark mode: all cards identical (same bg + pink gradient accent)
-            const cardBg = isDark ? '#121212' : palette.bg;
-            const gradientColors: [string, string] = isDark 
-              ? [colors.primary as string, (colors as any).pink4 as string]  // pink gradient (#f51866 → #ff7e95)
-              : [palette.g1, palette.g2];
-            const textColor = isDark ? colors.text : palette.text;
+            const categoryKey = getCategoryKeyByLabel(ann.category);
+            const translatedCategory = categoryKey ? translateCategory(categoryKey, locale) : ann.category;
 
             return (
-              <Pressable
+              <TouchableOpacity
                 key={ann._id}
+                activeOpacity={0.9}
                 onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
-                style={({ pressed }) => [
-                  styles.modernCard,
-                  styles.modernRow,
-                  {
-                    backgroundColor: cardBg,
-                    opacity: pressed ? 0.92 : 1,
-                    borderWidth: isDark ? 1 : 0,
-                    borderColor: isDark ? 'rgb(139, 139, 139)' : 'transparent',
-                  },
+                style={[
+                  styles.card,
+                  isTwoColumn ? styles.cardTwoColumn : styles.cardMobile
                 ]}
               >
-                {!isDark && (
-                  <LinearGradient
-                    colors={gradientColors}
-                    style={styles.leftAccent}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
-                  />
-                )}
-                <View style={[styles.squareImageWrapper, { marginLeft: isDark ? 0 : 22 }]}>
+                {/* Image Background */}
+                <View style={styles.imageContainer}>
                   {firstImage ? (
-                    <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
+                    <Image 
+                      source={{ uri: firstImage }} 
+                      style={styles.cardImage} 
+                      resizeMode="cover" 
+                    />
                   ) : (
-                    <View style={styles.squareImagePlaceholder}>
-                      <Ionicons name="image-outline" size={32} color={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
+                    <View style={[styles.cardImagePlaceholder, { 
+                      backgroundColor: isDark ? '#1a1a1a' : '#e0e0e0' 
+                    }]}>
+                      <Ionicons 
+                        name="image-outline" 
+                        size={64} 
+                        color={isDark ? '#3f3f3f' : '#bdbdbd'} 
+                      />
                     </View>
                   )}
-                </View>
-                <View style={styles.squareContent}>
-                  <ThemedText style={[styles.modernTitle, { color: textColor }]} numberOfLines={2}>{ann.title}</ThemedText>
-                  <View style={[styles.categoryBadgeModern, { 
-                    backgroundColor: isDark ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)',
-                    borderWidth: isDark ? 1 : 0,
-                    borderColor: isDark ? (colors as any).pink5 : 'transparent'
-                  }]}>
-                    <ThemedText style={[styles.categoryBadgeText, { color: isDark ? (colors as any).pink6 : textColor }]} numberOfLines={1}>{ann.category}</ThemedText>
+                  
+                  {/* Gradient Overlay */}
+                  <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)']}
+                    style={styles.gradientOverlay}
+                  />
+
+                  {/* Content Over Image */}
+                  <View style={styles.cardContent}>
+                    {/* Category Badge */}
+                    <View style={styles.categoryContainer}>
+                      <View style={[styles.categoryBadge, { 
+                        backgroundColor: isDark ? 'rgba(245, 24, 102, 0.9)' : 'rgba(245, 24, 102, 0.85)'
+                      }]}>
+                        <Text style={styles.categoryText}>
+                          {translatedCategory.toUpperCase()}
+                        </Text>
+                      </View>
+                      {ann.location && (
+                        <View style={[styles.locationBadge, { 
+                          backgroundColor: isDark ? 'rgba(40, 40, 40, 0.9)' : 'rgba(50, 50, 50, 0.85)'
+                        }]}>
+                          <Text style={styles.locationText}>
+                            {ann.location.toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Title */}
+                    <Text style={styles.cardTitle} numberOfLines={2}>
+                      {ann.title}
+                    </Text>
                   </View>
-                  <ThemedText style={[styles.modernSub, { color: textColor, opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
-                  <ThemedText style={[styles.modernDate, { color: textColor, opacity: 0.55 }]}>Postat {new Date(ann.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' })}</ThemedText>
+
+                  {/* Favorite Button */}
+                  <TouchableOpacity
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFavorite(ann._id);
+                    }}
+                    style={styles.favoriteButton}
+                    activeOpacity={0.7}
+                    disabled={removingIds.has(ann._id)}
+                  >
+                    {removingIds.has(ann._id) ? (
+                      <ActivityIndicator size="small" color="#f51866" />
+                    ) : (
+                      <Ionicons
+                        name={removedFavorites.has(ann._id) ? 'heart-outline' : 'heart'}
+                        size={22}
+                        color={removedFavorites.has(ann._id) ? (isDark ? '#ffffff' : '#9e9e9e') : '#f51866'}
+                      />
+                    )}
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  onPress={() => handleRemoveFavorite(ann._id)}
-                  style={[styles.modernFavBtn, { backgroundColor: isDark ? colors.elev : 'rgba(255,255,255,0.65)' }]}
-                  activeOpacity={0.75}
-                >
-                  <Ionicons name="heart" size={20} color={isDark ? colors.primary : '#E0245E'} />
-                </TouchableOpacity>
-              </Pressable>
+              </TouchableOpacity>
             );
           })
         )}
@@ -234,94 +351,180 @@ export default function FavoritesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 12, fontSize: 14, fontWeight: '500' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 },
-  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24 },
-  emptyImage: { width: 220, height: 180, marginTop: 28, marginBottom: -52 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', marginTop: 16 },
-  emptyMessage: { fontSize: 14, textAlign: 'center', marginTop: 8 },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
-  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  headerTitle: { fontSize: 24, fontWeight: '600' },
-  subtitleContainer: { paddingHorizontal: 16, paddingVertical: 16, alignItems: 'center' },
-  subtitle: { fontSize: 16, fontWeight: '600' },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
-  /* Legacy card styles removed in favor of modern design */
-  modernCard: {
-    borderRadius: 26,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+  container: { 
+    flex: 1 
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  loadingText: { 
+    marginTop: 12, 
+    fontSize: 14, 
+    fontWeight: '500' 
+  },
+  emptyContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    paddingHorizontal: 24 
+  },
+  emptyState: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    paddingVertical: 60, 
+    paddingHorizontal: 24 
+  },
+  emptyImage: { 
+    width: 220, 
+    height: 180, 
+    marginTop: 28, 
+    marginBottom: -52 
+  },
+  emptyTitle: { 
+    fontSize: 20, 
+    fontWeight: '700', 
+    marginTop: 16 
+  },
+  emptyMessage: { 
+    fontSize: 14, 
+    textAlign: 'center', 
+    marginTop: 8 
+  },
+  header: { 
+    paddingHorizontal: 16, 
+    paddingBottom: 16
+  },
+  backButton: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: 22, 
+    alignItems: 'center', 
+    justifyContent: 'center'
+  },
+  headerTitle: { 
+    fontSize: 28, 
+    fontWeight: '700',
+    letterSpacing: 0.3
+  },
+  countBadge: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  scrollView: { 
+    flex: 1 
+  },
+  scrollContent: { 
+    paddingHorizontal: 16, 
+    paddingBottom: 24, 
+    gap: 16 
+  },
+  scrollContentTwoColumn: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  
+  // New Card Design (Image Overlay Style)
+  card: {
+    borderRadius: 24,
     overflow: 'hidden',
+    height: 280,
     shadowColor: '#000',
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.15,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    elevation: 6,
   },
-  modernRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  cardTwoColumn: {
+    width: '48.5%',
   },
-  leftAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 16,
-    borderTopLeftRadius: 26,
-    borderBottomLeftRadius: 26,
+  cardMobile: {
+    height: 220,
   },
-  squareImageWrapper: {
-    width: 100,
-    height: 100,
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginLeft: 22, // leave space for accent
-    marginRight: 14,
-    backgroundColor: 'rgba(0,0,0,0.05)'
+  imageContainer: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
   },
-  squareImage: { width: '100%', height: '100%' },
-  squareImagePlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  squareContent: { flex: 1, gap: 6, paddingRight: 40 },
-  modernTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    letterSpacing: 0.2,
+  cardImage: {
+    width: '100%',
+    height: '100%',
   },
-  modernSub: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  modernDate: {
-    fontSize: 11,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  categoryBadgeModern: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-  },
-  categoryBadgeText: {
-    fontSize: 12,
-    fontWeight: '600'
-  },
-  modernFavBtn: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.65)',
+  cardImagePlaceholder: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
+  },
+  cardContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    gap: 8,
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  categoryBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  categoryText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  locationBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  locationText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.8,
+  },
+  cardTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '700',
+    lineHeight: 26,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
   },
   loginButton: {
     marginTop: 20,
