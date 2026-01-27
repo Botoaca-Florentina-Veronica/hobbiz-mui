@@ -97,7 +97,8 @@ hobbiz-mui/
 │  │  ├─ auth.js                             # JWT protection
 │  │  └─ optionalAuth.js                     # Optional JWT
 │  ├─ services/
-│  │  └─ UserService.js                      # Helper functions
+│  │  ├─ UserService.js                      # Helper functions
+│  │  └─ encryptionService.js                # AES-256-CBC encryption/decryption
 │  └─ scripts/                               # DB seeding, migrations
 │
 ├─ frontend/                                 # React 19 + Vite Web App
@@ -156,6 +157,7 @@ hobbiz-mui/
 - **Mongoose**: Single source of truth pentru schema datelor
 - **Socket.IO**: Real-time communication (chat, notifications, active users)
 - **Cloudinary**: Media storage (imagini anunțuri & avatare)
+- **Encryption**: AES-256-CBC la nivel de server (mesaje stocate criptate, decriptate la lectura)
 
 ---
 
@@ -179,13 +181,38 @@ Socket.IO pentru:
 
 ---
 
-## 🔐 Resetarea Parolei via Email
-Utilizatorii pot reseta parola în siguranță prin:
-- Cerere de resetare parolă (endpoint `/api/auth/forgot-password`)
-- Primire cod de verificare pe email (trimis via **MailerSend**)
-- Setare parolă nouă cu codul primit
-- **Limita gratuită**: 500 emailuri/lună (MailerSend free tier)
-- Criptare parolă cu bcryptjs; tokeni de resetare cu TTL scurt
+## 🔐 Securitate
+
+### Criptarea Mesajelor (AES-256-CBC)
+Toate mesajele chat sunt criptate la nivel de server:
+- **Encryption at Rest**: Mesajele sunt stocate criptate în MongoDB
+- **Transparent**: Serverul decriptează automat mesajele la citire și trimitere în timp real (Socket.IO)
+- **Unicity**: Fiecare mesaj are IV (inițializare vector) unic
+- **Backward Compatibility**: Mesajele existente (decriptate) sunt accesate transparent
+
+### Resetarea Parolei via Email + Cod
+Procesul sigur de schimbare a parolei:
+
+1. **Endpoint**: `POST /api/auth/forgot-password`
+   - Utilizatorul solicită reset parolă cu email-ul
+   - Server generează cod de verificare (6 cifre) + token cu TTL 15 min
+   
+2. **Email**: Primește email cu cod folosind **MailerSend**
+   - Template: "Cod resetare parolă: XXXXXX"
+   - Valid timp de 15 minute
+   
+3. **Verificare Cod**: `POST /api/auth/verify-reset-code`
+   - Client trimite email + cod
+   - Server validează și confirmă
+   
+4. **Setare Parolă Nouă**: `POST /api/auth/reset-password`
+   - Parolă nouă + token de verificare
+   - Parolă criptată cu bcryptjs (salt rounds 10)
+
+**Limitări:**
+- Max 3 încercări /IP/oră (rate limiting)
+- Token valabil 15 minute
+- Email verificat conform RFC 5322
 
 ---
 
@@ -264,6 +291,7 @@ Health & Utilitare
 - Multer + Cloudinary (multer-storage-cloudinary)
 - Socket.IO 4
 - **MailerSend** (email service: password reset, notifications)
+- **crypto** (Node.js built-in: AES-256-CBC encryption)
 
 **Mobile (Expo):**
 - Expo SDK 54, React Native 0.81
@@ -297,6 +325,7 @@ Health & Utilitare
 - Image upload (Cloudinary)
 - Mobile app (Expo)
 - Reviews & ratings
+- **Criptare mesaje AES-256-CBC** (encryption at rest)
 
 **🔄 In Progress:**
 - Rate limiting (express-rate-limit) & helmet (security)

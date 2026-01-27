@@ -2,6 +2,7 @@ const Message = require("../models/Message");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
 const { Types } = require("mongoose");
+const { encrypt, decrypt } = require("../services/encryptionService");
 
 // Adaugă sau actualizează o reacție la un mesaj; repetarea aceleiași reacții o elimină (toggle)
 const reactToMessage = async (req, res) => {
@@ -52,7 +53,11 @@ const reactToMessage = async (req, res) => {
       }
     } catch (_) {}
 
-    return res.json({ ...message.toObject(), senderInfo });
+    const responseMessage = message.toObject();
+    if(responseMessage.text) responseMessage.text = decrypt(responseMessage.text);
+    if(responseMessage.replyTo && responseMessage.replyTo.text) responseMessage.replyTo.text = decrypt(responseMessage.replyTo.text);
+
+    return res.json({ ...responseMessage, senderInfo });
   } catch (err) {
     console.error("Eroare reactToMessage:", err);
     return res.status(500).json({ error: "Eroare la setarea reacției" });
@@ -226,7 +231,7 @@ const createMessage = async (req, res) => {
       };
     }
 
-    if (hasText) messageData.text = String(text).trim();
+    if (hasText) messageData.text = encrypt(String(text).trim());
     // Reply info (safe subset)
     // Acceptă și string (din multipart) și obiect nativ
     if (typeof replyTo === "string") {
@@ -240,7 +245,7 @@ const createMessage = async (req, res) => {
       messageData.replyTo = {
         messageId: String(replyTo.messageId || ""),
         senderId: String(replyTo.senderId || ""),
-        text: replyTo.text ? String(replyTo.text).slice(0, 300) : undefined,
+        text: replyTo.text ? encrypt(String(replyTo.text).slice(0, 300)) : undefined,
         image: replyTo.image ? String(replyTo.image) : undefined,
       };
     }
@@ -263,6 +268,11 @@ const createMessage = async (req, res) => {
 
     console.log("   • Salvăm mesajul în MongoDB...");
     const message = await new Message(messageData).save();
+    
+    // Create decrypted response object
+    const messageResponse = message.toObject();
+    if(messageResponse.text) messageResponse.text = decrypt(messageResponse.text);
+    if(messageResponse.replyTo && messageResponse.replyTo.text) messageResponse.replyTo.text = decrypt(messageResponse.replyTo.text);
     console.log("✅ Mesaj salvat:", message._id);
 
     // Real-time message delivery via Socket.IO
@@ -299,7 +309,7 @@ const createMessage = async (req, res) => {
 
         // Emit the new message to the recipient
         io.to(recipientSocketId).emit("newMessage", {
-          ...message.toObject(),
+          ...messageResponse,
           senderInfo,
         });
         console.log(`📨 Real-time message sent to user ${destinatarId}`);
@@ -413,7 +423,7 @@ const createMessage = async (req, res) => {
       }
     }
 
-    return res.status(201).json(message);
+    return res.status(201).json(messageResponse);
   } catch (err) {
     console.error("❌ EROARE createMessage:", err);
     return res.status(500).json({
@@ -525,7 +535,7 @@ const getConversations = async (req, res) => {
                 lastSeen: otherUser.lastSeen,
               },
               lastMessage: {
-                text: message.text,
+                text: decrypt(message.text),
                 senderId: message.senderId,
                 createdAt: message.createdAt,
               },
@@ -548,7 +558,7 @@ const getConversations = async (req, res) => {
           new Date(existingConversation.lastMessage.createdAt)
         ) {
           existingConversation.lastMessage = {
-            text: message.text,
+            text: decrypt(message.text),
             senderId: message.senderId,
             createdAt: message.createdAt,
           };
@@ -613,12 +623,16 @@ const getMessagesBetweenUsers = async (req, res) => {
     // Preluam informațiile utilizatorilor pentru fiecare mesaj
     const messagesWithUserData = await Promise.all(
       messages.map(async (message) => {
+        const m = message.toObject();
+        if (m.text) m.text = decrypt(m.text);
+        if (m.replyTo && m.replyTo.text) m.replyTo.text = decrypt(m.replyTo.text);
+
         try {
           const sender = await User.findById(message.senderId).select(
             "firstName lastName avatar"
           );
           return {
-            ...message.toObject(),
+             ...m,
             senderInfo: sender
               ? {
                   firstName: sender.firstName,
@@ -630,7 +644,7 @@ const getMessagesBetweenUsers = async (req, res) => {
         } catch (error) {
           console.error("Eroare la preluarea datelor utilizatorului:", error);
           return {
-            ...message.toObject(),
+            ...m,
             senderInfo: null,
           };
         }
@@ -679,12 +693,16 @@ const getMessages = async (req, res) => {
     // Preluam informațiile utilizatorilor pentru fiecare mesaj
     const messagesWithUserData = await Promise.all(
       messages.map(async (message) => {
+        const m = message.toObject();
+        if (m.text) m.text = decrypt(m.text);
+        if (m.replyTo && m.replyTo.text) m.replyTo.text = decrypt(m.replyTo.text);
+
         try {
           const sender = await User.findById(message.senderId).select(
             "firstName lastName avatar"
           );
           return {
-            ...message.toObject(),
+            ...m,
             senderInfo: sender
               ? {
                   firstName: sender.firstName,
@@ -696,7 +714,7 @@ const getMessages = async (req, res) => {
         } catch (error) {
           console.error("Eroare la preluarea datelor utilizatorului:", error);
           return {
-            ...message.toObject(),
+            ...m,
             senderInfo: null,
           };
         }
@@ -1002,7 +1020,11 @@ const handleCollaborationResponse = async (req, res) => {
       }
     } catch (_) {}
 
-    return res.json({ ...message.toObject(), senderInfo });
+    const responseMessage = message.toObject();
+    if(responseMessage.text) responseMessage.text = decrypt(responseMessage.text);
+    if(responseMessage.replyTo && responseMessage.replyTo.text) responseMessage.replyTo.text = decrypt(responseMessage.replyTo.text);
+
+    return res.json({ ...responseMessage, senderInfo });
   } catch (err) {
     console.error("Error handling collaboration response:", err);
     return res.status(500).json({ error: "Eroare la procesarea răspunsului" });

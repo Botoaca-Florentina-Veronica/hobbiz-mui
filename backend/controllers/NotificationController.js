@@ -2,6 +2,7 @@
 const Notification = require('../models/Notification');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const { decrypt } = require('../services/encryptionService');
 
 // Obține toate notificările pentru un user
 // Îmbogățim cu detalii de expeditor pentru notificările de tip chat (/chat/:conversationId)
@@ -37,7 +38,7 @@ const getNotifications = async (req, res) => {
                     obj.senderAvatar = sender.avatar || null;
                     obj.senderId = String(sender._id);
                   }
-                  obj.preview = msg.text ? String(msg.text) : (msg.image ? 'Imagine nouă' : obj.message);
+                  obj.preview = msg.text ? decrypt(msg.text) : (msg.image ? 'Imagine nouă' : obj.message);
                 }
                 // Regardless, if conversationId looks like it encodes an announcement (owner-other-annId), expose metadata
                 if (conversationId) {
@@ -80,7 +81,7 @@ const getNotifications = async (req, res) => {
                     obj.senderId = String(sender._id);
                   }
                   obj.preview = lastIncoming.text
-                    ? String(lastIncoming.text)
+                    ? decrypt(lastIncoming.text)
                     : (lastIncoming.image ? 'Imagine nouă' : obj.message);
                 } else {
                   // fallback: deduce other participant from conversationId
