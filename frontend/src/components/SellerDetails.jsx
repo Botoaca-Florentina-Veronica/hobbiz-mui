@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './SellerDetails.css';
 import ChatPopup from './ChatPopup';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -12,6 +13,7 @@ export default function SellerDetails({ user, contactPhone, contactEmail, announ
     : (user.firstName ? user.firstName[0].toUpperCase() : 'U');
   const joined = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long' }) : '';
 
+  const navigate = useNavigate();
   const loggedUserId = localStorage.getItem('userId');
   let loggedUserRole = 'cumparator';
   if (user && loggedUserId && user._id === loggedUserId) {
@@ -50,7 +52,13 @@ export default function SellerDetails({ user, contactPhone, contactEmail, announ
           </div>
         </div>
         <div className="seller-details-right">
-          <button className="seller-message-btn" onClick={() => setShowChat(true)}>Trimite mesaj</button>
+          <button className="seller-message-btn" onClick={() => {
+            if (!loggedUserId) {
+              navigate('/login', { state: { from: window.location.pathname + window.location.search } });
+              return;
+            }
+            setShowChat(true);
+          }}>Trimite mesaj</button>
           <div className="seller-phone-row">
             <div className="seller-phone-icon">📞</div>
             <div className="seller-phone-number">{showPhone ? (contactPhone || user.phone || 'N/A') : 'xxx xxx xxx'}</div>

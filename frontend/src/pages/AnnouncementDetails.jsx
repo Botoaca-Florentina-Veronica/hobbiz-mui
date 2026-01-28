@@ -138,6 +138,12 @@ export default function AnnouncementDetails() {
   // ========== Rating handlers ==========
   const handleRateClick = (e) => {
     e?.stopPropagation();
+    // Dacă utilizatorul nu este autentificat, redirecționăm la pagina de login și transmitem locația curentă pentru revenire
+    const loggedUserId = localStorage.getItem('userId');
+    if (!user && !loggedUserId) {
+      navigate('/login', { state: { from: window.location.pathname + window.location.search } });
+      return;
+    }
     setRateOpen(true);
   };
   const handleRateClose = () => {
@@ -476,14 +482,14 @@ export default function AnnouncementDetails() {
   const isOwnAnnouncement = loggedUserId && announcement.user._id === loggedUserId;
 
   const handleChatClick = () => {
-    console.log('🔍 Chat button clicked:', {
-      loggedUserId,
-      isOwnAnnouncement,
-      announcementUserId: announcement.user._id,
-      showChat
-    });
-  // Deschide chat-ul fără a forța redirecționarea la login; componenta ChatPopup gestionează lipsa autentificării
-  console.log('✅ Opening chat popup');
+    console.log('🔍 Chat button clicked:', { loggedUserId, isOwnAnnouncement, announcementUserId: announcement.user._id, showChat });
+    // Dacă utilizatorul nu este autentificat, redirecționăm la pagina de login și transmitem locația curentă pentru revenire
+    if (!user && !loggedUserId) {
+      console.log('⚠️ User not authenticated — redirecting to login');
+      navigate('/login', { state: { from: window.location.pathname + window.location.search } });
+      return;
+    }
+    console.log('✅ Opening chat popup');
     setShowChat(true);
   };
 

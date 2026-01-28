@@ -90,6 +90,11 @@ export default function TermsScreen() {
               ? 'The Terms include and refer to our related policies governing specific aspects of Platform use: the Privacy Policy, Cookie Policy, and any community rules or procedures published in the app/website. In case of any inconsistency, service-specific provisions may prevail over these general clauses.'
               : 'Termenii includ și fac trimitere la politicile noastre conexe, care reglementează aspecte specifice ale utilizării Platformei: Politica de Confidențialitate, Politica de Cookie-uri și orice reguli ale comunității sau proceduri publicate în aplicație/website. În măsura oricărei neconcordanțe, prevederile specifice serviciului utilizat pot prevala asupra prezentelor clauze generale.'
           }</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
+            locale === 'en'
+              ? 'Security practices: We implement industry-standard protections including encrypting chat messages at rest (AES-256-CBC with per-message IV) and secure password reset workflows (MailerSend 6-digit verification codes, valid for 15 minutes).'
+              : 'Practicile de securitate: Implementăm protecții standard din industrie, inclusiv criptarea mesajelor de chat în repaus (AES-256-CBC cu IV per mesaj) și proceduri sigure de resetare a parolei (coduri de verificare MailerSend de 6 cifre, valabile 15 minute).'
+          }</ThemedText>
           <ThemedText style={[styles.h3, { color: subHeadingColor }]}>{locale === 'en' ? 'Updates to the Terms' : 'Actualizări ale Termenilor'}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: bodyColor }]}>{
             locale === 'en'

@@ -93,7 +93,7 @@
     "publish": "Vinde",
     "publishLabel": "Publică un anunț",
     "accountHub": "Contul tău",
-    "copyright": "Copyright (c) 2025 Hobbiz. Toate drepturile rezervate."
+    "copyright": "Copyright (c) 2026 Hobbiz. Toate drepturile rezervate."
   },
   "cta": {
     "tagline": "Locul unde pasiunea ta se poate transforma într-o afacere, un side-hustle sau chiar o a doua sursă de venit.",
@@ -744,8 +744,9 @@
       "intro": "Am implementat un set complet de măsuri tehnice și organizatorice pentru protejarea datelor dumneavoastră împotriva accesului neautorizat, modificării, divulgării sau distrugerii neautorizate. Acestea includ:",
       "encryption": {
         "title": "Criptare avansată:",
-        "text": "Toate datele sunt criptate atât în tranzit (folosind protocoale TLS 1.2+), cât și la rest, cu algoritmi moderni. Datele sensibile suplimentare sunt criptate la nivel de câmp în baza noastră de date."
+        "text": "Toate datele sunt criptate atât în tranzit (folosind protocoale TLS 1.2+), cât și la rest, cu algoritmi moderni. Datele sensibile suplimentare sunt criptate la nivel de câmp în baza noastră de date. În mod specific, mesajele de chat sunt criptate în repaus folosind AES-256-CBC cu IV unic pentru fiecare mesaj, iar cheile de criptare sunt stocate în siguranță ca variabile de mediu pe server. Pentru resetarea parolei trimitem un cod de verificare de 6 cifre prin MailerSend; codul este valabil 15 minute și este supus unor limite de rată pentru prevenirea abuzului."
       },
+
       "access": {
         "title": "Controlul accesului:",
         "text": "Implementăm principiul privilegiilor minime, cu acces la date strict pe bază de necesitate funcțională. Toate accesurile sunt monitorizate și jurnalizate, cu revizuiri periodice ale permisiunilor."
@@ -1263,5 +1264,12 @@
       "documentRejected": "a respins documentul tău",
       "userVerified": "a verificat și aprobat contul tău"
     }
+  },
+  "cookieConsent": {
+    "title": "Setări cookie",
+    "description": "Folosim cookie-uri pentru a îmbunătăți experiența de navigare, a afișa conținut personalizat și a analiza traficul. Click pe \"Acceptă tot\" pentru a-ți da acordul.",
+    "acceptAll": "Acceptă tot",
+    "rejectAll": "Refuză tot",
+    "customize": "Personalizează setările"
   }
 }
