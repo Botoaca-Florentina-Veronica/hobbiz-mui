@@ -221,10 +221,22 @@ export default function ProfileScreen() {
     fetchPublic();
   }, [userId]);
 
+  // Helper to get correct image URL (moved up so it can be used in useEffect)
+  const getImageSrc = (img?: string) => {
+    if (!img) return null;
+    if (img.startsWith('http')) return img;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    if (!base) return img;
+    if (img.startsWith('/uploads')) return `${base}${img}`;
+    return `${base}/uploads/${img}`;
+  };
+
   // keep a local displayed avatar so we can optimistically update after upload
   React.useEffect(() => {
     const active = publicProfile || user;
-    setCurrentAvatar(active?.avatar || undefined);
+    // Normalize avatar URL to ensure it works on web
+    const avatarUrl = active?.avatar ? (getImageSrc(active.avatar) || active.avatar) : undefined;
+    setCurrentAvatar(avatarUrl);
   }, [publicProfile, user]);
 
   // Fetch user announcements
@@ -387,11 +399,13 @@ export default function ProfileScreen() {
                   headers: { 'Content-Type': 'multipart/form-data' } 
                 });
                 // server should return the updated avatar URL; fall back to local uri
-                const newAvatar = res?.data?.avatar || res?.data?.url || uri;
+                const rawAvatar = res?.data?.avatar || res?.data?.url || uri;
+                // Normalize the avatar URL for web compatibility
+                const newAvatar = getImageSrc(rawAvatar) || rawAvatar;
                 setCurrentAvatar(newAvatar);
                 // If viewing a publicProfile (e.g., viewing another user's profile) update it too
                 if (publicProfile) {
-                  setPublicProfile((p: any) => ({ ...(p || {}), avatar: newAvatar }));
+                  setPublicProfile((p: any) => ({ ...(p || {}), avatar: rawAvatar }));
                 } else {
                   // If this is the logged-in user's own profile, refresh auth profile so UI reflects changes immediately
                   try {
@@ -425,16 +439,6 @@ export default function ProfileScreen() {
     const monthsEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const months = locale === 'en' ? monthsEn : monthsRo;
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  };
-
-  // Get correct image URL
-  const getImageSrc = (img?: string) => {
-    if (!img) return null;
-    if (img.startsWith('http')) return img;
-    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
-    if (!base) return img;
-    if (img.startsWith('/uploads')) return `${base}${img}`;
-    return `${base}/uploads/${img}`;
   };
 
   // Start editing contact info

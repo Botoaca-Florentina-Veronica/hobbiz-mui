@@ -96,6 +96,7 @@ export default function EditAnnouncementScreen() {
   const [contactName, setContactName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [price, setPrice] = useState('');
   const [location, setLocation] = useState('Toată țara');
   const [images, setImages] = useState<ImageItem[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -142,6 +143,7 @@ export default function EditAnnouncementScreen() {
       setContactName(announcement.contactPerson || '');
       setEmail(announcement.contactEmail || '');
       setPhone(announcement.contactPhone || '');
+      setPrice(announcement.price || '');
       setLocation(announcement.location || 'Toată țara');
       
       // Set existing images
@@ -249,6 +251,7 @@ export default function EditAnnouncementScreen() {
       formData.append('contactPerson', contactName);
       if (email.trim()) formData.append('contactEmail', email);
       if (phone.trim()) formData.append('contactPhone', phone);
+      if (price.trim()) formData.append('price', price);
 
       // Append existing images that weren't removed
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -486,6 +489,18 @@ export default function EditAnnouncementScreen() {
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
+            />
+          </View>
+
+          <View style={styles.fieldBlock}>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Preț (opțional)</ThemedText>
+            <ThemedTextInput
+              style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
+              placeholder="ex: 150 RON"
+              placeholderTextColor={tokens.colors.muted}
+              value={price}
+              onChangeText={setPrice}
+              keyboardType="numeric"
             />
           </View>
           

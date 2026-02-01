@@ -81,6 +81,10 @@ const TRANSLATIONS = {
     descriptionHelper: 'Introdu cel puțin 40 caractere',
     locationLabel: 'Localitate*',
     contactSection: 'Informații de contact',
+    priceLabel: 'Preț (opțional)',
+    pricePlaceholder: 'ex: 150 RON',
+    priceHelper: 'Poți adăuga un preț pentru serviciul/produsul tău',
+    contactSection: 'Informații de contact',
     contactNameLabel: 'Persoana de contact*',
     contactNamePlaceholder: 'Nume și prenume',
     emailLabel: 'Adresa de email*',
@@ -126,6 +130,9 @@ const TRANSLATIONS = {
     descriptionPlaceholder: 'Try to write what you would like to know if you were looking at this announcement',
     descriptionHelper: 'Enter at least 40 characters',
     locationLabel: 'Location*',
+    priceLabel: 'Price (optional)',
+    pricePlaceholder: 'e.g.: 150 RON',
+    priceHelper: 'You can add a price for your service/product',
     contactSection: 'Contact Information',
     contactNameLabel: 'Contact person*',
     contactNamePlaceholder: 'First and last name',
@@ -180,6 +187,7 @@ export default function SellScreen() {
   const [category, setCategory] = useState<string | null>(null);
   const [categoryKey, setCategoryKey] = useState<string | null>(null);
   const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
   const [contactName, setContactName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -437,6 +445,7 @@ export default function SellScreen() {
       formData.append('contactPerson', contactName);
       if (email.trim()) formData.append('contactEmail', email);
       if (phone.trim()) formData.append('contactPhone', phone);
+      if (price.trim()) formData.append('price', price);
 
       images.forEach((img) => {
         if (img.uri) {
@@ -464,6 +473,7 @@ export default function SellScreen() {
         setCategory(null);
         setCategoryKey(null);
         setDescription('');
+        setPrice('');
         setContactName('');
         setEmail('');
         setPhone('');
@@ -606,6 +616,20 @@ export default function SellScreen() {
             <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>{t.descriptionHelper}</ThemedText>
             <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{description.length}/9000</ThemedText>
           </View>
+        </View>
+
+        {/* Section: Preț */}
+        <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
+          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>Preț (opțional)</ThemedText>
+          <ThemedTextInput
+            style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
+            placeholder="Ex: 150"
+            placeholderTextColor={tokens.colors.muted}
+            value={price}
+            onChangeText={setPrice}
+            keyboardType="decimal-pad"
+          />
+          <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>Adaugă un preț pentru serviciul tău (RON)</ThemedText>
         </View>
 
         {/* Section: Localitate */}

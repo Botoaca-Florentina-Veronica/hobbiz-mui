@@ -11,6 +11,7 @@ import { useChatNotifications } from '../../src/context/ChatNotificationContext'
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { useRouter } from 'expo-router';
+import api from '../../src/services/api';
 
 // Static icon config; labels will be provided via translations below
 const TAB_CONFIG: Record<string, { icon: string; label?: string; special?: boolean }> = {
@@ -38,6 +39,16 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
   const router = useRouter();
+  
+  // Helper to normalize image URLs for web compatibility
+  const getImageSrc = (img?: string | null) => {
+    if (!img) return null;
+    if (img.startsWith('http')) return img;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    if (!base) return img;
+    if (img.startsWith('/uploads')) return `${base}${img}`;
+    return `${base}/uploads/${img}`;
+  };
   
   // In guest mode, only show the 'index' (explore) tab
   const allowedTabsInGuest = ['index'];
@@ -136,7 +147,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
                   ] : undefined}
                 >
                   {route.name === 'account' && user?.avatar ? (
-                    <Image source={{ uri: user.avatar }} style={{ width: config.special ? 28 : 24, height: config.special ? 28 : 24, borderRadius: 999 }} />
+                    <Image source={{ uri: getImageSrc(user.avatar) || undefined }} style={{ width: config.special ? 28 : 24, height: config.special ? 28 : 24, borderRadius: 999 }} />
                   ) : (
                     <Ionicons
                       name={config.icon as any}
@@ -241,6 +252,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.2,
     fontFamily: 'Poppins-Bold',
+    lineHeight: 12,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
 });
 

@@ -178,6 +178,7 @@ const TRANSLATIONS = {
     finalizeDeal: 'Finalizează',
     negotiationOffer: 'Ofertă de preț',
     counterOffer: 'Contraofertă',
+    counterOfferSent: 'Contraofertă trimisă: {price} RON',
     priceOffered: 'Preț oferit',
     acceptOffer: 'Acceptă',
     rejectOffer: 'Refuză',
@@ -189,6 +190,21 @@ const TRANSLATIONS = {
     finalizeDealConfirm: 'Ești sigur că vrei să finalizezi această negociere? Prețul va fi adăugat în balanța vânzătorului.',
     balanceUpdated: 'Balanța ta a fost actualizată cu',
     negotiationError: 'Eroare la procesarea negocierii.',
+    
+    // New collaboration confirmation translations
+    pendingConfirmation: 'Preț acceptat - În așteptare',
+    confirmCollaboration: 'Confirmă colaborarea',
+    collaborationConfirmed: 'Colaborare confirmată',
+    collaborationConfirmedMessage: '✓ Colaborarea este confirmată! Puteți lăsa recenzii unul altuia.',
+    waitingForConfirmation: 'Confirmarea ta a fost înregistrată. Așteptăm confirmarea celuilalt utilizator.',
+    collaborationEstablished: 'Colaborare confirmată! Acum puteți lăsa recenzii unul altuia.',
+    collaborationAndBalanceUpdated: 'Colaborare confirmată! Balanța ta a fost actualizată cu',
+    
+    // Direct collaboration with price
+    directCollaborationSuccess: 'Colaborarea a fost confirmată! Balanța vânzătorului a fost actualizată.',
+    collaborationWithPrice: 'Colaborare directă',
+    collaborationPriceText: 'Acceptă prețul de',
+    priceRON: 'RON',
   },
   en: {
     loadingMessages: 'Loading messages...',
@@ -265,6 +281,7 @@ const TRANSLATIONS = {
     finalizeDeal: 'Finalize',
     negotiationOffer: 'Price offer',
     counterOffer: 'Counter offer',
+    counterOfferSent: 'Counter-offer sent: {price} RON',
     priceOffered: 'Price offered',
     acceptOffer: 'Accept',
     rejectOffer: 'Reject',
@@ -276,6 +293,21 @@ const TRANSLATIONS = {
     finalizeDealConfirm: 'Are you sure you want to finalize this negotiation? The price will be added to the seller\'s balance.',
     balanceUpdated: 'Your balance has been updated with',
     negotiationError: 'Error processing negotiation.',
+    
+    // New collaboration confirmation translations
+    pendingConfirmation: 'Price accepted - Pending',
+    confirmCollaboration: 'Confirm collaboration',
+    collaborationConfirmed: 'Collaboration confirmed',
+    collaborationConfirmedMessage: '✓ Collaboration is confirmed! You can now leave reviews for each other.',
+    waitingForConfirmation: 'Your confirmation has been recorded. Waiting for the other user to confirm.',
+    collaborationEstablished: 'Collaboration confirmed! You can now leave reviews for each other.',
+    collaborationAndBalanceUpdated: 'Collaboration confirmed! Your balance has been updated with',
+    
+    // Direct collaboration with price
+    directCollaborationSuccess: 'Collaboration has been confirmed! Seller balance has been updated.',
+    collaborationWithPrice: 'Direct collaboration',
+    collaborationPriceText: 'Accept the price of',
+    priceRON: 'RON',
   },
 };
 
@@ -334,12 +366,23 @@ export default function ConversationScreen() {
   const [counterOfferModalVisible, setCounterOfferModalVisible] = useState(false);
   const [counterOfferPrice, setCounterOfferPrice] = useState('');
   const [loadingNegotiation, setLoadingNegotiation] = useState(false);
+  
+  // Announcement details state
+  const [announcementDetails, setAnnouncementDetails] = useState<any>(null);
+  const [loadingAnnouncementDetails, setLoadingAnnouncementDetails] = useState(false);
 
   const width = Dimensions.get('window').width;
 
   // Socket effect
   useEffect(() => {
     if (!socket || !selectedConversation || !userId) return;
+
+    // Notify server that user entered this conversation
+    socket.emit('joinConversation', { 
+      userId, 
+      conversationId: selectedConversation.conversationId 
+    });
+    console.log(`📱 Joined conversation: ${selectedConversation.conversationId}`);
 
     // Check initial status
     const otherUserId = selectedConversation.otherParticipant?.id;
@@ -377,6 +420,10 @@ export default function ConversationScreen() {
     socket.on('userStatus', handleUserStatus);
 
     return () => {
+        // Notify server that user left this conversation
+        socket.emit('leaveConversation', { userId });
+        console.log(`👋 Left conversation: ${selectedConversation.conversationId}`);
+        
         socket.off('newMessage', handleNewMessage);
         socket.off('userTyping', handleUserTyping);
         socket.off('userStatus', handleUserStatus);
@@ -528,6 +575,20 @@ export default function ConversationScreen() {
     }
   };
 
+  // Load announcement details
+  const loadAnnouncementDetails = useCallback(async () => {
+    if (!selectedConversation?.announcementId) return;
+    try {
+      setLoadingAnnouncementDetails(true);
+      const response = await api.get(`/api/announcements/${selectedConversation.announcementId}`);
+      setAnnouncementDetails(response.data);
+    } catch (error) {
+      console.error('Error loading announcement details:', error);
+    } finally {
+      setLoadingAnnouncementDetails(false);
+    }
+  }, [selectedConversation?.announcementId]);
+
   // Negotiation functions
   const loadActiveNegotiation = useCallback(async () => {
     if (!selectedConversation?.announcementId) return;
@@ -538,9 +599,18 @@ export default function ConversationScreen() {
       // Find the active negotiation between current user and the other participant
       const active = negotiations.find((neg: any) => 
         (neg.buyer._id === userId || neg.seller._id === userId) &&
-        ['pending', 'counter_offer', 'accepted'].includes(neg.status)
+        ['pending', 'counter_offer', 'pending_confirmation', 'confirmed'].includes(neg.status)
       );
       setActiveNegotiation(active || null);
+      
+      // Update selectedConversation with announcement info from negotiation if available
+      if (active?.announcement && selectedConversation) {
+        setSelectedConversation(prev => prev ? {
+          ...prev,
+          announcementTitle: active.announcement.title || prev.announcementTitle,
+          announcementId: active.announcement._id || prev.announcementId
+        } : prev);
+      }
     } catch (error) {
       const status = error?.response?.status;
       if (status === 404) {
@@ -557,8 +627,9 @@ export default function ConversationScreen() {
   useEffect(() => {
     if (selectedConversation?.announcementId) {
       loadActiveNegotiation();
+      loadAnnouncementDetails();
     }
-  }, [selectedConversation?.announcementId, loadActiveNegotiation]);
+  }, [selectedConversation?.announcementId, loadActiveNegotiation, loadAnnouncementDetails]);
 
   const handleAcceptOffer = async () => {
     if (!activeNegotiation) return;
@@ -609,13 +680,19 @@ export default function ConversationScreen() {
       setCounterOfferModalVisible(false);
       
       const isSeller = String(userId) === String(activeNegotiation.seller._id);
+      let res: any = null;
       if (isSeller) {
-        await negotiationService.counterOffer(activeNegotiation._id, { counterPrice: price });
+        res = await negotiationService.counterOffer(activeNegotiation._id, { counterPrice: price });
       } else {
-        await negotiationService.buyerCounterOffer(activeNegotiation._id, { newPrice: price });
+        res = await negotiationService.buyerCounterOffer(activeNegotiation._id, { newPrice: price });
       }
       
-      setToastMessage(t.counterOffer);
+      // Determine the displayed price from server response or fallback to entered price
+      const displayedPrice = res?.negotiation?.currentPrice ?? price;
+
+      // More descriptive toast to help users understand what happened
+      const sentMessage = t.counterOfferSent ? t.counterOfferSent.replace('{price}', String(displayedPrice)) : `${t.counterOffer}: ${displayedPrice} RON`;
+      setToastMessage(sentMessage);
       setToastType('success');
       setToastVisible(true);
       setCounterOfferPrice('');
@@ -705,6 +782,36 @@ export default function ConversationScreen() {
         }
       ]
     );
+  };
+
+  const handleConfirmCollaboration = async () => {
+    if (!activeNegotiation) return;
+    
+    try {
+      setLoadingNegotiation(true);
+      const response = await negotiationService.confirmCollaboration(activeNegotiation._id);
+      
+      if (response.collaborationEstablished) {
+        if (response.sellerNewBalance && String(activeNegotiation.seller._id) === String(userId)) {
+          setToastMessage(`${t.collaborationAndBalanceUpdated} ${activeNegotiation.currentPrice} RON.`);
+        } else {
+          setToastMessage(t.collaborationEstablished);
+        }
+        setToastType('success');
+        setToastVisible(true);
+      } else {
+        setToastMessage(t.waitingForConfirmation);
+        setToastType('info');
+        setToastVisible(true);
+      }
+      
+      await loadActiveNegotiation();
+    } catch (error: any) {
+      console.error('Error confirming collaboration:', error);
+      Alert.alert(t.error, error?.response?.data?.message || 'Eroare la confirmarea colaborării');
+    } finally {
+      setLoadingNegotiation(false);
+    }
   };
 
   const renderCollaborationBody = (message: Message, isOwn: boolean) => {
@@ -854,6 +961,28 @@ export default function ConversationScreen() {
   useEffect(() => {
     setUserId(user?.id || null);
   }, [user]);
+
+  // Handle screen focus/blur to manage conversation viewing state
+  useFocusEffect(
+    useCallback(() => {
+      // Screen focused - rejoin conversation if we have one
+      if (socket && userId && selectedConversation) {
+        socket.emit('joinConversation', { 
+          userId, 
+          conversationId: selectedConversation.conversationId 
+        });
+        console.log(`📱 Re-joined conversation on focus: ${selectedConversation.conversationId}`);
+      }
+
+      return () => {
+        // Screen blurred - leave conversation
+        if (socket && userId) {
+          socket.emit('leaveConversation', { userId });
+          console.log(`👋 Left conversation on blur`);
+        }
+      };
+    }, [socket, userId, selectedConversation])
+  );
 
   const routeParams = useLocalSearchParams();
   const routeParamsRef = useRef(routeParams);
@@ -1576,9 +1705,9 @@ export default function ConversationScreen() {
               </View>
 
               <View style={{ flexDirection: 'row', gap: 8 }}>
-                {/* Finalize Deal Button - only for buyer when negotiation is accepted */}
+                {/* Finalize Deal Button - only for buyer when negotiation is confirmed */}
                 {activeNegotiation && 
-                 activeNegotiation.status === 'accepted' && 
+                 activeNegotiation.status === 'confirmed' && 
                  String(activeNegotiation.buyer._id) === String(userId) && (
                   <TouchableOpacity
                     onPress={handleFinalizeDeal}
@@ -1618,9 +1747,13 @@ export default function ConversationScreen() {
                 style={styles.announcementThumb}
               />
               <View style={styles.announcementInfo}>
-                <ThemedText style={[styles.announcementTitle, isDark ? styles.announcementTitleDark : undefined]} numberOfLines={1}>{selectedConversation.announcementTitle || 'Anunț'}</ThemedText>
-                {selectedConversation.announcementId ? (
-                  <ThemedText style={[styles.announcementId, isDark ? styles.announcementIdDark : undefined]}>ID: {selectedConversation.announcementId}</ThemedText>
+                <ThemedText style={[styles.announcementTitle, isDark ? styles.announcementTitleDark : undefined]} numberOfLines={1}>
+                  {activeNegotiation?.announcement?.title || selectedConversation.announcementTitle || 'Anunț'}
+                </ThemedText>
+                {(activeNegotiation?.announcement?._id || selectedConversation.announcementId) ? (
+                  <ThemedText style={[styles.announcementId, isDark ? styles.announcementIdDark : undefined]}>
+                    ID: {activeNegotiation?.announcement?._id || selectedConversation.announcementId}
+                  </ThemedText>
                 ) : null}
               </View>
             </TouchableOpacity>
@@ -1638,6 +1771,10 @@ export default function ConversationScreen() {
                     ? t.negotiationOffer
                     : activeNegotiation.status === 'counter_offer'
                     ? t.counterOffer
+                    : activeNegotiation.status === 'pending_confirmation'
+                    ? t.pendingConfirmation
+                    : activeNegotiation.status === 'confirmed'
+                    ? t.collaborationConfirmed
                     : activeNegotiation.status === 'accepted'
                     ? t.offerAccepted
                     : t.negotiationOffer}
@@ -1648,7 +1785,7 @@ export default function ConversationScreen() {
               </View>
               {/* Buton de refuză poziționat pe același rând cu oferta */}
               {(String(activeNegotiation.seller._id) === String(userId) || String(activeNegotiation.buyer._id) === String(userId)) && 
-               ['pending', 'counter_offer', 'accepted'].includes(activeNegotiation.status) && (
+               ['pending', 'counter_offer', 'pending_confirmation', 'confirmed'].includes(activeNegotiation.status) && (
                 <TouchableOpacity
                   onPress={handleRejectOffer}
                   disabled={loadingNegotiation}
@@ -1714,6 +1851,32 @@ export default function ConversationScreen() {
                     {t.sendCounterOffer}
                   </ThemedText>
                 </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Confirmation button for pending_confirmation status */}
+            {(String(activeNegotiation.seller._id) === String(userId) || String(activeNegotiation.buyer._id) === String(userId)) && 
+             activeNegotiation.status === 'pending_confirmation' && (
+              <View style={styles.negotiationActions}>
+                <TouchableOpacity
+                  onPress={handleConfirmCollaboration}
+                  disabled={loadingNegotiation}
+                  style={[styles.negotiationBtn, { backgroundColor: tokens.colors.primary }]}
+                  activeOpacity={0.85}
+                >
+                  <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.primaryContrast }]}>
+                    {t.confirmCollaboration}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Message for confirmed status */}
+            {activeNegotiation.status === 'confirmed' && (
+              <View style={[styles.negotiationActions, { justifyContent: 'center' }]}>
+                <ThemedText style={[styles.negotiationBtnText, { color: tokens.colors.success || tokens.colors.primary, textAlign: 'center' }]}>
+                  {t.collaborationConfirmedMessage}
+                </ThemedText>
               </View>
             )}
 
@@ -1814,7 +1977,7 @@ export default function ConversationScreen() {
                             styles.messageBubbleClean,
                             isOwn
                               ? {
-                                  backgroundColor: isDark ? tokens.colors.primary : '#d1e7ff',
+                                  backgroundColor: isDark ? tokens.colors.primary : '#e3f2fd',
                                   marginLeft: 'auto',
                                   marginRight: 12,
                                   borderTopLeftRadius: 20,
@@ -1823,7 +1986,7 @@ export default function ConversationScreen() {
                                   borderBottomRightRadius: 6,
                                 }
                               : {
-                                  backgroundColor: tokens.colors.elev,
+                                  backgroundColor: isDark ? tokens.colors.elev : '#f5f5f5',
                                   marginLeft: 12,
                                   marginRight: 'auto',
                                   borderTopLeftRadius: 20,
@@ -2267,8 +2430,16 @@ export default function ConversationScreen() {
         <ConfirmDialog
           visible={confirmCollabVisible}
           title={t.collaborateConfirmTitle}
-          message={t.collaborateConfirmMessage}
-          confirmText={t.collaborate}
+          message={
+            announcementDetails?.price && announcementDetails.price > 0
+              ? `${t.collaborationPriceText} ${announcementDetails.price} ${t.priceRON}?`
+              : t.collaborateConfirmMessage
+          }
+          confirmText={
+            announcementDetails?.price && announcementDetails.price > 0
+              ? `${t.collaborationPriceText} ${announcementDetails.price} RON`
+              : t.collaborate
+          }
           cancelText={t.cancel}
           confirmColor={tokens.colors.primary}
           icon="people-outline"

@@ -26,6 +26,7 @@ const TRANSLATIONS = {
     darkMode: 'Mod întunecat',
     language: 'Limba',
     aboutUs: 'Despre noi',
+    howItWorks: 'Cum funcționează',
     legalInfo: 'Informații legale',
     logout: 'Ieși din cont',
     logoutConfirmTitle: 'Ești sigur(ă) că vrei să te deconectezi?',
@@ -46,6 +47,7 @@ const TRANSLATIONS = {
     darkMode: 'Dark Mode',
     language: 'Language',
     aboutUs: 'About Us',
+    howItWorks: 'How it works',
     legalInfo: 'Legal Information',
     logout: 'Log Out',
     logoutConfirmTitle: 'Are you sure you want to log out?',
@@ -84,6 +86,7 @@ export default function AccountScreen() {
 
   const infoRows: RowSpec[] = [
     { key: 'about', label: t.aboutUs, icon: 'information-circle-outline', action: () => router.push('/about') },
+    { key: 'howItWorks', label: t.howItWorks, icon: 'help-circle-outline', action: () => router.push('/how-it-works') },
     { key: 'legal', label: t.legalInfo, icon: 'document-text-outline', action: () => router.push('/legal') },
   ];
 

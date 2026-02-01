@@ -25,6 +25,7 @@ interface Announcement {
   contactPerson: string;
   contactEmail?: string;
   contactPhone?: string;
+  price?: number;
   images?: string[];
   views?: number;
   favoritesCount?: number;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, Platform, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../components/themed-text';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
@@ -31,6 +31,7 @@ export default function AllAnnouncements() {
   } : tokens.colors;
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -39,6 +40,7 @@ export default function AllAnnouncements() {
   const [searchTerm, setSearchTerm] = useState(qParam || '');
   const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const isWeb = Platform.OS === 'web';
 
   const getImageSrc = (img?: string) => {
     if (!img) return null;
@@ -106,7 +108,7 @@ export default function AllAnnouncements() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.container, { backgroundColor: tokens.colors.bg || colors.bg }]}> 
+      <View style={[styles.container, { backgroundColor: tokens.colors.bg || colors.bg, maxHeight: isWeb ? height : undefined }]}> 
         <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border, flexShrink: 0 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>

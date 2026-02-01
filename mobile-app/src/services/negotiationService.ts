@@ -30,7 +30,7 @@ export interface Negotiation {
   };
   originalPrice?: number;
   currentPrice: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'counter_offer' | 'finalized';
+  status: 'pending' | 'accepted' | 'rejected' | 'counter_offer' | 'pending_confirmation' | 'confirmed' | 'finalized';
   offerHistory: NegotiationOffer[];
   finalizedAt?: string;
   lastActionBy: string;
@@ -106,6 +106,12 @@ class NegotiationService {
   // Buyer sends a new offer (responds to counter offer)
   async buyerCounterOffer(id: string, data: CounterOfferData): Promise<{ negotiation: Negotiation }> {
     const response = await api.post(`/api/negotiations/${id}/buyer-counter`, data);
+    return response.data;
+  }
+
+  // Confirm collaboration (both users need to confirm)
+  async confirmCollaboration(id: string): Promise<{ negotiation: Negotiation; collaborationEstablished: boolean; sellerNewBalance?: number }> {
+    const response = await api.post(`/api/negotiations/${id}/confirm`);
     return response.data;
   }
 

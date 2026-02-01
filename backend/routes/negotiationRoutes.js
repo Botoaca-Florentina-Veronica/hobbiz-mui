@@ -34,8 +34,14 @@ router.post('/:id/accept-counter', negotiationController.acceptCounterOffer);
 // Buyer sends a new offer (responds to counter offer)
 router.post('/:id/buyer-counter', negotiationController.buyerCounterOffer);
 
+// Confirm collaboration (both users need to confirm)
+router.post('/:id/confirm', negotiationController.confirmCollaboration);
+
 // Finalize negotiation (buyer confirms transaction)
 router.post('/:id/finalize', negotiationController.finalizeNegotiation);
+
+// Direct collaboration with announcement price
+router.post('/direct-collaboration', negotiationController.directCollaboration);
 
 // Cancel negotiation
 router.delete('/:id', negotiationController.cancelNegotiation);

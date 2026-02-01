@@ -2,6 +2,7 @@ import axios from 'axios';
 import storage from './storage';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { showToast } from './toastService';
 
 const getBaseUrl = () => {
   // 1) Allow explicit override from environment (recommended for production/tests)
@@ -117,6 +118,8 @@ api.interceptors.response.use(
 
         if (isTimeout) {
           console.error('[mobile-app] API timeout:', (error?.message || '').toString(), 'baseURL:', base, 'url:', url);
+          // Show a friendly toast on timeout and indicate we will retry
+          showToast('Conexiune lentă — se reîncearcă automat...', 'info', 3500);
         } else {
           console.error('[mobile-app] API error:', error?.message, 'code:', error?.code, 'status:', status, 'baseURL:', base, 'url:', url);
         }
@@ -129,6 +132,11 @@ api.interceptors.response.use(
           (cfg as any).__retryCount = retryCount + 1;
           const delay = Math.min(1000 * Math.pow(2, retryCount), 6000); // 1s, 2s, 4s caps at 6s
           return new Promise((resolve) => setTimeout(resolve, delay)).then(() => api(cfg));
+        }
+
+        // If we're here it means we won't retry - show an error toast once
+        if (!shouldRetry) {
+          showToast('Request eșuat. Verifică conexiunea la internet și încearcă din nou.', 'error', 6000);
         }
     } catch (e) {
       // ignore

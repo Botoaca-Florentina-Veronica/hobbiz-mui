@@ -12,6 +12,7 @@ interface NotificationItem {
   _id: string;
   senderName?: string;
   preview?: string;
+  message?: string;
   senderAvatar?: string | null;
   createdAt?: string;
   read?: boolean;
@@ -170,7 +171,7 @@ export default function NotificationsScreen() {
                 {/* Header: Name & Date */}
                 <View style={styles.headerRow}>
                     <ThemedText style={[styles.senderName, { color: textColor }]} numberOfLines={1}>
-                        {item.senderName || 'Sistem'}
+                        {item.senderName || 'Notificare Hobbiz'}
                     </ThemedText>
                     <ThemedText style={styles.dateText}>
                         {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ro-RO', { hour: '2-digit', minute:'2-digit' }) : ''}
@@ -179,7 +180,7 @@ export default function NotificationsScreen() {
 
                 {/* Message Preview - Immediately underneath */}
                 <ThemedText style={[styles.messageText, { color: subTextColor }]} numberOfLines={3}>
-                    {item.preview || 'Fără conținut.'}
+                    {item.preview || item.message || 'Notificare nouă'}
                 </ThemedText>
 
                 {/* Action Button (Conditional) */}

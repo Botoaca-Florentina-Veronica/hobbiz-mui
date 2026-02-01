@@ -17,6 +17,8 @@ import {
 import { JsStack } from '../components/JsStack';
 import { NetworkStatus } from '../components/NetworkStatus';
 import { PrivacyTermsModal } from '../components/PrivacyTermsModal';
+import { GlobalToast } from '../components/ui/GlobalToast';
+import { showToast } from '../src/services/toastService';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
@@ -177,6 +179,34 @@ export default function RootLayout() {
         }
       }
     );
+
+    // Global unhandled promise rejection handler – show a friendly toast instead of crashing the app
+    if (typeof (global as any)?.process?.on === 'function') {
+      try {
+        (global as any).process.on('unhandledRejection', (reason: any) => {
+          const msg = reason?.message || String(reason || 'Unknown error');
+          console.warn('Unhandled promise rejection:', msg);
+          showToast('Eroare de rețea sau timeout. Verifică conexiunea și încearcă din nou.', 'error', 6000);
+        });
+      } catch (e) {}
+    }
+
+    // Global JS error handler to catch uncaught errors and display a toast
+    try {
+      const anyGlobal: any = global as any;
+      if (anyGlobal && anyGlobal.ErrorUtils && typeof anyGlobal.ErrorUtils.setGlobalHandler === 'function') {
+        const prev = anyGlobal.ErrorUtils.getGlobalHandler && anyGlobal.ErrorUtils.getGlobalHandler();
+        anyGlobal.ErrorUtils.setGlobalHandler((error: any, isFatal?: boolean) => {
+          try {
+            const message = error?.message || 'A apărut o eroare necunoscută';
+            console.error('Global JS Error captured:', message, error);
+            showToast(message, 'error', 6000);
+          } catch (_) {}
+          if (prev) try { prev(error, isFatal); } catch (_) {}
+        });
+      }
+    } catch (e) {}
+
     return cleanup;
   }, []);
 
@@ -192,6 +222,8 @@ export default function RootLayout() {
             <ChatNotificationProvider>
               <SafeAreaProvider>
                 <NetworkStatus />
+                {/* Global toast for network / error feedback */}
+                <GlobalToast />
                 <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <NavigationWrapper>
                   <JsStack

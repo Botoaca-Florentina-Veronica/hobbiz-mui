@@ -313,11 +313,11 @@ export default function CookiesScreen() {
         </View>
 
   <View ref={secTipuriRef} style={[styles.sectionCard, { backgroundColor: tokens.colors.surface, borderColor: 'transparent' }]}> 
-          <ThemedText style={[styles.h2, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Title}</ThemedText>
+          <ThemedText style={[styles.h2, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Title}</ThemedText>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type1}</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type1Desc}</ThemedText>
+            <ThemedText style={[styles.h3, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type1}</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type1Desc}</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>{t.sec2Tags1[0]}</CookieTag>
               <CookieTag>{t.sec2Tags1[1]}</CookieTag>
@@ -327,8 +327,8 @@ export default function CookiesScreen() {
           </View>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type2}</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type2Desc}</ThemedText>
+            <ThemedText style={[styles.h3, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type2}</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type2Desc}</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>{t.sec2Tags2[0]}</CookieTag>
               <CookieTag>{t.sec2Tags2[1]}</CookieTag>
@@ -338,8 +338,8 @@ export default function CookiesScreen() {
           </View>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type3}</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type3Desc}</ThemedText>
+            <ThemedText style={[styles.h3, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type3}</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type3Desc}</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>{t.sec2Tags3[0]}</CookieTag>
               <CookieTag>{t.sec2Tags3[1]}</CookieTag>
@@ -349,8 +349,8 @@ export default function CookiesScreen() {
           </View>
 
           <View style={styles.cookieType}>
-            <ThemedText style={[styles.h3, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type4}</ThemedText>
-            <ThemedText style={[styles.paragraph, { color: 'rgb(214, 214, 214)' }]}>{t.sec2Type4Desc}</ThemedText>
+            <ThemedText style={[styles.h3, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type4}</ThemedText>
+            <ThemedText style={[styles.paragraph, { color: isDark ? 'rgb(214, 214, 214)' : '#000000' }]}>{t.sec2Type4Desc}</ThemedText>
             <View style={styles.cookieExamples}>
               <CookieTag>{t.sec2Tags4[0]}</CookieTag>
               <CookieTag>{t.sec2Tags4[1]}</CookieTag>

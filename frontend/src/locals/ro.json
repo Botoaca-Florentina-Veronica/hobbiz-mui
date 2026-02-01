@@ -330,6 +330,9 @@
     "contactEmailPlaceholder": "ex: exemplu@gmail.com",
     "contactPhoneLabel": "Numărul de telefon",
     "contactPhonePlaceholder": "ex: 07xxxxxxxx",
+    "priceLabel": "Preț (opțional)",
+    "pricePlaceholder": "ex: 150 RON",
+    "priceHelper": "Poți adăuga un preț pentru serviciul/produsul tău",
     "previewButton": "Previzualizează anunțul",
     "submitButton": { "create": "Publică un anunț", "update": "Actualizează anunțul" },
     "imagePrimaryBadge": "Principală",
@@ -477,8 +480,8 @@
         },
         {
           "label": "Publică sau caută anunțuri",
-          "description": "Publică ușor un anunț sau explorează categoriile și filtrele pentru a găsi ce te interesează.",
-          "details": "Folosește filtre (preț, locație, dată, popularitate) și sortări, sau adaugă rapid un anunț cu imagini, categorie și detalii clare."
+          "description": "Publică ușor un anunț cu preț opțional sau explorează categoriile și filtrele pentru a găsi ce te interesează.",
+          "details": "Poți adăuga un preț la anunțul tău pentru a indica suma dorită. Cumpărătorii pot să accepte prețul direct sau să inițieze o negociere. Folosește filtre (preț, locație, dată, popularitate) și sortări pentru căutări precise."
         },
         {
           "label": "Salvează în Favorite și revino",
@@ -486,9 +489,9 @@
           "details": "Favoritele se salvează pe dispozitiv, separate pe utilizator sau invitat, și pot fi regăsite în pagina „Favorite”."
         },
         {
-          "label": "Discută și primește notificări",
-          "description": "Deschide chatul cu autorul anunțului și urmărește actualizările în „Notificări”.",
-          "details": "Chat integrat pentru întrebări rapide. Primești notificări despre mesaje noi sau activitate pe anunțurile tale."
+          "label": "Colaborează inteligent",
+          "description": "Comunică prin chat și alege între acceptarea directă a prețului sau negocierea unei sume personalizate. „Notificări”.",
+          "details": "Dacă anunțul are preț setat, poți accepta direct cu butonul 'Vrei să colaborăm?' - balanța vânzătorului va fi actualizată automat. Altfel, poți negocia o sumă customizată prin sistemul de oferte și contraoferte."
         }
       ],
       "buttons": {
@@ -532,6 +535,11 @@
         "title": "Siguranță și încredere",
         "description": "Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.",
         "color": "#ffffff"
+      },
+      {
+        "title": "Trading flexibil",
+        "description": "Setează prețuri fixe sau negociază sume personalizate. Colaborarea directă cu actualizare automată a balanței.",
+        "color": "#28a745"
       }
     ],
     "cta": {

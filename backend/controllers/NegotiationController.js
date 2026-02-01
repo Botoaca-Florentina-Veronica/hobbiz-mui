@@ -301,8 +301,8 @@ exports.acceptOffer = async (req, res) => {
       return res.status(400).json({ message: 'This negotiation cannot be accepted' });
     }
 
-    // Update negotiation status
-    negotiation.status = 'accepted';
+    // Update negotiation status to pending confirmation
+    negotiation.status = 'pending_confirmation';
     negotiation.lastActionBy = userId;
     negotiation.lastActionAt = new Date();
     negotiation.offerHistory.push({
@@ -319,7 +319,7 @@ exports.acceptOffer = async (req, res) => {
       try {
         const ownerId = String(negotiation.announcement.user || negotiation.seller);
         const otherId = String(negotiation.buyer);
-        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+        conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
         conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
       }
@@ -328,10 +328,10 @@ exports.acceptOffer = async (req, res) => {
         senderId: userId,
         senderRole: 'vanzator',
         destinatarId: negotiation.buyer,
-        text: encrypt(`Oferta acceptată: ${negotiation.currentPrice} RON`),
+        text: encrypt(`Preț acceptat: ${negotiation.currentPrice} RON. Ambii trebuie să confirmați colaborarea.`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
-        announcementId: String(negotiation.announcement)
+        announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
@@ -403,7 +403,7 @@ exports.rejectOffer = async (req, res) => {
       try {
         const ownerId = String(negotiation.announcement.user || negotiation.seller);
         const otherId = String(negotiation.buyer);
-        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+        conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
         conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
       }
@@ -415,7 +415,7 @@ exports.rejectOffer = async (req, res) => {
         text: encrypt(`Oferta refuzată: ${negotiation.currentPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
-        announcementId: String(negotiation.announcement)
+        announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
@@ -492,7 +492,7 @@ exports.counterOffer = async (req, res) => {
       try {
         const ownerId = String(negotiation.announcement.user || negotiation.seller);
         const otherId = String(negotiation.buyer);
-        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+        conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
         conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
       }
@@ -504,7 +504,7 @@ exports.counterOffer = async (req, res) => {
         text: encrypt(`Contraofertă: ${counterPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: counterPrice, action: 'counter_offer' },
-        announcementId: String(negotiation.announcement)
+        announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
@@ -574,7 +574,7 @@ exports.acceptCounterOffer = async (req, res) => {
       try {
         const ownerId = String(negotiation.announcement.user || negotiation.seller);
         const otherId = String(negotiation.buyer);
-        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+        conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
         conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
       }
@@ -586,7 +586,7 @@ exports.acceptCounterOffer = async (req, res) => {
         text: encrypt(`Contraofertă acceptată: ${negotiation.currentPrice} RON`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
-        announcementId: String(negotiation.announcement)
+        announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
@@ -663,7 +663,7 @@ exports.buyerCounterOffer = async (req, res) => {
       try {
         const ownerId = String(negotiation.announcement.user || negotiation.seller);
         const otherId = String(negotiation.buyer);
-        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+        conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
         conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
       }
@@ -675,7 +675,7 @@ exports.buyerCounterOffer = async (req, res) => {
         text: encrypt(`Contraofertă (buyer): ${newPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: newPrice, action: 'counter_offer' },
-        announcementId: String(negotiation.announcement)
+        announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
@@ -722,9 +722,9 @@ exports.finalizeNegotiation = async (req, res) => {
       return res.status(403).json({ message: 'Only the buyer can finalize the transaction' });
     }
 
-    // Can only finalize if accepted
-    if (negotiation.status !== 'accepted') {
-      return res.status(400).json({ message: 'Can only finalize accepted negotiations' });
+    // Can only finalize if confirmed
+    if (negotiation.status !== 'confirmed') {
+      return res.status(400).json({ message: 'Can only finalize confirmed collaborations' });
     }
 
     // Update negotiation
@@ -793,7 +793,7 @@ exports.cancelNegotiation = async (req, res) => {
       try {
         const ownerId = String(negotiation.announcement.user || negotiation.seller);
         const otherId = String(negotiation.buyer);
-        conversationId = [ownerId, otherId, String(negotiation.announcement)].join('-');
+        conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
         conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
       }
@@ -806,7 +806,7 @@ exports.cancelNegotiation = async (req, res) => {
         text: `Negociere anulată.`,
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
-        announcementId: String(negotiation.announcement)
+        announcementId: String(negotiation.announcement._id)
       }).save();
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
@@ -835,6 +835,282 @@ exports.cancelNegotiation = async (req, res) => {
     });
   } catch (error) {
     console.error('Error cancelling negotiation:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Confirm collaboration (both users need to confirm)
+exports.confirmCollaboration = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    const negotiation = await Negotiation.findById(id)
+      .populate('buyer', 'firstName lastName collaborations balance')
+      .populate('seller', 'firstName lastName collaborations balance')
+      .populate('announcement', 'title');
+
+    if (!negotiation) {
+      return res.status(404).json({ message: 'Negotiation not found' });
+    }
+
+    // Only buyer or seller can confirm
+    if (![negotiation.buyer._id.toString(), negotiation.seller._id.toString()].includes(userId)) {
+      return res.status(403).json({ message: 'Only participants can confirm the collaboration' });
+    }
+
+    // Can only confirm if status is pending_confirmation
+    if (negotiation.status !== 'pending_confirmation') {
+      return res.status(400).json({ message: 'Negotiation is not in pending confirmation status' });
+    }
+
+    // Check if user already confirmed
+    const alreadyConfirmed = negotiation.confirmedBy.some(confirmation => 
+      confirmation.user.toString() === userId
+    );
+
+    if (!alreadyConfirmed) {
+      // Add user confirmation
+      negotiation.confirmedBy.push({
+        user: userId,
+        confirmedAt: new Date()
+      });
+    }
+
+    // Check if both users have confirmed
+    const buyerConfirmed = negotiation.confirmedBy.some(confirmation => 
+      confirmation.user.toString() === negotiation.buyer._id.toString()
+    );
+    const sellerConfirmed = negotiation.confirmedBy.some(confirmation => 
+      confirmation.user.toString() === negotiation.seller._id.toString()
+    );
+
+    if (buyerConfirmed && sellerConfirmed) {
+      // Both confirmed - finalize collaboration
+      negotiation.status = 'confirmed';
+      negotiation.collaborationConfirmedAt = new Date();
+      negotiation.lastActionBy = userId;
+      negotiation.lastActionAt = new Date();
+      
+      negotiation.offerHistory.push({
+        offeredBy: userId,
+        price: negotiation.currentPrice,
+        action: 'confirm'
+      });
+
+      // Add collaboration to both users
+      const User = require('../models/User');
+      const buyer = await User.findById(negotiation.buyer._id);
+      const seller = await User.findById(negotiation.seller._id);
+
+      // Add each user to the other's collaborations if not already there
+      if (buyer && !buyer.collaborations.includes(negotiation.seller._id.toString())) {
+        buyer.collaborations.push(negotiation.seller._id.toString());
+        await buyer.save();
+      }
+      if (seller && !seller.collaborations.includes(negotiation.buyer._id.toString())) {
+        seller.collaborations.push(negotiation.buyer._id.toString());
+        await seller.save();
+      }
+
+      // Update seller's balance
+      seller.balance = (seller.balance || 0) + negotiation.currentPrice;
+      await seller.save();
+
+      await negotiation.save();
+
+      // Send system message about collaboration confirmation
+      try {
+        let conversationId;
+        try {
+          const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+          const otherId = String(negotiation.buyer._id);
+          conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
+        } catch (e) {
+          conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
+        }
+
+        const Message = require('../models/Message');
+        const { encrypt, decrypt } = require('../services/encryptionService');
+
+        const msg = await new Message({
+          conversationId,
+          senderId: userId,
+          senderRole: userId === negotiation.seller._id.toString() ? 'vanzator' : 'cumparator',
+          destinatarId: userId === negotiation.seller._id.toString() ? negotiation.buyer._id : negotiation.seller._id,
+          text: encrypt(`Colaborare confirmată! Preț finalizat: ${negotiation.currentPrice} RON. Acum puteți lăsa recenzii unul altuia.`),
+          messageType: 'negotiation',
+          negotiation: { 
+            negotiationId: String(negotiation._id), 
+            price: negotiation.currentPrice, 
+            action: 'collaboration_confirmed' 
+          },
+          announcementId: String(negotiation.announcement._id)
+        }).save();
+
+        const msgResponse = msg.toObject();
+        msgResponse.text = decrypt(msgResponse.text);
+
+        // Send socket messages
+        const io = req.app && req.app.get ? req.app.get('io') : null;
+        const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+        if (io && activeUsers) {
+          const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
+          const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+          let senderInfo = null;
+          try { 
+            const senderUser = await User.findById(userId).select('firstName lastName avatar'); 
+            if (senderUser) senderInfo = { 
+              firstName: senderUser.firstName, 
+              lastName: senderUser.lastName, 
+              avatar: senderUser.avatar 
+            }; 
+          } catch (_) {}
+          if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+          if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+        }
+      } catch (e) { 
+        console.warn('Nu s-a putut crea mesaj pentru confirmarea colaborării:', e?.message || e); 
+      }
+
+      return res.json({ 
+        message: 'Collaboration confirmed by both users', 
+        negotiation,
+        collaborationEstablished: true,
+        sellerNewBalance: seller.balance
+      });
+    } else {
+      // Only one confirmed so far
+      negotiation.lastActionBy = userId;
+      negotiation.lastActionAt = new Date();
+      await negotiation.save();
+
+      // Send system message about partial confirmation
+      try {
+        let conversationId;
+        try {
+          const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+          const otherId = String(negotiation.buyer._id);
+          conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
+        } catch (e) {
+          conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
+        }
+
+        const Message = require('../models/Message');
+        const { encrypt } = require('../services/encryptionService');
+        const User = require('../models/User');
+
+        const confirmerName = userId === negotiation.buyer._id.toString() ? 
+          `${negotiation.buyer.firstName || ''} ${negotiation.buyer.lastName || ''}`.trim() : 
+          `${negotiation.seller.firstName || ''} ${negotiation.seller.lastName || ''}`.trim();
+
+        const msg = await new Message({
+          conversationId,
+          senderId: userId,
+          senderRole: userId === negotiation.seller._id.toString() ? 'vanzator' : 'cumparator',
+          destinatarId: userId === negotiation.seller._id.toString() ? negotiation.buyer._id : negotiation.seller._id,
+          text: encrypt(`${confirmerName} a confirmat colaborarea. Așteptăm confirmarea celuilalt utilizator.`),
+          messageType: 'negotiation',
+          negotiation: { 
+            negotiationId: String(negotiation._id), 
+            price: negotiation.currentPrice, 
+            action: 'partial_confirm' 
+          },
+          announcementId: String(negotiation.announcement._id)
+        }).save();
+
+        // Send socket notification (simplified)
+        const io = req.app && req.app.get ? req.app.get('io') : null;
+        const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
+        if (io && activeUsers) {
+          const targetUserId = userId === negotiation.seller._id.toString() ? negotiation.buyer._id : negotiation.seller._id;
+          const targetSocket = activeUsers.get(String(targetUserId));
+          if (targetSocket) {
+            const msgResponse = msg.toObject();
+            const { decrypt } = require('../services/encryptionService');
+            msgResponse.text = decrypt(msgResponse.text);
+            io.to(targetSocket).emit('newMessage', msgResponse);
+          }
+        }
+      } catch (e) { 
+        console.warn('Nu s-a putut crea mesaj pentru confirmarea parțială:', e?.message || e); 
+      }
+
+      return res.json({ 
+        message: 'Your confirmation recorded. Waiting for the other user to confirm.', 
+        negotiation,
+        collaborationEstablished: false
+      });
+    }
+
+  } catch (error) {
+    console.error('Error confirming collaboration:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Direct collaboration with announcement price (no negotiation needed)
+exports.directCollaboration = async (req, res) => {
+  try {
+    const { announcementId, buyerId, sellerId, price, conversationId } = req.body;
+
+    if (!announcementId || !buyerId || !sellerId || !price) {
+      return res.status(400).json({ message: 'All fields are required for direct collaboration' });
+    }
+
+    // Verify announcement exists and has the specified price
+    const announcement = await Announcement.findById(announcementId);
+    if (!announcement) {
+      return res.status(404).json({ message: 'Announcement not found' });
+    }
+
+    if (!announcement.price || announcement.price !== price) {
+      return res.status(400).json({ message: 'Announcement price does not match requested price' });
+    }
+
+    // Verify buyer and seller exist
+    const buyer = await User.findById(buyerId);
+    const seller = await User.findById(sellerId);
+
+    if (!buyer || !seller) {
+      return res.status(404).json({ message: 'Buyer or seller not found' });
+    }
+
+    // Update seller balance
+    seller.balance = (seller.balance || 0) + price;
+    await seller.save();
+
+    // Set up collaboration rights
+    if (!buyer.collaborations.includes(sellerId)) {
+      buyer.collaborations.push(sellerId);
+    }
+    if (!seller.collaborations.includes(buyerId)) {
+      seller.collaborations.push(buyerId);
+    }
+
+    await buyer.save();
+    await seller.save();
+
+    // Create a system message for the conversation
+    if (conversationId) {
+      const systemMessage = new Message({
+        conversationId,
+        senderId: 'system',
+        text: encrypt(`Colaborare confirmată pentru prețul de ${price} RON. Balanța vânzătorului a fost actualizată.`),
+        messageType: 'collaboration_request'
+      });
+      await systemMessage.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Direct collaboration confirmed successfully',
+      balanceUpdated: price,
+      sellerNewBalance: seller.balance
+    });
+
+  } catch (error) {
+    console.error('Error in direct collaboration:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

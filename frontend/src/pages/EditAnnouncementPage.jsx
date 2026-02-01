@@ -61,6 +61,7 @@ export default function EditAnnouncementPage() {
   const [contactPerson, setContactPerson] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [price, setPrice] = useState("");
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
@@ -134,6 +135,7 @@ export default function EditAnnouncementPage() {
       setContactPerson(a.contactPerson || '');
       setContactEmail(a.contactEmail || '');
       setContactPhone(a.contactPhone || '');
+      setPrice(a.price || '');
       setAnnouncementId(a._id);
       
       // Setează imaginile existente
@@ -361,6 +363,7 @@ export default function EditAnnouncementPage() {
       formData.append('contactPerson', contactPerson);
       formData.append('contactEmail', contactEmail);
       formData.append('contactPhone', contactPhone);
+      if (price.trim()) formData.append('price', price);
       
       // Adaugă doar imaginile noi (File objects)
       images.filter(img => img instanceof File).forEach((img) => {
@@ -772,6 +775,15 @@ export default function EditAnnouncementPage() {
           onChange={handleContactPhoneChange}
           onBlur={handleContactPhoneBlur}
         />
+        <label className="add-announcement-label">Preț (opțional)</label>
+        <input
+          className="add-announcement-contact-input"
+          type="number"
+          placeholder="ex: 150 RON"
+          value={price || ''}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <div className="add-announcement-helper">Poți adăuga un preț pentru serviciul/produsul tău</div>
       </div>
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
@@ -884,8 +896,13 @@ export default function EditAnnouncementPage() {
               </Typography>
             )}
             {contactPhone && (
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
                 <strong>Telefon:</strong> {contactPhone}
+              </Typography>
+            )}
+            {price && (
+              <Typography variant="body2">
+                <strong>Preț:</strong> {price} RON
               </Typography>
             )}
           </Box>

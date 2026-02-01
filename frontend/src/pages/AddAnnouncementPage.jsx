@@ -80,6 +80,7 @@ export default function AddAnnouncementPage() {
   const [contactPerson, setContactPerson] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [price, setPrice] = useState("");
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
@@ -195,6 +196,7 @@ export default function AddAnnouncementPage() {
       setContactPerson(data.contactPerson || '');
       setContactEmail(data.contactEmail || '');
       setContactPhone(data.contactPhone || '');
+      setPrice(data.price || '');
       setIsEdit(false);
       setAnnouncementId(null);
       // Restaurează preview-ul imaginii principale dacă există
@@ -271,6 +273,7 @@ export default function AddAnnouncementPage() {
       setContactPerson(a.contactPerson || '');
       setContactEmail(a.contactEmail || '');
       setContactPhone(a.contactPhone || '');
+      setPrice(a.price || '');
       setMainImagePreview(a.images && a.images[0] ? a.images[0] : null);
       setIsEdit(true);
       setAnnouncementId(a._id);
@@ -289,6 +292,7 @@ export default function AddAnnouncementPage() {
       setContactPerson('');
       setContactEmail('');
       setContactPhone('');
+      setPrice('');
       setMainImagePreview(null);
     }
   }, [location.state]);
@@ -441,6 +445,7 @@ export default function AddAnnouncementPage() {
       formData.append('contactPerson', contactPerson);
       formData.append('contactEmail', contactEmail);
       formData.append('contactPhone', contactPhone);
+      if (price.trim()) formData.append('price', price);
       // Adaugă toate imaginile
       images.forEach((img) => {
         formData.append('images', img);
@@ -987,6 +992,15 @@ export default function AddAnnouncementPage() {
           onChange={handleContactPhoneChange}
           onBlur={handleContactPhoneBlur}
         />
+        <label className="add-announcement-label">{t('addAnnouncement.priceLabel')}</label>
+        <input
+          className="add-announcement-contact-input"
+          type="number"
+          placeholder={t('addAnnouncement.pricePlaceholder')}
+          value={price || ''}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <div className="add-announcement-helper">{t('addAnnouncement.priceHelper')}</div>
       </div>
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
@@ -1237,6 +1251,39 @@ export default function AddAnnouncementPage() {
                             color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
                           }}>
                             {contactEmail}
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Price */}
+                    {price && (
+                      <Paper elevation={1} sx={{ 
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
+                        border: (theme) => theme.palette.mode === 'dark' 
+                          ? '1px solid #3f3f3f' 
+                          : '1px solid #e5e7eb',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          boxShadow: (theme) => theme.palette.mode === 'dark'
+                            ? '0 4px 12px rgba(245, 24, 102, 0.2)'
+                            : '0 4px 12px rgba(53, 80, 112, 0.15)'
+                        }
+                      }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body1" sx={{ 
+                            fontWeight: 600,
+                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070'
+                          }}>
+                            💰
+                          </Typography>
+                          <Typography variant="body1" sx={{ 
+                            fontWeight: 500,
+                            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
+                          }}>
+                            {price} RON
                           </Typography>
                         </Box>
                       </Paper>

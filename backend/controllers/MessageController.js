@@ -278,6 +278,11 @@ const createMessage = async (req, res) => {
     // Real-time message delivery via Socket.IO
     const io = req.app.get("io");
     const activeUsers = req.app.get("activeUsers");
+    const activeConversations = req.app.get("activeConversations");
+
+    // Check if recipient is currently viewing this conversation
+    const isRecipientViewingConversation = activeConversations && 
+      activeConversations.get(destinatarId) === conversationId;
 
     if (
       io &&
@@ -313,13 +318,26 @@ const createMessage = async (req, res) => {
           senderInfo,
         });
         console.log(`📨 Real-time message sent to user ${destinatarId}`);
+
+        // If recipient is viewing the conversation, mark message as read immediately
+        if (isRecipientViewingConversation) {
+          try {
+            message.isRead = true;
+            message.readAt = new Date();
+            await message.save();
+            console.log(`✓ Message auto-marked as read (recipient viewing conversation)`);
+          } catch (e) {
+            console.warn("Could not auto-mark message as read:", e.message);
+          }
+        }
       }
     }
 
-    // Notificare – doar dacă avem un destinatar valid și diferit de expeditor
+    // Notificare – doar dacă avem un destinatar valid, diferit de expeditor ȘI destinatarul NU vizualizează conversația
     if (
       isValidObjectId(destinatarId) &&
-      String(destinatarId) !== String(senderId)
+      String(destinatarId) !== String(senderId) &&
+      !isRecipientViewingConversation
     ) {
       try {
         // Include message id so clients can deep-link to the exact message

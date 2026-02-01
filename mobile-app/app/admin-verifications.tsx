@@ -9,6 +9,7 @@ import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
 import { Toast } from '../components/ui/Toast';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import api from '../src/services/api';
 import { 
   getPendingVerifications, 
   verifyDocument, 
@@ -22,6 +23,16 @@ export default function AdminVerificationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { tokens, isDark } = useAppTheme();
+  
+  // Helper to normalize image URLs for web compatibility
+  const getImageSrc = (img?: string | null) => {
+    if (!img) return null;
+    if (img.startsWith('http')) return img;
+    const base = String(api.defaults.baseURL || '').replace(/\/$/, '');
+    if (!base) return img;
+    if (img.startsWith('/uploads')) return `${base}${img}`;
+    return `${base}/uploads/${img}`;
+  };
   
   const [users, setUsers] = useState<UserWithDocuments[]>([]);
   const [loading, setLoading] = useState(true);
@@ -484,7 +495,7 @@ export default function AdminVerificationsScreen() {
         <ScrollView style={styles.content}>
           <View style={styles.userCard}>
             {selectedUser.avatar ? (
-              <Image source={{ uri: selectedUser.avatar }} style={styles.avatar} />
+              <Image source={{ uri: getImageSrc(selectedUser.avatar) || undefined }} style={styles.avatar} />
             ) : (
               <View style={styles.avatar}>
                 <Ionicons name="person" size={30} color={tokens.colors.primary} style={{ alignSelf: 'center', marginTop: 10 }} />
@@ -693,7 +704,7 @@ export default function AdminVerificationsScreen() {
               onPress={() => handleViewUserDocuments(user)}
             >
               {user.avatar ? (
-                <Image source={{ uri: user.avatar }} style={styles.avatar} />
+                <Image source={{ uri: getImageSrc(user.avatar) || undefined }} style={styles.avatar} />
               ) : (
                 <View style={styles.avatar}>
                   <Ionicons name="person" size={30} color={tokens.colors.primary} style={{ alignSelf: 'center', marginTop: 10 }} />

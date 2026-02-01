@@ -330,6 +330,9 @@
     "contactEmailPlaceholder": "e.g.: example@gmail.com",
     "contactPhoneLabel": "Phone number",
     "contactPhonePlaceholder": "e.g.: 07xxxxxxxx",
+    "priceLabel": "Price (optional)",
+    "pricePlaceholder": "e.g.: 150 RON",
+    "priceHelper": "You can add a price for your service/product",
     "previewButton": "Preview announcement",
     "submitButton": { "create": "Publish announcement", "update": "Update announcement" },
     "imagePrimaryBadge": "Main",
@@ -477,8 +480,8 @@
         },
         {
           "label": "Post or search announcements",
-          "description": "Easily post an announcement or explore categories and filters to find what interests you.",
-          "details": "Use filters (price, location, date, popularity) and sorting, or quickly add an announcement with images, category and clear details."
+          "description": "Easily post an announcement with optional pricing or explore categories and filters to find what interests you.",
+          "details": "You can add a price to your announcement to indicate the desired amount. Buyers can accept the price directly or initiate a negotiation. Use filters (price, location, date, popularity) and sorting for precise searches."
         },
         {
           "label": "Save to Favorites and return",
@@ -486,9 +489,9 @@
           "details": "Favorites are saved on the device, separated by user or guest, and can be found in the 'Favorites' page."
         },
         {
-          "label": "Discuss and receive notifications",
-          "description": "Open the chat with the announcement author and follow updates in 'Notifications'.",
-          "details": "Integrated chat for quick questions. You receive notifications about new messages or activity on your announcements."
+          "label": "Collaborate intelligently",
+          "description": "Communicate via chat and choose between direct price acceptance or negotiating a custom amount.",
+          "details": "If the announcement has a set price, you can accept directly with the 'Want to collaborate?' button - the seller's balance will be updated automatically. Otherwise, you can negotiate a custom amount through the offer and counteroffer system."
         }
       ],
       "buttons": {
@@ -532,6 +535,11 @@
         "title": "Security and trust",
         "description": "URL image normalization, contact data protection and good UI/UX practices.",
         "color": "#ffffff"
+      },
+      {
+        "title": "Flexible trading",
+        "description": "Set fixed prices or negotiate custom amounts. Direct collaboration with automatic balance updates.",
+        "color": "#28a745"
       }
     ],
     "cta": {

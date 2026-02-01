@@ -19,6 +19,7 @@ interface Announcement {
   title: string;
   category: string;
   location: string;
+  price?: number;
   images?: string[];
   createdAt: string;
   user?: { _id: string; firstName?: string; lastName?: string };

@@ -118,6 +118,17 @@ const getNotifications = async (req, res) => {
             obj.announcementImage = `${base}${path}`;
           }
         } catch (_) {}
+        
+        // Ensure we always have a preview - fallback to the message field from the notification
+        if (!obj.preview && obj.message) {
+          obj.preview = obj.message;
+        }
+        
+        // If still no senderName after enrichment (system notifications), set a descriptive name
+        if (!obj.senderName) {
+          obj.senderName = 'Notificare Hobbiz';
+        }
+        
         return obj;
       })
     );

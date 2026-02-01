@@ -34,6 +34,7 @@ interface Announcement {
   category: string;
   location: string;
   description?: string;
+  price?: number;
   images?: string[];
   createdAt: string;
 }

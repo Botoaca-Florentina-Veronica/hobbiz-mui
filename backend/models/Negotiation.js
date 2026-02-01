@@ -37,7 +37,7 @@ const negotiationSchema = new mongoose.Schema({
   // Status of the negotiation
   status: { 
     type: String, 
-    enum: ['pending', 'accepted', 'rejected', 'counter_offer', 'finalized'], 
+    enum: ['pending', 'accepted', 'rejected', 'counter_offer', 'pending_confirmation', 'confirmed', 'finalized'], 
     default: 'pending' 
   },
   
@@ -61,13 +61,30 @@ const negotiationSchema = new mongoose.Schema({
     },
     action: { 
       type: String, 
-      enum: ['offer', 'counter_offer', 'accept', 'reject'],
+      enum: ['offer', 'counter_offer', 'accept', 'reject', 'confirm'],
       required: true
     }
   }],
   
   // When the negotiation was finalized (transaction confirmed by buyer)
   finalizedAt: { 
+    type: Date 
+  },
+  
+  // Collaboration confirmation tracking
+  confirmedBy: [{
+    user: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User' 
+    },
+    confirmedAt: { 
+      type: Date, 
+      default: Date.now 
+    }
+  }],
+  
+  // When collaboration was confirmed by both users
+  collaborationConfirmedAt: { 
     type: Date 
   },
   

@@ -526,7 +526,7 @@ const addAnnouncement = async (req, res) => {
     console.log('--- [addAnnouncement] req.file:', req.file);
     console.log('--- [addAnnouncement] req.userId:', req.userId);
     const userId = req.userId;
-    const { title, category, description, location, contactPerson, contactEmail, contactPhone } = req.body;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone, price } = req.body;
     if (!title || !category || !description || !location || !contactPerson) {
       return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });
     }
@@ -544,6 +544,7 @@ const addAnnouncement = async (req, res) => {
       contactPerson,
       contactEmail,
       contactPhone,
+      price: price ? Number(price) : undefined,
       images
     });
     await announcement.save();
@@ -639,7 +640,7 @@ const updateAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
     const { id } = req.params;
-    const { title, category, description, location, contactPerson, contactEmail, contactPhone, existingImages } = req.body;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone, price, existingImages } = req.body;
     let announcement = await Announcement.findOne({ _id: id, user: userId });
     if (!announcement) {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit' });
@@ -652,6 +653,7 @@ const updateAnnouncement = async (req, res) => {
     announcement.contactPerson = contactPerson;
     announcement.contactEmail = contactEmail;
     announcement.contactPhone = contactPhone;
+    announcement.price = price ? Number(price) : undefined;
     
     // Gestionează imaginile
     let finalImages = [];

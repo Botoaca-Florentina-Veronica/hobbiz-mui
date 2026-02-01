@@ -87,6 +87,7 @@ const io = socketIo(server, {
 // Store active users and their typing status
 const activeUsers = new Map(); // userId -> socketId
 const typingUsers = new Map(); // conversationId -> Set of userIds
+const activeConversations = new Map(); // userId -> conversationId (which conversation they're currently viewing)
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
@@ -98,6 +99,22 @@ io.on('connection', (socket) => {
     socket.userId = userId;
     console.log(`👤 User ${userId} joined with socket ${socket.id}`);
     io.emit('userStatus', { userId, status: 'online' });
+  });
+
+  // User enters a specific conversation
+  socket.on('joinConversation', ({ userId, conversationId }) => {
+    if (userId && conversationId) {
+      activeConversations.set(userId, conversationId);
+      console.log(`💬 User ${userId} is now viewing conversation ${conversationId}`);
+    }
+  });
+
+  // User leaves a conversation
+  socket.on('leaveConversation', ({ userId }) => {
+    if (userId) {
+      activeConversations.delete(userId);
+      console.log(`👋 User ${userId} left their active conversation`);
+    }
   });
 
   // Check user status
@@ -144,6 +161,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     if (socket.userId) {
       activeUsers.delete(socket.userId);
+      activeConversations.delete(socket.userId);
       io.emit('userStatus', { userId: socket.userId, status: 'offline' });
       // Remove from all typing conversations
       typingUsers.forEach((typingSet, conversationId) => {
@@ -173,6 +191,7 @@ io.on('connection', (socket) => {
 // Make io available to routes
 app.set('io', io);
 app.set('activeUsers', activeUsers);
+app.set('activeConversations', activeConversations);
 
 // Middleware
 // CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify și DigitalOcean
