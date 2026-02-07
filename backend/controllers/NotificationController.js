@@ -27,6 +27,7 @@ const getNotifications = async (req, res) => {
             const payload = link.split('/chat/')[1] || '';
             const [conversationId, messageId] = payload.split('/').map(p => p && String(p).trim());
             obj.conversationId = conversationId; // Explicitly add conversationId to the object
+            if (messageId) obj.messageId = messageId; // Expose messageId when present so clients can deep-link
             try {
               if (messageId) {
                 // If a specific message id is provided, try to load that message for exact preview

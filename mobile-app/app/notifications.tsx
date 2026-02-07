@@ -14,9 +14,18 @@ interface NotificationItem {
   preview?: string;
   message?: string;
   senderAvatar?: string | null;
+  senderId?: string;
   createdAt?: string;
   read?: boolean;
   link?: string;
+
+  // Enriched by backend for chat notifications
+  conversationId?: string;
+  messageId?: string;
+  announcementOwnerId?: string;
+  announcementId?: string;
+  announcementTitle?: string;
+  announcementImage?: string;
 }
 
 export default function NotificationsScreen() {
@@ -68,15 +77,17 @@ export default function NotificationsScreen() {
     ));
 
     // Step 2: Use explicit fields from backend if available, or fallback to link parsing
-    const notifData = notification as any;
-    let conversationId = notifData.conversationId;
-    let messageId = null;
+    const notifData = notification as NotificationItem;
+    let conversationId: string | undefined = notifData.conversationId;
+    let messageId: string | undefined = notifData.messageId;
 
-    if (!conversationId && notification.link && notification.link.startsWith('/chat/')) {
+    if (notification.link && notification.link.startsWith('/chat/')) {
       const chatPath = notification.link.replace('/chat/', '');
       const parts = chatPath.split('/').map(s => s?.trim()).filter(Boolean);
-      conversationId = parts[0];
-      if (parts.length > 1) messageId = parts[1];
+      const parsedConversationId = parts[0];
+      const parsedMessageId = parts.length > 1 ? parts[1] : undefined;
+      if (!conversationId) conversationId = parsedConversationId;
+      if (!messageId) messageId = parsedMessageId;
     }
 
     if (conversationId) {
@@ -138,6 +149,7 @@ export default function NotificationsScreen() {
   // --- RENDER ITEM ---
   const renderItem = ({ item }: { item: NotificationItem }) => {
     const isUnread = !item.read;
+    const isChatNotification = !!item.conversationId || !!(item.link && item.link.startsWith('/chat/'));
     const cardBg = isDark ? '#1E1E1E' : '#FFFFFF';
     const textColor = isDark ? '#EEEEEE' : '#1A1A1A';
     const subTextColor = isDark ? '#AAAAAA' : '#666666';
@@ -184,7 +196,7 @@ export default function NotificationsScreen() {
                 </ThemedText>
 
                 {/* Action Button (Conditional) */}
-                {item.link && (
+                {isChatNotification && (
                     <TouchableOpacity 
                         style={[styles.miniButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#f2f4f7' }]}
                         onPress={() => handleReply(item._id)}

@@ -18,6 +18,7 @@ import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
+import { rankSearchSuggestions, type SearchIndexItem } from '../../src/utils/search';
 
 const TRANSLATIONS = {
   ro: {
@@ -117,6 +118,8 @@ export default function HomeScreen() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [searchIndex, setSearchIndex] = useState<SearchIndexItem[]>([]);
+  const searchSeqRef = useRef(0);
 
   const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
 
@@ -186,8 +189,26 @@ export default function HomeScreen() {
     useCallback(() => {
       refreshNotificationCount();
       loadPopular();
+      loadSearchIndex();
     }, [refreshNotificationCount])
   );
+
+  const loadSearchIndex = useCallback(async () => {
+    try {
+      const res = await api.get('/api/announcements/search-index?limit=800');
+      const data = Array.isArray(res.data) ? res.data : [];
+      setSearchIndex(data);
+    } catch (e) {
+      // Fallback to full fetch (older servers) so autocomplete keeps working.
+      try {
+        const res = await api.get('/api/announcements');
+        const data = Array.isArray(res.data) ? res.data : [];
+        setSearchIndex(data);
+      } catch {
+        setSearchIndex([]);
+      }
+    }
+  }, []);
 
   const loadPopular = useCallback(async () => {
     setPopularLoading(true);
@@ -209,37 +230,55 @@ export default function HomeScreen() {
     }
   }, []);
   
-  // Search effect with debounce
+  // Search effect with debounce (local fuzzy suggestions)
   useEffect(() => {
-    if (searchTerm.trim().length >= 2) {
+    const q = (searchTerm || '').trim();
+
+    if (q.length >= 2) {
       setIsSearching(true);
-      
+
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
-      
-      searchTimeoutRef.current = setTimeout(async () => {
-        try {
-          const res = await api.get(`/api/announcements/search?q=${encodeURIComponent(searchTerm)}`);
-          setSearchResults(Array.isArray(res.data) ? res.data : []);
+
+      const mySeq = ++searchSeqRef.current;
+      searchTimeoutRef.current = setTimeout(() => {
+        if (mySeq !== searchSeqRef.current) return;
+
+        // Prefer local fuzzy ranking over a cached index.
+        if (searchIndex.length > 0) {
+          const ranked = rankSearchSuggestions(searchIndex, q, { limit: 20 });
+          setSearchResults(ranked);
           setIsSearching(false);
-        } catch (error) {
-          console.error('Error searching announcements:', error);
-          setSearchResults([]);
-          setIsSearching(false);
+          return;
         }
-      }, 300);
+
+        // If index isn't available, keep old behavior (server suggestions).
+        (async () => {
+          try {
+            const res = await api.get(`/api/announcements/search?q=${encodeURIComponent(q)}`);
+            if (mySeq !== searchSeqRef.current) return;
+            setSearchResults(Array.isArray(res.data) ? res.data : []);
+          } catch (error) {
+            if (mySeq !== searchSeqRef.current) return;
+            console.error('Error searching announcements:', error);
+            setSearchResults([]);
+          } finally {
+            if (mySeq === searchSeqRef.current) setIsSearching(false);
+          }
+        })();
+      }, 120);
     } else {
       setSearchResults([]);
       setIsSearching(false);
     }
-    
+
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchTerm]);
+  }, [searchTerm, searchIndex]);
 
   return (
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 

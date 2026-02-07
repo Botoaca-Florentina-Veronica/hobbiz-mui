@@ -342,13 +342,24 @@ const createMessage = async (req, res) => {
       try {
         // Include message id so clients can deep-link to the exact message
         const link = `/chat/${conversationId}/${message._id}`;
-        const existingNotification = await Notification.findOne({
-          userId: destinatarId,
-          link,
-          read: false,
-        });
+        // Load recipient settings (messages category + global push)
+        let recipientUser = null;
+        try {
+          recipientUser = await User.findById(destinatarId).select('pushToken notificationSettings');
+        } catch (_) {}
+        const recipientSettings = recipientUser && recipientUser.notificationSettings ? recipientUser.notificationSettings : {};
+        const allowMessageNotifications = recipientSettings.messages !== false;
+        const allowPushNotifications = allowMessageNotifications && recipientSettings.push !== false;
 
-        if (!existingNotification) {
+        const existingNotification = allowMessageNotifications
+          ? await Notification.findOne({
+              userId: destinatarId,
+              link,
+              read: false,
+            })
+          : null;
+
+        if (allowMessageNotifications && !existingNotification) {
           // Obține numele expeditorului și titlul anunțului pentru un mesaj mai clar
           let senderName = 'Cineva';
           let announcementTitle = '';
@@ -389,11 +400,9 @@ const createMessage = async (req, res) => {
           });
         }
 
-        // Trimite push notification dacă destinatarul are pushToken
+        // Trimite push notification dacă destinatarul are pushToken și permite push
         try {
-          const recipient = await User.findById(destinatarId).select(
-            "pushToken"
-          );
+          const recipient = recipientUser || (await User.findById(destinatarId).select('pushToken notificationSettings'));
           let sender = null;
           try {
             sender = await User.findById(senderId).select("firstName lastName");
@@ -407,11 +416,16 @@ const createMessage = async (req, res) => {
             : messageData.image
             ? "Imagine nouă"
             : "Mesaj nou";
-          if (
-            recipient &&
-            recipient.pushToken &&
-            /^ExponentPushToken\[.+\]$/.test(recipient.pushToken)
-          ) {
+          const settings = recipient && recipient.notificationSettings ? recipient.notificationSettings : {};
+          const allowPush = allowPushNotifications && settings.push !== false;
+          let tokens = [];
+          if (recipient && recipient.pushToken) {
+            if (Array.isArray(recipient.pushToken)) tokens = recipient.pushToken;
+            else if (typeof recipient.pushToken === 'string') tokens = [recipient.pushToken];
+          }
+          tokens = tokens.filter((t) => /^ExponentPushToken\[.+\]$/.test(t));
+
+          if (allowPush && tokens.length > 0) {
             // Folosim fetch global (Node 18+) cu fallback la node-fetch dacă e necesar
             const doFetch = (url, opts) =>
               typeof fetch !== "undefined"
@@ -421,7 +435,7 @@ const createMessage = async (req, res) => {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                to: recipient.pushToken,
+                to: tokens,
                 title,
                 body,
                 data: { link },

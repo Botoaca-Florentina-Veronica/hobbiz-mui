@@ -95,6 +95,7 @@ interface Message {
   deleted?: boolean;
   messageType?: 'text' | 'collaboration_request' | 'negotiation';
   negotiation?: { negotiationId?: string; price?: number; action?: string };
+  lastActionBy?: string;
   collaborationData?: {
     participants?: string[];
     acceptedBy?: string[];
@@ -1767,10 +1768,14 @@ export default function ConversationScreen() {
               <Ionicons name="pricetag" size={20} color={tokens.colors.primary} />
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <ThemedText style={[styles.negotiationTitle, { color: tokens.colors.text }]}>
-                  {activeNegotiation.status === 'pending' && String(activeNegotiation.buyer._id) === String(userId)
-                    ? t.negotiationOffer
+                  {activeNegotiation.status === 'pending' 
+                    ? (String(activeNegotiation.buyer._id) === String(userId) 
+                        ? t.negotiationOffer + ' - ' + (locale === 'ro' ? 'Așteaptă răspuns' : 'Waiting for reply')
+                        : t.negotiationOffer + ' - ' + (locale === 'ro' ? 'Răspunde la ofertă' : 'Respond to offer'))
                     : activeNegotiation.status === 'counter_offer'
-                    ? t.counterOffer
+                    ? (String(activeNegotiation.lastActionBy) === String(userId)
+                        ? t.counterOffer + ' - ' + (locale === 'ro' ? 'Așteaptă răspuns' : 'Waiting for reply')
+                        : t.counterOffer + ' - ' + (locale === 'ro' ? 'Răspunde la contraofertă' : 'Respond to counter'))
                     : activeNegotiation.status === 'pending_confirmation'
                     ? t.pendingConfirmation
                     : activeNegotiation.status === 'confirmed'
@@ -1800,8 +1805,12 @@ export default function ConversationScreen() {
             </View>
 
             {/* Action buttons based on role and status */}
+            {/* Seller sees buttons when: status is 'pending' OR (status is 'counter_offer' AND buyer made last action) */}
             {String(activeNegotiation.seller._id) === String(userId) && 
-             ['pending', 'counter_offer'].includes(activeNegotiation.status) && (
+             (
+               (activeNegotiation.status === 'pending') ||
+               (activeNegotiation.status === 'counter_offer' && String(activeNegotiation.lastActionBy) === String(activeNegotiation.buyer._id))
+             ) && (
               <View style={styles.negotiationActions}>
                 <TouchableOpacity
                   onPress={handleAcceptOffer}
@@ -1826,10 +1835,10 @@ export default function ConversationScreen() {
               </View>
             )}
 
-
-
+            {/* Buyer sees buttons when: status is 'counter_offer' AND seller made last action */}
             {String(activeNegotiation.buyer._id) === String(userId) && 
-             activeNegotiation.status === 'counter_offer' && (
+             activeNegotiation.status === 'counter_offer' &&
+             String(activeNegotiation.lastActionBy) === String(activeNegotiation.seller._id) && (
               <View style={styles.negotiationActions}>
                 <TouchableOpacity
                   onPress={handleAcceptCounterOffer}

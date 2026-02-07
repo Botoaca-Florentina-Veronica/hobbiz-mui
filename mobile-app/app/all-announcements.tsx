@@ -1,46 +1,57 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Pressable, Platform, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../components/themed-text';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
+import { useLocale } from '../src/context/LocaleContext';
 import api from '../src/services/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { translateCategory, getCategoryKeyByLabel } from '../src/constants/categories';
+
+interface Announcement {
+  _id: string;
+  title: string;
+  category: string;
+  location: string;
+  price?: number;
+  images?: string[];
+  createdAt: string;
+  description?: string;
+  user?: { _id: string; firstName?: string; lastName?: string };
+}
 
 const TRANSLATIONS = {
   ro: {
     title: 'Toate anunțurile',
     loading: 'Se încarcă anunțurile...',
     noAnnouncements: 'Nu există anunțuri',
-    posted: 'Postat',
+    posted: 'POSTAT',
   },
   en: {
     title: 'All announcements',
     loading: 'Loading announcements...',
     noAnnouncements: 'No announcements found',
-    posted: 'Posted',
+    posted: 'POSTED',
   }
 };
 
 export default function AllAnnouncements() {
   const { tokens, isDark } = useAppTheme();
-  const colors = isDark ? {
-    bg: '#121212', surface: '#282828', elev: '#3f3f3f', border: '#575757', placeholder: '#717171', muted: '#8b8b8b', text: '#FFFFFF', primary: '#f51866'
-  } : tokens.colors;
+  const { locale } = useLocale();
+  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
-  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const { width } = useWindowDimensions();
+  const isTwoColumn = width > 700;
+
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const params = useLocalSearchParams();
   const qParam = (params.q as string) || '';
   const [searchTerm, setSearchTerm] = useState(qParam || '');
-  const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
-  const isWeb = Platform.OS === 'web';
 
   const getImageSrc = (img?: string) => {
     if (!img) return null;
@@ -96,11 +107,94 @@ export default function AllAnnouncements() {
     setRefreshing(false);
   }, [fetchAnnouncements]);
 
+  const renderAnnouncement = useCallback(({ item: ann }: { item: Announcement }) => {
+    const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
+    const categoryKey = getCategoryKeyByLabel(ann.category);
+    const translatedCategory = categoryKey ? translateCategory(categoryKey, locale) : ann.category;
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
+        style={[
+          styles.card,
+          isTwoColumn ? styles.cardTwoColumn : styles.cardMobile,
+          styles.cardSpacing,
+        ]}
+      >
+        {/* Image Background */}
+        <View style={styles.imageContainer}>
+          {firstImage ? (
+            <Image
+              source={{ uri: firstImage }}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[
+              styles.cardImagePlaceholder,
+              { backgroundColor: isDark ? '#1a1a1a' : '#e0e0e0' }
+            ]}>
+              <Ionicons
+                name="image-outline"
+                size={64}
+                color={isDark ? '#3f3f3f' : '#bdbdbd'}
+              />
+            </View>
+          )}
+
+          {/* Gradient Overlay */}
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)']}
+            style={styles.gradientOverlay}
+          />
+
+          {/* Content Over Image */}
+          <View style={styles.cardContent}>
+            {/* Category Badge */}
+            <View style={styles.categoryContainer}>
+              <View style={[
+                styles.categoryBadge,
+                { backgroundColor: isDark ? 'rgba(245, 24, 102, 0.9)' : 'rgba(245, 24, 102, 0.85)' }
+              ]}>
+                <Text style={styles.categoryText}>
+                  {translatedCategory.toUpperCase()}
+                </Text>
+              </View>
+              {ann.location && (
+                <View style={[
+                  styles.locationBadge,
+                  { backgroundColor: isDark ? 'rgba(40, 40, 40, 0.9)' : 'rgba(50, 50, 50, 0.85)' }
+                ]}>
+                  <Text style={styles.locationText}>
+                    {ann.location.toUpperCase()}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Title */}
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {ann.title}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }, [isTwoColumn, isDark, locale, router]);
+
+  const getItemLayout = useCallback((_: ArrayLike<Announcement> | null | undefined, index: number) => {
+    const cardHeight = isTwoColumn ? 280 : 220;
+    const rowIndex = isTwoColumn ? Math.floor(index / 2) : index;
+    const rowHeight = cardHeight + 16; // spacing
+    return { length: rowHeight, offset: rowHeight * rowIndex, index };
+  }, [isTwoColumn]);
+
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <ThemedText style={[styles.loadingText, { color: colors.muted }]}>{t.loading}</ThemedText>
+      <View style={[styles.loadingContainer, { backgroundColor: isDark ? '#000000' : '#ffffff', paddingTop: insets.top }]}> 
+        <ActivityIndicator size="large" color={isDark ? '#f51866' : tokens.colors.primary} />
+        <ThemedText style={[styles.loadingText, { color: isDark ? '#8b8b8b' : tokens.colors.muted }]}>{t.loading}</ThemedText>
       </View>
     );
   }
@@ -108,73 +202,64 @@ export default function AllAnnouncements() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.container, { backgroundColor: tokens.colors.bg || colors.bg, maxHeight: isWeb ? height : undefined }]}> 
-        <View style={[styles.header, { paddingTop: insets.top + 12, backgroundColor: colors.bg, borderBottomColor: colors.border, flexShrink: 0 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Ionicons name="arrow-back" size={20} color={colors.text} />
-            </TouchableOpacity>
-            <ThemedText style={[styles.headerTitle, { color: colors.text }]}>{t.title}</ThemedText>
+      <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+        {/* Header */}
+        <View style={[styles.header, { 
+          paddingTop: insets.top + 12, 
+          backgroundColor: isDark ? '#000000' : '#ffffff',
+          borderBottomWidth: 0
+        }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <TouchableOpacity 
+                onPress={() => router.back()} 
+                style={[styles.backButton, { 
+                  backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
+                  borderWidth: 0
+                }]}
+              >
+                <Ionicons name="arrow-back" size={20} color={isDark ? '#ffffff' : tokens.colors.text} />
+              </TouchableOpacity>
+              <ThemedText style={[styles.headerTitle, { color: isDark ? '#ffffff' : tokens.colors.text }]}>
+                {t.title}
+              </ThemedText>
+            </View>
+            <ThemedText style={[styles.countBadge, { color: isDark ? '#f51866' : '#E0245E' }]}>
+              {filteredAnnouncements.length}
+            </ThemedText>
           </View>
         </View>
 
+        {/* List */}
         <FlatList
           data={filteredAnnouncements}
           keyExtractor={(item) => item._id}
+          renderItem={renderAnnouncement}
+          numColumns={isTwoColumn ? 2 : 1}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-          showsVerticalScrollIndicator={true}
+          columnWrapperStyle={isTwoColumn ? styles.columnWrapper : undefined}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={isDark ? '#f51866' : tokens.colors.primary}
+            />
+          }
+          removeClippedSubviews
+          initialNumToRender={6}
+          maxToRenderPerBatch={8}
+          updateCellsBatchingPeriod={50}
+          windowSize={7}
+          getItemLayout={getItemLayout}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Ionicons name="albums-outline" size={64} color={colors.placeholder} />
-              <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>{t.noAnnouncements}</ThemedText>
+              <Ionicons name="albums-outline" size={64} color={isDark ? '#3f3f3f' : tokens.colors.placeholder} />
+              <ThemedText style={[styles.emptyTitle, { color: isDark ? '#ffffff' : tokens.colors.text }]}>
+                {t.noAnnouncements}
+              </ThemedText>
             </View>
           }
-          renderItem={({ item: ann, index }) => {
-            const firstImage = ann.images?.[0] ? getImageSrc(ann.images[0]) : null;
-            const sellerName = ann.user ? `${ann.user.firstName || ''} ${ann.user.lastName || ''}`.trim() : 'Anonim';
-            const isDarkMode = isDark;
-            const cardBg = isDarkMode ? '#121212' : '#fff';
-            return (
-              <View style={{ marginBottom: index === filteredAnnouncements.length - 1 ? 0 : 12 }}>
-                <Pressable
-                  onPress={() => router.push(`/announcement-details?id=${ann._id}`)}
-                  style={({ pressed }) => [
-                    styles.modernCard,
-                    styles.modernRow,
-                    {
-                      backgroundColor: cardBg,
-                      opacity: pressed ? 0.96 : 1,
-                      borderWidth: isDarkMode ? 1 : 0,
-                      borderColor: isDarkMode ? '#575757' : 'transparent',
-                    },
-                  ]}
-                >
-                  {!isDarkMode && (
-                    <LinearGradient colors={[tokens.colors.primary || '#355070', '#ffd']} style={styles.leftAccent} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
-                  )}
-                  <View style={[styles.squareImageWrapper, { marginLeft: isDarkMode ? 0 : 22 }]}>
-                    {firstImage ? (
-                      <Image source={{ uri: firstImage }} style={styles.squareImage} resizeMode="cover" />
-                    ) : (
-                      <View style={styles.squareImagePlaceholder}>
-                        <Ionicons name="image-outline" size={32} color={isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'} />
-                      </View>
-                    )}
-                  </View>
-                  <View style={styles.squareContent}>
-                    <ThemedText style={[styles.modernTitle, { color: isDarkMode ? '#fff' : '#111' }]} numberOfLines={2}>{ann.title}</ThemedText>
-                    <View style={[styles.categoryBadgeModern, { backgroundColor: isDarkMode ? 'rgba(245,24,102,0.15)' : 'rgba(255,255,255,0.55)', borderWidth: isDarkMode ? 1 : 0, borderColor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'transparent' }]}>
-                      <ThemedText style={[styles.categoryBadgeText, { color: isDarkMode ? '#ffabb7' : '#222' }]} numberOfLines={1}>{translateCategory(getCategoryKeyByLabel(ann.category) || ann.category, locale)}</ThemedText>
-                    </View>
-                    <ThemedText style={[styles.modernSub, { color: isDarkMode ? '#fff' : '#333', opacity: 0.75 }]} numberOfLines={1}>{sellerName}</ThemedText>
-                    <ThemedText style={[styles.modernDate, { color: isDarkMode ? '#fff' : '#666', opacity: 0.55 }]}>{t.posted} {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : 'ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</ThemedText>
-                  </View>
-                </Pressable>
-              </View>
-            );
-          }}
         />
       </View>
     </>
@@ -182,27 +267,144 @@ export default function AllAnnouncements() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 12, fontSize: 14, fontWeight: '500' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
-  backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  headerTitle: { fontSize: 24, fontWeight: '600' },
-  scrollView: { flex: 1, width: '100%' },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 16 },
-  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', marginTop: 16 },
-  modernCard: { borderRadius: 26, paddingVertical: 16, paddingHorizontal: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
-  modernRow: { flexDirection: 'row', alignItems: 'center' },
-  leftAccent: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 16, borderTopLeftRadius: 26, borderBottomLeftRadius: 26 },
-  squareImageWrapper: { width: 100, height: 100, borderRadius: 16, overflow: 'hidden', marginLeft: 22, marginRight: 14, backgroundColor: 'rgba(0,0,0,0.05)' },
-  squareImage: { width: '100%', height: '100%' },
-  squareImagePlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  squareContent: { flex: 1, gap: 6, paddingRight: 40 },
-  modernTitle: { fontSize: 17, fontWeight: '700', letterSpacing: 0.2 },
-  modernSub: { fontSize: 13, fontWeight: '600' },
-  modernDate: { fontSize: 11, fontWeight: '500', textTransform: 'uppercase', letterSpacing: 0.5 },
-  categoryBadgeModern: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.55)' },
-  categoryBadgeText: { fontSize: 12, fontWeight: '600' },
+  container: { 
+    flex: 1 
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  loadingText: { 
+    marginTop: 12, 
+    fontSize: 14, 
+    fontWeight: '500' 
+  },
+  emptyState: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    paddingVertical: 60, 
+    paddingHorizontal: 24 
+  },
+  emptyTitle: { 
+    fontSize: 20, 
+    fontWeight: '700', 
+    marginTop: 16 
+  },
+  header: { 
+    paddingHorizontal: 16, 
+    paddingBottom: 16
+  },
+  backButton: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: 22, 
+    alignItems: 'center', 
+    justifyContent: 'center'
+  },
+  headerTitle: { 
+    fontSize: 28, 
+    fontWeight: '700',
+    letterSpacing: 0.3
+  },
+  countBadge: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  scrollView: { 
+    flex: 1 
+  },
+  scrollContent: { 
+    paddingHorizontal: 16, 
+    paddingBottom: 24, 
+    paddingTop: 0,
+  },
+  columnWrapper: { justifyContent: 'space-between' },
+  cardSpacing: { marginBottom: 16 },
+  
+  // Card Design (Image Overlay Style)
+  card: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    height: 280,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  cardTwoColumn: {
+    width: '48.5%',
+  },
+  cardMobile: {
+    height: 220,
+  },
+  imageContainer: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  cardImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
+  },
+  cardContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    gap: 8,
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  categoryBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  categoryText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  locationBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  locationText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.8,
+  },
+  cardTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '700',
+    lineHeight: 26,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
 });
 

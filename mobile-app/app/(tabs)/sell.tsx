@@ -84,7 +84,6 @@ const TRANSLATIONS = {
     priceLabel: 'Preț (opțional)',
     pricePlaceholder: 'ex: 150 RON',
     priceHelper: 'Poți adăuga un preț pentru serviciul/produsul tău',
-    contactSection: 'Informații de contact',
     contactNameLabel: 'Persoana de contact*',
     contactNamePlaceholder: 'Nume și prenume',
     emailLabel: 'Adresa de email*',

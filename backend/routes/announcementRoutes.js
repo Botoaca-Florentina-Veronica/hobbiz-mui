@@ -2,6 +2,29 @@ const express = require('express');
 const router = express.Router();
 const Announcement = require('../models/Announcement');
 
+function escapeRegexLiteral(input) {
+  return String(input || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// GET /api/announcements/search-index?limit=800
+// Lightweight index for client-side (fuzzy) autocomplete.
+router.get('/search-index', async (req, res) => {
+  try {
+    const limitRaw = parseInt(req.query.limit, 10);
+    const limit = Math.min(Number.isFinite(limitRaw) ? limitRaw : 800, 1000);
+
+    const announcements = await Announcement.find({ archived: { $ne: true } })
+      .select('_id title category location price images createdAt')
+      .sort({ createdAt: -1 })
+      .limit(limit);
+
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la search-index:', error);
+    res.status(500).json({ error: 'Eroare server la index căutare anunțuri' });
+  }
+});
+
 // GET /api/announcements/search?q=cuvant - căutare anunțuri pentru autocomplete/suggestions
 router.get('/search', async (req, res) => {
   try {
@@ -10,7 +33,7 @@ router.get('/search', async (req, res) => {
       return res.json([]);
     }
 
-    const searchTerm = q.trim();
+    const searchTerm = escapeRegexLiteral(q.trim());
     const filter = {
       archived: { $ne: true },
       $or: [

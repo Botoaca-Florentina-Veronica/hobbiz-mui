@@ -32,6 +32,7 @@ export interface Negotiation {
   currentPrice: number;
   status: 'pending' | 'accepted' | 'rejected' | 'counter_offer' | 'pending_confirmation' | 'confirmed' | 'finalized';
   offerHistory: NegotiationOffer[];
+  lastActionBy: string;
   finalizedAt?: string;
   lastActionBy: string;
   lastActionAt: string;

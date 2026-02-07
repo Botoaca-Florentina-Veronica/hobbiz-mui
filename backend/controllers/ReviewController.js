@@ -1,5 +1,6 @@
 const Review = require("../models/Review");
 const User = require("../models/User");
+const Notification = require("../models/Notification");
 
 // Create a review for a user
 const createReview = async (req, res) => {
@@ -58,6 +59,87 @@ const createReview = async (req, res) => {
 
     await review.save();
     console.log("[ReviewController] review saved with id=", review._id);
+
+    // Fire-and-forget: notify reviewed user (in-app + optional push) if enabled in settings
+    (async () => {
+      try {
+        // Reload reviewed user with only needed fields (covers older docs too)
+        const reviewedUser = await User.findById(reviewedUserId).select(
+          "pushToken notificationSettings firstName lastName"
+        );
+        if (!reviewedUser) return;
+
+        const settings = reviewedUser.notificationSettings || {};
+        const allowReviewNotifications = settings.reviews !== false;
+        if (!allowReviewNotifications) return;
+
+        // Build notification message
+        let authorName = "Utilizator";
+        try {
+          const authorUser = await User.findById(authorId).select(
+            "firstName lastName"
+          );
+          if (authorUser) {
+            authorName =
+              `${authorUser.firstName || ""} ${authorUser.lastName || ""}`.trim() ||
+              authorName;
+          }
+        } catch (_) {}
+
+        const notifMessage = `${authorName} ți-a lăsat o recenzie (${parsedScore}/5)`;
+        const link = `/users/${reviewedUserId}/reviews`;
+
+        await Notification.create({
+          userId: reviewedUserId,
+          message: notifMessage,
+          link,
+          type: "review",
+          fromUserId: authorId,
+          actionDescription: "a lăsat o recenzie",
+        });
+
+        // Emit socket event for real-time delivery (if Socket.IO configured)
+        try {
+          const io = req.app && req.app.get ? req.app.get("io") : null;
+          const activeUsers = req.app && req.app.get ? req.app.get("activeUsers") : null;
+          if (io && activeUsers) {
+            const sid = activeUsers.get(String(reviewedUserId));
+            if (sid) io.to(sid).emit("newNotification", { userId: reviewedUserId });
+          }
+        } catch (_) {}
+
+        // Push notification (only if global push enabled)
+        const allowPush = settings.push !== false;
+        let tokens = [];
+        if (reviewedUser.pushToken) {
+          if (Array.isArray(reviewedUser.pushToken)) tokens = reviewedUser.pushToken;
+          else if (typeof reviewedUser.pushToken === "string") tokens = [reviewedUser.pushToken];
+        }
+        tokens = tokens.filter((t) => /^ExponentPushToken\[.+\]$/.test(t));
+
+        if (allowPush && tokens.length > 0) {
+          const doFetch = (url, opts) =>
+            typeof fetch !== "undefined"
+              ? fetch(url, opts)
+              : require("node-fetch")(url, opts);
+
+          await doFetch("https://exp.host/--/api/v2/push/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              to: tokens,
+              title: "Recenzie nouă",
+              body: notifMessage.slice(0, 120),
+              data: { link },
+              priority: "high",
+              sound: "default",
+            }),
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn("[ReviewController] Failed to notify reviewed user:", e?.message || e);
+      }
+    })();
 
     // Attach review reference to the reviewed user's document for quick lookup
     try {

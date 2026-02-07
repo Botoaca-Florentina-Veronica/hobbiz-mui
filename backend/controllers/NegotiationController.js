@@ -120,7 +120,7 @@ exports.createNegotiation = async (req, res) => {
     (async () => {
       try {
         const Notification = require('../models/Notification');
-        const seller = await User.findById(sellerId).select('pushToken firstName lastName');
+        const seller = await User.findById(sellerId).select('pushToken firstName lastName notificationSettings');
         const buyerUser = await User.findById(buyerId).select('firstName lastName');
         const buyerName = buyerUser ? (`${buyerUser.firstName || ''} ${buyerUser.lastName || ''}`).trim() || 'Utilizator' : 'Utilizator';
         const notifMessage = `${buyerName} ți-a propus un preț pentru anunțul "${announcement.title || ''}"`;
@@ -142,14 +142,23 @@ exports.createNegotiation = async (req, res) => {
           }
         } catch (_) {}
 
-        // Send push notification if seller has Expo push token
-        if (seller && seller.pushToken && /^ExponentPushToken\[.+\]$/.test(seller.pushToken)) {
+        // Send push notification if seller allows push and has Expo push token(s)
+        const settings = seller && seller.notificationSettings ? seller.notificationSettings : {};
+        const allowPush = settings.push !== false;
+        let tokens = [];
+        if (seller && seller.pushToken) {
+          if (Array.isArray(seller.pushToken)) tokens = seller.pushToken;
+          else if (typeof seller.pushToken === 'string') tokens = [seller.pushToken];
+        }
+        tokens = tokens.filter((t) => /^ExponentPushToken\[.+\]$/.test(t));
+
+        if (allowPush && tokens.length > 0) {
           const doFetch = (url, opts) => typeof fetch !== 'undefined' ? fetch(url, opts) : require('node-fetch')(url, opts);
           await doFetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              to: seller.pushToken,
+              to: tokens,
               title: 'Propunere de preț',
               body: notifMessage.slice(0, 120),
               data: { link: `/negotiations/${negotiation._id}` },

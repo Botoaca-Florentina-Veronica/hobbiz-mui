@@ -10,26 +10,30 @@ import api from '../src/services/api';
 import { Toast } from '../components/ui/Toast';
 import { useLocale } from '../src/context/LocaleContext';
 import { useAuth } from '../src/context/AuthContext';
+import storage from '../src/services/storage';
+import { registerForPushNotificationsAsync } from '../src/services/notificationService';
 
 export default function NotificationSettingsScreen() {
   const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
-  // Default settings
-  const [settings, setSettings] = useState({
+  // Default settings (keep in sync with backend defaults)
+  const defaultSettings = {
     email: true,
     push: true,
     messages: true,
     reviews: true,
     favorites: true,
-    promotions: false
-  });
+    promotions: false,
+  };
+
+  const [settings, setSettings] = useState(defaultSettings);
 
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -78,12 +82,13 @@ export default function NotificationSettingsScreen() {
   useEffect(() => {
     if (user?.notificationSettings) {
       setSettings({
-        email: user.notificationSettings.email ?? true,
-        push: user.notificationSettings.push ?? true,
-        messages: user.notificationSettings.messages ?? true,
-        reviews: user.notificationSettings.reviews ?? true,
-        favorites: true,
-        promotions: user.notificationSettings.promotions ?? false
+        ...defaultSettings,
+        email: user.notificationSettings.email ?? defaultSettings.email,
+        push: user.notificationSettings.push ?? defaultSettings.push,
+        messages: user.notificationSettings.messages ?? defaultSettings.messages,
+        reviews: user.notificationSettings.reviews ?? defaultSettings.reviews,
+        favorites: (user.notificationSettings as any).favorites ?? defaultSettings.favorites,
+        promotions: user.notificationSettings.promotions ?? defaultSettings.promotions,
       });
       setLoading(false);
     } else {
@@ -96,7 +101,10 @@ export default function NotificationSettingsScreen() {
       setLoading(true);
       const res = await api.get('/api/users/profile');
       if (res.data && res.data.notificationSettings) {
-        setSettings(res.data.notificationSettings);
+        setSettings({
+          ...defaultSettings,
+          ...(res.data.notificationSettings || {}),
+        });
       } else {
         // If no settings exist on backend, keep defaults
         console.log('No notification settings found, using defaults');
@@ -118,6 +126,37 @@ export default function NotificationSettingsScreen() {
       setSaving(true);
       await api.put('/api/users/profile', { notificationSettings: newSettings });
       console.log('✓ Notification settings saved successfully');
+
+      // If push was toggled, also update push token registration on backend
+      if (key === 'push') {
+        if (newSettings.push === false) {
+          // Remove this device token from backend if we have it stored
+          try {
+            const storedToken = await storage.getItemAsync('pushToken');
+            if (storedToken) {
+              await api.delete('/api/users/push-token', { data: { token: storedToken } });
+            } else {
+              await api.delete('/api/users/push-token');
+            }
+          } catch (_) {
+            // non-fatal
+          }
+        } else {
+          // Register and send token to backend
+          try {
+            const tokenValue = await registerForPushNotificationsAsync();
+            if (tokenValue) {
+              await storage.setItemAsync('pushToken', tokenValue);
+              await api.post('/api/users/push-token', { token: tokenValue });
+            }
+          } catch (_) {
+            // non-fatal
+          }
+        }
+      }
+
+      // Refresh user context so the rest of the app sees updated settings
+      try { await refreshProfile(); } catch (_) {}
       // Optionally show a subtle success indicator
       // showToast(t.saveSuccess, 'success');
     } catch (error) {
@@ -148,7 +187,7 @@ export default function NotificationSettingsScreen() {
         ios_backgroundColor={tokens.colors.border}
         onValueChange={() => handleToggle(key)}
         value={settings[key]}
-        disabled={loading}
+        disabled={loading || saving}
       />
     </View>
   );

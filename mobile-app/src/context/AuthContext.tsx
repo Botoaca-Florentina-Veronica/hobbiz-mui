@@ -23,6 +23,7 @@ interface UserProfile {
     push: boolean;
     messages: boolean;
     reviews: boolean;
+    favorites?: boolean;
     promotions: boolean;
   };
 }
@@ -36,6 +37,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   restore: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
   setGuestMode: (enabled: boolean) => void;
 }
 
@@ -49,6 +51,7 @@ const defaultAuthContext: AuthContextType = {
   login: async () => false,
   logout: async () => {},
   restore: async () => {},
+  refreshProfile: async () => {},
   setGuestMode: () => {},
 };
 
@@ -60,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (): Promise<UserProfile | null> => {
     try {
       const res = await api.get('/api/users/profile');
       // Backend returnează direct obiectul user fără wrapper
@@ -69,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const ADMIN_USER_ID = '6808bf9a48e492acb8db7173';
         const isHardcodedAdmin = res.data._id === ADMIN_USER_ID;
         
-        setUser({
+        const profile: UserProfile = {
           id: res.data._id,
           email: res.data.email,
           firstName: res.data.firstName,
@@ -86,16 +89,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             push: true,
             messages: true,
             reviews: true,
+            favorites: true,
             promotions: false
           },
-        });
+        };
+
+        // Ensure favorites key exists for older backend payloads
+        if (profile.notificationSettings && typeof (profile.notificationSettings as any).favorites === 'undefined') {
+          (profile.notificationSettings as any).favorites = true;
+        }
+
+        setUser(profile);
+        return profile;
       } else {
         setUser(null);
+        return null;
       }
     } catch (e) {
       setUser(null);
+      return null;
     }
   }, []);
+
+  const refreshProfile = useCallback(async () => {
+    await fetchProfile();
+  }, [fetchProfile]);
 
   const restore = useCallback(async () => {
     setLoading(true);
@@ -104,13 +122,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (stored) {
         setToken(stored);
         try {
-          await fetchProfile();
+          const profile = await fetchProfile();
           setIsGuest(false); // User is authenticated, not a guest
           // After profile is available, register for push notifications
           try {
-            const tokenValue = await registerForPushNotificationsAsync();
-            if (tokenValue) {
-              try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+            const allowPush = profile?.notificationSettings?.push !== false;
+            if (allowPush) {
+              const tokenValue = await registerForPushNotificationsAsync();
+              if (tokenValue) {
+                try { await storage.setItemAsync('pushToken', tokenValue); } catch (_) {}
+                try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+              }
             }
           } catch (e) {
             // ignore push errors to not block auth
@@ -143,13 +165,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data?.token) {
         await saveToken(data.token);
         setToken(data.token);
-        await fetchProfile();
+        const profile = await fetchProfile();
 
         // Register for push notifications
         try {
-          const tokenValue = await registerForPushNotificationsAsync();
-          if (tokenValue) {
-            try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+          const allowPush = profile?.notificationSettings?.push !== false;
+          if (allowPush) {
+            const tokenValue = await registerForPushNotificationsAsync();
+            if (tokenValue) {
+              try { await storage.setItemAsync('pushToken', tokenValue); } catch (_) {}
+              try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+            }
           }
         } catch (e) {
           // ignore
@@ -171,11 +197,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      // Try to get current push token to remove only this device
-      let tokenValue;
+      // Try to remove only this device token (use stored token first to avoid permission prompts)
+      let tokenValue: string | null | undefined;
       try {
-        tokenValue = await registerForPushNotificationsAsync();
+        tokenValue = await storage.getItemAsync('pushToken');
       } catch (_) {}
+      if (!tokenValue) {
+        try {
+          tokenValue = await registerForPushNotificationsAsync();
+        } catch (_) {}
+      }
 
       try { 
         if (tokenValue) {
@@ -188,6 +219,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await doLogout();
       setUser(null);
       setIsGuest(false);
+      try { await storage.deleteItemAsync('pushToken'); } catch (_) {}
     } finally {
       setLoading(false);
     }
@@ -203,7 +235,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ loading, user, token, isAuthenticated: !!user && !!token && !isGuest, isGuest, login, logout, restore, setGuestMode }}>
+    <AuthContext.Provider value={{ loading, user, token, isAuthenticated: !!user && !!token && !isGuest, isGuest, login, logout, restore, refreshProfile, setGuestMode }}>
       {children}
     </AuthContext.Provider>
   );
