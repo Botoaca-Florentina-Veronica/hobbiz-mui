@@ -326,17 +326,17 @@ exports.acceptOffer = async (req, res) => {
     try {
       let conversationId;
       try {
-        const ownerId = String(negotiation.announcement.user || negotiation.seller);
-        const otherId = String(negotiation.buyer);
+        const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+        const otherId = String(negotiation.buyer._id);
         conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
-        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+        conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
       const msg = await new Message({
         conversationId,
-        senderId: userId,
+        senderId: String(negotiation.seller._id),
         senderRole: 'vanzator',
-        destinatarId: negotiation.buyer,
+        destinatarId: String(negotiation.buyer._id),
         text: encrypt(`Preț acceptat: ${negotiation.currentPrice} RON. Ambii trebuie să confirmați colaborarea.`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
@@ -348,8 +348,8 @@ exports.acceptOffer = async (req, res) => {
       const io = req.app && req.app.get ? req.app.get('io') : null;
       const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
       if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer));
-        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
+        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
         let senderInfo = null;
         try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
         if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
@@ -410,17 +410,17 @@ exports.rejectOffer = async (req, res) => {
     try {
       let conversationId;
       try {
-        const ownerId = String(negotiation.announcement.user || negotiation.seller);
-        const otherId = String(negotiation.buyer);
+        const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+        const otherId = String(negotiation.buyer._id);
         conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
-        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+        conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
       const msg = await new Message({
         conversationId,
-        senderId: userId,
+        senderId: String(negotiation.seller._id),
         senderRole: 'vanzator',
-        destinatarId: negotiation.buyer,
+        destinatarId: String(negotiation.buyer._id),
         text: encrypt(`Oferta refuzată: ${negotiation.currentPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
@@ -432,8 +432,8 @@ exports.rejectOffer = async (req, res) => {
       const io = req.app && req.app.get ? req.app.get('io') : null;
       const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
       if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer));
-        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
+        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
         let senderInfo = null;
         try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
         if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
@@ -499,17 +499,17 @@ exports.counterOffer = async (req, res) => {
     try {
       let conversationId;
       try {
-        const ownerId = String(negotiation.announcement.user || negotiation.seller);
-        const otherId = String(negotiation.buyer);
+        const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+        const otherId = String(negotiation.buyer._id);
         conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
-        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+        conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
       const msg = await new Message({
         conversationId,
-        senderId: userId,
+        senderId: String(negotiation.seller._id),
         senderRole: 'vanzator',
-        destinatarId: negotiation.buyer,
+        destinatarId: String(negotiation.buyer._id),
         text: encrypt(`Contraofertă: ${counterPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: counterPrice, action: 'counter_offer' },
@@ -521,8 +521,8 @@ exports.counterOffer = async (req, res) => {
       const io = req.app && req.app.get ? req.app.get('io') : null;
       const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
       if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer));
-        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
+        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
         let senderInfo = null;
         try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
         if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
@@ -581,17 +581,17 @@ exports.acceptCounterOffer = async (req, res) => {
     try {
       let conversationId;
       try {
-        const ownerId = String(negotiation.announcement.user || negotiation.seller);
-        const otherId = String(negotiation.buyer);
+        const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+        const otherId = String(negotiation.buyer._id);
         conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
-        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+        conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
       const msg = await new Message({
         conversationId,
-        senderId: userId,
+        senderId: String(negotiation.buyer._id),
         senderRole: 'cumparator',
-        destinatarId: negotiation.seller,
+        destinatarId: String(negotiation.seller._id),
         text: encrypt(`Contraofertă acceptată: ${negotiation.currentPrice} RON`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
@@ -603,8 +603,8 @@ exports.acceptCounterOffer = async (req, res) => {
       const io = req.app && req.app.get ? req.app.get('io') : null;
       const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
       if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer));
-        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
+        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
         let senderInfo = null;
         try { const buyerUser = await User.findById(userId).select('firstName lastName avatar'); if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar }; } catch (_) {}
         if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
@@ -670,17 +670,17 @@ exports.buyerCounterOffer = async (req, res) => {
     try {
       let conversationId;
       try {
-        const ownerId = String(negotiation.announcement.user || negotiation.seller);
-        const otherId = String(negotiation.buyer);
+        const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+        const otherId = String(negotiation.buyer._id);
         conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
-        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+        conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
       const msg = await new Message({
         conversationId,
-        senderId: userId,
+        senderId: String(negotiation.buyer._id),
         senderRole: 'cumparator',
-        destinatarId: negotiation.seller,
+        destinatarId: String(negotiation.seller._id),
         text: encrypt(`Contraofertă (buyer): ${newPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: newPrice, action: 'counter_offer' },
@@ -692,8 +692,8 @@ exports.buyerCounterOffer = async (req, res) => {
       const io = req.app && req.app.get ? req.app.get('io') : null;
       const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
       if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer));
-        const sellerSocket = activeUsers.get(String(negotiation.seller));
+        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
+        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
         let senderInfo = null;
         try { const buyerUser = await User.findById(userId).select('firstName lastName avatar'); if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar }; } catch (_) {}
         if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
@@ -800,18 +800,18 @@ exports.cancelNegotiation = async (req, res) => {
     try {
       let conversationId;
       try {
-        const ownerId = String(negotiation.announcement.user || negotiation.seller);
-        const otherId = String(negotiation.buyer);
+        const ownerId = String(negotiation.announcement.user || negotiation.seller._id);
+        const otherId = String(negotiation.buyer._id);
         conversationId = [ownerId, otherId, String(negotiation.announcement._id)].join('-');
       } catch (e) {
-        conversationId = [String(negotiation.buyer), String(negotiation.seller)].sort().join('-');
+        conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
 
       const msg = await new Message({
         conversationId,
         senderId: userId,
-        senderRole: userId === String(negotiation.buyer) ? 'cumparator' : 'vanzator',
-        destinatarId: userId === String(negotiation.buyer) ? negotiation.seller : negotiation.buyer,
+        senderRole: userId === String(negotiation.buyer._id) ? 'cumparator' : 'vanzator',
+        destinatarId: userId === String(negotiation.buyer._id) ? String(negotiation.seller._id) : String(negotiation.buyer._id),
         text: `Negociere anulată.`,
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
@@ -821,7 +821,7 @@ exports.cancelNegotiation = async (req, res) => {
       const io = req.app && req.app.get ? req.app.get('io') : null;
       const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
       if (io && activeUsers) {
-        const destId = userId === String(negotiation.buyer) ? String(negotiation.seller) : String(negotiation.buyer);
+        const destId = userId === String(negotiation.buyer._id) ? String(negotiation.seller._id) : String(negotiation.buyer._id);
         const sourceSocket = activeUsers.get(String(userId));
         const destSocket = activeUsers.get(destId);
         

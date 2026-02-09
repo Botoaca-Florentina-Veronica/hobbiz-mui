@@ -499,6 +499,14 @@ const getConversations = async (req, res) => {
       let otherParticipantId =
         message.senderId === userId ? message.destinatarId : message.senderId;
       if (!otherParticipantId || otherParticipantId === userId) continue;
+      
+      // Skip invalid messages (those with undefined or null sender/recipient)
+      if (!message.senderId || !message.destinatarId || 
+          message.senderId === 'undefined' || message.destinatarId === 'undefined') {
+        console.warn(`⚠️ Skipping invalid message ${message._id}: invalid sender or recipient`);
+        continue;
+      }
+      
       // Determină announcementId și pentru mesaje legacy: dacă lipsește pe mesaj, încearcă să-l extragi din conversationId (format cu 3 părți)
       let announcementId = message.announcementId || "";
       if (!announcementId && message.conversationId) {
