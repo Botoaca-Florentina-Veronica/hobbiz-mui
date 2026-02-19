@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
+import { useAuth } from '../context/AuthContext.jsx';
 import '../pages/LoginSignup.css';
 import introImg400 from '../assets/images/intro-web-400.webp';
 import introImg800 from '../assets/images/intro-web-800.webp';
@@ -13,6 +14,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function LoginPage() {
   const { t } = useTranslation();
+  const { refreshUser } = useAuth() || {};
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -67,6 +69,9 @@ export default function LoginPage() {
       // Salvează NOUL token în localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data.userId);
+
+      // Re-hidratează AuthContext imediat (altfel user/favorite apar cu întârziere de până la 60s)
+      await refreshUser?.({ force: true });
 
       // Redirect către pagina principală sau dashboard
       navigate('/');

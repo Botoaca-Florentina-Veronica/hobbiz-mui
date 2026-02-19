@@ -31,6 +31,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const negotiationRoutes = require('./routes/negotiationRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -262,6 +263,7 @@ app.use('/api/favorites', favoriteRoutes); // Rute pentru favorite persistente
 app.use('/api/messages', messageRoutes); // Rute pentru mesaje chat
 app.use('/api/reviews', reviewRoutes); // Rute pentru recenzii (create/list)
 app.use('/api/negotiations', negotiationRoutes); // Rute pentru negocieri
+app.use('/api/contact', contactRoutes); // Rute pentru formularul de contact
 
 // Servire imagini uploadate din frontend/public/uploads
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));

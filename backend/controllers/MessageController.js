@@ -3,15 +3,17 @@ const Notification = require("../models/Notification");
 const User = require("../models/User");
 const { Types } = require("mongoose");
 const { encrypt, decrypt } = require("../services/encryptionService");
+const { sanitizeText, sanitizeEmoji } = require("../utils/sanitize");
 
 // Adaugă sau actualizează o reacție la un mesaj; repetarea aceleiași reacții o elimină (toggle)
 const reactToMessage = async (req, res) => {
   try {
     const { id } = req.params; // message id
-    const { emoji } = req.body;
+    const rawEmoji = req.body.emoji;
+    const emoji = sanitizeEmoji(rawEmoji);
     const userId = req.userId;
 
-    if (!emoji || typeof emoji !== "string") {
+    if (!emoji) {
       return res.status(400).json({ error: "Emoji lipsă sau invalid" });
     }
 
@@ -231,7 +233,7 @@ const createMessage = async (req, res) => {
       };
     }
 
-    if (hasText) messageData.text = encrypt(String(text).trim());
+    if (hasText) messageData.text = encrypt(sanitizeText(String(text).trim()));
     // Reply info (safe subset)
     // Acceptă și string (din multipart) și obiect nativ
     if (typeof replyTo === "string") {
@@ -245,7 +247,7 @@ const createMessage = async (req, res) => {
       messageData.replyTo = {
         messageId: String(replyTo.messageId || ""),
         senderId: String(replyTo.senderId || ""),
-        text: replyTo.text ? encrypt(String(replyTo.text).slice(0, 300)) : undefined,
+        text: replyTo.text ? encrypt(sanitizeText(String(replyTo.text).slice(0, 300))) : undefined,
         image: replyTo.image ? String(replyTo.image) : undefined,
       };
     }

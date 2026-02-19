@@ -19,7 +19,7 @@ let API_URL = import.meta.env.VITE_API_URL;
 if (!API_URL) {
   const isDev = import.meta.env.MODE === 'development';
   if (isDev) {
-    API_URL = 'http://localhost:5000';
+    API_URL = ''; // URL relativ – Vite proxy redirecționează /api → localhost:3000
   } else if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     // Dacă suntem pe Netlify și nu avem VITE_API_URL, folosește backend-ul pe Render (configurat în CORS)

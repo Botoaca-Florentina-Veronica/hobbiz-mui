@@ -17,6 +17,13 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       include: ['react-slick']
     },
+    server: {
+      proxy: {
+        '/api': 'http://localhost:3000',
+        '/auth': 'http://localhost:3000',
+        '/uploads': 'http://localhost:3000',
+      }
+    },
     build: {
       assetsInclude: ['**/*.{jpg,jpeg,png,webp,svg}'],
       commonjsOptions: {

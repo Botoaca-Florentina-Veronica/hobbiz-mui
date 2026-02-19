@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
   const [fullFavorites, setFullFavorites] = useState([]); // obiecte populate
   const [loading, setLoading] = useState(true);
   const lastHydrateRef = useRef(0);
+  // Ref sincronizat cu starea `favorites` pentru a preveni stale closure în toggleFavorite
+  // (util când userul face toggle rapid de 2x pe același anunț)
+  const favoritesRef = useRef([]);
   
   // Ref pentru a urmări acțiunile "în zbor" (optimistic toggle)
   // Cheie: announcementId, Valoare: 'added' | 'removed'
@@ -45,6 +48,9 @@ export const AuthProvider = ({ children }) => {
     });
     return Array.from(set);
   }, []);
+
+  // Ține `favoritesRef` mereu sincronizat cu starea curentă
+  favoritesRef.current = favorites;
 
   const hydrate = useCallback(async (opts = {}) => {
     const now = Date.now();
@@ -101,12 +107,20 @@ export const AuthProvider = ({ children }) => {
       const finalIds = applyPendingToggles(favData.favoriteIds || []);
       setFavorites(finalIds);
       
+      // Persistă în localStorage astfel încât la refresh paginile de listing
+      // să citească imediat starea corectă (fără flash de favorite goale)
+      try {
+        localStorage.setItem(`favoriteAnnouncements_${profile._id}`, JSON.stringify(finalIds));
+      } catch {}
+      
       setFullFavorites(favData.favorites || []);
     } catch (e) {
       console.warn('Hydrate failed:', e.response?.data || e.message);
       if (e.response?.status === 401) {
-        // token invalid - șterge toate datele de autentificare
+        // token invalid - șterge toate datele de autentificare + cache-ul de favorite
         try {
+          const uid = localStorage.getItem('userId');
+          if (uid) localStorage.removeItem(`favoriteAnnouncements_${uid}`);
           localStorage.removeItem('token');
           localStorage.removeItem('userId');
           localStorage.removeItem('lastAvatarUrl');
@@ -203,15 +217,18 @@ export const AuthProvider = ({ children }) => {
 
   // Toggle favorite (optimistic + support guest + pending logic)
   const toggleFavorite = async (announcementId) => {
-    const isFav = favorites.includes(announcementId);
+    // Citim din ref (nu din closure) pentru a obține valoarea curentă chiar și la toggle rapid
+    const isFav = favoritesRef.current.includes(announcementId);
     
     // Urmărim acțiunea
     pendingTogglesRef.current.set(announcementId, isFav ? 'removed' : 'added');
 
     // 1. Optimistic Update State
-    setFavorites((prev) => {
-      return isFav ? prev.filter(id => id !== announcementId) : [...prev, announcementId];
-    });
+    const optimisticIds = isFav
+      ? favoritesRef.current.filter(id => id !== announcementId)
+      : [...favoritesRef.current, announcementId];
+
+    setFavorites(optimisticIds);
 
     // 2. Persist
     if (!user) {
@@ -252,6 +269,10 @@ export const AuthProvider = ({ children }) => {
     }
 
     // Logic pentru User Autentificat (API)
+    // Persistăm optimist în localStorage cheia corectă, astfel la refresh
+    // listing pages inițializează imediat cu starea corectă (fără flash de favorite goale)
+    try { localStorage.setItem(`favoriteAnnouncements_${user._id}`, JSON.stringify(optimisticIds)); } catch {}
+
     try {
       if (isFav) {
         await apiClient.delete(`/api/favorites/${announcementId}`);
@@ -268,14 +289,15 @@ export const AuthProvider = ({ children }) => {
       pendingTogglesRef.current.delete(announcementId);
       window.dispatchEvent(new Event('favorites:updated'));
     } catch (e) {
-      // Revert on error
+      // Revert on error — inclusiv în localStorage
       console.error("Favorites toggle error", e);
       pendingTogglesRef.current.delete(announcementId);
       
-      setFavorites((prev) => {
-         // Logic invers pentru revert
-         return isFav ? [...prev, announcementId] : prev.filter(id => id !== announcementId);
-      });
+      const revertedIds = isFav
+        ? [...favoritesRef.current, announcementId]
+        : favoritesRef.current.filter(id => id !== announcementId);
+      setFavorites(revertedIds);
+      try { localStorage.setItem(`favoriteAnnouncements_${user._id}`, JSON.stringify(revertedIds)); } catch {}
       return { error: e.response?.data?.error || 'Eroare la actualizare favorite' };
     }
   };

@@ -152,6 +152,11 @@ export default function ArchivedAnnouncementsPage() {
 
   useEffect(() => {
     const handleFavoritesUpdated = () => {
+      // For authenticated users, sync happens via the useEffect([user, authFavorites]) above.
+      // Reading from localStorage here would read from a key AuthContext never writes to
+      // (it only writes 'favoriteAnnouncements_guest'), causing favoriteIds to be wiped.
+      if (user) return;
+
       const stored = localStorage.getItem(FAVORITES_KEY);
       if (!stored) { setFavoriteIds([]); return; }
       try {
@@ -168,7 +173,7 @@ export default function ArchivedAnnouncementsPage() {
       window.removeEventListener('favorites:updated', handleFavoritesUpdated);
       window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [FAVORITES_KEY]);
+  }, [FAVORITES_KEY, user]);
 
   const handleToggleFavorite = async (announcementId, e) => {
     e.stopPropagation();

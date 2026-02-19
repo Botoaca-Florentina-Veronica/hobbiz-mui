@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -130,6 +130,8 @@ export default function MyAnnouncementsScreen() {
   const { isDark, tokens } = useAppTheme();
   const { locale } = useLocale();
   const t = TRANSLATIONS[locale] || TRANSLATIONS.ro;
+  const params = useLocalSearchParams();
+  const fromPostSuccess = params.fromPostSuccess === 'true';
   
   // English labels for categories keyed by category key from CATEGORY_DEFS
   const CATEGORY_LABELS_EN: Record<string, string> = {
@@ -358,7 +360,13 @@ export default function MyAnnouncementsScreen() {
   {/* Remove default header bottom border on this screen to avoid a visible line above the search container */}
   <View style={[styles.header, { paddingTop: insets.top, borderBottomWidth: 0, borderBottomColor: 'transparent' }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <TouchableOpacity onPress={() => { try { router.back(); } catch (e) { try { router.push('/'); } catch (_) {} } }} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
+            <TouchableOpacity onPress={() => { 
+              if (fromPostSuccess) {
+                router.replace('/(tabs)');
+              } else {
+                try { router.back(); } catch (e) { try { router.push('/'); } catch (_) {} }
+              }
+            }} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
               <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
             </TouchableOpacity>
             <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.title}</ThemedText>

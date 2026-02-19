@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function OAuthSuccess() {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth() || {};
 
   useEffect(() => {
     // Extrage tokenul din query string
@@ -18,12 +20,12 @@ export default function OAuthSuccess() {
         console.warn('Failed to clear old tokens:', e);
       }
       localStorage.setItem('token', token);
-      // Poți face un request pentru profilul userului dacă vrei
-      navigate('/');
+      // Re-hidratează AuthContext imediat după OAuth (altfel user/favorite apar cu întârziere)
+      refreshUser?.({ force: true }).finally(() => navigate('/'));
     } else {
       navigate('/login');
     }
-  }, [navigate]);
+  }, [navigate, refreshUser]);
 
   return <div>Se finalizează autentificarea...</div>;
 }

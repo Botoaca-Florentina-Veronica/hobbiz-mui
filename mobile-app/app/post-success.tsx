@@ -74,7 +74,10 @@ export default function PostSuccessScreen() {
   }, []);
 
   const handleGoToAnnouncements = () => {
-    router.replace('/my-announcements');
+    router.push({
+      pathname: '/my-announcements',
+      params: { fromPostSuccess: 'true' }
+    });
   };
 
   const handleGoHome = () => {

@@ -399,6 +399,7 @@ export default function ChatPage() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() && !selectedImage) return;
+    if (newMessage.length > 2000) return;
     const tempId = Date.now().toString();
     const payload = {
       _id: tempId, conversationId: selectedConversation.conversationId, senderId: userId,
@@ -788,7 +789,7 @@ export default function ChatPage() {
                     <button type="button" className="chat-input-button" onClick={() => fileInputRef.current?.click()}>📎</button>
                     <button type="button" className="chat-input-button" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😊</button>
                   </div>
-                  <input className="chat-input" placeholder={t('chat.messagePlaceholder')} value={newMessage} onChange={e => { setNewMessage(e.target.value); emitTyping([userId, selectedConversation.id].sort().join('-'), true); }}/>
+                  <input className="chat-input" placeholder={t('chat.messagePlaceholder')} value={newMessage} maxLength={2000} onChange={e => { setNewMessage(e.target.value); emitTyping([userId, selectedConversation.id].sort().join('-'), true); }}/>
                   <button type="submit" className="chat-send-button" disabled={!newMessage && !selectedImage}>➤</button>
                 </div>
                 <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleImageSelect} />

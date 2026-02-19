@@ -79,6 +79,11 @@ export default function AnnouncementsByCategory() {
   // Listen for favorites updates (storage + custom event) so UI stays in sync across app
   useEffect(() => {
     const handleFavoritesUpdated = () => {
+      // For authenticated users, sync happens via the useEffect([user, authFavorites]) above.
+      // Reading from localStorage here would read from a key AuthContext never writes to
+      // (it only writes 'favoriteAnnouncements_guest'), causing favoriteIds to be wiped.
+      if (user) return;
+
       const stored = localStorage.getItem(FAVORITES_KEY);
       if (!stored) {
         setFavoriteIds([]);
@@ -104,7 +109,7 @@ export default function AnnouncementsByCategory() {
       window.removeEventListener('favorites:updated', handleFavoritesUpdated);
       window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [FAVORITES_KEY]);
+  }, [FAVORITES_KEY, user]);
 
   // Get unique locations from announcements
   const uniqueLocations = useMemo(() => {

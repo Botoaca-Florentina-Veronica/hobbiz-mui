@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LegalSection.css';
 import appStoreImg from '../assets/images/appStore.png';
 import googlePlayImg from '../assets/images/googlePlay.png';
 import { useTranslation } from 'react-i18next';
+import ContactModal from './ContactModal';
 
 const LegalSection = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [contactOpen, setContactOpen] = useState(false);
 
   const handleLinkClick = (e, to) => {
     e.preventDefault();
@@ -15,6 +17,7 @@ const LegalSection = () => {
   };
 
   return (
+    <>
     <div className="legal-section">
       <div className="legal-section__column">
         <div className="legal-section__logo">
@@ -35,7 +38,7 @@ const LegalSection = () => {
         <h4>{t('legal.usefulLinks')}</h4>
         <ul>
           <li><a href="/despre" onClick={(e) => handleLinkClick(e, '/despre')}>{t('legal.about')}</a></li>
-          <li><a href="/contact" onClick={(e) => handleLinkClick(e, '/contact')}>{t('legal.contact')}</a></li>
+          <li><a href="#" onClick={(e) => { e.preventDefault(); setContactOpen(true); }}>{t('legal.contact')}</a></li>
           <li><a href="/cum-functioneaza" onClick={(e) => handleLinkClick(e, '/cum-functioneaza')}>{t('legal.howItWorks')}</a></li>
         </ul>
       </div>
@@ -56,6 +59,8 @@ const LegalSection = () => {
         </div>
       </div>
     </div>
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+    </>
   );
 };
 

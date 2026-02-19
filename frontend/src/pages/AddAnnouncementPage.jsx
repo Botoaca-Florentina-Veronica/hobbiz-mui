@@ -6,10 +6,18 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, Card, CardMedia, CardContent, Paper } from '@mui/material';
+import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, Card, CardMedia, CardContent, Paper, Avatar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import ShareIcon from '@mui/icons-material/Share';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import MessageIcon from '@mui/icons-material/Message';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import CloseIcon from '@mui/icons-material/Close';
@@ -39,10 +47,13 @@ import { localitatiPeJudet } from '../assets/comunePeJudet';
 const judete = ["Toată țara", ...Object.keys(localitatiPeJudet)];
 
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import translateCategory from '../utils/translateCategory';
+import AnnouncementPreviewDialog from '../components/AnnouncementPreviewDialog';
 
 export default function AddAnnouncementPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   // Șterge draftul de anunț la deconectare și resetează complet starea formularului
   useEffect(() => {
     const handleLogout = () => {
@@ -98,6 +109,26 @@ export default function AddAnnouncementPage() {
   
   // State pentru preview modal
   const [showPreview, setShowPreview] = useState(false);
+  const [selectedPreviewIdx, setSelectedPreviewIdx] = useState(0);
+  const [previewImgFade, setPreviewImgFade] = useState(true);
+  useEffect(() => { if (showPreview) { setSelectedPreviewIdx(0); setPreviewImgFade(true); } }, [showPreview]);
+
+  const handlePreviewPrev = (e) => {
+    e.stopPropagation();
+    setPreviewImgFade(false);
+    setTimeout(() => {
+      setSelectedPreviewIdx(i => i > 0 ? i - 1 : imagePreviews.length - 1);
+      setPreviewImgFade(true);
+    }, 200);
+  };
+  const handlePreviewNext = (e) => {
+    e.stopPropagation();
+    setPreviewImgFade(false);
+    setTimeout(() => {
+      setSelectedPreviewIdx(i => i < imagePreviews.length - 1 ? i + 1 : 0);
+      setPreviewImgFade(true);
+    }, 200);
+  };
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -828,52 +859,125 @@ export default function AddAnnouncementPage() {
             id={anchorEl ? 'location-popover' : undefined}
             open={Boolean(anchorEl)}
             anchorEl={anchorEl}
-            onClose={() => setAnchorEl(null)}
+            onClose={() => { setAnchorEl(null); setSelectedJudet(null); setLocationSearch(''); }}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            BackdropProps={{
+              sx: {
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.18)'
+              }
+            }}
             PaperProps={{
               sx: {
-                minWidth: 300,
-                width: { xs: 320, sm: 380 },
-                marginLeft: '60px',
-                marginTop: '12px',
-                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
-                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit',
-                border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : '1px solid #e5e7eb',
-                borderRadius: 10,
-                boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
-                p: 1,
-                overflow: 'hidden'
+                width: { xs: 'min(92vw, 340px)', sm: 400 },
+                mt: '8px',
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2c2c2c' : '#ffffff',
+                color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a',
+                border: (theme) => theme.palette.mode === 'dark' ? '1px solid #484848' : '1px solid #e0e0e0',
+                borderRadius: '16px',
+                boxShadow: '0 16px 40px rgba(0,0,0,0.18)',
+                overflow: 'hidden',
+                p: 0
               }
             }}
           >
-            <Box sx={{ maxHeight: 480, overflowY: 'auto', borderRadius: '8px', backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white', color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit', pr: 1.5 }}>
-              {!selectedJudet ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>
-                  <Typography sx={{ fontWeight: 700, mb: 1 }}>{t('addAnnouncement.popover.chooseCountyTitle')}</Typography>
-                  <TextField
-                    value={locationSearch}
-                    onChange={(e) => setLocationSearch(e.target.value)}
-                    placeholder={t('common.search')}
+            {/* ── Header ── */}
+            <Box sx={{
+              px: 2,
+              py: 1.5,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#484848' : '#f0f0f0'}`,
+              backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#252525' : '#fafafa'
+            }}>
+              {selectedJudet ? (
+                <IconButton
+                  size="small"
+                  onClick={() => { setSelectedJudet(null); setLocationSearch(''); }}
+                  sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#aaa' : '#555', mr: 0.5 }}
+                >
+                  <ArrowBackIosNewIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              ) : (
+                <LocationOnIcon sx={{ fontSize: 20, color: '#f51866', flexShrink: 0 }} />
+              )}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', lineHeight: 1.2 }}>
+                  {selectedJudet ? t('addAnnouncement.popover.chooseLocalityTitle') : t('addAnnouncement.popover.chooseCountyTitle')}
+                </Typography>
+                {selectedJudet && (
+                  <Chip
+                    label={selectedJudet}
                     size="small"
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon fontSize="small" />
-                        </InputAdornment>
-                      )
-                    }}
                     sx={{
-                      '& .MuiOutlinedInput-root': { borderRadius: 9999, backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#fff' },
-                      '& .MuiInputBase-input': { color: (theme) => theme.palette.mode === 'dark' ? '#fff' : 'inherit' }
+                      mt: 0.4,
+                      height: 20,
+                      fontSize: '0.72rem',
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3a3a3a' : '#f0f0f0',
+                      color: (theme) => theme.palette.mode === 'dark' ? '#ccc' : '#555'
                     }}
                   />
-                </Box>
-                <Divider sx={{ borderColor: (theme) => theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb' }} />
-                <List sx={{ px: 1 }}>
-                  {filteredJudete.map((judet) => (
+                )}
+              </Box>
+              <IconButton
+                size="small"
+                onClick={() => { setAnchorEl(null); setSelectedJudet(null); setLocationSearch(''); }}
+                sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#aaa' : '#777', flexShrink: 0 }}
+              >
+                <CloseIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Box>
+
+            {/* ── Search field ── */}
+            <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
+              <TextField
+                autoFocus
+                value={locationSearch}
+                onChange={(e) => setLocationSearch(e.target.value)}
+                placeholder={t('common.search')}
+                size="small"
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#aaa' : '#888' }} />
+                    </InputAdornment>
+                  )
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 9999,
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                    '& fieldset': { border: 'none' }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#1a1a1a',
+                    py: '7px'
+                  }
+                }}
+              />
+            </Box>
+
+            {/* ── List ── */}
+            <Box sx={{ maxHeight: 320, overflowY: 'auto', pb: 1,
+              scrollbarWidth: 'thin',
+              scrollbarColor: (theme) => theme.palette.mode === 'dark' ? '#484848 transparent' : '#ddd transparent',
+              '&::-webkit-scrollbar': { width: 4 },
+              '&::-webkit-scrollbar-thumb': {
+                borderRadius: 9999,
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#484848' : '#ddd'
+              }
+            }}>
+              {!selectedJudet ? (
+                <List dense disablePadding sx={{ px: 1 }}>
+                  {filteredJudete.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 3, color: (theme) => theme.palette.mode === 'dark' ? '#888' : '#aaa' }}>
+                      <Typography variant="body2">{t('common.noResults') || 'Niciun rezultat'}</Typography>
+                    </Box>
+                  ) : filteredJudete.map((judet) => (
                     <ListItemButton
                       key={judet}
                       onClick={() => {
@@ -886,72 +990,78 @@ export default function AddAnnouncementPage() {
                           setLocationSearch('');
                         }
                       }}
-                      sx={{ 
-                        borderRadius: 2, 
-                        mb: 0.5,
+                      sx={{
+                        borderRadius: 2,
+                        mx: 0.5,
+                        mb: 0.25,
+                        py: 0.85,
+                        backgroundColor: judet === selectedJudet
+                          ? (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.15)' : 'rgba(245,24,102,0.07)'
+                          : 'transparent',
                         '&:hover': {
-                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#505050' : '#f5f5f5'
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3a3a3a' : '#f5f5f5'
                         }
                       }}
                     >
-                      <ListItemText
-                          primary={judet === 'Toată țara' ? (
-                          <Chip label={t('addAnnouncement.labels.entireCountry')} color="primary" size="small" sx={{ borderRadius: 2 }} />
-                        ) : judet}
-                      />
+                      {judet === 'Toată țara' ? (
+                        <>
+                          <LocationOnIcon sx={{ fontSize: 18, color: '#f51866', mr: 1, flexShrink: 0 }} />
+                          <ListItemText
+                            primary={
+                              <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: '#f51866' }}>
+                                {t('addAnnouncement.labels.entireCountry')}
+                              </Typography>
+                            }
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <ListItemText primary={
+                            <Typography sx={{ fontSize: '0.9rem' }}>{judet}</Typography>
+                          } />
+                          <ChevronRightIcon sx={{ fontSize: 18, color: (theme) => theme.palette.mode === 'dark' ? '#666' : '#bbb', flexShrink: 0 }} />
+                        </>
+                      )}
                     </ListItemButton>
                   ))}
                 </List>
-                </Box>
               ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Box sx={{ px: 2, pt: 1, pb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconButton size="small" onClick={() => { setSelectedJudet(null); setLocationSearch(''); }}>
-                    <ArrowBackIosNewIcon fontSize="small" />
-                  </IconButton>
-                  <Typography sx={{ fontWeight: 700 }}>{t('addAnnouncement.popover.chooseLocalityTitle')}</Typography>
-                </Box>
-                <Box sx={{ px: 2 }}>
-                  <TextField
-                    value={locationSearch}
-                    onChange={(e) => setLocationSearch(e.target.value)}
-                    placeholder={t('common.search')}
-                    size="small"
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon fontSize="small" />
-                        </InputAdornment>
-                      )
-                    }}
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 9999, backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#fff' }, '& .MuiInputBase-input': { color: (theme) => theme.palette.mode === 'dark' ? '#fff' : 'inherit' } }}
-                  />
-                </Box>
-                <Divider sx={{ borderColor: (theme) => theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb' }} />
-                <List sx={{ px: 1 }}>
-                  {filteredLocalitati.map((localitate) => (
+                <List dense disablePadding sx={{ px: 1 }}>
+                  {filteredLocalitati.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 3, color: (theme) => theme.palette.mode === 'dark' ? '#888' : '#aaa' }}>
+                      <Typography variant="body2">{t('common.noResults') || 'Niciun rezultat'}</Typography>
+                    </Box>
+                  ) : filteredLocalitati.map((localitate) => (
                     <ListItemButton
                       key={localitate}
                       onClick={() => {
                         setSelectedLocalitate(localitate);
-                        handleClose();
+                        setAnchorEl(null);
                         setSelectedJudet(null);
                         setLocationSearch('');
                       }}
-                      sx={{ 
-                        borderRadius: 2, 
-                        mb: 0.5,
+                      sx={{
+                        borderRadius: 2,
+                        mx: 0.5,
+                        mb: 0.25,
+                        py: 0.85,
+                        backgroundColor: localitate === selectedLocalitate
+                          ? (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.15)' : 'rgba(245,24,102,0.07)'
+                          : 'transparent',
                         '&:hover': {
-                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#505050' : '#f5f5f5'
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3a3a3a' : '#f5f5f5'
                         }
                       }}
                     >
-                      <ListItemText primary={localitate} />
+                      <ListItemText primary={
+                        <Typography sx={{ fontSize: '0.9rem' }}>{localitate}</Typography>
+                      } />
+                      {localitate === selectedLocalitate && (
+                        <CheckCircleIcon sx={{ fontSize: 18, color: '#f51866', flexShrink: 0 }} />
+                      )}
                     </ListItemButton>
                   ))}
                 </List>
-                </Box>
               )}
             </Box>
           </Popover>
@@ -1017,340 +1127,23 @@ export default function AddAnnouncementPage() {
         duration={3000}
       />
       
-      {/* Preview Modal - Same structure as AnnouncementDetails */}
-      <Dialog
+      <AnnouncementPreviewDialog
         open={showPreview}
         onClose={() => setShowPreview(false)}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          className: 'add-announcement-preview-paper',
-          sx: {
-            borderRadius: 3,
-            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#fff',
-            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
-            maxHeight: '90vh',
-            boxShadow: (theme) => theme.palette.mode === 'dark' 
-              ? '0 20px 60px rgba(0,0,0,0.8)' 
-              : '0 20px 60px rgba(0,0,0,0.2)'
-          }
-        }}
-        BackdropProps={{
-          sx: {
-            backdropFilter: 'blur(8px)',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
-          pb: 2,
-          fontWeight: 600,
-          fontSize: '1.5rem',
-          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070'
-        }}>
-          {t('addAnnouncement.previewTitle')}
-        </DialogTitle>
-        <DialogContent sx={{ p: { xs: 2, md: 3 }, overflowY: 'auto' }}>
-          <Grid container spacing={4}>
-            {/* Main Content Column */}
-            <Grid item xs={12} md={8}>
-              {/* Image Card */}
-              {(imagePreviews.length > 0 || mainImagePreview) && (
-                <Card elevation={3} sx={{ 
-                  mb: 3, 
-                  overflow: 'hidden', 
-                  borderRadius: 2,
-                  border: (theme) => theme.palette.mode === 'dark' 
-                    ? '1px solid #3f3f3f' 
-                    : '1px solid #e5e7eb',
-                  boxShadow: (theme) => theme.palette.mode === 'dark'
-                    ? '0 4px 20px rgba(0,0,0,0.5)'
-                    : '0 4px 20px rgba(0,0,0,0.1)'
-                }}>
-                  <Box sx={{ position: 'relative', height: { xs: 300, md: 400 } }}>
-                    <CardMedia
-                      component="img"
-                      image={mainImagePreview || imagePreviews[0]}
-                      alt={t('addAnnouncement.preview.imageAlt') || 'Preview'}
-                      sx={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f8f8'
-                      }}
-                    />
-                  </Box>
-                </Card>
-              )}
-
-              {/* Details Card */}
-              <Card elevation={2} sx={{ 
-                borderRadius: 2,
-                border: (theme) => theme.palette.mode === 'dark' 
-                  ? '1px solid #3f3f3f' 
-                  : '1px solid #e5e7eb',
-                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
-              }}>
-                <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
-                  {/* Header */}
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="h4" component="h1" sx={{ 
-                      color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                      fontWeight: 700,
-                      mb: 2,
-                      fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' },
-                      textAlign: 'center'
-                    }}>
-                      {title}
-                    </Typography>
-                    {category && (
-                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Chip
-                          label={translateCategory(category, t)}
-                          variant="outlined"
-                          sx={{
-                            borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                            fontWeight: 600,
-                            fontSize: '0.875rem'
-                          }}
-                        />
-                      </Box>
-                    )}
-                  </Box>
-
-                  <Divider sx={{ 
-                    mb: 3,
-                    borderColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : '#e5e7eb'
-                  }} />
-
-                  {/* Description */}
-                  <Typography variant="h6" sx={{ 
-                    color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                    mb: 2,
-                    fontWeight: 600
-                  }}>
-                    {t('addAnnouncement.preview.description') || t('addAnnouncement.descriptionLabel')}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: (theme) => theme.palette.mode === 'dark' ? '#f5f5f5' : '#2d3748',
-                      lineHeight: 1.7,
-                      whiteSpace: 'pre-line',
-                      fontSize: { xs: '1rem', md: '1.1rem' }
-                    }}
-                  >
-                    {description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Sidebar Column */}
-            <Grid item xs={12} md={4}>
-              {/* Seller Information Card */}
-              <Card elevation={2} sx={{ 
-                mb: 3, 
-                borderRadius: 2,
-                border: (theme) => theme.palette.mode === 'dark' 
-                  ? '1px solid #3f3f3f' 
-                  : '1px solid #e5e7eb',
-                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
-              }}>
-                <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-                  <Typography variant="h6" sx={{ 
-                    color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                    mb: 3,
-                    fontWeight: 600
-                  }}>
-                    {t('addAnnouncement.preview.sellerInfo')}
-                  </Typography>
-
-                  {/* Contact Person */}
-                  {contactPerson && (
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="body2" sx={{ 
-                        mb: 1,
-                        color: (theme) => theme.palette.mode === 'dark' ? '#b0b0b0' : '#6b7280',
-                        fontWeight: 500
-                      }}>
-                        {t('addAnnouncement.preview.contactPersonLabel')}
-                      </Typography>
-                      <Typography variant="body1" sx={{ 
-                        fontWeight: 500,
-                        color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
-                      }}>
-                        {contactPerson}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Divider sx={{ 
-                    mb: 3,
-                    borderColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : '#e5e7eb'
-                  }} />
-
-                  {/* Contact Details */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {/* Phone */}
-                    {contactPhone && (
-                      <Paper elevation={1} sx={{ 
-                        p: 2,
-                        borderRadius: 2,
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
-                        border: (theme) => theme.palette.mode === 'dark' 
-                          ? '1px solid #3f3f3f' 
-                          : '1px solid #e5e7eb',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          boxShadow: (theme) => theme.palette.mode === 'dark'
-                            ? '0 4px 12px rgba(245, 24, 102, 0.2)'
-                            : '0 4px 12px rgba(53, 80, 112, 0.15)'
-                        }
-                      }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <PhoneIcon sx={{ 
-                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                            fontSize: 20
-                          }} />
-                          <Typography variant="body1" sx={{
-                            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
-                          }}>
-                            {contactPhone}
-                          </Typography>
-                        </Box>
-                      </Paper>
-                    )}
-
-                    {/* Email */}
-                    {contactEmail && (
-                      <Paper elevation={1} sx={{ 
-                        p: 2,
-                        borderRadius: 2,
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
-                        border: (theme) => theme.palette.mode === 'dark' 
-                          ? '1px solid #3f3f3f' 
-                          : '1px solid #e5e7eb',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          boxShadow: (theme) => theme.palette.mode === 'dark'
-                            ? '0 4px 12px rgba(245, 24, 102, 0.2)'
-                            : '0 4px 12px rgba(53, 80, 112, 0.15)'
-                        }
-                      }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <EmailIcon sx={{ 
-                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                            fontSize: 20
-                          }} />
-                          <Typography variant="body1" sx={{ 
-                            wordBreak: 'break-word',
-                            fontSize: '0.95rem',
-                            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
-                          }}>
-                            {contactEmail}
-                          </Typography>
-                        </Box>
-                      </Paper>
-                    )}
-
-                    {/* Price */}
-                    {price && (
-                      <Paper elevation={1} sx={{ 
-                        p: 2,
-                        borderRadius: 2,
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
-                        border: (theme) => theme.palette.mode === 'dark' 
-                          ? '1px solid #3f3f3f' 
-                          : '1px solid #e5e7eb',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          boxShadow: (theme) => theme.palette.mode === 'dark'
-                            ? '0 4px 12px rgba(245, 24, 102, 0.2)'
-                            : '0 4px 12px rgba(53, 80, 112, 0.15)'
-                        }
-                      }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body1" sx={{ 
-                            fontWeight: 600,
-                            color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070'
-                          }}>
-                            💰
-                          </Typography>
-                          <Typography variant="body1" sx={{ 
-                            fontWeight: 500,
-                            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
-                          }}>
-                            {price} RON
-                          </Typography>
-                        </Box>
-                      </Paper>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-
-              {/* Location Card */}
-              {selectedLocalitate && (
-                <Card elevation={2} sx={{ 
-                  borderRadius: 2,
-                  border: (theme) => theme.palette.mode === 'dark' 
-                    ? '1px solid #3f3f3f' 
-                    : '1px solid #e5e7eb',
-                  bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
-                }}>
-                  <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-                    <Typography variant="h6" sx={{ 
-                      color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                      mb: 2,
-                      fontWeight: 600
-                    }}>
-                      {t('addAnnouncement.preview.location')}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <FaMapMarkerAlt style={{ 
-                        color: '#f51866',
-                        fontSize: 20
-                      }} />
-                      <Typography variant="body1" sx={{
-                        color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a1a'
-                      }}>
-                        {selectedLocalitate}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              )}
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ 
-          p: 2,
-          borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
-          bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
-        }}>
-          <Button 
-            onClick={() => setShowPreview(false)}
-            variant="outlined"
-            sx={{
-              color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-              borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-              fontWeight: 600,
-              px: 3,
-              '&:hover': {
-                backgroundColor: (theme) => theme.palette.mode === 'dark' 
-                  ? 'rgba(245, 24, 102, 0.1)' 
-                  : 'rgba(53, 80, 112, 0.05)',
-                borderColor: (theme) => theme.palette.mode === 'dark' ? '#fa4875' : '#2a4059'
-              }
-            }}
-          >
-            {t('common.close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title={title}
+        category={category}
+        description={description}
+        price={price}
+        imagePreviews={imagePreviews}
+        mainImagePreview={mainImagePreview}
+        contactPerson={contactPerson}
+        contactEmail={contactEmail}
+        contactPhone={contactPhone}
+        selectedLocalitate={selectedLocalitate}
+        selectedJudet={selectedJudet}
+        onSubmit={handleSubmit}
+        submitLabel={isEdit ? t('addAnnouncement.submitButton.update') : t('addAnnouncement.submitButton.create')}
+      />
     </div>
   );
 }

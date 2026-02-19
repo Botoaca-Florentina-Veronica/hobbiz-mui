@@ -6,7 +6,9 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, InputAdornment, Divider, Chip } from '@mui/material';
+import { Box, IconButton, Button, TextField, InputAdornment, Divider, Chip } from '@mui/material';
+import AnnouncementPreviewDialog from '../components/AnnouncementPreviewDialog';
+import { useTranslation } from 'react-i18next';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
@@ -50,6 +52,7 @@ import { localitatiPeJudet } from '../assets/comunePeJudet';
 const judete = ["Toată țara", ...Object.keys(localitatiPeJudet)];
 
 export default function EditAnnouncementPage() {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [titleChars, setTitleChars] = useState(0);
@@ -800,127 +803,24 @@ export default function EditAnnouncementPage() {
         duration={3000}
       />
       
-      {/* Preview Modal */}
-      <Dialog
+      <AnnouncementPreviewDialog
         open={showPreview}
         onClose={() => setShowPreview(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#fff',
-            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f'
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}`,
-          pb: 2
-        }}>
-          Previzualizare Anunț
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          {/* Image preview */}
-          {(imagePreviews.length > 0 || mainImagePreview) && (
-            <Box sx={{ mb: 3, borderRadius: 2, overflow: 'hidden' }}>
-              <img 
-                src={mainImagePreview || imagePreviews[0]} 
-                alt="Preview" 
-                style={{ 
-                  width: '100%', 
-                  maxHeight: '400px', 
-                  objectFit: 'cover',
-                  borderRadius: '8px'
-                }} 
-              />
-            </Box>
-          )}
-          
-          {/* Category chip */}
-          <Chip 
-            label={category} 
-            size="small" 
-            sx={{ 
-              mb: 2,
-              backgroundColor: '#f51866',
-              color: 'white'
-            }} 
-          />
-          
-          {/* Title */}
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-            {title}
-          </Typography>
-          
-          {/* Description */}
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              mb: 3, 
-              whiteSpace: 'pre-wrap',
-              color: (theme) => theme.palette.mode === 'dark' ? '#e0e0e0' : '#575757'
-            }}
-          >
-            {description}
-          </Typography>
-          
-          {/* Location */}
-          {selectedLocalitate && (
-            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FaMapMarkerAlt style={{ color: '#f51866' }} />
-              <Typography variant="body2" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#d6d6d6' : '#717171' }}>
-                {selectedLocalitate}
-              </Typography>
-            </Box>
-          )}
-          
-          {/* Contact info */}
-          <Box sx={{ 
-            mt: 3, 
-            p: 2, 
-            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#f5f5f5',
-            borderRadius: 2
-          }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
-              Informații Contact
-            </Typography>
-            {contactPerson && (
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Persoana de contact:</strong> {contactPerson}
-              </Typography>
-            )}
-            {contactEmail && (
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Email:</strong> {contactEmail}
-              </Typography>
-            )}
-            {contactPhone && (
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                <strong>Telefon:</strong> {contactPhone}
-              </Typography>
-            )}
-            {price && (
-              <Typography variant="body2">
-                <strong>Preț:</strong> {price} RON
-              </Typography>
-            )}
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb'}` }}>
-          <Button 
-            onClick={() => setShowPreview(false)}
-            sx={{
-              color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#3f3f3f',
-              '&:hover': {
-                backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#2f2f2f' : '#f5f5f5'
-              }
-            }}
-          >
-            Închide
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title={title}
+        category={category}
+        description={description}
+        price={price}
+        imagePreviews={imagePreviews}
+        mainImagePreview={mainImagePreview}
+        contactPerson={contactPerson}
+        contactEmail={contactEmail}
+        contactPhone={contactPhone}
+        selectedLocalitate={selectedLocalitate}
+        selectedJudet={selectedJudet}
+        onSubmit={handleSubmit}
+        submitLabel={t('addAnnouncement.submitButton.update')}
+      />
+
     </div>
   );
 }

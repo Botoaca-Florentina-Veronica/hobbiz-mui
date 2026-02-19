@@ -192,6 +192,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     const hasText = !!input.trim();
     const hasFile = !!selectedFile;
     if (!hasText && !hasFile) return;
+    if (input.length > 2000) return;
 
     const recipientId = seller._id || seller.id;
     if (!recipientId || !effectiveUserId) return;
@@ -596,6 +597,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               placeholder={sending ? "Se trimite..." : selectedFile ? "Sau scrie un mesaj..." : "Scrie mesajul tău..."}
               value={input}
               onChange={e => setInput(e.target.value)}
+              maxLength={2000}
               disabled={sending}
               autoFocus
             />

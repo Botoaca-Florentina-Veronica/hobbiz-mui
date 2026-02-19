@@ -23,7 +23,10 @@ import {
   SwapVert as SwapVertIcon,
   Close as CloseIcon,
   Image as ImageIcon,
-  CheckCircle as CheckCircleIcon
+  CheckCircle as CheckCircleIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 import './MyAnnouncements.css';
 
@@ -335,79 +338,89 @@ export default function MyAnnouncements() {
             </div>
           </div>
         ) : (
-          filteredAndSortedAnnouncements.map((announcement) => {
-            const imageUri = announcement.images?.[0] ? getImageSrc(announcement.images[0]) : null;
+          <div className="ma-cards-grid">
+            {filteredAndSortedAnnouncements.map((announcement) => {
+              const imageUri = announcement.images?.[0] ? getImageSrc(announcement.images[0]) : null;
+              const formattedDate = announcement.createdAt
+                ? new Date(announcement.createdAt).toLocaleDateString(
+                    currentLocale === 'en' ? 'en-GB' : 'ro-RO',
+                    { day: '2-digit', month: 'short', year: 'numeric' }
+                  )
+                : '';
 
-            return (
-              <div key={announcement._id} className="ma-card">
-                {/* Image - Left side */}
+              return (
                 <div
-                  className="ma-card-image"
+                  key={announcement._id}
+                  className="ma-card"
                   onClick={() => navigate(`/announcement/${announcement._id}`)}
                 >
-                  {imageUri ? (
-                    <img src={imageUri} alt={announcement.title} className="ma-image" />
-                  ) : (
-                    <div className="ma-image ma-placeholder-image">
-                      <ImageIcon className="ma-placeholder-icon" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Content - Right side */}
-                <div className="ma-card-content">
-                  {/* Top section: Title + ID */}
-                  <div onClick={() => navigate(`/announcement/${announcement._id}`)}>
-                    <div className="ma-card-top-row">
-                      <div className="ma-card-title">{announcement.title}</div>
-                      <div className="ma-id-badge">
-                        <span className="ma-id-text">ID: {announcement._id?.slice(-8) || ''}</span>
+                  {/* Image at top */}
+                  <div className="ma-card-image-wrapper">
+                    {imageUri ? (
+                      <img src={imageUri} alt={announcement.title} className="ma-image" />
+                    ) : (
+                      <div className="ma-placeholder-image">
+                        <ImageIcon className="ma-placeholder-icon" />
                       </div>
-                    </div>
-
-                    {/* Category badge */}
-                    <div className="ma-category-badge">
-                      <span className="ma-category-text">{announcement.category}</span>
-                    </div>
-
-                    {/* Placeholder spacing */}
-                    <div className="ma-location-placeholder" />
+                    )}
+                    {announcement.category && (
+                      <span className="ma-img-category-badge">{announcement.category}</span>
+                    )}
                   </div>
 
-                  {/* Action buttons - single row: 4 equal buttons on wider screens, wrap on small screens */}
-                  <div className="ma-actions-grid ma-actions-single-row">
-                    <button
-                      className="ma-action-button ma-primary-button"
-                      onClick={() => handleEdit(announcement)}
-                    >
-                      {t('myAnnouncements.edit')}
-                    </button>
+                  {/* Card body */}
+                  <div className="ma-card-body" onClick={(e) => e.stopPropagation()}>
+                    <div className="ma-card-meta-row">
+                      <span className="ma-card-id">#{announcement._id?.slice(-6) || ''}</span>
+                      <span className="ma-card-date">{formattedDate}</span>
+                    </div>
 
-                    <button
-                      className="ma-action-button ma-secondary-button"
-                      onClick={() => handleArchive(announcement)}
+                    <div
+                      className="ma-card-title"
+                      onClick={() => navigate(`/announcement/${announcement._id}`)}
+                      role="button"
+                      tabIndex={0}
                     >
-                      {t('myAnnouncements.archive')}
-                    </button>
+                      {announcement.title}
+                    </div>
 
-                    <button
-                      className="ma-action-button ma-danger-button"
-                      onClick={() => handleDelete(announcement._id)}
-                    >
-                      {t('myAnnouncements.delete')}
-                    </button>
-
-                    <button
-                      className="ma-action-button ma-secondary-button ma-refresh-button"
-                      onClick={() => handleRefresh(announcement)}
-                    >
-                      {t('myAnnouncements.refresh')}
-                    </button>
+                    {/* Actions */}
+                    <div className="ma-card-actions">
+                      <button
+                        className="ma-btn ma-btn-edit"
+                        onClick={() => handleEdit(announcement)}
+                        title={t('myAnnouncements.edit')}
+                      >
+                        <EditIcon style={{ fontSize: 15 }} />
+                        {t('myAnnouncements.edit')}
+                      </button>
+                      <button
+                        className="ma-btn ma-btn-icon ma-btn-archive"
+                        onClick={() => handleArchive(announcement)}
+                        title={t('myAnnouncements.archive')}
+                      >
+                        <ArchiveIcon style={{ fontSize: 17 }} />
+                      </button>
+                      <button
+                        className="ma-btn ma-btn-icon ma-btn-delete"
+                        onClick={() => handleDelete(announcement._id)}
+                        title={t('myAnnouncements.delete')}
+                      >
+                        <DeleteIcon style={{ fontSize: 17 }} />
+                      </button>
+                      <button
+                        className="ma-btn ma-btn-icon ma-btn-refresh"
+                        onClick={() => handleRefresh(announcement)}
+                        title={t('myAnnouncements.refresh')}
+                      >
+                        <RefreshIcon style={{ fontSize: 17 }} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
 
