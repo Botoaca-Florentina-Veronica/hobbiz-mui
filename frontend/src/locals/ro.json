@@ -79,6 +79,7 @@
     "count": "Anunțuri favorite",
     "empty": "Nu ai anunturi favorite salvate, e timpul să îți adaugi",
     "removed": "Șters din favorite",
+    "loginRequired": "Trebuie să fii autentificat pentru a adăuga la favorite!",
     "posted": "Postat",
     "back": "Înapoi",
     "next": "Următoarea",
@@ -502,44 +503,47 @@
       },
       "completion": {
         "message": "Gata! Acum poți începe să explorezi platforma 🎉",
-        "reset": "Resetează"
+        "reset": "Resetează",
+        "startNow": "Începe acum"
       }
     },
+    "featuresHeader": "De ce să alegi Hobbiz?",
+    "featuresSubtitle": "Funcționalități care fac diferența pentru experiența ta",
     "features": [
       {
         "title": "Categorii și filtre puternice",
         "description": "Navigare pe categorii, căutare după cuvinte cheie, sortări și filtre pentru rezultate relevante.",
-        "color": "#355070"
+        "icon": "category"
       },
       {
         "title": "Favorite sincronizate local",
         "description": "Salvează ce-ți place și revino oricând. Stocare pe dispozitiv și separare pe utilizator/guest.",
-        "color": "#406b92"
+        "icon": "favorite"
       },
       {
         "title": "Chat integrat",
         "description": "Comunică rapid cu autorii anunțurilor. Avatare normalizate și fallback cu inițiale.",
-        "color": "#ffffff"
+        "icon": "chat"
       },
       {
         "title": "Notificări clare",
         "description": "Vezi noutățile importante, cu avatare, linkuri către anunțuri și evidențiere pentru elementele necitite.",
-        "color": "#355070"
+        "icon": "notifications"
       },
       {
         "title": "Dark mode elegant",
         "description": "Paletă dark rafinată și accente roz, cu contrast și lizibilitate optimizate pe toate paginile.",
-        "color": "#406b92"
+        "icon": "darkmode"
       },
       {
         "title": "Siguranță și încredere",
         "description": "Normalizare url imagini, protejarea datelor de contact și bune practici UI/UX.",
-        "color": "#ffffff"
+        "icon": "shield"
       },
       {
         "title": "Trading flexibil",
         "description": "Setează prețuri fixe sau negociază sume personalizate. Colaborarea directă cu actualizare automată a balanței.",
-        "color": "#28a745"
+        "icon": "handshake"
       }
     ],
     "cta": {
@@ -618,6 +622,53 @@
       "coverDeleted": "Coperta a fost ștearsă.",
       "errorDeletingCover": "Eroare la ștergerea copertei"
     }
+  },
+  "publicProfile": {
+    "mobileTitle": "Profil",
+    "backAria": "Înapoi",
+    "errorLoading": "Eroare la încărcarea profilului",
+    "loading": "Se încarcă...",
+    "verifiedSeller": "Vânzător verificat",
+    "memberSince": "Membru din",
+    "listings": "Anunțuri",
+    "reviews": "Recenzii",
+    "rating": "Rating",
+    "noRating": "N/A",
+    "reviewsSection": "Recenzii",
+    "reviewPostedSuccess": "Recenzia a fost publicată. Mulțumim pentru feedback!",
+    "noReviews": "Acest utilizator nu are recenzii încă.",
+    "allReviews": "Toate recenziile",
+    "reviewLikeAuth": "Trebuie să fii autentificat pentru a da like.",
+    "reviewLikeError": "A apărut o eroare. Încearcă din nou.",
+    "announcementsSection": "Anunțurile utilizatorului",
+    "noAnnouncements": "Acest utilizator nu are anunțuri.",
+    "noImage": "Fără imagine",
+    "contactSection": "Informații de contact",
+    "locationSection": "Locație",
+    "mapTitle": "Harta locației",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "phone": "Telefon",
+    "email": "Email",
+    "unspecified": "Nespecificat",
+    "editReview": "Editează recenzia",
+    "editReviewScore": "Scor (0-5)",
+    "editReviewComment": "Comentariu",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "deleteReview": "Confirmare ștergere",
+    "deleteReviewMessage": "Ești sigur(ă) că vrei să ștergi această recenzie? Această acțiune nu poate fi anulată.",
+    "delete": "Șterge",
+    "edit": "Editează",
+    "editReviewError": "A apărut o eroare la editare.",
+    "deleteReviewError": "A apărut o eroare la ștergere.",
+    "sendMessage": "Trimite mesaj",
+    "onlineNow": "Online",
+    "lastSeenMinutes": "Activ acum {{count}} min",
+    "lastSeenHours": "Activ acum {{count}}h",
+    "lastSeenYesterday": "Activ ieri",
+    "lastSeenDays": "Activ acum {{count}} zile",
+    "retry": "Încearcă din nou"
   },
   "terms": {
     "title": "Termeni și condiții",
@@ -1173,7 +1224,11 @@
     "loading": "Se încarcă notificările...",
     "empty": "Nu ai notificări noi.",
     "reply": "Răspunde",
-    "deleteNotification": "Șterge notificarea"
+    "deleteNotification": "Șterge notificarea",
+    "viewProfile": "Vizualizează profilul",
+    "viewDocuments": "Verifică documentele",
+    "viewAdmin": "Verifică",
+    "viewAnnouncement": "Vizualizează anunțul"
   },
   "myAnnouncements": {
     "title": "Anunțurile mele",

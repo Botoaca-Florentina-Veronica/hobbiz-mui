@@ -22,7 +22,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/stack": "^7.6.9",
-    "axios": "^1.12.2",
+    "axios": "^1.13.5",
     "escape-string-regexp": "^5.0.0",
     "expo": "~54.0.30",
     "expo-blur": "~15.0.8",
@@ -72,6 +72,13 @@
     "jimp": "^0.16.1",
     "react-native-make": "^1.0.1",
     "typescript": "~5.9.2"
+  },
+  "overrides": {
+    "@isaacs/brace-expansion": ">=5.0.1",
+    "tar": ">=7.5.8",
+    "fast-xml-parser": ">=5.3.6",
+    "minimatch": ">=10.2.2",
+    "lodash": ">=4.17.23"
   },
   "private": true
 }

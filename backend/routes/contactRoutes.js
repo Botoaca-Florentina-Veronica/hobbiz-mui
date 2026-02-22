@@ -63,8 +63,7 @@ router.post('/', async (req, res) => {
     const emailParams = new EmailParams()
       .setFrom(sentFrom)
       .setTo(recipients)
-      .setReplyTo(new Sender(cleanEmail, cleanName))
-      .setSubject(`[${appName}] Mesaj de contact de la ${cleanName}`)
+      .setSubject(`[${appName}] Mesaj de contact de la ${cleanName} <${cleanEmail}>`)
       .setHtml(htmlBody)
       .setText(textBody);
 

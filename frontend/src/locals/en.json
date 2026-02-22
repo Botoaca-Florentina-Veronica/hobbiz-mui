@@ -79,6 +79,7 @@
     "count": "Favorite Announcements",
     "empty": "You have no favorite announcements saved, it's time to add some",
     "removed": "Removed from favorites",
+    "loginRequired": "You must be logged in to add to favorites!",
     "posted": "Posted",
     "back": "Back",
     "next": "Next",
@@ -502,44 +503,47 @@
       },
       "completion": {
         "message": "All done! Now you can start exploring the platform 🎉",
-        "reset": "Reset"
+        "reset": "Reset",
+        "startNow": "Start now"
       }
     },
+    "featuresHeader": "Why choose Hobbiz?",
+    "featuresSubtitle": "Features that make a difference for your experience",
     "features": [
       {
         "title": "Powerful categories and filters",
         "description": "Browse by categories, search by keywords, sorting and filters for relevant results.",
-        "color": "#355070"
+        "icon": "category"
       },
       {
         "title": "Locally synchronized favorites",
         "description": "Save what you like and come back anytime. Device storage and separation by user/guest.",
-        "color": "#406b92"
+        "icon": "favorite"
       },
       {
         "title": "Integrated chat",
         "description": "Communicate quickly with announcement authors. Normalized avatars and fallback with initials.",
-        "color": "#ffffff"
+        "icon": "chat"
       },
       {
         "title": "Clear notifications",
         "description": "See important news, with avatars, links to announcements and highlighting for unread items.",
-        "color": "#355070"
+        "icon": "notifications"
       },
       {
         "title": "Elegant dark mode",
         "description": "Refined dark palette and pink accents, with optimized contrast and readability on all pages.",
-        "color": "#406b92"
+        "icon": "darkmode"
       },
       {
         "title": "Security and trust",
         "description": "URL image normalization, contact data protection and good UI/UX practices.",
-        "color": "#ffffff"
+        "icon": "shield"
       },
       {
         "title": "Flexible trading",
         "description": "Set fixed prices or negotiate custom amounts. Direct collaboration with automatic balance updates.",
-        "color": "#28a745"
+        "icon": "handshake"
       }
     ],
     "cta": {
@@ -618,6 +622,53 @@
       "coverDeleted": "Cover deleted.",
       "errorDeletingCover": "Error deleting cover"
     }
+  },
+  "publicProfile": {
+    "mobileTitle": "Profile",
+    "backAria": "Back",
+    "errorLoading": "Error loading profile",
+    "loading": "Loading...",
+    "verifiedSeller": "Verified Seller",
+    "memberSince": "Member since",
+    "listings": "Listings",
+    "reviews": "Reviews",
+    "rating": "Rating",
+    "noRating": "N/A",
+    "reviewsSection": "Reviews",
+    "reviewPostedSuccess": "Your review has been published. Thank you for your feedback!",
+    "noReviews": "This user has no reviews yet.",
+    "allReviews": "All reviews",
+    "reviewLikeAuth": "You must be logged in to like a review.",
+    "reviewLikeError": "An error occurred. Please try again.",
+    "announcementsSection": "User's Listings",
+    "noAnnouncements": "This user has no listings.",
+    "noImage": "No image",
+    "contactSection": "Contact Information",
+    "locationSection": "Location",
+    "mapTitle": "Location map",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "unspecified": "Unspecified",
+    "editReview": "Edit review",
+    "editReviewScore": "Score (0-5)",
+    "editReviewComment": "Comment",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteReview": "Confirm deletion",
+    "deleteReviewMessage": "Are you sure you want to delete this review? This action cannot be undone.",
+    "delete": "Delete",
+    "edit": "Edit",
+    "editReviewError": "An error occurred while editing.",
+    "deleteReviewError": "An error occurred while deleting.",
+    "sendMessage": "Send message",
+    "onlineNow": "Online",
+    "lastSeenMinutes": "Active {{count}} min ago",
+    "lastSeenHours": "Active {{count}}h ago",
+    "lastSeenYesterday": "Active yesterday",
+    "lastSeenDays": "Active {{count}} days ago",
+    "retry": "Try again"
   },
   "terms": {
     "title": "Terms and Conditions",
@@ -1160,7 +1211,11 @@
     "loading": "Loading notifications...",
     "empty": "You have no new notifications.",
     "reply": "Reply",
-    "deleteNotification": "Delete notification"
+    "deleteNotification": "Delete notification",
+    "viewProfile": "View profile",
+    "viewDocuments": "Check documents",
+    "viewAdmin": "Review",
+    "viewAnnouncement": "View listing"
   },
   "myAnnouncements": {
     "title": "My Announcements",

@@ -86,8 +86,9 @@ const createReview = async (req, res) => {
           }
         } catch (_) {}
 
-        const notifMessage = `${authorName} ți-a lăsat o recenzie (${parsedScore}/5)`;
-        const link = `/users/${reviewedUserId}/reviews`;
+        const commentSnippet = comment ? ` — "${String(comment).slice(0, 80)}${String(comment).length > 80 ? '...' : ''}"` : '';
+        const notifMessage = `${authorName} ți-a lăsat o recenzie de ${parsedScore}/5${commentSnippet}`;
+        const link = `/profil/${reviewedUserId}`;
 
         await Notification.create({
           userId: reviewedUserId,

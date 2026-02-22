@@ -442,6 +442,56 @@
 }
 
 
+/* 6b. NOTIFICATION TYPE STRIPS
+   ---------------------------------------------------------- */
+
+.notification-card-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+}
+
+.notif-type-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  min-height: 60px;
+  border-radius: 8px 0 0 8px;
+  margin: -1px 0 -1px -1px;
+  padding: 8px 4px;
+  color: #fff;
+}
+
+.notif-strip-message    { background: linear-gradient(160deg, #2196f3, #1565c0); }
+.notif-strip-review     { background: linear-gradient(160deg, #ff9800, #e65100); }
+.notif-strip-verification { background: linear-gradient(160deg, #4caf50, #1b5e20); }
+.notif-strip-document   { background: linear-gradient(160deg, #9c27b0, #4a148c); }
+.notif-strip-general    { background: linear-gradient(160deg, #355070, #1c3045); }
+
+/* Announcement context chip */
+.notif-ann-context {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(53,80,112,0.08);
+  color: var(--nt-text-secondary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .notif-type-strip { opacity: 0.9; }
+[data-theme='dark'] .notif-ann-context { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.6); }
+
 /* 7. RESPONSIVITATE SUPLIMENTARĂ
    ---------------------------------------------------------- */
 @media (max-width: 768px) {

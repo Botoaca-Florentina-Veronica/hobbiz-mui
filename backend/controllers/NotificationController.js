@@ -120,6 +120,20 @@ const getNotifications = async (req, res) => {
           }
         } catch (_) {}
         
+        // For non-chat notifications with fromUserId, enrich sender info
+        if (!obj.senderName && obj.fromUserId) {
+          try {
+            const sender = await User.findById(obj.fromUserId).select('firstName lastName avatar');
+            if (sender) {
+              obj.senderName = `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'Utilizator';
+              obj.senderId = String(sender._id);
+              if (sender.avatar) {
+                obj.senderAvatar = sender.avatar;
+              }
+            }
+          } catch (_) {}
+        }
+
         // Ensure we always have a preview - fallback to the message field from the notification
         if (!obj.preview && obj.message) {
           obj.preview = obj.message;

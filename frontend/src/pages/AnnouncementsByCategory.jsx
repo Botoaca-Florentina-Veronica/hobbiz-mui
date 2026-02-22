@@ -30,6 +30,7 @@ import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTranslation } from 'react-i18next';
 import translateCategory from '../utils/translateCategory';
+import Toast from '../components/Toast';
 import './MyAnnouncements.css';
 import './AnnouncementsByCategory.css';
 
@@ -45,6 +46,7 @@ export default function AnnouncementsByCategory() {
   const [locationFilter, setLocationFilter] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [showLoginToast, setShowLoginToast] = useState(false);
   
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
@@ -200,6 +202,12 @@ export default function AnnouncementsByCategory() {
 
   return (
     <div className="my-announcements-container announcements-by-category">
+      <Toast
+        message={t('favorites.loginRequired')}
+        type="info"
+        visible={showLoginToast}
+        onClose={() => setShowLoginToast(false)}
+      />
       <div className="mobile-back-container" onClick={() => window.history.back()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && window.history.back()}>
         <button className="mobile-back-btn" aria-label="Înapoi">
           {/* left arrow svg */}
@@ -429,36 +437,8 @@ export default function AnnouncementsByCategory() {
                         toggleFavorite?.(a._id);
                         return;
                       }
-                      // Guest/localStorage path
-                      const stored = localStorage.getItem(FAVORITES_KEY);
-                      let favoriteObjects = [];
-                      try {
-                        const parsed = JSON.parse(stored || '[]');
-                        if (parsed.length > 0 && typeof parsed[0] === 'string') {
-                          favoriteObjects = parsed.map(id => ({ id, addedAt: Date.now() }));
-                        } else {
-                          favoriteObjects = parsed;
-                        }
-                      } catch {
-                        favoriteObjects = [];
-                      }
-                      const exists = favoriteObjects.find(item => item.id === a._id);
-                      let updatedObjects;
-                      if (exists) {
-                        updatedObjects = favoriteObjects.filter(item => item.id !== a._id);
-                      } else {
-                        updatedObjects = [...favoriteObjects, { id: a._id, addedAt: Date.now() }];
-                      }
-                      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedObjects));
-                      // Notify other parts of the app in the same tab
-                      if (typeof window !== 'undefined') window.dispatchEvent(new Event('favorites:updated'));
-                      setFavoriteIds((prev) => {
-                        if (prev.includes(a._id)) {
-                          return prev.filter((id) => id !== a._id);
-                        } else {
-                          return [...prev, a._id];
-                        }
-                      });
+                      // Guest: show login required toast
+                      setShowLoginToast(true);
                     }}
                 >
                   {(user ? (authFavorites || []).includes(a._id) : favoriteIds.includes(a._id)) ? (

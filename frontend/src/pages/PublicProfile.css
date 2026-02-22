@@ -1,510 +1,647 @@
-/* PublicProfile specific styles
-   - Controls container max width on desktop to reduce whitespace
-   - Styles the reviews summary card (stars, score, bars)
-*/
+﻿/* ============================================================
+   PublicProfile â€“ complete redesign
+   Uses --pf-* design tokens from ProfilePage.css
+   ============================================================ */
 
-/* Utility classes for quick per-page adjustments.
-   Prefer editing the global variables in `src/index.css` for app-wide changes.
-   Use these classes on the Container element to override widths for this page only.
-*/
-.pp-container--wide { --pp-lg-width: min(99%, 1500px); }
-.pp-container--narrow { --pp-lg-width: min(92%, 1200px); }
+/* â”€â”€ Page â”€â”€ */
+.pp-page {
+  --pp-accent: var(--pf-primary, #ec407a);
+  --pp-accent-hover: var(--pf-primary-hover, #d81b60);
+  --pp-bg: var(--pf-bg, #ffffff);
+  --pp-card: var(--pf-card-bg, #ffffff);
+  --pp-text: var(--pf-text, #1a1a1a);
+  --pp-muted: var(--pf-text-muted, #6b7280);
+  --pp-border: var(--pf-border, #e5e7eb);
+  --pp-radius: var(--pf-card-radius, 16px);
+  --pp-shadow: var(--pf-shadow, 0 1px 3px rgba(0,0,0,.1));
+  --pp-shadow-lg: var(--pf-shadow-hover, 0 4px 12px rgba(0,0,0,.15));
 
-/* -------------------------------------------------------------------------------- */
-
-.public-profile-container {
-  margin: 24px auto;
-  padding: 0 16px;
-  box-sizing: border-box;
-  /* Default fallback max-width (will be overridden by percentage-based rules) */
-  max-width: 1200px;
-  --pf-card-gap: 1.25rem;
+  min-height: 100vh;
+  background: var(--pp-bg);
+  color: var(--pp-text);
+  font-family: 'Poppins', sans-serif;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
 }
 
-/* Page-level wrapper to avoid the global .profile-page-container token that sets a fixed max-width
-  We create a separate page container so wide screens can expand the layout while preserving
-  the original spacing and token variables. Use this wrapper instead of .profile-page-container
-  inside `PublicProfile.jsx`.
-*/
-.public-profile-page-container {
-  /* Only override width-related tokens so we preserve the original profile visual spacing
-    (margins/padding) provided by `.profile-page-container`. */
-  --pp-lg-width: min(98%, 1600px);
-  --pp-md-width: min(98%, 1300px);
-  --pp-xl-width: min(96%, 1800px);
-  /* keep sticky top in rem units so it matches the vertical spacing used on the page
-    (the `.profile-page-container` uses `margin-top: 6rem`) — use 6rem so header and
-    reviews card start aligned on desktop. */
-  --pp-sticky-top: 6rem;
-  --pp-reviews-max-width: 420px;
-  --pp-score-size: 40px;
-  --pp-score-size-mobile: 32px;
-
-  /* Ensure the page-level wrapper can expand to the width limits defined above */
-  max-width: var(--pp-lg-width);
-}
-
-/* Ensure the page always leaves a small responsive bottom padding so the last card
-   isn't flush with the viewport bottom (accounts for safe area on mobile). */
-.public-profile-page-container {
-  padding-bottom: calc(20px + env(safe-area-inset-bottom));
-}
-
-/* Animated alert wrapper for review-posted confirmation */
-.profile-alert-wrapper {
+.pp-loading {
   display: flex;
   justify-content: center;
-  margin: 12px 0;
-}
-.profile-alert-wrapper.alert-entering {
-  animation: alertEnter 420ms ease-out forwards;
-}
-.profile-alert-wrapper.alert-leaving {
-  animation: alertLeave 420ms cubic-bezier(.22,.9,.32,1) forwards;
-}
-@keyframes alertEnter {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes alertLeave {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  align-items: center;
+  min-height: 60vh;
 }
 
-/* Ensure the page wrappers allow the page to grow (prevent clipping) and leave room
-   for fixed footers. This forces the page to scroll if content is taller than viewport. */
-.public-profile-page-container,
-.public-profile-container,
-.profile-page-container {
-  overflow: visible !important;
-  min-height: auto !important;
-  padding-bottom: calc(var(--footer-height, 6px) + 10px);
+/* ── Error state ── */
+.pp-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+}
+.pp-error-icon {
+  font-size: 56px !important;
+  color: var(--pp-muted);
+  opacity: .6;
+}
+.pp-error h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--pp-text);
+}
+.pp-error .MuiButton-root {
+  background: var(--pp-accent);
+  border-radius: 12px;
+  text-transform: none;
+  font-weight: 600;
+  padding: 8px 24px;
 }
 
-/* Wider container percentages at breakpoints */
-@media (min-width: 900px) {
-  /* md and up */
-  .public-profile-container { max-width: var(--pp-md-width); }
+/* â”€â”€ Mobile header â”€â”€ */
+.pp-mobile-header {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--pp-card);
+  border-bottom: 1px solid var(--pp-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
-@media (min-width: 1200px) {
-  /* lg and up */
-  .public-profile-container { max-width: var(--pp-lg-width); }
-}
-@media (min-width: 1600px) {
-  /* xl */
-  .public-profile-container { max-width: var(--pp-xl-width); }
+.pp-mobile-back { color: var(--pp-text) !important; }
+.pp-mobile-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--pp-text);
 }
 
-/* Reviews card wrapper to emulate sticky on desktop */
-.public-profile-reviews-wrap {
+/* â”€â”€ Hero â”€â”€ */
+.pp-hero {
   position: relative;
+  margin-bottom: 32px;
 }
-/* Desktop sticky: only enable sticky on wider desktop (>1000px) so tablet / small-desktop
-   layouts between 600-1000px behave predictably and don't produce visual shifts. */
-@media (min-width: 1001px) {
-  .public-profile-reviews-wrap {
-    position: sticky;
-    top: var(--pp-sticky-top);
-    margin-top: 0;
-    align-self: flex-start;
-  }
+.pp-hero-cover {
+  height: 220px;
+  background: linear-gradient(135deg, #ec407a 0%, #ab47bc 100%);
+  background-size: cover;
+  background-position: center;
+  border-radius: 0 0 var(--pp-radius) var(--pp-radius);
 }
-
-/* Tablet / small-desktop range: 600px - 1000px — ensure reviews card sits aligned with
-   seller info, has appropriate widths and padding, and is not sticky (prevents jumpy behavior). */
-@media (min-width: 600px) and (max-width: 1000px) {
-  .public-profile-reviews-wrap {
-    position: relative;
-    top: auto;
-    margin-top: 0;
-    align-self: flex-start;
-  }
-
-  .public-profile-reviews-card {
-    /* Let it take full column width but don't exceed a comfortable size */
-    width: 100%;
-    max-width: 100%;
-    margin-left: 0;
-  }
-
-  .public-profile-reviews-content {
-    padding: 16px;
-  }
-
-  /* Slightly reduce the rating score font on mid sizes for balance */
-  .public-profile-reviews-score {
-    font-size: calc(var(--pp-score-size) * 0.85);
-  }
+.pp-hero-cover.has-cover {
+  background-color: #2d2d2d;
 }
-
-/* Make the page container wider on tablets (so left column + reviews have more room) */
-@media (min-width: 600px) and (max-width: 1000px) {
-  .public-profile-container {
-    max-width: 1100px; /* increase width for tablet and larger mobiles */
-  }
+.pp-hero-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  max-width: 1200px;
+  margin: -56px auto 0;
+  padding: 0 32px;
+  position: relative;
+  z-index: 2;
 }
-
-.public-profile-reviews-card {
-  /* Match visual style of other profile cards */
-  border-radius: var(--pf-card-radius, 12px);
-  box-shadow: var(--pf-card-shadow, 0 2px 8px rgba(0,0,0,0.1));
-  background: var(--pf-card-bg, #ffffff);
-  border: 1px solid var(--pf-divider, #e0e0e0);
+.pp-hero-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 4px solid var(--pp-card);
+  background: var(--pp-card);
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
   overflow: hidden;
-  /* Ensure the card spans the entire Grid column width like other profile cards */
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pp-hero-avatar img {
   width: 100%;
-  /* Remove max-width so it matches other cards and doesn't appear too small */
-  max-width: none;
-  margin: 0 0 0 0;
-  box-sizing: border-box;
-  margin-bottom: var(--pf-card-gap, 1.25rem);
+  height: 100%;
+  object-fit: cover;
 }
-.public-profile-reviews-content {
-  padding: 20px;
+.pp-hero-avatar-fallback {
+  font-size: 48px !important;
+  color: var(--pp-muted);
 }
-.public-profile-reviews-title {
-  color: var(--pf-accent, #355070);
-  margin-bottom: 10px;
-  font-weight: 600;
+.pp-hero-info {
+  padding-bottom: 8px;
+  min-width: 0;
 }
-
-.public-profile-reviews-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.public-profile-reviews-score {
-  font-size: var(--pp-score-size);
+.pp-hero-name {
+  margin: 0;
+  font-size: 1.65rem;
   font-weight: 700;
-  color: var(--pf-text, #2d3748);
-  line-height: 1;
-}
-.public-profile-reviews-stars {
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 8px;
+  line-height: 1.3;
+  color: var(--pp-text);
 }
-.public-star {
-  font-size: 20px;
+.pp-verified-icon {
+  color: var(--pf-verified-icon, #0ea5e9) !important;
+  font-size: 22px !important;
 }
-.public-star.filled {
-  color: #FFD24A;
-}
-.public-star.empty {
-  color: #cbd5e1;
-}
-.public-profile-reviews-count {
-  color: var(--pf-text-muted, #6b7280);
-  margin-top: 6px;
-  font-size: 0.95rem;
+.pp-verified-badge {
+  display: inline-block;
+  font-size: 0.75rem;
   font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--pf-verified-bg, #f0f9ff);
+  color: var(--pf-verified-text, #0284c7);
+  margin-top: 4px;
+}
+.pp-hero-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.88rem;
+  color: var(--pp-muted);
+  margin-top: 4px;
+}
+.pp-hero-loc-icon {
+  font-size: 18px !important;
+  color: var(--pp-accent);
 }
 
-.public-profile-reviews-divider {
-  margin: 10px 0 12px 0;
+/* ── Last seen / online status ── */
+.pp-hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--pp-muted);
+  margin-top: 4px;
+}
+.pp-hero-status.online {
+  color: #22c55e;
+}
+.pp-status-dot {
+  font-size: 10px !important;
+  color: #22c55e;
+  animation: pp-pulse 2s infinite;
+}
+.pp-status-icon {
+  font-size: 15px !important;
+  opacity: .7;
+}
+@keyframes pp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
 }
 
-.public-profile-rating-row {
+/* ── Hero action buttons ── */
+.pp-hero-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 8px;
+}
+.pp-msg-btn {
+  background: var(--pp-accent) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  padding: 8px 20px !important;
+  font-size: .9rem !important;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(236,64,122,.3) !important;
+  transition: all .2s !important;
+}
+.pp-msg-btn:hover {
+  background: var(--pp-accent-hover) !important;
+  box-shadow: 0 4px 16px rgba(236,64,122,.4) !important;
+}
+
+/* â”€â”€ Stats bar â”€â”€ */
+.pp-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  max-width: 1200px;
+  margin: 24px auto 0;
+  padding: 16px 20px;
+  background: var(--pp-card);
+  border-radius: var(--pp-radius);
+  box-shadow: var(--pp-shadow);
+  border: 1px solid var(--pp-border);
+}
+.pp-stat {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
-}
-.public-profile-rating-star {
-  width: 36px;
-  font-weight: 600;
-  color: #374151;
-}
-.public-profile-rating-bar-outer {
   flex: 1;
-  height: 12px;
-  background: var(--pf-divider, #eef2f7);
-  border-radius: 999px;
+  justify-content: center;
+  padding: 4px 8px;
+}
+.pp-stat-icon {
+  font-size: 24px !important;
+  color: var(--pp-accent);
+  opacity: .85;
+}
+.pp-stat-icon--gold { color: #fbbf24 !important; }
+.pp-stat-text { display: flex; flex-direction: column; }
+.pp-stat-val {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--pp-text);
+  line-height: 1.3;
+}
+.pp-stat-lbl {
+  font-size: 0.75rem;
+  color: var(--pp-muted);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.pp-stat-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--pp-border);
+  flex-shrink: 0;
+}
+
+/* â”€â”€ Grid layout â”€â”€ */
+.pp-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 24px auto 0;
+  padding: 0 32px;
+  align-items: start;
+}
+.pp-col-main { min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.pp-col-side { min-width: 0; }
+
+/* â”€â”€ Card â”€â”€ */
+.pp-card {
+  background: var(--pp-card);
+  border-radius: var(--pp-radius);
+  box-shadow: var(--pp-shadow);
+  border: 1px solid var(--pp-border);
+  padding: 24px;
+  transition: box-shadow .2s;
+}
+.pp-card:hover { box-shadow: var(--pp-shadow-lg); }
+.pp-card--flush { padding-bottom: 0; overflow: hidden; }
+.pp-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.pp-card-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--pp-text);
+}
+.pp-link-btn {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  color: var(--pp-accent) !important;
+  font-size: .85rem !important;
+}
+
+/* â”€â”€ Rating summary â”€â”€ */
+.pp-rating-box {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--pp-border) 30%, transparent);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.pp-rating-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+.pp-big-score {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--pp-text);
+}
+.pp-stars-row { display: flex; gap: 2px; margin: 6px 0 4px; }
+.pp-star { font-size: 18px !important; }
+.pp-star--on { color: #fbbf24; }
+.pp-star--off { color: var(--pp-border); }
+.pp-total-reviews { font-size: .78rem; color: var(--pp-muted); }
+
+.pp-bars { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.pp-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pp-bar-num { font-size: .8rem; font-weight: 600; width: 12px; text-align: right; color: var(--pp-muted); }
+.pp-bar-star { font-size: 14px !important; color: #fbbf24; }
+.pp-bar-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--pp-border) 50%, transparent);
   overflow: hidden;
 }
-.public-profile-rating-bar-inner {
+.pp-bar-fill {
   height: 100%;
-  background: #FFD24A;
-  transition: width .5s ease;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  transition: width .4s ease;
 }
-.public-profile-rating-count {
-  width: 32px;
-  text-align: right;
+.pp-bar-cnt { font-size: .78rem; width: 20px; color: var(--pp-muted); }
+
+/* â”€â”€ Reviews list â”€â”€ */
+.pp-reviews { display: flex; flex-direction: column; gap: 16px; }
+.pp-rev {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--pp-border);
+}
+.pp-rev:last-child { border-bottom: none; }
+.pp-rev-avatar {
+  width: 40px !important;
+  height: 40px !important;
+  font-size: .9rem !important;
+  flex-shrink: 0;
+}
+.pp-rev-content { flex: 1; min-width: 0; }
+.pp-rev-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pp-rev-meta { display: flex; flex-direction: column; gap: 2px; }
+.pp-rev-name { font-weight: 600; font-size: .92rem; color: var(--pp-text); }
+.pp-rev-date { font-size: .78rem; color: var(--pp-muted); }
+.pp-rev-ann {
+  font-size: .76rem;
+  color: var(--pp-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+.pp-rev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 700;
+  font-size: .85rem;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #92400e;
+  flex-shrink: 0;
+}
+body.dark-mode .pp-rev-badge { background: #422006; color: #fbbf24; }
+.pp-rev-badge-star { font-size: 16px !important; color: #fbbf24; }
+.pp-rev-text {
+  font-size: .9rem;
+  line-height: 1.5;
+  color: var(--pp-text);
+  margin: 8px 0 6px;
+  word-break: break-word;
+}
+.pp-rev-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pp-like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--pp-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pp-muted);
+  font-size: .82rem;
+  cursor: pointer;
+  transition: all .2s;
+}
+.pp-like-btn:hover { border-color: var(--pp-accent); color: var(--pp-accent); }
+.pp-like-btn.active { border-color: var(--pp-accent); color: var(--pp-accent); background: color-mix(in srgb, var(--pp-accent) 8%, transparent); }
+.pp-like-ico { font-size: 16px !important; }
+.pp-rev-menu { color: var(--pp-muted) !important; }
+
+.pp-empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--pp-muted);
+  font-size: .92rem;
+}
+
+/* â”€â”€ Contact grid â”€â”€ */
+.pp-contacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.pp-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pp-contact-ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pp-accent) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--pp-accent);
+}
+.pp-contact-ic .MuiSvgIcon-root { font-size: 20px; }
+.pp-contact-info { display: flex; flex-direction: column; min-width: 0; }
+.pp-contact-lbl { font-size: .75rem; color: var(--pp-muted); text-transform: uppercase; letter-spacing: .3px; }
+.pp-contact-val { font-size: .92rem; font-weight: 500; color: var(--pp-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-contact-val.empty { font-style: italic; opacity: .6; }
+
+/* â”€â”€ Map â”€â”€ */
+.pp-map {
+  border-radius: 0 0 var(--pp-radius) var(--pp-radius);
+  overflow: hidden;
+}
+.pp-map iframe {
+  width: 100%;
+  height: 260px;
+  border: none;
+  display: block;
+}
+
+/* â”€â”€ Sidebar â”€â”€ */
+.pp-side-card {
+  background: var(--pp-card);
+  border-radius: var(--pp-radius);
+  box-shadow: var(--pp-shadow);
+  border: 1px solid var(--pp-border);
+  padding: 20px;
+  position: sticky;
+  top: 100px;
+}
+.pp-side-title {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--pp-text);
+}
+.pp-side-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 0;
+  color: var(--pp-muted);
+  font-size: .88rem;
+}
+.pp-ann-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.pp-ann-list::-webkit-scrollbar { width: 4px; }
+.pp-ann-list::-webkit-scrollbar-thumb { background: var(--pp-border); border-radius: 4px; }
+
+.pp-ann {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--pp-border);
+  cursor: pointer;
+  transition: all .2s;
+}
+.pp-ann:hover {
+  box-shadow: var(--pp-shadow);
+  border-color: var(--pp-accent);
+}
+.pp-ann-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--pp-border) 50%, transparent);
+}
+.pp-ann-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .7rem;
+  color: var(--pp-muted);
+}
+.pp-ann-body { display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; }
+.pp-ann-title {
   font-weight: 600;
-  color: #374151;
+  font-size: .88rem;
+  color: var(--pp-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pp-ann-price {
+  font-weight: 700;
+  font-size: .92rem;
+  color: var(--pp-accent);
+}
+.pp-ann-loc {
+  font-size: .78rem;
+  color: var(--pp-muted);
 }
 
-/* Small tweaks for mobile */
+/* â”€â”€ Dark mode â”€â”€ */
+body.dark-mode .pp-page {
+  --pp-bg: #121212;
+  --pp-card: #2d2d2d;
+  --pp-text: #ffffff;
+  --pp-muted: #a0a0a0;
+  --pp-border: #3d3d3d;
+  --pp-shadow: 0 1px 3px rgba(0,0,0,.3);
+  --pp-shadow-lg: 0 4px 12px rgba(0,0,0,.4);
+}
+body.dark-mode .pp-hero-cover:not(.has-cover) {
+  background: linear-gradient(135deg, #ad1457 0%, #7b1fa2 100%);
+}
+body.dark-mode .pp-hero-avatar {
+  border-color: #2d2d2d;
+}
+body.dark-mode .pp-contact-ic {
+  background: rgba(236,64,122,.12);
+}
+body.dark-mode .pp-bar-track {
+  background: #3d3d3d;
+}
+
+/* â”€â”€ Responsive â”€â”€ */
 @media (max-width: 1024px) {
-  .public-profile-reviews-content {
-    padding: 14px;
+  .pp-grid {
+    grid-template-columns: 1fr 300px;
+    padding: 0 20px;
   }
-  .public-profile-reviews-score {
-    font-size: var(--pp-score-size-mobile);
-  }
+  .pp-hero-body { padding: 0 20px; }
+  .pp-stats { margin-left: 20px; margin-right: 20px; }
 }
+@media (max-width: 768px) {
+  .pp-mobile-header { display: flex; }
 
-/* Mobile height-constrained screens: ensure reviews card doesn't overflow viewport height
-   We use calc with safe-area-inset and a conservative offset to leave room for header/footer.
-   The card becomes internally scrollable if content exceeds available height. */
-/* For small screens allow the reviews card to expand naturally so the page scrolls
-   instead of the card having its own internal scrolling. This ensures the card is
-   always fully visible and not clipped on some device heights. */
-@media (max-width: 600px) {
-  .public-profile-reviews-card {
-    overflow: visible;
+  .pp-hero-cover { height: 160px; border-radius: 0; }
+  .pp-hero-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    margin-top: -48px;
+    padding: 0 16px;
   }
-  .public-profile-reviews-card .public-profile-reviews-content {
-    overflow: visible;
+  .pp-hero-avatar { width: 96px; height: 96px; }
+  .pp-hero-name { justify-content: center; font-size: 1.35rem; }
+  .pp-hero-location { justify-content: center; }
+  .pp-hero-status { justify-content: center; }
+  .pp-hero-actions { margin-left: 0; width: 100%; padding-bottom: 0; }
+  .pp-msg-btn { width: 100% !important; }
+
+  .pp-stats {
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 16px 16px 0;
     padding: 12px;
   }
-}
+  .pp-stat { flex: 1 1 45%; padding: 8px 4px; }
+  .pp-stat-sep { display: none; }
 
-/* If the viewport height is small, re-enable an internal max-height for the reviews
-   card so it doesn't overflow the visible area. These thresholds are conservative;
-   adjust numbers if your header/footer heights differ. */
-@media (max-height: 720px) {
-  .public-profile-page-container { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
-  .public-profile-reviews-card {
-    /* Allow room for header (~6rem) + some gap. Use the dynamically computed
-       --pp-available-height where possible so the value adapts to UI chrome. */
-    max-height: calc(var(--pp-available-height, 100vh) - 6rem - 80px);
-    overflow: hidden;
+  .pp-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
   }
-  .public-profile-reviews-card .public-profile-reviews-content {
-    max-height: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
+  .pp-col-side { order: -1; }
 
-@media (max-height: 560px) {
-  /* For very short viewports, be more strict so content doesn't get lost under UI chrome */
-  .public-profile-reviews-card {
-    max-height: calc(100vh - 6rem - 80px);
-  }
-}
+  .pp-contacts { grid-template-columns: 1fr; }
 
-/* Dark mode overrides to align with `ProfilePage.css` tokens */
-body.dark-mode .public-profile-reviews-card {
-  background: #282828;
-  border-color: #3f3f3f;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  .pp-rating-box { flex-direction: column; gap: 16px; }
+  .pp-rating-left { flex-direction: row; gap: 12px; }
 }
-
-body.dark-mode .public-profile-reviews-card .public-profile-reviews-content {
-  color: #ffffff;
-}
-
-body.dark-mode .public-profile-reviews-score {
-  color: #ffffff;
-}
-
-body.dark-mode .public-profile-rating-bar-outer {
-  background: #3a3a3a;
-}
-
-/* Individual review list under the summary */
-.public-profile-review-list {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.public-profile-review-item {
-  background: transparent;
-  border-radius: 8px;
-  padding: 8px 6px;
-  border: 1px solid rgba(0,0,0,0.04);
-}
-.public-profile-review-item-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.public-profile-review-author {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.public-profile-review-author-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-  line-height: 1;
-}
-.public-profile-review-meta {
-  font-size: 0.8rem;
-  color: var(--pf-text-muted, #6b7280);
-}
-.public-profile-review-score-small {
-  background: #f7f8fa;
-  color: #1f2937;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-weight: 700;
-  min-width: 44px;
-  text-align: center;
-}
-.public-profile-review-body {
-  margin-top: 8px;
-  color: var(--pf-text, #2d3748);
-  font-size: 0.95rem;
-  /* Softer 'code-like' style: a neutral proportional UI font with slightly tighter letter-spacing
-    and tabular numerics to keep numeric alignment but without the harsh monospace look. */
-  font-family: Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui;
-  font-weight: 500;
-  letter-spacing: 0.12px;
-  font-variant-numeric: tabular-nums;
-}
-.public-profile-no-reviews {
-  color: var(--pf-text-muted, #6b7280);
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 6px 0;
-}
-
-.review-ann-link {
-  color: #355070;
-  text-decoration: none;
-}
-
-.review-ann-link:hover {
-  text-decoration: underline;
-}
-
-
-/* Dark mode tweaks */
-body.dark-mode .public-profile-review-item {
-  border-color: rgba(255,255,255,0.06);
-}
-body.dark-mode .public-profile-review-score-small {
-  background: #1f2937;
-  color: #fff;
-}
-
-/* New compact reviews list (separate section under summary) */
-.public-profile-reviews-list-container {
-  margin-top: 8px;
-  width: 100%;
-}
-.public-profile-reviews-list-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.compact-review-item {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 8px;
-  border-radius: var(--pf-card-radius, 12px);
-  background: var(--pf-card-bg, #fff);
-  border: 1px solid var(--pf-divider, #e8eef6);
-  box-shadow: var(--pf-card-shadow, 0 1px 4px rgba(16,24,40,0.04));
-}
-.compact-review-item { position: relative; }
-
-.compact-review-item .review-actions-menu {
-  position: absolute;
-  right: 6px;
-  top: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-}
-
-/* If the menu Popup is slightly offset, ensure it visually overlaps the button */
-.MuiPopover-root {
-  z-index: 6000 !important;
-}
-
-/* Ensure the IconButton itself is slightly inset so menu appears closer */
-.compact-review-item .MuiIconButton-root {
-  padding: 6px;
-}
-
-/* Style menu items to match page */
-.MuiMenu-paper {
-  border-radius: 10px !important;
-}
-.MuiMenuItem-root {
-  font-weight: 600;
-  color: var(--pf-text, #2d3748);
-}
-.MuiMenuItem-root:hover {
-  background: rgba(53,80,112,0.06);
-}
-.compact-review-left {
-  flex: 0 0 36px;
-}
-.compact-review-main {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.compact-review-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-.compact-review-author {
-  font-weight: 700;
-  font-size: 0.92rem;
-}
-.compact-review-date {
-  color: var(--pf-text-muted, #6b7280);
-  font-size: 0.78rem;
-  margin-top: 2px;
-}
-.compact-review-ann-title {
-  margin-top: 4px;
-  font-weight: 700;
-  color: var(--pf-accent, #355070);
-  font-size: 0.92rem;
-  line-height: 1.1;
-}
-.compact-review-body {
-  color: var(--pf-text, #2d3748);
-  font-size: 0.9rem;
-  /* Softer 'code-like' style for compact review descriptions (proportional but tuned for readability) */
-  font-family: Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui;
-  font-weight: 500;
-  letter-spacing: 0.08px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.3;
-  margin-top: 2px;
-}
-.compact-review-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  margin-top: 8px;
-}
-.compact-review-score {
-  background: #f3f5f9;
-  padding: 4px 6px;
-  border-radius: 6px;
-  font-weight: 700;
-  color: #1f2937;
-  font-size: 0.92rem;
-}
-
-/* Dark mode for compact list */
-body.dark-mode .compact-review-item {
-  background: #242424;
-  border-color: rgba(255,255,255,0.04);
-}
-body.dark-mode .compact-review-body {
-  color: #e6e6e6;
-}
-
-@media (max-width: 600px) {
-  .compact-review-item { padding: 10px; }
-  .compact-review-body { font-size: 0.92rem; }
+@media (max-width: 480px) {
+  .pp-hero-cover { height: 130px; }
+  .pp-hero-avatar { width: 80px; height: 80px; }
+  .pp-hero-name { font-size: 1.15rem; }
+  .pp-card { padding: 16px; }
+  .pp-rev { gap: 10px; padding: 10px 0; }
+  .pp-ann-img { width: 60px; height: 60px; }
 }

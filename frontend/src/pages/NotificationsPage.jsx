@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import StarIcon from '@mui/icons-material/Star';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import DescriptionIcon from '@mui/icons-material/Description';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import './NotificationsPage.css';
 import gumballPeace from '../assets/images/gumballPeace.jpg';
 
-// Normalize avatar/announcement relative URLs to work with /uploads
+// Resolve relative avatar URLs
 const resolveAvatarUrl = (src) => {
   if (!src) return '';
   if (typeof src !== 'string') return '';
@@ -17,48 +24,26 @@ const resolveAvatarUrl = (src) => {
   return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\/]/, '')}`;
 };
 
-// Helper pentru obținerea datelor userului
-const getUserData = async (userId) => {
-  try {
-    const res = await apiClient.get(`/api/users/profile/${userId}`);
-    const user = res.data;
-    console.log('🔍 User data pentru userId:', userId, user);
-    const name = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : (user.email || 'Expeditor necunoscut');
-    const resolved = resolveAvatarUrl(user.avatar);
-    const result = {
-      name,
-      avatar: resolved || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=355070&color=fff&size=128')
-    };
-    console.log('🖼️ Avatar găsit:', result.avatar);
-    return result;
-  } catch (error) {
-    console.error('Eroare la obținerea datelor utilizatorului:', error);
-    return {
-      name: 'Expeditor necunoscut',
-      avatar: 'https://ui-avatars.com/api/?name=User&background=355070&color=fff&size=128'
-    };
-  }
+// Derive notification type from stored type or link pattern
+const getNotifType = (n) => {
+  if (n.type === 'review') return 'review';
+  if (n.type === 'verification' || n.type === 'document') return n.type;
+  if (n.link && typeof n.link === 'string' && n.link.startsWith('/chat/')) return 'message';
+  if (n.type === 'general' && n.relatedAnnouncementId) return 'general';
+  return n.type || 'general';
 };
 
-// Helper pentru obținerea preview-ului ultimului mesaj dintr-o conversație
-const getLastMessagePreview = async (convId) => {
-  try {
-    const res = await apiClient.get(`/api/messages/conversation/${convId}`);
-    const msgs = res.data;
-    if (!msgs.length) return { senderName: '', preview: '', senderAvatar: null };
-    const lastMsg = msgs[msgs.length - 1];
-    console.log('📩 Ultimul mesaj din conversația:', convId, lastMsg);
-    const userData = await getUserData(lastMsg.senderId);
-    const result = { 
-      senderName: userData.name, 
-      preview: lastMsg.text,
-      senderAvatar: userData.avatar
-    };
-    console.log('🔄 Preview final pentru notificare:', result);
-    return result;
-  } catch (error) {
-    console.error('Eroare la obținerea preview-ului mesajului:', error);
-    return { senderName: '', preview: '', senderAvatar: null };
+// Icon component per type
+const NotifIcon = ({ type }) => {
+  const style = { fontSize: 18 };
+  switch (type) {
+    case 'message':     return <ChatBubbleOutlineIcon style={style} />;
+    case 'review':      return <StarIcon style={style} />;
+    case 'verification':return <VerifiedUserIcon style={style} />;
+    case 'document':    return <DescriptionIcon style={style} />;
+    default:
+      // Guess from relatedAnnouncementId (favorite or negotiation)
+      return <LocalOfferIcon style={style} />;
   }
 };
 
@@ -69,67 +54,54 @@ export default function NotificationsPage() {
   const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
 
-  // Funcție pentru navigarea la chat
-  const handleChatNavigation = async (notificationId, chatLink) => {
-    // Șterge notificarea după ce a fost vizualizată
-    await deleteNotification(notificationId);
-    
-    // Extrage conversationId din link
-    if (chatLink && chatLink.startsWith('/chat/')) {
-      const parts = chatLink.split('/');
-      if (parts.length >= 3) {
-        const conversationId = parts[2];
-        // Navighează la pagina de chat cu conversationId în state sau ca query param
-        navigate('/chat', { state: { conversationId } });
-      } else {
-        // Navighează la pagina de chat generală
-        navigate('/chat');
-      }
-    } else {
-      // Navighează la pagina de chat generală
-      navigate('/chat');
-    }
-  };
-
-  // Funcție pentru a marca o notificare ca citită
+  // Mark a notification as read (update local state)
   const markAsRead = async (notificationId) => {
     try {
       await apiClient.patch(`/api/notifications/${notificationId}/read`);
-      // Actualizează starea locală
-      setNotifications(prev => 
-        prev.map(n => 
-          n._id === notificationId ? { ...n, read: true } : n
-        )
-      );
-    } catch (error) {
-      console.error('Eroare la marcarea notificării ca citită:', error);
+      setNotifications(prev => prev.map(n => n._id === notificationId ? { ...n, read: true } : n));
+    } catch (_) {}
+  };
+
+  // Delete a notification
+  const deleteNotification = async (notificationId) => {
+    try {
+      await apiClient.delete(`/api/notifications/${notificationId}`);
+      setNotifications(prev => prev.filter(n => n._id !== notificationId));
+    } catch (_) {}
+  };
+
+  // Handle click on the action button
+  const handleAction = async (n) => {
+    const type = getNotifType(n);
+
+    if (type === 'message' && n.link && n.link.startsWith('/chat/')) {
+      // Chat: delete the notification and open the conversation
+      await deleteNotification(n._id);
+      const parts = n.link.split('/');
+      if (parts.length >= 3) {
+        navigate('/chat', { state: { conversationId: parts[2] } });
+      } else {
+        navigate('/chat');
+      }
+      return;
+    }
+
+    // All other types: mark as read and navigate to the link
+    await markAsRead(n._id);
+    if (n.link) {
+      navigate(n.link);
     }
   };
 
-  // Funcție pentru ștergerea unei notificări
-  const deleteNotification = async (notificationId) => {
-    try {
-      console.log('🗑️ Ștergere notificare cu ID:', notificationId);
-      console.log('🔗 URL apel:', `${apiClient.defaults.baseURL}/api/notifications/${notificationId}`);
-      
-      const response = await apiClient.delete(`/api/notifications/${notificationId}`);
-      console.log('✅ Răspuns server pentru ștergere:', response.data);
-      console.log('📊 Status răspuns:', response.status);
-      
-      // Actualizează lista locală eliminând notificarea ștearsă
-      setNotifications(prev => {
-        const newNotifications = prev.filter(n => n._id !== notificationId);
-        console.log('📝 Notificări înainte de filtrare:', prev.length);
-        console.log('📝 Notificări după filtrare:', newNotifications.length);
-        return newNotifications;
-      });
-      console.log('✅ Lista de notificări actualizată local');
-    } catch (error) {
-      console.error('❌ Eroare la ștergerea notificării:', error);
-      console.error('❌ Detalii eroare:', error.response?.data);
-      console.error('❌ Status eroare:', error.response?.status);
-      console.error('❌ Mesaj eroare:', error.message);
-      // Poți adăuga aici o notificare de eroare pentru utilizator
+  // Get contextual action label
+  const getActionLabel = (n) => {
+    const type = getNotifType(n);
+    switch (type) {
+      case 'message':     return t('notifications.reply');
+      case 'review':      return t('notifications.viewProfile');
+      case 'verification':return t('notifications.viewDocuments');
+      case 'document':    return t('notifications.viewAdmin');
+      default:            return t('notifications.viewAnnouncement');
     }
   };
 
@@ -140,50 +112,12 @@ export default function NotificationsPage() {
       return;
     }
     setLoading(true);
-    console.log('🔔 Frontend: Încarcă notificări pentru userId:', userId);
-    
     apiClient.get(`/api/notifications/${userId}`)
       .then(res => {
-        console.log('🔔 Frontend: Răspuns primit:', res.data);
-        return res.data;
-      })
-      .then(async data => {
-        // Enrich chat și non-chat notifications cu sender (dacă există id disponibil)
-        const enriched = await Promise.all(data.map(async notif => {
-          console.log('🔍 Processing notification:', notif);
-          if (notif.link && notif.link.startsWith('/chat/')) {
-            const convId = notif.link.split('/chat/')[1];
-            const { senderName, preview, senderAvatar } = await getLastMessagePreview(convId);
-            const enrichedNotif = { ...notif, senderName, preview, senderAvatar };
-            console.log('✅ Enriched chat notification:', enrichedNotif);
-            return enrichedNotif;
-          }
-          // Non-chat: încercăm să deducem sender-ul din fromUserId
-          const possibleSenderId = notif.fromUserId || notif.senderId || notif.userId || null;
-          if (possibleSenderId) {
-            try {
-              const userData = await getUserData(possibleSenderId);
-              const enrichedNonChat = {
-                ...notif,
-                senderName: userData.name || '',
-                preview: notif.actionDescription || notif.message || '',
-                senderAvatar: userData.avatar || null
-              };
-              console.log('✅ Enriched non-chat notification with sender:', enrichedNonChat);
-              return enrichedNonChat;
-            } catch (e) {
-              // fallback silențios
-            }
-          }
-          const nonChatNotif = { ...notif, senderName: '', preview: notif.message || '', senderAvatar: null };
-          console.log('📋 Non-chat notification (no sender id):', nonChatNotif);
-          return nonChatNotif;
-        }));
-        setNotifications(enriched);
+        setNotifications(res.data || []);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error('❌ Frontend: Eroare la încărcarea notificărilor:', err);
+      .catch(() => {
         setNotifications([]);
         setLoading(false);
       });
@@ -193,7 +127,7 @@ export default function NotificationsPage() {
     <>
       <div className="notifications-page">
         <div className="notifications-container">
-          {/* Mobile header: back + title (mirror Favorites page) */}
+          {/* Mobile header */}
           <div className="mobile-header">
             <IconButton
               onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
@@ -222,62 +156,80 @@ export default function NotificationsPage() {
               </div>
             ) : (
               <ul className="notifications-list">
-                {notifications.map(n => (
-                  <li key={n._id} className={`notification-item ${!n.read ? 'unread' : 'read'}`}>
-                    <div className="notification-card-inner">
-                      {/* Avatar Column - Left */}
-                      <div className="notification-avatar-container">
-                        <div className="notification-avatar">
-                          <img 
-                            src={n.senderAvatar ? resolveAvatarUrl(n.senderAvatar) : ('https://ui-avatars.com/api/?name=' + encodeURIComponent(n.senderName || 'User') + '&background=355070&color=fff&size=128')}
-                            alt={n.senderName || 'User'} 
-                            onError={(e) => {
-                              console.log('❌ Eroare la încărcarea avatar-ului:', n.senderAvatar);
-                              const fallbackName = n.senderName || 'User';
-                              e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName) + '&background=355070&color=fff&size=128';
-                            }} 
-                          />
-                        </div>
-                      </div>
+                {notifications.map(n => {
+                  const type = getNotifType(n);
+                  const avatarSrc = n.senderAvatar
+                    ? resolveAvatarUrl(n.senderAvatar)
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(n.senderName || 'H')}&background=355070&color=fff&size=128`;
 
-                      {/* Content Column - Right */}
-                      <div className="notification-content-column">
-                        {/* Header: Name & Date */}
-                        <div className="notification-header-row">
-                          {n.senderName && (
-                            <div className="notification-sender">{n.senderName}</div>
-                          )}
-                          <div className="notification-date">
-                            {n.createdAt ? new Date(n.createdAt).toLocaleDateString('ro-RO', { hour: '2-digit', minute:'2-digit' }) : ''}
+                  return (
+                    <li key={n._id} className={`notification-item ${!n.read ? 'unread' : 'read'} notif-type-${type}`}>
+                      <div className="notification-card-inner">
+
+                        {/* Type icon strip */}
+                        <div className={`notif-type-strip notif-strip-${type}`}>
+                          <NotifIcon type={type} />
+                        </div>
+
+                        {/* Avatar */}
+                        <div className="notification-avatar-container">
+                          <div className="notification-avatar">
+                            <img
+                              src={avatarSrc}
+                              alt={n.senderName || 'User'}
+                              onError={(e) => {
+                                const fb = n.senderName || 'H';
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fb)}&background=355070&color=fff&size=128`;
+                              }}
+                            />
                           </div>
                         </div>
 
-                        {/* Message Preview */}
-                        <div className="notification-message">{n.preview}</div>
+                        {/* Content */}
+                        <div className="notification-content-column">
+                          <div className="notification-header-row">
+                            {n.senderName && (
+                              <div className="notification-sender">{n.senderName}</div>
+                            )}
+                            <div className="notification-date">
+                              {n.createdAt ? new Date(n.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}
+                            </div>
+                          </div>
 
-                        {/* Action Button (only for chat links) */}
-                        {n.link && typeof n.link === 'string' && n.link.startsWith('/chat/') && (
-                          <button 
-                            className="notification-action-btn"
-                            onClick={() => handleChatNavigation(n._id, n.link)}
-                          >
-                            <span>{t('notifications.reply')}</span>
-                            <span className="action-arrow">→</span>
-                          </button>
-                        )}
+                          {/* Main message */}
+                          <div className="notification-message">{n.preview || n.message}</div>
+
+                          {/* Announcement context */}
+                          {n.announcementTitle && (
+                            <div className="notif-ann-context">
+                              ðŸ“¦ {n.announcementTitle}
+                            </div>
+                          )}
+
+                          {/* Action button â€” shown for all notifications with a link */}
+                          {n.link && (
+                            <button
+                              className="notification-action-btn"
+                              onClick={() => handleAction(n)}
+                            >
+                              <span>{getActionLabel(n)}</span>
+                              <span className="action-arrow">â†’</span>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Delete button */}
+                        <button
+                          className="notification-delete-btn"
+                          onClick={() => deleteNotification(n._id)}
+                          title={t('notifications.deleteNotification')}
+                        >
+                          <DeleteIcon className="notification-delete-icon" />
+                        </button>
                       </div>
-
-                      {/* Delete Button - Absolute Top Right */}
-                      <button 
-                        className="notification-delete-btn"
-                        onClick={() => deleteNotification(n._id)}
-                        title={t('notifications.deleteNotification')}
-                      >
-                        <DeleteIcon className="notification-delete-icon" />
-                      </button>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -286,3 +238,4 @@ export default function NotificationsPage() {
     </>
   );
 }
+

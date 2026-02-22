@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
+import Toast from '../components/Toast';
 import './AllAnnouncements.css';
 import './FavoriteAnnouncements.css';
 
@@ -50,6 +51,7 @@ export default function ArchivedAnnouncementsPage() {
   const [viewMode, setViewMode] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showLoginToast, setShowLoginToast] = useState(false);
 
   const itemsPerPage = 12;
 
@@ -179,19 +181,7 @@ export default function ArchivedAnnouncementsPage() {
     e.stopPropagation();
 
     if (!user) {
-      let localFavorites = [];
-      try {
-        const stored = localStorage.getItem(FAVORITES_KEY);
-        const parsed = JSON.parse(stored || '[]');
-        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') localFavorites = parsed;
-        else if (Array.isArray(parsed)) localFavorites = parsed.map(item => item.id).filter(Boolean);
-      } catch {}
-
-      const isFav = localFavorites.includes(announcementId);
-      const updatedFavorites = isFav ? localFavorites.filter(id => id !== announcementId) : [...localFavorites, announcementId];
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
-      setFavoriteIds(updatedFavorites);
-      window.dispatchEvent(new Event('favorites:updated'));
+      setShowLoginToast(true);
       return;
     }
 
@@ -224,6 +214,12 @@ export default function ArchivedAnnouncementsPage() {
 
   return (
     <Box className="my-announcements-page">
+      <Toast
+        message={t('favorites.loginRequired')}
+        type="info"
+        visible={showLoginToast}
+        onClose={() => setShowLoginToast(false)}
+      />
       <Box className="mobile-header">
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />

@@ -58,6 +58,7 @@ import {
 } from '@mui/icons-material';
 import StarIcon from '@mui/icons-material/Star';
 import apiClient from '../api/api';
+import Toast from '../components/Toast';
 import './AnnouncementDetails.css';
 import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
 import translateCategory from '../utils/translateCategory';
@@ -105,6 +106,7 @@ export default function AnnouncementDetails() {
   // Favorite logic (migrated to AuthContext). Fallback la localStorage pentru guest.
   const { favorites, toggleFavorite, user } = useAuth() || {};
   const [isFavorite, setIsFavorite] = useState(false); // local UI state
+  const [showLoginToast, setShowLoginToast] = useState(false);
   
   // ========== Carousel ==========
   const [imgIndex, setImgIndex] = useState(0);
@@ -339,27 +341,7 @@ export default function AnnouncementDetails() {
       toggleFavorite?.(announcement._id);
       setIsFavorite(prev => !prev);
     } else {
-      // guest localStorage handling unchanged for now
-      const userId = localStorage.getItem('userId');
-      const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
-      const raw = localStorage.getItem(FAVORITES_KEY);
-      let list = [];
-      try {
-        const parsed = JSON.parse(raw || '[]');
-        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
-          list = parsed.map(id => ({ id, addedAt: Date.now() }));
-        } else if (Array.isArray(parsed)) {
-          list = parsed;
-        }
-      } catch { list = []; }
-      const exists = list.some(item => item.id === announcement._id);
-      const updated = exists ? list.filter(i => i.id !== announcement._id) : [...list, { id: announcement._id, addedAt: Date.now() }];
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-      setIsFavorite(!exists);
-      // Notifică header-ul (și alte componente) că s-a schimbat numărul de favorite
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('favorites:updated'));
-      }
+      setShowLoginToast(true);
     }
   };
 
@@ -495,6 +477,12 @@ export default function AnnouncementDetails() {
 
   return (
     <ErrorBoundary>
+      <Toast
+        message={t('favorites.loginRequired')}
+        type="info"
+        visible={showLoginToast}
+        onClose={() => setShowLoginToast(false)}
+      />
       <Container
         className="announcement-details-page"
         maxWidth="lg"

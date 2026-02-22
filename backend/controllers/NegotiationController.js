@@ -123,12 +123,16 @@ exports.createNegotiation = async (req, res) => {
         const seller = await User.findById(sellerId).select('pushToken firstName lastName notificationSettings');
         const buyerUser = await User.findById(buyerId).select('firstName lastName');
         const buyerName = buyerUser ? (`${buyerUser.firstName || ''} ${buyerUser.lastName || ''}`).trim() || 'Utilizator' : 'Utilizator';
-        const notifMessage = `${buyerName} ți-a propus un preț pentru anunțul "${announcement.title || ''}"`;
+        const notifMessage = `${buyerName} ți-a propus un preț de ${proposedPrice} lei pentru anunțul „${announcement.title || ''}"`;
 
         await Notification.create({
           userId: sellerId,
           message: notifMessage,
-          link: `/negotiations/${negotiation._id}`,
+          link: `/announcement/${announcementId}`,
+          type: 'general',
+          fromUserId: buyerId,
+          actionDescription: `a propus un preț de ${proposedPrice} lei`,
+          relatedAnnouncementId: String(announcementId),
           title: 'Propunere de preț'
         });
 
