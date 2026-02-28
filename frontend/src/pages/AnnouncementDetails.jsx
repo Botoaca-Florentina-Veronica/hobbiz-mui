@@ -42,6 +42,7 @@ import {
   Rating
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n.js';
 import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
@@ -80,9 +81,9 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <Container sx={{ mt: 12, mb: 4, textAlign: 'center' }}>
-          <Typography variant="h5" color="error" gutterBottom>Ceva nu a mers — încearcă să reîncarci pagina.</Typography>
+          <Typography variant="h5" color="error" gutterBottom>{i18n.t('announcementDetails.errorBoundary.message')}</Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom style={{ marginBottom: 12 }}>{this.state.error?.message}</Typography>
-          <Button variant="contained" onClick={() => window.location.reload()}>Reîncarcă pagina</Button>
+          <Button variant="contained" onClick={() => window.location.reload()}>{i18n.t('announcementDetails.errorBoundary.reload')}</Button>
         </Container>
       );
     }
@@ -162,7 +163,7 @@ export default function AnnouncementDetails() {
       // Ensure we have the target user id
       const reviewedUserId = announcement?.user?._id || announcement?.user?.id;
       if (!reviewedUserId) {
-        alert('Utilizatorul nu este disponibil pentru evaluare.');
+        alert(t('announcementDetails.userNotAvailable'));
         return;
       }
 
@@ -180,9 +181,9 @@ export default function AnnouncementDetails() {
       console.error('Eroare la trimiterea recenziei:', err);
       // Provide user feedback
       if (err?.response?.data?.error) {
-        alert(`Eroare: ${err.response.data.error}`);
+        alert(`${t('common.error')}: ${err.response.data.error}`);
       } else {
-        alert('A apărut o eroare la trimiterea recenziei. Încearcă din nou.');
+        alert(t('announcementDetails.reviewError'));
       }
     }
   };
@@ -213,7 +214,7 @@ export default function AnnouncementDetails() {
     const reviews = sellerProfile?.reviews;
     if (!Array.isArray(reviews) || reviews.length === 0) {
       return (
-        <Typography variant="body2" color="text.secondary">nu există review-uri</Typography>
+        <Typography variant="body2" color="text.secondary">{t('announcementDetails.noReviews')}</Typography>
       );
     }
     const avg = reviews.reduce((s, r) => s + Number(r.score || 0), 0) / reviews.length;
@@ -221,7 +222,7 @@ export default function AnnouncementDetails() {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Rating value={avg} precision={0.1} readOnly size="small" />
         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{avg.toFixed(1)}</Typography>
-        <Typography variant="body2" color="text.secondary">({reviews.length} recenzii)</Typography>
+        <Typography variant="body2" color="text.secondary">{t('announcementDetails.reviewsCount', { count: reviews.length })}</Typography>
       </Box>
     );
   };
@@ -367,7 +368,8 @@ export default function AnnouncementDetails() {
 
   // ========== Utilitare de format ==========
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('ro-RO', {
+    const locale = i18n.language === 'en' ? 'en-GB' : 'ro-RO';
+    return new Date(dateString).toLocaleDateString(locale, {
       day: '2-digit',
       month: 'long',
       year: 'numeric'
@@ -406,7 +408,7 @@ export default function AnnouncementDetails() {
       <ErrorBoundary>
         <Container maxWidth="lg" sx={{ mt: 12, mb: 4, textAlign: 'center' }}>
           <Typography variant="h4" color="error" gutterBottom>
-            Anunțul nu a fost găsit
+            {t('announcementDetails.notFound')}
           </Typography>
           <Button
             variant="contained"
@@ -414,7 +416,7 @@ export default function AnnouncementDetails() {
             onClick={() => navigate('/')}
             sx={{ mt: 2 }}
           >
-            Înapoi la pagina principală
+            {t('announcementDetails.backToMain')}
           </Button>
         </Container>
       </ErrorBoundary>
@@ -517,15 +519,15 @@ export default function AnnouncementDetails() {
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
             </div>
             <div style={{flex:1}}>
-              <div style={{fontWeight:600,fontSize:'1rem'}}>Anunț actualizat</div>
-              <div style={{opacity:.9,fontSize:'.9rem',marginTop:2}}>Modificările au fost salvate și sunt vizibile public.</div>
+              <div style={{fontWeight:600,fontSize:'1rem'}}>{t('announcementDetails.updatedBanner.title')}</div>
+              <div style={{opacity:.9,fontSize:'.9rem',marginTop:2}}>{t('announcementDetails.updatedBanner.body')}</div>
             </div>
             <button
               onClick={() => {
                 setBannerPhase('exit');
                 setTimeout(() => setShowUpdatedBanner(false), 450);
               }}
-              aria-label="Închide"
+              aria-label={t('common.close')}
               style={{
                 background:'rgba(255,255,255,0.18)',
                 border:'none',
@@ -555,7 +557,7 @@ export default function AnnouncementDetails() {
             '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)' }
           }}
         >
-          Înapoi
+          {t('common.back')}
         </Button>
 
         <Grid container spacing={4}>
@@ -637,7 +639,7 @@ export default function AnnouncementDetails() {
                       color: getIsDarkMode() ? '#f5f5f5' : '#999'
                     }}
                   >
-                    <Typography variant="h6">Nu există imagini disponibile</Typography>
+                    <Typography variant="h6">{t('announcementDetails.noImages')}</Typography>
                   </Box>
                 )}
               </Box>
@@ -653,7 +655,7 @@ export default function AnnouncementDetails() {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                       <AccessTimeIcon sx={{ color: getAccentCss(), fontSize: 20 }} />
                       <Typography variant="body2" color="text.secondary">
-                        Postat {formatDate(announcement.createdAt)}
+                        {t('announcementDetails.posted', { date: formatDate(announcement.createdAt) })}
                       </Typography>
                     </Box>
                     <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' }, textAlign: 'center' }}>
@@ -674,7 +676,7 @@ export default function AnnouncementDetails() {
                   
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Tooltip 
-                      title={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
+                      title={isFavorite ? t('announcementDetails.removeFromFavorites') : t('announcementDetails.addToFavorites')}
                       placement="right"
                       arrow
                       enterDelay={300}
@@ -702,7 +704,7 @@ export default function AnnouncementDetails() {
                       </IconButton>
                     </Tooltip>
                     <Tooltip 
-                      title="Partajează"
+                      title={t('announcementDetails.share')}
                       placement="right"
                       arrow
                       enterDelay={300}
@@ -734,7 +736,7 @@ export default function AnnouncementDetails() {
 
                 {/* Description */}
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 2, fontWeight: 600 }}>
-                  Descriere
+                  {t('announcementDetails.description')}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -800,13 +802,13 @@ export default function AnnouncementDetails() {
                         fontWeight: 500,
                         fontSize: { xs: '.65rem', sm: '.75rem' }
                       }}>
-                        {typeof announcement.views === 'number' ? announcement.views : 0} vizualizări
+                        {t('announcementDetails.views', { count: typeof announcement.views === 'number' ? announcement.views : 0 })}
                       </Typography>
                     </Box>
                   </Box>
                   <Button
                     size="small"
-                    onClick={() => alert('Funcționalitatea de raportare va fi disponibilă în curând.')}
+                    onClick={() => alert(t('announcementDetails.reportSoon'))}
                     startIcon={
                       <svg xmlns="http://www.w3.org/2000/svg" width={window.innerWidth < 600 ? "12" : "16"} height={window.innerWidth < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
                     }
@@ -823,7 +825,7 @@ export default function AnnouncementDetails() {
                       flexShrink: 0
                     }}
                   >
-                    Raportează
+                    {t('announcementDetails.report')}
                   </Button>
                 </Box>
 
@@ -831,7 +833,7 @@ export default function AnnouncementDetails() {
                   <>
                     <Divider sx={{ my: 3 }} />
                     <Typography variant="h6" sx={{ color: getAccentCss(), mb: 1, fontWeight: 600 }}>
-                      Preț
+                      {t('announcementDetails.price')}
                     </Typography>
                     <Typography variant="h5" sx={{ color: '#e53e3e', fontWeight: 700 }}>
                       {announcement.price} RON
@@ -848,7 +850,7 @@ export default function AnnouncementDetails() {
             <Card className="seller-card" elevation={2} sx={{ mb: 3, mt: { xs: 0, md: 4 } }}>
               <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                 <Typography variant="h6" sx={{ color: getAccentCss(), mb: 3, fontWeight: 600 }}>
-                  Informații vânzător
+                  {t('announcementDetails.sellerInfo')}
                 </Typography>
 
                 {/* Seller Avatar and Info */}
@@ -872,7 +874,7 @@ export default function AnnouncementDetails() {
                     </Typography>
                     {/* Show seller reviews summary instead of "Membru din" */}
                     {sellerReviewsLoading ? (
-                      <Typography variant="body2" color="text.secondary">Se încarcă...</Typography>
+                      <Typography variant="body2" color="text.secondary">{t('common.loading')}</Typography>
                     ) : (
                       renderSellerReviewsSummary()
                     )}
@@ -884,7 +886,7 @@ export default function AnnouncementDetails() {
                   <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Persoană de contact:
+                        {t('announcementDetails.contactPerson')}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 500 }}>
                         {announcement.contactPerson}
@@ -905,7 +907,7 @@ export default function AnnouncementDetails() {
                           py: 0.5
                         }}
                       >
-                        Evaluează
+                        {t('announcementDetails.rate')}
                       </Button>
                     </Box>
                   </Box>
@@ -928,7 +930,7 @@ export default function AnnouncementDetails() {
                         py: 1.5
                       }}
                     >
-                      Trimite mesaj
+                      {t('announcementDetails.sendMessage')}
                     </Button>
 
                     {/* Phone Contact */}
@@ -949,7 +951,7 @@ export default function AnnouncementDetails() {
                             onClick={() => setShowPhone(true)}
                             sx={{ color: getAccentCss() }}
                           >
-                            Arată
+                            {t('announcementDetails.show')}
                           </Button>
                         )}
                       </Box>
@@ -968,7 +970,7 @@ export default function AnnouncementDetails() {
                         '&:hover': { borderColor: getAccentHover(), bgcolor: 'transparent' }
                       }}
                     >
-                      Vizualizare profil
+                      {t('announcementDetails.viewProfile')}
                     </Button>
                   </Box>
                 )}
@@ -976,7 +978,7 @@ export default function AnnouncementDetails() {
                 {isOwnAnnouncement && (
                   <Box sx={{ textAlign: 'center', py: 2 }}>
                     <Typography variant="body2" color="text.secondary">
-                      Acesta este anunțul tău
+                      {t('announcementDetails.ownAnnouncement')}
                     </Typography>
                   </Box>
                 )}
@@ -1037,7 +1039,7 @@ export default function AnnouncementDetails() {
           }
         }}
       >
-        <DialogTitle sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>Evaluează utilizatorul</DialogTitle>
+        <DialogTitle sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('announcementDetails.rateUser')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <Rating
@@ -1057,7 +1059,7 @@ export default function AnnouncementDetails() {
             <Typography variant="body2" sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{ratingValue}.0</Typography>
           </Box>
           <TextField
-            label="Comentariu (opțional)"
+            label={t('announcementDetails.commentOptional')}
             fullWidth
             multiline
             minRows={3}
@@ -1085,8 +1087,8 @@ export default function AnnouncementDetails() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>Anulează</Button>
-          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>Trimite</Button>
+          <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('common.cancel')}</Button>
+          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('announcementDetails.submit')}</Button>
         </DialogActions>
       </Dialog>
 

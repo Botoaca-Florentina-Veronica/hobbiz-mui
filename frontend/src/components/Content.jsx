@@ -20,7 +20,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 // Content.css is imported in App.jsx to ensure it is loaded after global styles
-import apiClient from '../api/api';
+import apiClient, { searchAnnouncements } from '../api/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import translateCategory from '../utils/translateCategory';
 
@@ -61,37 +61,40 @@ export default function Content() {
     return () => { mounted = false; };
   }, []);
 
-  // Handle search parameter from URL
+  // Handle search parameter from URL (with AbortController to prevent race conditions)
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTerm = urlParams.get('search');
     
-    if (searchTerm && searchTerm.trim()) {
-      setIsSearching(true);
-      setSearchResults([]);
-      
-      // Search announcements
-      apiClient.get(`/api/announcements/search?q=${encodeURIComponent(searchTerm)}`)
-        .then(res => {
-          const results = res.data || [];
-          setSearchResults(results);
-          setIsSearching(false);
-          
-          // Show toast if no results found
-          if (results.length === 0) {
-            window.showToast(t('content.noResultsFound'), "info", 4000);
-          }
-        })
-        .catch(err => {
-          console.error('Eroare la căutarea anunțurilor:', err);
-          setSearchResults([]);
-          setIsSearching(false);
-          window.showToast(t('content.searchError'), "error", 4000);
-        });
-    } else {
+    if (!searchTerm || !searchTerm.trim()) {
       setSearchResults([]);
       setIsSearching(false);
+      return;
     }
+
+    const controller = new AbortController();
+    setIsSearching(true);
+    setSearchResults([]);
+
+    searchAnnouncements(searchTerm.trim(), controller.signal)
+      .then(res => {
+        if (controller.signal.aborted) return;
+        const results = res.data || [];
+        setSearchResults(results);
+        setIsSearching(false);
+        if (results.length === 0) {
+          window.showToast(t('content.noResultsFound'), "info", 4000);
+        }
+      })
+      .catch(err => {
+        if (controller.signal.aborted) return;
+        console.error('Eroare la căutarea anunțurilor:', err);
+        setSearchResults([]);
+        setIsSearching(false);
+        window.showToast(t('content.searchError'), "error", 4000);
+      });
+
+    return () => controller.abort();
   }, [location.search]);
 
   return (

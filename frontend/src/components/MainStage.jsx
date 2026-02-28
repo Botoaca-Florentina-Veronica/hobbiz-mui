@@ -15,7 +15,7 @@ import { Paper, CardContent, Chip, Box, IconButton, InputBase, Stack, useMediaQu
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import './MainStage.css';
-import { searchAnnouncements } from '../api/api';
+import useSearchSuggestions from '../hooks/useSearchSuggestions';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
@@ -212,51 +212,21 @@ export default function MainStage() {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [categoryDetailsAnimating, setCategoryDetailsAnimating] = useState(false);
   
-  // Search autocomplete state
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchSuggestions, setSearchSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+  // Search autocomplete (hook handles debounce + AbortController)
+  const {
+    searchTerm,
+    setSearchTerm,
+    suggestions: searchSuggestions,
+    isLoading: isSearching,
+    showSuggestions,
+    setShowSuggestions,
+    clearSearch,
+  } = useSearchSuggestions();
   
   // Refs
   const categoriesButtonRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
-  const searchTimeoutRef = useRef(null);
   const searchContainerRef = useRef(null);
-
-  // Effect pentru debounced search
-  useEffect(() => {
-    if (searchTerm.trim().length >= 2) {
-      setIsSearching(true);
-      // Debounce: așteaptă 300ms după ce utilizatorul termină de tastat
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-      
-      searchTimeoutRef.current = setTimeout(async () => {
-        try {
-          const response = await searchAnnouncements(searchTerm);
-          setSearchSuggestions(response.data);
-          setShowSuggestions(true);
-          setIsSearching(false);
-        } catch (error) {
-          console.error('Eroare la căutarea de sugestii:', error);
-          setSearchSuggestions([]);
-          setIsSearching(false);
-        }
-      }, 300);
-    } else {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-      setIsSearching(false);
-    }
-
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [searchTerm]);
 
   // Click outside to close suggestions
   useEffect(() => {
@@ -339,8 +309,7 @@ export default function MainStage() {
   }, []);
 
   const handleSuggestionClick = (announcementId) => {
-    setShowSuggestions(false);
-    setSearchTerm("");
+    clearSearch();
     navigate(`/announcement/${announcementId}`);
   };
 
@@ -348,15 +317,49 @@ export default function MainStage() {
     e.preventDefault();
     if (searchTerm.trim()) {
       setShowSuggestions(false);
-      // Redirecționează către homepage cu scroll la categories sau poți crea o pagină dedicată
-      // Pentru acum, voi folosi categoria "Fotografie" cu parametru de căutare custom
-      // Sau mai bine, navigăm către homepage și facem scroll
-      navigate(`/?search=${encodeURIComponent(searchTerm)}`);
+      navigate(`/?search=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
   const open = Boolean(anchorEl);
   const id = open ? 'location-popover' : undefined;
+
+  // Shared render for suggestion items (desktop + mobile)
+  const renderSuggestions = () =>
+    searchSuggestions.map((item) => (
+      <div
+        key={item._id}
+        className="suggestion-item"
+        onClick={() => handleSuggestionClick(item._id)}
+      >
+        <div className="suggestion-image">
+          {item.image ? (
+            <img src={item.image} alt={item.title} />
+          ) : (
+            <div className="no-image-placeholder">
+              <FaSearch />
+            </div>
+          )}
+        </div>
+        <div className="suggestion-content">
+          <div className="suggestion-title">{item.title}</div>
+          <div className="suggestion-meta">
+            <span className="suggestion-category">{translateCategory(item.category, t)}</span>
+            {item.location && (
+              <>
+                <span className="suggestion-separator">•</span>
+                <span className="suggestion-location">{item.location}</span>
+              </>
+            )}
+          </div>
+        </div>
+        {item.price != null && (
+          <div className="suggestion-price">
+            {item.price === 0 ? t('mainStage.free', 'Gratuit') : `${item.price} RON`}
+          </div>
+        )}
+      </div>
+    ));
 
   return (
     <div className="main-stage">
@@ -466,40 +469,7 @@ export default function MainStage() {
               {/* Suggestions Dropdown */}
               {showSuggestions && searchSuggestions.length > 0 && (
                 <div className="search-suggestions-dropdown">
-                  {searchSuggestions.map((announcement) => (
-                    <div
-                      key={announcement._id}
-                      className="suggestion-item"
-                      onClick={() => handleSuggestionClick(announcement._id)}
-                    >
-                      <div className="suggestion-image">
-                        {announcement.images && announcement.images.length > 0 ? (
-                          <img src={announcement.images[0]} alt={announcement.title} />
-                        ) : (
-                          <div className="no-image-placeholder">
-                            <FaSearch />
-                          </div>
-                        )}
-                      </div>
-                      <div className="suggestion-content">
-                        <div className="suggestion-title">{announcement.title}</div>
-                        <div className="suggestion-meta">
-                          <span className="suggestion-category">{translateCategory(announcement.category, t)}</span>
-                          {announcement.location && (
-                            <>
-                              <span className="suggestion-separator">•</span>
-                              <span className="suggestion-location">{announcement.location}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      {announcement.price && (
-                        <div className="suggestion-price">
-                          {announcement.price === 0 ? 'Gratuit' : `${announcement.price} RON`}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                  {renderSuggestions()}
                 </div>
               )}
             </form>
@@ -539,40 +509,7 @@ export default function MainStage() {
             {/* Mobile Suggestions Dropdown */}
             {showSuggestions && searchSuggestions.length > 0 && (
               <div className="search-suggestions-dropdown mobile-suggestions">
-                {searchSuggestions.map((announcement) => (
-                  <div
-                    key={announcement._id}
-                    className="suggestion-item"
-                    onClick={() => handleSuggestionClick(announcement._id)}
-                  >
-                    <div className="suggestion-image">
-                      {announcement.images && announcement.images.length > 0 ? (
-                        <img src={announcement.images[0]} alt={announcement.title} />
-                      ) : (
-                        <div className="no-image-placeholder">
-                          <FaSearch />
-                        </div>
-                      )}
-                    </div>
-                    <div className="suggestion-content">
-                      <div className="suggestion-title">{announcement.title}</div>
-                      <div className="suggestion-meta">
-                        <span className="suggestion-category">{announcement.category}</span>
-                        {announcement.location && (
-                          <>
-                            <span className="suggestion-separator">•</span>
-                            <span className="suggestion-location">{announcement.location}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    {announcement.price && (
-                      <div className="suggestion-price">
-                        {announcement.price === 0 ? 'Gratuit' : `${announcement.price} RON`}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {renderSuggestions()}
               </div>
             )}
           </Box>

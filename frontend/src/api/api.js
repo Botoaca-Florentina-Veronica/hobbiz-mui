@@ -105,8 +105,13 @@ export const verifyDocument = (userId, documentId, data) =>
 export const toggleUserVerification = (userId, data) => 
   apiClient.put(`/api/users/admin/users/${userId}/verification-badge`, data);
 
-// Announcement search for autocomplete suggestions
-export const searchAnnouncements = (searchQuery) => apiClient.get(`/api/announcements/search?q=${encodeURIComponent(searchQuery)}`);
+// Announcement search for autocomplete suggestions (lightweight)
+export const suggestAnnouncements = (query, signal) =>
+  apiClient.get(`/api/announcements/suggest?q=${encodeURIComponent(query)}`, { signal });
+
+// Full announcement search (used on search results page)
+export const searchAnnouncements = (query, signal) =>
+  apiClient.get(`/api/announcements/search?q=${encodeURIComponent(query)}`, { signal });
 
 // Logout request (pentru sesiuni/cookie-uri)
 export const logout = () => apiClient.get('/auth/logout', { withCredentials: true });

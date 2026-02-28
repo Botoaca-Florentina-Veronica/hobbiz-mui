@@ -19,4 +19,11 @@ const announcementSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Text index for fast full-text search (used by /search endpoint)
+// Weights prioritise title matches over description
+announcementSchema.index(
+  { title: 'text', category: 'text', location: 'text', description: 'text' },
+  { weights: { title: 10, category: 5, location: 3, description: 1 }, name: 'search_text' }
+);
+
 module.exports = mongoose.model('Announcement', announcementSchema);

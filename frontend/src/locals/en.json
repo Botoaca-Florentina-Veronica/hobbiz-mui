@@ -1301,6 +1301,19 @@
     },
     "admin": {
       "pendingTitle": "Pending Verifications",
+      "noPending": "No pending verifications.",
+      "colUser": "User",
+      "colDocuments": "Documents",
+      "colVerified": "Verified",
+      "colActions": "Actions",
+      "view": "View",
+      "documentsOf": "Documents: {{name}}",
+      "badgeActive": "Verified (Badge Active)",
+      "grantBadge": "Grant Badge",
+      "removeBadge": "Remove Badge",
+      "noDocuments": "No documents uploaded.",
+      "viewDocument": "View Document",
+      "reject": "Reject",
       "rejectionTitle": "Reject Document",
       "rejectionReason": "Rejection reason",
       "rejectionPlaceholder": "E.g.: Document unclear or expired...",
@@ -1321,5 +1334,41 @@
     "acceptAll": "Accept All",
     "rejectAll": "Reject All",
     "customize": "Customize Settings"
+  },
+  "announcementDetails": {
+    "errorBoundary": {
+      "message": "Something went wrong — try reloading the page.",
+      "reload": "Reload page"
+    },
+    "notFound": "Announcement not found",
+    "backToMain": "Back to home",
+    "updatedBanner": {
+      "title": "Announcement updated",
+      "body": "Changes have been saved and are publicly visible."
+    },
+    "noImages": "No images available",
+    "posted": "Posted {{date}}",
+    "removeFromFavorites": "Remove from favorites",
+    "addToFavorites": "Add to favorites",
+    "share": "Share",
+    "description": "Description",
+    "views": "{{count}} views",
+    "report": "Report",
+    "reportSoon": "The report feature will be available soon.",
+    "price": "Price",
+    "sellerInfo": "Seller info",
+    "noReviews": "no reviews",
+    "reviewsCount": "({{count}} reviews)",
+    "contactPerson": "Contact person:",
+    "rate": "Rate",
+    "sendMessage": "Send message",
+    "show": "Show",
+    "viewProfile": "View profile",
+    "ownAnnouncement": "This is your announcement",
+    "rateUser": "Rate user",
+    "commentOptional": "Comment (optional)",
+    "submit": "Submit",
+    "userNotAvailable": "The user is not available for rating.",
+    "reviewError": "An error occurred while submitting the review. Try again."
   }
 }

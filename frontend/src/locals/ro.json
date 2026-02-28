@@ -1314,6 +1314,19 @@
     },
     "admin": {
       "pendingTitle": "Verificări în așteptare",
+      "noPending": "Nu există verificări în așteptare.",
+      "colUser": "Utilizator",
+      "colDocuments": "Documente",
+      "colVerified": "Verificat",
+      "colActions": "Acțiuni",
+      "view": "Vezi",
+      "documentsOf": "Documente: {{name}}",
+      "badgeActive": "Verificat (Badge Activ)",
+      "grantBadge": "Acordă Badge",
+      "removeBadge": "Șterge Badge",
+      "noDocuments": "Niciun document încărcat.",
+      "viewDocument": "Vezi Document",
+      "reject": "Respinge",
       "rejectionTitle": "Respingere Document",
       "rejectionReason": "Motivul respingerii",
       "rejectionPlaceholder": "Ex: Document neclar sau expirat...",
@@ -1334,5 +1347,41 @@
     "acceptAll": "Acceptă tot",
     "rejectAll": "Refuză tot",
     "customize": "Personalizează setările"
+  },
+  "announcementDetails": {
+    "errorBoundary": {
+      "message": "Ceva nu a mers — încearcă să reîncarci pagina.",
+      "reload": "Reîncarcă pagina"
+    },
+    "notFound": "Anunțul nu a fost găsit",
+    "backToMain": "Înapoi la pagina principală",
+    "updatedBanner": {
+      "title": "Anunț actualizat",
+      "body": "Modificările au fost salvate și sunt vizibile public."
+    },
+    "noImages": "Nu există imagini disponibile",
+    "posted": "Postat {{date}}",
+    "removeFromFavorites": "Elimină din favorite",
+    "addToFavorites": "Adaugă la favorite",
+    "share": "Partajează",
+    "description": "Descriere",
+    "views": "{{count}} vizualizări",
+    "report": "Raportează",
+    "reportSoon": "Funcționalitatea de raportare va fi disponibilă în curând.",
+    "price": "Preț",
+    "sellerInfo": "Informații vânzător",
+    "noReviews": "nu există review-uri",
+    "reviewsCount": "({{count}} recenzii)",
+    "contactPerson": "Persoană de contact:",
+    "rate": "Evaluează",
+    "sendMessage": "Trimite mesaj",
+    "show": "Arată",
+    "viewProfile": "Vizualizare profil",
+    "ownAnnouncement": "Acesta este anunțul tău",
+    "rateUser": "Evaluează utilizatorul",
+    "commentOptional": "Comentariu (opțional)",
+    "submit": "Trimite",
+    "userNotAvailable": "Utilizatorul nu este disponibil pentru evaluare.",
+    "reviewError": "A apărut o eroare la trimiterea recenziei. Încearcă din nou."
   }
 }

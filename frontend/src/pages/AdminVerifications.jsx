@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   Container, 
   Typography, 
-  Paper, 
   Box, 
   Button, 
   IconButton, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  ListItemSecondaryAction, 
   Dialog, 
   DialogTitle, 
   DialogContent, 
@@ -17,21 +12,17 @@ import {
   TextField, 
   CircularProgress,
   Chip,
-  Tooltip,
   Divider,
   Avatar,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -52,14 +43,11 @@ export default function AdminVerifications() {
   const [processing, setProcessing] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
-  // Rejection State
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
-  const [targetDoc, setTargetDoc] = useState(null); // { userId, docId }
+  const [targetDoc, setTargetDoc] = useState(null);
 
-  useEffect(() => {
-    fetchPending();
-  }, []);
+  useEffect(() => { fetchPending(); }, []);
 
   const fetchPending = async () => {
     try {
@@ -68,9 +56,7 @@ export default function AdminVerifications() {
       setUsers(response.data.users || []);
     } catch (error) {
       console.error('Error fetching pending verifications:', error);
-      if (window.showToast) {
-        window.showToast(t('verification.messages.fetchError'), 'error');
-      }
+      if (window.showToast) window.showToast(t('verification.messages.fetchError'), 'error');
     } finally {
       setLoading(false);
     }
@@ -106,7 +92,6 @@ export default function AdminVerifications() {
         window.showToast(status === 'verified' ? t('verification.admin.verifySuccess') : t('verification.admin.rejectSuccess'), 'success');
       }
       setRejectionModalOpen(false);
-      // Refresh
       if (selectedUser) {
         const response = await getUserDocumentsAdmin(selectedUser._id);
         setSelectedUser(response.data.user);
@@ -123,9 +108,7 @@ export default function AdminVerifications() {
     try {
       setProcessing(true);
       await toggleUserVerification(userId, { isVerified: !currentStatus });
-      if (window.showToast) {
-        window.showToast(t('verification.admin.badgeSuccess'), 'success');
-      }
+      if (window.showToast) window.showToast(t('verification.admin.badgeSuccess'), 'success');
       if (selectedUser && selectedUser._id === userId) {
         setSelectedUser({ ...selectedUser, isVerified: !currentStatus });
       }
@@ -137,223 +120,244 @@ export default function AdminVerifications() {
     }
   };
 
+  const getInitials = (user) =>
+    user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase() : '?';
+
   return (
-    <div className="account-settings-page-container">
-      <Container maxWidth="lg" className="notification-settings-container">
-        <div className="mobile-header">
-          <IconButton onClick={() => navigate(-1)} className="mobile-back-btn">
+    <div className="av-page">
+      <Container maxWidth="lg" className="av-container">
+
+        {/* â”€â”€ Header â”€â”€ */}
+        <div className="av-back-row">
+          <IconButton className="av-back-btn" onClick={() => navigate(-1)}>
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h5" className="mobile-header-title">{t('verification.admin.pendingTitle')}</Typography>
         </div>
 
-        <h1 className="notification-title">{t('verification.admin.pendingTitle')}</h1>
+        <h1 className="av-title">
+          {t('verification.admin.pendingTitle')}
+          {!loading && <span className="av-count-badge">{users.length}</span>}
+        </h1>
 
-        <Paper elevation={0} className="settings-paper">
-          {loading ? (
-            <Box p={4} textAlign="center"><CircularProgress /></Box>
-          ) : users.length === 0 ? (
-            <Box p={4} textAlign="center"><Typography color="textSecondary">Nu există verificări în așteptare.</Typography></Box>
-          ) : (
-            <TableContainer component={Box}>
-              <Table>
-                <TableHead>
-                  <TableRow className="admin-table-header">
-                    <TableCell className="admin-table-header-cell">Utilizator</TableCell>
-                    <TableCell align="center" className="admin-table-header-cell">Documente</TableCell>
-                    <TableCell align="center" className="admin-table-header-cell">Verificat</TableCell>
-                    <TableCell align="right" className="admin-table-header-cell">Acțiuni</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow 
-                      key={user._id}
-                      onClick={() => navigate(`/profil/${user._id}`)}
-                      sx={{ cursor: 'pointer', '&:hover': { backgroundColor: (theme) => theme.palette.action.hover } }}
-                    >
-                      <TableCell>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Avatar src={user.avatar} sx={{ width: 32, height: 32 }} />
-                          <Box>
-                            <Typography variant="body2" fontWeight="bold">{user.firstName} {user.lastName}</Typography>
-                            <Typography variant="caption" color="textSecondary">{user.email}</Typography>
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip label={user.pendingDocuments?.length || 0} size="small" color="warning" />
-                      </TableCell>
-                      <TableCell align="center">
-                        {user.isVerified ? <VerifiedIcon color="success" /> : <CloseIcon color="disabled" />}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button 
-                          variant="outlined" 
-                          size="small" 
-                          startIcon={<VisibilityIcon />} 
-                          onClick={(e) => { e.stopPropagation(); handleOpenUserDocs(user); }}
-                        >
-                          Vezi
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Paper>
+        {/* â”€â”€ Content â”€â”€ */}
+        {loading ? (
+          <div className="av-loader">
+            <CircularProgress size={40} thickness={4} className="av-spinner" />
+          </div>
+        ) : users.length === 0 ? (
+          <div className="av-empty">
+            <VerifiedIcon className="av-empty-icon" />
+            <Typography className="av-empty-text">{t('verification.admin.noPending')}</Typography>
+          </div>
+        ) : (
+          <div className="av-grid">
+            {users.map((user) => (
+              <div key={user._id} className="av-card" onClick={() => navigate(`/profil/${user._id}`)}>
+                <div className="av-card-left">
+                  <Avatar
+                    src={user.avatar}
+                    className="av-avatar"
+                  >
+                    {!user.avatar && getInitials(user)}
+                  </Avatar>
+                  <div className="av-card-info">
+                    <span className="av-card-name">{user.firstName} {user.lastName}</span>
+                    <span className="av-card-email">{user.email}</span>
+                    <div className="av-card-badges">
+                      {user.isVerified && (
+                        <span className="av-badge av-badge--verified">
+                          <VerifiedIcon style={{ fontSize: 12 }} />
+                          {t('verification.admin.colVerified')}
+                        </span>
+                      )}
+                      {(user.pendingDocuments?.length > 0) && (
+                        <span className="av-badge av-badge--pending">
+                          <HourglassEmptyIcon style={{ fontSize: 12 }} />
+                          {user.pendingDocuments.length} {t('verification.admin.colDocuments').toLowerCase()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="contained"
+                  size="small"
+                  className="av-view-btn"
+                  startIcon={processing ? <CircularProgress size={14} /> : <VisibilityIcon />}
+                  onClick={(e) => { e.stopPropagation(); handleOpenUserDocs(user); }}
+                  disabled={processing}
+                >
+                  {t('verification.admin.view')}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </Container>
 
-      {/* User Documents Modal */}
-      <Dialog 
-        open={!!selectedUser} 
-        onClose={() => setSelectedUser(null)} 
-        fullWidth 
-        maxWidth="md"
-        className="admin-verification-dialog"
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            backgroundImage: 'none !important',
-            backgroundColor: (theme) => theme.palette.mode === 'dark' 
-              ? '#121212 !important' 
-              : '#ffffff !important',
-            boxShadow: (theme) => theme.palette.mode === 'dark' 
-              ? '0 20px 60px rgba(0,0,0,0.6)' 
-              : '0 20px 60px rgba(0,0,0,0.1)'
-          }
-        }}
+      {/* â•â•â•â•â•â•â•â•â•â• Documents Dialog â•â•â•â•â•â•â•â•â•â• */}
+      <Dialog
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        fullWidth
+        maxWidth="sm"
+        className="av-dialog"
+        PaperProps={{ className: 'av-dialog-paper' }}
         BackdropProps={{
           sx: {
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            backgroundColor: (theme) => theme.palette.mode === 'dark' 
-              ? 'rgba(0, 0, 0, 0.7)' 
-              : 'rgba(0, 0, 0, 0.4)'
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(0,0,0,0.45)'
           }
         }}
       >
-        <DialogTitle sx={{ fontWeight: 700, pt: 3 }}>
-          Documente: {selectedUser?.firstName} {selectedUser?.lastName}
-          {selectedUser && (
-            <Box mt={1} display="flex" gap={1}>
-              <Button 
-                variant={selectedUser.isVerified ? "contained" : "outlined"} 
-                color={selectedUser.isVerified ? "success" : "primary"}
-                onClick={() => handleToggleBadge(selectedUser._id, selectedUser.isVerified)}
-                startIcon={<VerifiedIcon />}
+        {/* Dialog Header */}
+        <div className="av-dialog-header">
+          <div className="av-dialog-user">
+            <Avatar src={selectedUser?.avatar} className="av-dialog-avatar">
+              {!selectedUser?.avatar && getInitials(selectedUser)}
+            </Avatar>
+            <div>
+              <Typography className="av-dialog-name">
+                {selectedUser?.firstName} {selectedUser?.lastName}
+              </Typography>
+              <Typography className="av-dialog-email">{selectedUser?.email}</Typography>
+            </div>
+          </div>
+
+          {/* Badge Toggle */}
+          <div className="av-badge-toggle">
+            <Button
+              variant={selectedUser?.isVerified ? 'contained' : 'outlined'}
+              className={`av-badge-btn ${selectedUser?.isVerified ? 'av-badge-btn--active' : ''}`}
+              startIcon={<VerifiedIcon />}
+              size="small"
+              onClick={() => handleToggleBadge(selectedUser._id, selectedUser.isVerified)}
+              disabled={processing}
+            >
+              {selectedUser?.isVerified ? t('verification.admin.badgeActive') : t('verification.admin.grantBadge')}
+            </Button>
+            {selectedUser?.isVerified && (
+              <Button
+                variant="outlined"
+                className="av-badge-btn av-badge-btn--remove"
+                startIcon={<CloseIcon />}
                 size="small"
+                onClick={() => handleToggleBadge(selectedUser._id, selectedUser.isVerified)}
+                disabled={processing}
               >
-                {selectedUser.isVerified ? "Verificat (Badge Activ)" : "Acordă Badge"}
+                {t('verification.admin.removeBadge')}
               </Button>
-              {selectedUser.isVerified && (
-                <Button 
-                  variant="outlined" 
-                  color="error"
-                  onClick={() => handleToggleBadge(selectedUser._id, selectedUser.isVerified)}
-                  startIcon={<CloseIcon />}
-                  size="small"
-                >
-                  Șterge Badge
-                </Button>
-              )}
-            </Box>
-          )}
-        </DialogTitle>
-        <DialogContent dividers>
-          {selectedUser?.documents?.length === 0 ? (
-            <Typography>Niciun document încărcat.</Typography>
+            )}
+          </div>
+          <IconButton className="av-dialog-close" onClick={() => setSelectedUser(null)} size="small">
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </div>
+
+        <Divider className="av-dialog-divider" />
+
+        {/* Document List */}
+        <DialogContent className="av-dialog-content">
+          {!selectedUser?.documents?.length ? (
+            <div className="av-no-docs">
+              <DescriptionOutlinedIcon className="av-no-docs-icon" />
+              <Typography className="av-no-docs-text">{t('verification.admin.noDocuments')}</Typography>
+            </div>
           ) : (
-            <List>
-              {selectedUser?.documents?.map((doc, idx) => (
-                <React.Fragment key={doc._id}>
-                  <ListItem>
-                    <ListItemText 
-                      primary={doc.name}
-                      secondary={
-                        <Box>
-                          <Typography variant="caption" display="block">{t(`verification.types.${doc.type}`)}</Typography>
-                          {doc.description && <Typography variant="body2">{doc.description}</Typography>}
-                          <Box mt={1}>
-                            <Button 
-                              size="small" 
-                              href={doc.url} 
-                              target="_blank" 
-                              rel="noopener"
-                              variant="text"
-                              startIcon={<VisibilityIcon />}
-                            >
-                              Vezi Document
-                            </Button>
-                          </Box>
-                        </Box>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      {doc.status === 'pending' ? (
-                        <Box display="flex" gap={1}>
-                          <IconButton color="success" onClick={() => handleVerifyAction(selectedUser._id, doc._id, 'verified')}>
-                            <CheckIcon />
-                          </IconButton>
-                          <IconButton color="error" onClick={() => handleVerifyAction(selectedUser._id, doc._id, 'rejected')}>
-                            <CloseIcon />
-                          </IconButton>
-                        </Box>
-                      ) : (
-                        <Chip 
-                          label={t(`verification.status.${doc.status}`)} 
-                          color={doc.status === 'verified' ? 'success' : 'error'} 
-                          variant="outlined"
-                          size="small"
-                        />
+            <div className="av-doc-list">
+              {selectedUser.documents.map((doc, idx) => (
+                <div key={doc._id} className={`av-doc-card av-doc-card--${doc.status}`}>
+                  <div className="av-doc-card-top">
+                    <div className="av-doc-icon-wrap">
+                      <DescriptionOutlinedIcon className="av-doc-icon" />
+                    </div>
+                    <div className="av-doc-info">
+                      <span className="av-doc-name">{doc.name}</span>
+                      <span className="av-doc-type">{t(`verification.types.${doc.type}`)}</span>
+                      {doc.description && (
+                        <span className="av-doc-desc">{doc.description}</span>
                       )}
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  {idx < selectedUser.documents.length - 1 && <Divider />}
-                </React.Fragment>
+                    </div>
+                    <div className="av-doc-status-wrap">
+                      {doc.status === 'pending' ? (
+                        <span className="av-doc-status av-doc-status--pending">
+                          <HourglassEmptyIcon style={{ fontSize: 13 }} />
+                          {t('verification.status.pending')}
+                        </span>
+                      ) : (
+                        <span className={`av-doc-status av-doc-status--${doc.status}`}>
+                          {doc.status === 'verified' ? <CheckIcon style={{ fontSize: 13 }} /> : <CloseIcon style={{ fontSize: 13 }} />}
+                          {t(`verification.status.${doc.status}`)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="av-doc-card-actions">
+                    <a
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="av-doc-link"
+                    >
+                      <OpenInNewIcon style={{ fontSize: 14 }} />
+                      {t('verification.admin.viewDocument')}
+                    </a>
+                    {doc.status === 'pending' && (
+                      <div className="av-doc-action-btns">
+                        <button
+                          className="av-action-btn av-action-btn--approve"
+                          onClick={() => handleVerifyAction(selectedUser._id, doc._id, 'verified')}
+                          disabled={processing}
+                        >
+                          <CheckIcon style={{ fontSize: 15 }} />
+                          {t('verification.status.verified')}
+                        </button>
+                        <button
+                          className="av-action-btn av-action-btn--reject"
+                          onClick={() => handleVerifyAction(selectedUser._id, doc._id, 'rejected')}
+                          disabled={processing}
+                        >
+                          <CloseIcon style={{ fontSize: 15 }} />
+                          {t('verification.admin.reject')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </List>
+            </div>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSelectedUser(null)}>Închide</Button>
-        </DialogActions>
       </Dialog>
 
-      {/* Rejection Modal */}
-      <Dialog 
-        open={rejectionModalOpen} 
+      {/* â•â•â•â•â•â•â•â•â•â• Rejection Dialog â•â•â•â•â•â•â•â•â•â• */}
+      <Dialog
+        open={rejectionModalOpen}
         onClose={() => setRejectionModalOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            backgroundImage: 'none',
-            backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
-            border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : 'none',
-            p: 1,
-            boxShadow: (theme) => theme.palette.mode === 'dark' 
-              ? '0 20px 60px rgba(0,0,0,0.6)' 
-              : '0 20px 60px rgba(0,0,0,0.1)'
-          }
-        }}
+        fullWidth
+        maxWidth="xs"
+        PaperProps={{ className: 'av-dialog-paper av-reject-paper' }}
         BackdropProps={{
           sx: {
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            backgroundColor: (theme) => theme.palette.mode === 'dark' 
-              ? 'rgba(0, 0, 0, 0.7)' 
-              : 'rgba(0, 0, 0, 0.4)'
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(0,0,0,0.5)'
           }
         }}
       >
-        <DialogTitle sx={{ fontWeight: 700 }}>{t('verification.admin.rejectionTitle')}</DialogTitle>
-        <DialogContent>
+        <div className="av-reject-header">
+          <div className="av-reject-icon-wrap">
+            <CloseIcon className="av-reject-icon" />
+          </div>
+          <div>
+            <Typography className="av-reject-title">{t('verification.admin.rejectionTitle')}</Typography>
+            <Typography className="av-reject-subtitle">{t('verification.admin.rejectionReason')}</Typography>
+          </div>
+        </div>
+        <DialogContent className="av-reject-content">
           <TextField
             autoFocus
-            margin="dense"
-            label={t('verification.admin.rejectionReason')}
             fullWidth
             variant="outlined"
             multiline
@@ -361,17 +365,24 @@ export default function AdminVerifications() {
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             placeholder={t('verification.admin.rejectionPlaceholder')}
+            className="av-reject-field"
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRejectionModalOpen(false)}>Anulează</Button>
-          <Button 
-            onClick={() => performVerification(targetDoc.userId, targetDoc.docId, 'rejected', rejectionReason)} 
-            color="error" 
-            variant="contained"
-            disabled={!rejectionReason.trim() || processing}
+        <DialogActions className="av-reject-actions">
+          <Button
+            className="av-reject-cancel"
+            onClick={() => setRejectionModalOpen(false)}
           >
-            Respinge
+            {t('common.cancel')}
+          </Button>
+          <Button
+            className="av-reject-confirm"
+            variant="contained"
+            onClick={() => performVerification(targetDoc.userId, targetDoc.docId, 'rejected', rejectionReason)}
+            disabled={!rejectionReason.trim() || processing}
+            startIcon={processing ? <CircularProgress size={14} /> : <CloseIcon />}
+          >
+            {t('verification.admin.reject')}
           </Button>
         </DialogActions>
       </Dialog>

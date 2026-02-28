@@ -202,18 +202,18 @@ export default function NotificationsPage() {
                           {/* Announcement context */}
                           {n.announcementTitle && (
                             <div className="notif-ann-context">
-                              ðŸ“¦ {n.announcementTitle}
+                              📦 {n.announcementTitle}
                             </div>
                           )}
 
-                          {/* Action button â€” shown for all notifications with a link */}
+                          {/* Action button — shown for all notifications with a link */}
                           {n.link && (
                             <button
                               className="notification-action-btn"
                               onClick={() => handleAction(n)}
                             >
                               <span>{getActionLabel(n)}</span>
-                              <span className="action-arrow">â†’</span>
+                              <span className="action-arrow">→</span>
                             </button>
                           )}
                         </div>

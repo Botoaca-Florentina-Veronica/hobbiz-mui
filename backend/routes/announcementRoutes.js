@@ -6,6 +6,92 @@ function escapeRegexLiteral(input) {
   return String(input || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// ---------------------------------------------------------------------------
+// GET /api/announcements/suggest?q=term
+// Lightweight autocomplete – returns only the fields the dropdown needs.
+// Uses regex on title+category only (fast, supports partial words).
+// ---------------------------------------------------------------------------
+router.get('/suggest', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) return res.json([]);
+
+    const escaped = escapeRegexLiteral(q.trim());
+    const suggestions = await Announcement.find({
+      archived: { $ne: true },
+      $or: [
+        { title: { $regex: escaped, $options: 'i' } },
+        { category: { $regex: escaped, $options: 'i' } },
+      ],
+    })
+      .select('_id title category location price images')
+      .sort({ favoritesCount: -1, createdAt: -1 })
+      .limit(8)
+      .lean();
+
+    // Only send the first image to keep the payload small
+    const light = suggestions.map((a) => ({
+      _id: a._id,
+      title: a.title,
+      category: a.category,
+      location: a.location,
+      price: a.price,
+      image: a.images?.[0] || null,
+    }));
+
+    res.json(light);
+  } catch (error) {
+    console.error('Eroare la suggest:', error);
+    res.status(500).json({ error: 'Eroare server la sugestii căutare' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/announcements/search?q=term
+// Full search – uses MongoDB $text when possible (whole-word, relevance-scored),
+// with regex fallback for partial / 1-word queries the text index might miss.
+// Returns full announcement objects for the results page.
+// ---------------------------------------------------------------------------
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) return res.json([]);
+
+    const trimmed = q.trim();
+
+    // Try $text search first (fast, uses index, has relevance score)
+    let announcements = await Announcement.find(
+      { archived: { $ne: true }, $text: { $search: trimmed } },
+      { score: { $meta: 'textScore' } },
+    )
+      .sort({ score: { $meta: 'textScore' } })
+      .limit(20)
+      .lean();
+
+    // Fallback to regex if $text found nothing (handles partial words like "foto")
+    if (announcements.length === 0) {
+      const escaped = escapeRegexLiteral(trimmed);
+      announcements = await Announcement.find({
+        archived: { $ne: true },
+        $or: [
+          { title: { $regex: escaped, $options: 'i' } },
+          { description: { $regex: escaped, $options: 'i' } },
+          { location: { $regex: escaped, $options: 'i' } },
+          { category: { $regex: escaped, $options: 'i' } },
+        ],
+      })
+        .sort({ favoritesCount: -1, createdAt: -1 })
+        .limit(20)
+        .lean();
+    }
+
+    res.json(announcements);
+  } catch (error) {
+    console.error('Eroare la search:', error);
+    res.status(500).json({ error: 'Eroare server la căutare anunțuri' });
+  }
+});
+
 // GET /api/announcements/search-index?limit=800
 // Lightweight index for client-side (fuzzy) autocomplete.
 router.get('/search-index', async (req, res) => {
@@ -22,36 +108,6 @@ router.get('/search-index', async (req, res) => {
   } catch (error) {
     console.error('Eroare la search-index:', error);
     res.status(500).json({ error: 'Eroare server la index căutare anunțuri' });
-  }
-});
-
-// GET /api/announcements/search?q=cuvant - căutare anunțuri pentru autocomplete/suggestions
-router.get('/search', async (req, res) => {
-  try {
-    const { q } = req.query;
-    if (!q || q.trim().length < 2) {
-      return res.json([]);
-    }
-
-    const searchTerm = escapeRegexLiteral(q.trim());
-    const filter = {
-      archived: { $ne: true },
-      $or: [
-        { title: { $regex: searchTerm, $options: 'i' } },
-        { description: { $regex: searchTerm, $options: 'i' } },
-        { location: { $regex: searchTerm, $options: 'i' } },
-        { category: { $regex: searchTerm, $options: 'i' } }
-      ]
-    };
-
-    const announcements = await Announcement.find(filter)
-      .sort({ favoritesCount: -1, createdAt: -1 })
-      .limit(20);
-    
-    res.json(announcements);
-  } catch (error) {
-    console.error('Eroare la search suggestions:', error);
-    res.status(500).json({ error: 'Eroare server la căutare anunțuri' });
   }
 });
 
