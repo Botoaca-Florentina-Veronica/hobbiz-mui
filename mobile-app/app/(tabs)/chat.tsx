@@ -23,6 +23,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 import { useLocale } from '../../src/context/LocaleContext';
+import { getChatTranslations } from '../../src/i18n/chat';
 
 interface Conversation {
   id: string;
@@ -43,31 +44,11 @@ interface Conversation {
   announcementId: string;
 }
 
-const TRANSLATIONS = {
-  ro: {
-    messages: 'Mesaje',
-    continueConversations: 'Continuă conversațiile tale',
-    buying: 'De cumpărat',
-    selling: 'De vândut',
-    loadingConversations: 'Se încarcă conversațiile...',
-    noConversations: 'Nu ai conversații',
-    startWriting: 'E momentul tău Eminescu, începe să scrii!',
-  },
-  en: {
-    messages: 'Messages',
-    continueConversations: 'Continue your conversations',
-    buying: 'Buying',
-    selling: 'Selling',
-    loadingConversations: 'Loading conversations...',
-    noConversations: 'You have no conversations',
-    startWriting: 'It\'s your moment, start writing!',
-  },
-};
 
 export default function ChatScreen() {
   const { tokens, isDark } = useAppTheme();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getChatTranslations(locale);
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();

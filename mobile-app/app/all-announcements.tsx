@@ -9,6 +9,7 @@ import { useLocale } from '../src/context/LocaleContext';
 import api from '../src/services/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { translateCategory, getCategoryKeyByLabel } from '../src/constants/categories';
+import { getAllAnnouncementsTranslations } from '../src/i18n/all-announcements';
 
 interface Announcement {
   _id: string;
@@ -22,25 +23,11 @@ interface Announcement {
   user?: { _id: string; firstName?: string; lastName?: string };
 }
 
-const TRANSLATIONS = {
-  ro: {
-    title: 'Toate anunțurile',
-    loading: 'Se încarcă anunțurile...',
-    noAnnouncements: 'Nu există anunțuri',
-    posted: 'POSTAT',
-  },
-  en: {
-    title: 'All announcements',
-    loading: 'Loading announcements...',
-    noAnnouncements: 'No announcements found',
-    posted: 'POSTED',
-  }
-};
 
 export default function AllAnnouncements() {
   const { tokens, isDark } = useAppTheme();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getAllAnnouncementsTranslations(locale);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();

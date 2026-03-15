@@ -8,57 +8,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { useLocale } from '../../src/context/LocaleContext';
+import { getAccountTranslations } from '../../src/i18n/account';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { Toast } from '../../components/ui/Toast';
-
-const TRANSLATIONS = {
-  ro: {
-    profile: 'Profil',
-    greeting: 'Ceau',
-    user: 'Utilizator',
-    settings: 'Setări',
-    myAds: 'Anunțurile mele',
-    notifications: 'Notificări',
-    darkMode: 'Mod întunecat',
-    language: 'Limba',
-    aboutUs: 'Despre noi',
-    howItWorks: 'Cum funcționează',
-    legalInfo: 'Informații legale',
-    logout: 'Ieși din cont',
-    logoutConfirmTitle: 'Ești sigur(ă) că vrei să te deconectezi?',
-    logoutConfirmMessage: 'Te poți reconecta oricând folosind datele tale.',
-    cancel: 'Anulează',
-    confirmLogout: 'Deconectează-te',
-    selectLanguage: 'Selectează limba',
-    selectLanguageMessage: 'Alege între Română și English.',
-    languageChanged: 'Limba a fost schimbată în Română',
-  },
-  en: {
-    profile: 'Profile',
-    greeting: 'Hey',
-    user: 'User',
-    settings: 'Settings',
-    myAds: 'My Announcements',
-    notifications: 'Notifications',
-    darkMode: 'Dark Mode',
-    language: 'Language',
-    aboutUs: 'About Us',
-    howItWorks: 'How it works',
-    legalInfo: 'Legal Information',
-    logout: 'Log Out',
-    logoutConfirmTitle: 'Are you sure you want to log out?',
-    logoutConfirmMessage: 'You can log back in anytime using your credentials.',
-    cancel: 'Cancel',
-    confirmLogout: 'Log Out',
-    selectLanguage: 'Select Language',
-    selectLanguageMessage: 'Choose between Română and English.',
-    languageChanged: 'Language changed to English',
-  },
-};
 
 type RowSpec = { key: string; label: string; icon: string; action?: () => void; type?: 'switch' | 'danger' };
 
@@ -74,7 +30,7 @@ export default function AccountScreen() {
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
 
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getAccountTranslations(locale);
 
   const accountRows: RowSpec[] = [
     { key: 'settings', label: t.settings, icon: 'settings-outline', action: () => router.push('/settings') },
@@ -113,7 +69,7 @@ export default function AccountScreen() {
     danger: isDark ? '#ff5566' : '#ff2d2d',
   }), [isDark, tokens]);
 
-  const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : 'Utilizator';
+  const displayName = user?.firstName || user?.lastName ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : t.user;
   const { width } = useWindowDimensions();
   // Treat widths less than 768px as phone-sized devices
   const isPhone = width < 768;
@@ -377,7 +333,7 @@ export default function AccountScreen() {
                     setLanguageModalOpen(false);
                     // Wait for modal close animation to complete before showing toast
                     setTimeout(() => {
-                      setToastMessage(TRANSLATIONS.ro.languageChanged);
+                      setToastMessage(getAccountTranslations('ro').languageChanged);
                       setToastVisible(true);
                     }, 300);
                   }}
@@ -391,12 +347,25 @@ export default function AccountScreen() {
                     setLanguageModalOpen(false);
                     // Wait for modal close animation to complete before showing toast
                     setTimeout(() => {
-                      setToastMessage(TRANSLATIONS.en.languageChanged);
+                      setToastMessage(getAccountTranslations('en').languageChanged);
                       setToastVisible(true);
                     }, 300);
                   }}
                 >
                   <ThemedText style={{ color: tokens.colors.text, fontSize: 16 }}>English</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalBtn, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}
+                  onPress={async () => {
+                    await setGlobalLocale('es');
+                    setLanguageModalOpen(false);
+                    setTimeout(() => {
+                      setToastMessage(getAccountTranslations('es').languageChanged);
+                      setToastVisible(true);
+                    }, 300);
+                  }}
+                >
+                  <ThemedText style={{ color: tokens.colors.text, fontSize: 16 }}>Español</ThemedText>
                 </TouchableOpacity>
               </View>
             </View>

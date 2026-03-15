@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import storage from '../services/storage';
 
-type Locale = 'ro' | 'en';
+type Locale = 'ro' | 'en' | 'es';
 
 interface LocaleContextType {
   locale: Locale;
@@ -21,7 +21,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       try {
         const stored = await storage.getItemAsync('locale');
         if (!mounted) return;
-        if (stored === 'en' || stored === 'ro') {
+        if (stored === 'en' || stored === 'ro' || stored === 'es') {
           setLocaleState(stored);
         }
       } catch (e) {

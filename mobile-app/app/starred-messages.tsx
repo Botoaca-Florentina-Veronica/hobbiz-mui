@@ -8,32 +8,15 @@ import storage from '../src/services/storage';
 import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
 import { Ionicons } from '@expo/vector-icons';
+import { getStarredMessagesTranslations } from '../src/i18n/starred-messages';
 
-const TRANSLATIONS = {
-  ro: {
-    title: 'Mesaje cu stea',
-    image: 'Imagine',
-    message: 'Mesaj',
-    noMessages: 'Nu ai mesaje salvate cu stea.',
-    error: 'Eroare',
-    loadError: 'Nu s-au putut încărca mesajele favorite.',
-  },
-  en: {
-    title: 'Starred Messages',
-    image: 'Image',
-    message: 'Message',
-    noMessages: 'You have no saved starred messages.',
-    error: 'Error',
-    loadError: 'Could not load favorite messages.',
-  },
-};
 
 export default function StarredMessagesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { tokens } = useAppTheme();
   const { user } = useAuth();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getStarredMessagesTranslations(locale);
   const [items, setItems] = useState<any[]>([]);
 
   const load = useCallback(async () => {

@@ -19,33 +19,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { rankSearchSuggestions, type SearchIndexItem } from '../../src/utils/search';
+import { getHomeTranslations } from '../../src/i18n/home';
 
-const TRANSLATIONS = {
-  ro: {
-    mainTitle: 'Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!',
-    ctaText: 'Fă din pasiunea ta o sursă de venit!',
-    popularTitle: 'Anunțuri populare',
-    seeAll: 'Vezi tot',
-    loading: 'Se încarcă...',
-    showAllAnnouncements: 'Afișați toate anunțurile',
-    announcement: 'Anunț',
-    seeDetails: 'Vezi detalii  ›',
-    exploreCategories: 'Explorează categorii',
-    categories: ['Fotografie','Prajituri','Muzica','Reparații','Dans','Curățenie','Gradinarit','Sport','Arta','Tehnologie','Auto','Meditații'],
-  },
-  en: {
-    mainTitle: 'Got a cool hobby and think it is useless? Find people willing to pay for it!',
-    ctaText: 'Turn your passion into a source of income!',
-    popularTitle: 'Popular Announcements',
-    seeAll: 'See all',
-    loading: 'Loading...',
-    showAllAnnouncements: 'Show all announcements',
-    announcement: 'Announcement',
-    seeDetails: 'See details  ›',
-    exploreCategories: 'Explore Categories',
-    categories: ['Photography','Cakes','Music','Repairs','Dance','Cleaning','Gardening','Sport','Art','Technology','Auto','Tutoring'],
-  },
-};
 
 const categories = [
   { description: 'Fotografie', color: '#FF6B6B', image: require('../../assets/images/camera.png') },
@@ -121,7 +96,7 @@ export default function HomeScreen() {
   const [searchIndex, setSearchIndex] = useState<SearchIndexItem[]>([]);
   const searchSeqRef = useRef(0);
 
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getHomeTranslations(locale);
 
   // helper: convert hex #RRGGBB to rgba(r,g,b,a)
   const hexToRgba = useCallback((hex: string, alpha: number) => {

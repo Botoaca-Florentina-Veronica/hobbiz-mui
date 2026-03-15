@@ -12,6 +12,7 @@ import { useLocale } from '../src/context/LocaleContext';
 import { useAuth } from '../src/context/AuthContext';
 import storage from '../src/services/storage';
 import { registerForPushNotificationsAsync } from '../src/services/notificationService';
+import { getNotificationSettingsTranslations } from '../src/i18n/notification-settings';
 
 export default function NotificationSettingsScreen() {
   const { tokens, isDark } = useAppTheme();
@@ -39,44 +40,7 @@ export default function NotificationSettingsScreen() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
-  const TRANSLATIONS: Record<string, any> = {
-    ro: {
-      title: 'Setări Notificări',
-      email: 'Notificări prin Email',
-      emailDesc: 'Primește actualizări importante pe email',
-      push: 'Notificări Push',
-      pushDesc: 'Primește notificări pe telefon',
-      messages: 'Mesaje Noi',
-      messagesDesc: 'Notificări când primești un mesaj nou',
-      reviews: 'Recenzii Noi',
-      reviewsDesc: 'Notificări când primești o recenzie nouă',
-      favorites: 'Anunțuri Adăugate la Favorite',
-      favoritesDesc: 'Notificări când cineva adaugă anunțurile tale la favorite',
-      promotions: 'Promoții și Noutăți',
-      promotionsDesc: 'Fii la curent cu ultimele noutăți',
-      saveSuccess: 'Setările au fost salvate',
-      saveError: 'Nu s-au putut salva setările',
-    },
-    en: {
-      title: 'Notification Settings',
-      email: 'Email Notifications',
-      emailDesc: 'Receive important updates via email',
-      push: 'Push Notifications',
-      pushDesc: 'Receive notifications on your phone',
-      messages: 'New Messages',
-      messagesDesc: 'Notify when you receive a new message',
-      reviews: 'New Reviews',
-      reviewsDesc: 'Notify when you receive a new review',
-      favorites: 'Announcements Added to Favorites',
-      favoritesDesc: 'Notify when someone adds your announcements to favorites',
-      promotions: 'Promotions & News',
-      promotionsDesc: 'Stay updated with the latest news',
-      saveSuccess: 'Settings saved successfully',
-      saveError: 'Could not save settings',
-    }
-  };
-
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getNotificationSettingsTranslations(locale);
 
   // Initialize settings from user context or fetch if not available
   useEffect(() => {

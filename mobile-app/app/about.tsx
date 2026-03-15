@@ -8,132 +8,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import storage from '../src/services/storage';
 import { useLocale } from '../src/context/LocaleContext';
+import { getAboutTranslations } from '../src/i18n/about';
 
 interface FAQ { question: string; answer: string; }
-const TRANSLATIONS: Record<string, any> = {
-  ro: {
-    title: 'Despre noi',
-    badge: '✨ Platforma pasionaților',
-    heroPrefix: 'Transformă-ți',
-    heroHighlighted: 'pasiunea',
-    heroSuffix: 'în oportunitate',
-    missionTitle: 'Misiunea noastră',
-    missionSubtitle: 'Construim punți între talente și oportunități',
-    missionText: 'Hobbiz este o platformă comunitară gratuită care celebrează autenticitatea și creativitatea. Credem că fiecare talent merită să fie văzut și apreciat. Platforma noastră conectează pasionați cu clienți care apreciază calitatea și originalitatea, creând un ecosistem unde hobby-urile devin surse de venit.',
-    pillars: [
-      { icon: '🌟', title: 'Autenticitate', text: 'Promovăm produse și servicii unice, create cu pasiune' },
-      { icon: '🤝', title: 'Comunitate', text: 'Legăm pasionați și clienți în mod direct și cald' },
-      { icon: '🚀', title: 'Creștere', text: 'Oferim instrumente pentru dezvoltarea afacerilor creative' },
-    ],
-    features: [
-      'Descoperi o nouă sursă de venit',
-      'Publici anunțuri pentru serviciile sau produselor tale',
-      'Află despre ofertele locale sau naționale',
-      'Salvează anunțurile preferate și contactează direct vânzătorii',
-      'Cunoaște alți oameni cu aceleași pasiuni și colaborează sau conversează cu ei',
-      'Gestionează-ți contul și anunțurile rapid și intuitiv',
-    ],
-    featuresHeader: 'Ce poți face pe Hobbiz?',
-    reasonsHeader: 'De ce să alegi Hobbiz?',
-    reasons: [
-      'Platformă modernă și rapidă',
-      'Comunitate prietenoasă și suport rapid',
-      'Promovare gratuită pentru pasiunile tale',
-      'Interfață intuitivă și experiență de utilizare optimă',
-      'Securitate și confidențialitate garantate',
-      'Conectare directă între creatori și cumpărători',
-    ],
-    howHeader: 'Cum funcționează?',
-    steps: [
-      { n: 1, t: 'Înregistrează-te', d: 'Creează un cont gratuit' },
-      { n: 2, t: 'Publică cu preț', d: 'Adaugă anunțuri cu preț opțional pentru tranzacții directe' },
-      { n: 3, t: 'Conectează-te', d: 'Discuții directe prin mesagerie' },
-      { n: 4, t: 'Colaborează smart', d: 'Acceptă prețul direct sau negociază sume personalizate' },
-    ],
-    valuesHeader: 'Valorile noastre',
-    values: [
-      { icon: '🛡️', title: 'Securitate', text: 'Protejăm datele și interacțiunile tale.' },
-      { icon: '🤝', title: 'Comunitate', text: 'Spațiu prietenos și colaborativ.' },
-      { icon: '💰', title: 'Trading flexibil', text: 'Prețuri fixe sau negocieri personalizate cu colaborare directă.' },
-      { icon: '🏗️', title: 'Dezvoltare', text: 'Îmbunătățim constant experiența.' },
-      { icon: '⚡', title: 'Simplitate', text: 'Ne dorim să facilităm cât mai mult utilizarea platformei.' },
-    ],
-    faqHeader: 'Întrebări frecvente',
-    faqs: [
-      { q: 'Este gratuit să folosesc Hobbiz?', a: 'Da, înregistrarea și utilizarea de bază a platformei Hobbiz sunt complet gratuite. Poți publica și răspunde la anunțuri și comunica cu alți utilizatori fără costuri.' },
-      { q: 'Cum îmi protejez datele personale?', a: 'Luăm în serios protecția datelor tale. Folosim criptare avansată și nu împărtășim informațiile tale personale cu terți fără consimțământ explicit.' },
-      { q: 'Pot vinde atât produse cât și servicii?', a: 'Absolut! Poți promova servicii, produse handmade, obiecte, vechituri, alimente și multe altele.' },
-      { q: 'Cum funcționează sistemul de mesagerie?', a: 'Mesageria integrată îți permite discuții directe, negociere și coordonare în siguranță.' },
-      { q: 'Care este diferența între colaborare directă și negociere?', a: 'Colaborarea directă se folosește când ești de acord cu prețul din anunț - se finalizează instant. Negocierea permite discutarea unei sume diferite.' },
-    ],
-    updateText: 'Ultima actualizare: 13 decembrie 2025',
-    contactTitle: 'Contactează-ne',
-    contactText: 'Pentru întrebări, sugestii sau asistență tehnică (răspunsuri în 2-5 zile):',
-    contactEmail: 'Email: team.hobbiz@gmail.com',
-    contactCompany: 'Platformă comunitară gratuită - România',
-  },
-  en: {
-    title: 'About Us',
-    badge: '✨ The makers community',
-    heroPrefix: "Turn your",
-    heroHighlighted: 'passion',
-    heroSuffix: 'into opportunity',
-    missionTitle: 'Our mission',
-    missionSubtitle: 'Building bridges between talent and opportunity',
-    missionText: 'Hobbiz is a free community platform celebrating authenticity and creativity. We believe every talent deserves to be seen and recognized. Our platform connects passionate creators with clients who appreciate quality and originality, creating an ecosystem where hobbies become income sources.',
-    pillars: [
-      { icon: '🌟', title: 'Authenticity', text: 'We promote unique products and services made with passion' },
-      { icon: '🤝', title: 'Community', text: 'Connecting creators and customers directly and warmly' },
-      { icon: '🚀', title: 'Growth', text: 'We provide tools to help creative businesses grow' },
-    ],
-    features: [
-      'Discover a new income stream',
-      'Post listings for your services or products',
-      'Find local or national offers',
-      'Save favorites and contact sellers directly',
-      'Meet people who share your passions and collaborate or chat',
-      'Manage your account and listings quickly and intuitively',
-    ],
-    featuresHeader: 'What can you do on Hobbiz?',
-    reasonsHeader: 'Why choose Hobbiz?',
-    reasons: [
-      'Modern and fast platform',
-      'Friendly community and quick support',
-      'Free promotion for your passions',
-      'Intuitive interface and great UX',
-      'Security and privacy guaranteed',
-      'Direct connection between creators and buyers',
-    ],
-    howHeader: 'How it works',
-    steps: [
-      { n: 1, t: 'Sign up', d: 'Create a free account' },
-      { n: 2, t: 'Post with pricing', d: 'Add listings with optional pricing for direct transactions' },
-      { n: 3, t: 'Connect', d: 'Direct conversations via messaging' },
-      { n: 4, t: 'Smart collaboration', d: 'Accept direct pricing or negotiate custom amounts' },
-    ],
-    valuesHeader: 'Our values',
-    values: [
-      { icon: '🛡️', title: 'Security', text: 'We protect your data and interactions.' },
-      { icon: '🤝', title: 'Community', text: 'A friendly and collaborative space.' },
-      { icon: '💰', title: 'Flexible trading', text: 'Fixed pricing or custom negotiations with direct collaboration.' },
-      { icon: '🏗️', title: 'Development', text: 'We continuously improve the experience.' },
-      { icon: '⚡', title: 'Simplicity', text: 'We aim to make the app as easy to use as possible.' },
-    ],
-    faqHeader: 'Frequently Asked Questions',
-    faqs: [
-      { q: 'Is Hobbiz free to use?', a: 'Yes, registering and basic use of Hobbiz are completely free. You can post and respond to listings and communicate with other users at no cost.' },
-      { q: 'How do you protect my personal data?', a: "We take your data protection seriously. We use strong encryption and do not share your personal information with third parties without explicit consent." },
-      { q: 'Can I sell both products and services?', a: 'Absolutely! You can promote services, handmade products, items, vintage goods, food and more.' },
-      { q: 'How does messaging work?', a: 'Built-in messaging lets you chat directly, negotiate and coordinate safely.' },
-      { q: 'What\'s the difference between direct collaboration and negotiation?', a: 'Direct collaboration is used when you agree with the listed price - it finalizes instantly. Negotiation allows discussing a different amount.' },
-    ],
-    updateText: 'Last updated: December 13, 2025',
-    contactTitle: 'Contact Us',
-    contactText: 'For questions, suggestions or technical support (replies in 2-5 days):',
-    contactEmail: 'Email: team.hobbiz@gmail.com',
-    contactCompany: 'Free community platform - Romania',
-  }
-};
 
 export default function AboutScreen() {
   const { tokens } = useAppTheme();
@@ -141,7 +18,7 @@ export default function AboutScreen() {
   const router = useRouter();
   const [open, setOpen] = useState<number | null>(null);
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale || 'ro'];
+  const t = getAboutTranslations(locale);
   const { width } = useWindowDimensions();
   // Use a conservative breakpoint: >=350dp -> 2 coloane, altfel 1 coloană
   const isTwoCol = width >= 350;

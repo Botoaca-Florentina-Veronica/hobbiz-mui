@@ -16,25 +16,8 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocale } from '@/src/context/LocaleContext';
+import { getWelcomeTranslations } from '../src/i18n/welcome';
 
-const TRANSLATIONS = {
-  ro: {
-    login: 'Conectează-te',
-    signup: 'Înregistrează-te',
-    noAccount: 'Nu ai cont?',
-    welcome: 'Bine ai venit',
-    subtitle: 'Transformă-ți hobby-urile în oportunități de câștig',
-    guestMode: 'Navighează ca vizitator',
-  },
-  en: {
-    login: 'Log in',
-    signup: 'Sign up',
-    noAccount: "Don't have an account?",
-    welcome: 'Welcome',
-    subtitle: 'Turn your hobbies into earning opportunities',
-    guestMode: 'Browse as guest',
-  },
-};
 
 // Logo configuration - easy to modify
 const LOGO_CONFIG = {
@@ -77,7 +60,7 @@ export default function WelcomeScreen() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale];
+  const t = getWelcomeTranslations(locale);
 
   const isSmallDevice = width < 600;
   const isMediumDevice = width >= 600 && width < 900;

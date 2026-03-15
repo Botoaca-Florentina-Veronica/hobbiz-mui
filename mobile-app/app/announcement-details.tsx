@@ -15,6 +15,8 @@ import Constants from 'expo-constants';
 import { translateCategory, getCategoryKeyByLabel } from '../src/constants/categories';
 import negotiationService from '../src/services/negotiationService';
 import { Toast } from '../components/ui/Toast';
+import { useLocale } from '../src/context/LocaleContext';
+import { getAnnouncementDetailsTranslations } from '../src/i18n/announcement-details';
 
 interface Announcement {
   _id: string;
@@ -33,102 +35,6 @@ interface Announcement {
   user?: { _id: string; firstName?: string; lastName?: string; avatar?: string };
 }
 
-const TRANSLATIONS = {
-  ro: {
-    posted: 'Postat',
-    description: 'Descriere',
-    id: 'ID:',
-    views: 'vizualizări',
-    sellerInfo: 'Informații vânzător',
-    contactPerson: 'Persoană de contact:',
-    evaluate: 'Evaluează',
-    sendMessage: 'TRIMITE MESAJ',
-    hide: 'ASCUNDE',
-    show: 'ARATĂ',
-    viewProfile: 'VIZUALIZARE PROFIL',
-    location: 'Locație',
-    openMap: 'Deschide Harta',
-    mapNotAvailable: 'Harta nu este disponibilă',
-    evaluateUser: 'Evaluează utilizatorul',
-    commentOptional: 'Comentariu (opțional)',
-    cancel: 'ANULEAZĂ',
-    send: 'TRIMITE',
-    sending: 'TRIMITE...',
-    reviewFailed: 'Nu am putut trimite recenzia. Încearcă din nou mai târziu.',
-    back: 'înapoi',
-    loadError: 'Nu am putut încărca anunțul.',
-    loading: 'Se încarcă anunțul...',
-    error: 'Eroare',
-    notFound: 'Anunțul nu a fost găsit.',
-    retry: 'Reîncearcă',
-    openSellerProfile: 'Deschide profilul vânzătorului',
-    loadingReviews: 'se încarcă recenziile...',
-    noReviews: 'nu există review-uri',
-    reviews: 'recenzii',
-    loginRequired: 'Autentificare necesară',
-    loginToFavorite: 'Trebuie să te autentifici pentru a adăuga la favorite.',
-    favoriteAdded: 'Adăugat la favorite',
-    favoriteRemoved: 'Eliminat din favorite',
-    favoriteFailed: 'Nu am putut actualiza favorite. Încearcă din nou.',
-    noCollaborationTitle: 'Colaborare necesară',
-    noCollaborationMessage: 'Poți lăsa o recenzie doar utilizatorilor cu care ai colaborat oficial pe platformă.',
-    understood: 'AM ÎNȚELES',
-    proposePrice: 'PROPUNE UN PREȚ',
-    proposePriceTitle: 'Propune un preț',
-    yourOffer: 'Oferta ta (RON)',
-    messageOptional: 'Mesaj (opțional)',
-    proposePriceError: 'Nu am putut trimite oferta. Încearcă din nou.',
-    proposePriceSuccess: 'Oferta a fost trimisă cu succes!',
-    enterValidPrice: 'Te rog introdu un preț valid.',
-  },
-  en: {
-    posted: 'Posted',
-    description: 'Description',
-    id: 'ID:',
-    views: 'views',
-    sellerInfo: 'Seller Information',
-    contactPerson: 'Contact Person:',
-    evaluate: 'Rate',
-    sendMessage: 'SEND MESSAGE',
-    hide: 'HIDE',
-    show: 'SHOW',
-    viewProfile: 'VIEW PROFILE',
-    location: 'Location',
-    openMap: 'Open Map',
-    mapNotAvailable: 'Map not available',
-    evaluateUser: 'Rate user',
-    commentOptional: 'Comment (optional)',
-    cancel: 'CANCEL',
-    send: 'SEND',
-    sending: 'SENDING...',
-    reviewFailed: 'Could not send review. Please try again later.',
-    back: 'back',
-    loadError: 'Could not load announcement.',
-    loading: 'Loading announcement...',
-    error: 'Error',
-    notFound: 'Announcement not found.',
-    retry: 'Retry',
-    openSellerProfile: 'Open seller profile',
-    loadingReviews: 'loading reviews...',
-    noReviews: 'no reviews',
-    reviews: 'reviews',
-    loginRequired: 'Login Required',
-    loginToFavorite: 'You need to login to add favorites.',
-    favoriteAdded: 'Added to favorites',
-    favoriteRemoved: 'Removed from favorites',
-    favoriteFailed: 'Could not update favorites. Please try again.',
-    noCollaborationTitle: 'Collaboration Required',
-    noCollaborationMessage: 'You can only leave a review for users you have officially collaborated with on the platform.',
-    understood: 'UNDERSTOOD',
-    proposePrice: 'PROPOSE A PRICE',
-    proposePriceTitle: 'Propose a price',
-    yourOffer: 'Your offer (RON)',
-    messageOptional: 'Message (optional)',
-    proposePriceError: 'Could not send offer. Please try again.',
-    proposePriceSuccess: 'Offer sent successfully!',
-    enterValidPrice: 'Please enter a valid price.',
-  }
-};
 
 export default function AnnouncementDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -138,8 +44,8 @@ export default function AnnouncementDetailsScreen() {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const { locale } = useLocale();
+  const t = getAnnouncementDetailsTranslations(locale);
 
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(true);

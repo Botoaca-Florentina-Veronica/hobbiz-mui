@@ -16,6 +16,7 @@ import { useLocale } from '../src/context/LocaleContext';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { getSettingsTranslations } from '../src/i18n/settings';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
 
@@ -39,90 +40,7 @@ export default function SettingsScreen() {
 
   const { locale } = useLocale();
 
-  const TRANSLATIONS: Record<string, any> = {
-    ro: {
-      title: 'Setări',
-      settings: {
-        'change-password': 'Schimbă parola',
-        'change-email': 'Schimbă email-ul',
-        'archived-announcements': 'Anunțuri arhivate',
-        notifications: 'Setează notificările',
-        billing: 'Descarcă datele mele',
-        'logout-devices': 'Ieși din cont de pe toate dispozitivele',
-        'delete-account': 'Șterge contul',
-      },
-      allFieldsRequired: 'Toate câmpurile sunt obligatorii',
-      passwordMinLength: 'Parola nouă trebuie să aibă cel puțin 6 caractere',
-      passwordChangedSuccess: 'Parola a fost schimbată cu succes!',
-      cannotChangePassword: 'Nu s-a putut schimba parola',
-      emailInvalid: 'Format email invalid',
-      emailUpdatedSuccess: 'Email-ul a fost actualizat cu succes!',
-      cannotUpdateEmail: 'Nu s-a putut actualiza email-ul',
-      currentPasswordLabel: 'Parola curentă',
-      newPasswordLabel: 'Parola nouă',
-      currentPasswordPlaceholder: 'Introduceți parola curentă',
-      newPasswordPlaceholder: 'Introduceți noua parolă',
-      saving: 'Se salvează...',
-      save: 'Salvează',
-      newEmailLabel: 'Email nou',
-      newEmailPlaceholder: 'Introduceți noul email',
-      confirmPasswordLabel: 'Confirmă parola',
-      confirmPasswordPlaceholder: 'Introduceți parola pentru confirmare',
-      deleteAccountTitle: 'Ștergere cont',
-      deleteAccountMessage: 'Această acțiune este permanentă. Ești sigur(ă) că vrei să-ți ștergi contul și toate anunțurile asociate?',
-      cancel: 'Anulează',
-      delete: 'Șterge',
-      accountDeletedTitle: 'Cont șters',
-      accountDeletedMessage: 'Contul tău a fost șters cu succes.',
-      error: 'Eroare',
-      downloadingData: 'Se descarcă datele...',
-      dataDownloadSuccess: 'Datele tale au fost descărcate cu succes!',
-      dataDownloadError: 'Nu s-a putut descărca datele. Încearcă din nou.',
-      sharingNotAvailable: 'Partajarea nu este disponibilă pe acest dispozitiv.',
-    },
-    en: {
-      title: 'Settings',
-      settings: {
-        'change-password': 'Change password',
-        'change-email': 'Change email',
-        'archived-announcements': 'Archived announcements',
-        notifications: 'Notifications',
-        billing: 'Download my data',
-        'logout-devices': 'Log out from all devices',
-        'delete-account': 'Delete account',
-      },
-      allFieldsRequired: 'All fields are required',
-      passwordMinLength: 'New password must be at least 6 characters',
-      passwordChangedSuccess: 'Password changed successfully!',
-      cannotChangePassword: 'Could not change password',
-      emailInvalid: 'Invalid email format',
-      emailUpdatedSuccess: 'Email updated successfully!',
-      cannotUpdateEmail: 'Could not update email',
-      currentPasswordLabel: 'Current password',
-      newPasswordLabel: 'New password',
-      currentPasswordPlaceholder: 'Enter current password',
-      newPasswordPlaceholder: 'Enter new password',
-      saving: 'Saving...',
-      save: 'Save',
-      newEmailLabel: 'New email',
-      newEmailPlaceholder: 'Enter new email',
-      confirmPasswordLabel: 'Confirm password',
-      confirmPasswordPlaceholder: 'Enter password to confirm',
-      deleteAccountTitle: 'Delete account',
-      deleteAccountMessage: 'This action is permanent. Are you sure you want to delete your account and all associated announcements?',
-      cancel: 'Cancel',
-      delete: 'Delete',
-      accountDeletedTitle: 'Account deleted',
-      accountDeletedMessage: 'Your account has been deleted successfully.',
-      error: 'Error',
-      downloadingData: 'Downloading data...',
-      dataDownloadSuccess: 'Your data has been downloaded successfully!',
-      dataDownloadError: 'Could not download data. Please try again.',
-      sharingNotAvailable: 'Sharing is not available on this device.',
-    }
-  };
-
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getSettingsTranslations(locale);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMessage(message);

@@ -22,9 +22,10 @@ import { useAppTheme } from '../src/context/ThemeContext';
 import { useLocale } from '../src/context/LocaleContext';
 import api from '../src/services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
-import { findCategoryByLabel } from '../src/constants/categories';
+import { findCategoryByLabel, translateCategory } from '../src/constants/categories';
 import { Toast } from '../components/ui/Toast';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
+import { getMyAnnouncementsTranslations } from '../src/i18n/my-announcements';
 
 // useWindowDimensions will be read inside the component to handle orientation/responsive layout
 
@@ -39,84 +40,6 @@ interface Announcement {
   createdAt: string;
 }
 
-const TRANSLATIONS = {
-  ro: {
-    title: 'Anunțurile mele',
-    loading: 'Se încarcă anunțurile...',
-    searchPlaceholder: 'Caută după titlu, ID sau locație...',
-    category: 'Categorie',
-    sort: 'Sortare',
-    results: 'rezultate',
-    searchLabel: 'Căutare',
-    categoryLabel: 'Categorie',
-    all: 'Toate',
-    selectCategory: 'Selectează categoria',
-    sortBy: 'Sortează după',
-    mostRecent: 'Cele mai recente',
-    oldest: 'Cele mai vechi',
-    titleAZ: 'Titlu A-Z',
-    titleZA: 'Titlu Z-A',
-    noResults: 'Nu au fost găsite anunțuri cu criteriile selectate',
-    noAnnouncements: 'Nu ai încă niciun anunț publicat',
-    edit: 'Editează',
-    archive: 'Arhivează',
-    delete: 'Șterge',
-    refresh: 'Reactualizează',
-    archiveTitle: 'Arhivează anunț',
-    archiveMessage: "Ești sigur(ă) că vrei să arhivezi acest anunț? Nimeni nu îl va mai putea accesa. Îl poți găsi în pagina 'Anunțuri arhivate'.",
-    yes: 'Da',
-    no: 'Nu',
-    deleteTitle: 'Șterge anunț',
-    deleteMessage: 'Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată.',
-    deleteBtn: 'Șterge',
-    cancel: 'Anulează',
-    deleteSuccess: 'Anunțul a fost șters cu succes',
-    deleteError: 'Nu s-a putut șterge anunțul. Încearcă din nou',
-    archiveSuccess: 'Anunțul a fost arhivat cu succes',
-    archiveError: 'Nu s-a putut arhiva anunțul. Încearcă din nou',
-    navigationError: 'Nu s-a putut naviga la pagina de editare.',
-    errorTitle: 'Eroare',
-    refreshAnnouncement: 'Reactualizează anunț',
-  },
-  en: {
-    title: 'My Announcements',
-    loading: 'Loading announcements...',
-    searchPlaceholder: 'Search by title, ID, or location...',
-    category: 'Category',
-    sort: 'Sort',
-    results: 'results',
-    searchLabel: 'Search',
-    categoryLabel: 'Category',
-    all: 'All',
-    selectCategory: 'Select category',
-    sortBy: 'Sort by',
-    mostRecent: 'Most Recent',
-    oldest: 'Oldest',
-    titleAZ: 'Title A-Z',
-    titleZA: 'Title Z-A',
-    noResults: 'No announcements found with the selected criteria',
-    noAnnouncements: "You don't have any published announcements yet",
-    edit: 'Edit',
-    archive: 'Archive',
-    delete: 'Delete',
-    refresh: 'Refresh',
-    archiveTitle: 'Archive Announcement',
-    archiveMessage: "Are you sure you want to archive this announcement? No one will be able to access it. You can find it in the 'Archived Announcements' page.",
-    yes: 'Yes',
-    no: 'No',
-    deleteTitle: 'Delete Announcement',
-    deleteMessage: 'Are you sure you want to delete this announcement? This action cannot be undone.',
-    deleteBtn: 'Delete',
-    cancel: 'Cancel',
-    deleteSuccess: 'Announcement deleted successfully',
-    deleteError: 'Could not delete the announcement. Please try again',
-    archiveSuccess: 'Announcement archived successfully',
-    archiveError: 'Could not archive the announcement. Please try again',
-    navigationError: 'Could not navigate to the edit page.',
-    errorTitle: 'Error',
-    refreshAnnouncement: 'Refresh announcement',
-  },
-};
 
 export default function MyAnnouncementsScreen() {
   const { width, height } = useWindowDimensions();
@@ -129,32 +52,16 @@ export default function MyAnnouncementsScreen() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { isDark, tokens } = useAppTheme();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale] || TRANSLATIONS.ro;
+  const t = getMyAnnouncementsTranslations(locale);
   const params = useLocalSearchParams();
   const fromPostSuccess = params.fromPostSuccess === 'true';
   
-  // English labels for categories keyed by category key from CATEGORY_DEFS
-  const CATEGORY_LABELS_EN: Record<string, string> = {
-    fotografie: 'Photography',
-    prajituri: 'Cakes',
-    muzica: 'Music',
-    reparatii: 'Repairs',
-    dans: 'Dance',
-    curatenie: 'Cleaning',
-    gradinarit: 'Gardening',
-    sport: 'Sports',
-    arta: 'Art',
-    tehnologie: 'Technology',
-    auto: 'Auto',
-    meditatii: 'Tutoring',
-  };
-
   const getCategoryLabel = (label?: string) => {
     if (!label) return '';
     if (label === t.all) return t.all;
     const def = findCategoryByLabel(label);
     if (!def) return label;
-    return locale === 'en' ? (CATEGORY_LABELS_EN[def.key] || def.label) : def.label;
+    return translateCategory(def.key, locale);
   };
   
   const styles = useMemo(() => createStyles(tokens), [tokens]);

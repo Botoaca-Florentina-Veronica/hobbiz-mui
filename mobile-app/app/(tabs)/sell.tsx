@@ -16,6 +16,7 @@ import { useLocale } from '../../src/context/LocaleContext';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { Toast } from '../../components/ui/Toast';
+import { getSellTranslations } from '../../src/i18n/sell';
 
 interface ImageItem { 
   id: string; 
@@ -60,122 +61,6 @@ const CATEGORY_IMAGES: Record<string, any> = {
   meditatii: require('../../assets/images/carte.png'),
 };
 
-const TRANSLATIONS = {
-  ro: {
-    pageTitle: 'Publică un anunț',
-    describeSection: 'Descrie-ți anunțul cu lux de detalii!',
-    titleLabel: 'Adaugă un titlu clar*',
-    titlePlaceholder: 'ex: Predau lecții de fizică, online',
-    titleHelper: 'Introdu cel puțin 16 caractere',
-    categoryLabel: 'Categoria*',
-    categoryPlaceholder: 'Alege categoria',
-    imagesSection: 'Imagini',
-    imagesHelper: 'Prima imagine va fi coperta anunțului! Poți adăuga mai multe imagini.',
-    duplicateImageTitle: 'Imagine duplicată',
-    duplicateImageMessage: 'Această imagine a fost deja adăugată. Te rugăm să alegi o imagine diferită.',
-    duplicateImageDismiss: 'Am înțeles',
-    coverBadge: '⭐ Copertă',
-    addImages: 'Adaugă imagini',
-    descriptionLabel: 'Descriere*',
-    descriptionPlaceholder: 'Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț',
-    descriptionHelper: 'Introdu cel puțin 40 caractere',
-    locationLabel: 'Localitate*',
-    contactSection: 'Informații de contact',
-    priceLabel: 'Preț (opțional)',
-    pricePlaceholder: 'ex: 150 RON',
-    priceHelper: 'Poți adăuga un preț pentru serviciul/produsul tău',
-    contactNameLabel: 'Persoana de contact*',
-    contactNamePlaceholder: 'Nume și prenume',
-    emailLabel: 'Adresa de email*',
-    emailPlaceholder: 'ex: exemplu@gmail.com',
-    phoneLabel: 'Numărul de telefon*',
-    phonePlaceholder: 'ex: 07xxxxxxx',
-    previewButton: 'Previzualizați anunțul',
-    publishButton: 'Publică un anunț',
-    chooseCategoryTitle: 'Alege categoria',
-    chooseLocationTitle: 'Alege localitatea',
-    allCountry: 'Toată țara',
-    authError: 'Trebuie să fii autentificat pentru a posta un anunț.',
-    titleValidation: 'Titlul trebuie să aibă minim 16 caractere.',
-    categoryValidation: 'Te rugăm să alegi o categorie.',
-    descriptionValidation: 'Descrierea trebuie să aibă minim 40 caractere.',
-    locationValidation: 'Te rugăm să alegi o localitate.',
-    contactNameValidation: 'Te rugăm să introduci numele persoanei de contact.',
-    emailValidation: 'Te rugăm să introduci o adresă de email.',
-    emailFormatError: 'Adresa de email nu este validă.',
-    phoneValidation: 'Te rugăm să introduci un număr de telefon.',
-    phoneFormatError: 'Numărul de telefon nu este valid (ex: 07xxxxxxxx).',
-    imageFormatError: 'Format imagine invalid',
-    imageFormatMessage: 'Doar fișiere JPG sau JPEG.',
-    postError: 'Eroare la postare',
-    postErrorMessage: 'A intervenit o eroare. Te rugăm să încerci din nou.',
-  },
-  en: {
-    pageTitle: 'Post an Announcement',
-    describeSection: 'Describe your announcement in detail!',
-    titleLabel: 'Add a clear title*',
-    titlePlaceholder: 'e.g.: Physics lessons, online',
-    titleHelper: 'Enter at least 16 characters',
-    categoryLabel: 'Category*',
-    categoryPlaceholder: 'Choose category',
-    imagesSection: 'Images',
-    imagesHelper: '⭐ The first image will be the cover! You can add multiple images.',
-    duplicateImageTitle: 'Duplicate image',
-    duplicateImageMessage: 'This image has already been added. Please choose a different image.',
-    duplicateImageDismiss: 'Got it',
-    coverBadge: '⭐ Cover',
-    addImages: 'Add images',
-    descriptionLabel: 'Description*',
-    descriptionPlaceholder: 'Try to write what you would like to know if you were looking at this announcement',
-    descriptionHelper: 'Enter at least 40 characters',
-    locationLabel: 'Location*',
-    priceLabel: 'Price (optional)',
-    pricePlaceholder: 'e.g.: 150 RON',
-    priceHelper: 'You can add a price for your service/product',
-    contactSection: 'Contact Information',
-    contactNameLabel: 'Contact person*',
-    contactNamePlaceholder: 'First and last name',
-    emailLabel: 'Email address*',
-    emailPlaceholder: 'e.g.: example@gmail.com',
-    phoneLabel: 'Phone number*',
-    phonePlaceholder: 'e.g.: 07xxxxxxx',
-    previewButton: 'Preview announcement',
-    publishButton: 'Post an announcement',
-    chooseCategoryTitle: 'Choose category',
-    chooseLocationTitle: 'Choose location',
-    allCountry: 'Entire country',
-    authError: 'You must be authenticated to post an announcement.',
-    titleValidation: 'The title must be at least 16 characters.',
-    categoryValidation: 'Please choose a category.',
-    descriptionValidation: 'The description must be at least 40 characters.',
-    locationValidation: 'Please choose a location.',
-    contactNameValidation: 'Please enter the contact person name.',
-    emailValidation: 'Please enter an email address.',
-    emailFormatError: 'The email address is invalid.',
-    phoneValidation: 'Please enter a phone number.',
-    phoneFormatError: 'The phone number is invalid (e.g. 07xxxxxxxx).',
-    imageFormatError: 'Invalid image format',
-    imageFormatMessage: 'Only JPG or JPEG files.',
-    postError: 'Post error',
-    postErrorMessage: 'An error occurred. Please try again.',
-  },
-};
-
-// Category translation keys
-const CATEGORY_LABELS: Record<string, { ro: string; en: string }> = {
-  fotografie: { ro: 'Fotografie', en: 'Photography' },
-  prajituri: { ro: 'Prăjituri', en: 'Baking' },
-  muzica: { ro: 'Muzică', en: 'Music' },
-  reparatii: { ro: 'Reparații', en: 'Repairs' },
-  dans: { ro: 'Dans', en: 'Dance' },
-  curatenie: { ro: 'Curățenie', en: 'Cleaning' },
-  gradinarit: { ro: 'Grădinărit', en: 'Gardening' },
-  sport: { ro: 'Sport', en: 'Sports' },
-  arta: { ro: 'Artă', en: 'Art' },
-  tehnologie: { ro: 'Tehnologie', en: 'Technology' },
-  auto: { ro: 'Auto', en: 'Cars' },
-  meditatii: { ro: 'Meditații', en: 'Tutoring' },
-};
 
 export default function SellScreen() {
   const { tokens, isDark } = useAppTheme();
@@ -209,10 +94,10 @@ export default function SellScreen() {
     setToastVisible(true);
   };
 
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getSellTranslations(locale);
 
   const selectedCategoryLabel = categoryKey
-    ? (CATEGORY_LABELS[categoryKey] ? (locale === 'en' ? CATEGORY_LABELS[categoryKey].en : CATEGORY_LABELS[categoryKey].ro) : (category || t.categoryPlaceholder))
+    ? (t.categoryLabels[categoryKey as keyof typeof t.categoryLabels] || category || t.categoryPlaceholder)
     : (category || t.categoryPlaceholder);
 
   // Initialize location with translated text

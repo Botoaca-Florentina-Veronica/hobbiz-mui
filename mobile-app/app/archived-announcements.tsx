@@ -21,71 +21,8 @@ import api from '../src/services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { findCategoryByLabel } from '../src/constants/categories';
 import { Toast } from '../components/ui/Toast';
+import { getArchivedAnnouncementsTranslations } from '../src/i18n/archived-announcements';
 
-const TRANSLATIONS = {
-  ro: {
-    title: 'Anunțuri arhivate',
-    searchPlaceholder: 'Caută după titlu, ID sau locație...',
-    category: 'Categorie',
-    all: 'Toate',
-    sort: 'Sortare',
-    results: 'rezultate',
-    searchLabel: 'Căutare',
-    sortMostRecent: 'Cele mai recente',
-    sortOldest: 'Cele mai vechi',
-    sortTitleAZ: 'Titlu A-Z',
-    sortTitleZA: 'Titlu Z-A',
-    noResults: 'Nu au fost găsite anunțuri cu criteriile selectate',
-    noAnnouncements: 'Nu ai încă niciun anunț arhivat',
-    unarchive: 'Dezarhivează',
-    delete: 'Șterge',
-    deleteTitle: 'Șterge anunț',
-    deleteMessage: 'Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată.',
-    yes: 'Da',
-    no: 'Nu',
-    cancel: 'Anulează',
-    unarchiveTitle: 'Dezarhivează anunț',
-    unarchiveMessage: "Ești sigur(ă) că vrei să dezarhivezi acest anunț?",
-    deleteSuccess: 'Anunțul a fost șters cu succes',
-    deleteError: 'Nu s-a putut șterge anunțul. Încearcă din nou',
-    unarchiveSuccess: 'Anunțul a fost dezarhivat cu succes',
-    unarchiveError: 'Nu s-a putut dezarhiva anunțul. Încearcă din nou',
-    loading: 'Se încarcă anunțurile arhivate...',
-    filterSearch: 'Căutare',
-    filterCategory: 'Categorie',
-  },
-  en: {
-    title: 'Archived Announcements',
-    searchPlaceholder: 'Search by title, ID, or location...',
-    category: 'Category',
-    all: 'All',
-    sort: 'Sort',
-    results: 'results',
-    searchLabel: 'Search',
-    sortMostRecent: 'Most Recent',
-    sortOldest: 'Oldest',
-    sortTitleAZ: 'Title A-Z',
-    sortTitleZA: 'Title Z-A',
-    noResults: 'No announcements found with the selected criteria',
-    noAnnouncements: "You don't have any archived announcements yet",
-    unarchive: 'Unarchive',
-    delete: 'Delete',
-    deleteTitle: 'Delete Announcement',
-    deleteMessage: 'Are you sure you want to delete this announcement? This action cannot be undone.',
-    yes: 'Yes',
-    no: 'No',
-    cancel: 'Cancel',
-    unarchiveTitle: 'Unarchive Announcement',
-    unarchiveMessage: "Are you sure you want to unarchive this announcement?",
-    deleteSuccess: 'Announcement deleted successfully',
-    deleteError: 'Could not delete the announcement. Please try again',
-    unarchiveSuccess: 'Announcement unarchived successfully',
-    unarchiveError: 'Could not unarchive the announcement. Please try again',
-    loading: 'Loading archived announcements...',
-    filterSearch: 'Search',
-    filterCategory: 'Category',
-  },
-};
 
 interface Announcement {
   _id: string;
@@ -106,7 +43,7 @@ export default function ArchivedAnnouncementsScreen() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { isDark, tokens } = useAppTheme();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getArchivedAnnouncementsTranslations(locale);
   
   const styles = useMemo(() => createStyles(tokens), [tokens]);
   const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;

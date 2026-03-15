@@ -12,52 +12,12 @@ import { useAuth } from '../src/context/AuthContext';
 import api from '../src/services/api';
 import { Toast } from '../components/ui/Toast';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
+import { useLocale } from '../src/context/LocaleContext';
+import { getEditAnnouncementTranslations } from '../src/i18n/edit-announcement';
 
 interface ImageItem { id: string; uri?: string; }
 interface Category { key: string; label: string; icon: string; color: string; }
 
-const TRANSLATIONS = {
-  ro: {
-    error: 'Eroare',
-    authRequired: 'Trebuie să fii autentificat pentru a edita un anunț.',
-    invalidId: 'ID anunț invalid.',
-    loadError: 'Nu am putut încărca datele anunțului.',
-    permissionTitle: 'Permisiune necesară',
-    permissionMessage: 'Te rog permite accesul la galerie pentru a selecta imagini.',
-    formatError: 'Format neacceptat',
-    formatMessage: 'Te rog selectează fișiere JPG (jpeg).',
-    selectError: 'Nu am putut selecta imaginile.',
-    validationTitle: 'Validare',
-    titleTooShort: 'Titlul trebuie să aibă cel puțin 16 caractere.',
-    titleTooLong: 'Titlul nu poate depăși 70 de caractere.',
-    noCategory: 'Trebuie să selectezi o categorie.',
-    descriptionTooShort: 'Descrierea trebuie să aibă cel puțin 40 de caractere.',
-    descriptionTooLong: 'Descrierea nu poate depăși 9000 de caractere.',
-    contactRequired: 'Numele persoanei de contact este obligatoriu.',
-    contactIncomplete: 'Trebuie să completezi cel puțin email-ul sau telefonul.',
-    saveError: 'Nu s-a putut salva anunțul.',
-  },
-  en: {
-    error: 'Error',
-    authRequired: 'You must be authenticated to edit an announcement.',
-    invalidId: 'Invalid announcement ID.',
-    loadError: 'Could not load announcement data.',
-    permissionTitle: 'Permission required',
-    permissionMessage: 'Please allow gallery access to select images.',
-    formatError: 'Unsupported format',
-    formatMessage: 'Please select JPG files.',
-    selectError: 'Could not select images.',
-    validationTitle: 'Validation',
-    titleTooShort: 'Title must be at least 16 characters.',
-    titleTooLong: 'Title cannot exceed 70 characters.',
-    noCategory: 'You must select a category.',
-    descriptionTooShort: 'Description must be at least 40 characters.',
-    descriptionTooLong: 'Description cannot exceed 9000 characters.',
-    contactRequired: 'Contact person name is required.',
-    contactIncomplete: 'You must provide at least email or phone.',
-    saveError: 'Could not save the announcement.',
-  }
-};
 
 import { translateCategory } from '../src/constants/categories';
 
@@ -84,8 +44,8 @@ export default function EditAnnouncementScreen() {
   const params = useLocalSearchParams();
   const announcementId = params.id as string;
 
-  const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const { locale } = useLocale();
+  const t = getEditAnnouncementTranslations(locale);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

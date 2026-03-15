@@ -16,31 +16,8 @@ import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
 import api from '../src/services/api';
+import { getAllReviewsTranslations } from '../src/i18n/all-reviews';
 
-const TRANSLATIONS = {
-  ro: {
-    allReviews: 'Toate evaluările',
-    reviewsFor: 'Evaluările lui',
-    loading: 'Se încarcă evaluările...',
-    noReviews: 'Nu există evaluări încă',
-    error: 'Eroare',
-    errorLoading: 'Nu s-au putut încărca evaluările',
-    user: 'Utilizator',
-    review: 'evaluare',
-    reviews: 'evaluări',
-  },
-  en: {
-    allReviews: 'All Reviews',
-    reviewsFor: 'Reviews for',
-    loading: 'Loading reviews...',
-    noReviews: 'No reviews yet',
-    error: 'Error',
-    errorLoading: 'Could not load reviews',
-    user: 'User',
-    review: 'review',
-    reviews: 'reviews',
-  },
-};
 
 interface UserReview {
   _id: string;
@@ -73,7 +50,7 @@ export default function AllReviewsScreen() {
   const { userId } = useLocalSearchParams<{ userId?: string }>();
   const { user } = useAuth();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getAllReviewsTranslations(locale);
   const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
 
   const [reviews, setReviews] = useState<UserReview[]>([]);

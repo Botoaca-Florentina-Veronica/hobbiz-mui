@@ -16,6 +16,7 @@ import { useLocale } from '../src/context/LocaleContext';
 import { Toast } from '../components/ui/Toast';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { localitatiPeJudet } from '../assets/comunePeJudet';
+import { getProfileTranslations } from '../src/i18n/profile';
 
 interface UserAnnouncement {
   _id: string;
@@ -66,75 +67,7 @@ export default function ProfileScreen() {
   const { userId } = useLocalSearchParams<{ userId?: string }>();
   const { locale } = useLocale();
 
-  const TRANSLATIONS: Record<string, any> = {
-    ro: {
-      permissionTitle: 'Permisiune',
-      permissionGallery: 'Trebuie să permiți accesul la galerie pentru a schimba poza de profil.',
-      changeAvatarTitle: 'Schimbă poza de profil',
-      changeAvatarConfirm: 'Ești sigur că vrei să modifica poza de profil a contului?',
-      cancel: 'Anulează',
-      confirm: 'Confirmă',
-      avatarUpdated: 'Poza de profil a fost actualizată',
-      avatarUploadFailed: 'Nu s-a putut încărca poza. Încearcă din nou',
-      locationUpdated: 'Locația a fost actualizată',
-      locationUpdateFailed: 'Nu s-a putut actualiza locația. Încearcă din nou',
-      memberSince: 'Membru din',
-      myLocation: 'Locația mea',
-      changeLocation: 'Schimbă locația',
-      noLocationText: "Nu ți-ai setat încă locația, dc?",
-      balance: 'Balanță',
-      ron: 'RON',
-      contactInfo: 'Informații de Contact',
-      edit: 'Editează',
-      lastName: 'Nume',
-      firstName: 'Prenume',
-      phone: 'Telefon',
-      email: 'Email',
-      placeholderLastName: 'Introduceți numele',
-      placeholderFirstName: 'Introduceți prenumele',
-      placeholderPhone: 'Introduceți telefonul',
-      reviewsTitle: 'Rezultatul evaluării',
-      saveSuccess: 'Informațiile au fost actualizate',
-      saveInfo: 'Informațiile au fost actualizate',
-      saveFailed: 'Nu s-au putut actualiza informațiile. Încearcă din nou',
-      cancelBtn: 'Anulează',
-      saveBtn: 'Salvează'
-    },
-    en: {
-      permissionTitle: 'Permission',
-      permissionGallery: 'You need to allow gallery access to change your profile picture.',
-      changeAvatarTitle: 'Change profile picture',
-      changeAvatarConfirm: 'Are you sure you want to change your account profile picture?',
-      cancel: 'Cancel',
-      confirm: 'Confirm',
-      avatarUpdated: 'Profile picture updated',
-      avatarUploadFailed: 'Could not upload the picture. Please try again',
-      locationUpdated: 'Location updated',
-      locationUpdateFailed: 'Could not update location. Please try again',
-      memberSince: 'Member since',
-      myLocation: 'My location',
-      changeLocation: 'Change location',
-      noLocationText: "You haven't set your location yet.",
-      balance: 'Balance',
-      ron: 'RON',
-      contactInfo: 'Contact Information',
-      edit: 'Edit',
-      lastName: 'Last name',
-      firstName: 'First name',
-      phone: 'Phone',
-      email: 'Email',
-      placeholderLastName: 'Enter last name',
-      placeholderFirstName: 'Enter first name',
-      placeholderPhone: 'Enter phone number',
-      reviewsTitle: 'Review summary',
-      saveSuccess: 'Information updated',
-      saveInfo: 'Information updated',
-      saveFailed: 'Could not update information. Please try again',
-      cancelBtn: 'Cancel',
-      saveBtn: 'Save'
-    }
-  };
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getProfileTranslations(locale);
   const [publicProfile, setPublicProfile] = React.useState<any | null>(null);
   const [loadingPublic, setLoadingPublic] = React.useState(false);
   const [currentAvatar, setCurrentAvatar] = React.useState<string | undefined>(undefined);

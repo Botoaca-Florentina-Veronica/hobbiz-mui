@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { translateCategory, getCategoryKeyByLabel } from '../../src/constants/categories';
+import { getFavoritesTranslations } from '../../src/i18n/favorites';
 
 interface Announcement {
   _id: string;
@@ -25,37 +26,11 @@ interface Announcement {
   user?: { _id: string; firstName?: string; lastName?: string };
 }
 
-const TRANSLATIONS = {
-  ro: {
-    favorites: 'Favorite',
-    back: 'înapoi',
-    favoriteAnnouncements: 'Anunțuri favorite',
-    loading: 'Se încarcă favorite...',
-    loginRequired: 'Autentifică-te',
-    loginMessage: 'Pentru a vedea anunțurile tale favorite',
-    goToLogin: 'Mergi la autentificare',
-    noFavorites: 'Niciun anunț favorit',
-    noFavoritesMessage: 'Știi ce înseamnă asta, e timpul să îți adaugi!',
-    posted: 'POSTAT',
-  },
-  en: {
-    favorites: 'Favorite',
-    back: 'back',
-    favoriteAnnouncements: 'Favorite Announcements',
-    loading: 'Loading favorites...',
-    loginRequired: 'Login Required',
-    loginMessage: 'To see your favorite announcements',
-    goToLogin: 'Go to Login',
-    noFavorites: 'No favorite announcements',
-    noFavoritesMessage: 'You know what that means, time to add some!',
-    posted: 'POSTED',
-  },
-};
 
 export default function FavoritesScreen() {
   const { tokens, isDark } = useAppTheme();
   const { locale } = useLocale();
-  const t = TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const t = getFavoritesTranslations(locale);
   // Dark-mode palette (from attachment): use only these surface tints + pink primary and white for contrast
   const darkPalette = {
     bg: '#121212', // a10

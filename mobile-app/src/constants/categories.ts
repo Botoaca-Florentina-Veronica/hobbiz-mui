@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from 'react-native';
+import { normalizeLocale } from '../i18n';
 
 export type CategoryDef = {
   key: string;
@@ -51,11 +52,25 @@ export const CATEGORY_TRANSLATIONS = {
     tehnologie: 'Technology',
     auto: 'Auto',
     meditatii: 'Tutoring',
-  }
+  },
+  es: {
+    fotografie: 'Fotografía',
+    prajituri: 'Pastelería',
+    muzica: 'Música',
+    reparatii: 'Reparaciones',
+    dans: 'Danza',
+    curatenie: 'Limpieza',
+    gradinarit: 'Jardinería',
+    sport: 'Deportes',
+    arta: 'Arte',
+    tehnologie: 'Tecnología',
+    auto: 'Auto',
+    meditatii: 'Clases particulares',
+  },
 };
 
 export function translateCategory(categoryKey: string, locale: string = 'ro'): string {
-  const translations = CATEGORY_TRANSLATIONS[locale === 'en' ? 'en' : 'ro'];
+  const translations = CATEGORY_TRANSLATIONS[normalizeLocale(locale)];
   return translations[categoryKey] || categoryKey;
 }
 
