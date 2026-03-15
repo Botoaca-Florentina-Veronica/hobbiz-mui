@@ -726,6 +726,150 @@ body:not(.dark-mode) .search-suggestions-dropdown {
   margin-top: 8px;
 }
 
+/* === NEW: Active/highlighted suggestion (keyboard navigation) === */
+.suggestion-item.active {
+  background-color: var(--ms-hover-bg, rgba(245, 24, 102, 0.08));
+}
+.dark-mode .suggestion-item.active {
+  background-color: rgba(245, 24, 102, 0.15);
+}
+
+/* === NEW: "Search for X" action row === */
+.search-action-item {
+  background: transparent;
+}
+.search-action-item .search-action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover, #ff6b9d) 100%);
+  color: #fff;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.search-action-item .suggestion-title {
+  font-weight: 400;
+}
+.search-action-item .suggestion-title strong {
+  font-weight: 600;
+}
+
+/* === NEW: Suggestions header (recent searches label) === */
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ms-loc-icon);
+}
+.suggestions-header .clear-recent-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.suggestions-header .clear-recent-btn:hover {
+  background: rgba(245, 24, 102, 0.1);
+}
+
+/* === NEW: Recent search items === */
+.recent-item .recent-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ms-hover-bg, rgba(0,0,0,0.04));
+  flex-shrink: 0;
+}
+.dark-mode .recent-item .recent-icon {
+  background: rgba(255,255,255,0.06);
+}
+.recent-item .remove-recent-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ms-loc-icon);
+  opacity: 0;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s, background 0.15s;
+}
+.recent-item:hover .remove-recent-btn,
+.recent-item.active .remove-recent-btn {
+  opacity: 1;
+}
+.recent-item .remove-recent-btn:hover {
+  background: rgba(0,0,0,0.08);
+}
+.dark-mode .recent-item .remove-recent-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* === NEW: Divider between "Search for X" and results === */
+.suggestions-divider {
+  height: 1px;
+  background: var(--ms-loc-border);
+  margin: 0 12px;
+  opacity: 0.6;
+}
+
+/* === NEW: Loading state === */
+.suggestions-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 16px;
+  font-size: 0.88rem;
+  color: var(--ms-loc-icon);
+}
+
+/* === NEW: Empty / no results state === */
+.suggestions-empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ms-loc-icon);
+  line-height: 1.4;
+}
+
+/* === NEW: Text highlight in suggestions === */
+.suggestion-highlight {
+  background: rgba(245, 24, 102, 0.15);
+  color: var(--primary);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.dark-mode .suggestion-highlight {
+  background: rgba(245, 24, 102, 0.25);
+}
+
+/* === NEW: Dropdown entrance animation === */
+.search-suggestions-dropdown {
+  animation: dropdownSlideIn 0.15s ease-out;
+}
+@keyframes dropdownSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Scrollbar styling for suggestions */
 .search-suggestions-dropdown::-webkit-scrollbar {
   width: 6px;

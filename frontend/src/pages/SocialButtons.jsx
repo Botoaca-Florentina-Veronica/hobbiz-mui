@@ -1,10 +1,12 @@
 import googleLogo from '../assets/images/google-logo.svg';
 import facebookLogo from '../assets/images/facebook-logo.png';
 import appleLogo from '../assets/images/apple-logo.png';
+import { useTranslation } from 'react-i18next';
 import '../pages/SocialButtons.css';
 
 // Buton Google
 export function GoogleLoginButton() {
+  const { t } = useTranslation();
   const handleGoogleLogin = () => {
     // Ensure we don't end up with a double slash if VITE_API_URL ends with '/'
     // Use Render backend as safe production fallback when VITE_API_URL is not provided at build time
@@ -15,13 +17,14 @@ export function GoogleLoginButton() {
   return (
     <button className="social-btn google" onClick={handleGoogleLogin}>
       <img src={googleLogo} alt="Google" />
-      Continuă cu Google
+      {t('auth.social.google')}
     </button>
   );
 }
 
 // Buton Facebook
 export function FacebookLoginButton() {
+  const { t } = useTranslation();
   const handleFacebookLogin = () => {
     window.FB.login(function(response) {
       if (response.authResponse) {
@@ -56,17 +59,18 @@ export function FacebookLoginButton() {
   return (
     <button className="social-btn facebook" onClick={handleFacebookLogin}>
       <img src={facebookLogo} alt="Facebook" />
-      Continuă cu Facebook
+      {t('auth.social.facebook')}
     </button>
   );
 }
 
 // Buton Apple
 export function AppleLoginButton({ onClick }) {
+  const { t } = useTranslation();
   return (
     <button className="social-btn apple" onClick={onClick}>
       <img src={appleLogo} alt="Apple" />
-      Continuă cu Apple
+      {t('auth.social.apple')}
     </button>
   );
 }

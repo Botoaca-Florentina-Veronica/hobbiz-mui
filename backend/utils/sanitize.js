@@ -21,7 +21,7 @@ const MAX_EMOJI_LENGTH   = 12;    // Limita pentru un emoji (multi-char + variat
 
 /**
  * Sanitizează un text dat de utilizator pentru stocare sigură:
- * — elimină toate tagurile HTML
+ * — elimină toat`e   tagurile HTML
  * — elimină script-uri, event handlers și URL-uri javascript:
  * — respectă limita maximă de lungime
  *

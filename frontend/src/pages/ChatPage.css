@@ -384,6 +384,19 @@ body.dark-mode.chat-page .terms-conditions {
 
 .chat-message-content-group { display: flex; flex-direction: column; position: relative; }
 
+/* Bubble row: flex so reaction sits beside the bubble */
+.chat-bubble-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chat-message.own .chat-bubble-row {
+  flex-direction: row-reverse; /* bubble right, reaction left */
+}
+.chat-message:not(.own) .chat-bubble-row {
+  flex-direction: row; /* bubble left, reaction right */
+}
+
 /* Chat Bubble Styling */
 .chat-message-bubble {
   /* provide comfortable vertical space so reply preview sits fully inside */
@@ -462,23 +475,13 @@ body.dark-mode.chat-page .terms-conditions {
    REACTIONS (Restaurat stilul de pastilă)
    ========================================================= */
 .message-reactions-bubble {
-  position: absolute;
-  bottom: -4px; /* Iese puțin din bulă */
   display: inline-flex;
   gap: 4px;
   background: transparent;
   z-index: 2;
   flex-wrap: wrap;
-}
-
-.chat-message.own .message-reactions-bubble {
-  right: 0;
-  justify-content: flex-end;
-}
-
-.chat-message:not(.own) .message-reactions-bubble {
-  left: 0;
-  justify-content: flex-start;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .reaction-chip {
@@ -510,20 +513,25 @@ body.dark-mode.chat-page .terms-conditions {
 /* Reaction Picker (Popup) */
 .reaction-picker {
   position: absolute;
-  top: -50px;
+  bottom: calc(100% + 8px);
   background: var(--c-bg-container);
   border: 1px solid var(--c-sidebar-border);
-  padding: 6px;
-  border-radius: 24px;
-  display: flex; gap: 4px;
+  padding: 8px;
+  border-radius: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-width: 280px;
+  max-height: 200px;
+  overflow-y: auto;
   box-shadow: var(--c-shadow-hover);
   z-index: 100;
   animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-.chat-message.own .reaction-picker { right: 0; }
-.chat-message:not(.own) .reaction-picker { left: 0; }
+.chat-message.own .reaction-picker { left: 0; }
+.chat-message:not(.own) .reaction-picker { right: 0; }
 
 .reaction-option {
   background: transparent; border: none; font-size: 20px;

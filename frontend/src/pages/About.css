@@ -574,10 +574,12 @@
 }
 
 .steps-timeline {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.8vw, 28px);
   align-items: flex-start;
-  max-width: 1000px;
+  max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
   position: relative;
   z-index: 2;
@@ -593,12 +595,14 @@
 .dark-mode .timeline-line { background: linear-gradient(90deg, #f51866, #fa4875, #fe6585); }
 
 .step-item {
-  flex: 1; text-align: center; max-width: 200px;
+  min-width: 0;
+  width: 100%;
+  text-align: center;
   position: relative; z-index: 2;
 }
 
 .step-circle {
-  width: 60px; height: 60px;
+  width: clamp(46px, 5vw, 60px); height: clamp(46px, 5vw, 60px);
   background: var(--ab-icon-bg);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -632,7 +636,7 @@
 
 .step-number {
   color: white;
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 2vw, 1.4rem);
   font-weight: 700;
   position: relative;
   z-index: 2;
@@ -640,16 +644,17 @@
 
 .step-title {
   color: var(--ab-text-heading-alt);
-  font-size: 1.2rem;
+  font-size: clamp(0.95rem, 1.7vw, 1.2rem);
   font-weight: 600;
   margin: 0 0 10px 0;
 }
 
 .step-description {
   color: var(--ab-text-body);
-  font-size: 0.95rem;
+  font-size: clamp(0.72rem, 1.35vw, 0.95rem);
   line-height: 1.5;
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .step-icon {
@@ -943,17 +948,24 @@
   .how-it-works h2 { font-size: 1.8rem; margin-bottom: 15px; }
   .how-it-works-subtitle { font-size: 1rem; margin-bottom: 30px; }
   
-  .steps-timeline { flex-direction: column; gap: 30px; }
-  .timeline-line { display: none; }
+  .steps-timeline {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .timeline-line {
+    top: clamp(22px, 5vw, 30px);
+    left: 8%;
+    right: 8%;
+    display: block;
+  }
   
   .step-item {
-    max-width: 100%;
-    display: flex; align-items: center; text-align: left; gap: 20px;
+    display: block;
+    text-align: center;
   }
-  .step-circle { flex-shrink: 0; margin: 0; }
-  .step-content { flex: 1; }
-  .step-title { font-size: 1.1rem; margin-bottom: 8px; }
-  .step-description { font-size: 0.9rem; }
+  .step-circle { margin: 0 auto 14px auto; }
+  .step-content { width: 100%; }
+  .step-title { margin-bottom: 8px; }
   
   /* Values */
   .values-section { margin: 40px 0; padding: 40px 20px; border-radius: 16px; }

@@ -110,8 +110,11 @@ export const suggestAnnouncements = (query, signal) =>
   apiClient.get(`/api/announcements/suggest?q=${encodeURIComponent(query)}`, { signal });
 
 // Full announcement search (used on search results page)
-export const searchAnnouncements = (query, signal) =>
-  apiClient.get(`/api/announcements/search?q=${encodeURIComponent(query)}`, { signal });
+export const searchAnnouncements = (query, signal, location) => {
+  const params = new URLSearchParams({ q: query });
+  if (location) params.set('location', location);
+  return apiClient.get(`/api/announcements/search?${params.toString()}`, { signal });
+};
 
 // Logout request (pentru sesiuni/cookie-uri)
 export const logout = () => apiClient.get('/auth/logout', { withCredentials: true });

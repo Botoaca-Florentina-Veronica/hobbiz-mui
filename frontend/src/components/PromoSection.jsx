@@ -3,6 +3,10 @@ import img1 from '../../../device-view_images/1.png';
 import img2 from '../../../device-view_images/2.png';
 import img3 from '../../../device-view_images/3.png';
 import img4 from '../../../device-view_images/4.png';
+import img9 from '../assets/images/9.png';
+import img10 from '../assets/images/10.png';
+import img11 from '../assets/images/11.png';
+import img12 from '../assets/images/12.png';
 import { useTranslation } from 'react-i18next';
 import './PromoSection.css';
 
@@ -10,7 +14,10 @@ export default function PromoSection() {
   const sectionRef = useRef(null);
   // Stage 0 = nicio imagine, 1-4 = imagini vizibile
   const [activeStage, setActiveStage] = useState(0);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Select images based on language
+  const images = i18n.language === 'en' ? [img9, img10, img11, img12] : [img1, img2, img3, img4];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,8 +60,6 @@ export default function PromoSection() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const images = [img1, img2, img3, img4];
 
   return (
     <section className="promo-section" ref={sectionRef}>

@@ -67,7 +67,12 @@
     "resetConfirm": "Resetează parola",
     "resetSent": "Dacă există un cont, a fost trimis un cod.",
     "resetDone": "Parola a fost resetată. Te poți autentifica.",
-    "resetBack": "Înapoi la login"
+    "resetBack": "Înapoi la login",
+    "social": {
+      "google": "Continuă cu Google",
+      "facebook": "Continuă cu Facebook",
+      "apple": "Continuă cu Apple"
+    }
   },
   "mobileHeader": {
     "searchPlaceholder": "Ce anume cauți?",
@@ -108,7 +113,14 @@
     "locationPlaceholder": "Toată țara",
     "searchButton": "Căutare",
     "categoriesButton": "Categorii",
-    "backToCounties": "Înapoi la județe"
+    "backToCounties": "Înapoi la județe",
+    "recentSearches": "Căutări recente",
+    "clearAll": "Șterge tot",
+    "removeRecent": "Elimină",
+    "searchFor": "Caută",
+    "noSuggestions": "Nu s-au găsit sugestii. Apasă Enter pentru căutare completă.",
+    "searching": "Se caută...",
+    "free": "Gratuit"
   },
   "content": {
     "popularTitle": "Cele mai populare anunțuri",
@@ -1326,6 +1338,7 @@
       "removeBadge": "Șterge Badge",
       "noDocuments": "Niciun document încărcat.",
       "viewDocument": "Vezi Document",
+      "downloadDocument": "Descarcă",
       "reject": "Respinge",
       "rejectionTitle": "Respingere Document",
       "rejectionReason": "Motivul respingerii",

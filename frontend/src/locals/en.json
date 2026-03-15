@@ -67,7 +67,12 @@
     "resetConfirm": "Reset password",
     "resetSent": "If an account exists, a code was sent.",
     "resetDone": "Password reset successfully. You can sign in.",
-    "resetBack": "Back to login"
+    "resetBack": "Back to login",
+    "social": {
+      "google": "Continue with Google",
+      "facebook": "Continue with Facebook",
+      "apple": "Continue with Apple"
+    }
   },
   "mobileHeader": {
     "searchPlaceholder": "What are you looking for?",
@@ -108,7 +113,14 @@
     "locationPlaceholder": "Entire country",
     "searchButton": "Search",
     "categoriesButton": "Categories",
-    "backToCounties": "Back to counties"
+    "backToCounties": "Back to counties",
+    "recentSearches": "Recent searches",
+    "clearAll": "Clear all",
+    "removeRecent": "Remove",
+    "searchFor": "Search for",
+    "noSuggestions": "No suggestions found. Press Enter for full search.",
+    "searching": "Searching...",
+    "free": "Free"
   },
   "content": {
     "popularTitle": "Most popular announcements",
@@ -1313,6 +1325,7 @@
       "removeBadge": "Remove Badge",
       "noDocuments": "No documents uploaded.",
       "viewDocument": "View Document",
+      "downloadDocument": "Download",
       "reject": "Reject",
       "rejectionTitle": "Reject Document",
       "rejectionReason": "Rejection reason",

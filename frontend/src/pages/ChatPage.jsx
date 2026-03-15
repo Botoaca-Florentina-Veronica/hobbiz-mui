@@ -522,7 +522,13 @@ export default function ChatPage() {
   };
 
   const popularEmojis = ['😀', '😍', '🥰', '😊', '😂', '😭', '😎', '🤔', '😴', '🎉', '❤️', '👍', '👎', '🔥', '💯'];
-  const reactionEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+  const reactionEmojis = [
+    '👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '🎉', '😍', '🤔', '😎', '👎',
+    '🥰', '😘', '🤩', '😏', '😴', '🤯', '🥳', '😡', '🤮', '💀', '👻', '🤡',
+    '💪', '👏', '🙌', '🤝', '✌️', '🫶', '💯', '💔', '💕', '⭐', '🌟', '🎯',
+    '🏆', '🎵', '🍀', '🌈', '☀️', '🌙', '❄️', '💎', '🦋', '🐱', '🐶', '🍕',
+    '☕', '🍺', '🚀', '✅',
+  ];
   const unreadConvs = conversations.filter(c => c.unread);
   const readConvs = conversations.filter(c => !c.unread);
 
@@ -736,26 +742,26 @@ export default function ChatPage() {
                               </div>
                             )}
 
-                            {/* REACTIONS PILLS */}
-                            {Object.keys(reactionCounts).length > 0 && (
-                              <div className="message-reactions-bubble">
-                                {Object.entries(reactionCounts).map(([emoji, count]) => {
-                                  const iReacted = myReactions.includes(emoji);
-                                  return (
-                                    <div 
-                                      key={emoji} 
-                                      className={`reaction-chip ${iReacted ? 'mine' : ''}`}
-                                      onClick={() => handleReactToMessage(msg._id, emoji)}
-                                      title={iReacted ? t('chat.deleteReaction') : t('chat.addReaction')}
-                                    >
-                                      <span>{emoji}</span>
-                                      {count > 1 && <span style={{marginLeft:2, fontWeight:600}}>{count}</span>}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
                           </div>
+                          {/* REACTIONS PILLS - outside bubble, next to it */}
+                          {Object.keys(reactionCounts).length > 0 && (
+                            <div className="message-reactions-bubble">
+                              {Object.entries(reactionCounts).map(([emoji, count]) => {
+                                const iReacted = myReactions.includes(emoji);
+                                return (
+                                  <div 
+                                    key={emoji} 
+                                    className={`reaction-chip ${iReacted ? 'mine' : ''}`}
+                                    onClick={() => handleReactToMessage(msg._id, emoji)}
+                                    title={iReacted ? t('chat.deleteReaction') : t('chat.addReaction')}
+                                  >
+                                    <span>{emoji}</span>
+                                    {count > 1 && <span style={{marginLeft:2, fontWeight:600}}>{count}</span>}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                         <div className="chat-message-time">
                           {new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}

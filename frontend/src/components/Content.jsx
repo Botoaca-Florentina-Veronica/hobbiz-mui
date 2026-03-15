@@ -65,6 +65,7 @@ export default function Content() {
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTerm = urlParams.get('search');
+    const locationParam = urlParams.get('location');
     
     if (!searchTerm || !searchTerm.trim()) {
       setSearchResults([]);
@@ -76,7 +77,7 @@ export default function Content() {
     setIsSearching(true);
     setSearchResults([]);
 
-    searchAnnouncements(searchTerm.trim(), controller.signal)
+    searchAnnouncements(searchTerm.trim(), controller.signal, locationParam || undefined)
       .then(res => {
         if (controller.signal.aborted) return;
         const results = res.data || [];

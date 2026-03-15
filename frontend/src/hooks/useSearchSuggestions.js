@@ -3,27 +3,32 @@ import { suggestAnnouncements } from '../api/api';
 
 const DEBOUNCE_MS = 250;
 const MIN_CHARS = 2;
+const MAX_RECENT = 5;
+const RECENT_KEY = 'hobbiz_recent_searches';
 
-/**
- * Hook for search autocomplete suggestions.
- *
- * Features:
- * - Debounced API calls (250 ms)
- * - AbortController cancels stale requests so only the latest one wins
- * - Clears suggestions automatically when input is too short
- *
- * Returns:
- *   searchTerm, setSearchTerm   – controlled input value
- *   suggestions                 – array of lightweight announcement objects
- *   isLoading                   – true while a request is in-flight
- *   showSuggestions / setShowSuggestions – visibility of the dropdown
- *   clearSearch()               – reset everything (e.g. after navigation)
- */
+function loadRecent() {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecent(list) {
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, MAX_RECENT)));
+  } catch { /* quota exceeded – ignore */ }
+}
+
 export default function useSearchSuggestions() {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState(loadRecent);
+  // true once a fetch completes with 0 results (distinct from "haven't searched yet")
+  const [noResults, setNoResults] = useState(false);
 
   const debounceTimer = useRef(null);
   const abortRef = useRef(null);
@@ -32,31 +37,29 @@ export default function useSearchSuggestions() {
   useEffect(() => {
     const trimmed = searchTerm.trim();
 
-    // Not enough characters → reset immediately
     if (trimmed.length < MIN_CHARS) {
       setSuggestions([]);
-      setShowSuggestions(false);
+      setNoResults(false);
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
+    setNoResults(false);
 
-    // Clear previous timer
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
     debounceTimer.current = setTimeout(async () => {
-      // Abort any in-flight request
       if (abortRef.current) abortRef.current.abort();
       const controller = new AbortController();
       abortRef.current = controller;
 
       try {
         const res = await suggestAnnouncements(trimmed, controller.signal);
-        // Only update if this controller wasn't aborted
         if (!controller.signal.aborted) {
           setSuggestions(res.data);
-          setShowSuggestions(res.data.length > 0);
+          setNoResults(res.data.length === 0);
+          setShowSuggestions(true);
           setIsLoading(false);
         }
       } catch (err) {
@@ -68,11 +71,13 @@ export default function useSearchSuggestions() {
       }
     }, DEBOUNCE_MS);
 
-    // Cleanup on unmount or next keystroke
     return () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [searchTerm]);
+
+  // Reset highlighted index whenever suggestions change
+  useEffect(() => { setActiveIndex(-1); }, [suggestions]);
 
   // Cancel in-flight request on unmount
   useEffect(() => {
@@ -81,11 +86,36 @@ export default function useSearchSuggestions() {
     };
   }, []);
 
+  const addRecentSearch = useCallback((term) => {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    setRecentSearches((prev) => {
+      const next = [trimmed, ...prev.filter((t) => t !== trimmed)].slice(0, MAX_RECENT);
+      saveRecent(next);
+      return next;
+    });
+  }, []);
+
+  const removeRecentSearch = useCallback((term) => {
+    setRecentSearches((prev) => {
+      const next = prev.filter((t) => t !== term);
+      saveRecent(next);
+      return next;
+    });
+  }, []);
+
+  const clearAllRecent = useCallback(() => {
+    setRecentSearches([]);
+    saveRecent([]);
+  }, []);
+
   const clearSearch = useCallback(() => {
     setSearchTerm('');
     setSuggestions([]);
     setShowSuggestions(false);
     setIsLoading(false);
+    setActiveIndex(-1);
+    setNoResults(false);
     if (abortRef.current) abortRef.current.abort();
   }, []);
 
@@ -96,6 +126,13 @@ export default function useSearchSuggestions() {
     isLoading,
     showSuggestions,
     setShowSuggestions,
+    activeIndex,
+    setActiveIndex,
+    noResults,
+    recentSearches,
+    addRecentSearch,
+    removeRecentSearch,
+    clearAllRecent,
     clearSearch,
   };
 }

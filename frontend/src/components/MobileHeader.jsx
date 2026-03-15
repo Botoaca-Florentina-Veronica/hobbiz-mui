@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
@@ -6,69 +6,82 @@ import Badge from '@mui/material/Badge';
 import { Paper, List, ListItemButton, ListItemText } from '@mui/material';
 import './MobileHeader.css';
 import { useTranslation } from 'react-i18next';
-import apiClient from '../api/api';
+import useSearchSuggestions from '../hooks/useSearchSuggestions';
+import translateCategory from '../utils/translateCategory';
 
 export default function MobileHeader({ notificationCount = 0, onSearchFocus, onNotificationClick }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const containerRef = useRef(null);
 
-  const handleSearchChange = async (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
+  const {
+    searchTerm: searchQuery,
+    setSearchTerm: setSearchQuery,
+    suggestions,
+    isLoading,
+    showSuggestions,
+    setShowSuggestions,
+    clearSearch,
+  } = useSearchSuggestions();
 
-    if (query.length > 2) {
-      try {
-        console.log("Mobile: Fetching suggestions for:", query);
-        const response = await apiClient.get(`/api/announcements/suggestions?q=${query}`);
-        console.log("Mobile: Suggestions received:", response.data);
-        setSuggestions(response.data);
-        setShowSuggestions(true);
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
+  // Close on click outside
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setShowSuggestions(false);
       }
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion.title);
-    setShowSuggestions(false);
-    navigate(`/anunt/${suggestion._id}`);
+    clearSearch();
+    navigate(`/announcement/${suggestion._id}`);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setShowSuggestions(false);
+      navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
   
   return (
     <>
       <div className="mobile-header-spacer" aria-hidden="true" />
       <div className="mobile-header">
-      <div className="mobile-search-container" style={{ position: 'relative' }}>
-        <div className="mobile-search-bar">
+      <div className="mobile-search-container" ref={containerRef} style={{ position: 'relative' }}>
+        <form className="mobile-search-bar" onSubmit={handleSubmit}>
           <input
             type="text"
             className="mobile-search-input"
             placeholder={t('mobileHeader.searchPlaceholder')}
             onFocus={(e) => {
               if (onSearchFocus) onSearchFocus(e);
-              if (searchQuery.length > 2) setShowSuggestions(true);
+              if (suggestions.length > 0) setShowSuggestions(true);
             }}
             value={searchQuery}
-            onChange={handleSearchChange}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoComplete="off"
           />
-          <div className="mobile-search-btn">
+          <button type="submit" className="mobile-search-btn">
             <SearchIcon htmlColor="currentColor" />
-          </div>
-        </div>
+          </button>
+        </form>
         {showSuggestions && suggestions.length > 0 && (
-            <Paper className="search-suggestions-mobile" elevation={3} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000, maxHeight: '200px', overflowY: 'auto', borderRadius: '0 0 12px 12px', marginTop: '5px' }}>
+            <Paper className="search-suggestions-mobile" elevation={3} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000, maxHeight: '280px', overflowY: 'auto', borderRadius: '0 0 12px 12px', marginTop: '5px' }}>
               <List>
                 {suggestions.map((suggestion) => (
                   <ListItemButton key={suggestion._id} onClick={() => handleSuggestionClick(suggestion)}>
-                    <ListItemText primary={suggestion.title} />
+                    <ListItemText 
+                      primary={suggestion.title}
+                      secondary={[
+                        translateCategory(suggestion.category, t),
+                        suggestion.location
+                      ].filter(Boolean).join(' • ')}
+                    />
                   </ListItemButton>
                 ))}
               </List>

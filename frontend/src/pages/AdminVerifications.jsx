@@ -23,6 +23,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -33,6 +34,11 @@ import {
 } from '../api/api';
 import './AccountSettings.css';
 import './AdminVerifications.css';
+
+const getCloudinaryDownloadUrl = (url) => {
+  if (!url || !url.includes('cloudinary.com')) return url;
+  return url.replace('/upload/', '/upload/fl_attachment/');
+};
 
 export default function AdminVerifications() {
   const { t } = useTranslation();
@@ -294,15 +300,26 @@ export default function AdminVerifications() {
                     </div>
                   </div>
                   <div className="av-doc-card-actions">
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="av-doc-link"
-                    >
-                      <OpenInNewIcon style={{ fontSize: 14 }} />
-                      {t('verification.admin.viewDocument')}
-                    </a>
+                    <div className="av-doc-links">
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="av-doc-link"
+                      >
+                        <OpenInNewIcon style={{ fontSize: 14 }} />
+                        {t('verification.admin.viewDocument')}
+                      </a>
+                      <a
+                        href={getCloudinaryDownloadUrl(doc.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="av-doc-link av-doc-link--download"
+                      >
+                        <FileDownloadIcon style={{ fontSize: 15 }} />
+                        {t('verification.admin.downloadDocument')}
+                      </a>
+                    </div>
                     {doc.status === 'pending' && (
                       <div className="av-doc-action-btns">
                         <button

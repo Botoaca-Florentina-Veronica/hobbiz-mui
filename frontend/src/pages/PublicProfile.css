@@ -83,13 +83,14 @@
 .pp-hero {
   position: relative;
   margin-bottom: 32px;
+  margin-top: 4.5rem;
 }
 .pp-hero-cover {
   height: 220px;
   background: linear-gradient(135deg, #ec407a 0%, #ab47bc 100%);
   background-size: cover;
   background-position: center;
-  border-radius: 0 0 var(--pp-radius) var(--pp-radius);
+  border-radius: 0;
 }
 .pp-hero-cover.has-cover {
   background-color: #2d2d2d;

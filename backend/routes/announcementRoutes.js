@@ -58,10 +58,18 @@ router.get('/search', async (req, res) => {
     if (!q || q.trim().length < 2) return res.json([]);
 
     const trimmed = q.trim();
+    const { location } = req.query;
+
+    // Optional location filter
+    const locationFilter = {};
+    if (location && location.trim()) {
+      const escapedLoc = escapeRegexLiteral(location.trim());
+      locationFilter.location = { $regex: escapedLoc, $options: 'i' };
+    }
 
     // Try $text search first (fast, uses index, has relevance score)
     let announcements = await Announcement.find(
-      { archived: { $ne: true }, $text: { $search: trimmed } },
+      { archived: { $ne: true }, ...locationFilter, $text: { $search: trimmed } },
       { score: { $meta: 'textScore' } },
     )
       .sort({ score: { $meta: 'textScore' } })
@@ -73,6 +81,7 @@ router.get('/search', async (req, res) => {
       const escaped = escapeRegexLiteral(trimmed);
       announcements = await Announcement.find({
         archived: { $ne: true },
+        ...locationFilter,
         $or: [
           { title: { $regex: escaped, $options: 'i' } },
           { description: { $regex: escaped, $options: 'i' } },

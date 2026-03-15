@@ -416,6 +416,13 @@
   border-top: 1px solid rgba(0,0,0,0.06);
 }
 
+.av-doc-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .av-doc-link {
   display: inline-flex;
   align-items: center;
@@ -428,6 +435,7 @@
   transition: opacity 0.15s;
 }
 .av-doc-link:hover { opacity: 1; text-decoration: underline; }
+.av-doc-link--download { color: #1a7f4b; }
 
 .av-doc-action-btns {
   display: flex;
@@ -556,6 +564,9 @@
 }
 .dark-mode .av-doc-link {
   color: var(--as-btn-bg, #f51866);
+}
+.dark-mode .av-doc-link--download {
+  color: #4caf8a;
 }
 .dark-mode .av-badge--verified {
   background: rgba(76,175,80,0.15);

@@ -2,7 +2,7 @@ import { FaSearch, FaBars, FaMapMarkerAlt } from "react-icons/fa";
 import { HiOutlineBell } from 'react-icons/hi';
 import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
 import hobby from '../assets/images/hobby_img.jpg';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import translateCategory from '../utils/translateCategory';
@@ -11,9 +11,12 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Paper, CardContent, Chip, Box, IconButton, InputBase, Stack, useMediaQuery } from '@mui/material';
+import { Paper, CardContent, Chip, Box, IconButton, InputBase, Stack, useMediaQuery, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import CloseIcon from '@mui/icons-material/Close';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import './MainStage.css';
 import useSearchSuggestions from '../hooks/useSearchSuggestions';
 
@@ -220,6 +223,13 @@ export default function MainStage() {
     isLoading: isSearching,
     showSuggestions,
     setShowSuggestions,
+    activeIndex,
+    setActiveIndex,
+    noResults,
+    recentSearches,
+    addRecentSearch,
+    removeRecentSearch,
+    clearAllRecent,
     clearSearch,
   } = useSearchSuggestions();
   
@@ -227,18 +237,90 @@ export default function MainStage() {
   const categoriesButtonRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const searchContainerRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  // Whether the search input is focused (controls dropdown visibility for recent/empty states)
+  const [inputFocused, setInputFocused] = useState(false);
 
   // Click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
         setShowSuggestions(false);
+        setInputFocused(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Total selectable items in the dropdown (for keyboard nav)
+  const trimmedTerm = searchTerm.trim();
+  const hasTypedEnough = trimmedTerm.length >= 2;
+  // "Search for X" row counts as index 0 when we have text
+  const totalItems = hasTypedEnough ? 1 + searchSuggestions.length : 0;
+
+  // Determine if the dropdown should be visible
+  const showRecentPanel = inputFocused && !hasTypedEnough && recentSearches.length > 0;
+  const showDropdown = showSuggestions || showRecentPanel;
+
+  // Keyboard handler for the search input
+  const handleSearchKeyDown = useCallback((e) => {
+    if (!showDropdown) {
+      if (e.key === 'ArrowDown' && recentSearches.length > 0) {
+        setInputFocused(true);
+      }
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setShowSuggestions(false);
+      setInputFocused(false);
+      searchInputRef.current?.blur();
+      return;
+    }
+
+    if (showRecentPanel) {
+      // Arrow navigation through recent items
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex((i) => (i + 1) % recentSearches.length);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex((i) => (i <= 0 ? recentSearches.length - 1 : i - 1));
+      } else if (e.key === 'Enter' && activeIndex >= 0 && activeIndex < recentSearches.length) {
+        e.preventDefault();
+        const term = recentSearches[activeIndex];
+        setSearchTerm(term);
+        setShowSuggestions(false);
+        setInputFocused(false);
+        addRecentSearch(term);
+        navigate(`/?search=${encodeURIComponent(term)}`);
+      }
+      return;
+    }
+
+    // Suggestions dropdown navigation
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % totalItems);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => (i <= 0 ? totalItems - 1 : i - 1));
+    } else if (e.key === 'Enter') {
+      if (activeIndex === 0) {
+        // "Search for X" row
+        e.preventDefault();
+        handleSearchSubmit(e);
+      } else if (activeIndex > 0 && activeIndex <= searchSuggestions.length) {
+        e.preventDefault();
+        handleSuggestionClick(searchSuggestions[activeIndex - 1]._id);
+      }
+      // if activeIndex === -1, let the form submit naturally
+    }
+  }, [showDropdown, showRecentPanel, activeIndex, totalItems, recentSearches, searchSuggestions, searchTerm, hasTypedEnough]);
 
   // Event Handlers
   const handleCategoryHover = (category) => {
@@ -310,56 +392,191 @@ export default function MainStage() {
 
   const handleSuggestionClick = (announcementId) => {
     clearSearch();
+    setInputFocused(false);
     navigate(`/announcement/${announcementId}`);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
+      addRecentSearch(searchTerm.trim());
       setShowSuggestions(false);
-      navigate(`/?search=${encodeURIComponent(searchTerm.trim())}`);
+      setInputFocused(false);
+      const params = new URLSearchParams();
+      params.set('search', searchTerm.trim());
+      if (selectedLocalitate) {
+        params.set('location', selectedLocalitate);
+      } else if (selectedJudet && selectedJudet !== 'Toată țara') {
+        params.set('location', selectedJudet);
+      }
+      navigate(`/?${params.toString()}`);
     }
+  };
+
+  const handleRecentClick = (term) => {
+    setSearchTerm(term);
+    addRecentSearch(term);
+    setShowSuggestions(false);
+    setInputFocused(false);
+    navigate(`/?search=${encodeURIComponent(term)}`);
+  };
+
+  const handleSearchFocus = () => {
+    setInputFocused(true);
+    if (searchSuggestions.length > 0) setShowSuggestions(true);
   };
 
   const open = Boolean(anchorEl);
   const id = open ? 'location-popover' : undefined;
 
-  // Shared render for suggestion items (desktop + mobile)
-  const renderSuggestions = () =>
-    searchSuggestions.map((item) => (
-      <div
-        key={item._id}
-        className="suggestion-item"
-        onClick={() => handleSuggestionClick(item._id)}
-      >
-        <div className="suggestion-image">
-          {item.image ? (
-            <img src={item.image} alt={item.title} />
-          ) : (
-            <div className="no-image-placeholder">
+  // Highlight matching text portions
+  const highlightMatch = (text, query) => {
+    if (!query || query.length < 2) return text;
+    try {
+      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+      return parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase()
+          ? <mark key={i} className="suggestion-highlight">{part}</mark>
+          : part
+      );
+    } catch { return text; }
+  };
+
+  // Render the dropdown panel (recent, loading, suggestions, no-results)
+  const renderSearchDropdown = (isMobileVariant) => {
+    const trimmed = searchTerm.trim();
+    const typed = trimmed.length >= 2;
+
+    // RECENT SEARCHES (shown when focused + empty input)
+    if (!typed && recentSearches.length > 0 && inputFocused) {
+      return (
+        <div className={`search-suggestions-dropdown${isMobileVariant ? ' mobile-suggestions' : ''}`} role="listbox">
+          <div className="suggestions-header">
+            <AccessTimeIcon sx={{ fontSize: 16, opacity: 0.6 }} />
+            <span>{t('mainStage.recentSearches', 'Căutări recente')}</span>
+            <button className="clear-recent-btn" onClick={clearAllRecent} type="button">
+              {t('mainStage.clearAll', 'Șterge tot')}
+            </button>
+          </div>
+          {recentSearches.map((term, idx) => (
+            <div
+              key={term}
+              className={`suggestion-item recent-item${activeIndex === idx ? ' active' : ''}`}
+              onClick={() => handleRecentClick(term)}
+              role="option"
+              aria-selected={activeIndex === idx}
+            >
+              <div className="recent-icon">
+                <AccessTimeIcon sx={{ fontSize: 18, opacity: 0.4 }} />
+              </div>
+              <div className="suggestion-content">
+                <div className="suggestion-title">{term}</div>
+              </div>
+              <button
+                className="remove-recent-btn"
+                onClick={(e) => { e.stopPropagation(); removeRecentSearch(term); }}
+                type="button"
+                aria-label={t('mainStage.removeRecent', 'Elimină')}
+              >
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </button>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Nothing typed yet and no recent→ don't show anything
+    if (!typed) return null;
+
+    // LOADING STATE
+    if (isSearching && searchSuggestions.length === 0) {
+      return (
+        <div className={`search-suggestions-dropdown${isMobileVariant ? ' mobile-suggestions' : ''}`}>
+          <div className="suggestions-loading">
+            <CircularProgress size={20} sx={{ color: 'var(--primary)' }} />
+            <span>{t('mainStage.searching', 'Se caută...')}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // SUGGESTIONS + "Search for X" header
+    if (searchSuggestions.length > 0 || noResults) {
+      return (
+        <div className={`search-suggestions-dropdown${isMobileVariant ? ' mobile-suggestions' : ''}`} role="listbox">
+          {/* "Search for X" action row */}
+          <div
+            className={`suggestion-item search-action-item${activeIndex === 0 ? ' active' : ''}`}
+            onClick={handleSearchSubmit}
+            role="option"
+            aria-selected={activeIndex === 0}
+          >
+            <div className="search-action-icon">
               <FaSearch />
+            </div>
+            <div className="suggestion-content">
+              <div className="suggestion-title">
+                {t('mainStage.searchFor', 'Caută')}{' '}
+                <strong>"{trimmed}"</strong>
+              </div>
+            </div>
+            <ArrowForwardIosIcon sx={{ fontSize: 14, opacity: 0.4 }} />
+          </div>
+
+          {searchSuggestions.length > 0 ? (
+            <>
+              <div className="suggestions-divider" />
+              {searchSuggestions.map((item, idx) => (
+                <div
+                  key={item._id}
+                  className={`suggestion-item${activeIndex === idx + 1 ? ' active' : ''}`}
+                  onClick={() => handleSuggestionClick(item._id)}
+                  role="option"
+                  aria-selected={activeIndex === idx + 1}
+                >
+                  <div className="suggestion-image">
+                    {item.image ? (
+                      <img src={item.image} alt="" />
+                    ) : (
+                      <div className="no-image-placeholder">
+                        <FaSearch />
+                      </div>
+                    )}
+                  </div>
+                  <div className="suggestion-content">
+                    <div className="suggestion-title">{highlightMatch(item.title, trimmed)}</div>
+                    <div className="suggestion-meta">
+                      <span className="suggestion-category">{translateCategory(item.category, t)}</span>
+                      {item.location && (
+                        <>
+                          <span className="suggestion-separator">•</span>
+                          <span className="suggestion-location">{item.location}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {item.price != null && (
+                    <div className="suggestion-price">
+                      {item.price === 0 ? t('mainStage.free', 'Gratuit') : `${item.price} RON`}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
+          ) : (
+            /* NO RESULTS body (the "Search for X" action is still shown above) */
+            <div className="suggestions-empty">
+              <span>{t('mainStage.noSuggestions', 'Nu s-au găsit sugestii. Apasă Enter pentru căutare completă.')}</span>
             </div>
           )}
         </div>
-        <div className="suggestion-content">
-          <div className="suggestion-title">{item.title}</div>
-          <div className="suggestion-meta">
-            <span className="suggestion-category">{translateCategory(item.category, t)}</span>
-            {item.location && (
-              <>
-                <span className="suggestion-separator">•</span>
-                <span className="suggestion-location">{item.location}</span>
-              </>
-            )}
-          </div>
-        </div>
-        {item.price != null && (
-          <div className="suggestion-price">
-            {item.price === 0 ? t('mainStage.free', 'Gratuit') : `${item.price} RON`}
-          </div>
-        )}
-      </div>
-    ));
+      );
+    }
+
+    return null;
+  };
 
   return (
     <div className="main-stage">
@@ -441,15 +658,20 @@ export default function MainStage() {
         )}
 
         {!isMobile ? (
-          <div className="search-container mainstage-search-desktop" ref={searchContainerRef}>
+          <div className="search-container mainstage-search-desktop" ref={searchContainerRef} role="combobox" aria-expanded={showDropdown} aria-haspopup="listbox">
             <form onSubmit={handleSearchSubmit} style={{ display: 'flex', flex: 1, position: 'relative' }}>
               <input 
+                ref={searchInputRef}
                 type="text" 
                 placeholder={t('mainStage.searchPlaceholder')} 
                 className="search-input"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
+                onFocus={handleSearchFocus}
+                onKeyDown={handleSearchKeyDown}
+                autoComplete="off"
+                role="searchbox"
+                aria-autocomplete="list"
               />
               <div className="location-section" onClick={handleInputClick}>
                 <FaMapMarkerAlt className="location-icon" />
@@ -466,12 +688,8 @@ export default function MainStage() {
                 <FaSearch className="search-icon" />
               </button>
               
-              {/* Suggestions Dropdown */}
-              {showSuggestions && searchSuggestions.length > 0 && (
-                <div className="search-suggestions-dropdown">
-                  {renderSuggestions()}
-                </div>
-              )}
+              {/* Suggestions / Recent Dropdown */}
+              {showDropdown && renderSearchDropdown(false)}
             </form>
           </div>
         ) : (
@@ -488,10 +706,12 @@ export default function MainStage() {
                 <InputBase
                   className="mobile-search-input"
                   placeholder={t('mainStage.searchPlaceholder')}
-                  inputProps={{ 'aria-label': t('mainStage.searchButton') }}
+                  inputProps={{ 'aria-label': t('mainStage.searchButton'), role: 'searchbox' }}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
+                  onFocus={handleSearchFocus}
+                  onKeyDown={handleSearchKeyDown}
+                  autoComplete="off"
                 />
                 <IconButton type="submit" color="primary" aria-label={t('mainStage.searchButton')}>
                   <FaSearch />
@@ -506,12 +726,8 @@ export default function MainStage() {
               </IconButton>
             </Stack>
             
-            {/* Mobile Suggestions Dropdown */}
-            {showSuggestions && searchSuggestions.length > 0 && (
-              <div className="search-suggestions-dropdown mobile-suggestions">
-                {renderSuggestions()}
-              </div>
-            )}
+            {/* Mobile Dropdown */}
+            {showDropdown && renderSearchDropdown(true)}
           </Box>
         )}
 

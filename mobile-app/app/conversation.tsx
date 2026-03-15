@@ -1950,8 +1950,8 @@ export default function ConversationScreen() {
                           const visible = entries.slice(0, 3);
                           const more = Math.max(0, entries.length - visible.length);
                           const absStyle: ViewStyle = isOwn
-                            ? { position: 'absolute', right: 12, top: -36 }
-                            : { position: 'absolute', left: 12, top: -36 };
+                            ? { position: 'absolute', left: 12, top: -36 }
+                            : { position: 'absolute', right: 12, top: -36 };
                           return (
                             <View
                               onLayout={(e) => {
