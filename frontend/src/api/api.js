@@ -104,6 +104,10 @@ export const verifyDocument = (userId, documentId, data) =>
   apiClient.put(`/api/users/admin/users/${userId}/documents/${documentId}/verify`, data);
 export const toggleUserVerification = (userId, data) => 
   apiClient.put(`/api/users/admin/users/${userId}/verification-badge`, data);
+export const getContactFallbacks = (status = 'open') =>
+  apiClient.get(`/api/contact/fallbacks?status=${encodeURIComponent(status)}`);
+export const resolveContactFallback = (id) =>
+  apiClient.patch(`/api/contact/fallbacks/${id}/resolve`);
 
 // Announcement search for autocomplete suggestions (lightweight)
 export const suggestAnnouncements = (query, signal) =>

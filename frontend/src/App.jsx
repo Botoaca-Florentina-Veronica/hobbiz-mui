@@ -24,6 +24,7 @@ import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import VerificationDocuments from './pages/VerificationDocuments';
 import AdminVerifications from './pages/AdminVerifications';
+import AdminContactFallbacks from './pages/AdminContactFallbacks';
 import PublicProfile from './pages/PublicProfile';
 import PublicProfileAllReviews from './pages/PublicProfileAllReviews';
 import MyAnnouncements from './pages/MyAnnouncements';
@@ -64,6 +65,8 @@ function App() {
         const country = data.country_code;
         if (country === 'RO') {
           i18n.changeLanguage('ro');
+        } else if (country === 'ES') {
+          i18n.changeLanguage('es');
         } else {
           i18n.changeLanguage('en');
         }
@@ -278,6 +281,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AdminVerifications />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/admin/contact-fallbacks" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AdminContactFallbacks />
             <Footer hideOnMobile />
           </>
         } />

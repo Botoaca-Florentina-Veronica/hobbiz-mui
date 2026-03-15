@@ -118,7 +118,10 @@ export default function AccountMenuMobile() {
     { icon: <Campaign />, label: 'Anunțurile mele', path: '/anunturile-mele' },
     { icon: <Person />, label: 'Profil', path: '/profil' },
     { icon: <VerifiedUser />, label: 'Verificare Documente', path: '/verificare-documente' },
-    ...(userProfile?.isAdmin ? [{ icon: <VerifiedUser />, label: 'Verificări Admin', path: '/admin/verificari', style: { color: '#f51866' } }] : []),
+    ...(userProfile?.isAdmin ? [
+      { icon: <VerifiedUser />, label: t('header.adminVerifications'), path: '/admin/verificari', style: { color: '#f51866' } },
+      { icon: <VerifiedUser />, label: t('header.adminContactMessages'), path: '/admin/contact-fallbacks', style: { color: '#f51866' } }
+    ] : []),
     { icon: <InfoOutlined />, label: 'Despre noi', path: '/despre' },
     { icon: <Gavel />, label: 'Informații legale', path: '/informatii-legale' }
   ];

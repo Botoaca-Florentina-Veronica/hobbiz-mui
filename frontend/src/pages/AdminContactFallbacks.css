@@ -1,0 +1,214 @@
+/* ============================================================
+   ADMIN CONTACT FALLBACKS
+   ============================================================ */
+
+.acf-page {
+  min-height: 100vh;
+  background: var(--as-bg-page, #f7f9fc);
+  padding-bottom: 4rem;
+}
+
+.acf-container {
+  padding-top: 5.5rem !important;
+  padding-bottom: 2rem !important;
+}
+
+.acf-back-row {
+  margin-bottom: 0;
+  display: none;
+}
+
+.acf-back-btn {
+  color: var(--as-text-title, #183642) !important;
+  background: var(--as-bg-item, #f3f5f6) !important;
+  border-radius: 12px !important;
+  width: 40px !important;
+  height: 40px !important;
+  flex-shrink: 0;
+  transition: background 0.18s, transform 0.18s !important;
+}
+.acf-back-btn:hover {
+  transform: translateX(-2px);
+  background: var(--as-bg-item-hover, #eaf0f4) !important;
+}
+
+.acf-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4rem 0 2rem 0;
+  flex-wrap: wrap;
+}
+
+.acf-title {
+  color: var(--as-text-title, #183642);
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  line-height: 1.1;
+  font-family: 'Poppins', sans-serif !important;
+  margin: 0;
+}
+
+.acf-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.acf-filter-btn {
+  border-radius: 999px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  padding: 6px 14px !important;
+  border: 1px solid rgba(53, 80, 112, 0.2) !important;
+  color: var(--as-text-primary, #183642) !important;
+}
+
+.acf-filter-btn.active {
+  background: var(--as-btn-bg, #0B2D5A) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+.acf-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem 0;
+}
+
+.acf-spinner {
+  color: var(--as-btn-bg, #0B2D5A) !important;
+}
+
+.acf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 5rem 0;
+}
+
+.acf-empty-icon {
+  font-size: 3rem !important;
+  color: var(--as-btn-bg, #0B2D5A);
+  opacity: 0.35;
+}
+
+.acf-empty-text {
+  font-size: 1rem !important;
+  color: var(--as-text-primary, #183642) !important;
+  opacity: 0.55;
+}
+
+.acf-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.acf-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 22px;
+  background: var(--as-bg-menu, #fff);
+  border-radius: 16px;
+  box-shadow: var(--as-shadow-item, 0 2px 8px rgba(0,0,0,0.05));
+  border: 1px solid rgba(11,45,90,0.06);
+}
+
+.acf-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.acf-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.acf-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--as-text-primary, #183642);
+}
+
+.acf-email {
+  font-size: 0.82rem;
+  color: var(--as-text-primary, #183642);
+  opacity: 0.62;
+}
+
+.acf-chip {
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+}
+
+.acf-chip.open {
+  background: rgba(237, 108, 2, 0.12) !important;
+  color: #e65100 !important;
+}
+
+.acf-chip.resolved {
+  background: rgba(46, 125, 50, 0.12) !important;
+  color: #2e7d32 !important;
+}
+
+.acf-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.78rem;
+  color: var(--as-text-primary, #183642);
+  opacity: 0.6;
+  flex-wrap: wrap;
+}
+
+.acf-message {
+  font-size: 0.92rem;
+  color: var(--as-text-primary, #183642);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.acf-error {
+  background: rgba(229, 57, 53, 0.08);
+  border: 1px solid rgba(229, 57, 53, 0.18);
+  color: #b71c1c;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+.acf-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.acf-resolve-btn {
+  background: var(--as-btn-bg, #0B2D5A) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  padding: 6px 16px !important;
+}
+
+.acf-resolve-btn:disabled {
+  opacity: 0.6;
+}
+
+@media (max-width: 900px) {
+  .acf-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -119,6 +119,22 @@ export default function AnnouncementsByCategory() {
     return [...new Set(locations)];
   }, [announcements]);
 
+  const priceFilterLabel = useMemo(() => {
+    switch (priceFilter) {
+      case 'free':
+        return t('allAnnouncements.free');
+      case 'under50':
+        return t('allAnnouncements.under50');
+      case 'under100':
+        return t('allAnnouncements.under100');
+      case 'over100':
+        return t('allAnnouncements.over100');
+      case 'all':
+      default:
+        return t('allAnnouncements.allPrices');
+    }
+  }, [priceFilter, t]);
+
   // Filter and sort announcements
   const filteredAndSortedAnnouncements = useMemo(() => {
     let filtered = announcements.filter(a => {
@@ -198,7 +214,7 @@ export default function AnnouncementsByCategory() {
     fetchAnnouncements();
   }, [category]);
 
-  if (loading) return <div>Se încarcă anunțurile...</div>;
+  if (loading) return <div>{t('allAnnouncements.loading')}</div>;
 
   return (
     <div className="my-announcements-container announcements-by-category">
@@ -209,13 +225,13 @@ export default function AnnouncementsByCategory() {
         onClose={() => setShowLoginToast(false)}
       />
       <div className="mobile-back-container" onClick={() => window.history.back()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && window.history.back()}>
-        <button className="mobile-back-btn" aria-label="Înapoi">
+        <button className="mobile-back-btn" aria-label={t('common.back')}>
           {/* left arrow svg */}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M15 18l-6-6 6-6" stroke="#23484a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
-        <span className="mobile-back-label">Înapoi</span>
+        <span className="mobile-back-label">{t('common.back')}</span>
       </div>
       <div className="abc-align-container">
         <Typography variant="h4" className="my-announcements-title" gutterBottom>
@@ -226,7 +242,7 @@ export default function AnnouncementsByCategory() {
           <Stack spacing={2} sx={{ width: '100%' }}>
             <TextField
               fullWidth
-              placeholder="Caută anunturi..."
+                placeholder={t('allAnnouncements.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -261,25 +277,25 @@ export default function AnnouncementsByCategory() {
                         }
                   }
                 >
-                  Filtre
+                  {showFilters ? t('allAnnouncements.hideFilters') : t('allAnnouncements.showFilters')}
                 </Button>
                 <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel>Sortează după</InputLabel>
+                  <InputLabel>{t('myAnnouncements.sortBy')}</InputLabel>
                   <Select
                     value={sortBy}
-                    label="Sortează după"
+                    label={t('myAnnouncements.sortBy')}
                     onChange={(e) => setSortBy(e.target.value)}
                   >
-                    <MenuItem value="recent">Cele mai recente</MenuItem>
-                    <MenuItem value="price-asc">Preț crescător</MenuItem>
-                    <MenuItem value="price-desc">Preț descrescător</MenuItem>
-                    <MenuItem value="title">Nume (A-Z)</MenuItem>
+                    <MenuItem value="recent">{t('allAnnouncements.recent')}</MenuItem>
+                    <MenuItem value="price-asc">{t('allAnnouncements.priceLow')}</MenuItem>
+                    <MenuItem value="price-desc">{t('allAnnouncements.priceHigh')}</MenuItem>
+                    <MenuItem value="title">{t('allAnnouncements.titleSort')}</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="body2" color="text.secondary">
-                  {filteredAndSortedAnnouncements.length} rezultate
+                  {filteredAndSortedAnnouncements.length} {t('allAnnouncements.results')}
                 </Typography>
                 <ButtonGroup size="small">
                   <IconButton
@@ -308,27 +324,27 @@ export default function AnnouncementsByCategory() {
             {showFilters && (
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', pt: 1, borderTop: 1, borderColor: 'divider' }}>
                 <FormControl size="small" sx={{ minWidth: 150 }}>
-                  <InputLabel>Preț</InputLabel>
+                  <InputLabel>{t('allAnnouncements.priceLabel')}</InputLabel>
                   <Select
                     value={priceFilter}
-                    label="Preț"
+                    label={t('allAnnouncements.priceLabel')}
                     onChange={(e) => setPriceFilter(e.target.value)}
                   >
-                    <MenuItem value="all">Toate prețurile</MenuItem>
-                    <MenuItem value="free">Gratuit</MenuItem>
-                    <MenuItem value="under50">Sub 50 RON</MenuItem>
-                    <MenuItem value="under100">50-100 RON</MenuItem>
-                    <MenuItem value="over100">Peste 100 RON</MenuItem>
+                    <MenuItem value="all">{t('allAnnouncements.allPrices')}</MenuItem>
+                    <MenuItem value="free">{t('allAnnouncements.free')}</MenuItem>
+                    <MenuItem value="under50">{t('allAnnouncements.under50')}</MenuItem>
+                    <MenuItem value="under100">{t('allAnnouncements.under100')}</MenuItem>
+                    <MenuItem value="over100">{t('allAnnouncements.over100')}</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl size="small" sx={{ minWidth: 150 }}>
-                  <InputLabel>Locație</InputLabel>
+                  <InputLabel>{t('allAnnouncements.locationLabel')}</InputLabel>
                   <Select
                     value={locationFilter}
-                    label="Locație"
+                    label={t('allAnnouncements.locationLabel')}
                     onChange={(e) => setLocationFilter(e.target.value)}
                   >
-                    <MenuItem value="all">Toate locațiile</MenuItem>
+                    <MenuItem value="all">{t('allAnnouncements.allLocations')}</MenuItem>
                     {uniqueLocations.map(location => (
                       <MenuItem key={location} value={location}>{location}</MenuItem>
                     ))}
@@ -344,7 +360,7 @@ export default function AnnouncementsByCategory() {
                       setLocationFilter('all');
                     }}
                   >
-                    Resetează filtrele
+                    {t('allAnnouncements.resetFilters')}
                   </Button>
                 )}
               </Box>
@@ -353,23 +369,21 @@ export default function AnnouncementsByCategory() {
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 {searchTerm && (
                   <Chip
-                    label={`Căutare: "${searchTerm}"`}
+                    label={`${t('common.search')}: "${searchTerm}"`}
                     onDelete={() => setSearchTerm('')}
                     size="small"
                   />
                 )}
                 {priceFilter !== 'all' && (
                   <Chip
-                    label={`Preț: ${priceFilter === 'free' ? 'Gratuit' : 
-                      priceFilter === 'under50' ? 'Sub 50 RON' : 
-                      priceFilter === 'under100' ? '50-100 RON' : 'Peste 100 RON'}`}
+                    label={`${t('allAnnouncements.priceLabel')}: ${priceFilterLabel}`}
                     onDelete={() => setPriceFilter('all')}
                     size="small"
                   />
                 )}
                 {locationFilter !== 'all' && (
                   <Chip
-                    label={`Locație: ${locationFilter}`}
+                    label={`${t('allAnnouncements.locationLabel')}: ${locationFilter}`}
                     onDelete={() => setLocationFilter('all')}
                     size="small"
                   />
@@ -383,8 +397,8 @@ export default function AnnouncementsByCategory() {
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="h6" color="text.secondary">
               {announcements.length === 0 
-                ? "Nu există anunțuri pentru această categorie." 
-                : "Nu s-au găsit anunțuri care să corespundă filtrelor."}
+                ? t('allAnnouncements.noCategoryAnnouncements')
+                : t('allAnnouncements.noFilteredAnnouncements')}
             </Typography>
           </Box>
         ) : (
@@ -402,7 +416,7 @@ export default function AnnouncementsByCategory() {
                       src={a.images[0].startsWith('http') || a.images[0].startsWith('/uploads')
                         ? a.images[0]
                         : `/uploads/${a.images[0].replace(/^.*[\\/]/, '')}`}
-                      alt="imagine principala"
+                      alt={t('allAnnouncements.mainImageAlt')}
                       className="my-announcement-img"
                     />
                   ) : (
@@ -417,7 +431,7 @@ export default function AnnouncementsByCategory() {
                       <div className="my-announcement-location">{a.location}</div>
                       {a.price && (
                         <div className="my-announcement-price">
-                          {parseFloat(a.price) === 0 ? 'Gratuit' : `${a.price} RON`}
+                          {parseFloat(a.price) === 0 ? t('allAnnouncements.free') : `${a.price} RON`}
                         </div>
                       )}
 

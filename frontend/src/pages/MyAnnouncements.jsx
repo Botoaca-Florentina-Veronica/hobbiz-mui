@@ -5,6 +5,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
+import translateCategory from '../utils/translateCategory';
 import { 
   CircularProgress,
   IconButton,
@@ -37,6 +38,13 @@ export default function MyAnnouncements() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const currentLocale = i18n.language || 'ro';
+  const isEn = currentLocale === 'en';
+  const isEs = currentLocale === 'es';
+  const allLabel = isEn ? 'All' : (isEs ? 'Todas' : 'Toate');
+  const mostRecentValue = isEn ? 'mostRecent' : (isEs ? 'mas_reciente' : 'cea mai recenta');
+  const oldestValue = isEn ? 'oldest' : (isEs ? 'mas_antiguo' : 'cea mai veche');
+  const titleAzValue = isEn ? 'titleAZ' : (isEs ? 'titulo_a_z' : 'titlu_a_z');
+  const titleZaValue = isEn ? 'titleZA' : (isEs ? 'titulo_z_a' : 'titlu_z_a');
   
   // ---------------------------------------------------------------------------
   // 1. STATE MANAGEMENT
@@ -46,8 +54,8 @@ export default function MyAnnouncements() {
   const [loading, setLoading] = useState(true);
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState(currentLocale === 'en' ? 'All' : 'Toate');
-  const [sortFilter, setSortFilter] = useState(currentLocale === 'en' ? 'mostRecent' : 'cea mai recenta');
+  const [categoryFilter, setCategoryFilter] = useState(allLabel);
+  const [sortFilter, setSortFilter] = useState(mostRecentValue);
   const [activePickerType, setActivePickerType] = useState(null); // 'category' | 'sort' | null
   
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
@@ -62,13 +70,10 @@ export default function MyAnnouncements() {
   
   const uniqueCategories = useMemo(() => {
     const categories = announcements.map(a => a.category).filter(Boolean);
-    const allLabel = currentLocale === 'en' ? 'All' : 'Toate';
     return [allLabel, ...Array.from(new Set(categories))];
-  }, [announcements, currentLocale]);
+  }, [announcements, allLabel]);
 
   const filteredAndSortedAnnouncements = useMemo(() => {
-    const allLabel = currentLocale === 'en' ? 'All' : 'Toate';
-    
     let filtered = announcements.filter(a => {
       const searchWords = searchTerm.toLowerCase().trim().split(/\s+/).filter(w => w.length > 0);
       let matchesSearch = true;
@@ -91,16 +96,20 @@ export default function MyAnnouncements() {
       switch (sortFilter) {
         case 'oldest':
         case 'cea mai veche':
+        case 'mas_antiguo':
           return new Date(a.createdAt) - new Date(b.createdAt);
         case 'mostRecent':
         case 'cea mai recenta':
+        case 'mas_reciente':
           return new Date(b.createdAt) - new Date(a.createdAt);
         case 'titleAZ':
         case 'titlu_a_z':
-          return a.title.localeCompare(b.title, currentLocale === 'en' ? 'en' : 'ro');
+        case 'titulo_a_z':
+          return a.title.localeCompare(b.title, isEn ? 'en' : (isEs ? 'es' : 'ro'));
         case 'titleZA':
         case 'titlu_z_a':
-          return b.title.localeCompare(a.title, currentLocale === 'en' ? 'en' : 'ro');
+        case 'titulo_z_a':
+          return b.title.localeCompare(a.title, isEn ? 'en' : (isEs ? 'es' : 'ro'));
         default:
           return new Date(b.createdAt) - new Date(a.createdAt);
       }
@@ -207,13 +216,11 @@ export default function MyAnnouncements() {
     );
   }
 
-  const allLabel = currentLocale === 'en' ? 'All' : 'Toate';
-  
   const sortOptions = [
-    { value: currentLocale === 'en' ? 'mostRecent' : 'cea mai recenta', label: t('myAnnouncements.sortNewest'), icon: 'arrow-down' },
-    { value: currentLocale === 'en' ? 'oldest' : 'cea mai veche', label: t('myAnnouncements.sortOldest'), icon: 'arrow-up' },
-    { value: currentLocale === 'en' ? 'titleAZ' : 'titlu_a_z', label: t('myAnnouncements.sortTitleAz'), icon: 'text' },
-    { value: currentLocale === 'en' ? 'titleZA' : 'titlu_z_a', label: t('myAnnouncements.sortTitleZa'), icon: 'text' },
+    { value: mostRecentValue, label: t('myAnnouncements.sortNewest'), icon: 'arrow-down' },
+    { value: oldestValue, label: t('myAnnouncements.sortOldest'), icon: 'arrow-up' },
+    { value: titleAzValue, label: t('myAnnouncements.sortTitleAz'), icon: 'text' },
+    { value: titleZaValue, label: t('myAnnouncements.sortTitleZa'), icon: 'text' },
   ];
 
   return (
@@ -278,7 +285,7 @@ export default function MyAnnouncements() {
               >
                 <AppsIcon className="ma-filter-icon" />
                 <span className="ma-filter-text">
-                  {categoryFilter === allLabel ? t('myAnnouncements.categoryLabel') : categoryFilter}
+                  {categoryFilter === allLabel ? t('myAnnouncements.categoryLabel') : translateCategory(categoryFilter, t)}
                 </span>
                 <svg className="ma-filter-chevron" viewBox="0 0 24 24" fill="currentColor">
                   <path d={activePickerType === 'category' ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z'} />
@@ -318,7 +325,7 @@ export default function MyAnnouncements() {
                 )}
                 {categoryFilter !== allLabel && (
                   <div className="ma-chip">
-                    <span className="ma-chip-text">{t('myAnnouncements.categoryChip')}: {categoryFilter}</span>
+                    <span className="ma-chip-text">{t('myAnnouncements.categoryChip')}: {translateCategory(categoryFilter, t)}</span>
                     <CloseIcon className="ma-chip-close" onClick={() => setCategoryFilter(allLabel)} />
                   </div>
                 )}
@@ -451,7 +458,9 @@ export default function MyAnnouncements() {
                   >
                     <div className="ma-modal-option-left">
                       <AppsIcon className="ma-modal-option-icon" />
-                      <span className="ma-modal-option-text">{cat}</span>
+                      <span className="ma-modal-option-text">
+                        {cat === allLabel ? cat : translateCategory(cat, t)}
+                      </span>
                     </div>
                     {categoryFilter === cat && (
                       <CheckCircleIcon className="ma-modal-option-check" />

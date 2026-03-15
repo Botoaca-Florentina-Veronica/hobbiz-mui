@@ -117,9 +117,11 @@ export default function Content() {
             display: 'block'
           }}
         >
-          {searchResults.length > 0 ? `S-au găsit ${searchResults.length} rezultate` : 
-           isSearching ? 'Se caută...' : 
-           'Cele mai apreciate anunțuri din comunitatea noastră'}
+          {searchResults.length > 0
+            ? t('content.searchResultsCount', { count: searchResults.length })
+            : isSearching
+              ? t('content.searching')
+              : t('content.popularSubtitle')}
         </Typography>
       </Box>
 
@@ -772,7 +774,7 @@ export default function Content() {
           className="explore-all-button"
           onClick={() => navigate('/toate-anunturile')}
         >
-          Explorează toate anunțurile
+          {t('content.exploreAllButton')}
         </button>
       </Box>
     </section>

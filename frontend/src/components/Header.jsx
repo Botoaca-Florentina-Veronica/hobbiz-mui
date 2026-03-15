@@ -413,7 +413,7 @@ export default function Header() {
               <button 
                 className="language-btn" 
                 onClick={() => setShowLangDropdown(!showLangDropdown)}
-                aria-label="Schimbă limba"
+                aria-label={t('language.change')}
               >
                 <IoLanguage className="language-icon" />
                 <span className="current-lang">{getCurrentLanguage().toUpperCase()}</span>
@@ -426,14 +426,21 @@ export default function Header() {
                     onClick={() => changeLanguage('ro')}
                   >
                     <span className="lang-flag">🇷🇴</span>
-                    <span>Română</span>
+                    <span>{t('language.ro')}</span>
                   </div>
                   <div 
                     className={`language-option ${getCurrentLanguage() === 'en' ? 'active' : ''}`}
                     onClick={() => changeLanguage('en')}
                   >
                     <span className="lang-flag">🇬🇧</span>
-                    <span>English</span>
+                    <span>{t('language.en')}</span>
+                  </div>
+                  <div 
+                    className={`language-option ${getCurrentLanguage() === 'es' ? 'active' : ''}`}
+                    onClick={() => changeLanguage('es')}
+                  >
+                    <span className="lang-flag">🇪🇸</span>
+                    <span>{t('language.es')}</span>
                   </div>
                 </div>
               )}
@@ -538,9 +545,14 @@ export default function Header() {
                     <a onClick={(e) => { e.preventDefault(); navigate('/anunturile-mele'); }}>{t('header.myAnnouncements')}</a>
                     <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>{t('header.profile')}</a>
                     {auth?.user?.isAdmin && (
-                      <a onClick={(e) => { e.preventDefault(); navigate('/admin/verificari'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
-                        Verificări Admin
-                      </a>
+                      <>
+                        <a onClick={(e) => { e.preventDefault(); navigate('/admin/verificari'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
+                          {t('header.adminVerifications')}
+                        </a>
+                        <a onClick={(e) => { e.preventDefault(); navigate('/admin/contact-fallbacks'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
+                          {t('header.adminContactMessages')}
+                        </a>
+                      </>
                     )}
                     <a onClick={(e) => { e.preventDefault(); handleLogout(); }}>{t('header.logout')}</a>
                   </div>

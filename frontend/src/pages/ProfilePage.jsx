@@ -589,7 +589,7 @@ export default function ProfilePage() {
         </h1>
         <p className="mobile-register-date">
           {t('profile.memberSince')} {profile?.createdAt
-            ? new Date(profile.createdAt).toLocaleDateString(i18n?.language === 'en' ? 'en-US' : 'ro-RO', {
+            ? new Date(profile.createdAt).toLocaleDateString(i18n?.language === 'en' ? 'en-US' : (i18n?.language === 'es' ? 'es-ES' : 'ro-RO'), {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'

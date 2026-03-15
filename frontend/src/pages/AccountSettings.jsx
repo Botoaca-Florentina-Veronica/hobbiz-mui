@@ -130,7 +130,7 @@ export default function AccountSettings() {
         telefon: userData.phone || 'N/A',
         locatie: userData.localitate || 'N/A',
         dataInregistrarii: userData.createdAt 
-          ? new Date(userData.createdAt).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ro-RO', {
+          ? new Date(userData.createdAt).toLocaleDateString(i18n.language === 'en' ? 'en-US' : (i18n.language === 'es' ? 'es-ES' : 'ro-RO'), {
               year: 'numeric',
               month: 'long',
               day: 'numeric',

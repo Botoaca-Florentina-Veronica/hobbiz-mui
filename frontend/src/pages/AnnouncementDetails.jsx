@@ -368,7 +368,7 @@ export default function AnnouncementDetails() {
 
   // ========== Utilitare de format ==========
   const formatDate = (dateString) => {
-    const locale = i18n.language === 'en' ? 'en-GB' : 'ro-RO';
+    const locale = i18n.language === 'en' ? 'en-GB' : (i18n.language === 'es' ? 'es-ES' : 'ro-RO');
     return new Date(dateString).toLocaleDateString(locale, {
       day: '2-digit',
       month: 'long',

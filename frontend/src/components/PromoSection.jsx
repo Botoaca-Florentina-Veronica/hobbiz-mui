@@ -17,7 +17,9 @@ export default function PromoSection() {
   const { t, i18n } = useTranslation();
 
   // Select images based on language
-  const images = i18n.language === 'en' ? [img9, img10, img11, img12] : [img1, img2, img3, img4];
+  const images = (i18n.language === 'en' || i18n.language === 'es')
+    ? [img9, img10, img11, img12]
+    : [img1, img2, img3, img4];
 
   useEffect(() => {
     const handleScroll = () => {

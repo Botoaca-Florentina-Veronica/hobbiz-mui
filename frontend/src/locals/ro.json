@@ -12,12 +12,15 @@
     "logoutSuccess": "Ai fost deconectat din cont.",
     "login": "Autentificare",
     "signup": "Înregistrare",
-    "account": "Contul tău"
+    "account": "Contul tău",
+    "adminVerifications": "Verificări Admin",
+    "adminContactMessages": "Mesaje Contact"
   },
   "language": {
     "select": "Alege limba",
     "ro": "Română",
     "en": "Engleză",
+    "es": "Spaniolă",
     "change": "Schimbă limba"
   },
   "common": {
@@ -124,9 +127,12 @@
   },
   "content": {
     "popularTitle": "Cele mai populare anunțuri",
+    "popularSubtitle": "Cele mai apreciate anunțuri din comunitatea noastră",
+    "exploreAllButton": "Explorează toate anunțurile",
     "noAnnouncements": "Nu există anunțuri momentan",
     "searchResults": "Rezultate căutare",
     "searching": "Se caută...",
+    "searchResultsCount": "S-au găsit {{count}} rezultate",
     "noResultsFound": "Nu s-au găsit anunțuri pentru căutarea ta. Încearcă alte cuvinte cheie.",
     "searchError": "Eroare la căutarea anunțurilor. Încearcă din nou."
   },
@@ -154,11 +160,22 @@
     "gridView": "Grilă",
     "listView": "Listă",
     "results": "rezultate",
+    "resetFilters": "Resetează filtrele",
     "noResults": "Nu s-au găsit rezultate pentru căutarea ta.",
     "noResultsDescription": "Încearcă să modifici criteriile de căutare",
+    "noCategoryAnnouncements": "Nu există anunțuri pentru această categorie.",
+    "noFilteredAnnouncements": "Nu s-au găsit anunțuri care să corespundă filtrelor.",
     "loading": "Se încarcă anunțurile...",
+    "mainImageAlt": "imagine principală",
     "previous": "Înapoi",
     "next": "Următorul"
+  },
+  "announcementLocationMap": {
+    "title": "Locație",
+    "mapTitle": "Harta pentru {{location}}",
+    "loadError": "Nu s-a putut încărca harta.",
+    "openInMaps": "Deschide în Google Maps",
+    "pinAria": "locație"
   },
   "categories": {
     "title": "Explorează categorii",
@@ -306,6 +323,8 @@
   },
   "addAnnouncement": {
     "pageTitle": "Publică un anunț",
+    "editPageTitle": "Editează anunțul",
+    "editMobileHeaderTitle": "Editează anunțul",
     "categoryHints": {
       "photography": "Servicii foto, cursuri, echipamente",
       "pastries": "Cofetărie, patiserie, cursuri de coacere",
@@ -361,6 +380,7 @@
       "descriptionMax": "Descrierea nu poate depăși 9000 de caractere",
       "locationRequired": "Trebuie să selectezi o locație",
       "contactPersonRequired": "Numele persoanei de contact este obligatoriu",
+      "contactPersonMax": "Numele nu poate depăși 50 de caractere",
       "invalidEmail": "Adresa de email nu este validă",
       "invalidPhone": "Numărul de telefon trebuie să înceapă cu 0 și să aibă 10 cifre",
       "emailRequired": "Trebuie să completezi adresa de email",
@@ -373,7 +393,8 @@
     },
     "success": { "updated": "Anunț actualizat cu succes!", "created": "Anunțul a fost publicat cu succes!" },
     "labels": { "entireCountry": "Toată țara", "mainImage": "Principală" },
-    "popover": { "close": "Închide", "title": "Alege categoria", "chooseCountyTitle": "Alege județul", "chooseLocalityTitle": "Alege localitatea", "closeAria": "Închide" },
+    "popover": { "close": "Închide", "title": "Alege categoria", "chooseCountyTitle": "Alege județul", "chooseLocalityTitle": "Alege localitatea", "backToCounties": "Înapoi la județe", "closeAria": "Închide" },
+    "popover": { "close": "Închide", "title": "Alege categoria", "chooseCountyTitle": "Alege județul", "chooseLocalityTitle": "Alege localitatea", "backToCounties": "Înapoi la județe", "closeAria": "Închide" },
     "previewTitle": "Previzualizare anunț",
     "preview": {
       "description": "Descriere",
@@ -1352,6 +1373,45 @@
       "documentVerified": "a verificat documentul tău",
       "documentRejected": "a respins documentul tău",
       "userVerified": "a verificat și aprobat contul tău"
+    }
+  },
+  "contactModal": {
+    "closeAria": "Închide",
+    "title": "Contactează-ne",
+    "email": "team.hobbiz@gmail.com",
+    "successTitle": "Mesaj trimis cu succes!",
+    "successLine1": "Îți mulțumim că ne-ai contactat.",
+    "successLine2": "Echipa Hobbiz îți va răspunde în curând.",
+    "intro": "Scrie-ne un mesaj și te vom contacta în curând.",
+    "nameLabel": "Nume",
+    "emailLabel": "Email",
+    "messageLabel": "Mesajul tău",
+    "cancelButton": "Anulează",
+    "closeButton": "Închide",
+    "sendButton": "Trimite mesajul",
+    "sending": "Se trimite...",
+    "errorRequired": "Toate câmpurile sunt obligatorii.",
+    "errorGeneric": "A apărut o eroare. Încearcă din nou."
+  },
+  "adminContactFallbacks": {
+    "title": "Mesaje contact (fallback)",
+    "filters": {
+      "open": "Deschise",
+      "resolved": "Rezolvate",
+      "all": "Toate"
+    },
+    "empty": "Nu există mesaje în acest moment.",
+    "status": {
+      "open": "Deschis",
+      "resolved": "Rezolvat"
+    },
+    "ipLabel": "IP:",
+    "mailErrorLabel": "Eroare email:",
+    "resolveButton": "Marchează ca rezolvat",
+    "messages": {
+      "fetchError": "Nu am putut încărca mesajele de contact.",
+      "resolveSuccess": "Mesaj marcat ca rezolvat.",
+      "resolveError": "Nu am putut actualiza mesajul."
     }
   },
   "cookieConsent": {

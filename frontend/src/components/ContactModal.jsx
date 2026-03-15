@@ -16,6 +16,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import apiClient from '../api/api';
+import { useTranslation } from 'react-i18next';
 
 const isDark = () => document.body.classList.contains('dark-mode');
 
@@ -26,6 +27,7 @@ const isDark = () => document.body.classList.contains('dark-mode');
  *   onClose {function}
  */
 export default function ContactModal({ open, onClose }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -42,7 +44,7 @@ export default function ContactModal({ open, onClose }) {
     e.preventDefault();
     const { name, email, message } = form;
     if (!name.trim() || !email.trim() || !message.trim()) {
-      setError('Toate câmpurile sunt obligatorii.');
+      setError(t('contactModal.errorRequired'));
       return;
     }
     setLoading(true);
@@ -55,7 +57,7 @@ export default function ContactModal({ open, onClose }) {
       });
       setSuccess(true);
     } catch (err) {
-      setError(err?.response?.data?.error || 'A apărut o eroare. Încearcă din nou.');
+      setError(err?.response?.data?.error || t('contactModal.errorGeneric'));
     } finally {
       setLoading(false);
     }
@@ -168,7 +170,7 @@ export default function ContactModal({ open, onClose }) {
             '&:hover': { bgcolor: 'rgba(255,255,255,0.22)', color: '#fff' },
             transition: 'all 0.2s',
           }}
-          aria-label="Închide"
+          aria-label={t('contactModal.closeAria')}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
@@ -196,7 +198,7 @@ export default function ContactModal({ open, onClose }) {
             letterSpacing: '-0.01em',
           }}
         >
-          Contactează-ne
+          {t('contactModal.title')}
         </Typography>
         <Typography
           sx={{
@@ -205,7 +207,7 @@ export default function ContactModal({ open, onClose }) {
             fontFamily: "'Poppins', sans-serif",
           }}
         >
-          team.hobbiz@gmail.com
+          {t('contactModal.email')}
         </Typography>
       </Box>
 
@@ -223,7 +225,7 @@ export default function ContactModal({ open, onClose }) {
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Mesaj trimis cu succes!
+              {t('contactModal.successTitle')}
             </Typography>
             <Typography
               sx={{
@@ -233,9 +235,9 @@ export default function ContactModal({ open, onClose }) {
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Îți mulțumim că ne-ai contactat.
+              {t('contactModal.successLine1')}
               <br />
-              Echipa Hobbiz îți va răspunde în curând.
+              {t('contactModal.successLine2')}
             </Typography>
           </Box>
         ) : (
@@ -253,12 +255,12 @@ export default function ContactModal({ open, onClose }) {
                 mb: 0.5,
               }}
             >
-              Scrie-ne un mesaj și te vom contacta în curând.
+              {t('contactModal.intro')}
             </Typography>
 
             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
               <TextField
-                label="Nume"
+                label={t('contactModal.nameLabel')}
                 name="name"
                 value={form.name}
                 onChange={handleChange}
@@ -270,7 +272,7 @@ export default function ContactModal({ open, onClose }) {
                 sx={fieldSx}
               />
               <TextField
-                label="Email"
+                label={t('contactModal.emailLabel')}
                 name="email"
                 type="email"
                 value={form.email}
@@ -285,7 +287,7 @@ export default function ContactModal({ open, onClose }) {
             </Box>
 
             <TextField
-              label="Mesajul tău"
+              label={t('contactModal.messageLabel')}
               name="message"
               value={form.message}
               onChange={handleChange}
@@ -352,7 +354,7 @@ export default function ContactModal({ open, onClose }) {
               '&:hover': { background: gradientBtnHv },
             }}
           >
-            Închide
+            {t('contactModal.closeButton')}
           </Button>
         ) : (
           <>
@@ -372,7 +374,7 @@ export default function ContactModal({ open, onClose }) {
                 '&:hover': { bgcolor: surface, borderColor: dark ? '#444' : '#d1d5db' },
               }}
             >
-              Anulează
+              {t('contactModal.cancelButton')}
             </Button>
 
             <Button
@@ -410,7 +412,7 @@ export default function ContactModal({ open, onClose }) {
                 },
               }}
             >
-              {loading ? 'Se trimite...' : 'Trimite mesajul'}
+              {loading ? t('contactModal.sending') : t('contactModal.sendButton')}
             </Button>
           </>
         )}

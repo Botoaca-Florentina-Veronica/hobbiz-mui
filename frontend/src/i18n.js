@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import translationRO from './locals/ro.json';
 import translationEN from './locals/en.json';
+import translationES from './locals/es.json';
 
 const resources = {
   ro: {
@@ -11,6 +12,9 @@ const resources = {
   },
   en: {
     translation: translationEN
+  },
+  es: {
+    translation: translationES
   }
 };
 
@@ -20,7 +24,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'ro',
-    preload: ['ro', 'en'],
+    preload: ['ro', 'en', 'es'],
     load: 'languageOnly',
     debug: false,
     interpolation: {
