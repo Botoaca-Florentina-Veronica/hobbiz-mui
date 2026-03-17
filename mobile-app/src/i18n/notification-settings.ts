@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const notificationSettingsTranslations = {
   ro: {
@@ -57,4 +57,4 @@ export const notificationSettingsTranslations = {
 export type NotificationSettingsTranslations = typeof notificationSettingsTranslations.ro;
 
 export const getNotificationSettingsTranslations = (locale?: string) =>
-  notificationSettingsTranslations[normalizeLocale(locale)] as NotificationSettingsTranslations;
+  getLocaleTranslations(notificationSettingsTranslations, locale) as NotificationSettingsTranslations;

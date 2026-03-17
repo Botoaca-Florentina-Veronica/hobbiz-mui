@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const starredMessagesTranslations = {
   ro: {
@@ -30,4 +30,4 @@ export const starredMessagesTranslations = {
 export type StarredMessagesTranslations = typeof starredMessagesTranslations.ro;
 
 export const getStarredMessagesTranslations = (locale?: string) =>
-  starredMessagesTranslations[normalizeLocale(locale)] as StarredMessagesTranslations;
+  getLocaleTranslations(starredMessagesTranslations, locale) as StarredMessagesTranslations;

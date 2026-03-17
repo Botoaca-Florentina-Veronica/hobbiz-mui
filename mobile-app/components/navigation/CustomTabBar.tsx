@@ -12,6 +12,7 @@ import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { useRouter } from 'expo-router';
 import api from '../../src/services/api';
+import { normalizeLocale } from '../../src/i18n';
 
 // Static icon config; labels will be provided via translations below
 const TAB_CONFIG: Record<string, { icon: string; label?: string; special?: boolean }> = {
@@ -22,12 +23,12 @@ const TAB_CONFIG: Record<string, { icon: string; label?: string; special?: boole
   account: { icon: 'person-circle-outline' },
 };
 
-const TAB_LABELS: Record<string, { ro: string; en: string }> = {
-  index: { ro: 'Explorează', en: 'Explore' },
-  favorites: { ro: 'Favorite', en: 'Favorites' },
-  sell: { ro: 'Vinde', en: 'Sell' },
-  chat: { ro: 'Chat', en: 'Chat' },
-  account: { ro: 'Cont', en: 'Account' },
+const TAB_LABELS: Record<string, { ro: string; en: string; es: string }> = {
+  index: { ro: 'Explorează', en: 'Explore', es: 'Explorar' },
+  favorites: { ro: 'Favorite', en: 'Favorites', es: 'Favoritos' },
+  sell: { ro: 'Vinde', en: 'Sell', es: 'Vender' },
+  chat: { ro: 'Chat', en: 'Chat', es: 'Chat' },
+  account: { ro: 'Cont', en: 'Account', es: 'Cuenta' },
 };
 
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
@@ -38,6 +39,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { unreadCount } = useChatNotifications();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
+  const tabLocale = normalizeLocale(locale);
   const router = useRouter();
   
   // Helper to normalize image URLs for web compatibility
@@ -98,7 +100,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
           const base = TAB_CONFIG[route.name] || { icon: 'ellipse' };
-          const config = { ...base, label: (TAB_LABELS as any)[route.name]?.[locale] ?? route.name } as any;
+          const config = { ...base, label: (TAB_LABELS as any)[route.name]?.[tabLocale] ?? route.name } as any;
           const onPress = () => {
             // Dacă nu e autentificat și nu este tab-ul Explorează (index), redirecționează la login (folosim router.push pentru ruta absolută)
             if (!loading && !isAuthenticated && route.name !== 'index') {

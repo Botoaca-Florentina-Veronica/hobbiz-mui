@@ -145,6 +145,38 @@
   gap: 0.5rem; /* Reduced gap for tighter spacing */
   margin-top: 0.5rem; /* Reduced top margin */
   align-items: center; /* Vertically align buttons */
+  justify-content: center; /* Center horizontally in the column */
+  width: 100%;
+}
+
+.legal-download {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: center;
+}
+
+.legal-download__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 20px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4a4a4a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+  box-shadow: 0 7px 14px rgba(34, 34, 34, 0.16);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.legal-download__button:hover,
+.legal-download__button:focus-visible {
+  background: #ffffff;
+  transform: translateY(-2px);
+  filter: brightness(1.02);
 }
 
 .app-store-button {
@@ -241,4 +273,17 @@
 /* Dark mode adjustments for app store buttons */
 .dark-mode .app-store-button:hover {
   filter: brightness(1.15) contrast(1.05);
+}
+
+.dark-mode .legal-download__button {
+  background: #ffffff;
+  color: #2b2b2b;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .legal-download__button:hover,
+.dark-mode .legal-download__button:focus-visible {
+  background: #ffffff;
+  filter: brightness(1.02);
 }

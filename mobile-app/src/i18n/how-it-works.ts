@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const howItWorksTranslations = {
   ro: {
@@ -177,4 +177,4 @@ export const howItWorksTranslations = {
 export type HowItWorksTranslations = typeof howItWorksTranslations.ro;
 
 export const getHowItWorksTranslations = (locale?: string) =>
-  howItWorksTranslations[normalizeLocale(locale)] as HowItWorksTranslations;
+  getLocaleTranslations(howItWorksTranslations, locale) as HowItWorksTranslations;

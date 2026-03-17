@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const settingsTranslations = {
   ro: {
@@ -126,4 +126,4 @@ export const settingsTranslations = {
 export type SettingsTranslations = typeof settingsTranslations.ro;
 
 export const getSettingsTranslations = (locale?: string) =>
-  settingsTranslations[normalizeLocale(locale)] as SettingsTranslations;
+  getLocaleTranslations(settingsTranslations, locale) as SettingsTranslations;

@@ -8,17 +8,42 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
+import { normalizeLocale } from '../../src/i18n';
 
 export default function LegalMenu() {
   const { tokens } = useAppTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { locale } = useLocale();
+  const normalizedLocale = normalizeLocale(locale);
+
+  const labels = {
+    title: {
+      ro: 'Informații legale',
+      en: 'Legal information',
+      es: 'Informacion legal',
+    },
+    terms: {
+      ro: 'Termeni și condiții',
+      en: 'Terms and Conditions',
+      es: 'Terminos y condiciones',
+    },
+    cookies: {
+      ro: 'Cookie policy',
+      en: 'Cookie Policy',
+      es: 'Politica de cookies',
+    },
+    privacy: {
+      ro: 'Politica de confidențialitate',
+      en: 'Privacy Policy',
+      es: 'Politica de privacidad',
+    },
+  };
 
   const items = [
-    { key: 'terms', label: locale === 'en' ? 'Terms and Conditions' : 'Termeni și condiții', route: '/legal/terms', icon: 'document-text-outline' },
-    { key: 'cookies', label: locale === 'en' ? 'Cookie Policy' : 'Cookie policy', route: '/legal/cookies', icon: 'logo-chrome' },
-    { key: 'privacy', label: locale === 'en' ? 'Privacy Policy' : 'Politica de confidențialitate', route: '/legal/privacy', icon: 'shield-checkmark-outline' },
+    { key: 'terms', label: labels.terms[normalizedLocale], route: '/legal/terms', icon: 'document-text-outline' },
+    { key: 'cookies', label: labels.cookies[normalizedLocale], route: '/legal/cookies', icon: 'logo-chrome' },
+    { key: 'privacy', label: labels.privacy[normalizedLocale], route: '/legal/privacy', icon: 'shield-checkmark-outline' },
   ];
 
   return (
@@ -28,7 +53,7 @@ export default function LegalMenu() {
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{locale === 'en' ? 'Legal information' : 'Informații legale'}</ThemedText>
+          <ThemedText style={[styles.title, { color: tokens.colors.text }]}>{labels.title[normalizedLocale]}</ThemedText>
         </View>
 
         <View style={styles.group}>

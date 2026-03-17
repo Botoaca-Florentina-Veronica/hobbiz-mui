@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const archivedAnnouncementsTranslations = {
   ro: {
@@ -99,4 +99,4 @@ export const archivedAnnouncementsTranslations = {
 export type ArchivedAnnouncementsTranslations = typeof archivedAnnouncementsTranslations.ro;
 
 export const getArchivedAnnouncementsTranslations = (locale?: string) =>
-  archivedAnnouncementsTranslations[normalizeLocale(locale)] as ArchivedAnnouncementsTranslations;
+  getLocaleTranslations(archivedAnnouncementsTranslations, locale) as ArchivedAnnouncementsTranslations;

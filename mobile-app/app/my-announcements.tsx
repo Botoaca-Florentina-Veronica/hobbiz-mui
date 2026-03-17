@@ -72,8 +72,8 @@ export default function MyAnnouncementsScreen() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState(locale === 'en' ? 'All' : 'Toate');
-  const [sortFilter, setSortFilter] = useState(locale === 'en' ? 'mostRecent' : 'cea mai recenta');
+  const [categoryFilter, setCategoryFilter] = useState(t.all);
+  const [sortFilter, setSortFilter] = useState('mostRecent');
   const [activePickerType, setActivePickerType] = useState<'category' | 'sort' | null>(null);
   // Track per-card content heights so the left image can match the card height exactly
   const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
@@ -148,17 +148,13 @@ export default function MyAnnouncementsScreen() {
     filtered.sort((a, b) => {
       switch (sortFilter) {
         case 'oldest':
-        case 'cea mai veche':
           return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         case 'mostRecent':
-        case 'cea mai recenta':
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         case 'titleAZ':
-        case 'titlu_a_z':
-          return a.title.localeCompare(b.title, locale === 'en' ? 'en' : 'ro');
+          return a.title.localeCompare(b.title, locale);
         case 'titleZA':
-        case 'titlu_z_a':
-          return b.title.localeCompare(a.title, locale === 'en' ? 'en' : 'ro');
+          return b.title.localeCompare(a.title, locale);
         default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
@@ -642,10 +638,10 @@ export default function MyAnnouncementsScreen() {
               ) : (
                 // Sort options
                 [
-                  { value: locale === 'en' ? 'mostRecent' : 'cea mai recenta', label: t.mostRecent, icon: 'arrow-down' },
-                  { value: locale === 'en' ? 'oldest' : 'cea mai veche', label: t.oldest, icon: 'arrow-up' },
-                  { value: locale === 'en' ? 'titleAZ' : 'titlu_a_z', label: t.titleAZ, icon: 'text' },
-                  { value: locale === 'en' ? 'titleZA' : 'titlu_z_a', label: t.titleZA, icon: 'text' },
+                  { value: 'mostRecent', label: t.mostRecent, icon: 'arrow-down' },
+                  { value: 'oldest', label: t.oldest, icon: 'arrow-up' },
+                  { value: 'titleAZ', label: t.titleAZ, icon: 'text' },
+                  { value: 'titleZA', label: t.titleZA, icon: 'text' },
                 ].map((option) => (
                   <TouchableOpacity
                     key={option.value}
@@ -828,7 +824,7 @@ const createStyles = (tokens: any) => StyleSheet.create({
   },
   // Modal Overlay & Content
   modalOverlay: {
-    position: 'absolute',
+    position: Platform.OS === 'web' ? 'fixed' : 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -836,6 +832,13 @@ const createStyles = (tokens: any) => StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
     zIndex: 1000,
+    ...Platform.select({
+      web: {
+        width: '100vw',
+        height: '100vh',
+        zIndex: 9999,
+      },
+    }),
   },
   modalContent: {
     backgroundColor: tokens.colors.surface,

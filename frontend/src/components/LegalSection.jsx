@@ -33,6 +33,16 @@ const LegalSection = () => {
             <img src={googlePlayImg} alt={t('legal.getOnGooglePlay')} />
           </a>
         </div>
+        <div className="legal-download">
+          <a
+            className="legal-download__button"
+            href="https://drive.google.com/file/d/1fBxOLH5Wfgoze1ywbC-H-mY1aBggLQYU/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('legal.downloadPresentation')}
+          </a>
+        </div>
       </div>
       <div className="legal-section__column">
         <h4>{t('legal.usefulLinks')}</h4>

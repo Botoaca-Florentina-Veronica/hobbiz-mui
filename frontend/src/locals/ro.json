@@ -410,6 +410,7 @@
     "description": "Descoperă, vinde și cumpără servicii sau produse de la pasionați ca tine.",
     "downloadAppStore": "Descarcă din App Store",
     "getOnGooglePlay": "Obține pe Google Play",
+    "downloadPresentation": "Descarcă preview al aplicației",
     "usefulLinks": "Linkuri utile",
     "about": "Despre noi",
     "contact": "Contact",
@@ -1408,10 +1409,19 @@
     "ipLabel": "IP:",
     "mailErrorLabel": "Eroare email:",
     "resolveButton": "Marchează ca rezolvat",
+    "deleteButton": "Șterge",
+    "deleteConfirm": "Sigur vrei să ștergi acest mesaj?",
+    "confirmDialog": {
+      "title": "Confirmare ștergere",
+      "cancel": "Anulează",
+      "confirm": "Șterge"
+    },
     "messages": {
       "fetchError": "Nu am putut încărca mesajele de contact.",
       "resolveSuccess": "Mesaj marcat ca rezolvat.",
-      "resolveError": "Nu am putut actualiza mesajul."
+      "resolveError": "Nu am putut actualiza mesajul.",
+      "deleteSuccess": "Mesaj șters cu succes.",
+      "deleteError": "Nu am putut șterge mesajul."
     }
   },
   "cookieConsent": {

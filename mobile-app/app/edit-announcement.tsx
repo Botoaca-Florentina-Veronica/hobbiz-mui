@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
@@ -57,7 +57,7 @@ export default function EditAnnouncementScreen() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [price, setPrice] = useState('');
-  const [location, setLocation] = useState('Toată țara');
+  const [location, setLocation] = useState(t.countrywide);
   const [images, setImages] = useState<ImageItem[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -104,7 +104,7 @@ export default function EditAnnouncementScreen() {
       setEmail(announcement.contactEmail || '');
       setPhone(announcement.contactPhone || '');
       setPrice(announcement.price || '');
-      setLocation(announcement.location || 'Toată țara');
+      setLocation(announcement.location || t.countrywide);
       
       // Set existing images
       if (announcement.images && announcement.images.length > 0) {
@@ -237,7 +237,7 @@ export default function EditAnnouncementScreen() {
         },
       });
 
-      showToast('Anunțul a fost actualizat cu succes!', 'success');
+      showToast(t.updateSuccess, 'success');
       
       // Navigate back after a short delay to allow toast to be visible
       setTimeout(() => {
@@ -245,7 +245,7 @@ export default function EditAnnouncementScreen() {
       }, 2500);
     } catch (error: any) {
       console.error('Error updating announcement:', error);
-      const errorMsg = error.response?.data?.error || 'Eroare la actualizarea anunțului.';
+      const errorMsg = error.response?.data?.error || t.updateError;
       Alert.alert(t.error, errorMsg);
     } finally {
       setSubmitting(false);
@@ -267,7 +267,7 @@ export default function EditAnnouncementScreen() {
         <View style={[styles.loadingContainer]}>
           <ActivityIndicator size="large" color={tokens.colors.primary} />
           <ThemedText style={[styles.loadingText, { color: tokens.colors.muted }]}>
-            Se încarcă datele anunțului...
+            {t.loading}
           </ThemedText>
         </View>
       </ThemedView>
@@ -278,7 +278,11 @@ export default function EditAnnouncementScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : undefined}
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -288,48 +292,48 @@ export default function EditAnnouncementScreen() {
           >
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />
           </TouchableOpacity>
-          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>Editează anunțul</ThemedText>
+          <ThemedText style={[styles.headerTitle, { color: tokens.colors.text }]}>{t.headerTitle}</ThemedText>
         </View>
 
         {/* Section: Descrie-ti anuntul */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Descrie-ți anunțul cu lux de detalii!</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.detailsTitle}</ThemedText>
           
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Adaugă un titlu clar*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.titleLabel}</ThemedText>
             <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="ex: Predau lecții de fizică, online"
+              placeholder={t.titlePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={title}
               onChangeText={setTitle}
               maxLength={70}
             />
             <View style={styles.helperRow}>
-              <ThemedText style={[styles.helper, { color: tokens.colors.muted }]}>Introdu cel puțin 16 caractere</ThemedText>
-              <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{remainingTitle} caractere rămase</ThemedText>
+              <ThemedText style={[styles.helper, { color: tokens.colors.muted }]}>{t.titleMin}</ThemedText>
+              <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{remainingTitle} {t.remaining}</ThemedText>
             </View>
           </View>
 
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Categoria*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.categoryLabel}</ThemedText>
             <TouchableOpacity
               style={[styles.input, styles.selectLike, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}
               activeOpacity={0.75}
               onPress={() => setCategoryModalOpen(true)}
             >
               <ThemedText style={{ color: category ? tokens.colors.text : tokens.colors.muted }}>
-                {category || 'Alege categoria'}
+                {category || t.categoryPlaceholder}
               </ThemedText>
               <Ionicons name="chevron-down" size={18} color={tokens.colors.muted} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Descriere*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.descriptionLabel}</ThemedText>
             <ThemedTextInput
               style={[styles.textarea, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț"
+              placeholder={t.descriptionPlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={description}
               onChangeText={setDescription}
@@ -337,17 +341,17 @@ export default function EditAnnouncementScreen() {
               maxLength={9000}
             />
             <View style={styles.helperRow}>
-              <ThemedText style={[styles.helper, { color: tokens.colors.muted }]}>Introdu cel puțin 40 caractere</ThemedText>
-              <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{remainingDesc} caractere rămase</ThemedText>
+              <ThemedText style={[styles.helper, { color: tokens.colors.muted }]}>{t.descriptionMin}</ThemedText>
+              <ThemedText style={[styles.counter, { color: tokens.colors.muted }]}>{remainingDesc} {t.remaining}</ThemedText>
             </View>
           </View>
         </View>
 
         {/* Section: Imagini */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Imagini</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.imagesTitle}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>
-            Încarcă imagini relevante (format JPG). Maximum 10 imagini.
+            {t.imagesHelp}
           </ThemedText>
           
           <View style={styles.imagesRow}>
@@ -364,7 +368,7 @@ export default function EditAnnouncementScreen() {
                 </TouchableOpacity>
                 {idx === 0 && (
                   <View style={styles.mainImageBadge}>
-                    <ThemedText style={styles.mainImageText}>Principală</ThemedText>
+                    <ThemedText style={styles.mainImageText}>{t.mainImage}</ThemedText>
                   </View>
                 )}
               </View>
@@ -392,7 +396,7 @@ export default function EditAnnouncementScreen() {
                 style={[styles.addImageCard, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.elev }]}
               >
                 <Ionicons name="add-circle-outline" size={32} color={tokens.colors.primary} />
-                <ThemedText style={[styles.addImageText, { color: tokens.colors.text }]}>Adaugă imagine</ThemedText>
+                <ThemedText style={[styles.addImageText, { color: tokens.colors.text }]}>{t.addImage}</ThemedText>
                 <View style={styles.addUnderline} />
               </TouchableOpacity>
             )}
@@ -401,7 +405,7 @@ export default function EditAnnouncementScreen() {
 
         {/* Section: Localitate */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Localitate*</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.locationLabel}</ThemedText>
           <TouchableOpacity
             style={[styles.input, styles.selectLike, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border }]}
             activeOpacity={0.75}
@@ -414,13 +418,13 @@ export default function EditAnnouncementScreen() {
 
         {/* Section: Contact */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>
-          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>Detalii de contact</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t.contactTitle}</ThemedText>
           
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Persoană de contact*</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.contactNameLabel}</ThemedText>
             <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="ex: Ion Popescu"
+              placeholder={t.contactNamePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={contactName}
               onChangeText={setContactName}
@@ -428,10 +432,10 @@ export default function EditAnnouncementScreen() {
           </View>
 
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Email</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.emailLabel}</ThemedText>
             <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="exemplu@email.com"
+              placeholder={t.emailPlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={email}
               onChangeText={setEmail}
@@ -441,10 +445,10 @@ export default function EditAnnouncementScreen() {
           </View>
 
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Telefon</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.phoneLabel}</ThemedText>
             <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="07xx xxx xxx"
+              placeholder={t.phonePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={phone}
               onChangeText={setPhone}
@@ -453,10 +457,10 @@ export default function EditAnnouncementScreen() {
           </View>
 
           <View style={styles.fieldBlock}>
-            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>Preț (opțional)</ThemedText>
+            <ThemedText style={[styles.label, { color: tokens.colors.text }]}>{t.priceLabel}</ThemedText>
             <ThemedTextInput
               style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-              placeholder="ex: 150 RON"
+              placeholder={t.pricePlaceholder}
               placeholderTextColor={tokens.colors.muted}
               value={price}
               onChangeText={setPrice}
@@ -465,7 +469,7 @@ export default function EditAnnouncementScreen() {
           </View>
           
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>
-            * Cel puțin unul dintre email sau telefon este obligatoriu
+            {t.contactNote}
           </ThemedText>
         </View>
 
@@ -484,7 +488,7 @@ export default function EditAnnouncementScreen() {
               <ActivityIndicator color="#fff" />
             ) : (
               <ThemedText style={[styles.publishText, { color: '#fff' }]}>
-                Actualizează anunțul
+                {t.updateButton}
               </ThemedText>
             )}
           </TouchableOpacity>
@@ -496,7 +500,7 @@ export default function EditAnnouncementScreen() {
         <View style={[styles.categoryOverlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.4)' }]}>          
           <View style={[styles.categorySheet, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
             <View style={[styles.categoryHeader, { borderColor: tokens.colors.border }]}>              
-              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege categoria</ThemedText>
+              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{t.categoryPickerTitle}</ThemedText>
               <TouchableOpacity onPress={() => setCategoryModalOpen(false)} style={styles.closeBtn}>
                 <Ionicons name="close" size={22} color={tokens.colors.text} />
               </TouchableOpacity>
@@ -529,14 +533,14 @@ export default function EditAnnouncementScreen() {
         <View style={[styles.categoryOverlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.4)' }]}>          
           <View style={[styles.categorySheet, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>            
             <View style={[styles.categoryHeader, { borderColor: tokens.colors.border }]}>              
-              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>Alege localitatea</ThemedText>
+              <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{t.locationPickerTitle}</ThemedText>
               <TouchableOpacity onPress={() => setLocationModalOpen(false)} style={styles.closeBtn}>
                 <Ionicons name="close" size={22} color={tokens.colors.text} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
               {[
-                'Toată țara', 'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila',
+                t.countrywide, 'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila',
                 'Buzău', 'Călărași', 'Cluj', 'Constanța', 'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu', 'Gorj',
                 'Harghita', 'Hunedoara', 'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț', 'Olt',
                 'Prahova', 'Satu Mare', 'Sălaj', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea', 'Vaslui', 'Vâlcea', 'Vrancea'

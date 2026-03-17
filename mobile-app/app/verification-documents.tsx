@@ -11,6 +11,7 @@ import { ThemedTextInput } from '../components/themed-text-input';
 import { useAuth } from '../src/context/AuthContext';
 import { Toast } from '../components/ui/Toast';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { getVerificationDocumentsTranslations } from '../src/i18n/verification-documents';
 import { 
   getUserDocuments, 
   getUserDocumentsAdmin,
@@ -30,36 +31,8 @@ export default function VerificationDocumentsScreen() {
   const { user } = useAuth();
   const params = useLocalSearchParams();
 
-  const TRANSLATIONS = {
-    ro: {
-      verifyWhyTitle: 'De ce să îți verifici profilul?',
-      verifyWhyBody: "Încărcarea documentelor profesionale (diplome, certificări, atestate) ajută la construirea încrederii în rândul clienților. După verificare, vei primi un badge de 'Utilizator Verificat'.",
-      documentsHeader: 'Documente de Verificare',
-      documentsHeaderAdminPrefix: 'Documente',
-      uploadButtonText: 'Încarcă Document',
-      adminModeTitle: 'Mod Administrator',
-      adminViewing: 'Vizualizezi documentele utilizatorului',
-      verificationStatus: 'Status verificare',
-      verifiedLabel: 'Verificat',
-      notVerifiedLabel: 'Neverificat',
-      user: 'Utilizator'
-    },
-    en: {
-      verifyWhyTitle: 'Why verify your profile?',
-      verifyWhyBody: "Uploading professional documents (diplomas, certificates, authorizations) helps build trust with customers. After verification, you'll receive a 'Verified User' badge.",
-      documentsHeader: 'Verification Documents',
-      documentsHeaderAdminPrefix: 'Documents',
-      uploadButtonText: 'Upload Document',
-      adminModeTitle: 'Admin Mode',
-      adminViewing: "You're viewing the user's documents",
-      verificationStatus: 'Verification status',
-      verifiedLabel: 'Verified',
-      notVerifiedLabel: 'Not verified',
-      user: 'User'
-    }
-  };
-
-  const t = (TRANSLATIONS[locale === 'en' ? 'en' : 'ro'] as typeof TRANSLATIONS['ro']);
+  const t = getVerificationDocumentsTranslations(locale);
+  const dateLocale = locale?.startsWith('es') ? 'es-ES' : locale?.startsWith('en') ? 'en-US' : 'ro-RO';
   
   // Check if this is admin view
   const isAdminView = params.adminView === 'true';
@@ -98,11 +71,11 @@ export default function VerificationDocumentsScreen() {
 
   // Document type options
   const documentTypes = [
-    { value: 'certificate', label: 'Certificat' },
-    { value: 'diploma', label: 'Diplomă' },
-    { value: 'authorization', label: 'Autorizație' },
-    { value: 'license', label: 'Licență' },
-    { value: 'other', label: 'Altele' },
+    { value: 'certificate', label: t.documentTypes.certificate },
+    { value: 'diploma', label: t.documentTypes.diploma },
+    { value: 'authorization', label: t.documentTypes.authorization },
+    { value: 'license', label: t.documentTypes.license },
+    { value: 'other', label: t.documentTypes.other },
   ];
 
   useEffect(() => {
@@ -131,7 +104,7 @@ export default function VerificationDocumentsScreen() {
       }
     } catch (error) {
       console.error('Error fetching documents:', error);
-      showToast('Nu s-au putut încărca documentele.', 'error');
+      showToast(t.loadError, 'error');
     } finally {
       setLoading(false);
     }
@@ -148,14 +121,14 @@ export default function VerificationDocumentsScreen() {
       setUploadModalVisible(true);
     } catch (error) {
       console.error('Error picking document:', error);
-      showToast('Nu s-a putut selecta documentul.', 'error');
+      showToast(t.pickError, 'error');
     }
   };
 
   const confirmUpload = async () => {
     if (!pickedUri) return;
     if (!newDocName.trim()) {
-      showToast('Te rugăm să introduci un nume pentru document.', 'info');
+      showToast(t.nameRequired, 'info');
       return;
     }
 
@@ -163,11 +136,11 @@ export default function VerificationDocumentsScreen() {
       setUploading(true);
       await uploadDocument(pickedUri, newDocType, newDocName, newDocDesc);
       setUploadModalVisible(false);
-      showToast('Document încărcat cu succes și trimis spre verificare.');
+      showToast(t.uploadSuccess);
       fetchDocuments();
     } catch (error) {
       console.error('Error uploading document:', error);
-      showToast('Nu s-a putut încărca documentul.', 'error');
+      showToast(t.uploadError, 'error');
     } finally {
       setUploading(false);
     }
@@ -176,22 +149,22 @@ export default function VerificationDocumentsScreen() {
   const handleDeleteDocument = (documentId: string) => {
     // Only allow deletion if not in admin view
     if (isAdminView) {
-      showToast('Doar utilizatorul poate șterge propriile documente.', 'info');
+      showToast(t.deleteNotAllowed, 'info');
       return;
     }
     
-    setConfirmTitle('Ștergere Document');
-    setConfirmMessage('Sigur vrei să ștergi acest document? Această acțiune este permanentă.');
+    setConfirmTitle(t.deleteTitle);
+    setConfirmMessage(t.deleteMessage);
     setConfirmIcon('trash-outline');
     setConfirmColor('#F44336');
     setConfirmAction(() => async () => {
       try {
         await deleteDocument(documentId);
-        showToast('Document șters cu succes.', 'info');
+        showToast(t.deleteSuccess, 'info');
         fetchDocuments();
       } catch (error) {
         console.error('Error deleting document:', error);
-        showToast('Nu s-a putut șterge documentul.', 'error');
+        showToast(t.deleteError, 'error');
       } finally {
         setConfirmVisible(false);
       }
@@ -207,8 +180,8 @@ export default function VerificationDocumentsScreen() {
       setRejectionReason('');
       setRejectionModalVisible(true);
     } else {
-      setConfirmTitle('Verificare Document');
-      setConfirmMessage('Sigur vrei să verifici acest document ca fiind autentic?');
+      setConfirmTitle(t.verifyTitle);
+      setConfirmMessage(t.verifyMessage);
       setConfirmIcon('checkmark-shield-outline');
       setConfirmColor(tokens.colors.primary);
       setConfirmAction(() => () => performVerification(documentId, status));
@@ -218,7 +191,7 @@ export default function VerificationDocumentsScreen() {
 
   const confirmRejection = async () => {
     if (!rejectingDocId || !rejectionReason.trim()) {
-      showToast('Te rugăm să introduci un motiv pentru respingere.', 'info');
+      showToast(t.rejectionReasonRequired, 'info');
       return;
     }
     await performVerification(rejectingDocId, 'rejected', rejectionReason);
@@ -236,13 +209,13 @@ export default function VerificationDocumentsScreen() {
       setProcessing(true);
       await verifyDocument(targetUserId, documentId, status, rejectionReasonText);
       showToast(
-        `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`,
+        status === 'verified' ? t.verifySuccessVerified : t.verifySuccessRejected,
         status === 'verified' ? 'success' : 'info'
       );
       fetchDocuments();
     } catch (error) {
       console.error('Error verifying document:', error);
-      showToast('Nu s-a putut procesa documentul.', 'error');
+      showToast(t.verifyError, 'error');
     } finally {
       setProcessing(false);
       setConfirmVisible(false);
@@ -264,12 +237,12 @@ export default function VerificationDocumentsScreen() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'verified':
-        return 'Verificat';
+        return t.statusVerified;
       case 'rejected':
-        return 'Respins';
+        return t.statusRejected;
       case 'pending':
       default:
-        return 'În așteptare';
+        return t.statusPending;
     }
   };
 
@@ -602,8 +575,8 @@ export default function VerificationDocumentsScreen() {
             <View style={styles.emptyState}>
               <Ionicons name="document-text-outline" size={64} color={tokens.colors.muted} />
               <ThemedText style={styles.emptyStateText}>
-                Nu ai încărcat încă niciun document.{'\n'}
-                Apasă butonul de mai sus pentru a începe.
+                {t.emptyStateLine1}{'\n'}
+                {t.emptyStateLine2}
               </ThemedText>
             </View>
           ) : (
@@ -616,7 +589,7 @@ export default function VerificationDocumentsScreen() {
                       {documentTypes.find(t => t.value === doc.type)?.label || doc.type}
                     </Text>
                     <Text style={styles.documentDate}>
-                      Încărcat: {new Date(doc.uploadedAt).toLocaleDateString('ro-RO')}
+                      {t.uploadedLabel}: {new Date(doc.uploadedAt).toLocaleDateString(dateLocale)}
                     </Text>
                     
                     <TouchableOpacity 
@@ -633,7 +606,7 @@ export default function VerificationDocumentsScreen() {
                     >
                       <Ionicons name="eye-outline" size={18} color={tokens.colors.primary} />
                       <Text style={{ color: tokens.colors.primary, marginLeft: 6, fontWeight: '600', fontSize: 13 }}>
-                        Vezi Fișier Document
+                        {t.viewFile}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -645,7 +618,7 @@ export default function VerificationDocumentsScreen() {
 
                 {doc.status === 'rejected' && doc.rejectionReason && (
                   <View style={styles.rejectionReason}>
-                    <Text style={styles.rejectionLabel}>Motiv respingere:</Text>
+                    <Text style={styles.rejectionLabel}>{t.rejectionTitle}:</Text>
                     <ThemedText style={styles.rejectionText}>{doc.rejectionReason}</ThemedText>
                   </View>
                 )}
@@ -666,7 +639,7 @@ export default function VerificationDocumentsScreen() {
                         disabled={processing}
                       >
                         <Ionicons name="checkmark-circle-outline" size={18} color="#4CAF50" />
-                        <Text style={[styles.deleteButtonText, { color: '#4CAF50' }]}>Aprobă</Text>
+                        <Text style={[styles.deleteButtonText, { color: '#4CAF50' }]}>{t.approve}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity 
                         style={styles.deleteButton}
@@ -674,7 +647,7 @@ export default function VerificationDocumentsScreen() {
                         disabled={processing}
                       >
                         <Ionicons name="close-circle-outline" size={18} color="#F44336" />
-                        <Text style={styles.deleteButtonText}>Respinge</Text>
+                        <Text style={styles.deleteButtonText}>{t.reject}</Text>
                       </TouchableOpacity>
                     </>
                   ) : !isAdminView ? (
@@ -684,7 +657,7 @@ export default function VerificationDocumentsScreen() {
                       onPress={() => handleDeleteDocument(doc._id)}
                     >
                       <Ionicons name="trash-outline" size={18} color="#F44336" />
-                      <Text style={styles.deleteButtonText}>Șterge</Text>
+                        <Text style={styles.deleteButtonText}>{t.delete}</Text>
                     </TouchableOpacity>
                   ) : null}
                 </View>
@@ -704,23 +677,23 @@ export default function VerificationDocumentsScreen() {
         <View style={styles.modalOverlay}>
           <ThemedView style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>Detalii Document</ThemedText>
+              <ThemedText style={styles.modalTitle}>{t.documentDetailsTitle}</ThemedText>
               <TouchableOpacity onPress={() => setUploadModalVisible(false)}>
                 <Ionicons name="close" size={24} color={tokens.colors.text} />
               </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={{ padding: 20 }}>
-              <ThemedText style={styles.inputLabel}>Nume Document</ThemedText>
+              <ThemedText style={styles.inputLabel}>{t.documentNameLabel}</ThemedText>
               <ThemedTextInput
                 value={newDocName}
                 onChangeText={setNewDocName}
-                placeholder="Ex: Diplomă Bac, Certificat Google..."
+                placeholder={t.documentNamePlaceholder}
                 placeholderTextColor={isDark ? tokens.colors.muted : '#999999'}
                 style={styles.modalInput}
               />
 
-              <ThemedText style={styles.inputLabel}>Tip Document</ThemedText>
+              <ThemedText style={styles.inputLabel}>{t.documentTypeLabel}</ThemedText>
               <View style={styles.typeSelector}>
                 {documentTypes.map((type) => (
                   <TouchableOpacity
@@ -741,11 +714,11 @@ export default function VerificationDocumentsScreen() {
                 ))}
               </View>
 
-              <ThemedText style={styles.inputLabel}>Descriere (opțional)</ThemedText>
+              <ThemedText style={styles.inputLabel}>{t.documentDescLabel}</ThemedText>
               <ThemedTextInput
                 value={newDocDesc}
                 onChangeText={setNewDocDesc}
-                placeholder="Adaugă detalii suplimentare..."
+                placeholder={t.documentDescPlaceholder}
                 placeholderTextColor={isDark ? tokens.colors.muted : '#999999'}
                 multiline
                 numberOfLines={3}
@@ -773,7 +746,7 @@ export default function VerificationDocumentsScreen() {
                 ) : (
                   <>
                     <Ionicons name="cloud-upload" size={20} color="#fff" style={{ marginRight: 8 }} />
-                    <Text style={styles.uploadButtonText}>Confirmă Încărcarea</Text>
+                    <Text style={styles.uploadButtonText}>{t.confirmUpload}</Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -792,18 +765,18 @@ export default function VerificationDocumentsScreen() {
         <View style={styles.modalOverlay}>
           <ThemedView style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>Motiv Respingere</ThemedText>
+              <ThemedText style={styles.modalTitle}>{t.rejectionTitle}</ThemedText>
               <TouchableOpacity onPress={() => setRejectionModalVisible(false)}>
                 <Ionicons name="close" size={24} color={tokens.colors.text} />
               </TouchableOpacity>
             </View>
 
             <View style={{ padding: 20 }}>
-              <ThemedText style={styles.inputLabel}>De ce respingi acest document?</ThemedText>
+              <ThemedText style={styles.inputLabel}>{t.rejectionPrompt}</ThemedText>
               <ThemedTextInput
                 value={rejectionReason}
                 onChangeText={setRejectionReason}
-                placeholder="Ex: Document neclar, expirat..."
+                placeholder={t.rejectionPlaceholder}
                 placeholderTextColor={isDark ? tokens.colors.muted : '#999999'}
                 multiline
                 numberOfLines={4}
@@ -823,7 +796,7 @@ export default function VerificationDocumentsScreen() {
                 {processing ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={[styles.deleteButtonText, { color: '#fff' }]}>Confirmă Respingerea</Text>
+                  <Text style={[styles.deleteButtonText, { color: '#fff' }]}>{t.confirmRejection}</Text>
                 )}
               </TouchableOpacity>
             </View>

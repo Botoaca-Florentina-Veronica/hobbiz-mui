@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const favoritesTranslations = {
   ro: {
@@ -42,4 +42,4 @@ export const favoritesTranslations = {
 export type FavoritesTranslations = typeof favoritesTranslations.ro;
 
 export const getFavoritesTranslations = (locale?: string) =>
-  favoritesTranslations[normalizeLocale(locale)] as FavoritesTranslations;
+  getLocaleTranslations(favoritesTranslations, locale) as FavoritesTranslations;

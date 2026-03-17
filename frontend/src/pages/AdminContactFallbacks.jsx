@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box, Button, Chip, CircularProgress, IconButton } from '@mui/material';
+import { Container, Typography, Box, Button, Chip, CircularProgress, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getContactFallbacks, resolveContactFallback } from '../api/api';
+import { getContactFallbacks, resolveContactFallback, deleteContactFallback } from '../api/api';
 import './AccountSettings.css';
 import './AdminContactFallbacks.css';
 
@@ -26,6 +27,8 @@ export default function AdminContactFallbacks() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [statusFilter, setStatusFilter] = useState('open');
   const locale = i18n?.language?.startsWith('ro') ? 'ro-RO' : 'en-GB';
 
@@ -51,12 +54,38 @@ export default function AdminContactFallbacks() {
       setProcessingId(id);
       await resolveContactFallback(id);
       if (window.showToast) window.showToast(t('adminContactFallbacks.messages.resolveSuccess'), 'success');
-      await fetchItems(statusFilter);
+      setItems((prev) => prev.map((item) => {
+        if (item._id !== id) return item;
+        return {
+          ...item,
+          status: 'resolved',
+          resolvedAt: item.resolvedAt || new Date().toISOString()
+        };
+      }));
+
+      if (statusFilter === 'open') {
+        setItems((prev) => prev.filter((item) => item._id !== id));
+      }
     } catch (error) {
       console.error('Error resolving fallback:', error);
       if (window.showToast) window.showToast(t('adminContactFallbacks.messages.resolveError'), 'error');
     } finally {
       setProcessingId(null);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      setDeletingId(id);
+      await deleteContactFallback(id);
+      setItems((prev) => prev.filter((item) => item._id !== id));
+      if (window.showToast) window.showToast(t('adminContactFallbacks.messages.deleteSuccess'), 'success');
+    } catch (error) {
+      console.error('Error deleting fallback:', error);
+      if (window.showToast) window.showToast(t('adminContactFallbacks.messages.deleteError'), 'error');
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
     }
   };
 
@@ -141,16 +170,62 @@ export default function AdminContactFallbacks() {
                     variant="contained"
                     className="acf-resolve-btn"
                     startIcon={processingId === item._id ? <CircularProgress size={14} /> : <CheckCircleOutlineIcon />}
-                    disabled={item.status === 'resolved' || processingId === item._id}
+                    disabled={item.status === 'resolved' || processingId === item._id || deletingId === item._id}
                     onClick={() => handleResolve(item._id)}
                   >
                     {t('adminContactFallbacks.resolveButton')}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    className="acf-delete-btn"
+                    startIcon={deletingId === item._id ? <CircularProgress size={14} /> : <DeleteOutlineIcon />}
+                    disabled={processingId === item._id || deletingId === item._id}
+                    onClick={() => setConfirmDeleteId(item._id)}
+                  >
+                    {t('adminContactFallbacks.deleteButton')}
                   </Button>
                 </div>
               </div>
             ))}
           </div>
         )}
+
+        <Dialog
+          open={Boolean(confirmDeleteId)}
+          onClose={() => {
+            if (!deletingId) setConfirmDeleteId(null);
+          }}
+          classes={{ paper: 'acf-dialog-paper' }}
+        >
+          <DialogTitle className="acf-dialog-title">
+            {t('adminContactFallbacks.confirmDialog.title')}
+          </DialogTitle>
+          <DialogContent className="acf-dialog-content">
+            <DialogContentText className="acf-dialog-text">
+              {t('adminContactFallbacks.deleteConfirm')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions className="acf-dialog-actions">
+            <Button
+              onClick={() => setConfirmDeleteId(null)}
+              disabled={Boolean(deletingId)}
+              className="acf-dialog-cancel"
+            >
+              {t('adminContactFallbacks.confirmDialog.cancel')}
+            </Button>
+            <Button
+              onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
+              color="error"
+              variant="contained"
+              disabled={Boolean(deletingId)}
+              className="acf-dialog-confirm"
+              startIcon={Boolean(deletingId) ? <CircularProgress size={14} color="inherit" /> : <DeleteOutlineIcon />}
+            >
+              {t('adminContactFallbacks.confirmDialog.confirm')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </div>
   );

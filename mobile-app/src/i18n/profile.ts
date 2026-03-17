@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const profileTranslations = {
   ro: {
@@ -32,7 +32,21 @@ export const profileTranslations = {
     saveInfo: 'Informațiile au fost actualizate',
     saveFailed: 'Nu s-au putut actualiza informațiile. Încearcă din nou',
     cancelBtn: 'Anulează',
-    saveBtn: 'Salvează'
+    saveBtn: 'Salvează',
+    verificationTitle: 'Verificare Profesională',
+    verificationDescription: 'Încarcă documente care atestă abilitățile tale profesionale pentru a primi un badge de verificare pe profil.',
+    manageDocuments: 'Gestionează Documente',
+    adminVerificationPanel: 'Panou Admin Verificări',
+    removeVerification: 'Elimină Verificare',
+    grantVerification: 'Acordă Verificare',
+    viewUserDocuments: 'Vezi Documente Utilizator',
+    fullAdminPanel: 'Panou Admin Complet',
+    myAnnouncementsTitle: 'Anunțurile Mele',
+    userAnnouncementsTitle: 'Anunțurile postate de {name}',
+    userLabel: 'utilizator',
+    activeLabel: 'Active',
+    totalLabel: 'Total',
+    viewsLabel: 'Vizualizări'
   },
   en: {
     permissionTitle: 'Permission',
@@ -65,7 +79,21 @@ export const profileTranslations = {
     saveInfo: 'Information updated',
     saveFailed: 'Could not update information. Please try again',
     cancelBtn: 'Cancel',
-    saveBtn: 'Save'
+    saveBtn: 'Save',
+    verificationTitle: 'Professional Verification',
+    verificationDescription: 'Upload documents that prove your professional skills to receive a verification badge on your profile.',
+    manageDocuments: 'Manage Documents',
+    adminVerificationPanel: 'Admin Verification Panel',
+    removeVerification: 'Remove Verification',
+    grantVerification: 'Grant Verification',
+    viewUserDocuments: 'View User Documents',
+    fullAdminPanel: 'Full Admin Panel',
+    myAnnouncementsTitle: 'My Announcements',
+    userAnnouncementsTitle: 'Announcements posted by {name}',
+    userLabel: 'user',
+    activeLabel: 'Active',
+    totalLabel: 'Total',
+    viewsLabel: 'Views'
   },
   es: {
     permissionTitle: 'Permiso',
@@ -98,11 +126,25 @@ export const profileTranslations = {
     saveInfo: 'Informacion actualizada',
     saveFailed: 'No se pudo actualizar la informacion. Intentalo de nuevo',
     cancelBtn: 'Cancelar',
-    saveBtn: 'Guardar'
+    saveBtn: 'Guardar',
+    verificationTitle: 'Verificacion Profesional',
+    verificationDescription: 'Sube documentos que acrediten tus habilidades profesionales para recibir un badge de verificacion en tu perfil.',
+    manageDocuments: 'Gestionar Documentos',
+    adminVerificationPanel: 'Panel Admin Verificaciones',
+    removeVerification: 'Quitar verificacion',
+    grantVerification: 'Otorgar verificacion',
+    viewUserDocuments: 'Ver documentos del usuario',
+    fullAdminPanel: 'Panel admin completo',
+    myAnnouncementsTitle: 'Mis Anuncios',
+    userAnnouncementsTitle: 'Anuncios publicados por {name}',
+    userLabel: 'usuario',
+    activeLabel: 'Activos',
+    totalLabel: 'Total',
+    viewsLabel: 'Vistas'
   }
 };
 
 export type ProfileTranslations = typeof profileTranslations.ro;
 
 export const getProfileTranslations = (locale?: string) =>
-  profileTranslations[normalizeLocale(locale)] as ProfileTranslations;
+  getLocaleTranslations(profileTranslations, locale) as ProfileTranslations;

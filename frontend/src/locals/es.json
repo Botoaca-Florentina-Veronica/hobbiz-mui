@@ -408,6 +408,7 @@
     "description": "Descubre, vende y compra servicios o productos de personas apasionadas como tú.",
     "downloadAppStore": "Descargar en App Store",
     "getOnGooglePlay": "Obtenlo en Google Play",
+    "downloadPresentation": "Descargar vista previa de la app",
     "usefulLinks": "Enlaces útiles",
     "about": "Sobre nosotros",
     "contact": "Contacto",
@@ -1403,10 +1404,19 @@
     "ipLabel": "IP:",
     "mailErrorLabel": "Error de email:",
     "resolveButton": "Marcar como resuelto",
+    "deleteButton": "Eliminar",
+    "deleteConfirm": "¿Seguro que quieres eliminar este mensaje?",
+    "confirmDialog": {
+      "title": "Confirmación de eliminación",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
+    },
     "messages": {
       "fetchError": "No se pudieron cargar los mensajes de contacto.",
       "resolveSuccess": "Mensaje marcado como resuelto.",
-      "resolveError": "No se pudo actualizar el mensaje."
+      "resolveError": "No se pudo actualizar el mensaje.",
+      "deleteSuccess": "Mensaje eliminado correctamente.",
+      "deleteError": "No se pudo eliminar el mensaje."
     }
   },
   "cookieConsent": {

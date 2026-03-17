@@ -25,7 +25,15 @@ export const normalizeLocale = (locale?: string): Locale => {
   return 'ro';
 };
 
-export const pickTranslations = (
-  translations: Record<Locale, any>,
+export const getLocaleTranslations = <T>(
+  translations: Partial<Record<Locale, T>>,
   locale?: string
-): Record<string, unknown> => translations[normalizeLocale(locale)];
+): T => {
+  const normalized = normalizeLocale(locale);
+  return (translations[normalized] || translations.ro || translations.en) as T;
+};
+
+export const pickTranslations = (
+  translations: Partial<Record<Locale, any>>,
+  locale?: string
+): Record<string, unknown> => getLocaleTranslations(translations, locale);

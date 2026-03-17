@@ -504,16 +504,16 @@ export default function SellScreen() {
 
         {/* Section: Preț */}
         <View style={[styles.card, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>          
-          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>Preț (opțional)</ThemedText>
+          <ThemedText style={[styles.label, styles.blockLabel, { color: tokens.colors.text }]}>{t.priceLabel}</ThemedText>
           <ThemedTextInput
             style={[styles.input, { backgroundColor: tokens.colors.elev, borderColor: tokens.colors.border, color: tokens.colors.text }]}
-            placeholder="Ex: 150"
+            placeholder={t.pricePlaceholder}
             placeholderTextColor={tokens.colors.muted}
             value={price}
             onChangeText={setPrice}
             keyboardType="decimal-pad"
           />
-          <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>Adaugă un preț pentru serviciul tău (RON)</ThemedText>
+          <ThemedText style={[styles.helper, { color: tokens.colors.primary }]}>{t.priceHelper}</ThemedText>
         </View>
 
         {/* Section: Localitate */}
@@ -629,7 +629,7 @@ export default function SellScreen() {
                     )}
                   </View>
                   <ThemedText style={[styles.categoryLabel, { color: tokens.colors.text }]}>
-                    {(CATEGORY_LABELS as any)[cat.key] ? (locale === 'en' ? (CATEGORY_LABELS as any)[cat.key].en : (CATEGORY_LABELS as any)[cat.key].ro) : cat.label}
+                    {(t.categoryLabels as Record<string, string>)[cat.key] || cat.label}
                   </ThemedText>
                   {categoryKey === cat.key && (
                     <Ionicons name="checkmark" size={18} color={tokens.colors.primary} style={{ marginLeft:'auto' }} />

@@ -9,11 +9,13 @@ import introImg400 from '../assets/images/intro-web-400.webp';
 import introImg800 from '../assets/images/intro-web-800.webp';
 import introImg1200 from '../assets/images/intro-web-1200.webp';
 import introImgFallback from '../assets/images/intro-web.png';
+import introImgEn from '../assets/images/intro-web2.png';
+import introImgEs from '../assets/images/intro-web3.png';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function LoginPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { refreshUser } = useAuth() || {};
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,16 +84,15 @@ export default function LoginPage() {
     }
   };
 
+  const language = i18n?.language || 'ro';
+  const useIntroEs = language.startsWith('es');
+  const useIntroEn = language.startsWith('en');
+
   return (
     <div className="login-page-main">
-      <picture>
-        <source
-          type="image/webp"
-          srcSet={`${introImg400} 400w, ${introImg800} 800w, ${introImg1200} 1200w`}
-          sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px"
-        />
+      {useIntroEs || useIntroEn ? (
         <img
-          src={introImgFallback}
+          src={useIntroEs ? introImgEs : introImgEn}
           alt="Intro"
           className="login-intro-image"
           ref={imgRef}
@@ -99,7 +100,24 @@ export default function LoginPage() {
           height="800"
           loading="eager"
         />
-      </picture>
+      ) : (
+        <picture>
+          <source
+            type="image/webp"
+            srcSet={`${introImg400} 400w, ${introImg800} 800w, ${introImg1200} 1200w`}
+            sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px"
+          />
+          <img
+            src={introImgFallback}
+            alt="Intro"
+            className="login-intro-image"
+            ref={imgRef}
+            width="800"
+            height="800"
+            loading="eager"
+          />
+        </picture>
+      )}
       <div className="login-container" ref={loginRef}>
         <h2>{t('auth.signIn')}</h2>
         

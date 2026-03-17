@@ -1,4 +1,4 @@
-import { normalizeLocale } from './index';
+import { getLocaleTranslations } from './index';
 
 export const legalCookiesTranslations = {
   ro: {
@@ -216,4 +216,4 @@ export const legalCookiesTranslations = {
 export type LegalCookiesTranslations = typeof legalCookiesTranslations.ro;
 
 export const getLegalCookiesTranslations = (locale?: string) =>
-  legalCookiesTranslations[normalizeLocale(locale)] as LegalCookiesTranslations;
+  getLocaleTranslations(legalCookiesTranslations, locale) as LegalCookiesTranslations;

@@ -884,13 +884,13 @@ export default function ProfileScreen() {
           <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
             <View style={styles.dashboardHeader}>
               <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>
-                Verificare Profesională
+                {t.verificationTitle}
               </ThemedText>
             </View>
 
             <View style={{ padding: 16 }}>
               <ThemedText style={[styles.statLabel, { color: tokens.colors.muted, marginBottom: 16 }]}>
-                Încarcă documente care atestă abilitățile tale profesionale pentru a primi un badge de verificare pe profil.
+                {t.verificationDescription}
               </ThemedText>
               
               <TouchableOpacity
@@ -900,7 +900,7 @@ export default function ProfileScreen() {
               >
                 <Ionicons name="document-text" size={18} color="#fff" style={{ marginRight: 8 }} />
                 <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                  Gestionează Documente
+                  {t.manageDocuments}
                 </ThemedText>
               </TouchableOpacity>
 
@@ -913,7 +913,7 @@ export default function ProfileScreen() {
                 >
                   <Ionicons name="shield-checkmark" size={18} color="#fff" style={{ marginRight: 8 }} />
                   <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                    Panou Admin Verificări
+                    {t.adminVerificationPanel}
                   </ThemedText>
                 </TouchableOpacity>
               )}
@@ -970,7 +970,7 @@ export default function ProfileScreen() {
               >
                 <Ionicons name={publicProfile.isVerified ? "close-circle" : "checkmark-circle"} size={18} color="#fff" style={{ marginRight: 8 }} />
                 <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                  {publicProfile.isVerified ? 'Elimină Verificare' : 'Acordă Verificare'}
+                  {publicProfile.isVerified ? t.removeVerification : t.grantVerification}
                 </ThemedText>
               </TouchableOpacity>
 
@@ -984,7 +984,7 @@ export default function ProfileScreen() {
               >
                 <Ionicons name="documents" size={18} color="#fff" style={{ marginRight: 8 }} />
                 <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                  Vezi Documente Utilizator
+                  {t.viewUserDocuments}
                 </ThemedText>
               </TouchableOpacity>
 
@@ -996,7 +996,7 @@ export default function ProfileScreen() {
               >
                 <Ionicons name="settings" size={18} color="#fff" style={{ marginRight: 8 }} />
                 <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                  Panou Admin Complet
+                  {t.fullAdminPanel}
                 </ThemedText>
               </TouchableOpacity>
             </View>
@@ -1212,8 +1212,11 @@ export default function ProfileScreen() {
           <View style={styles.dashboardHeader}>
             <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>
               {isViewingOwnProfile
-                ? 'Anunțurile Mele'
-                : `Anunțurile postate de ${((publicProfile?.firstName || '') + ' ' + (publicProfile?.lastName || '')).trim() || 'utilizator'}`}
+                ? t.myAnnouncementsTitle
+                : t.userAnnouncementsTitle.replace(
+                    '{name}',
+                    ((publicProfile?.firstName || '') + ' ' + (publicProfile?.lastName || '')).trim() || t.userLabel
+                  )}
             </ThemedText>
             <TouchableOpacity 
               onPress={() => {
@@ -1237,21 +1240,21 @@ export default function ProfileScreen() {
               <ThemedText style={[styles.statValue, { color: tokens.colors.primary }]}>
                 {userAnnouncements.length}
               </ThemedText>
-              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Active</ThemedText>
+              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>{t.activeLabel}</ThemedText>
             </View>
             <View style={[styles.statDivider, { backgroundColor: tokens.colors.borderNeutral }]} />
             <View style={styles.statItem}>
               <ThemedText style={[styles.statValue, { color: tokens.colors.text }]}>
                 {userAnnouncements.length}
               </ThemedText>
-              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Total</ThemedText>
+              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>{t.totalLabel}</ThemedText>
             </View>
             <View style={[styles.statDivider, { backgroundColor: tokens.colors.borderNeutral }]} />
             <View style={styles.statItem}>
               <ThemedText style={[styles.statValue, { color: tokens.colors.text }]}>
                 {userAnnouncements.reduce((sum, a) => sum + (a.views || 0), 0)}
               </ThemedText>
-              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>Views</ThemedText>
+              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted }]}>{t.viewsLabel}</ThemedText>
             </View>
           </View>
 

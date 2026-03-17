@@ -4,11 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../src/context/ThemeContext';
+import { useLocale } from '../src/context/LocaleContext';
 import { ThemedView } from '../components/themed-view';
 import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
 import { Toast } from '../components/ui/Toast';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { getAdminVerificationsTranslations } from '../src/i18n/admin-verifications';
 import api from '../src/services/api';
 import { 
   getPendingVerifications, 
@@ -23,6 +25,9 @@ export default function AdminVerificationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { tokens, isDark } = useAppTheme();
+  const { locale } = useLocale();
+  const t = getAdminVerificationsTranslations(locale);
+  const dateLocale = locale?.startsWith('es') ? 'es-ES' : locale?.startsWith('en') ? 'en-US' : 'ro-RO';
   
   // Helper to normalize image URLs for web compatibility
   const getImageSrc = (img?: string | null) => {
@@ -75,10 +80,10 @@ export default function AdminVerificationsScreen() {
     } catch (error: any) {
       console.error('Error fetching pending verifications:', error);
       if (error?.response?.status === 403) {
-        showToast('Nu ai permisiuni de administrator.', 'error');
+        showToast(t.adminPermissionError, 'error');
         router.back();
       } else {
-        showToast('Nu s-au putut încărca verificările în așteptare.', 'error');
+        showToast(t.loadPendingError, 'error');
       }
     } finally {
       setLoading(false);
@@ -91,8 +96,8 @@ export default function AdminVerificationsScreen() {
       setRejectionReason('');
       setRejectionModalVisible(true);
     } else {
-      setConfirmTitle('Verificare Document');
-      setConfirmMessage('Sigur vrei să verifici acest document ca fiind autentic?');
+      setConfirmTitle(t.verifyTitle);
+      setConfirmMessage(t.verifyMessage);
       setConfirmIcon('checkmark-shield-outline');
       setConfirmColor(tokens.colors.primary);
       setConfirmAction(() => () => performVerification(userId, documentId, status));
@@ -102,7 +107,7 @@ export default function AdminVerificationsScreen() {
 
   const confirmRejection = async () => {
     if (!targetDoc || !rejectionReason.trim()) {
-      showToast('Te rugăm să introduci un motiv pentru respingere.', 'info');
+      showToast(t.rejectionReasonRequired, 'info');
       return;
     }
     await performVerification(targetDoc.userId, targetDoc.docId, 'rejected', rejectionReason);
@@ -119,14 +124,14 @@ export default function AdminVerificationsScreen() {
       setProcessing(true);
       await verifyDocument(userId, documentId, status, rejectionReasonText);
       showToast(
-        `Document ${status === 'verified' ? 'verificat' : 'respins'} cu succes.`,
+        status === 'verified' ? t.verifySuccessVerified : t.verifySuccessRejected,
         status === 'verified' ? 'success' : 'info'
       );
       fetchPendingVerifications();
       setSelectedUser(null);
     } catch (error) {
       console.error('Error verifying document:', error);
-      showToast('Nu s-a putut procesa documentul.', 'error');
+      showToast(t.verifyError, 'error');
     } finally {
       setProcessing(false);
       setConfirmVisible(false);
@@ -134,8 +139,8 @@ export default function AdminVerificationsScreen() {
   };
 
   const handleToggleVerificationBadge = async (userId: string, currentStatus: boolean) => {
-    setConfirmTitle(currentStatus ? 'Eliminare Badge' : 'Acordare Badge');
-    setConfirmMessage(`Sigur vrei să ${currentStatus ? 'elimini' : 'acorzi'} badge-ul de verificare acestui utilizator?`);
+    setConfirmTitle(currentStatus ? t.badgeRemoveTitle : t.badgeGrantTitle);
+    setConfirmMessage(currentStatus ? t.badgeRemoveMessage : t.badgeGrantMessage);
     setConfirmIcon(currentStatus ? 'close-circle-outline' : 'checkmark-circle-outline');
     setConfirmColor(currentStatus ? '#F44336' : tokens.colors.primary);
     setConfirmAction(() => async () => {
@@ -143,13 +148,13 @@ export default function AdminVerificationsScreen() {
         setProcessing(true);
         await toggleUserVerification(userId, !currentStatus);
         showToast(
-          `Badge ${!currentStatus ? 'acordat' : 'eliminat'} cu succes.`,
+          !currentStatus ? t.badgeGrantSuccess : t.badgeRemoveSuccess,
           !currentStatus ? 'success' : 'info'
         );
         fetchPendingVerifications();
       } catch (error) {
         console.error('Error toggling verification badge:', error);
-        showToast('Nu s-a putut actualiza badge-ul.', 'error');
+        showToast(t.badgeError, 'error');
       } finally {
         setProcessing(false);
         setConfirmVisible(false);
@@ -165,7 +170,7 @@ export default function AdminVerificationsScreen() {
       setSelectedUser(response.user);
     } catch (error) {
       console.error('Error fetching user documents:', error);
-      showToast('Nu s-au putut încărca documentele utilizatorului.', 'error');
+      showToast(t.userDocsLoadError, 'error');
     } finally {
       setProcessing(false);
     }
@@ -186,12 +191,12 @@ export default function AdminVerificationsScreen() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'verified':
-        return 'Verificat';
+        return t.statusVerified;
       case 'rejected':
-        return 'Respins';
+        return t.statusRejected;
       case 'pending':
       default:
-        return 'În așteptare';
+        return t.statusPending;
     }
   };
 
@@ -473,7 +478,7 @@ export default function AdminVerificationsScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Verificări în așteptare</Text>
+          <Text style={styles.headerTitle}>{t.pendingHeader}</Text>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={tokens.colors.primary} />
@@ -489,7 +494,7 @@ export default function AdminVerificationsScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => setSelectedUser(null)}>
             <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Documente Utilizator</Text>
+          <Text style={styles.headerTitle}>{t.userDocumentsHeader}</Text>
         </View>
 
         <ScrollView style={styles.content}>
@@ -510,13 +515,13 @@ export default function AdminVerificationsScreen() {
             {selectedUser.isVerified && (
               <View style={styles.verifiedBadge}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-                <Text style={styles.verifiedText}>Verificat</Text>
+                <Text style={styles.verifiedText}>{t.statusVerified}</Text>
               </View>
             )}
           </View>
 
           <View style={styles.badgeControl}>
-            <Text style={styles.badgeControlHeader}>Badge de Verificare</Text>
+            <Text style={styles.badgeControlHeader}>{t.badgeHeader}</Text>
             <TouchableOpacity
               style={[
                 styles.badgeButton,
@@ -535,7 +540,7 @@ export default function AdminVerificationsScreen() {
                     color="#fff" 
                   />
                   <Text style={styles.badgeButtonText}>
-                    {selectedUser.isVerified ? 'Elimină Badge' : 'Acordă Badge'}
+                    {selectedUser.isVerified ? t.removeBadge : t.grantBadge}
                   </Text>
                 </>
               )}
@@ -549,7 +554,7 @@ export default function AdminVerificationsScreen() {
                   <Text style={styles.documentName}>{doc.name}</Text>
                   <Text style={styles.documentType}>{doc.type}</Text>
                   <Text style={[styles.documentType, { marginTop: 4 }]}>
-                    Încărcat: {new Date(doc.uploadedAt).toLocaleDateString('ro-RO')}
+                    {t.uploadedLabel}: {new Date(doc.uploadedAt).toLocaleDateString(dateLocale)}
                   </Text>
                   
                   <TouchableOpacity 
@@ -566,7 +571,7 @@ export default function AdminVerificationsScreen() {
                   >
                     <Ionicons name="eye-outline" size={18} color={tokens.colors.primary} />
                     <Text style={{ color: tokens.colors.primary, marginLeft: 6, fontWeight: '600', fontSize: 13 }}>
-                      Vezi Fișier Document
+                      {t.viewFile}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -585,7 +590,7 @@ export default function AdminVerificationsScreen() {
                   >
                     <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
                     <Text style={[styles.actionButtonText, styles.approveButtonText]}>
-                      Aprobă
+                      {t.approve}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -595,7 +600,7 @@ export default function AdminVerificationsScreen() {
                   >
                     <Ionicons name="close-circle" size={20} color="#F44336" />
                     <Text style={[styles.actionButtonText, styles.rejectButtonText]}>
-                      Respinge
+                      {t.reject}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -603,7 +608,7 @@ export default function AdminVerificationsScreen() {
 
               {doc.rejectionReason && (
                 <ThemedText style={{ marginTop: 8, fontSize: 14, color: '#F44336' }}>
-                  Motiv respingere: {doc.rejectionReason}
+                  {t.rejectionReasonLabel}: {doc.rejectionReason}
                 </ThemedText>
               )}
             </View>
@@ -629,18 +634,18 @@ export default function AdminVerificationsScreen() {
           <View style={styles.modalOverlay}>
             <ThemedView style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <ThemedText style={styles.modalTitle}>Motiv Respingere</ThemedText>
+                <ThemedText style={styles.modalTitle}>{t.rejectionTitle}</ThemedText>
                 <TouchableOpacity onPress={() => setRejectionModalVisible(false)}>
                   <Ionicons name="close" size={24} color={tokens.colors.text} />
                 </TouchableOpacity>
               </View>
 
               <View style={{ padding: 20, paddingBottom: 40 }}>
-                <ThemedText style={styles.inputLabel}>De ce respingi acest document?</ThemedText>
+                <ThemedText style={styles.inputLabel}>{t.rejectionPrompt}</ThemedText>
                 <ThemedTextInput
                   value={rejectionReason}
                   onChangeText={setRejectionReason}
-                  placeholder="Ex: Document neclar, expirat..."
+                  placeholder={t.rejectionPlaceholder}
                   placeholderTextColor={tokens.colors.muted}
                   multiline
                   numberOfLines={4}
@@ -660,7 +665,7 @@ export default function AdminVerificationsScreen() {
                   {processing ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text style={[styles.rejectConfirmButtonText, { color: '#fff' }]}>Confirmă Respingerea</Text>
+                    <Text style={[styles.rejectConfirmButtonText, { color: '#fff' }]}>{t.confirmRejection}</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -685,7 +690,7 @@ export default function AdminVerificationsScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={tokens.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verificări în așteptare</Text>
+        <Text style={styles.headerTitle}>{t.pendingHeader}</Text>
       </View>
 
       <ScrollView style={styles.content}>
@@ -693,7 +698,7 @@ export default function AdminVerificationsScreen() {
           <View style={styles.emptyState}>
             <Ionicons name="checkmark-done-circle-outline" size={64} color={tokens.colors.muted} />
             <ThemedText style={styles.emptyStateText}>
-              Nu există verificări în așteptare.
+              {t.emptyPending}
             </ThemedText>
           </View>
         ) : (
@@ -716,13 +721,13 @@ export default function AdminVerificationsScreen() {
                 </Text>
                 <Text style={styles.userEmail}>{user.email}</Text>
                 <Text style={styles.pendingCount}>
-                  {user.pendingDocuments?.length || 0} documente în așteptare
+                  {t.pendingDocumentsCount.replace('{count}', String(user.pendingDocuments?.length || 0))}
                 </Text>
               </View>
               {user.isVerified && (
                 <View style={styles.verifiedBadge}>
                   <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-                  <Text style={styles.verifiedText}>Verificat</Text>
+                  <Text style={styles.verifiedText}>{t.statusVerified}</Text>
                 </View>
               )}
               <Ionicons name="chevron-forward" size={24} color={tokens.colors.muted} />
@@ -749,18 +754,18 @@ export default function AdminVerificationsScreen() {
         <View style={styles.modalOverlay}>
           <ThemedView style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>Motiv Respingere</ThemedText>
+              <ThemedText style={styles.modalTitle}>{t.rejectionTitle}</ThemedText>
               <TouchableOpacity onPress={() => setRejectionModalVisible(false)}>
                 <Ionicons name="close" size={24} color={tokens.colors.text} />
               </TouchableOpacity>
             </View>
 
             <View style={{ padding: 20, paddingBottom: 40 }}>
-              <ThemedText style={styles.inputLabel}>De ce respingi acest document?</ThemedText>
+                <ThemedText style={styles.inputLabel}>{t.rejectionPrompt}</ThemedText>
               <ThemedTextInput
                 value={rejectionReason}
                 onChangeText={setRejectionReason}
-                placeholder="Ex: Document neclar, expirat..."
+                  placeholder={t.rejectionPlaceholder}
                 placeholderTextColor={tokens.colors.muted}
                 multiline
                 numberOfLines={4}
@@ -780,7 +785,7 @@ export default function AdminVerificationsScreen() {
                 {processing ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={[styles.rejectConfirmButtonText, { color: '#fff' }]}>Confirmă Respingerea</Text>
+                    <Text style={[styles.rejectConfirmButtonText, { color: '#fff' }]}>{t.confirmRejection}</Text>
                 )}
               </TouchableOpacity>
             </View>

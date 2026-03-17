@@ -3,6 +3,7 @@ import './Toast.css';
 
 export default function Toast({ message, type = 'success', visible, onClose, duration = 3000 }) {
   const [isExiting, setIsExiting] = useState(false);
+  const durationMs = Number.isFinite(duration) ? duration : 3000;
 
   useEffect(() => {
     if (!visible) {
@@ -12,15 +13,15 @@ export default function Toast({ message, type = 'success', visible, onClose, dur
 
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
-    }, duration);
+    }, durationMs);
 
-    const closeTimer = setTimeout(onClose, duration + 300);
+    const closeTimer = setTimeout(onClose, durationMs + 300);
 
     return () => {
       clearTimeout(exitTimer);
       clearTimeout(closeTimer);
     };
-  }, [visible, onClose, duration]);
+  }, [visible, onClose, durationMs]);
 
   if (!visible && !isExiting) return null;
 
@@ -54,12 +55,33 @@ export default function Toast({ message, type = 'success', visible, onClose, dur
     }
   };
 
+  const handleManualClose = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      if (onClose) onClose();
+    }, 220);
+  };
+
   return (
-    <div className={`toast toast-${type} ${isExiting ? 'toast-exit' : ''}`}>
+    <div
+      className={`toast toast-${type} ${isExiting ? 'toast-exit' : ''}`}
+      style={{ '--toast-duration': `${durationMs}ms` }}
+      role="status"
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+    >
       <div className="toast-content">
         <span className="toast-icon">{getIcon()}</span>
         <span className="toast-message">{message}</span>
+        <button
+          type="button"
+          className="toast-close"
+          onClick={handleManualClose}
+          aria-label="Close notification"
+        >
+          x
+        </button>
       </div>
+      <div className="toast-progress" />
     </div>
   );
 }

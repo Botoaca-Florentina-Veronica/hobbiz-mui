@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image, Platform, useWindowDimensions, Modal, Text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, Image, Platform, useWindowDimensions, Modal, Text, TextInput } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,8 @@ import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { useLocale } from '../../src/context/LocaleContext';
 import { getAccountTranslations } from '../../src/i18n/account';
+import { normalizeLocale } from '../../src/i18n';
+import api from '../../src/services/api';
 import { useRouter } from 'expo-router';
 import storage from '../../src/services/storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,14 +23,19 @@ type RowSpec = { key: string; label: string; icon: string; action?: () => void; 
 export default function AccountScreen() {
   const { isDark, setMode, tokens } = useAppTheme();
   const { locale, setLocale: setGlobalLocale } = useLocale();
+  const normalizedLocale = normalizeLocale(locale);
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { logout, user } = useAuth();
   const [confirmVisible, setConfirmVisible] = React.useState(false);
   const [languageModalOpen, setLanguageModalOpen] = React.useState(false);
+  const [contactModalOpen, setContactModalOpen] = React.useState(false);
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
+  const [contactForm, setContactForm] = React.useState({ name: '', email: '', message: '' });
+  const [contactError, setContactError] = React.useState('');
+  const [contactSending, setContactSending] = React.useState(false);
 
   const t = getAccountTranslations(locale);
 
@@ -37,6 +44,7 @@ export default function AccountScreen() {
     { key: 'my-ads', label: t.myAds, icon: 'megaphone-outline', action: () => router.push('/my-announcements') },
     { key: 'profile', label: t.profile, icon: 'person-outline', action: () => router.push('/profile') },
     { key: 'darkmode', label: t.darkMode, icon: 'moon-outline', type: 'switch' },
+    { key: 'contact', label: t.contact, icon: 'mail-outline', action: () => setContactModalOpen(true) },
     { key: 'language', label: t.language, icon: 'language-outline', action: () => setLanguageModalOpen(true) },
   ];
 
@@ -85,6 +93,47 @@ export default function AccountScreen() {
   const sunTop = Platform.OS === 'web'
     ? -Math.round(sunOverlap / 2)
     : -insets.top + sunOverlap - (sunTopNudge as number);
+
+  const openContactModal = () => {
+    setContactError('');
+    setContactForm((prev) => {
+      const next = { ...prev };
+      if (!next.name) next.name = displayName || '';
+      if (!next.email) next.email = user?.email || '';
+      return next;
+    });
+    setContactModalOpen(true);
+  };
+
+  const handleContactChange = (key: 'name' | 'email' | 'message', value: string) => {
+    setContactForm((prev) => ({ ...prev, [key]: value }));
+    if (contactError) setContactError('');
+  };
+
+  const handleContactSubmit = async () => {
+    const name = contactForm.name.trim();
+    const email = contactForm.email.trim();
+    const message = contactForm.message.trim();
+    if (!name || !email || !message) {
+      setContactError(t.contactErrorRequired);
+      return;
+    }
+
+    setContactSending(true);
+    setContactError('');
+    try {
+      await api.post('/api/contact', { name, email, message });
+      setContactModalOpen(false);
+      setContactForm({ name: '', email: '', message: '' });
+      setToastMessage(t.contactSuccess);
+      setToastVisible(true);
+    } catch (error: any) {
+      const apiMessage = error?.response?.data?.error;
+      setContactError(apiMessage || t.contactErrorGeneric);
+    } finally {
+      setContactSending(false);
+    }
+  };
 
   return (
     <ProtectedRoute>
@@ -166,11 +215,12 @@ export default function AccountScreen() {
           <ThemedText style={[styles.userName, { color: tokens.colors.text }]}>
             {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : t.user}
           </ThemedText>
-          
-          {user?.phone && (
-            <ThemedText style={[styles.userInfo, { color: tokens.colors.muted }]}>
-              {user.phone}
-            </ThemedText>
+
+          {user?.isAdmin && (
+            <View style={[styles.adminBadge, { borderColor: palette.emphasisBg }]}> 
+              <Ionicons name="shield-checkmark" size={14} color={palette.emphasisBg} />
+              <ThemedText style={[styles.adminBadgeText, { color: palette.emphasisBg }]}>{t.adminBadge}</ThemedText>
+            </View>
           )}
           
           {user?.email && (
@@ -206,7 +256,7 @@ export default function AccountScreen() {
                 key={r.key}
                 activeOpacity={0.7}
                 style={[styles.row, { backgroundColor: tokens.colors.surface }]}
-                onPress={r.action}
+                onPress={r.key === 'contact' ? openContactModal : r.action}
               >
                 <View style={styles.rowLeft}>
                   <View style={[styles.iconCircle, { backgroundColor: palette.iconBg }]}>
@@ -216,7 +266,9 @@ export default function AccountScreen() {
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   {r.key === 'language' && (
-                    <ThemedText style={{ color: tokens.colors.muted }}>{locale === 'en' ? 'English' : 'Română'}</ThemedText>
+                    <ThemedText style={{ color: tokens.colors.muted }}>
+                      {normalizedLocale === 'en' ? 'English' : normalizedLocale === 'es' ? 'Espanol' : 'Romana'}
+                    </ThemedText>
                   )}
                   <Ionicons name="chevron-forward" size={20} color={tokens.colors.muted} />
                 </View>
@@ -366,6 +418,88 @@ export default function AccountScreen() {
                   }}
                 >
                   <ThemedText style={{ color: tokens.colors.text, fontSize: 16 }}>Español</ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </BlurView>
+        </Modal>
+
+        {/* Contact modal */}
+        <Modal
+          visible={contactModalOpen}
+          transparent
+          animationType="fade"
+          presentationStyle="overFullScreen"
+          statusBarTranslucent={true}
+          onRequestClose={() => setContactModalOpen(false)}
+        >
+          <BlurView
+            intensity={80}
+            tint={isDark ? 'dark' : 'light'}
+            experimentalBlurMethod="dimezisBlurView"
+            style={[StyleSheet.absoluteFill, styles.modalOverlay, { zIndex: 1000 }]}
+          >
+            <View style={[styles.logoutModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+              <TouchableOpacity style={styles.closeButton} onPress={() => setContactModalOpen(false)}>
+                <Ionicons name="close" size={20} color={tokens.colors.muted} />
+              </TouchableOpacity>
+              <ThemedText style={[styles.modalTitle, { color: tokens.colors.text }]}>{t.contactTitle}</ThemedText>
+              <ThemedText style={[styles.modalMessage, { color: tokens.colors.muted }]}>{t.contactSubtitle}</ThemedText>
+
+              <View style={{ marginTop: 16, width: '100%' }}>
+                <Text style={[styles.inputLabel, { color: tokens.colors.muted }]}>{t.contactNameLabel}</Text>
+                <TextInput
+                  style={[styles.inputField, { color: tokens.colors.text, borderColor: tokens.colors.border }]}
+                  value={contactForm.name}
+                  onChangeText={(value) => handleContactChange('name', value)}
+                  autoCapitalize="words"
+                  placeholder={t.contactNameLabel}
+                  placeholderTextColor={tokens.colors.placeholder}
+                />
+
+                <Text style={[styles.inputLabel, { color: tokens.colors.muted }]}>{t.contactEmailLabel}</Text>
+                <TextInput
+                  style={[styles.inputField, { color: tokens.colors.text, borderColor: tokens.colors.border }]}
+                  value={contactForm.email}
+                  onChangeText={(value) => handleContactChange('email', value)}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  placeholder={t.contactEmailLabel}
+                  placeholderTextColor={tokens.colors.placeholder}
+                />
+
+                <Text style={[styles.inputLabel, { color: tokens.colors.muted }]}>{t.contactMessageLabel}</Text>
+                <TextInput
+                  style={[styles.textArea, { color: tokens.colors.text, borderColor: tokens.colors.border }]}
+                  value={contactForm.message}
+                  onChangeText={(value) => handleContactChange('message', value)}
+                  multiline
+                  textAlignVertical="top"
+                  placeholder={t.contactMessageLabel}
+                  placeholderTextColor={tokens.colors.placeholder}
+                />
+
+                {!!contactError && (
+                  <ThemedText style={[styles.errorText, { color: tokens.colors.error }]}>{contactError}</ThemedText>
+                )}
+              </View>
+
+              <View style={[styles.modalButtons, { marginTop: 20 }]}> 
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonCancel, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg, borderColor: tokens.colors.border }]}
+                  onPress={() => setContactModalOpen(false)}
+                  disabled={contactSending}
+                >
+                  <ThemedText style={[styles.modalButtonText, { color: tokens.colors.text }]}>{t.contactCancel}</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonConfirm, { backgroundColor: palette.emphasisBg, opacity: contactSending ? 0.7 : 1 }]}
+                  onPress={handleContactSubmit}
+                  disabled={contactSending}
+                >
+                  <ThemedText style={[styles.modalButtonText, { color: '#ffffff', fontWeight: '700' }]}> 
+                    {contactSending ? '...' : t.contactSend}
+                  </ThemedText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -629,6 +763,35 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.3,
   },
+  inputLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  inputField: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    marginBottom: 12,
+    backgroundColor: 'transparent',
+  },
+  textArea: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    minHeight: 110,
+    marginBottom: 12,
+    backgroundColor: 'transparent',
+  },
+  errorText: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
+  },
   logoutTextContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -650,6 +813,20 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#ff2d2d',
     borderRadius: 2,
+  },
+  adminBadge: {
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  adminBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   // Sun decoration in top-right corner
   sunWrapper: {

@@ -162,6 +162,13 @@ router.get('/fallbacks', auth, adminAuth, async (req, res) => {
 router.patch('/fallbacks/:id/resolve', auth, adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    const existing = await ContactFallbackMessage.findById(id);
+    if (!existing) return res.status(404).json({ error: 'Mesaj negăsit.' });
+
+    if (existing.status === 'resolved') {
+      return res.json({ success: true, item: existing });
+    }
+
     const item = await ContactFallbackMessage.findByIdAndUpdate(
       id,
       { status: 'resolved', resolvedAt: new Date(), resolvedBy: req.userId },
@@ -172,6 +179,19 @@ router.patch('/fallbacks/:id/resolve', auth, adminAuth, async (req, res) => {
   } catch (error) {
     console.error('[Contact] Eroare la rezolvare fallback:', error?.message || error);
     res.status(500).json({ error: 'Nu am putut actualiza mesajul.' });
+  }
+});
+
+// Admin: delete fallback
+router.delete('/fallbacks/:id', auth, adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await ContactFallbackMessage.findByIdAndDelete(id);
+    if (!item) return res.status(404).json({ error: 'Mesaj negăsit.' });
+    res.json({ success: true, id });
+  } catch (error) {
+    console.error('[Contact] Eroare la ștergerea fallback:', error?.message || error);
+    res.status(500).json({ error: 'Nu am putut șterge mesajul.' });
   }
 });
 

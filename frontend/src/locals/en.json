@@ -409,6 +409,7 @@
     "description": "Discover, sell and buy services or products from passionate people like you.",
     "downloadAppStore": "Download on the App Store",
     "getOnGooglePlay": "Get it on Google Play",
+    "downloadPresentation": "Download app preview",
     "usefulLinks": "Useful links",
     "about": "About us",
     "contact": "Contact",
@@ -1408,10 +1409,19 @@
     "ipLabel": "IP:",
     "mailErrorLabel": "Email error:",
     "resolveButton": "Mark as resolved",
+    "deleteButton": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this message?",
+    "confirmDialog": {
+      "title": "Delete confirmation",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
     "messages": {
       "fetchError": "Could not load contact messages.",
       "resolveSuccess": "Message marked as resolved.",
-      "resolveError": "Could not update the message."
+      "resolveError": "Could not update the message.",
+      "deleteSuccess": "Message deleted successfully.",
+      "deleteError": "Could not delete the message."
     }
   },
   "cookieConsent": {
