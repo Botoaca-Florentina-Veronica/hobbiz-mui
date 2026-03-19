@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, RefreshControl, useWindowDimensions, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../components/themed-text';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
@@ -189,7 +189,11 @@ export default function AllAnnouncements() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+      <View style={[
+        styles.container,
+        { backgroundColor: isDark ? '#000000' : '#ffffff' },
+        Platform.OS === 'web' ? ({ height: '100vh' } as any) : undefined,
+      ]}>
         {/* Header */}
         <View style={[styles.header, { 
           paddingTop: insets.top + 12, 
@@ -223,8 +227,11 @@ export default function AllAnnouncements() {
           keyExtractor={(item) => item._id}
           renderItem={renderAnnouncement}
           numColumns={isTwoColumn ? 2 : 1}
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          style={[
+            styles.scrollView,
+            Platform.OS === 'web' ? ({ height: '100%' } as any) : undefined,
+          ]}
+          contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
           columnWrapperStyle={isTwoColumn ? styles.columnWrapper : undefined}
           refreshControl={
             <RefreshControl
@@ -306,6 +313,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, 
     paddingBottom: 24, 
     paddingTop: 0,
+    flexGrow: 1,
   },
   columnWrapper: { justifyContent: 'space-between' },
   cardSpacing: { marginBottom: 16 },

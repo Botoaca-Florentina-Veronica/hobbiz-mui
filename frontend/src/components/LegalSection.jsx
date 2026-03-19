@@ -36,7 +36,7 @@ const LegalSection = () => {
         <div className="legal-download">
           <a
             className="legal-download__button"
-            href="https://drive.google.com/file/d/1fBxOLH5Wfgoze1ywbC-H-mY1aBggLQYU/view?usp=sharing"
+            href="https://drive.google.com/file/d/1JGuHSou3ROWWC7PRLuOggvdfSCENna-A/view?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
           >

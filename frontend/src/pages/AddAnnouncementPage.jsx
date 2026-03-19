@@ -54,6 +54,10 @@ import AnnouncementPreviewDialog from '../components/AnnouncementPreviewDialog';
 export default function AddAnnouncementPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [viewportWidth, setViewportWidth] = useState(() => {
+    if (typeof window === 'undefined') return 1280;
+    return window.innerWidth;
+  });
   // Șterge draftul de anunț la deconectare și resetează complet starea formularului
   useEffect(() => {
     const handleLogout = () => {
@@ -574,12 +578,37 @@ export default function AddAnnouncementPage() {
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
   // Mobile category menu for widths under 500px; desktop popover from 500px+
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
+  const isMobile = viewportWidth < 600;
+  const isSellAppLike = viewportWidth <= 1024;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 1024px)');
+    const onResize = () => setViewportWidth(window.innerWidth);
+
+    window.addEventListener('resize', onResize);
+
+    if (media.addEventListener) {
+      media.addEventListener('change', onResize);
+    } else {
+      media.addListener(onResize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      if (media.addEventListener) {
+        media.removeEventListener('change', onResize);
+      } else {
+        media.removeListener(onResize);
+      }
+    };
+  }, []);
 
   return (
-    <div className="add-announcement-container">
+    <div className={`add-announcement-container ${isSellAppLike ? 'sell-applike' : ''}`}>
       {/* Mobile header: back + title (same style as Chat/Favorites) */}
-      <Box sx={{
+      <Box className="sell-mobile-header" sx={{
         display: { xs: 'flex', md: 'none' },
         alignItems: 'center',
         gap: 2,
@@ -589,18 +618,14 @@ export default function AddAnnouncementPage() {
       }}>
         <IconButton
           onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
-          sx={{
-            backgroundColor: 'var(--chat-elev)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            '&:hover': { backgroundColor: 'var(--chat-surface)' }
-          }}
+          className="sell-mobile-back-btn"
           disableRipple
           disableFocusRipple
           aria-label="Înapoi"
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>{t('addAnnouncement.mobileHeaderTitle')}</Typography>
+        <Typography variant="h5" className="sell-mobile-header-title">{t('addAnnouncement.mobileHeaderTitle')}</Typography>
       </Box>
       <h1 className="add-announcement-title">{t('addAnnouncement.pageTitle')}</h1>
       <form className="add-announcement-form" onSubmit={e => e.preventDefault()}>

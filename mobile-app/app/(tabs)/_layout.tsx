@@ -24,7 +24,12 @@ export default function TabLayout() {
     <TabBarProvider>
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
-        screenOptions={{ headerShown: false }}
+        detachInactiveScreens
+        screenOptions={{
+          headerShown: false,
+          lazy: true,
+          freezeOnBlur: true,
+        }}
       >
       <Tabs.Screen name="index" options={{ title: TAB_TITLES.index[tabLocale] }} />
       <Tabs.Screen name="favorites" options={{ title: TAB_TITLES.favorites[tabLocale] }} />

@@ -40,6 +40,12 @@
     "plugins": [
       "expo-router",
       [
+        "react-native-bottom-tabs",
+        {
+          "theme": "material3"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/puzzle.png",

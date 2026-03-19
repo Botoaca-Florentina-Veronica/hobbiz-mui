@@ -13,6 +13,9 @@ import { useLocale } from '../../src/context/LocaleContext';
 import { useRouter } from 'expo-router';
 import api from '../../src/services/api';
 import { normalizeLocale } from '../../src/i18n';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import { GlassContainer, GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
 // Static icon config; labels will be provided via translations below
 const TAB_CONFIG: Record<string, { icon: string; label?: string; special?: boolean }> = {
@@ -31,16 +34,26 @@ const TAB_LABELS: Record<string, { ro: string; en: string; es: string }> = {
   account: { ro: 'Cont', en: 'Account', es: 'Cuenta' },
 };
 
+const TAB_BAR_HEIGHT = 70;
+const INDICATOR_HEIGHT = 62;
+const INDICATOR_TOP = (TAB_BAR_HEIGHT - INDICATOR_HEIGHT) / 2;
+const INDICATOR_REGULAR_WIDTH = 80;
+const INDICATOR_SPECIAL_WIDTH = 74;
+
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const { tokens, isDark } = useAppTheme();
   const webBox = (tokens as any)?.shadow?.elev2?.boxShadow;
   const { isAuthenticated, isGuest, loading, user } = useAuth();
   const { hidden } = useTabBar();
   const { unreadCount } = useChatNotifications();
+  const [favoriteCount, setFavoriteCount] = useState(0);
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
   const tabLocale = normalizeLocale(locale);
   const router = useRouter();
+  // For uniformity between Expo Web and Expo Go, render the same tab bar style path.
+  // This avoids diverging native glass look and keeps consistency with web appearance.
+  const canUseNativeLiquid = false;
   
   // Helper to normalize image URLs for web compatibility
   const getImageSrc = (img?: string | null) => {
@@ -57,7 +70,23 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
   const activeColor = isDark ? tokens.colors.primary : '#355070';
-  const inactiveColor = tokens.colors.muted;
+  const inactiveColor = isDark ? 'rgba(255,255,255,0.86)' : 'rgba(67,80,101,0.88)';
+  const isNative = Platform.OS !== 'web';
+  // Keep mobile tab bar glass aligned with web header blur palette.
+  const glassBaseColor = isDark ? 'rgba(18,18,18,0.34)' : 'rgba(38,62,98,0.14)';
+  const glassEdgeColor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(44,68,102,0.08)';
+  const nativeTint = isDark ? 'rgba(12,12,16,0.08)' : 'rgba(42,68,106,0.06)';
+  const webBackdropFilter = isDark ? 'blur(10px) saturate(125%)' : 'blur(8px) saturate(120%)';
+  const darkBaseColor = isNative ? 'rgba(18,18,18,0.16)' : glassBaseColor;
+  const darkOverlayColor = isNative ? 'rgba(24,24,24,0.10)' : 'rgba(18,18,18,0.20)';
+  const darkGradientColors = isNative
+    ? (['rgba(24,24,24,0.12)', 'rgba(24,24,24,0.06)'] as const)
+    : (['rgba(18,18,18,0.22)', 'rgba(18,18,18,0.14)'] as const);
+  const lightBaseColor = isNative ? 'rgba(38,62,98,0.02)' : glassBaseColor;
+  const lightOverlayColor = isNative ? 'rgba(42,72,110,0.03)' : 'rgba(46,74,112,0.11)';
+  const lightGradientColors = isNative
+    ? (['rgba(40,66,102,0.02)', 'rgba(40,66,102,0.005)'] as const)
+    : (['rgba(44,70,106,0.06)', 'rgba(44,70,106,0.02)'] as const);
 
   // Indicator bazat pe măsurători reale
   const [layouts, setLayouts] = useState<{ x: number; width: number }[]>([]);
@@ -76,187 +105,356 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   useEffect(() => {
     const l = layouts[state.index];
     if (l) {
+      const focusedRoute = state.routes[state.index];
+      const focusedConfig = TAB_CONFIG[focusedRoute.name] || { icon: 'ellipse' };
+      const targetWidth = focusedConfig.special ? INDICATOR_SPECIAL_WIDTH : INDICATOR_REGULAR_WIDTH;
+      const targetLeft = l.x + (l.width - targetWidth) / 2;
       Animated.parallel([
-        Animated.timing(indicatorLeft, { toValue: l.x, duration: 260, useNativeDriver: false }),
-        Animated.timing(indicatorWidth, { toValue: l.width, duration: 260, useNativeDriver: false }),
+        Animated.spring(indicatorLeft, { 
+          toValue: targetLeft, 
+          useNativeDriver: false,
+          friction: 9,
+          tension: 60 
+        }),
+        Animated.spring(indicatorWidth, { 
+          toValue: targetWidth,
+          useNativeDriver: false,
+          friction: 9, 
+          tension: 60
+        }),
       ]).start();
     }
-  }, [state.index, layouts]);
+  }, [state.index, layouts, state.routes]);
 
   if (hidden) return null;
 
-  // On iPhones with the home indicator, ensure extra bottom padding so the bar is not obscured
-  const baselinePad = Platform.select({ ios: 12, default: 6 }) || 6;
-  const extraForIos = Platform.OS === 'ios' ? 8 : 0; // a bit more space above the home pill
-  const bottomPad = Math.max(insets.bottom, baselinePad) + extraForIos;
-  // Increase baseHeight so icons/labels are more visible on devices with home indicator
-  const baseHeight = 78;
-  const barHeight = baseHeight + (bottomPad - baselinePad);
+  // Floating tab bar constants
+  // Use a fixed height for the floating bar
+  const BAR_HEIGHT = 64;
+  // Margin from bottom of screen (safe area + spacing)
+  const bottomMargin = Math.max(insets.bottom, 20);
 
-  return (
-    <View style={[styles.wrapper, { backgroundColor: tokens.colors.surface, borderTopColor: tokens.colors.border, paddingBottom: bottomPad, height: barHeight }]}>      
-      <View style={styles.row}>
-        {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const isFocused = state.index === index;
-          const base = TAB_CONFIG[route.name] || { icon: 'ellipse' };
-          const config = { ...base, label: (TAB_LABELS as any)[route.name]?.[tabLocale] ?? route.name } as any;
-          const onPress = () => {
-            // Dacă nu e autentificat și nu este tab-ul Explorează (index), redirecționează la login (folosim router.push pentru ruta absolută)
-            if (!loading && !isAuthenticated && route.name !== 'index') {
-              try {
-                router.replace('/login');
-              } catch (e) {
-                // fallback la navigation în caz că router nu funcționează (rare)
-                (navigation as any).replace('login');
-              }
-              return;
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setFavoriteCount(0);
+      return;
+    }
+
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await api.get('/api/favorites');
+        if (isMounted) {
+          const count = Array.isArray(res.data?.favorites) ? res.data.favorites.length : 0;
+          setFavoriteCount(count);
+        }
+      } catch (e) {
+        // ignore errors; badge stays 0
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated]);
+
+  const tabItems = (
+    <View style={styles.contentRow}>
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const isFocused = state.index === index;
+        const base = TAB_CONFIG[route.name] || { icon: 'ellipse' };
+        const config = { ...base, label: (TAB_LABELS as any)[route.name]?.[tabLocale] ?? route.name } as any;
+
+        const onPress = () => {
+          if (!loading && !isAuthenticated && route.name !== 'index') {
+            try {
+              router.replace('/login');
+            } catch (e) {
+              (navigation as any).replace('login');
             }
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
-          const onLongPress = () => {
-            navigation.emit({ type: 'tabLongPress', target: route.key });
-          };
-          return (
-            <Pressable
-              key={route.key}
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              onPress={onPress}
-              onLongPress={onLongPress}
-              android_ripple={{ color: isDark ? 'rgba(245, 24, 102, 0.2)' : 'rgba(53, 80, 112, 0.12)', radius: 28 }}
-              style={({ pressed }) => [
-                styles.tab,
-                pressed && !config.special && { opacity: 0.6 },
-              ]}
-              onLayout={(e) => onLayoutTab(e, index)}
-            >
-              <View style={config.special ? [styles.publishWrapper] : undefined}>
-                <View
-                  style={config.special ? [
-                    styles.publishCircle,
-                    { backgroundColor: activeColor },
-                    // apply boxShadow on web
-                    (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : undefined,
-                  ] : undefined}
-                >
-                  {route.name === 'account' && user?.avatar ? (
-                    <Image source={{ uri: getImageSrc(user.avatar) || undefined }} style={{ width: config.special ? 28 : 24, height: config.special ? 28 : 24, borderRadius: 999 }} />
-                  ) : (
-                    <Ionicons
-                      name={config.icon as any}
-                      size={config.special ? 26 : 26}
-                      color={config.special ? tokens.colors.primaryContrast : isFocused ? activeColor : inactiveColor}
-                    />
-                  )}
-                </View>
-                {/* Badge pentru mesaje necitite pe tab-ul chat */}
-                {route.name === 'chat' && unreadCount > 0 && (
-                  <View style={[styles.badge, { backgroundColor: tokens.colors.primary }, (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : undefined]}>
-                    <ThemedText style={[styles.badgeText, { color: tokens.colors.primaryContrast }]}>
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </ThemedText>
-                  </View>
+            return;
+          }
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({ type: 'tabLongPress', target: route.key });
+        };
+
+        return (
+          <Pressable
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            style={({ pressed }) => [
+              styles.tab,
+              pressed && !config.special && { opacity: 0.7 },
+            ]}
+            onLayout={(e) => onLayoutTab(e, index)}
+          >
+            <View style={config.special ? [styles.specialButtonWrapper] : undefined}>
+              <View
+                style={config.special ? [
+                  styles.specialButton,
+                  { backgroundColor: activeColor },
+                  (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : undefined,
+                ] : undefined}
+              >
+                {route.name === 'account' && user?.avatar ? (
+                  <Image source={{ uri: getImageSrc(user.avatar) || undefined }} style={{ width: config.special ? 28 : 24, height: config.special ? 28 : 24, borderRadius: 999 }} />
+                ) : (
+                  <Ionicons
+                    name={isFocused ? (config.icon as any) : (`${config.icon}` as any)}
+                    size={config.special ? 26 : 24}
+                    color={config.special ? tokens.colors.primaryContrast : isFocused ? activeColor : inactiveColor}
+                    style={[
+                      styles.tabIcon,
+                      !isDark && styles.tabIconLightOutline,
+                    ]}
+                  />
                 )}
               </View>
+              {route.name === 'chat' && unreadCount > 0 && (
+                <View style={[styles.badge, { backgroundColor: tokens.colors.primary }]}>
+                  <ThemedText style={[styles.badgeText, { color: tokens.colors.primaryContrast }]}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </ThemedText>
+                </View>
+              )}
+              {route.name === 'favorites' && favoriteCount > 0 && (
+                <View style={[styles.badge, { backgroundColor: tokens.colors.primary }]}>
+                  <ThemedText style={[styles.badgeText, { color: tokens.colors.primaryContrast }]}>
+                    {favoriteCount > 99 ? '99+' : favoriteCount}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+            {!config.special && (
               <ThemedText
                 style={[
                   styles.label,
-                  config.special ? styles.labelSpecial : undefined,
                   { color: isFocused ? activeColor : inactiveColor, fontWeight: isFocused ? '600' : '500' },
+                  isFocused ? { opacity: 1 } : { opacity: 0.8 },
                 ]}
               >
                 {config.label}
               </ThemedText>
-            </Pressable>
-          );
-        })}
+            )}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+
+  return (
+    <View style={styles.absoluteContainer}>
+      {canUseNativeLiquid ? (
+        <GlassContainer style={[styles.nativeContainer, { bottom: bottomMargin }]} spacing={12}>
+          <GlassView
+            glassEffectStyle="regular"
+            isInteractive
+            colorScheme={isDark ? 'dark' : 'light'}
+            tintColor={nativeTint}
+            style={[styles.floatingWrapper, { shadowColor: isDark ? '#000' : '#889', borderColor: glassEdgeColor }]}
+          >
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.nativeBubbleWrap,
+                {
+                  transform: [{ translateX: indicatorLeft }],
+                  width: indicatorWidth,
+                },
+              ]}
+            >
+              <GlassView
+                glassEffectStyle="clear"
+                colorScheme={isDark ? 'dark' : 'light'}
+                tintColor={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.22)'}
+                style={styles.nativeBubbleInner}
+              />
+            </Animated.View>
+            {tabItems}
+          </GlassView>
+        </GlassContainer>
+      ) : (
+      <View
+        style={[
+          styles.floatingWrapper,
+          {
+            bottom: bottomMargin,
+            shadowColor: isDark ? '#000' : '#889',
+            backgroundColor: isDark ? darkBaseColor : lightBaseColor,
+            borderColor: glassEdgeColor,
+          },
+          Platform.OS === 'web'
+            ? ({
+                backdropFilter: webBackdropFilter,
+                WebkitBackdropFilter: webBackdropFilter,
+              } as any)
+            : undefined,
+        ]}
+      >
+        {/* Native platforms use real blur from expo-blur to match the web glass style. */}
+        {Platform.OS !== 'web' && (
+          <BlurView
+            intensity={isDark ? 55 : 58}
+            tint={isDark ? 'dark' : 'light'}
+            experimentalBlurMethod="dimezisBlurView"
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: isDark ? darkOverlayColor : lightOverlayColor },
+          ]}
+        />
+        
+        {/* Subtle Gradient Overlay for "Liquid" / "Glass" shine */}
+        <LinearGradient
+          colors={isDark ? darkGradientColors : lightGradientColors}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 0.5 }}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
+
+        {/* Animated "Bubble" Indicator */}
+        <Animated.View 
+          style={[
+            styles.indicatorBubble, 
+            { 
+              transform: [{ translateX: indicatorLeft }], 
+              width: indicatorWidth,
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.30)',
+            }
+          ]} 
+        />
+
+        {tabItems}
       </View>
-      {/* Active indicator line (simple implementation) */}
-      <Animated.View style={[styles.indicator, { backgroundColor: activeColor, transform: [{ translateX: indicatorLeft }], width: indicatorWidth }]} />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    borderTopWidth: 1,
-    paddingBottom: Platform.select({ ios: 10, default: 6 }),
-    paddingTop: 2,
-    height: 65,
+  absoluteContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    pointerEvents: 'box-none', // Allow touches to pass through empty areas
   },
-  row: {
+  nativeContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  floatingWrapper: {
+    width: '90%', // Floating width
+    maxWidth: 400,
+    height: 70,
+    borderRadius: 35, // Pill shape
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.45)',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  nativeBubbleWrap: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -(INDICATOR_HEIGHT / 2),
+    height: INDICATOR_HEIGHT,
+    borderRadius: INDICATOR_HEIGHT / 2,
+    overflow: 'hidden',
+  },
+  nativeBubbleInner: {
+    flex: 1,
+    borderRadius: INDICATOR_HEIGHT / 2,
+  },
+  contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     height: '100%',
+    paddingHorizontal: 10,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    height: '100%',
+    gap: 2,
   },
   label: {
     fontSize: 11,
     letterSpacing: 0.2,
     fontFamily: 'Poppins-Regular',
   },
-  labelSpecial: {
-    marginTop: -6,
+  specialButtonWrapper: {
+    marginBottom: 0,
   },
-  indicator: {
-    position: 'absolute',
-    height: 3,
-    top: 0,
-    left: 0,
-    borderRadius: 0,
-  },
-  publishWrapper: {
-    marginBottom: 2,
-  },
-  publishCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 40,
+  specialButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 5,
+  },
+  tabIcon: {
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 2,
+  },
+  tabIconLightOutline: {
+    textShadowColor: 'rgba(255,255,255,0.95)',
+  },
+  indicatorBubble: {
+    position: 'absolute',
+    height: INDICATOR_HEIGHT,
+    top: '50%',
+    marginTop: -(INDICATOR_HEIGHT / 2),
+    borderRadius: INDICATOR_HEIGHT / 2,
   },
   badge: {
     position: 'absolute',
     top: -4,
     right: -6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 4,
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    elevation: 3,
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
-    letterSpacing: -0.2,
     fontFamily: 'Poppins-Bold',
-    lineHeight: 12,
-    textAlign: 'center',
-    includeFontPadding: false,
+    lineHeight: 11,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Platform, Dimensions } from 'react-native';
+import { Platform, Dimensions, InteractionManager } from 'react-native';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
@@ -75,6 +75,8 @@ const HERO_IMAGE_CONFIG = {
 // ============================================================================
 
 export default function HomeScreen() {
+  const POPULAR_STALE_MS = 120000;
+  const SEARCH_INDEX_STALE_MS = 300000;
   const { tokens, isDark } = useAppTheme();
   // shared border style for inner container-like cards (used in popular cards)
   // In light mode: black border; in dark mode: white border
@@ -95,6 +97,8 @@ export default function HomeScreen() {
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [searchIndex, setSearchIndex] = useState<SearchIndexItem[]>([]);
   const searchSeqRef = useRef(0);
+  const lastPopularLoadRef = useRef(0);
+  const lastSearchIndexLoadRef = useRef(0);
 
   const t = getHomeTranslations(locale);
 
@@ -160,32 +164,34 @@ export default function HomeScreen() {
 
 
 
-  useFocusEffect(
-    useCallback(() => {
-      refreshNotificationCount();
-      loadPopular();
-      loadSearchIndex();
-    }, [refreshNotificationCount])
-  );
-
-  const loadSearchIndex = useCallback(async () => {
+  const loadSearchIndex = useCallback(async (force = false) => {
+    const now = Date.now();
+    if (!force && searchIndex.length > 0 && now - lastSearchIndexLoadRef.current < SEARCH_INDEX_STALE_MS) {
+      return;
+    }
     try {
       const res = await api.get('/api/announcements/search-index?limit=800');
       const data = Array.isArray(res.data) ? res.data : [];
       setSearchIndex(data);
+      lastSearchIndexLoadRef.current = now;
     } catch (e) {
       // Fallback to full fetch (older servers) so autocomplete keeps working.
       try {
         const res = await api.get('/api/announcements');
         const data = Array.isArray(res.data) ? res.data : [];
         setSearchIndex(data);
+        lastSearchIndexLoadRef.current = now;
       } catch {
         setSearchIndex([]);
       }
     }
-  }, []);
+  }, [searchIndex.length]);
 
-  const loadPopular = useCallback(async () => {
+  const loadPopular = useCallback(async (force = false) => {
+    const now = Date.now();
+    if (!force && popular.length > 0 && now - lastPopularLoadRef.current < POPULAR_STALE_MS) {
+      return;
+    }
     setPopularLoading(true);
     try {
       // Fetch all announcements and sort client-side by favoritesCount desc, then createdAt desc
@@ -198,12 +204,28 @@ export default function HomeScreen() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
       setPopular(data);
+      lastPopularLoadRef.current = now;
     } catch (e) {
       setPopular([]);
     } finally {
       setPopularLoading(false);
     }
-  }, []);
+  }, [popular.length]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const interactionTask = InteractionManager.runAfterInteractions(() => {
+        void refreshNotificationCount();
+        // Keep back navigation smooth by scheduling list refreshes after transition animation.
+        void loadPopular(false);
+        void loadSearchIndex(false);
+      });
+
+      return () => {
+        interactionTask.cancel();
+      };
+    }, [refreshNotificationCount, loadPopular, loadSearchIndex])
+  );
   
   // Search effect with debounce (local fuzzy suggestions)
   useEffect(() => {
@@ -617,8 +639,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  // Remove extra bottom spacing so the page ends right after the categories section
-  scrollContent: { paddingBottom: 0 },
+  // Keep extra bottom padding so the last category cards are not hidden by the floating tab bar
+  scrollContent: { paddingBottom: 120 },
   mainContent: {
     padding: 16,
     marginBottom: 16,

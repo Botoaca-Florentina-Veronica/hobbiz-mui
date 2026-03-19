@@ -234,6 +234,8 @@ export default function RootLayout() {
                       headerShown: false,
                       gestureEnabled: true,
                       gestureDirection: 'horizontal',
+                      detachPreviousScreen: true,
+                      cardOverlayEnabled: false,
                       cardStyle: {
                         backgroundColor: colorScheme === 'dark' ? '#000000' : '#ffffff',
                       },

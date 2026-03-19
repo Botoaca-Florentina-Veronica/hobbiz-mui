@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ProtectedRoute } from '../../src/components/ProtectedRoute';
 import { GuestModeRestriction } from '../../src/components/GuestModeRestriction';
 import { Toast } from '../../components/ui/Toast';
+import Constants from 'expo-constants';
 
 type RowSpec = { key: string; label: string; icon: string; action?: () => void; type?: 'switch' | 'danger' };
 
@@ -61,18 +62,18 @@ export default function AccountScreen() {
 
   // Centralized per-screen palette so dark-mode tweaks are simple in one place
   const palette = React.useMemo(() => ({
-    // Header background (use a flat gradient; you can make a real gradient by changing end color)
-    headerBgStart: isDark ? '#f51866' : '#F8B195',
-    headerBgEnd: isDark ? tokens.colors.primaryHover : '#F8B195',
+    // Header background (use blue in light mode, pink in dark mode)
+    headerBgStart: isDark ? '#f51866' : tokens.colors.primary,
+    headerBgEnd: isDark ? tokens.colors.primaryHover : tokens.colors.primaryHover,
     headerText: '#ffffff',
     // Name accent color within header greeting
-    nameAccent: isDark ? '#121212' : '#355070',
+    nameAccent: isDark ? '#ffffff' : '#000000',
     // Background for circular icons on rows
     iconBg: isDark ? tokens.colors.elev : '#F3F5F6',
   // Icon color (pink in dark mode)
   iconColor: isDark ? '#f51866' : tokens.colors.text,
     // Track ON color for the dark mode switch and generic confirm buttons
-    emphasisBg: isDark ? tokens.colors.primary : '#F8B195',
+    emphasisBg: isDark ? tokens.colors.primary : tokens.colors.primary,
     // Logout color accent
     danger: isDark ? '#ff5566' : '#ff2d2d',
   }), [isDark, tokens]);
@@ -83,14 +84,15 @@ export default function AccountScreen() {
   const isPhone = width < 768;
   const firstName = user?.firstName || '';
   const lastName = user?.lastName || '';
+  const isExpoGo = (Constants as any).appOwnership === 'expo' || (Constants as any).executionEnvironment === 'storeClient';
   // How much of the sun should remain visible when we push it into the status bar area.
   // Increase this value to show more of the sun (pixels). We use a modest default so it still overlaps but not too much.
   const sunOverlap = 28;
   // Small device-specific nudge to ensure the sun reaches the very top on phones where a thin gap appears.
   const sunTopNudge = Platform.select({ android: 8, ios: 4, default: 6 });
   // On web safe-area insets are usually 0 which would produce a positive top (gap).
-  // Use a different formula for web so the sun is moved up into the corner.
-  const sunTop = Platform.OS === 'web'
+  // Use the web formula in Expo Go as well so the header composition matches web.
+  const sunTop = Platform.OS === 'web' || isExpoGo
     ? -Math.round(sunOverlap / 2)
     : -insets.top + sunOverlap - (sunTopNudge as number);
 
@@ -142,8 +144,8 @@ export default function AccountScreen() {
       <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
         {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
         <View
-          style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }, Platform.OS === 'web' ? { pointerEvents: 'none' } : undefined]}
-          {...(Platform.OS !== 'web' ? { pointerEvents: 'none' } : {})}
+          style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }, (Platform.OS === 'web' || isExpoGo) ? { pointerEvents: 'none' } : undefined]}
+          {...((Platform.OS !== 'web' && !isExpoGo) ? { pointerEvents: 'none' } : {})}
         > 
           <Image
             source={isDark ? require('../../assets/images/night.png') : require('../../assets/images/sun.png')}
@@ -526,7 +528,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: { 
-    paddingBottom: 40,
+    paddingBottom: 90,
   },
   header: {
     paddingHorizontal: 20,

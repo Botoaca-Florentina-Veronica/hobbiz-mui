@@ -12,6 +12,7 @@ import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
 import Toast from './components/Toast';
+import ExploreMobilePage from './components/ExploreMobilePage';
 
 import LoginPage from "./pages/LoginPage";
 import SignupPage from './pages/SignupPage';
@@ -86,6 +87,11 @@ function App() {
     return localStorage.getItem('darkMode') === 'true';
   });
 
+  const [isSmallExploreViewport, setIsSmallExploreViewport] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 1024px)').matches;
+  });
+
   // Global toast state
   const [toast, setToast] = useState({
     visible: false,
@@ -118,6 +124,23 @@ function App() {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 1024px)');
+    const onChange = (event) => setIsSmallExploreViewport(event.matches);
+
+    setIsSmallExploreViewport(media.matches);
+
+    if (media.addEventListener) {
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    }
+
+    media.addListener(onChange);
+    return () => media.removeListener(onChange);
+  }, []);
 
   const appView = (
     <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
@@ -221,12 +244,18 @@ function App() {
           <div className="homepage">
               <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
               <Header />
-              <MainStage />
-              <Content />
-              <ChooseUs />
-              <PromoSection />
-              <Categories />
-              <CallToAction />
+              {isSmallExploreViewport ? (
+                <ExploreMobilePage />
+              ) : (
+                <>
+                  <MainStage />
+                  <Content />
+                  <ChooseUs />
+                  <PromoSection />
+                  <Categories />
+                  <CallToAction />
+                </>
+              )}
             <Footer hideLegalUpTo1200 />
             <CookieConsent />
           </div>

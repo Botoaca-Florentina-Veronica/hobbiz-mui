@@ -1,39 +1,50 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  Typography, 
-  IconButton, 
-  Button,
-  Switch,
-  FormControlLabel,
-  Divider
-} from '@mui/material';
+import { Typography, IconButton, Switch } from '@mui/material';
 import { 
   ArrowBack, 
   Settings, 
   Campaign, 
   Person, 
   InfoOutlined,
+  HelpOutline,
+  Language,
+  MailOutline,
   Gavel,
   Logout,
   DarkMode,
-  VerifiedUser
+  VerifiedUser,
+  Close
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
 import { useTranslation } from 'react-i18next';
+import sunImage from '../assets/images/sun.png';
+import nightImage from '../assets/images/night.png';
 import './AccountMenuMobile.v2.css';
 
 export default function AccountMenuMobile() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [isSmallViewport, setIsSmallViewport] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 1024px)').matches;
+  });
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLogoutToast, setShowLogoutToast] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactError, setContactError] = useState('');
+  const [contactSending, setContactSending] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+  const [showContactSuccessToast, setShowContactSuccessToast] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -70,6 +81,23 @@ export default function AccountMenuMobile() {
     const initial = saved === 'true' || body.classList.contains('dark-mode');
     body.classList.toggle('dark-mode', initial);
     setIsDarkMode(initial);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 1024px)');
+    const onChange = (event) => setIsSmallViewport(event.matches);
+
+    setIsSmallViewport(media.matches);
+
+    if (media.addEventListener) {
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    }
+
+    media.addListener(onChange);
+    return () => media.removeListener(onChange);
   }, []);
 
   const toggleDarkMode = () => {
@@ -111,32 +139,98 @@ export default function AccountMenuMobile() {
 
   const displayFirstName = userProfile?.firstName || 'Utilizator';
   const displayLastName = userProfile?.lastName || '';
-  const displayPhone = userProfile?.phone || '\u2014';
 
-  const menuItems = [
-    { icon: <Settings />, label: 'Setări', path: '/setari-cont' },
-    { icon: <Campaign />, label: 'Anunțurile mele', path: '/anunturile-mele' },
-    { icon: <Person />, label: 'Profil', path: '/profil' },
+  const greetingByLang = {
+    ro: 'Ceau',
+    en: 'Hello',
+    es: 'Hola',
+  };
+  const currentLang = String(i18n.language || 'ro').toLowerCase().startsWith('en')
+    ? 'en'
+    : String(i18n.language || 'ro').toLowerCase().startsWith('es')
+      ? 'es'
+      : 'ro';
+
+  const primaryMenuItems = [
+    { icon: <Settings />, label: t('header.settings'), path: '/setari-cont' },
+    { icon: <Campaign />, label: t('header.myAnnouncements'), path: '/anunturile-mele' },
+    { icon: <Person />, label: t('header.profile'), path: '/profil' },
     { icon: <VerifiedUser />, label: 'Verificare Documente', path: '/verificare-documente' },
     ...(userProfile?.isAdmin ? [
       { icon: <VerifiedUser />, label: t('header.adminVerifications'), path: '/admin/verificari', style: { color: '#f51866' } },
       { icon: <VerifiedUser />, label: t('header.adminContactMessages'), path: '/admin/contact-fallbacks', style: { color: '#f51866' } }
-    ] : []),
-    { icon: <InfoOutlined />, label: 'Despre noi', path: '/despre' },
-    { icon: <Gavel />, label: 'Informații legale', path: '/informatii-legale' }
+    ] : [])
   ];
 
+  const secondaryMenuItems = [
+    { icon: <MailOutline />, label: t('contactModal.title'), actionType: 'contact' },
+    { icon: <Language />, label: t('language.change'), action: () => setShowLanguageModal(true) },
+    { icon: <InfoOutlined />, label: t('mainStage.about'), path: '/despre' },
+    { icon: <HelpOutline />, label: t('mainStage.howItWorks'), path: '/cum-functioneaza' },
+    { icon: <Gavel />, label: t('mainStage.legalInfo'), path: '/informatii-legale' }
+  ];
+
+  const selectLanguage = (lang) => {
+    i18n.changeLanguage(lang);
+    setShowLanguageModal(false);
+  };
+
+  const openContactModal = () => {
+    setContactError('');
+    setContactForm({
+      name: `${displayFirstName} ${displayLastName}`.trim(),
+      email: userProfile?.email || '',
+      message: '',
+    });
+    setShowContactModal(true);
+  };
+
+  const submitContact = async () => {
+    const name = contactForm.name.trim();
+    const email = contactForm.email.trim();
+    const message = contactForm.message.trim();
+    if (!name || !email || !message) {
+      setContactError(t('contactModal.errorRequired'));
+      return;
+    }
+
+    setContactSending(true);
+    setContactError('');
+    try {
+      await apiClient.post('/api/contact', { name, email, message });
+      setShowContactModal(false);
+      setContactForm({ name: '', email: '', message: '' });
+      setShowContactSuccessToast(true);
+    } catch (err) {
+      const apiMessage = err?.response?.data?.error;
+      setContactError(apiMessage || t('contactModal.errorGeneric'));
+    } finally {
+      setContactSending(false);
+    }
+  };
+
   return (
-    <div className="account-mobile">
+    <div className={`account-mobile ${isDarkMode ? 'mode-dark' : 'mode-light'} ${isSmallViewport ? 'account-mobile--applike' : ''}`}>
       <div className="account-mobile__header">
+        <div className="account-mobile__sun" aria-hidden>
+          <img
+            src={isDarkMode ? nightImage : sunImage}
+            alt=""
+            className="account-mobile__sun-image"
+          />
+        </div>
         <div className="account-mobile__header-inner">
           <button className="account-mobile__backbtn" onClick={() => navigate(-1)} aria-label="inapoi">
             <ArrowBack />
           </button>
-          <div className="account-mobile__title">Profil</div>
+          <div className="account-mobile__title">{t('header.profile')}</div>
         </div>
 
-        <div className="account-mobile__greeting">Ceau <span className="account-mobile__greeting-name">{displayFirstName} {displayLastName}!</span></div>
+        <div className="account-mobile__greeting">
+          <span className="account-mobile__greeting-hello">{greetingByLang[currentLang]} </span>
+          <span className="account-mobile__greeting-name">{displayFirstName}<br />{displayLastName}!</span>
+          <span className="account-mobile__greeting-emoji" aria-hidden>👋</span>
+        </div>
       </div>
 
       <main className="account-mobile__content">
@@ -153,37 +247,151 @@ export default function AccountMenuMobile() {
 
           <div className="account-mobile__info">
             <div className="account-mobile__name">{displayFirstName} {displayLastName}</div>
-            <div className="account-mobile__phone">{displayPhone}</div>
+            {userProfile?.isAdmin ? (
+              <div className="account-mobile__admin-badge">
+                <VerifiedUser fontSize="inherit" />
+                <span>Administrator</span>
+              </div>
+            ) : null}
             <div className="account-mobile__email">{userProfile?.email || '\u2014'}</div>
           </div>
         </section>
 
-        <ul className="account-mobile__menu" role="menu">
-          {menuItems.map((item) => (
-            <li key={item.path} role="none">
-              <button role="menuitem" className="account-mobile__menu-btn" onClick={() => navigate(item.path)} style={item.style}>
+        <section className="account-mobile__menu-group" role="menu">
+          {primaryMenuItems.map((item, idx) => (
+            <div key={item.path || `item-${idx}`} role="none" className="account-mobile__menu-item-wrap">
+              <button
+                role="menuitem"
+                className="account-mobile__menu-btn"
+                onClick={() => {
+                  if (item.actionType === 'contact') {
+                      openContactModal();
+                      return;
+                  }
+                  if (item.action) {
+                    item.action();
+                    return;
+                  }
+                  navigate(item.path);
+                }}
+                style={item.style}
+              >
                 <span className="account-mobile__menu-icon" aria-hidden>{item.icon}</span>
                 <span className="account-mobile__menu-label">{item.label}</span>
+                <span className="account-mobile__chevron" aria-hidden>&#8250;</span>
               </button>
-            </li>
+            </div>
           ))}
 
-          <li>
-            <div className="account-mobile__menu-row">
+          <div className="account-mobile__menu-item-wrap">
+            <div className="account-mobile__menu-row" role="menuitem">
               <div className="account-mobile__menu-icon" aria-hidden><DarkMode /></div>
-              <div className="account-mobile__menu-label">{isDarkMode ? 'Mod luminos' : 'Mod întunecat'}</div>
+              <div className="account-mobile__menu-label">{isDarkMode ? t('common.lightMode') : t('common.darkMode')}</div>
               <div className="account-mobile__menu-control"><Switch checked={isDarkMode} onChange={toggleDarkMode} /></div>
             </div>
-          </li>
+          </div>
+        </section>
 
-          <li>
-            <button className="account-mobile__menu-btn account-mobile__logout" onClick={handleLogout}>
+        <section className="account-mobile__menu-group" role="menu">
+          {secondaryMenuItems.map((item, idx) => (
+            <div key={item.path || `sec-${idx}`} role="none" className="account-mobile__menu-item-wrap">
+              <button
+                role="menuitem"
+                className="account-mobile__menu-btn"
+                onClick={() => {
+                  if (item.actionType === 'contact') {
+                    openContactModal();
+                    return;
+                  }
+                  if (item.action) {
+                    item.action();
+                    return;
+                  }
+                  navigate(item.path);
+                }}
+                style={item.style}
+              >
+                <span className="account-mobile__menu-icon" aria-hidden>{item.icon}</span>
+                <span className="account-mobile__menu-label">{item.label}</span>
+                <span className="account-mobile__chevron" aria-hidden>&#8250;</span>
+              </button>
+            </div>
+          ))}
+
+          <div className="account-mobile__menu-item-wrap">
+            <button className="account-mobile__menu-btn account-mobile__logout" onClick={() => setShowLogoutConfirm(true)}>
               <span className="account-mobile__menu-icon" aria-hidden><Logout /></span>
-              <span className="account-mobile__menu-label">Deconectează-te</span>
+              <span className="account-mobile__menu-label">{t('header.logout')}</span>
             </button>
-          </li>
-        </ul>
+          </div>
+        </section>
       </main>
+
+      {showLogoutConfirm && (
+        <div className="account-modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="account-modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('common.confirmTitle')}</h3>
+            <p>{t('header.logout')}?</p>
+            <div className="account-modal-actions">
+              <button type="button" className="account-modal-btn ghost" onClick={() => setShowLogoutConfirm(false)}>{t('common.cancel')}</button>
+              <button type="button" className="account-modal-btn danger" onClick={handleLogout}>{t('header.logout')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLanguageModal && (
+        <div className="account-modal-overlay" onClick={() => setShowLanguageModal(false)}>
+          <div className="account-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="account-modal-close" onClick={() => setShowLanguageModal(false)} aria-label={t('common.close')}>
+              <Close />
+            </button>
+            <h3>{t('language.change')}</h3>
+            <div className="account-lang-list">
+              <button type="button" className="account-modal-btn" onClick={() => selectLanguage('ro')}>{t('language.ro')}</button>
+              <button type="button" className="account-modal-btn" onClick={() => selectLanguage('en')}>{t('language.en')}</button>
+              <button type="button" className="account-modal-btn" onClick={() => selectLanguage('es')}>{t('language.es')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showContactModal && (
+        <div className="account-modal-overlay" onClick={() => setShowContactModal(false)}>
+          <div className="account-modal-card contact" onClick={(e) => e.stopPropagation()}>
+            <button className="account-modal-close" onClick={() => setShowContactModal(false)} aria-label={t('contactModal.closeAria')}>
+              <Close />
+            </button>
+            <h3>{t('contactModal.title')}</h3>
+            <p>{t('contactModal.intro')}</p>
+            <label>{t('contactModal.nameLabel')}</label>
+            <input
+              type="text"
+              value={contactForm.name}
+              onChange={(e) => setContactForm((prev) => ({ ...prev, name: e.target.value }))}
+            />
+            <label>{t('contactModal.emailLabel')}</label>
+            <input
+              type="email"
+              value={contactForm.email}
+              onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
+            />
+            <label>{t('contactModal.messageLabel')}</label>
+            <textarea
+              rows={4}
+              value={contactForm.message}
+              onChange={(e) => setContactForm((prev) => ({ ...prev, message: e.target.value }))}
+            />
+            {contactError ? <p className="account-contact-error">{contactError}</p> : null}
+            <div className="account-modal-actions">
+              <button type="button" className="account-modal-btn ghost" onClick={() => setShowContactModal(false)}>{t('contactModal.cancelButton')}</button>
+              <button type="button" className="account-modal-btn primary" onClick={submitContact} disabled={contactSending}>
+                {contactSending ? t('contactModal.sending') : t('contactModal.sendButton')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="account-mobile__footer-spacer" />
       <Toast
@@ -191,6 +399,12 @@ export default function AccountMenuMobile() {
         type="info"
         visible={showLogoutToast}
         onClose={() => setShowLogoutToast(false)}
+      />
+      <Toast
+        message={t('contactModal.successTitle')}
+        type="success"
+        visible={showContactSuccessToast}
+        onClose={() => setShowContactSuccessToast(false)}
       />
     </div>
   );

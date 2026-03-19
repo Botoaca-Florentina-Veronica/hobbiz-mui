@@ -744,7 +744,7 @@ export default function SellScreen() {
 
 const styles = StyleSheet.create({
   container:{ flex:1 },
-  scroll:{ padding:16, paddingBottom:24, gap:20 },
+  scroll:{ padding:16, paddingBottom:104, gap:20 },
   headerRow:{ flexDirection:'row', alignItems:'center', gap:12 },
   backButton:{ width:44, height:44, borderRadius:999, alignItems:'center', justifyContent:'center', borderWidth:1 },
   headerTitle:{ fontSize:24, fontWeight:'600' },
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
   categoryHeader:{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16, paddingVertical:14, borderBottomWidth:1 },
   categoryHeaderTitle:{ fontSize:16, fontWeight:'600' },
   closeBtn:{ padding:6, borderRadius:8 },
-  categoryList:{ },
+  categoryList:{ paddingBottom: 104 },
   categoryRow:{ flexDirection:'row', alignItems:'center', gap:14, paddingHorizontal:16, paddingVertical:14, borderBottomWidth:1 },
   categoryIconWrap:{ width:44, height:44, borderRadius:10, alignItems:'center', justifyContent:'center' },
   categoryLabel:{ fontSize:15, fontWeight:'500' },

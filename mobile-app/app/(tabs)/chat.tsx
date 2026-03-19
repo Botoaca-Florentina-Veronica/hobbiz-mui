@@ -271,7 +271,7 @@ export default function ChatScreen() {
       <View style={[styles.listContentWrapper, { backgroundColor: 'transparent', marginTop: 0, paddingTop: 0 }] }>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={[styles.listContent, { paddingBottom: Math.max(64, insets.bottom + 40) }]}
+          contentContainerStyle={[styles.listContent, { paddingBottom: Math.max(104, insets.bottom + 40) }]}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={isDark ? tokens.colors.primary : '#355070'} />}
           keyboardShouldPersistTaps="handled"
         >
