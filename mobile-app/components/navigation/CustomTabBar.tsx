@@ -126,8 +126,6 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
     }
   }, [state.index, layouts, state.routes]);
 
-  if (hidden) return null;
-
   // Floating tab bar constants
   // Use a fixed height for the floating bar
   const BAR_HEIGHT = 64;
@@ -157,6 +155,8 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
       isMounted = false;
     };
   }, [isAuthenticated]);
+
+  if (hidden) return null;
 
   const tabItems = (
     <View style={styles.contentRow}>

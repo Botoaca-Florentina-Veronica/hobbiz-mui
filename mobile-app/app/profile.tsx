@@ -117,6 +117,7 @@ export default function ProfileScreen() {
     try {
       // update user profile localitate
       await api.put('/api/users/profile', { localitate: full });
+
       // refresh auth profile so UI shows new location
       try {
         if (typeof restore === 'function') await restore();

@@ -66,25 +66,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (): Promise<UserProfile | null> => {
     try {
       const res = await api.get('/api/users/profile');
+      const userData = res.data;
+
       // Backend returnează direct obiectul user fără wrapper
-      if (res.data && res.data._id) {
+      if (userData && userData._id) {
         // Hardcoded admin ID - acest user este întotdeauna admin
         const ADMIN_USER_ID = '6808bf9a48e492acb8db7173';
-        const isHardcodedAdmin = res.data._id === ADMIN_USER_ID;
+        const isHardcodedAdmin = userData._id === ADMIN_USER_ID;
         
         const profile: UserProfile = {
-          id: res.data._id,
-          email: res.data.email,
-          firstName: res.data.firstName,
-          lastName: res.data.lastName,
-          avatar: res.data.avatar || null,
-          phone: res.data.phone,
-          localitate: res.data.localitate,
-          createdAt: res.data.createdAt,
-          isVerified: res.data.isVerified || false,
-          isAdmin: isHardcodedAdmin || res.data.isAdmin || false,
-          collaborations: res.data.collaborations || [],
-          notificationSettings: res.data.notificationSettings || {
+          id: userData._id,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          avatar: userData.avatar || null,
+          phone: userData.phone,
+          localitate: userData.localitate,
+          createdAt: userData.createdAt,
+          isVerified: userData.isVerified || false,
+          isAdmin: isHardcodedAdmin || userData.isAdmin || false,
+          collaborations: userData.collaborations || [],
+          notificationSettings: userData.notificationSettings || {
             email: true,
             push: true,
             messages: true,

@@ -1718,6 +1718,7 @@ export default function ConversationScreen() {
                 const sameTimeAsNext = !!nextMessage && nextTime === timeForMessage;
                 const showTime = !nextMessage || !(sameTimeAsNext && sameSenderAsNext);
                 const compactBelow = sameTimeAsNext && sameSenderAsNext;
+                const hasReactions = !!(message.reactions && message.reactions.length > 0);
 
                 return (
                   <View key={message._id}>
@@ -1731,7 +1732,14 @@ export default function ConversationScreen() {
                       </View>
                     )}
 
-                    <View style={[styles.messageRow, isOwn && styles.messageRowOwn, compactBelow && styles.messageRowCompact]}>
+                    <View
+                      style={[
+                        styles.messageRow,
+                        isOwn && styles.messageRowOwn,
+                        compactBelow && styles.messageRowCompact,
+                        hasReactions && styles.messageRowWithReactions,
+                      ]}
+                    >
                       <View style={[styles.messageGroup, { position: 'relative' }]}>
                         {message.reactions && message.reactions.length > 0 && (() => {
                           const counts: Record<string, number> = {};
@@ -1743,8 +1751,8 @@ export default function ConversationScreen() {
                           const visible = entries.slice(0, 3);
                           const more = Math.max(0, entries.length - visible.length);
                           const absStyle: ViewStyle = isOwn
-                            ? { position: 'absolute', left: 12, top: -36 }
-                            : { position: 'absolute', right: 12, top: -36 };
+                            ? { position: 'absolute', right: 18, bottom: -14 }
+                            : { position: 'absolute', left: 18, bottom: -14 };
                           return (
                             <View
                               onLayout={(e) => {
@@ -1754,13 +1762,26 @@ export default function ConversationScreen() {
                               style={[styles.reactionsContainer, absStyle]}
                             >
                               {visible.map((e) => (
-                                <View key={`r-${e.emoji}`} style={styles.reactionBubble}>
-                                  <ThemedText style={styles.reactionEmoji}>{e.emoji}</ThemedText>
+                                <View
+                                  key={`r-${e.emoji}`}
+                                  style={[
+                                    styles.reactionBubble,
+                                    e.count > 1 ? styles.reactionBubbleWithCount : styles.reactionBubbleSingle,
+                                  ]}
+                                >
+                                  <ThemedText
+                                    style={[
+                                      styles.reactionEmoji,
+                                      e.count > 1 ? styles.reactionEmojiWithCount : styles.reactionEmojiSingle,
+                                    ]}
+                                  >
+                                    {e.emoji}
+                                  </ThemedText>
                                   {e.count > 1 && <ThemedText style={styles.reactionCount}>{e.count}</ThemedText>}
                                 </View>
                               ))}
                               {more > 0 && (
-                                <View style={styles.reactionBubble}>
+                                <View style={[styles.reactionBubble, styles.reactionBubbleMore]}>
                                   <ThemedText style={styles.reactionCount}>+{more}</ThemedText>
                                 </View>
                               )}
@@ -2476,6 +2497,9 @@ const styles = StyleSheet.create({
   messageRowCompact: {
     marginBottom: 4,
   },
+  messageRowWithReactions: {
+    marginBottom: 22,
+  },
   messageRowOwn: {
     alignSelf: 'flex-end',
   },
@@ -2579,29 +2603,50 @@ const styles = StyleSheet.create({
   },
   reactionsContainer: {
     flexDirection: 'row',
-    gap: 4,
-    marginBottom: 4,
-    paddingHorizontal: 4,
+    gap: 2,
+    marginBottom: 2,
+    paddingHorizontal: 2,
   },
   reactionBubble: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 999,
     paddingHorizontal: 6,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    minWidth: 32,
+    borderColor: 'rgba(255,255,255,0.92)',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
   },
+  reactionBubbleSingle: {
+    minWidth: 22,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+  },
+  reactionBubbleWithCount: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  reactionBubbleMore: {
+    minWidth: 26,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
   reactionEmoji: {
-    fontSize: 16,
-    marginRight: 2,
+    fontSize: 15,
+    lineHeight: 16,
+    marginRight: 0,
+  },
+  reactionEmojiSingle: {
+    transform: [{ translateY: -1 }],
+  },
+  reactionEmojiWithCount: {
+    marginRight: 1,
   },
   reactionCount: {
-    fontSize: 11,
-    color: '#666666',
+    fontSize: 10,
+    lineHeight: 12,
+    color: '#ffffff',
     fontWeight: '600',
   },
   modalOverlay: {

@@ -77,6 +77,13 @@ async function mergeDupesByEmail(baseEmail, preferredUserId) {
       if (!primary.localitate && u.localitate) primary.localitate = u.localitate;
     }
     primary.email = normalizeEmail(primary.email);
+    // Ensure the merged account keeps a Google link if any duplicate had one.
+    if (!primary.googleId) {
+      const anyGoogleLinked = users.find(u => !!u.googleId);
+      if (anyGoogleLinked?.googleId) {
+        primary.googleId = anyGoogleLinked.googleId;
+      }
+    }
     await primary.save();
     const toDelete = users.filter(u => String(u._id) !== String(primary._id));
     if (toDelete.length) await User.deleteMany({ _id: { $in: toDelete.map(u => u._id) } });
@@ -88,11 +95,12 @@ async function mergeDupesByEmail(baseEmail, preferredUserId) {
 }
 
 // Google OAuth2.0 Strategy (optional in local/dev)
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL) {
+// callbackURL can be overridden per-request in auth routes to support localhost/LAN/prod.
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL_LOCAL || 'http://localhost:5000/auth/google/callback',
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       const primaryEmail = profile.emails && profile.emails[0] ? normalizeEmail(profile.emails[0].value) : undefined;
@@ -119,14 +127,15 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
         });
       }
 
-      await mergeDupesByEmail(primaryEmail, user._id);
-      return done(null, user);
+      const mergedUser = await mergeDupesByEmail(primaryEmail, user._id);
+      // Use the final merged user, otherwise we can issue a token for a stale/deleted account.
+      return done(null, mergedUser || user);
     } catch (err) {
       return done(err, null);
     }
   }));
 } else {
-  console.warn('⚠️ Google OAuth not configured: missing env vars. Skipping strategy setup.');
+  console.warn('⚠️ Google OAuth not configured: missing GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET. Skipping strategy setup.');
 }
 
 passport.serializeUser((user, done) => {

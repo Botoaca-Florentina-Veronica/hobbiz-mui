@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedTextInput } from './themed-text-input';
 import { ThemedText } from './themed-text';
@@ -108,7 +108,13 @@ export default function MobileHeader({
 
       {/* Notification Button */}
       <TouchableOpacity
-        style={styles.notificationButton}
+        style={[
+          styles.notificationButton,
+          {
+            backgroundColor: tokens.colors.surface,
+            borderColor: isDark ? tokens.colors.border : '#E6E8EE',
+          },
+        ]}
         onPress={onNotificationClick}
         activeOpacity={0.7}
       >
@@ -217,22 +223,25 @@ export default function MobileHeader({
 const styles = StyleSheet.create({
   headerContainer: {
     position: 'relative',
-    zIndex: 1000,
+    zIndex: 40,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 8,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 6,
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
     gap: 12,
   },
   suggestionsDropdown: {
     position: 'absolute',
-    top: 58,
+    top: 66,
     maxHeight: 400,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -294,10 +303,10 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flex: 1,
-    maxWidth: '86%',
+    maxWidth: '85%',
   },  searchIconWrapper: {
     position: 'absolute',
-    left: 14,
+    left: 16,
     top: 0,
     bottom: 0,
     justifyContent: 'center',
@@ -305,39 +314,42 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },  searchBar: {
     flexDirection: 'row',
-    borderRadius: 14,
+    borderRadius: 18,
     overflow: 'hidden',
     borderWidth: 1,
-    height: 52,
+    height: 50,
     alignItems: 'center',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
-    paddingLeft: 44,
-    paddingRight: 16,
-    paddingVertical: 14,
+    paddingLeft: 46,
+    paddingRight: 10,
+    paddingVertical: 12,
     fontSize: 15,
     fontWeight: '500',
   },
   searchButton: {
-    paddingHorizontal: 18,
-    height: 52,
+    marginRight: 4,
+    borderRadius: 14,
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    minWidth: 56,
+    minWidth: 40,
   },
   notificationButton: {
-    padding: 8,
-    borderRadius: 22,
+    padding: 10,
+    borderRadius: 16,
     minWidth: 44,
     minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    borderWidth: 1,
   },
   badge: {
     position: 'absolute',

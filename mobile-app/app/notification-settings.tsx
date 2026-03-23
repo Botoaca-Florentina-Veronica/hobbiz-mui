@@ -64,13 +64,14 @@ export default function NotificationSettingsScreen() {
     try {
       setLoading(true);
       const res = await api.get('/api/users/profile');
-      if (res.data && res.data.notificationSettings) {
+      const notificationSettings = res?.data?.notificationSettings || null;
+
+      if (notificationSettings) {
         setSettings({
           ...defaultSettings,
-          ...(res.data.notificationSettings || {}),
+          ...(notificationSettings || {}),
         });
       } else {
-        // If no settings exist on backend, keep defaults
         console.log('No notification settings found, using defaults');
       }
     } catch (error) {
@@ -89,6 +90,7 @@ export default function NotificationSettingsScreen() {
     try {
       setSaving(true);
       await api.put('/api/users/profile', { notificationSettings: newSettings });
+
       console.log('✓ Notification settings saved successfully');
 
       // If push was toggled, also update push token registration on backend

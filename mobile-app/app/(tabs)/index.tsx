@@ -37,6 +37,11 @@ const categories = [
   { description: 'Meditații', color: '#82E0AA', image: require('../../assets/images/carte.png') },
 ];
 
+const HERO_PHONE_SOURCE = require('../../assets/images/imp.png');
+const HERO_TABLET_SOURCE = require('../../assets/images/hobbiz-wide.png');
+const HERO_PHONE_ASPECT_RATIO = 1.72;
+const HERO_TABLET_ASPECT_RATIO = 1.5;
+
 // Design colors
 const DESIGN_BLUE = '#034e84ff';
 // deep blue for announcement titles (matches mock)
@@ -64,10 +69,10 @@ const HERO_IMAGE_CONFIG = {
   horizontalPadding: 24,
   // Suprascrieri specifice telefoanelor (opțional)
   phoneOverrides: {
-    // Face imaginea mai wide și semnificativ mai înaltă pe telefoane
-    aspectRatio: 1.0,
-    minHeight: 420,
-    screenHeightPercent: 0.55,
+    // Menține un raport landscape pe telefoane pentru a evita spațiile goale sus/jos
+    aspectRatio: 1.5,
+    minHeight: 220,
+    screenHeightPercent: 0.30,
     // Mai puțin padding pe mobile pentru a profita de lățimea ecranului
     horizontalPadding: 16,
   },
@@ -280,6 +285,7 @@ export default function HomeScreen() {
   return (
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
       {checkeredBackground}
+  <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <MobileHeader 
         notificationCount={unreadNotificationCount}
         searchValue={searchTerm}
@@ -301,19 +307,20 @@ export default function HomeScreen() {
         }}
         onNotificationClick={() => router.push('/notifications')}
       />
-  <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
   <View style={[styles.mainContent, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}> 
           {
-            (() => {
-              // Determină dimensiunea titlului în mod responsive
-              // Slightly smaller sizes to make the headline a bit less dominant
-              const titleSize = isPhone ? Math.round(scale(20)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(24));
-              return (
-                <ThemedText style={[styles.mainText, { color: tokens.colors.text, fontSize: titleSize, fontWeight: '800', lineHeight: Math.round(titleSize * 1.05) }]}> 
-                  {t.mainTitle}
-                </ThemedText>
-              );
-            })()
+            t.mainTitle ? (
+              (() => {
+                // Determină dimensiunea titlului în mod responsive
+                // Slightly smaller sizes to make the headline unimportant
+                const titleSize = isPhone ? Math.round(scale(20)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(24));
+                return (
+                  <ThemedText style={[styles.mainText, { color: tokens.colors.text, fontSize: titleSize, fontWeight: '800', lineHeight: Math.round(titleSize * 1.05) }]}> 
+                    {t.mainTitle}
+                  </ThemedText>
+                );
+              })()
+            ) : null
           }
           {(() => {
             // Calculăm dimensiunile imaginii hero folosind configurația de mai sus
@@ -325,10 +332,13 @@ export default function HomeScreen() {
               ? { ...HERO_IMAGE_CONFIG, ...HERO_IMAGE_CONFIG.phoneOverrides }
               : HERO_IMAGE_CONFIG;
 
+            const heroSource = isPhone ? HERO_PHONE_SOURCE : HERO_TABLET_SOURCE;
+            const assetAspectRatio = isPhone ? HERO_PHONE_ASPECT_RATIO : HERO_TABLET_ASPECT_RATIO;
+
             const availableWidth = Math.max(320, (screenWidth || 360) - cfg.horizontalPadding);
 
             // Calculăm înălțimea pe baza lățimii și aspect ratio
-            const heightFromWidth = Math.round(availableWidth / cfg.aspectRatio);
+            const heightFromWidth = Math.round(availableWidth / assetAspectRatio);
             // Calculăm înălțimea pe baza procentului din înălțimea ecranului
             const heightFromScreen = Math.round(screenH * cfg.screenHeightPercent);
 
@@ -340,48 +350,39 @@ export default function HomeScreen() {
             );
 
             // Calculăm lățimea finală păstrând aspect ratio-ul
-            let imageWidth = Math.min(availableWidth, Math.round(calculatedHeight * cfg.aspectRatio));
-            const imageHeight = Math.round(imageWidth / cfg.aspectRatio);
+            let imageWidth = Math.min(availableWidth, Math.round(calculatedHeight * assetAspectRatio));
+            const imageHeight = Math.round(imageWidth / assetAspectRatio);
 
-            const squareSide = Math.min(imageWidth, imageHeight);
+            const heroWidth = imageWidth;
+            const heroHeight = imageHeight;
             return (
-              <View style={[styles.mainHeroWrap, { height: squareSide + 20, marginBottom: -64 }]}>
-                <View style={{ 
-                  width: squareSide, 
-                  height: squareSide,
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  borderRadius: cfg.borderRadius, 
-                  overflow: 'hidden'
-                }}>
-                  <Image
-                    // Afișăm `hobby-img.png` pe telefoane și `hobbiz-wide.png` pe tablete
-                    source={isPhone 
-                      ? require('../../assets/images/hobby-img.png') 
-                      : require('../../assets/images/hobbiz-wide.png')
-                    }
-                    style={{ 
-                      width: squareSide, 
-                      height: squareSide, 
-                      borderRadius: cfg.borderRadius,
-                    }} 
-                    resizeMode="contain"
-                  />
-                </View>
+              <View style={[styles.mainHeroWrap, { width: heroWidth, height: heroHeight, marginTop: 0, marginBottom: 8 }]}>
+                <Image
+                  // Afișăm `imp.png` pe telefoane și `hobbiz-wide.png` pe tablete
+                  source={heroSource}
+                  style={{ 
+                    width: heroWidth,
+                    height: heroHeight,
+                    borderRadius: cfg.borderRadius,
+                  }}
+                  resizeMode="contain"
+                />
               </View>
             );
           })()}
-          <View style={[styles.callToAction, { backgroundColor: tokens.colors.surface }]}> 
-            {(() => {
-              // Use same bold style as the main title, slightly smaller
-              const ctaSize = isPhone ? Math.round(scale(18)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(22));
-              return (
-                <ThemedText style={[styles.ctaText, { color: tokens.colors.text, fontSize: ctaSize, fontWeight: '800', lineHeight: Math.round(ctaSize * 1.05) }]}> 
-                  {t.ctaText}
-                </ThemedText>
-              );
-            })()}
-          </View>
+          {t.ctaText ? (
+            <View style={[styles.callToAction, { backgroundColor: tokens.colors.surface }]}> 
+              {(() => {
+                // Use same bold style as the main title, slightly smaller
+                const ctaSize = isPhone ? Math.round(scale(18)) : isTablet ? Math.round(scale(30)) : isLargeTablet ? Math.round(scale(40)) : Math.round(scale(22));
+                return (
+                  <ThemedText style={[styles.ctaText, { color: tokens.colors.text, fontSize: ctaSize, fontWeight: '800', lineHeight: Math.round(ctaSize * 1.05) }]}> 
+                    {t.ctaText}
+                  </ThemedText>
+                );
+              })()}
+            </View>
+          ) : null}
         </View>
 
   {/* Popular announcements */}
@@ -642,8 +643,8 @@ const styles = StyleSheet.create({
   // Keep extra bottom padding so the last category cards are not hidden by the floating tab bar
   scrollContent: { paddingBottom: 120 },
   mainContent: {
-    padding: 16,
-    marginBottom: 16,
+    padding: 8,
+    marginBottom: 8,
     alignItems: 'center',
   },
   mainText: {
@@ -668,7 +669,8 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 8,
     paddingHorizontal: 0,
   },
   callToAction: {

@@ -64,7 +64,7 @@ export default function MyAnnouncementsScreen() {
     return translateCategory(def.key, locale);
   };
   
-  const styles = useMemo(() => createStyles(tokens), [tokens]);
+  const styles = useMemo(() => createStyles(tokens), [tokens]) as any;
   // shared border style for container-like elements to match other pages
   const containerBorderStyle = { borderWidth: isDark ? 1 : 0, borderColor: tokens.colors.borderNeutral } as const;
   const insets = useSafeAreaInsets();
@@ -834,8 +834,8 @@ const createStyles = (tokens: any) => StyleSheet.create({
     zIndex: 1000,
     ...Platform.select({
       web: {
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         zIndex: 9999,
       },
     }),

@@ -1,4 +1,6 @@
-const Jimp = require('jimp');
+/* global __dirname */
+
+const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,24 +17,31 @@ const path = require('path');
     const size = 1024;
     const destPath = path.join(assetsDir, 'puzzle_safe.png');
 
-    const srcImage = await Jimp.read(srcPath);
-
     // Resize source image to fit within ~48% of canvas while preserving aspect
     // Slightly larger than before so the foreground appears a bit bigger but still framed
     const maxContent = Math.floor(size * 0.48);
-    srcImage.contain(maxContent, maxContent, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE);
+    const resizedBuffer = await sharp(srcPath)
+      .resize(maxContent, maxContent, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .png()
+      .toBuffer();
 
-    // Create canvas
-    const canvas = new Jimp(size, size, 0x00000000);
-
-    // Compute position to center the source
-    const x = Math.floor((size - srcImage.bitmap.width) / 2);
-    const y = Math.floor((size - srcImage.bitmap.height) / 2);
-
-    canvas.composite(srcImage, x, y, {
-      mode: Jimp.BLEND_SOURCE_OVER,
-      opacitySource: 1,
-    });
+    // Compose resized image centered on a transparent square canvas
+    const canvas = sharp({
+      create: {
+        width: size,
+        height: size,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    }).composite([
+      {
+        input: resizedBuffer,
+        gravity: 'center',
+      },
+    ]);
 
     // Optionally add subtle padding/shadow (skipped to keep icon clean)
 
@@ -42,7 +51,7 @@ const path = require('path');
       try { fs.copyFileSync(destPath, bak); console.log('Backed up previous icon to', bak); } catch (e) { /* ignore */ }
     }
 
-    await canvas.writeAsync(destPath);
+    await canvas.png().toFile(destPath);
     console.log('Generated', destPath);
   } catch (err) {
     console.error(err);

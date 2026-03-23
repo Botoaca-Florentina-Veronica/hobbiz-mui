@@ -177,7 +177,6 @@ export default function SettingsScreen() {
   const handleDownloadData = async () => {
     setIsLoading(true);
     try {
-      // Fetch user data from API
       const token = await storage.getItemAsync('userToken');
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000'}/api/users/profile`, {
         method: 'GET',

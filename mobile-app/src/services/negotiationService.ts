@@ -34,7 +34,6 @@ export interface Negotiation {
   offerHistory: NegotiationOffer[];
   lastActionBy: string;
   finalizedAt?: string;
-  lastActionBy: string;
   lastActionAt: string;
   createdAt: string;
 }

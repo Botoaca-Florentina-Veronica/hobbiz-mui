@@ -66,6 +66,8 @@ export default function SellScreen() {
   const { tokens, isDark } = useAppTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const tabBarOverlayHeight = 70 + Math.max(insets.bottom, 20);
+  const scrollBottomPadding = tabBarOverlayHeight + 24;
   const { locale } = useLocale();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<string | null>(null);
@@ -397,7 +399,10 @@ export default function SellScreen() {
   <ProtectedRoute>
     <GuestModeRestriction allowedRoutes={[]}>
       <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>      
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { paddingBottom: scrollBottomPadding }]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -613,7 +618,11 @@ export default function SellScreen() {
                 <Ionicons name="close" size={22} color={tokens.colors.text} />
               </TouchableOpacity>
             </View>
-            <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.categoryList}
+              contentContainerStyle={{ paddingBottom: scrollBottomPadding }}
+              showsVerticalScrollIndicator={false}
+            >
               {CATEGORIES.map(cat => (
                 <TouchableOpacity
                   key={cat.key}
@@ -665,7 +674,11 @@ export default function SellScreen() {
                 </>
               )}
             </View>
-            <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.categoryList}
+              contentContainerStyle={{ paddingBottom: scrollBottomPadding }}
+              showsVerticalScrollIndicator={false}
+            >
               {/* If a county is expanded, show its localities, otherwise show the list of counties + 'Toată țara' */}
               {countyExpanded ? (
                 // show localities for selected county
@@ -744,7 +757,7 @@ export default function SellScreen() {
 
 const styles = StyleSheet.create({
   container:{ flex:1 },
-  scroll:{ padding:16, paddingBottom:104, gap:20 },
+  scroll:{ padding:16, gap:20 },
   headerRow:{ flexDirection:'row', alignItems:'center', gap:12 },
   backButton:{ width:44, height:44, borderRadius:999, alignItems:'center', justifyContent:'center', borderWidth:1 },
   headerTitle:{ fontSize:24, fontWeight:'600' },
@@ -790,7 +803,7 @@ const styles = StyleSheet.create({
   categoryHeader:{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16, paddingVertical:14, borderBottomWidth:1 },
   categoryHeaderTitle:{ fontSize:16, fontWeight:'600' },
   closeBtn:{ padding:6, borderRadius:8 },
-  categoryList:{ paddingBottom: 104 },
+  categoryList:{},
   categoryRow:{ flexDirection:'row', alignItems:'center', gap:14, paddingHorizontal:16, paddingVertical:14, borderBottomWidth:1 },
   categoryIconWrap:{ width:44, height:44, borderRadius:10, alignItems:'center', justifyContent:'center' },
   categoryLabel:{ fontSize:15, fontWeight:'500' },

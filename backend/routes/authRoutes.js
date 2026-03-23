@@ -4,6 +4,36 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+function hostWithoutPort(host = '') {
+  return String(host).split(':')[0].trim().toLowerCase();
+}
+
+function isLocalOrPrivateHost(hostname = '') {
+  if (!hostname) return false;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+  if (/^10\./.test(hostname)) return true;
+  if (/^192\.168\./.test(hostname)) return true;
+  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(hostname)) return true;
+  return false;
+}
+
+function getGoogleCallbackURL(req) {
+  const host = req.get('host') || '';
+  const hostname = hostWithoutPort(host);
+  const localFromEnv = process.env.GOOGLE_CALLBACK_URL_LOCAL;
+  const defaultFromEnv = process.env.GOOGLE_CALLBACK_URL;
+
+  if (isLocalOrPrivateHost(hostname)) {
+    if (localFromEnv) return localFromEnv;
+    return `http://${host}/auth/google/callback`;
+  }
+
+  if (defaultFromEnv) return defaultFromEnv;
+
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  return `${proto}://${host}/auth/google/callback`;
+}
+
 // Inițiază autentificarea cu Google
 // Acceptă opțional parametri "state=mobile" sau "mobile=1" pentru a redirecționa către aplicația mobilă după login
 router.get('/google', (req, res, next) => {
@@ -26,7 +56,14 @@ router.get('/google', (req, res, next) => {
       req.session.oauthRedirect = req.query.redirect;
     } catch (e) { /* ignore session write errors */ }
   }
-  const options = { scope: ['profile', 'email'] };
+  const callbackURL = getGoogleCallbackURL(req);
+  const options = {
+    scope: ['profile', 'email'],
+    callbackURL,
+  };
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[Auth] Google OAuth init callbackURL:', callbackURL);
+  }
 
   // Passport will use this state value to send to Google and validate on return. We prefix to know this is a mobile flow.
   if (isMobile) {
@@ -57,10 +94,11 @@ router.get('/google/callback',
     } catch (e) {}
     return next();
   },
-  passport.authenticate('google', {
+  (req, res, next) => passport.authenticate('google', {
     failureRedirect: '/login',
     session: true,
-  }),
+    callbackURL: getGoogleCallbackURL(req),
+  })(req, res, next),
   (req, res) => {
     // Generează JWT pentru utilizatorul autentificat
     const user = req.user;

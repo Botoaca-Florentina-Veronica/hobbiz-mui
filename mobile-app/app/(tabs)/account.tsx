@@ -482,7 +482,7 @@ export default function AccountScreen() {
                 />
 
                 {!!contactError && (
-                  <ThemedText style={[styles.errorText, { color: tokens.colors.error }]}>{contactError}</ThemedText>
+                  <ThemedText style={[styles.errorText, { color: '#dc3545' }]}>{contactError}</ThemedText>
                 )}
               </View>
 

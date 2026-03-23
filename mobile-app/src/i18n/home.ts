@@ -2,8 +2,8 @@ import { getLocaleTranslations } from './index';
 
 export const homeTranslations = {
   ro: {
-    mainTitle: 'Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!',
-    ctaText: 'Fă din pasiunea ta o sursă de venit!',
+    mainTitle: '',
+    ctaText: '',
     popularTitle: 'Anunțuri populare',
     seeAll: 'Vezi tot',
     loading: 'Se încarcă...',
@@ -14,8 +14,8 @@ export const homeTranslations = {
     categories: ['Fotografie','Prajituri','Muzica','Reparații','Dans','Curățenie','Gradinarit','Sport','Arta','Tehnologie','Auto','Meditații'],
   },
   en: {
-    mainTitle: 'Got a cool hobby and think it is useless? Find people willing to pay for it!',
-    ctaText: 'Turn your passion into a source of income!',
+    mainTitle: '',
+    ctaText: '',
     popularTitle: 'Popular Announcements',
     seeAll: 'See all',
     loading: 'Loading...',
@@ -26,8 +26,8 @@ export const homeTranslations = {
     categories: ['Photography','Cakes','Music','Repairs','Dance','Cleaning','Gardening','Sport','Art','Technology','Auto','Tutoring'],
   },
   es: {
-    mainTitle: '¿Tienes un hobby genial y crees que es inutil? ¡Encuentra personas dispuestas a pagar por el!',
-    ctaText: 'Convierte tu pasion en una fuente de ingresos!',
+    mainTitle: '',
+    ctaText: '',
     popularTitle: 'Anuncios populares',
     seeAll: 'Ver todo',
     loading: 'Cargando...',
