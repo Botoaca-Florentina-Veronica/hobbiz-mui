@@ -174,6 +174,7 @@ export default function ImageZoomModal({ open, images, index, onClose, onPrev, o
                 <img
                   src={images[index]}
                   alt={`Imagine ${index + 1} din ${images.length}`}
+                  onContextMenu={(e) => e.preventDefault()}
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',

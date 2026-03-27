@@ -2,7 +2,7 @@ import { getLocaleTranslations } from './index';
 
 export const adminVerificationsTranslations = {
   ro: {
-    pendingHeader: 'Verificari in asteptare',
+    pendingHeader: 'Setari admin',
     userDocumentsHeader: 'Documente Utilizator',
     badgeHeader: 'Badge de Verificare',
     removeBadge: 'Elimina Badge',
@@ -39,7 +39,7 @@ export const adminVerificationsTranslations = {
     pendingDocumentsCount: '{count} documente in asteptare',
   },
   en: {
-    pendingHeader: 'Pending Verifications',
+    pendingHeader: 'Admin Settings',
     userDocumentsHeader: 'User Documents',
     badgeHeader: 'Verification Badge',
     removeBadge: 'Remove Badge',
@@ -76,7 +76,7 @@ export const adminVerificationsTranslations = {
     pendingDocumentsCount: '{count} pending documents',
   },
   es: {
-    pendingHeader: 'Verificaciones pendientes',
+    pendingHeader: 'Configuracion de administrador',
     userDocumentsHeader: 'Documentos del usuario',
     badgeHeader: 'Insignia de verificacion',
     removeBadge: 'Quitar insignia',

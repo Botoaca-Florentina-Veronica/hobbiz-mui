@@ -111,6 +111,15 @@ export const resolveContactFallback = (id) =>
 export const deleteContactFallback = (id) =>
   apiClient.delete(`/api/contact/fallbacks/${id}`);
 
+export const createAnnouncementReport = (announcementId, data) =>
+  apiClient.post('/api/reports', { announcementId, ...data });
+export const getAnnouncementReports = (status = 'open') =>
+  apiClient.get(`/api/reports?status=${encodeURIComponent(status)}`);
+export const resolveAnnouncementReport = (id, data = {}) =>
+  apiClient.patch(`/api/reports/${id}/resolve`, data);
+export const deleteAnnouncementReport = (id) =>
+  apiClient.delete(`/api/reports/${id}`);
+
 // Announcement search for autocomplete suggestions (lightweight)
 export const suggestAnnouncements = (query, signal) =>
   apiClient.get(`/api/announcements/suggest?q=${encodeURIComponent(query)}`, { signal });

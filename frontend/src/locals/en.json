@@ -13,7 +13,7 @@
     "login": "Log In",
     "signup": "Sign Up",
     "account": "Your Account",
-    "adminVerifications": "Admin Verifications",
+    "adminVerifications": "Admin Settings",
     "adminContactMessages": "Contact Messages"
   },
   "language": {
@@ -1348,6 +1348,11 @@
     },
     "admin": {
       "pendingTitle": "Pending Verifications",
+      "sections": {
+        "verifications": "Document verifications",
+        "contacts": "Contact messages",
+        "reports": "Reports"
+      },
       "noPending": "No pending verifications.",
       "colUser": "User",
       "colDocuments": "Documents",
@@ -1367,7 +1372,53 @@
       "rejectionPlaceholder": "E.g.: Document unclear or expired...",
       "verifySuccess": "Document verified successfully.",
       "rejectSuccess": "Document rejected.",
-      "badgeSuccess": "Badge status updated successfully."
+      "badgeSuccess": "Badge status updated successfully.",
+      "reports": {
+        "title": "User reports",
+        "filters": {
+          "open": "Open",
+          "resolved": "Resolved",
+          "all": "All"
+        },
+        "status": {
+          "open": "Open",
+          "resolved": "Resolved"
+        },
+        "reasons": {
+          "spam": "Spam / advertising",
+          "fake": "Fake / misleading announcement",
+          "abusive": "Abusive content",
+          "wrong_category": "Wrong category",
+          "other": "Other reason"
+        },
+        "actions": {
+          "details": "Details",
+          "openAnnouncement": "Open announcement",
+          "resolve": "Resolve",
+          "delete": "Delete"
+        },
+        "labels": {
+          "reporter": "Reported by",
+          "listedBy": "Listed by",
+          "reason": "Reason",
+          "createdAt": "Created at",
+          "details": "Report details",
+          "adminNote": "Admin note"
+        },
+        "dialog": {
+          "title": "Report details"
+        },
+        "empty": "No reports for the selected filter.",
+        "noDetails": "The user did not provide additional details.",
+        "announcementDeleted": "Deleted announcement",
+        "messages": {
+          "fetchError": "Could not load reports.",
+          "resolveSuccess": "Report marked as resolved.",
+          "resolveError": "Could not update the report.",
+          "deleteSuccess": "Report deleted successfully.",
+          "deleteError": "Could not delete the report."
+        }
+      }
     },
     "notifications": {
       "documentUploaded": "uploaded a verification document",
@@ -1451,6 +1502,23 @@
     "views": "{{count}} views",
     "report": "Report",
     "reportSoon": "The report feature will be available soon.",
+    "cantReportOwn": "You cannot report your own announcement.",
+    "reportSubmitted": "Your report was sent successfully.",
+    "reportError": "Could not send report. Please try again.",
+    "reportDialog": {
+      "title": "Report this announcement",
+      "reasonLabel": "Report reason",
+      "detailsLabel": "Details (optional)",
+      "detailsPlaceholder": "Briefly describe the issue you found.",
+      "submit": "Submit report",
+      "reasons": {
+        "spam": "Spam / advertising",
+        "fake": "Fake / misleading announcement",
+        "abusive": "Abusive content",
+        "wrong_category": "Wrong category",
+        "other": "Other reason"
+      }
+    },
     "price": "Price",
     "sellerInfo": "Seller info",
     "noReviews": "no reviews",

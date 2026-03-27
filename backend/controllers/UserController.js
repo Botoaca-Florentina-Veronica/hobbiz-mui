@@ -874,7 +874,7 @@ const uploadVerificationDocument = async (req, res) => {
         await Notification.create({
           userId: admin._id,
           message: `${user.firstName || 'Utilizator'} ${user.lastName || ''} a încărcat un ${documentTypeLabel} pentru verificare.`,
-          link: '/admin/verificari',
+          link: '/admin/setari',
           type: 'document',
           fromUserId: userId,
           actionDescription: `a încărcat un document de verificare (${documentTypeLabel}: ${name})`,

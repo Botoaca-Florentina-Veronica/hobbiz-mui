@@ -39,7 +39,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Rating
+  Rating,
+  MenuItem
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n.js';
@@ -59,10 +60,12 @@ import {
 } from '@mui/icons-material';
 import StarIcon from '@mui/icons-material/Star';
 import apiClient from '../api/api';
+import { createAnnouncementReport } from '../api/api';
 import Toast from '../components/Toast';
 import './AnnouncementDetails.css';
 import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
 import translateCategory from '../utils/translateCategory';
+import { resolveMediaUrl } from '../utils/media';
 // Header and Footer are provided by the App.jsx route layout
 import ChatPopup from '../components/ChatPopup';
 
@@ -126,6 +129,12 @@ export default function AnnouncementDetails() {
   const [rateOpen, setRateOpen] = useState(false);
   const [ratingValue, setRatingValue] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
+
+  // ========== Report dialog ==========
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('spam');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reportSubmitting, setReportSubmitting] = useState(false);
 
   // ========== Seller profile & reviews ==========
   // Folosit pentru a afișa un scurt rezumat în cardul vânzătorului.
@@ -425,11 +434,8 @@ export default function AnnouncementDetails() {
 
   const images = announcement.images || [];
   const showArrows = images.length > 1;
-  /** Returnează src pentru imagine (acceptă http / uploads). */
-  const getImageSrc = (img) =>
-    img.startsWith('http') || img.startsWith('/uploads')
-      ? img
-      : `/uploads/${img.replace(/^.*[\\/]/, '')}`;
+  /** Returnează src robust pentru imagine (acceptă absolute/relative/uploads). */
+  const getImageSrc = (img) => resolveMediaUrl(img);
 
   // Pentru modal zoom
   const imagesSrc = images.map(getImageSrc);
@@ -461,6 +467,10 @@ export default function AnnouncementDetails() {
     }, 200);
   };
 
+  const preventImageContextMenu = (e) => {
+    e.preventDefault();
+  };
+
   const loggedUserId = localStorage.getItem('userId');
   const token = localStorage.getItem('token');
   const isOwnAnnouncement = loggedUserId && announcement.user._id === loggedUserId;
@@ -475,6 +485,49 @@ export default function AnnouncementDetails() {
     }
     console.log('✅ Opening chat popup');
     setShowChat(true);
+  };
+
+  const handleOpenReport = () => {
+    if (!user && !loggedUserId) {
+      navigate('/login', { state: { from: window.location.pathname + window.location.search } });
+      return;
+    }
+    if (isOwnAnnouncement) {
+      const msg = t('announcementDetails.cantReportOwn');
+      if (window.showToast) window.showToast(msg, 'warning');
+      else alert(msg);
+      return;
+    }
+    setReportOpen(true);
+  };
+
+  const handleCloseReport = () => {
+    if (reportSubmitting) return;
+    setReportOpen(false);
+    setReportReason('spam');
+    setReportDetails('');
+  };
+
+  const handleSubmitReport = async () => {
+    if (!announcement?._id) return;
+    try {
+      setReportSubmitting(true);
+      await createAnnouncementReport(announcement._id, {
+        reason: reportReason,
+        details: reportDetails,
+      });
+      const msg = t('announcementDetails.reportSubmitted');
+      if (window.showToast) window.showToast(msg, 'success');
+      else alert(msg);
+      handleCloseReport();
+    } catch (error) {
+      const backendError = error?.response?.data?.error;
+      const msg = backendError || t('announcementDetails.reportError');
+      if (window.showToast) window.showToast(msg, 'error');
+      else alert(msg);
+    } finally {
+      setReportSubmitting(false);
+    }
   };
 
   return (
@@ -573,6 +626,8 @@ export default function AnnouncementDetails() {
                       height={undefined}
                       image={getImageSrc(images[imgIndex])}
                       alt={`Imagine ${imgIndex + 1}`}
+                      onContextMenu={preventImageContextMenu}
+                      draggable={false}
                       sx={{
                         width: '100%',
                         height: '100%',
@@ -806,27 +861,29 @@ export default function AnnouncementDetails() {
                       </Typography>
                     </Box>
                   </Box>
-                  <Button
-                    size="small"
-                    onClick={() => alert(t('announcementDetails.reportSoon'))}
-                    startIcon={
-                      <svg xmlns="http://www.w3.org/2000/svg" width={window.innerWidth < 600 ? "12" : "16"} height={window.innerWidth < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
-                    }
-                    sx={{
-                      color: '#e5533d',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(229,83,61,0.08)' : 'rgba(229,83,61,0.08)' },
-                      fontSize: { xs: '.65rem', sm: '.75rem' },
-                      letterSpacing: '.5px',
-                      minWidth: { xs: '70px', sm: 'auto' },
-                      px: { xs: 1, sm: 1.5 },
-                      py: { xs: 0.5, sm: 0.75 },
-                      flexShrink: 0
-                    }}
-                  >
-                    {t('announcementDetails.report')}
-                  </Button>
+                  {!isOwnAnnouncement && (
+                    <Button
+                      size="small"
+                      onClick={handleOpenReport}
+                      startIcon={
+                        <svg xmlns="http://www.w3.org/2000/svg" width={window.innerWidth < 600 ? "12" : "16"} height={window.innerWidth < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
+                      }
+                      sx={{
+                        color: '#e5533d',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(229,83,61,0.08)' : 'rgba(229,83,61,0.08)' },
+                        fontSize: { xs: '.65rem', sm: '.75rem' },
+                        letterSpacing: '.5px',
+                        minWidth: { xs: '70px', sm: 'auto' },
+                        px: { xs: 1, sm: 1.5 },
+                        py: { xs: 0.5, sm: 0.75 },
+                        flexShrink: 0
+                      }}
+                    >
+                      {t('announcementDetails.report')}
+                    </Button>
+                  )}
                 </Box>
 
                 {announcement.price && (
@@ -856,7 +913,7 @@ export default function AnnouncementDetails() {
                 {/* Seller Avatar and Info */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, cursor: 'pointer' }} onClick={() => navigate(`/profil/${announcement.user._id}`)}>
                   <Avatar
-                    src={announcement.user.avatar}
+                    src={resolveMediaUrl(announcement.user.avatar) || undefined}
                     sx={{
                       width: 60,
                       height: 60,
@@ -1089,6 +1146,111 @@ export default function AnnouncementDetails() {
         <DialogActions>
           <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('common.cancel')}</Button>
           <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('announcementDetails.submit')}</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={reportOpen}
+        onClose={handleCloseReport}
+        fullWidth
+        maxWidth="sm"
+        BackdropProps={{
+          sx: {
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            backgroundColor: getIsDarkMode() ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.35)'
+          }
+        }}
+        PaperProps={{
+          sx: {
+            bgcolor: getIsDarkMode() ? '#121212' : '#ffffff',
+            color: getIsDarkMode() ? '#f5f5f5' : 'inherit',
+            borderRadius: 2,
+            boxShadow: getIsDarkMode() ? '0 10px 30px rgba(0,0,0,0.6)' : undefined,
+            fontFamily: "'Poppins', sans-serif !important"
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>
+          {t('announcementDetails.reportDialog.title')}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            select
+            margin="normal"
+            fullWidth
+            label={t('announcementDetails.reportDialog.reasonLabel')}
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: getIsDarkMode() ? '#ffffff' : '#374151'
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#d1d5db'
+                },
+                '&:hover fieldset': {
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#cbd5e1'
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#9ca3af'
+                }
+              },
+              '& .MuiInputLabel-root': {
+                color: getIsDarkMode() ? '#ffffff' : '#6b7280'
+              }
+            }}
+          >
+            <MenuItem value="spam">{t('announcementDetails.reportDialog.reasons.spam')}</MenuItem>
+            <MenuItem value="fake">{t('announcementDetails.reportDialog.reasons.fake')}</MenuItem>
+            <MenuItem value="abusive">{t('announcementDetails.reportDialog.reasons.abusive')}</MenuItem>
+            <MenuItem value="wrong_category">{t('announcementDetails.reportDialog.reasons.wrong_category')}</MenuItem>
+            <MenuItem value="other">{t('announcementDetails.reportDialog.reasons.other')}</MenuItem>
+          </TextField>
+
+          <TextField
+            margin="normal"
+            fullWidth
+            multiline
+            minRows={4}
+            value={reportDetails}
+            label={t('announcementDetails.reportDialog.detailsLabel')}
+            onChange={(e) => setReportDetails(e.target.value)}
+            placeholder={t('announcementDetails.reportDialog.detailsPlaceholder')}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: getIsDarkMode() ? '#ffffff' : '#374151'
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#d1d5db'
+                },
+                '&:hover fieldset': {
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#cbd5e1'
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: getIsDarkMode() ? '#ffffff' : '#9ca3af'
+                }
+              },
+              '& .MuiInputLabel-root': {
+                color: getIsDarkMode() ? '#ffffff' : '#6b7280'
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseReport} disabled={reportSubmitting} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmitReport}
+            disabled={reportSubmitting}
+            sx={{ bgcolor: '#e5533d', '&:hover': { bgcolor: '#cd412b' }, color: '#ffffff', fontFamily: "'Poppins', sans-serif" }}
+          >
+            {t('announcementDetails.reportDialog.submit')}
+          </Button>
         </DialogActions>
       </Dialog>
 

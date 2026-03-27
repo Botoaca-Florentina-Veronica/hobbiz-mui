@@ -25,7 +25,6 @@ import EditAnnouncementPage from './pages/EditAnnouncementPage';
 import ProfilePage from './pages/ProfilePage';
 import VerificationDocuments from './pages/VerificationDocuments';
 import AdminVerifications from './pages/AdminVerifications';
-import AdminContactFallbacks from './pages/AdminContactFallbacks';
 import PublicProfile from './pages/PublicProfile';
 import PublicProfileAllReviews from './pages/PublicProfileAllReviews';
 import MyAnnouncements from './pages/MyAnnouncements';
@@ -305,6 +304,14 @@ function App() {
             <Footer hideOnMobile />
           </>
         } />
+        <Route path="/admin/setari" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AdminVerifications />
+            <Footer hideOnMobile />
+          </>
+        } />
         <Route path="/admin/verificari" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -317,7 +324,7 @@ function App() {
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
-            <AdminContactFallbacks />
+            <AdminVerifications />
             <Footer hideOnMobile />
           </>
         } />

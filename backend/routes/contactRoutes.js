@@ -110,7 +110,7 @@ router.post('/', optionalAuth, async (req, res) => {
           await Notification.create({
             userId: admin._id,
             message: `Mesaj de contact salvat (fallback) de la ${fallback.name}`,
-            link: '/admin/contact-fallbacks',
+            link: '/admin/setari',
             type: 'general',
           });
           try {

@@ -157,8 +157,7 @@ export default function AccountMenuMobile() {
     { icon: <Person />, label: t('header.profile'), path: '/profil' },
     { icon: <VerifiedUser />, label: 'Verificare Documente', path: '/verificare-documente' },
     ...(userProfile?.isAdmin ? [
-      { icon: <VerifiedUser />, label: t('header.adminVerifications'), path: '/admin/verificari', style: { color: '#f51866' } },
-      { icon: <VerifiedUser />, label: t('header.adminContactMessages'), path: '/admin/contact-fallbacks', style: { color: '#f51866' } }
+      { icon: <VerifiedUser />, label: t('header.adminVerifications'), path: '/admin/setari', style: { color: '#f51866' } }
     ] : [])
   ];
 

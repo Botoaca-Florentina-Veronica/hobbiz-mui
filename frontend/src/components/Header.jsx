@@ -546,11 +546,8 @@ export default function Header() {
                     <a onClick={(e) => { e.preventDefault(); navigate('/profil'); }}>{t('header.profile')}</a>
                     {auth?.user?.isAdmin && (
                       <>
-                        <a onClick={(e) => { e.preventDefault(); navigate('/admin/verificari'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
+                        <a onClick={(e) => { e.preventDefault(); navigate('/admin/setari'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
                           {t('header.adminVerifications')}
-                        </a>
-                        <a onClick={(e) => { e.preventDefault(); navigate('/admin/contact-fallbacks'); }} style={{ color: '#f51866', fontWeight: 'bold' }}>
-                          {t('header.adminContactMessages')}
                         </a>
                       </>
                     )}

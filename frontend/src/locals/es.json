@@ -13,7 +13,7 @@
     "login": "Iniciar sesión",
     "signup": "Registrarse",
     "account": "Tu cuenta",
-    "adminVerifications": "Verificaciones de administrador",
+    "adminVerifications": "Configuración de administrador",
     "adminContactMessages": "Mensajes de contacto"
   },
   "language": {
@@ -1343,6 +1343,11 @@
     },
     "admin": {
       "pendingTitle": "Verificaciones pendientes",
+      "sections": {
+        "verifications": "Verificación de documentos",
+        "contacts": "Mensajes de contacto",
+        "reports": "Reportes"
+      },
       "noPending": "No hay verificaciones pendientes.",
       "colUser": "Usuario",
       "colDocuments": "Documentos",
@@ -1362,7 +1367,53 @@
       "rejectionPlaceholder": "Ej.: Documento poco claro o vencido...",
       "verifySuccess": "Documento verificado correctamente.",
       "rejectSuccess": "Documento rechazado.",
-      "badgeSuccess": "Estado del badge actualizado correctamente."
+      "badgeSuccess": "Estado del badge actualizado correctamente.",
+      "reports": {
+        "title": "Reportes de usuarios",
+        "filters": {
+          "open": "Abiertos",
+          "resolved": "Resueltos",
+          "all": "Todos"
+        },
+        "status": {
+          "open": "Abierto",
+          "resolved": "Resuelto"
+        },
+        "reasons": {
+          "spam": "Spam / publicidad",
+          "fake": "Anuncio falso / engañoso",
+          "abusive": "Contenido abusivo",
+          "wrong_category": "Categoría incorrecta",
+          "other": "Otro motivo"
+        },
+        "actions": {
+          "details": "Detalles",
+          "openAnnouncement": "Abrir anuncio",
+          "resolve": "Resolver",
+          "delete": "Eliminar"
+        },
+        "labels": {
+          "reporter": "Reportado por",
+          "listedBy": "Publicado por",
+          "reason": "Motivo",
+          "createdAt": "Creado el",
+          "details": "Detalles del reporte",
+          "adminNote": "Nota del admin"
+        },
+        "dialog": {
+          "title": "Detalles del reporte"
+        },
+        "empty": "No hay reportes para el filtro seleccionado.",
+        "noDetails": "El usuario no agregó detalles adicionales.",
+        "announcementDeleted": "Anuncio eliminado",
+        "messages": {
+          "fetchError": "No se pudieron cargar los reportes.",
+          "resolveSuccess": "Reporte marcado como resuelto.",
+          "resolveError": "No se pudo actualizar el reporte.",
+          "deleteSuccess": "Reporte eliminado correctamente.",
+          "deleteError": "No se pudo eliminar el reporte."
+        }
+      }
     },
     "notifications": {
       "documentUploaded": "subio un documento de verificación",
@@ -1446,6 +1497,23 @@
     "views": "{{count}} vistas",
     "report": "Reportar",
     "reportSoon": "La funcion de reporte estara disponible pronto.",
+    "cantReportOwn": "No puedes reportar tu propio anuncio.",
+    "reportSubmitted": "Tu reporte se envió correctamente.",
+    "reportError": "No se pudo enviar el reporte. Inténtalo de nuevo.",
+    "reportDialog": {
+      "title": "Reportar este anuncio",
+      "reasonLabel": "Motivo del reporte",
+      "detailsLabel": "Detalles (opcional)",
+      "detailsPlaceholder": "Describe brevemente el problema detectado.",
+      "submit": "Enviar reporte",
+      "reasons": {
+        "spam": "Spam / publicidad",
+        "fake": "Anuncio falso / engañoso",
+        "abusive": "Contenido abusivo",
+        "wrong_category": "Categoría incorrecta",
+        "other": "Otro motivo"
+      }
+    },
     "price": "Precio",
     "sellerInfo": "Información del vendedor",
     "noReviews": "sin reseñas",

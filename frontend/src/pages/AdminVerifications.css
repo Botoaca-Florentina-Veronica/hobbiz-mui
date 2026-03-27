@@ -67,6 +67,45 @@
   letter-spacing: 0.3px;
 }
 
+/* ── Category separators (tabs) ── */
+.av-sections {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 22px;
+  flex-wrap: wrap;
+}
+
+.av-section-btn {
+  border: 1px solid rgba(11,45,90,0.18);
+  background: var(--as-bg-menu, #fff);
+  color: var(--as-text-primary, #183642);
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.av-section-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(11,45,90,0.12);
+}
+
+.av-section-btn.active {
+  background: var(--as-btn-bg, #0B2D5A);
+  color: #fff;
+  border-color: var(--as-btn-bg, #0B2D5A);
+}
+
+.av-section-btn.active .av-count-badge {
+  background: rgba(255,255,255,0.22);
+}
+
 /* ── Loader ── */
 .av-loader {
   display: flex;
@@ -594,6 +633,207 @@
 .dark-mode .av-doc-card--rejected   { border-color: rgba(244,67,54,0.15); }
 .dark-mode .av-doc-icon-wrap        { opacity: 0.75; }
 
+/* ════════════════════════════════
+   REPORTS SECTION
+   ════════════════════════════════ */
+.av-reports-wrap {
+  margin-top: 4px;
+}
+
+.av-reports-subtitle {
+  margin-bottom: 14px !important;
+  color: var(--as-text-primary, #183642) !important;
+  opacity: 0.72;
+}
+
+.av-reports-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.av-report-filter-btn {
+  border-radius: 10px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+}
+
+.av-reports-grid {
+  gap: 10px;
+}
+
+.av-empty--reports {
+  padding: 2.25rem 0;
+}
+
+.av-report-card {
+  display: grid;
+  gap: 8px;
+  align-items: initial;
+}
+
+.av-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.av-card-badges--reports {
+  margin-top: 0;
+}
+
+.av-report-title {
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+  color: var(--as-text-primary, #183642) !important;
+}
+
+.av-report-meta {
+  font-size: 0.82rem !important;
+  color: var(--as-text-primary, #183642) !important;
+  opacity: 0.72;
+}
+
+.av-report-actions {
+  margin-top: 4px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.av-report-action-btn {
+  border-radius: 9px !important;
+  text-transform: none !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+}
+
+.av-report-action-btn--resolve {
+  background: #2e7d32 !important;
+}
+
+.av-report-action-btn--resolve:hover:not(:disabled) {
+  background: #26682a !important;
+}
+
+.av-report-action-btn--delete {
+  border-color: #c62828 !important;
+  color: #c62828 !important;
+}
+
+.av-report-action-btn--delete:hover:not(:disabled) {
+  background: rgba(198,40,40,0.08) !important;
+}
+
+.av-report-badge--spam {
+  background: rgba(237,108,2,0.14);
+  color: #e65100;
+}
+
+.av-report-badge--fake {
+  background: rgba(198,40,40,0.12);
+  color: #c62828;
+}
+
+.av-report-badge--abusive {
+  background: rgba(109,40,217,0.12);
+  color: #6d28d9;
+}
+
+.av-report-badge--wrong-category {
+  background: rgba(2,132,199,0.12);
+  color: #0369a1;
+}
+
+.av-report-badge--other {
+  background: rgba(71,85,105,0.12);
+  color: #475569;
+}
+
+.av-reports-dialog-paper {
+  max-width: 680px !important;
+}
+
+.av-reports-dialog-title {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: var(--as-text-primary, #183642) !important;
+}
+
+.av-reports-dialog-content {
+  padding-top: 6px !important;
+}
+
+.av-report-detail-label {
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  color: var(--as-text-primary, #183642) !important;
+  margin-bottom: 6px !important;
+}
+
+.av-report-details-box {
+  min-height: 90px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(11,45,90,0.14);
+  background: var(--as-bg-item, #f7f9fc);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.av-reports-dialog-actions {
+  padding: 6px 20px 16px !important;
+}
+
+.dark-mode .av-report-badge--spam {
+  background: rgba(255,152,0,0.16);
+  color: #ffb74d;
+}
+
+.dark-mode .av-report-badge--fake {
+  background: rgba(244,67,54,0.16);
+  color: #ef9a9a;
+}
+
+.dark-mode .av-report-badge--abusive {
+  background: rgba(167,139,250,0.16);
+  color: #c4b5fd;
+}
+
+.dark-mode .av-report-badge--wrong-category {
+  background: rgba(56,189,248,0.16);
+  color: #7dd3fc;
+}
+
+.dark-mode .av-report-badge--other {
+  background: rgba(148,163,184,0.16);
+  color: #cbd5e1;
+}
+
+.dark-mode .av-report-action-btn--resolve {
+  background: #388e3c !important;
+}
+
+.dark-mode .av-report-action-btn--resolve:hover:not(:disabled) {
+  background: #2f7a33 !important;
+}
+
+.dark-mode .av-report-action-btn--delete {
+  border-color: #ef9a9a !important;
+  color: #ef9a9a !important;
+}
+
+.dark-mode .av-report-action-btn--delete:hover:not(:disabled) {
+  background: rgba(244,67,54,0.2) !important;
+}
+
+.dark-mode .av-report-details-box {
+  border-color: rgba(255,255,255,0.12);
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .av-container {
@@ -619,6 +859,17 @@
     width: 100%;
   }
   .av-action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .av-report-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .av-report-actions {
+    width: 100%;
+  }
+  .av-report-action-btn {
     flex: 1;
     justify-content: center;
   }

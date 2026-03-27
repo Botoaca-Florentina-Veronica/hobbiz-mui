@@ -13,7 +13,7 @@
     "login": "Autentificare",
     "signup": "Înregistrare",
     "account": "Contul tău",
-    "adminVerifications": "Verificări Admin",
+    "adminVerifications": "Setări admin",
     "adminContactMessages": "Mesaje Contact"
   },
   "language": {
@@ -1348,6 +1348,11 @@
     },
     "admin": {
       "pendingTitle": "Verificări în așteptare",
+      "sections": {
+        "verifications": "Verificări documente",
+        "contacts": "Mesaje contact",
+        "reports": "Raportări"
+      },
       "noPending": "Nu există verificări în așteptare.",
       "colUser": "Utilizator",
       "colDocuments": "Documente",
@@ -1367,7 +1372,53 @@
       "rejectionPlaceholder": "Ex: Document neclar sau expirat...",
       "verifySuccess": "Document verificat cu succes.",
       "rejectSuccess": "Document respins.",
-      "badgeSuccess": "Status badge actualizat cu succes."
+      "badgeSuccess": "Status badge actualizat cu succes.",
+      "reports": {
+        "title": "Raportări utilizatori",
+        "filters": {
+          "open": "Deschise",
+          "resolved": "Rezolvate",
+          "all": "Toate"
+        },
+        "status": {
+          "open": "Deschisă",
+          "resolved": "Rezolvată"
+        },
+        "reasons": {
+          "spam": "Spam / publicitate",
+          "fake": "Anunț fals / înșelător",
+          "abusive": "Conținut abuziv",
+          "wrong_category": "Categorie greșită",
+          "other": "Alt motiv"
+        },
+        "actions": {
+          "details": "Detalii",
+          "openAnnouncement": "Deschide anunț",
+          "resolve": "Rezolvă",
+          "delete": "Șterge"
+        },
+        "labels": {
+          "reporter": "Raportat de",
+          "listedBy": "Publicat de",
+          "reason": "Motiv",
+          "createdAt": "Creat la",
+          "details": "Detalii raportare",
+          "adminNote": "Notă admin"
+        },
+        "dialog": {
+          "title": "Detalii raportare"
+        },
+        "empty": "Nu există raportări pentru filtrul selectat.",
+        "noDetails": "Utilizatorul nu a adăugat detalii suplimentare.",
+        "announcementDeleted": "Anunț șters",
+        "messages": {
+          "fetchError": "Nu am putut încărca raportările.",
+          "resolveSuccess": "Raportarea a fost marcată ca rezolvată.",
+          "resolveError": "Nu am putut actualiza raportarea.",
+          "deleteSuccess": "Raportarea a fost ștearsă.",
+          "deleteError": "Nu am putut șterge raportarea."
+        }
+      }
     },
     "notifications": {
       "documentUploaded": "a încărcat un document de verificare",
@@ -1451,6 +1502,23 @@
     "views": "{{count}} vizualizări",
     "report": "Raportează",
     "reportSoon": "Funcționalitatea de raportare va fi disponibilă în curând.",
+    "cantReportOwn": "Nu poți raporta propriul anunț.",
+    "reportSubmitted": "Raportarea a fost trimisă cu succes.",
+    "reportError": "Nu am putut trimite raportarea. Încearcă din nou.",
+    "reportDialog": {
+      "title": "Raportează acest anunț",
+      "reasonLabel": "Motiv raportare",
+      "detailsLabel": "Detalii (opțional)",
+      "detailsPlaceholder": "Descrie pe scurt problema observată.",
+      "submit": "Trimite raportarea",
+      "reasons": {
+        "spam": "Spam / publicitate",
+        "fake": "Anunț fals / înșelător",
+        "abusive": "Conținut abuziv",
+        "wrong_category": "Categorie greșită",
+        "other": "Alt motiv"
+      }
+    },
     "price": "Preț",
     "sellerInfo": "Informații vânzător",
     "noReviews": "nu există review-uri",

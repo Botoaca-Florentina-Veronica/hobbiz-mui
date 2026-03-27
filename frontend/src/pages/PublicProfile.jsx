@@ -41,6 +41,7 @@ import './PublicProfile.css';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import Toast from '../components/Toast';
+import { resolveMediaUrl } from '../utils/media';
 
 export default function PublicProfile() {
   const navigate = useNavigate();
@@ -248,7 +249,7 @@ export default function PublicProfile() {
         <div className="pp-hero-body">
           <div className="pp-hero-avatar">
             {profile?.avatar ? (
-              <img src={profile.avatar} alt={fullName} />
+              <img src={resolveMediaUrl(profile.avatar)} alt={fullName} />
             ) : (
               <PersonIcon className="pp-hero-avatar-fallback" />
             )}
@@ -378,7 +379,7 @@ export default function PublicProfile() {
               {Array.isArray(profile?.reviews) && profile.reviews.length > 0 ? (
                 profile.reviews.map((r) => (
                   <article key={r._id || `${r.user || 'u'}-${r.createdAt || Math.random()}`} className="pp-rev">
-                    <Avatar src={r.authorAvatar || r.avatar} alt={r.authorName || r.name || 'U'} className="pp-rev-avatar">
+                    <Avatar src={resolveMediaUrl(r.authorAvatar || r.avatar) || undefined} alt={r.authorName || r.name || 'U'} className="pp-rev-avatar">
                       {(r.authorName || r.name || 'U').charAt(0)}
                     </Avatar>
                     <div className="pp-rev-content">

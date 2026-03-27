@@ -26,6 +26,8 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import AdminContactFallbacks from './AdminContactFallbacks';
+import AdminReportsSection from './AdminReportsSection';
 import { 
   getPendingVerifications, 
   verifyDocument, 
@@ -43,6 +45,7 @@ const getCloudinaryDownloadUrl = (url) => {
 export default function AdminVerifications() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState('verifications');
   
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,64 +143,99 @@ export default function AdminVerifications() {
           </IconButton>
         </div>
 
-        <h1 className="av-title">
-          {t('verification.admin.pendingTitle')}
-          {!loading && <span className="av-count-badge">{users.length}</span>}
-        </h1>
+        <h1 className="av-title">{t('header.adminVerifications')}</h1>
 
-        {/* â”€â”€ Content â”€â”€ */}
-        {loading ? (
-          <div className="av-loader">
-            <CircularProgress size={40} thickness={4} className="av-spinner" />
-          </div>
-        ) : users.length === 0 ? (
-          <div className="av-empty">
-            <VerifiedIcon className="av-empty-icon" />
-            <Typography className="av-empty-text">{t('verification.admin.noPending')}</Typography>
-          </div>
-        ) : (
-          <div className="av-grid">
-            {users.map((user) => (
-              <div key={user._id} className="av-card" onClick={() => navigate(`/profil/${user._id}`)}>
-                <div className="av-card-left">
-                  <Avatar
-                    src={user.avatar}
-                    className="av-avatar"
-                  >
-                    {!user.avatar && getInitials(user)}
-                  </Avatar>
-                  <div className="av-card-info">
-                    <span className="av-card-name">{user.firstName} {user.lastName}</span>
-                    <span className="av-card-email">{user.email}</span>
-                    <div className="av-card-badges">
-                      {user.isVerified && (
-                        <span className="av-badge av-badge--verified">
-                          <VerifiedIcon style={{ fontSize: 12 }} />
-                          {t('verification.admin.colVerified')}
-                        </span>
-                      )}
-                      {(user.pendingDocuments?.length > 0) && (
-                        <span className="av-badge av-badge--pending">
-                          <HourglassEmptyIcon style={{ fontSize: 12 }} />
-                          {user.pendingDocuments.length} {t('verification.admin.colDocuments').toLowerCase()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  variant="contained"
-                  size="small"
-                  className="av-view-btn"
-                  startIcon={processing ? <CircularProgress size={14} /> : <VisibilityIcon />}
-                  onClick={(e) => { e.stopPropagation(); handleOpenUserDocs(user); }}
-                  disabled={processing}
-                >
-                  {t('verification.admin.view')}
-                </Button>
+        <div className="av-sections">
+          <button
+            type="button"
+            className={`av-section-btn ${activeSection === 'verifications' ? 'active' : ''}`}
+            onClick={() => setActiveSection('verifications')}
+          >
+            {t('verification.admin.sections.verifications')}
+            {!loading && <span className="av-count-badge">{users.length}</span>}
+          </button>
+          <button
+            type="button"
+            className={`av-section-btn ${activeSection === 'contacts' ? 'active' : ''}`}
+            onClick={() => setActiveSection('contacts')}
+          >
+            {t('verification.admin.sections.contacts')}
+          </button>
+          <button
+            type="button"
+            className={`av-section-btn ${activeSection === 'reports' ? 'active' : ''}`}
+            onClick={() => setActiveSection('reports')}
+          >
+            {t('verification.admin.sections.reports')}
+          </button>
+        </div>
+
+        {activeSection === 'verifications' ? (
+          <>
+            <Typography sx={{ mb: 2, color: 'text.secondary' }}>
+              {t('verification.admin.pendingTitle')}
+            </Typography>
+
+            {loading ? (
+              <div className="av-loader">
+                <CircularProgress size={40} thickness={4} className="av-spinner" />
               </div>
-            ))}
-          </div>
+            ) : users.length === 0 ? (
+              <div className="av-empty">
+                <VerifiedIcon className="av-empty-icon" />
+                <Typography className="av-empty-text">{t('verification.admin.noPending')}</Typography>
+              </div>
+            ) : (
+              <div className="av-grid">
+                {users.map((user) => (
+                  <div key={user._id} className="av-card" onClick={() => navigate(`/profil/${user._id}`)}>
+                    <div className="av-card-left">
+                      <Avatar
+                        src={user.avatar}
+                        className="av-avatar"
+                      >
+                        {!user.avatar && getInitials(user)}
+                      </Avatar>
+                      <div className="av-card-info">
+                        <span className="av-card-name">{user.firstName} {user.lastName}</span>
+                        <span className="av-card-email">{user.email}</span>
+                        <div className="av-card-badges">
+                          {user.isVerified && (
+                            <span className="av-badge av-badge--verified">
+                              <VerifiedIcon style={{ fontSize: 12 }} />
+                              {t('verification.admin.colVerified')}
+                            </span>
+                          )}
+                          {(user.pendingDocuments?.length > 0) && (
+                            <span className="av-badge av-badge--pending">
+                              <HourglassEmptyIcon style={{ fontSize: 12 }} />
+                              {user.pendingDocuments.length} {t('verification.admin.colDocuments').toLowerCase()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      className="av-view-btn"
+                      startIcon={processing ? <CircularProgress size={14} /> : <VisibilityIcon />}
+                      onClick={(e) => { e.stopPropagation(); handleOpenUserDocs(user); }}
+                      disabled={processing}
+                    >
+                      {t('verification.admin.view')}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : activeSection === 'contacts' ? (
+          <Box sx={{ mt: 1 }}>
+            <AdminContactFallbacks embedded />
+          </Box>
+        ) : (
+          <AdminReportsSection />
         )}
       </Container>
 

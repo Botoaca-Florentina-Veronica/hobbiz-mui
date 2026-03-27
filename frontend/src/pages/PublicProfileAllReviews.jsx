@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import Toast from '../components/Toast';
+import { resolveMediaUrl } from '../utils/media';
 import './PublicProfile.css';
 import './PublicProfileAllReviews.css';
 
@@ -142,7 +143,7 @@ export default function PublicProfileAllReviews() {
           </IconButton>
           <div className="ar-header-info">
             <Avatar
-              src={profile.avatar}
+              src={resolveMediaUrl(profile.avatar) || undefined}
               alt={displayName}
               className="ar-header-avatar"
             >
@@ -227,7 +228,7 @@ export default function PublicProfileAllReviews() {
                 >
                   <div className="ar-review-header">
                     <Avatar
-                      src={r.authorAvatar || r.avatar}
+                      src={resolveMediaUrl(r.authorAvatar || r.avatar) || undefined}
                       alt={r.authorName || 'U'}
                       className="ar-review-avatar"
                     >

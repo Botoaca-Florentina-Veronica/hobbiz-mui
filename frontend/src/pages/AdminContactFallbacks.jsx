@@ -21,7 +21,7 @@ const formatDate = (value, locale) => {
   });
 };
 
-export default function AdminContactFallbacks() {
+export default function AdminContactFallbacks({ embedded = false }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -89,14 +89,8 @@ export default function AdminContactFallbacks() {
     }
   };
 
-  return (
-    <div className="acf-page">
-      <Container maxWidth="lg" className="acf-container">
-        <div className="acf-back-row">
-          <IconButton className="acf-back-btn" onClick={() => navigate(-1)}>
-            <ArrowBackIcon />
-          </IconButton>
-        </div>
+  const content = (
+    <>
 
         <div className="acf-title-row">
           <h1 className="acf-title">{t('adminContactFallbacks.title')}</h1>
@@ -191,41 +185,67 @@ export default function AdminContactFallbacks() {
           </div>
         )}
 
-        <Dialog
-          open={Boolean(confirmDeleteId)}
-          onClose={() => {
-            if (!deletingId) setConfirmDeleteId(null);
-          }}
-          classes={{ paper: 'acf-dialog-paper' }}
-        >
-          <DialogTitle className="acf-dialog-title">
-            {t('adminContactFallbacks.confirmDialog.title')}
-          </DialogTitle>
-          <DialogContent className="acf-dialog-content">
-            <DialogContentText className="acf-dialog-text">
-              {t('adminContactFallbacks.deleteConfirm')}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions className="acf-dialog-actions">
-            <Button
-              onClick={() => setConfirmDeleteId(null)}
-              disabled={Boolean(deletingId)}
-              className="acf-dialog-cancel"
-            >
-              {t('adminContactFallbacks.confirmDialog.cancel')}
-            </Button>
-            <Button
-              onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
-              color="error"
-              variant="contained"
-              disabled={Boolean(deletingId)}
-              className="acf-dialog-confirm"
-              startIcon={Boolean(deletingId) ? <CircularProgress size={14} color="inherit" /> : <DeleteOutlineIcon />}
-            >
-              {t('adminContactFallbacks.confirmDialog.confirm')}
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog
+        open={Boolean(confirmDeleteId)}
+        onClose={() => {
+          if (!deletingId) setConfirmDeleteId(null);
+        }}
+        classes={{ paper: 'acf-dialog-paper' }}
+        BackdropProps={{
+          sx: {
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(8, 12, 20, 0.5)'
+                : 'rgba(20, 30, 45, 0.3)'
+          }
+        }}
+      >
+        <DialogTitle className="acf-dialog-title">
+          {t('adminContactFallbacks.confirmDialog.title')}
+        </DialogTitle>
+        <DialogContent className="acf-dialog-content">
+          <DialogContentText className="acf-dialog-text">
+            {t('adminContactFallbacks.deleteConfirm')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions className="acf-dialog-actions">
+          <Button
+            onClick={() => setConfirmDeleteId(null)}
+            disabled={Boolean(deletingId)}
+            className="acf-dialog-cancel"
+          >
+            {t('adminContactFallbacks.confirmDialog.cancel')}
+          </Button>
+          <Button
+            onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
+            color="error"
+            variant="contained"
+            disabled={Boolean(deletingId)}
+            className="acf-dialog-confirm"
+            startIcon={Boolean(deletingId) ? <CircularProgress size={14} color="inherit" /> : <DeleteOutlineIcon />}
+          >
+            {t('adminContactFallbacks.confirmDialog.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+
+  if (embedded) {
+    return <div>{content}</div>;
+  }
+
+  return (
+    <div className="acf-page">
+      <Container maxWidth="lg" className="acf-container">
+        <div className="acf-back-row">
+          <IconButton className="acf-back-btn" onClick={() => navigate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+        </div>
+        {content}
       </Container>
     </div>
   );
