@@ -315,8 +315,8 @@ export default function AnnouncementDetailsScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: tokens.colors.bg }}>
-      <ScrollView style={Platform.OS === 'web' ? ({ height: '100vh' } as any) : { flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
+    <View style={[{ flex: 1, backgroundColor: tokens.colors.bg }, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : undefined]}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 }}>
       {/* Header: circular back button + 'înapoi' text on left, placeholder right for balance */}
       <View style={[styles.headerSpacer, { paddingTop: insets.top + 12 }]}>        
         <View style={[styles.headerRow, { alignItems: 'center' }]}>

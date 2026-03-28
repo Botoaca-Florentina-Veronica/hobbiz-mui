@@ -192,7 +192,6 @@ export default function AllAnnouncements() {
       <View style={[
         styles.container,
         { backgroundColor: isDark ? '#000000' : '#ffffff' },
-        Platform.OS === 'web' ? ({ height: '100vh' } as any) : undefined,
       ]}>
         {/* Header */}
         <View style={[styles.header, { 
@@ -227,10 +226,7 @@ export default function AllAnnouncements() {
           keyExtractor={(item) => item._id}
           renderItem={renderAnnouncement}
           numColumns={isTwoColumn ? 2 : 1}
-          style={[
-            styles.scrollView,
-            Platform.OS === 'web' ? ({ height: '100%' } as any) : undefined,
-          ]}
+          style={styles.scrollView}
           contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
           columnWrapperStyle={isTwoColumn ? styles.columnWrapper : undefined}
           refreshControl={
@@ -262,7 +258,8 @@ export default function AllAnnouncements() {
 
 const styles = StyleSheet.create({
   container: { 
-    flex: 1 
+    flex: 1,
+    minHeight: 0,
   },
   loadingContainer: { 
     flex: 1, 
@@ -307,7 +304,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   scrollView: { 
-    flex: 1 
+    flex: 1,
+    minHeight: 0,
   },
   scrollContent: { 
     paddingHorizontal: 16, 

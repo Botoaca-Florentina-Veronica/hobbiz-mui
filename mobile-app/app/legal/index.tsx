@@ -48,7 +48,7 @@ export default function LegalMenu() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface }]} activeOpacity={0.8}>
             <Ionicons name="arrow-back" size={20} color={tokens.colors.text} />

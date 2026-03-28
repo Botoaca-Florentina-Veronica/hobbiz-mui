@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   CircularProgress,
@@ -28,7 +28,7 @@ const getReasonColor = (reason) => {
   return 'av-report-badge--other';
 };
 
-export default function AdminReportsSection() {
+export default function AdminReportsSection({ onReportsChange }) {
   const { t } = useTranslation();
 
   const [statusFilter, setStatusFilter] = useState('open');
@@ -56,22 +56,25 @@ export default function AdminReportsSection() {
     [t]
   );
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAnnouncementReports(statusFilter);
       setReports(response.data.items || []);
+      if (onReportsChange) {
+        onReportsChange();
+      }
     } catch (error) {
       console.error('Error fetching reports:', error);
       if (window.showToast) window.showToast(t('verification.admin.reports.messages.fetchError'), 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, onReportsChange, t]);
 
   useEffect(() => {
     fetchReports();
-  }, [statusFilter]);
+  }, [fetchReports]);
 
   const handleResolve = async (reportId) => {
     try {

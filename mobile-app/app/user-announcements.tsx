@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import { Platform,  
   View, 
   Text, 
   ScrollView, 
@@ -128,7 +128,7 @@ export default function UserAnnouncementsScreen() {
   };
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : undefined]}>
       <Stack.Screen options={{ headerShown: false }} />
       
       {/* Header */}

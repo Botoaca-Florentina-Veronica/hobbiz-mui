@@ -34,6 +34,37 @@ function getGoogleCallbackURL(req) {
   return `${proto}://${host}/auth/google/callback`;
 }
 
+function normalizeOrigin(value = '') {
+  return String(value).replace(/\/+$/, '').trim();
+}
+
+function getOriginFromUrl(rawUrl = '') {
+  try {
+    if (!rawUrl) return '';
+    return normalizeOrigin(new URL(rawUrl).origin);
+  } catch (e) {
+    return '';
+  }
+}
+
+function getFrontendBaseURL(req) {
+  const fromEnv = normalizeOrigin(process.env.FRONTEND_URL || '');
+  if (fromEnv) return fromEnv;
+
+  const fromOrigin = getOriginFromUrl(req.get('origin') || '');
+  if (fromOrigin) return fromOrigin;
+
+  const fromReferer = getOriginFromUrl(req.get('referer') || req.get('referrer') || '');
+  if (fromReferer) return fromReferer;
+
+  if (process.env.NODE_ENV === 'production') {
+    // Safe fallback for production deploy when FRONTEND_URL is missing.
+    return 'https://hobbiz-mui.netlify.app';
+  }
+
+  return 'http://localhost:5173';
+}
+
 // Inițiază autentificarea cu Google
 // Acceptă opțional parametri "state=mobile" sau "mobile=1" pentru a redirecționa către aplicația mobilă după login
 router.get('/google', (req, res, next) => {
@@ -170,10 +201,7 @@ router.get('/google/callback',
     }
 
     // Redirecționează către frontend web cu tokenul în query string
-    // Pentru dezvoltare locală
-    const frontendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://hobbiz.netlify.app' 
-      : 'http://localhost:5173';
+    const frontendUrl = getFrontendBaseURL(req);
 
     return res.redirect(`${frontendUrl}/oauth-success?token=${token}`);
   }
@@ -182,9 +210,7 @@ router.get('/google/callback',
 // Logout
 router.get('/logout', (req, res) => {
   req.logout(() => {
-    const frontendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://hobbiz.netlify.app' 
-      : 'http://localhost:5173';
+    const frontendUrl = getFrontendBaseURL(req);
     res.redirect(frontendUrl);
   });
 });

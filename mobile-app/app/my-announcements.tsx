@@ -707,6 +707,7 @@ export default function MyAnnouncementsScreen() {
 const createStyles = (tokens: any) => StyleSheet.create({
   container: {
     flex: 1,
+    minHeight: 0,
     backgroundColor: tokens.colors.bg,
   },
   header: {
@@ -744,6 +745,7 @@ const createStyles = (tokens: any) => StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    minHeight: 0,
   },
   scrollContent: {
     padding: 12,

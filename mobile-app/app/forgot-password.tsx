@@ -141,7 +141,7 @@ export default function ForgotPasswordScreen() {
       style={[styles.container, { backgroundColor: tokens.colors.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={[styles.card, cardStyle, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} accessibilityLabel="Back" style={styles.backBtn}>

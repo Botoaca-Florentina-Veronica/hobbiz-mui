@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Switch, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
@@ -194,8 +194,6 @@ export default function NotificationSettingsScreen() {
     </ThemedView>
   );
 }
-
-import { Platform } from 'react-native';
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

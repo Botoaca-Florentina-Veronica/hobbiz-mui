@@ -285,7 +285,7 @@ export default function HomeScreen() {
   return (
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
       {checkeredBackground}
-  <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+  <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <MobileHeader 
         notificationCount={unreadNotificationCount}
         searchValue={searchTerm}

@@ -94,6 +94,16 @@ export default function WelcomeScreen() {
   // Calculate gradient height to be responsive
   const gradientHeight = Math.min(480, height * 0.45);
 
+  const ctaColors = {
+    loginBackground: isDark ? tokens.colors.primary : '#2f4e6f',
+    loginText: '#ffffff',
+    guestBackground: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.08)',
+    guestBorder: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.72)',
+    guestText: '#f5f7fa',
+    signupText: 'rgba(255,255,255,0.86)',
+    signupLink: isDark ? '#ff6e95' : '#9fd4ff',
+  };
+
   // Logo and decorative texts removed per request
 
 
@@ -240,7 +250,7 @@ export default function WelcomeScreen() {
           style={[
             styles.loginButton,
             {
-              backgroundColor: tokens.colors.primary,
+              backgroundColor: ctaColors.loginBackground,
               paddingVertical: responsiveSizes.buttonPadding,
               marginBottom: BUTTONS_CONFIG.loginButton.marginBottom,
             },
@@ -248,7 +258,7 @@ export default function WelcomeScreen() {
           onPress={handleLogin}
           activeOpacity={0.8}
         >
-          <ThemedText style={[styles.loginButtonText, { fontSize: responsiveSizes.buttonFontSize, color: '#FFFFFF' }]}>
+          <ThemedText style={[styles.loginButtonText, { fontSize: responsiveSizes.buttonFontSize, color: ctaColors.loginText }]}>
             {t.login}
           </ThemedText>
         </TouchableOpacity>
@@ -258,7 +268,8 @@ export default function WelcomeScreen() {
           style={[
             styles.guestButton,
             {
-              borderColor: tokens.colors.border,
+              borderColor: ctaColors.guestBorder,
+              backgroundColor: ctaColors.guestBackground,
               paddingVertical: responsiveSizes.buttonPadding,
               marginBottom: BUTTONS_CONFIG.guestButton.marginBottom,
             },
@@ -266,18 +277,18 @@ export default function WelcomeScreen() {
           onPress={handleGuestMode}
           activeOpacity={0.8}
         >
-          <ThemedText style={[styles.guestButtonText, { fontSize: responsiveSizes.buttonFontSize, color: tokens.colors.text }]}>
+          <ThemedText style={[styles.guestButtonText, { fontSize: responsiveSizes.buttonFontSize, color: ctaColors.guestText }]}>
             {t.guestMode}
           </ThemedText>
         </TouchableOpacity>
 
         {/* Sign up link */}
         <View style={[styles.signupContainer, { marginBottom: insets.bottom + 8, marginTop: BUTTONS_CONFIG.signupLink.marginTop }]}> 
-          <ThemedText style={[styles.signupText, { fontSize: responsiveSizes.linkFontSize, color: tokens.colors.muted }]}>
+          <ThemedText style={[styles.signupText, { fontSize: responsiveSizes.linkFontSize, color: ctaColors.signupText }]}>
             {t.noAccount}{' '}
           </ThemedText>
           <TouchableOpacity onPress={handleSignup} activeOpacity={0.7}>
-            <ThemedText style={[styles.signupLink, { fontSize: responsiveSizes.linkFontSize, color: tokens.colors.primary }]}>
+            <ThemedText style={[styles.signupLink, { fontSize: responsiveSizes.linkFontSize, color: ctaColors.signupLink }]}>
               {t.signup}
             </ThemedText>
           </TouchableOpacity>

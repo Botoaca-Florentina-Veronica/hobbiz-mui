@@ -126,7 +126,7 @@ export default function SignupScreen() {
       style={[styles.container, { backgroundColor: tokens.colors.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
+      <ScrollView style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

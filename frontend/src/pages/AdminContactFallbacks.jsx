@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Container, Typography, Box, Button, Chip, CircularProgress, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -21,7 +21,7 @@ const formatDate = (value, locale) => {
   });
 };
 
-export default function AdminContactFallbacks({ embedded = false }) {
+export default function AdminContactFallbacks({ embedded = false, onContactsChange }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -32,22 +32,25 @@ export default function AdminContactFallbacks({ embedded = false }) {
   const [statusFilter, setStatusFilter] = useState('open');
   const locale = i18n?.language?.startsWith('ro') ? 'ro-RO' : 'en-GB';
 
-  const fetchItems = async (status = statusFilter) => {
+  const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getContactFallbacks(status);
+      const response = await getContactFallbacks(statusFilter);
       setItems(response.data.items || []);
+      if (onContactsChange) {
+        onContactsChange();
+      }
     } catch (error) {
       console.error('Error fetching contact fallbacks:', error);
       if (window.showToast) window.showToast(t('adminContactFallbacks.messages.fetchError'), 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, onContactsChange, t]);
 
   useEffect(() => {
-    fetchItems(statusFilter);
-  }, [statusFilter]);
+    fetchItems();
+  }, [fetchItems]);
 
   const handleResolve = async (id) => {
     try {
@@ -186,7 +189,7 @@ export default function AdminContactFallbacks({ embedded = false }) {
         )}
 
       <Dialog
-        open={Boolean(confirmDeleteId)}
+        open={!!confirmDeleteId}
         onClose={() => {
           if (!deletingId) setConfirmDeleteId(null);
         }}
@@ -213,7 +216,7 @@ export default function AdminContactFallbacks({ embedded = false }) {
         <DialogActions className="acf-dialog-actions">
           <Button
             onClick={() => setConfirmDeleteId(null)}
-            disabled={Boolean(deletingId)}
+            disabled={deletingId !== null}
             className="acf-dialog-cancel"
           >
             {t('adminContactFallbacks.confirmDialog.cancel')}
@@ -222,9 +225,9 @@ export default function AdminContactFallbacks({ embedded = false }) {
             onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
             color="error"
             variant="contained"
-            disabled={Boolean(deletingId)}
+            disabled={deletingId !== null}
             className="acf-dialog-confirm"
-            startIcon={Boolean(deletingId) ? <CircularProgress size={14} color="inherit" /> : <DeleteOutlineIcon />}
+            startIcon={deletingId !== null ? <CircularProgress size={14} color="inherit" /> : <DeleteOutlineIcon />}
           >
             {t('adminContactFallbacks.confirmDialog.confirm')}
           </Button>

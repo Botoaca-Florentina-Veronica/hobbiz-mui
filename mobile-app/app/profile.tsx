@@ -880,47 +880,7 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Verification Documents Section (Only for own profile or if admin) */}
-        {isViewingOwnProfile && user && (
-          <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
-            <View style={styles.dashboardHeader}>
-              <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>
-                {t.verificationTitle}
-              </ThemedText>
-            </View>
-
-            <View style={{ padding: 16 }}>
-              <ThemedText style={[styles.statLabel, { color: tokens.colors.muted, marginBottom: 16 }]}>
-                {t.verificationDescription}
-              </ThemedText>
-              
-              <TouchableOpacity
-                style={[styles.editButton, { backgroundColor: tokens.colors.primary, borderWidth: 0, width: '100%' }]}
-                onPress={() => router.push('/verification-documents')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="document-text" size={18} color="#fff" style={{ marginRight: 8 }} />
-                <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                  {t.manageDocuments}
-                </ThemedText>
-              </TouchableOpacity>
-
-              {/* Admin Button */}
-              {user?.isAdmin && (
-                <TouchableOpacity
-                  style={[styles.editButton, { backgroundColor: '#FF9800', borderWidth: 0, width: '100%', marginTop: 12 }]}
-                  onPress={() => router.push('/admin-verifications')}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons name="shield-checkmark" size={18} color="#fff" style={{ marginRight: 8 }} />
-                  <ThemedText style={[styles.editButtonText, { color: '#fff' }]}>
-                    {t.adminVerificationPanel}
-                  </ThemedText>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        )}
+        {/* Verification Documents Section moved to account tab */}
 
         {/* Admin Controls - Show when viewing another user's profile */}
         {!isViewingOwnProfile && user?.isAdmin && publicProfile && (

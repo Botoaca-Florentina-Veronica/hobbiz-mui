@@ -44,10 +44,18 @@ export default function AccountScreen() {
     { key: 'settings', label: t.settings, icon: 'settings-outline', action: () => router.push('/settings') },
     { key: 'my-ads', label: t.myAds, icon: 'megaphone-outline', action: () => router.push('/my-announcements') },
     { key: 'profile', label: t.profile, icon: 'person-outline', action: () => router.push('/profile') },
+    { key: 'verification', label: t.verifyDocuments, icon: 'shield-checkmark-outline', action: () => router.push('/verification-documents') },
+  ];
+
+  if (user?.isAdmin) {
+    accountRows.push({ key: 'admin', label: t.adminPanel, icon: 'construct-outline', action: () => router.push('/admin-verifications') });
+  }
+
+  accountRows.push(
     { key: 'darkmode', label: t.darkMode, icon: 'moon-outline', type: 'switch' },
     { key: 'contact', label: t.contact, icon: 'mail-outline', action: () => setContactModalOpen(true) },
-    { key: 'language', label: t.language, icon: 'language-outline', action: () => setLanguageModalOpen(true) },
-  ];
+    { key: 'language', label: t.language, icon: 'language-outline', action: () => setLanguageModalOpen(true) }
+  );
 
   const infoRows: RowSpec[] = [
     { key: 'about', label: t.aboutUs, icon: 'information-circle-outline', action: () => router.push('/about') },
@@ -141,7 +149,7 @@ export default function AccountScreen() {
     <ProtectedRoute>
       <GuestModeRestriction allowedRoutes={[]}>
         <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg }]}>      
-      <ScrollView contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={[styles.scrollContent, { position: 'relative' }]} showsVerticalScrollIndicator={false}>
         {/* Decorative sun image stuck to the very top-right (overlaps status bar) but is part of scroll content so it will scroll away. */}
         <View
           style={[styles.sunWrapper, { position: 'absolute', top: sunTop, right: 0 }, (Platform.OS === 'web' || isExpoGo) ? { pointerEvents: 'none' } : undefined]}

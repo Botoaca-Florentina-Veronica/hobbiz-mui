@@ -33,6 +33,8 @@ export const accountTranslations = {
     contactSuccess: 'Mesajul a fost trimis cu succes',
     contactErrorRequired: 'Te rugăm să completezi toate câmpurile.',
     contactErrorGeneric: 'Nu am putut trimite mesajul. Încearcă din nou.',
+    verifyDocuments: 'Verificare profesională',
+    adminPanel: 'Panou Administrator',
   },
   en: {
     profile: 'Profile',
@@ -66,6 +68,8 @@ export const accountTranslations = {
     contactSuccess: 'Message sent successfully',
     contactErrorRequired: 'Please fill in all fields.',
     contactErrorGeneric: 'Could not send the message. Please try again.',
+    verifyDocuments: 'Professional Verification',
+    adminPanel: 'Admin Panel',
   },
   es: {
     profile: 'Perfil',
@@ -99,6 +103,8 @@ export const accountTranslations = {
     contactSuccess: 'Mensaje enviado correctamente',
     contactErrorRequired: 'Por favor completa todos los campos.',
     contactErrorGeneric: 'No se pudo enviar el mensaje. Intentalo de nuevo.',
+    verifyDocuments: 'Verificación Profesional',
+    adminPanel: 'Panel de Administrador',
   },
 };
 

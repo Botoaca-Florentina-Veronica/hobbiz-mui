@@ -37,6 +37,11 @@ const reportRoutes = require('./routes/reportRoutes');
 const app = express();
 const server = http.createServer(app);
 
+// Required for secure cookies when running behind Render/other reverse proxies.
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Utility: detect private/local hosts (LAN IPs, localhost)
 function isPrivateHostname(hostname) {
   if (!hostname) return false;
@@ -245,7 +250,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'a_very_secret_key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
 }));
 
 // Initialize Passport

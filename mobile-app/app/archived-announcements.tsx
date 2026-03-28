@@ -218,8 +218,8 @@ export default function ArchivedAnnouncementsScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <View style={[styles.container, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : undefined]}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}>
         {/* Header (match 'Anunțurile mele' layout: back button + title) -- placed inside ScrollView so it scrolls */}
         {/* Remove default header bottom border on this screen to avoid a visible line above the search container */}
         <View style={[styles.header, { paddingTop: insets.top, borderBottomWidth: 0, borderBottomColor: 'transparent' }]}> 

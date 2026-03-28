@@ -107,49 +107,65 @@
 .acf-grid {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .acf-card {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 18px 22px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
   background: var(--as-bg-menu, #fff);
   border-radius: 16px;
   box-shadow: var(--as-shadow-item, 0 2px 8px rgba(0,0,0,0.05));
-  border: 1px solid rgba(11,45,90,0.06);
+  border: 1px solid transparent;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.acf-card:hover {
+  box-shadow: var(--as-shadow-item-hover, 0 6px 20px rgba(24,54,66,0.1));
+  transform: translateY(-1px);
+  border-color: rgba(11,45,90,0.08);
 }
 
 .acf-card-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
 }
 
 .acf-card-title {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .acf-name {
-  font-size: 0.98rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--as-text-primary, #183642);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .acf-email {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--as-text-primary, #183642);
-  opacity: 0.62;
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .acf-chip {
   font-weight: 600 !important;
   letter-spacing: 0.2px;
+  flex-shrink: 0;
 }
 
 .acf-chip.open {
@@ -163,34 +179,38 @@
 }
 
 .acf-meta {
+  flex-basis: 100%;
   display: flex;
   gap: 16px;
   font-size: 0.78rem;
   color: var(--as-text-primary, #183642);
-  opacity: 0.6;
-  flex-wrap: wrap;
+  opacity: 0.65;
+  margin-top: -12px;
 }
 
 .acf-message {
-  font-size: 0.92rem;
+  flex-basis: 100%;
+  display: block;
+  font-size: 0.9rem;
   color: var(--as-text-primary, #183642);
-  line-height: 1.6;
-  white-space: pre-line;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 8px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(24,54,66,0.08);
+  padding-top: 12px;
 }
 
 .acf-error {
-  background: rgba(229, 57, 53, 0.08);
-  border: 1px solid rgba(229, 57, 53, 0.18);
-  color: #b71c1c;
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 0.8rem;
+  display: none;
 }
 
 .acf-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .acf-resolve-btn {
@@ -201,6 +221,10 @@
   font-weight: 600 !important;
   font-size: 0.82rem !important;
   padding: 6px 16px !important;
+  flex-shrink: 0;
+}
+.acf-resolve-btn:hover {
+  opacity: 0.88;
 }
 
 .acf-resolve-btn:disabled {
@@ -213,6 +237,7 @@
   font-weight: 600 !important;
   font-size: 0.82rem !important;
   padding: 6px 14px !important;
+  flex-shrink: 0;
 }
 
 .acf-delete-btn:disabled {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import {
+import { Platform, 
   StyleSheet,
   ScrollView,
   View,
@@ -130,7 +130,7 @@ export default function CategoryAnnouncementsScreen() {
   ];
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }]}>
+    <ThemedView style={[styles.container, { backgroundColor: tokens.colors.bg, paddingTop: insets.top }, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : undefined]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: tokens.colors.surface, borderBottomColor: tokens.colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}>

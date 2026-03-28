@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useCallback, useEffect, useState } from 'react';
 import { 
   Container, 
   Typography, 
@@ -6,12 +6,10 @@ import {
   Button, 
   IconButton, 
   Dialog, 
-  DialogTitle, 
   DialogContent, 
   DialogActions, 
   TextField, 
   CircularProgress,
-  Chip,
   Divider,
   Avatar,
 } from '@mui/material';
@@ -32,7 +30,9 @@ import {
   getPendingVerifications, 
   verifyDocument, 
   getUserDocumentsAdmin,
-  toggleUserVerification 
+  toggleUserVerification,
+  getAnnouncementReports,
+  getContactFallbacks
 } from '../api/api';
 import './AccountSettings.css';
 import './AdminVerifications.css';
@@ -49,16 +49,37 @@ export default function AdminVerifications() {
   
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
+  const [loadingUserId, setLoadingUserId] = useState(null);
+  const [processingDocId, setProcessingDocId] = useState(null);
+  const [badgeProcessing, setBadgeProcessing] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [targetDoc, setTargetDoc] = useState(null);
 
-  useEffect(() => { fetchPending(); }, []);
+  const [openReportsCount, setOpenReportsCount] = useState(0);
+  const [openContactsCount, setOpenContactsCount] = useState(0);
 
-  const fetchPending = async () => {
+  const fetchContactsCount = useCallback(async () => {
+    try {
+      const response = await getContactFallbacks('open');
+      setOpenContactsCount(response.data.items?.length || 0);
+    } catch (error) {
+      console.error('Error fetching contacts count:', error);
+    }
+  }, []);
+
+  const fetchReportsCount = useCallback(async () => {
+    try {
+      const response = await getAnnouncementReports('open');
+      setOpenReportsCount(response.data.items?.length || 0);
+    } catch (error) {
+      console.error('Error fetching reports count:', error);
+    }
+  }, []);
+
+  const fetchPending = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getPendingVerifications();
@@ -69,17 +90,23 @@ export default function AdminVerifications() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => { 
+    fetchPending(); 
+    fetchReportsCount();
+    fetchContactsCount();
+  }, [fetchPending, fetchReportsCount, fetchContactsCount]);
 
   const handleOpenUserDocs = async (user) => {
     try {
-      setProcessing(true);
+      setLoadingUserId(user._id);
       const response = await getUserDocumentsAdmin(user._id);
       setSelectedUser(response.data.user);
     } catch (error) {
       console.error('Error fetching user docs:', error);
     } finally {
-      setProcessing(false);
+      setLoadingUserId(null);
     }
   };
 
@@ -95,37 +122,38 @@ export default function AdminVerifications() {
 
   const performVerification = async (userId, docId, status, reason = '') => {
     try {
-      setProcessing(true);
+      setProcessingDocId(docId);
       await verifyDocument(userId, docId, { status, rejectionReason: reason });
       if (window.showToast) {
         window.showToast(status === 'verified' ? t('verification.admin.verifySuccess') : t('verification.admin.rejectSuccess'), 'success');
       }
       setRejectionModalOpen(false);
-      if (selectedUser) {
-        const response = await getUserDocumentsAdmin(selectedUser._id);
+      if (selectedUser?._id === userId) {
+        const response = await getUserDocumentsAdmin(userId);
         setSelectedUser(response.data.user);
       }
-      fetchPending();
+      await fetchPending();
     } catch (error) {
       console.error('Error verifying doc:', error);
     } finally {
-      setProcessing(false);
+      setProcessingDocId(null);
     }
   };
 
   const handleToggleBadge = async (userId, currentStatus) => {
     try {
-      setProcessing(true);
+      setBadgeProcessing(true);
       await toggleUserVerification(userId, { isVerified: !currentStatus });
       if (window.showToast) window.showToast(t('verification.admin.badgeSuccess'), 'success');
-      if (selectedUser && selectedUser._id === userId) {
-        setSelectedUser({ ...selectedUser, isVerified: !currentStatus });
-      }
-      fetchPending();
+      setSelectedUser((prev) => {
+        if (!prev || prev._id !== userId) return prev;
+        return { ...prev, isVerified: !currentStatus };
+      });
+      await fetchPending();
     } catch (error) {
       console.error('Error toggling badge:', error);
     } finally {
-      setProcessing(false);
+      setBadgeProcessing(false);
     }
   };
 
@@ -136,7 +164,7 @@ export default function AdminVerifications() {
     <div className="av-page">
       <Container maxWidth="lg" className="av-container">
 
-        {/* â”€â”€ Header â”€â”€ */}
+        {/* Header */}
         <div className="av-back-row">
           <IconButton className="av-back-btn" onClick={() => navigate(-1)}>
             <ArrowBackIcon />
@@ -160,6 +188,7 @@ export default function AdminVerifications() {
             onClick={() => setActiveSection('contacts')}
           >
             {t('verification.admin.sections.contacts')}
+            {openContactsCount > 0 && <span className="av-count-badge">{openContactsCount}</span>}
           </button>
           <button
             type="button"
@@ -167,6 +196,7 @@ export default function AdminVerifications() {
             onClick={() => setActiveSection('reports')}
           >
             {t('verification.admin.sections.reports')}
+            {openReportsCount > 0 && <span className="av-count-badge">{openReportsCount}</span>}
           </button>
         </div>
 
@@ -219,9 +249,9 @@ export default function AdminVerifications() {
                       variant="contained"
                       size="small"
                       className="av-view-btn"
-                      startIcon={processing ? <CircularProgress size={14} /> : <VisibilityIcon />}
+                      startIcon={loadingUserId === user._id ? <CircularProgress size={14} /> : <VisibilityIcon />}
                       onClick={(e) => { e.stopPropagation(); handleOpenUserDocs(user); }}
-                      disabled={processing}
+                      disabled={loadingUserId === user._id}
                     >
                       {t('verification.admin.view')}
                     </Button>
@@ -232,14 +262,13 @@ export default function AdminVerifications() {
           </>
         ) : activeSection === 'contacts' ? (
           <Box sx={{ mt: 1 }}>
-            <AdminContactFallbacks embedded />
+            <AdminContactFallbacks embedded onContactsChange={fetchContactsCount} />
           </Box>
         ) : (
-          <AdminReportsSection />
+          <AdminReportsSection onReportsChange={fetchReportsCount} />
         )}
       </Container>
-
-      {/* â•â•â•â•â•â•â•â•â•â• Documents Dialog â•â•â•â•â•â•â•â•â•â• */}
+      {/* Documents Dialog */}
       <Dialog
         open={!!selectedUser}
         onClose={() => setSelectedUser(null)}
@@ -277,7 +306,7 @@ export default function AdminVerifications() {
               startIcon={<VerifiedIcon />}
               size="small"
               onClick={() => handleToggleBadge(selectedUser._id, selectedUser.isVerified)}
-              disabled={processing}
+              disabled={badgeProcessing}
             >
               {selectedUser?.isVerified ? t('verification.admin.badgeActive') : t('verification.admin.grantBadge')}
             </Button>
@@ -288,7 +317,7 @@ export default function AdminVerifications() {
                 startIcon={<CloseIcon />}
                 size="small"
                 onClick={() => handleToggleBadge(selectedUser._id, selectedUser.isVerified)}
-                disabled={processing}
+                disabled={badgeProcessing}
               >
                 {t('verification.admin.removeBadge')}
               </Button>
@@ -310,7 +339,7 @@ export default function AdminVerifications() {
             </div>
           ) : (
             <div className="av-doc-list">
-              {selectedUser.documents.map((doc, idx) => (
+              {selectedUser.documents.map((doc) => (
                 <div key={doc._id} className={`av-doc-card av-doc-card--${doc.status}`}>
                   <div className="av-doc-card-top">
                     <div className="av-doc-icon-wrap">
@@ -363,7 +392,7 @@ export default function AdminVerifications() {
                         <button
                           className="av-action-btn av-action-btn--approve"
                           onClick={() => handleVerifyAction(selectedUser._id, doc._id, 'verified')}
-                          disabled={processing}
+                          disabled={processingDocId === doc._id}
                         >
                           <CheckIcon style={{ fontSize: 15 }} />
                           {t('verification.status.verified')}
@@ -371,7 +400,7 @@ export default function AdminVerifications() {
                         <button
                           className="av-action-btn av-action-btn--reject"
                           onClick={() => handleVerifyAction(selectedUser._id, doc._id, 'rejected')}
-                          disabled={processing}
+                          disabled={processingDocId === doc._id}
                         >
                           <CloseIcon style={{ fontSize: 15 }} />
                           {t('verification.admin.reject')}
@@ -386,7 +415,7 @@ export default function AdminVerifications() {
         </DialogContent>
       </Dialog>
 
-      {/* â•â•â•â•â•â•â•â•â•â• Rejection Dialog â•â•â•â•â•â•â•â•â•â• */}
+      {/* Rejection Dialog */}
       <Dialog
         open={rejectionModalOpen}
         onClose={() => setRejectionModalOpen(false)}
@@ -433,9 +462,9 @@ export default function AdminVerifications() {
           <Button
             className="av-reject-confirm"
             variant="contained"
-            onClick={() => performVerification(targetDoc.userId, targetDoc.docId, 'rejected', rejectionReason)}
-            disabled={!rejectionReason.trim() || processing}
-            startIcon={processing ? <CircularProgress size={14} /> : <CloseIcon />}
+            onClick={() => targetDoc && performVerification(targetDoc.userId, targetDoc.docId, 'rejected', rejectionReason)}
+            disabled={!rejectionReason.trim() || processingDocId === targetDoc?.docId}
+            startIcon={processingDocId === targetDoc?.docId ? <CircularProgress size={14} /> : <CloseIcon />}
           >
             {t('verification.admin.reject')}
           </Button>

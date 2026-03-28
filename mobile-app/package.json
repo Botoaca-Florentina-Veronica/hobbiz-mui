@@ -80,7 +80,11 @@
   },
   "overrides": {
     "@tootallnate/once": "3.0.1",
-    "@isaacs/brace-expansion": ">=5.0.1",
+    "@isaacs/brace-expansion": ">=5.0.5",
+    "brace-expansion": "5.0.5",
+    "picomatch": "4.0.4",
+    "node-forge": "1.4.0",
+    "yaml": "2.8.3",
     "tar": "7.5.11",
     "fast-xml-parser": "5.5.7",
     "minimatch": ">=10.2.2",
