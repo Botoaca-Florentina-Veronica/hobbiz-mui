@@ -69,8 +69,8 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const allowedTabsInGuest = ['index'];
   
   // Accent adapts to theme: dark uses brand pink, light keeps existing blue tone
-  const activeColor = isDark ? tokens.colors.primary : '#355070';
-  const inactiveColor = isDark ? 'rgba(255,255,255,0.86)' : 'rgba(67,80,101,0.88)';
+  const activeColor = isDark ? tokens.colors.primary : '#1a2d47';
+  const inactiveColor = isDark ? 'rgba(255,255,255,0.86)' : '#1e293b';
   const isNative = Platform.OS !== 'web';
   // Keep mobile tab bar glass aligned with web header blur palette.
   const glassBaseColor = isDark ? 'rgba(18,18,18,0.34)' : 'rgba(38,62,98,0.14)';

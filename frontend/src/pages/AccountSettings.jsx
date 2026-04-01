@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './AccountSettings.css';
 import './NotificationSettingsPage.css';
-import { updateEmail, updatePassword, detectMitm, deleteAccount, logout, getProfile } from '../api/api';
+import { updateEmail, updatePassword, detectMitm, deleteAccount, resetUserData, logout, getProfile } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, Typography, Container, Paper, List, ListItem, ListItemText } from '@mui/material';
@@ -19,7 +19,9 @@ export default function AccountSettings() {
   const [mitmResult, setMitmResult] = useState(null);
   const [mitmLoading, setMitmLoading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const [successDelete, setSuccessDelete] = useState(false);
+  const [successReset, setSuccessReset] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastData, setToastData] = useState({ message: '', type: 'success' });
   const navigate = useNavigate();
@@ -55,6 +57,19 @@ export default function AccountSettings() {
     setShowPasswordChange(false);
     setMessage(null); // Clear messages when toggling
     setNewEmail(''); // Clear input when toggling
+  };
+
+  const handleResetUserData = async () => {
+    try {
+      await resetUserData();
+      setShowResetDialog(false);
+      setSuccessReset(true);
+      try { localStorage.removeItem('lastAvatarUrl'); } catch {}
+      setTimeout(() => setSuccessReset(false), 2500);
+    } catch (error) {
+      setShowResetDialog(false);
+      setMessage({ type: 'error', text: t('accountSettings.messages.resetError') });
+    }
   };
 
   const handlePasswordChangeClick = () => {
@@ -325,6 +340,19 @@ export default function AccountSettings() {
       {/* Delete Account */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
+          <ListItem button onClick={() => setShowResetDialog(true)} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText 
+              primary={t('accountSettings.menu.resetUserData')} 
+              primaryTypographyProps={{ fontWeight: 'bold', color: 'warning.main' }} 
+              className="mobile-setting-text"
+            />
+          </ListItem>
+        </List>
+      </Paper>
+
+      {/* Delete Account */}
+      <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
+        <List disablePadding>
           <ListItem button onClick={() => setShowDeleteDialog(true)} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
             <ListItemText 
               primary={t('accountSettings.menu.deleteAccount')} 
@@ -336,6 +364,17 @@ export default function AccountSettings() {
       </Paper>
 
       <ConfirmDialog
+        open={showResetDialog}
+        onClose={() => setShowResetDialog(false)}
+        onConfirm={handleResetUserData}
+        title={t('accountSettings.confirm.resetTitle')}
+        description={t('accountSettings.confirm.resetDescription')}
+        confirmText={t('accountSettings.buttons.confirmReset')}
+        cancelText={t('accountSettings.buttons.cancel')}
+        confirmColor="warning"
+      />
+
+      <ConfirmDialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
         onConfirm={handleDeleteAccount}
@@ -344,6 +383,9 @@ export default function AccountSettings() {
       />
       {successDelete && (
         <div className="message success" style={{textAlign:'center',marginTop:20}}>{t('accountSettings.messages.deleteSuccess')}</div>
+      )}
+      {successReset && (
+        <div className="message success" style={{textAlign:'center',marginTop:20}}>{t('accountSettings.messages.resetSuccess')}</div>
       )}
       
       <Toast

@@ -1094,6 +1094,7 @@
       "notifications": "Setează notificările",
       "billing": "Descarcă datele mele",
       "logoutAll": "Ieși din cont de pe toate dispozitivele",
+      "resetUserData": "Resetează datele contului",
       "deleteAccount": "Șterge contul"
     },
     "labels": {
@@ -1108,14 +1109,19 @@
     },
     "buttons": {
       "save": "Salvează",
+      "confirmReset": "Da, resetează datele",
       "confirmDelete": "Da, șterge contul",
       "cancel": "Anulează"
     },
     "confirm": {
+      "resetTitle": "Sigur vrei să resetezi datele contului?",
+      "resetDescription": "Această acțiune va șterge datele salvate de tine (anunțuri, mesaje, recenzii, favorite, notificări și profil extins), dar contul rămâne activ.",
       "deleteTitle": "Sigur vrei să ștergi contul?",
       "deleteDescription": "Această acțiune este ireversibilă. Toate anunțurile tale vor fi șterse."
     },
     "messages": {
+      "resetSuccess": "Datele contului au fost resetate cu succes.",
+      "resetError": "Eroare la resetarea datelor contului.",
       "deleteSuccess": "Contul tău a fost șters cu succes!",
       "deleteError": "Eroare la ștergerea contului.",
       "enterEmail": "Introduceți noua adresă de e-mail.",

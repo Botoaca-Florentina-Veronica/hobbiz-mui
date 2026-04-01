@@ -4,6 +4,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { execFile } = require('child_process');
 const Announcement = require('../models/Announcement');
+const Message = require('../models/Message');
+const Negotiation = require('../models/Negotiation');
+const Review = require('../models/Review');
+const Report = require('../models/Report');
+const ContactFallbackMessage = require('../models/ContactFallbackMessage');
 const multer = require('multer');
 const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
@@ -190,6 +195,88 @@ const deleteAccount = async (req, res) => {
   } catch (error) {
     console.error('Eroare la ștergerea contului:', error);
     res.status(500).json({ error: 'Eroare server la ștergerea contului' });
+  }
+};
+
+// Resetează datele utilizatorului, dar păstrează contul activ
+const resetUserData = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+
+    const userIdString = String(userId);
+    const userObjectId = new mongoose.Types.ObjectId(userIdString);
+    const favoriteIds = Array.isArray(user.favorites) ? user.favorites.map((id) => String(id)) : [];
+
+    // Ștergem datele generate de utilizator în platformă
+    await Promise.all([
+      Announcement.deleteMany({ user: userObjectId }),
+      Message.deleteMany({ $or: [{ senderId: userIdString }, { destinatarId: userIdString }] }),
+      Negotiation.deleteMany({ $or: [{ buyer: userObjectId }, { seller: userObjectId }] }),
+      Notification.deleteMany({ $or: [{ userId: userObjectId }, { fromUserId: userObjectId }] }),
+      Review.deleteMany({ $or: [{ user: userObjectId }, { author: userObjectId }] }),
+      Report.deleteMany({ $or: [{ reporter: userObjectId }, { announcementOwner: userObjectId }, { resolvedBy: userObjectId }] }),
+      ContactFallbackMessage.deleteMany({ $or: [{ userId: userObjectId }, { resolvedBy: userObjectId }] }),
+    ]);
+
+    // Eliminăm reacțiile (like/unlike) lăsate de utilizator la recenzii rămase
+    await Review.updateMany(
+      { $or: [{ likes: userObjectId }, { unlikes: userObjectId }] },
+      { $pull: { likes: userObjectId, unlikes: userObjectId } }
+    );
+
+    // Ajustăm numărul de favorite pentru anunțurile care au fost favorite de acest utilizator
+    if (favoriteIds.length > 0) {
+      await Promise.all(
+        favoriteIds.map((announcementId) =>
+          Announcement.updateOne(
+            { _id: announcementId },
+            [
+              {
+                $set: {
+                  favoritesCount: { $max: [{ $subtract: ['$favoritesCount', 1] }, 0] },
+                },
+              },
+            ]
+          )
+        )
+      );
+    }
+
+    // Reset profile/config la valori implicite (fără a șterge contul)
+    user.phone = undefined;
+    user.localitate = undefined;
+    user.avatar = undefined;
+    user.coverImage = undefined;
+    user.pushToken = [];
+    user.favorites = [];
+    user.reviews = [];
+    user.collaborations = [];
+    user.balance = 0;
+    user.notificationSettings = {
+      email: true,
+      push: true,
+      messages: true,
+      reviews: true,
+      favorites: true,
+      promotions: false,
+    };
+    user.documents = [];
+    user.isVerified = false;
+    user.verifiedAt = null;
+    user.verifiedBy = null;
+    user.passwordResetCodeHash = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    return res.json({ message: 'Datele contului au fost resetate cu succes.' });
+  } catch (error) {
+    console.error('Eroare la resetarea datelor utilizatorului:', error);
+    return res.status(500).json({ error: 'Eroare server la resetarea datelor utilizatorului.' });
   }
 };
 
@@ -1236,6 +1323,7 @@ const toggleUserVerification = async (req, res) => {
 
 module.exports = {
   deleteAccount,
+  resetUserData,
   register,
   login,
   getProfile,

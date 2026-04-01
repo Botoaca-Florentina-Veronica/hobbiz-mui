@@ -4,6 +4,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import { useTranslation } from 'react-i18next';
 
 export default function ConfirmDialog({ 
@@ -17,6 +19,13 @@ export default function ConfirmDialog({
   confirmColor = "error"
 }) {
   const { t } = useTranslation();
+  const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark-mode');
+
+  const semanticAccent = confirmColor === 'warning'
+    ? '#f59e0b'
+    : confirmColor === 'error'
+      ? '#ef4444'
+      : '#ec407a';
 
   return (
     <Dialog
@@ -25,52 +34,83 @@ export default function ConfirmDialog({
       maxWidth="xs"
       PaperProps={{
         sx: {
-          minWidth: 320,
-          padding: 2,
-          borderRadius: 4,
+          minWidth: { xs: 300, sm: 360 },
+          maxWidth: 460,
+          padding: { xs: 1.5, sm: 2 },
+          borderRadius: 5,
           backgroundImage: 'none',
-          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#3f3f3f' : 'white',
-          border: (theme) => theme.palette.mode === 'dark' ? '1px solid #575757' : 'none',
-          boxShadow: (theme) => theme.palette.mode === 'dark' 
-            ? '0 20px 60px rgba(0,0,0,0.6)' 
-            : '0 20px 60px rgba(0,0,0,0.1)'
+          backgroundColor: isDarkMode ? '#17171c' : '#ffffff',
+          border: isDarkMode ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(15,23,42,0.08)',
+          boxShadow: isDarkMode
+            ? '0 28px 90px rgba(0,0,0,0.72)'
+            : '0 20px 55px rgba(15,23,42,0.16)'
         }
       }}
       BackdropProps={{
         sx: {
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-          backgroundColor: (theme) => theme.palette.mode === 'dark' 
-            ? 'rgba(0, 0, 0, 0.7)' 
-            : 'rgba(0, 0, 0, 0.4)'
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          backgroundColor: isDarkMode ? 'rgba(6, 8, 12, 0.75)' : 'rgba(15, 23, 42, 0.35)'
         }
       }}
     >
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pt: 3, pb: 2 }}>
-        <Typography variant="h5" fontWeight={700} align="center" gutterBottom color="text.primary">
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pt: 2.5, pb: 1 }}>
+        <Box
+          sx={{
+            width: 54,
+            height: 54,
+            borderRadius: '50%',
+            display: 'grid',
+            placeItems: 'center',
+            mb: 1.5,
+            backgroundColor: isDarkMode ? 'rgba(245,158,11,0.18)' : 'rgba(245,158,11,0.14)',
+            border: `1px solid ${isDarkMode ? 'rgba(245,158,11,0.35)' : 'rgba(245,158,11,0.3)'}`
+          }}
+        >
+          <WarningAmberRoundedIcon sx={{ fontSize: 28, color: semanticAccent }} />
+        </Box>
+        <Typography
+          variant="h5"
+          fontWeight={800}
+          align="center"
+          gutterBottom
+          sx={{ color: isDarkMode ? '#f4f4f5' : '#111827', fontSize: { xs: '1.2rem', sm: '1.35rem' }, lineHeight: 1.3 }}
+        >
           {title || t('common.confirmTitle') || 'Confirmare'}
         </Typography>
         {description && (
-          <Typography variant="body1" align="center" color="text.secondary" sx={{ mt: 1, px: 2 }}>
+          <Typography
+            variant="body1"
+            align="center"
+            sx={{
+              mt: 0.5,
+              px: 1,
+              maxWidth: 410,
+              color: isDarkMode ? 'rgba(228,228,231,0.88)' : '#4b5563',
+              lineHeight: 1.55,
+              fontSize: { xs: '0.95rem', sm: '1rem' }
+            }}
+          >
             {description}
           </Typography>
         )}
       </DialogContent>
-      <DialogActions sx={{ justifyContent: 'center', gap: 2, pb: 2, pt: 1 }}>
+      <DialogActions sx={{ justifyContent: 'center', gap: 1.5, pb: 1.5, pt: 1.75, px: 1, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
         <Button 
           onClick={onClose} 
           variant="outlined" 
           size="large"
           sx={{ 
-            borderRadius: '12px', 
+            borderRadius: '12px',
             textTransform: 'none',
-            px: 4,
-            minWidth: 120,
-            borderColor: (theme) => theme.palette.mode === 'dark' ? '#575757' : '#e5e7eb',
-            color: 'text.primary',
+            fontWeight: 700,
+            px: 3,
+            minWidth: { xs: '100%', sm: 140 },
+            borderColor: isDarkMode ? 'rgba(255,255,255,0.24)' : '#d1d5db',
+            color: isDarkMode ? '#f3f4f6' : '#111827',
             '&:hover': {
-              borderColor: (theme) => theme.palette.mode === 'dark' ? '#777' : '#ccc',
-              backgroundColor: 'rgba(0,0,0,0.02)'
+              borderColor: isDarkMode ? 'rgba(255,255,255,0.42)' : '#9ca3af',
+              backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(2,6,23,0.04)'
             }
           }}
         >
@@ -84,10 +124,14 @@ export default function ConfirmDialog({
           sx={{ 
             borderRadius: '12px', 
             textTransform: 'none',
-            px: 4,
-            minWidth: 120,
-            boxShadow: 'none',
-            '&:hover': { boxShadow: 'none' }
+            fontWeight: 800,
+            letterSpacing: '0.01em',
+            px: 3,
+            minWidth: { xs: '100%', sm: 220 },
+            boxShadow: isDarkMode ? '0 10px 24px rgba(0,0,0,0.34)' : '0 8px 20px rgba(236,72,153,0.22)',
+            '&:hover': {
+              boxShadow: isDarkMode ? '0 14px 28px rgba(0,0,0,0.44)' : '0 10px 24px rgba(236,72,153,0.3)'
+            }
           }}
         >
           {confirmText || t('common.delete')}

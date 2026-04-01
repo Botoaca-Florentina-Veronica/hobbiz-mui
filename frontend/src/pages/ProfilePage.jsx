@@ -34,6 +34,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import apiClient from '../api/api';
 import ImageCropModal from '../components/ImageCropModal';
+import ImageZoomModal from '../components/ImageZoomModal';
 import LocationSelector from '../components/LocationSelector';
 import './ProfilePage.css';
 
@@ -79,6 +80,7 @@ export default function ProfilePage() {
   // UI preferences
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [avatarZoomOpen, setAvatarZoomOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   
   // Refs
@@ -228,6 +230,15 @@ export default function ProfilePage() {
 
   const handleAvatarClick = () => {
     if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleAvatarZoomOpen = () => {
+    if (!profile?.avatar) return;
+    setAvatarZoomOpen(true);
+  };
+
+  const handleAvatarZoomClose = () => {
+    setAvatarZoomOpen(false);
   };
 
   const handleCoverClick = () => {
@@ -417,14 +428,23 @@ export default function ProfilePage() {
       <div
         className={`profile-avatar-unified ${
           avatarUploading ? 'uploading' : ''
-        }`}
-        onClick={handleAvatarClick}
+        } ${profile?.avatar ? 'clickable' : ''}`}
+        onClick={handleAvatarZoomOpen}
+        role={profile?.avatar ? 'button' : undefined}
+        tabIndex={profile?.avatar ? 0 : -1}
+        onKeyDown={(e) => {
+          if (!profile?.avatar) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleAvatarZoomOpen();
+          }
+        }}
       >
         {profile?.avatar ? (
           <img
             src={profile.avatar}
             alt={t('profile.editAvatar')}
-            className="profile-avatar-image"
+            className="profile-avatar-image profile-avatar-clickable"
           />
         ) : (
           <PersonIcon className="profile-person-icon" />
@@ -561,7 +581,12 @@ export default function ProfilePage() {
     <div className="mobile-profile-header-card">
       <div className="mobile-avatar-container">
         {profile?.avatar ? (
-          <img src={profile.avatar} alt="Avatar" className="mobile-avatar-image" />
+          <img
+            src={profile.avatar}
+            alt="Avatar"
+            className="mobile-avatar-image mobile-avatar-clickable"
+            onClick={handleAvatarZoomOpen}
+          />
         ) : (
           <div className="mobile-avatar-placeholder">
             <PersonIcon className="mobile-avatar-icon" />
@@ -1015,6 +1040,15 @@ export default function ProfilePage() {
         onSave={handleCoverSave}
         onDelete={handleCoverDelete}
         uploading={coverUploading}
+      />
+
+      <ImageZoomModal
+        open={avatarZoomOpen}
+        images={profile?.avatar ? [profile.avatar] : []}
+        index={0}
+        onClose={handleAvatarZoomClose}
+        onPrev={null}
+        onNext={null}
       />
 
       {/* Location Selector Modal */}

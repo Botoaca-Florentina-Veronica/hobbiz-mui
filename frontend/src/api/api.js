@@ -9,6 +9,8 @@ export const deleteMessage = (id) => apiClient.delete(`/api/messages/${id}`);
 export const getMessagesBetween = (userId1, userId2) => apiClient.get(`/api/messages/between/${userId1}/${userId2}`);
 // Șterge contul utilizatorului și toate anunțurile sale
 export const deleteAccount = () => apiClient.delete('/api/users/delete-account');
+// Resetează datele utilizatorului fără a șterge contul
+export const resetUserData = () => apiClient.post('/api/users/reset-data');
 // frontend/src/api/index.js
 import axios from 'axios';
 

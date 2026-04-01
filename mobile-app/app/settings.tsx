@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '../src/context/ThemeContext';
 import storage from '../src/services/storage';
 import { router } from 'expo-router';
-import { updateEmail, updatePassword, deleteAccount } from '../src/services/auth';
+import { updateEmail, updatePassword, deleteAccount, resetUserData } from '../src/services/auth';
 import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
@@ -36,6 +36,7 @@ export default function SettingsScreen() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [resetModalVisible, setResetModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const { locale } = useLocale();
@@ -106,6 +107,7 @@ export default function SettingsScreen() {
     { key: 'notifications', label: 'Setează notificările', icon: 'notifications-outline' },
     { key: 'billing', label: 'Descarcă datele mele', icon: 'download-outline' },
     { key: 'logout-devices', label: 'Ieși din cont de pe toate dispozitivele', icon: 'phone-portrait-outline' },
+    { key: 'reset-user-data', label: 'Resetează datele contului', icon: 'refresh-circle-outline' },
     { key: 'delete-account', label: 'Șterge contul', icon: 'trash-outline' },
   ];
 
@@ -155,6 +157,23 @@ export default function SettingsScreen() {
 
   const handleDeleteAccount = () => {
     setDeleteModalVisible(true);
+  };
+
+  const handleResetUserData = () => {
+    setResetModalVisible(true);
+  };
+
+  const confirmResetUserData = async () => {
+    setResetModalVisible(false);
+    setIsLoading(true);
+    try {
+      await resetUserData();
+      showToast(t.resetDataSuccess, 'success');
+    } catch (e: any) {
+      showToast(e?.message || t.resetDataError, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const confirmDeleteAccount = async () => {
@@ -267,6 +286,7 @@ export default function SettingsScreen() {
                 onPress={() => {
                   if (item.expandable) return toggleSection(item.key);
                   if (item.key === 'delete-account') return handleDeleteAccount();
+                  if (item.key === 'reset-user-data') return handleResetUserData();
                   if (item.key === 'archived-announcements') return router.push('/archived-announcements');
                   if (item.key === 'logout-devices') return handleLogoutAllDevices();
                   if (item.key === 'notifications') return router.push('/notification-settings');
@@ -417,6 +437,58 @@ export default function SettingsScreen() {
               >
                 <ThemedText style={[styles.modalButtonText, { color: '#ffffff', fontWeight: '700' }]}>
                   {isLoading ? (locale === 'ro' ? 'Se procesează...' : 'Processing...') : (locale === 'ro' ? 'Ieși' : 'Logout')}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BlurView>
+      </Modal>
+
+      {/* Reset Data Modal */}
+      <Modal
+        visible={resetModalVisible}
+        transparent
+        animationType="fade"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent={true}
+        onRequestClose={() => setResetModalVisible(false)}
+      >
+        <BlurView
+          intensity={80}
+          tint={isDark ? 'dark' : 'light'}
+          experimentalBlurMethod="dimezisBlurView"
+          style={[StyleSheet.absoluteFill, styles.modalOverlay, { zIndex: 1000 }]}
+        >
+          <View style={[styles.deleteModalCard, { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border }]}> 
+            <View style={[styles.modalIconContainer, { backgroundColor: isDark ? 'rgba(255, 152, 0, 0.16)' : 'rgba(255, 152, 0, 0.1)' }]}> 
+              <Ionicons name="refresh-circle-outline" size={32} color={isDark ? '#ffb74d' : '#ef6c00'} />
+            </View>
+
+            <ThemedText style={[styles.modalTitle, { color: tokens.colors.text }]}>
+              {t.resetDataTitle}
+            </ThemedText>
+
+            <ThemedText style={[styles.modalMessage, { color: tokens.colors.muted }]}>
+              {t.resetDataMessage}
+            </ThemedText>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel, { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg, borderColor: tokens.colors.border }]}
+                onPress={() => setResetModalVisible(false)}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.modalButtonText, { color: tokens.colors.text }]}>{t.cancel}</ThemedText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm, { backgroundColor: isDark ? '#ff9800' : '#ef6c00' }]}
+                onPress={confirmResetUserData}
+                activeOpacity={0.8}
+                disabled={isLoading}
+              >
+                <ThemedText style={[styles.modalButtonText, { color: '#ffffff', fontWeight: '700' }]}>
+                  {isLoading ? (locale === 'ro' ? 'Se procesează...' : 'Processing...') : t.resetAction}
                 </ThemedText>
               </TouchableOpacity>
             </View>

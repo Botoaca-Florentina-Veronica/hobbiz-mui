@@ -1094,6 +1094,7 @@
       "notifications": "Notification settings",
       "billing": "Download my data",
       "logoutAll": "Log out from all devices",
+      "resetUserData": "Reset account data",
       "deleteAccount": "Delete account"
     },
     "labels": {
@@ -1108,14 +1109,19 @@
     },
     "buttons": {
       "save": "Save",
+      "confirmReset": "Yes, reset data",
       "confirmDelete": "Yes, delete account",
       "cancel": "Cancel"
     },
     "confirm": {
+      "resetTitle": "Are you sure you want to reset your account data?",
+      "resetDescription": "This action removes your saved data (announcements, messages, reviews, favorites, notifications, and extended profile), but keeps your account active.",
       "deleteTitle": "Are you sure you want to delete your account?",
       "deleteDescription": "This action is irreversible. All your announcements will be deleted."
     },
     "messages": {
+      "resetSuccess": "Your account data was reset successfully.",
+      "resetError": "Error resetting account data.",
       "deleteSuccess": "Your account was deleted successfully!",
       "deleteError": "Error deleting account.",
       "enterEmail": "Please enter the new email address.",

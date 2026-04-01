@@ -68,3 +68,13 @@ export async function deleteAccount() {
     throw new Error(msg);
   }
 }
+
+export async function resetUserData() {
+  try {
+    const res = await api.post('/api/users/reset-data');
+    return res.data;
+  } catch (e: any) {
+    const msg = e?.response?.data?.error || 'Nu s-au putut reseta datele contului';
+    throw new Error(msg);
+  }
+}

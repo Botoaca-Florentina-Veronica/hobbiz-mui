@@ -1089,6 +1089,7 @@
       "notifications": "Configuración de notificaciones",
       "billing": "Descargar mis datos",
       "logoutAll": "Cerrar sesión en todos los dispositivos",
+      "resetUserData": "Restablecer datos de la cuenta",
       "deleteAccount": "Eliminar cuenta"
     },
     "labels": {
@@ -1103,14 +1104,19 @@
     },
     "buttons": {
       "save": "Guardar",
+      "confirmReset": "Sí, restablecer datos",
       "confirmDelete": "Sí, eliminar cuenta",
       "cancel": "Cancelar"
     },
     "confirm": {
+      "resetTitle": "¿Seguro que quieres restablecer los datos de tu cuenta?",
+      "resetDescription": "Esta acción elimina tus datos guardados (anuncios, mensajes, reseñas, favoritos, notificaciones y perfil extendido), pero mantiene tu cuenta activa.",
       "deleteTitle": "¿Estás seguro de eliminar tu cuenta?",
       "deleteDescription": "Esta acción es irreversible. Todos tus anuncios serán eliminados."
     },
     "messages": {
+      "resetSuccess": "Los datos de tu cuenta se restablecieron correctamente.",
+      "resetError": "Error al restablecer los datos de la cuenta.",
       "deleteSuccess": "¡Tu cuenta fue eliminada correctamente!",
       "deleteError": "Error al eliminar la cuenta.",
       "enterEmail": "Por favor ingresa el nuevo email.",

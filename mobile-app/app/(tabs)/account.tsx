@@ -75,7 +75,7 @@ export default function AccountScreen() {
     headerBgEnd: isDark ? tokens.colors.primaryHover : tokens.colors.primaryHover,
     headerText: '#ffffff',
     // Name accent color within header greeting
-    nameAccent: isDark ? '#ffffff' : '#000000',
+    nameAccent: '#000000',
     // Background for circular icons on rows
     iconBg: isDark ? tokens.colors.elev : '#F3F5F6',
   // Icon color (pink in dark mode)
@@ -845,7 +845,6 @@ const styles = StyleSheet.create({
     height: 128,
     zIndex: 50,
     elevation: 50,
-    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -854,7 +853,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   nightShift: {
-    transform: [{ translateY: 8 }],
+    transform: [
+      { scale: 1.3 },
+      { translateX: 25 },
+      { translateY: -2 }
+    ],
   },
   modalBtn: {
     paddingVertical: 12,

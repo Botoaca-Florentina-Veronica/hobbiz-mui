@@ -199,6 +199,15 @@ body:not(.dark-mode) .profile-header-unified {
   position: relative;
 }
 
+.profile-avatar-unified.clickable {
+  cursor: zoom-in;
+}
+
+.profile-avatar-unified.clickable:focus-visible {
+  outline: 3px solid rgba(236, 64, 122, 0.45);
+  outline-offset: 3px;
+}
+
 .profile-avatar-unified img {
   width: 100%;
   height: 100%;
@@ -1128,6 +1137,10 @@ body:not(.dark-mode) .profile-about-card {
   height: 80px;
   border-radius: 40px;
   object-fit: cover;
+}
+
+.mobile-avatar-clickable {
+  cursor: zoom-in;
 }
 
 .mobile-avatar-placeholder {
