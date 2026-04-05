@@ -30,6 +30,11 @@ export default function LoginScreen() {
 
   const locale = (Intl && Intl?.DateTimeFormat && (Intl.DateTimeFormat().resolvedOptions().locale || 'ro')) || 'ro';
   const t = locale === 'en' ? { auth: 'Authentication', authError: 'Error processing authentication' } : { auth: 'Autentificare', authError: 'Eroare la procesarea autentificării' };
+  const socialAuthNotice = locale.startsWith('en')
+    ? 'Social login is currently available only with Google. Facebook and Apple are in progress.'
+    : locale.startsWith('es')
+      ? 'El inicio de sesion social esta disponible por ahora solo con Google. Facebook y Apple estan en desarrollo.'
+      : 'Autentificarea sociala este disponibila momentan doar cu Google. Facebook si Apple sunt in curs de implementare.';
 
   // Calculează lățimea cardului în funcție de dimensiunea ecranului
   const getCardWidth = (): number | string => {
@@ -243,10 +248,12 @@ export default function LoginScreen() {
               { 
                 backgroundColor: '#1877f2',
                 paddingVertical: responsiveSizes.buttonPadding,
+                opacity: 0.6,
               }
             ]} 
             activeOpacity={0.85} 
-            onPress={() => {/* placeholder */}}
+            disabled
+            onPress={() => {}}
           >
             <Ionicons name="logo-facebook" size={responsiveSizes.iconSize} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
             <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast, fontSize: responsiveSizes.buttonFontSize }]}>
@@ -260,16 +267,24 @@ export default function LoginScreen() {
               { 
                 backgroundColor: '#000000',
                 paddingVertical: responsiveSizes.buttonPadding,
+                opacity: 0.6,
               }
             ]} 
             activeOpacity={0.85} 
-            onPress={() => {/* placeholder */}}
+            disabled
+            onPress={() => {}}
           >
             <Ionicons name="logo-apple" size={responsiveSizes.iconSize} color={tokens.colors.primaryContrast} style={styles.socialIcon} />
             <ThemedText style={[styles.socialText, { color: tokens.colors.primaryContrast, fontSize: responsiveSizes.buttonFontSize }]}>
               Continuă cu Apple
             </ThemedText>
           </TouchableOpacity>
+        </View>
+        <View style={[styles.socialNotice, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.surfaceSecondary || tokens.colors.surface }]}>
+          <Ionicons name="information-circle-outline" size={18} color={tokens.colors.primary} style={styles.socialNoticeIcon} />
+          <ThemedText style={[styles.socialNoticeText, { color: tokens.colors.muted }]}>
+            {socialAuthNotice}
+          </ThemedText>
         </View>
         <View style={styles.dividerWrap}>
           <View style={[styles.divider, { borderColor: tokens.colors.border }]} />
@@ -389,6 +404,18 @@ const styles = StyleSheet.create({
   facebookBtn: { backgroundColor: '#1877F2', borderColor: '#1877F2' },
   appleBtn: { backgroundColor: '#000', borderColor: '#000' },
   dividerWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  socialNotice: {
+    marginTop: -2,
+    marginBottom: 2,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  socialNoticeIcon: { marginRight: 8, marginTop: 1 },
+  socialNoticeText: { flex: 1, fontSize: 13, lineHeight: 18, fontWeight: '500' },
   divider: { flex: 1, borderBottomWidth: 1 },
   dividerText: { fontSize: 12, fontWeight: '600', letterSpacing: 1 },
   input: { borderWidth: 1, borderRadius: 8 },

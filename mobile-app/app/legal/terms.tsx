@@ -54,7 +54,9 @@ export default function TermsScreen() {
 
         {/* Hero Header (desktop style is hidden on web mobile, we'll show compact) */}
         <View style={[styles.desktopHeader, { backgroundColor: WEB_PRIMARY }]}>          
-          <ThemedText style={styles.headerIcon}>📝</ThemedText>
+          <View style={styles.headerIconCircle}>
+            <ThemedText style={styles.headerIcon}>📝</ThemedText>
+          </View>
           <ThemedText style={styles.headerH1}>{isEn ? 'Terms and Conditions' : isEs ? 'Terminos y condiciones' : 'Termeni și condiții'}</ThemedText>
           <ThemedText style={styles.headerDate}>{isEn ? 'Last updated: December 13, 2025' : isEs ? 'Ultima actualizacion: 13 de diciembre de 2025' : 'Ultima actualizare: 13 decembrie 2025'}</ThemedText>
           <View style={styles.radialOverlay} />
@@ -519,11 +521,53 @@ const styles = StyleSheet.create({
   backButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   pageTitle: { fontSize: 22, fontWeight: '700' },
 
-  desktopHeader: { marginTop: 40, borderRadius: 24, padding: 40, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' },
-  headerIcon: { fontSize: 54, marginBottom: 16, zIndex: 2 },
-  headerH1: { fontSize: 40, fontWeight: '700', letterSpacing: -0.5, color: '#fff', zIndex: 2, marginBottom: 12 },
-  headerDate: { fontSize: 15, color: 'rgba(255,255,255,0.9)', zIndex: 2 },
-  radialOverlay: { position: 'absolute', top: -120, right: -120, width: 360, height: 360, backgroundColor: 'rgba(252,194,46,0.15)', borderRadius: 360, transform: [{ rotate: '30deg' }] },
+  desktopHeader: {
+    marginTop: 40,
+    borderRadius: 20,
+    padding: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 8,
+  },
+  headerIconCircle: {
+    width: 54,
+    height: 54,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    zIndex: 2,
+  },
+  headerIcon: { fontSize: 28, zIndex: 2 },
+  headerH1: {
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: -0.4,
+    color: '#ffffff',
+    zIndex: 2,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  headerDate: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.95)',
+    zIndex: 2,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    marginTop: 4,
+  },
+  radialOverlay: { position: 'absolute', top: -120, right: -120, width: 360, height: 360, backgroundColor: 'rgba(252,194,46,0.17)', borderRadius: 360, transform: [{ rotate: '30deg' }] },
 
   introCard: { borderRadius: 20, padding: 28, backgroundColor: WEB_ACCENT, shadowColor: WEB_ACCENT_GRAD_TO, shadowOpacity: 0.3, shadowRadius: 32, shadowOffset: { width: 0, height: 8 }, elevation: 4 },
   introRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 20 },

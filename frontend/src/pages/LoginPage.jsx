@@ -31,34 +31,6 @@ export default function LoginPage() {
     return () => document.body.classList.remove('login-page');
   }, []);
 
-  useEffect(() => {
-    const adjust = () => {
-      if (!loginRef.current || !imgRef.current) return;
-      // On small screens let image be natural height
-      if (window.innerWidth < 900) {
-        imgRef.current.style.height = '';
-        return;
-      }
-      const h = loginRef.current.offsetHeight;
-      imgRef.current.style.height = `${h}px`;
-    };
-
-    adjust();
-
-    let ro;
-    if (window.ResizeObserver && loginRef.current) {
-      ro = new ResizeObserver(() => adjust());
-      ro.observe(loginRef.current);
-    }
-
-    window.addEventListener('resize', adjust);
-    return () => {
-      window.removeEventListener('resize', adjust);
-      if (ro) ro.disconnect();
-      if (imgRef.current) imgRef.current.style.height = '';
-    };
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -87,10 +59,16 @@ export default function LoginPage() {
   const language = i18n?.language || 'ro';
   const useIntroEs = language.startsWith('es');
   const useIntroEn = language.startsWith('en');
+  const socialAuthNotice = useIntroEn
+    ? 'Social login is currently available only with Google. Facebook and Apple login are in progress.'
+    : useIntroEs
+      ? 'El inicio de sesion social esta disponible por ahora solo con Google. Facebook y Apple estan en desarrollo.'
+      : 'Autentificarea socială este disponibilă momentan doar cu Google. Facebook și Apple sunt în curs de implementare.';
 
   return (
-    <div className="login-page-main">
-      {useIntroEs || useIntroEn ? (
+    <div className="login-page-wrapper">
+      <div className="login-page-main">
+        {useIntroEs || useIntroEn ? (
         <img
           src={useIntroEs ? introImgEs : introImgEn}
           alt="Intro"
@@ -124,8 +102,13 @@ export default function LoginPage() {
         {/* Butoane sociale */}
         <div className="social-login">
           <GoogleLoginButton />
-          <FacebookLoginButton onClick={() => console.log('Facebook login')} />
-          <AppleLoginButton onClick={() => console.log('Apple login')} />
+          <FacebookLoginButton disabled />
+          <AppleLoginButton disabled />
+        </div>
+
+        <div className="social-auth-notice" role="status" aria-live="polite">
+          <span className="social-auth-notice__icon" aria-hidden="true">i</span>
+          <span>{socialAuthNotice}</span>
         </div>
 
         <div className="divider">{t('auth.or')}</div>
@@ -179,6 +162,7 @@ export default function LoginPage() {
           <Link to="/signup">{t('auth.createAccount')}</Link>
         </div>
       </div>
+    </div>
     </div>
   );
 }

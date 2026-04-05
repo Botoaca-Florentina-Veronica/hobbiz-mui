@@ -1,12 +1,13 @@
- /* Stiluri pentru containerul de login/signup */
+/* ========================================
+   Login / Signup Shared Base Styles
+======================================== */
 .login-container {
   background-color: white;
   max-width: 400px;
-  /* more space above login container for better vertical breathing room */
   margin: 3.5rem auto 2rem auto;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   font-family: 'Poppins', sans-serif !important;
 }
 
@@ -18,18 +19,24 @@
 }
 
 @media (min-width: 900px) {
-  .login-container { margin-top: 5.5rem; }
+  .login-container {
+    margin-top: 5.5rem;
+  }
 }
 
-/* Extra spacing for signup page container */
 .signup-container {
-  margin-top: 4.5rem; /* more space above the signup form */
+  margin-top: 4.5rem;
 }
 
 @media (min-width: 900px) {
-  .signup-container { margin-top: 6rem; }
+  .signup-container {
+    margin-top: 6rem;
+  }
 }
 
+/* ========================================
+   Form Controls
+======================================== */
 .email-login {
   display: flex;
   flex-direction: column;
@@ -37,24 +44,17 @@
 }
 
 .email-login input {
+  width: 100%;
+  height: 44px;
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-family: 'Poppins', sans-serif !important;
-  width: 100%;
   box-sizing: border-box;
-  height: 44px;
-}
-
-.login-links {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-  cursor: pointer;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .submit-btn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 0.75rem;
   border: none;
@@ -68,15 +68,24 @@
   background-color: #cccccc;
 }
 
+/* ========================================
+   Links, Messages, Notices
+======================================== */
 .login-links {
+  display: flex;
+  justify-content: space-between;
   margin-top: 1rem;
   text-align: center;
+  cursor: pointer;
+  gap: 1rem;
+  min-width: 0;
 }
 
 .login-links a {
   color: var(--link-color);
   text-decoration: none;
   font-family: 'Poppins', sans-serif !important;
+  min-width: 0;
 }
 
 .error-message {
@@ -93,54 +102,325 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Password toggle wrapper */
+.social-auth-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: -0.5rem 0 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(53, 80, 112, 0.18);
+  background: rgba(53, 80, 112, 0.06);
+  color: #355070;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.social-auth-notice__icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: #355070;
+  color: #fff;
+  flex: 0 0 18px;
+  margin-top: 1px;
+}
+
+/* ========================================
+   Password Field Toggle
+======================================== */
 .password-field-wrapper {
   position: relative;
   display: flex;
   align-items: stretch;
   height: 44px;
 }
+
 .password-field-wrapper input {
   flex: 1;
-  padding-right: 44px; /* spațiu pentru buton icon */
+  padding-right: 44px;
   box-sizing: border-box;
 }
+
 .toggle-password-btn {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #355070;
-  cursor: pointer;
-  padding: 4px;
   width: 28px;
   height: 28px;
+  padding: 4px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: #355070;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: background .2s ease, color .2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
   font-family: 'Poppins', sans-serif !important;
 }
-.toggle-password-btn:hover, .toggle-password-btn:focus-visible {
-  background: rgba(53,80,112,0.08);
+
+.toggle-password-btn:hover,
+.toggle-password-btn:focus-visible {
+  background: rgba(53, 80, 112, 0.08);
   outline: none;
 }
-.toggle-password-btn:active { transform: translateY(calc(-50% + 1px)); }
 
-/* Dark mode adjustments */
-.dark-mode .toggle-password-btn { color: #f51866; }
-.dark-mode .toggle-password-btn:hover, .dark-mode .toggle-password-btn:focus-visible {
-  background: rgba(245,24,102,0.15);
+.toggle-password-btn:active {
+  transform: translateY(calc(-50% + 1px));
 }
 
-/* Dark Mode Styles */
-.dark-mode .login-container {
-  background: #282828; /* solid, the darker color from the previous gradient */
+/* ========================================
+   Login Page Layout (Desktop First)
+======================================== */
+.login-page-wrapper {
+  min-height: calc(100vh - 30px);
+  margin-top: 30px;
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.login-page-main {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  max-width: 920px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+.login-page-main .login-container {
+  margin: 0;
+  width: 100%;
+  max-width: 420px;
+  min-width: 0;
+  padding: 0.2rem 1.8rem;
+  border-radius: 0 8px 8px 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-page-main .login-container h2 {
+  margin-bottom: 1.1rem;
+}
+
+.login-page-main > picture,
+.login-page-main > .login-intro-image {
+  flex: 1;
+  width: 100%;
+  max-width: 500px;
+}
+
+.login-intro-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px 0 0 8px;
+  display: block;
+}
+
+/* ========================================
+   Responsive Breakpoints
+======================================== */
+@media (max-width: 900px) {
+  .login-page-wrapper {
+    min-height: calc(100dvh - 30px);
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .login-page-main {
+    flex-direction: column;
+    max-width: 100%;
+    padding: 0;
+    gap: 0;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .login-intro-image,
+  .login-page-main > picture {
+    display: none !important;
+  }
+
+  .login-page-main .login-container {
+    width: min(100%, 720px);
+    max-width: 720px;
+    margin: 3.5rem auto 0 auto;
+    padding: 2.4rem 1.5rem;
+    min-height: 860px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .login-page-wrapper {
+    padding: 0.875rem;
+  }
+
+  .login-page-main .login-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.9rem 1.1rem;
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-page-wrapper {
+    margin-top: 1rem;
+    min-height: 100dvh;
+    padding: 0.75rem;
+    padding-top: 2rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .login-page-main {
+    width: 100%;
+  }
+
+  .login-page-main .login-container {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 3rem;
+    padding: 1.35rem 0.9rem;
+    border-radius: 10px;
+  }
+
+  .login-page-main .login-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .email-login {
+    gap: 0.7rem;
+  }
+
+  .email-login input,
+  .submit-btn {
+    font-size: 0.95rem;
+  }
+
+  .divider {
+    margin: 0.7rem 0;
+  }
+
+  .social-login {
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-links {
+    margin-top: 0.7rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    column-gap: 1rem;
+  }
+
+  .login-links a {
+    flex: 1 1 45%;
+    text-align: center;
+    font-size: 0.95rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .social-auth-notice {
+    padding: 9px 10px;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-page-wrapper {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  .login-page-main .login-container {
+    padding: 1.2rem 0.8rem;
+  }
+
+  .login-page-main .login-container h2 {
+    font-size: 1.35rem;
+  }
+
+  .social-btn {
+    padding: 10px;
+  }
+
+  .social-auth-notice {
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-page-main .login-container {
+    padding: 1rem 0.7rem;
+  }
+
+  .email-login input,
+  .submit-btn,
+  .social-btn {
+    font-size: 0.9rem;
+  }
+}
+
+/* ========================================
+   Dark Mode
+======================================== */
+.dark-mode .login-page-main {
+  background-color: #282828;
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .login-container {
+  background: transparent;
+  border: none;
   color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .dark-mode .login-page-main {
+    background-color: transparent !important;
+    border: none;
+  }
+
+  .dark-mode .login-container {
+    background: #282828;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+.dark-mode .toggle-password-btn {
+  color: #f51866;
+}
+
+.dark-mode .toggle-password-btn:hover,
+.dark-mode .toggle-password-btn:focus-visible {
+  background: rgba(245, 24, 102, 0.15);
 }
 
 .dark-mode .email-login input {
@@ -184,68 +464,28 @@
   color: #ffffff;
 }
 
-/* New layout: center intro image and login form side-by-side on wide screens */
-/* Compensate for the fixed header (72px) so centering is visually correct */
-.login-page-main {
-  height: calc(100vh - 72px); /* available viewport under header */
-  margin-top: 72px; /* push below fixed header */
-  display: flex;
-  align-items: center; /* vertical centering within available area */
-  justify-content: center; /* horizontal centering */
-  gap: 0;
-  padding: 2rem;
-  box-sizing: border-box;
-  width: 100%;
+.dark-mode .social-auth-notice {
+  border-color: rgba(245, 24, 102, 0.35);
+  background: rgba(245, 24, 102, 0.12);
+  color: #ffd3e3;
 }
 
-.login-page-main .login-container {
-  margin: 0;
-  max-width: 420px;
-  width: 100%;
-  border-radius: 0 8px 8px 0;
+.dark-mode .social-auth-notice__icon {
+  background: #f51866;
 }
 
-.login-intro-image {
-  max-width: 500px;
-  width: auto;
-  height: auto; /* dynamic height is set via JS on wide screens */
-  object-fit: cover;
-  border-radius: 8px 0 0 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.06);
-  display: block;
-  max-height: 90vh;
-}
-
-/* Responsive: stack vertically on small screens */
-@media (max-width: 900px) {
-  .login-page-main {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  /* Hide the intro image on small screens to save space */
-  .login-intro-image {
-    display: none !important;
-  }
-  .login-page-main .login-container {
-    max-width: 520px;
-    border-radius: 8px; /* full rounded corners when image is hidden */
-  }
-}
-
-/* Ensure the login/signup pages always have a full-viewport themed background
-   (fixes cases where html zoom or layout causes a white/incorrect strip at the bottom) */
+/* ========================================
+   Login Page Background & Footer Overrides
+======================================== */
 body.login-page::before {
   content: '';
   position: fixed;
   inset: 0;
-  /* Subtle bluish tint for light mode so containers pop against the background */
   background: #f4f8ff;
   pointer-events: none;
   z-index: -9999;
 }
 
-/* Override footer colors when on the login page to keep visual consistency */
 body.login-page .footer,
 body.login-page .desktop-footer,
 body.login-page .footer-mobile-buttons,
@@ -254,10 +494,9 @@ body.login-page .mobile-legal {
 }
 
 body.login-page .footer-separator {
-  background: rgba(53,80,112,0.06) !important; /* subtle bluish divider */
+  background: rgba(53, 80, 112, 0.06) !important;
 }
 
-/* In dark mode, use the themed app background */
 .dark-mode body.login-page::before,
 body.login-page.dark-mode::before {
   background: #121212;

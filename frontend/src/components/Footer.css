@@ -8,6 +8,17 @@
   /* --- Colors (Light Mode) --- */
   --ft-bg-main: var(--bg-secondary);
   --ft-text-main: var(--text-primary);
+
+  /* Sizing & motion tokens */
+  --ft-mobile-height: 65px;
+  --ft-mobile-min-height: 60px;
+  --ft-mobile-max-height: 80px;
+  --ft-active-indicator-height: 3px;
+  --ft-icon-size: 24px;
+  --ft-icon-label-size: 0.7rem;
+  --ft-icon-gap: 0.2rem;
+  --ft-pub-size: 32px;
+  --ft-pub-svg-size: 22px;
   
   /* Mobile Bar */
   --ft-mob-bg: var(--bg-secondary);
@@ -135,22 +146,22 @@
   /* Mobile Bar Container */
   .footer-mobile-buttons {
     position: fixed !important; left: 0; bottom: 0;
-    width: 100%; height: 65px;
-    --footer-height: 65px;
+    width: 100%; height: var(--ft-mobile-height);
+    --footer-height: var(--ft-mobile-height);
     display: flex !important;
     flex-direction: column; justify-content: flex-end; align-items: center;
     background: var(--ft-mob-bg);
     border-top: 1px solid var(--ft-mob-border);
     box-shadow: var(--ft-mob-shadow);
     z-index: 1000; padding: 0;
-    min-height: 60px; max-height: 80px;
+    min-height: var(--ft-mobile-min-height); max-height: var(--ft-mobile-max-height);
     /* Safe Area */
     padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
   }
 
   /* Active Indicator */
   .footer-active-indicator {
-    position: absolute; top: 0; height: 3px;
+    position: absolute; top: 0; height: var(--ft-active-indicator-height);
     background: var(--primary);
     border-radius: 0 0 2px 2px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -178,7 +189,7 @@
     flex-direction: column; align-items: center; justify-content: center;
     height: 100%; cursor: pointer;
     color: var(--ft-mob-icon);
-    font-size: 0.7rem; gap: 0.2rem;
+    font-size: var(--ft-icon-label-size); gap: var(--ft-icon-gap);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none; border: none; background: none;
     padding: 0.5rem; position: relative;
@@ -191,7 +202,7 @@
 
   /* Icon SVG & Text */
   .footer-mobile-buttons .footer-icon svg {
-    width: 24px; height: 24px; margin-bottom: 0.2rem;
+    width: var(--ft-icon-size); height: var(--ft-icon-size); margin-bottom: var(--ft-icon-gap);
     stroke: currentColor; fill: currentColor; stroke-width: 1.5;
     transition: transform 0.2s; position: relative; z-index: 1;
   }
@@ -199,7 +210,7 @@
   .footer-mobile-buttons .footer-icon.active svg { transform: scale(1.05); }
 
   .footer-mobile-buttons .footer-icon span {
-    font-size: 0.7rem; font-weight: 500; color: inherit;
+    font-size: var(--ft-icon-label-size); font-weight: 500; color: inherit;
     transition: transform 0.2s; position: relative; z-index: 1;
   }
   .footer-mobile-buttons .footer-icon:hover span { 
@@ -212,9 +223,9 @@
   .footer-mobile-buttons .footer-publish-icon {
     background: var(--ft-pub-bg);
     color: var(--ft-pub-text);
-    width: 32px; height: 32px; border-radius: 50%;
+    width: var(--ft-pub-size); height: var(--ft-pub-size); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    line-height: 0; margin-bottom: 0.2rem;
+    line-height: 0; margin-bottom: var(--ft-icon-gap);
     box-shadow: var(--ft-pub-shadow);
     transition: all 0.25s;
     /* Dark Mode specific border logic handled via bg variable */
@@ -236,7 +247,7 @@
   }
 
   .footer-publish .footer-publish-svg {
-    display: block; line-height: 0; font-size: 22px; margin: 0;
+    display: block; line-height: 0; font-size: var(--ft-pub-svg-size); margin: 0;
     transition: transform 0.2s;
     /* Color override for dark mode hover */
     color: inherit; stroke: inherit;
@@ -293,13 +304,8 @@
   
   .mobile-legal__group:last-of-type { margin-bottom: 0; }
   .mobile-legal__group:last-of-type .mobile-legal__list { margin-bottom: var(--mobile-legal-last-list-margin-bottom); }
-  
-  .mobile-legal__list a {
-    text-decoration: none; color: var(--app-muted);
-    font-size: var(--mobile-legal-link-font-size);
-  }
-  .mobile-legal__list a:hover { color: var(--primary); text-decoration: underline; }
-  
+
+  .mobile-legal__list a,
   .mobile-legal-link {
     background: none;
     border: none;
@@ -310,6 +316,7 @@
     cursor: pointer;
     font-family: inherit;
   }
+  .mobile-legal__list a:hover,
   .mobile-legal-link:hover { color: var(--primary); text-decoration: underline; }
   
   /* Legacy Desktop Legal Override hide */
@@ -359,20 +366,24 @@
    ---------------------------------------------------------- */
 /* Small Phones */
 @media (max-width: 320px) {
-  .footer-mobile-buttons { height: 60px; }
-  .footer-mobile-buttons .footer-icon svg { width: 20px; height: 20px; }
-  .footer-mobile-buttons .footer-icon span { font-size: 0.65rem; }
-  .footer-mobile-buttons .footer-publish-icon { width: 28px; height: 28px; }
-  .footer-publish .footer-publish-svg { font-size: 18px; }
+  .footer-mobile-buttons {
+    --ft-mobile-height: 60px;
+    --ft-icon-size: 20px;
+    --ft-icon-label-size: 0.65rem;
+    --ft-pub-size: 28px;
+    --ft-pub-svg-size: 18px;
+  }
 }
 
 /* Large Phones */
 @media (min-width: 414px) {
-  .footer-mobile-buttons { height: 70px; }
-  .footer-mobile-buttons .footer-icon svg { width: 26px; height: 26px; }
-  .footer-mobile-buttons .footer-icon span { font-size: 0.75rem; }
-  .footer-mobile-buttons .footer-publish-icon { width: 36px; height: 36px; }
-  .footer-publish .footer-publish-svg { font-size: 24px; }
+  .footer-mobile-buttons {
+    --ft-mobile-height: 70px;
+    --ft-icon-size: 26px;
+    --ft-icon-label-size: 0.75rem;
+    --ft-pub-size: 36px;
+    --ft-pub-svg-size: 24px;
+  }
 }
 
 /* Hide mobile footer when in chat on mobile */

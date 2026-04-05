@@ -23,9 +23,10 @@ export function GoogleLoginButton() {
 }
 
 // Buton Facebook
-export function FacebookLoginButton() {
+export function FacebookLoginButton({ disabled = false }) {
   const { t } = useTranslation();
   const handleFacebookLogin = () => {
+    if (disabled) return;
     window.FB.login(function(response) {
       if (response.authResponse) {
         // Trimite tokenul la backend pentru validare și login
@@ -57,7 +58,13 @@ export function FacebookLoginButton() {
     }, {scope: 'email,public_profile'});
   };
   return (
-    <button className="social-btn facebook" onClick={handleFacebookLogin}>
+    <button
+      className={`social-btn facebook ${disabled ? 'social-btn--disabled' : ''}`}
+      onClick={handleFacebookLogin}
+      disabled={disabled}
+      aria-disabled={disabled}
+      title={disabled ? 'În curând' : undefined}
+    >
       <img src={facebookLogo} alt="Facebook" />
       {t('auth.social.facebook')}
     </button>
@@ -65,10 +72,16 @@ export function FacebookLoginButton() {
 }
 
 // Buton Apple
-export function AppleLoginButton({ onClick }) {
+export function AppleLoginButton({ onClick, disabled = false }) {
   const { t } = useTranslation();
   return (
-    <button className="social-btn apple" onClick={onClick}>
+    <button
+      className={`social-btn apple ${disabled ? 'social-btn--disabled' : ''}`}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
+      title={disabled ? 'În curând' : undefined}
+    >
       <img src={appleLogo} alt="Apple" />
       {t('auth.social.apple')}
     </button>

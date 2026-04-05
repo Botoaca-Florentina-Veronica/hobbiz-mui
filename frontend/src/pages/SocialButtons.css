@@ -16,6 +16,14 @@
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.social-btn--disabled,
+.social-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
 }
 
 .social-btn img {

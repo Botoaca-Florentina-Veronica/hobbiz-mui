@@ -22,7 +22,7 @@ type SettingRow = { key: string; label: string; icon?: string; expandable?: bool
 
 export default function SettingsScreen() {
   const { tokens, isDark } = useAppTheme();
-  const { logout } = useAuth();
+  const { logout, refreshProfile } = useAuth();
   const insets = useSafeAreaInsets();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -168,7 +168,12 @@ export default function SettingsScreen() {
     setIsLoading(true);
     try {
       await resetUserData();
+      // Actualizăm profilul și badge-ul favorites imediat după resetare
+      await refreshProfile();
       showToast(t.resetDataSuccess, 'success');
+      setTimeout(() => {
+        router.replace('/');
+      }, 1500);
     } catch (e: any) {
       showToast(e?.message || t.resetDataError, 'error');
     } finally {
