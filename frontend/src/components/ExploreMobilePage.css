@@ -2,7 +2,8 @@
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  padding: 8px 16px 28px;
+  /* Keep last row visible above the floating mobile footer dock. */
+  padding: 8px 16px max(28px, calc(var(--ft-mobile-height, 65px) + 16px + env(safe-area-inset-bottom, 0px)));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -261,7 +262,7 @@
 
 @media (max-width: 420px) {
   .explore-mobile-page {
-    padding: 8px 12px 24px;
+    padding: 8px 12px max(24px, calc(var(--ft-mobile-height, 65px) + 16px + env(safe-area-inset-bottom, 0px)));
   }
 
   .explore-mobile-cards-grid {

@@ -50,7 +50,6 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
   
   return (
     <>
-      <div className="mobile-header-spacer" aria-hidden="true" />
       <div className="mobile-header">
       <div className="mobile-search-container" ref={containerRef} style={{ position: 'relative' }}>
         <form className="mobile-search-bar" onSubmit={handleSubmit}>

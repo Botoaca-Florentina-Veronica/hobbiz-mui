@@ -36,11 +36,20 @@
   background: #121212;
 }
 
-/* Spațiu pentru conținutul de sub header */
-.main-stage, 
-.content, 
-.call-to-action {
-  margin-top: 72px; /* Înălțimea header-ului */
+@media (max-width: 1024px) {
+  .homepage {
+    height: auto;
+    min-height: auto;
+  }
+}
+
+/* Spațiu pentru conținutul de sub header pe desktop */
+@media (min-width: 1025px) {
+  .main-stage, 
+  .content, 
+  .call-to-action {
+    margin-top: 72px; /* Înălțimea header-ului fixat */
+  }
 }
 
 /* Fundal alb pentru main-stage în light mode */

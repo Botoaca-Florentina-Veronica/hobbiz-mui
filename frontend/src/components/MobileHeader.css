@@ -1,3 +1,7 @@
+:root {
+  --mh-height: 60px;
+}
+
 .mobile-header {
   /* Tokens (light mode defaults) */
   --mh-search-height: 44px;
@@ -8,18 +12,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(env(safe-area-inset-top) + 4px) 16px 6px !important; /* și mai compact top padding */
-  /* Use shared header look for light mode to match homepage header */
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px !important; /* padding uniform, compensat safe-area la interior */
+  min-height: calc(var(--mh-height) + env(safe-area-inset-top, 0px));
+  width: 100%;
+  max-width: 100%;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0;
+  right: 0;
+  z-index: 1200;
   background-color: var(--hdr-bg-light) !important;
   background-image: var(--hdr-gradient-light);
   -webkit-backdrop-filter: blur(10px) saturate(120%);
   backdrop-filter: blur(10px) saturate(120%);
   border-bottom: 1px solid var(--hdr-border-light);
   box-shadow: var(--hdr-shadow-light);
-  /* On mobile, let the header scroll away instead of staying fixed/sticky */
-  position: static;
-  top: auto;
-  z-index: auto;
+  margin: 0 !important;
   gap: 12px;
 }
 
@@ -45,8 +53,14 @@ body.page-favorites:not(.dark-mode) .mobile-header {
 }
 
 .mobile-header-spacer {
-  /* No spacer needed when header is not sticky */
-  height: 0;
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.mobile-header + * {
+  padding-top: calc(var(--mh-height, 60px) + env(safe-area-inset-top, 0px)) !important;
 }
 
   .mobile-search-container {
@@ -187,7 +201,7 @@ body.page-favorites:not(.dark-mode) .mobile-header {
 /* Media queries pentru dispozitive foarte mici */
 @media (max-width: 480px) {
   .mobile-header {
-    padding: calc(env(safe-area-inset-top) + 4px) 12px 6px !important; /* compacted for small screens */
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px !important; /* compensare padding safe-area interior */
     gap: 8px !important;
     /* Use shared header tokens on small devices too */
     background-color: var(--hdr-bg-light) !important;
@@ -224,7 +238,7 @@ body.page-favorites:not(.dark-mode) .mobile-header {
 
 @media (max-width: 360px) {
   .mobile-header {
-    padding: calc(env(safe-area-inset-top) + 2px) 8px 4px !important; /* minim păstrând safe-area */
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 8px 8px !important; /* padding minim compensat la interior */
     gap: 6px !important;
     /* Use the shared header tokens for very small screens too */
     background-color: var(--hdr-bg-light) !important;

@@ -65,6 +65,7 @@
   padding: 6px 14px !important;
   border: 1px solid rgba(53, 80, 112, 0.2) !important;
   color: var(--as-text-primary, #183642) !important;
+  min-height: 38px;
 }
 
 .acf-filter-btn.active {
@@ -216,7 +217,7 @@
 .acf-resolve-btn {
   background: var(--as-btn-bg, #0B2D5A) !important;
   color: #fff !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   text-transform: none !important;
   font-weight: 600 !important;
   font-size: 0.82rem !important;
@@ -232,7 +233,7 @@
 }
 
 .acf-delete-btn {
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   text-transform: none !important;
   font-weight: 600 !important;
   font-size: 0.82rem !important;
@@ -302,5 +303,101 @@
   .acf-title-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .acf-container {
+    padding-top: calc(88px + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 20px) !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .acf-title-row {
+    margin: 0 0 18px;
+  }
+
+  .acf-title {
+    font-size: 2rem;
+    line-height: 1.05;
+  }
+
+  .acf-filter {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    justify-items: stretch;
+  }
+
+  .acf-filter-btn {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px !important;
+    border-radius: 14px !important;
+  }
+
+  .acf-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .acf-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .acf-card-title,
+  .acf-name,
+  .acf-email {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .acf-chip {
+    align-self: flex-start;
+  }
+
+  .acf-meta {
+    width: 100%;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 0;
+  }
+
+  .acf-message {
+    margin-top: 0;
+  }
+
+  .acf-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .acf-resolve-btn,
+  .acf-delete-btn {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .acf-dialog-paper {
+    min-width: min(94vw, 440px);
+  }
+
+  .acf-dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acf-dialog-cancel,
+  .acf-dialog-confirm {
+    width: 100%;
   }
 }

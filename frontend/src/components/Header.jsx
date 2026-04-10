@@ -379,6 +379,8 @@ export default function Header() {
           location.pathname.startsWith('/favorite-announcements') ||
           location.pathname.startsWith('/cont') ||
           location.pathname.startsWith('/setari-cont') ||
+          location.pathname.startsWith('/verificare-documente') ||
+          location.pathname.startsWith('/admin/') ||
           location.pathname.startsWith('/add-announcement') ||
           location.pathname.startsWith('/anunturile-mele') ||
           location.pathname.startsWith('/profil') ||

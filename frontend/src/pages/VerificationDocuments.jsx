@@ -241,7 +241,7 @@ export default function VerificationDocuments() {
           </Typography>
         </Paper>
 
-        <Box mb={3} display="flex" justifyContent="flex-end">
+        <Box mb={3} display="flex" justifyContent="flex-end" className="upload-button-row">
           <Button 
             variant="contained" 
             startIcon={<AddIcon />} 
@@ -297,7 +297,7 @@ export default function VerificationDocuments() {
                               {t('verification.admin.rejectionReason')}: {doc.rejectionReason}
                             </Typography>
                           )}
-                          <Box mt={1} display="flex" alignItems="center" gap={2}>
+                          <Box mt={1} className="doc-action-row" display="flex" alignItems="center" gap={2}>
                             {getStatusChip(doc.status)}
                             <Button
                               size="small"

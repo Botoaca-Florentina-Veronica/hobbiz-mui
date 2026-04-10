@@ -222,7 +222,7 @@ export default function CookiePolicy() {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer hideLegalUpTo1200 />
     </>
   );
 }

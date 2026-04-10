@@ -213,7 +213,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <HowItWorks />
-            <Footer />
+            <Footer hideLegalUpTo1200 />
           </>
         } />
         <Route path="/confidentialitate" element={
@@ -222,7 +222,7 @@ function App() {
             <Header />
             <PrivacyPolicy />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
-            <Footer />
+            <Footer hideLegalUpTo1200 />
           </>
         } />
         <Route path="/cookie" element={
@@ -236,7 +236,7 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <TermsConditions />
-            <Footer />
+            <Footer hideLegalUpTo1200 />
           </>
         } />
         <Route path="/" element={

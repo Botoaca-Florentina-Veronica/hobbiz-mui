@@ -97,7 +97,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
 
   {/* Versiunea compactă pentru mobil */}
   {!hideLegal && <MobileLegal />}
-
+      {hideLegalUpTo1200 && <div className="mobile-legal-spacer" />}
       {/* Separator între legal-section și footer propriu-zis */}
   {!hideLegal && <div className="footer-separator desktop-only" />}
 

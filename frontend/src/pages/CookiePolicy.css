@@ -490,6 +490,7 @@
 @media (max-width: 768px) {
   .cookie-policy-page {
     padding: 20px 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
   }
   
   .cookie-policy-container { padding: 0 16px; }

@@ -784,6 +784,9 @@ export default function AddAnnouncementPage() {
                     )}
                   </div>
                 ))}
+                {Array.from({ length: 2 }).map((_, idx) => (
+                  <div key={`empty-category-${idx}`} className="ma-modal-option ma-modal-option-empty" aria-hidden="true" />
+                ))}
               </div>
             </div>
           </div>

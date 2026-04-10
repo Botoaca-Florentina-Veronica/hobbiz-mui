@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconButton, Box, Typography } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Gavel, Policy, PrivacyTip } from '@mui/icons-material';
 import './InformatiiLegale.css';
 
@@ -9,6 +9,18 @@ export default function InformatiiLegale() {
   return (
     <div className="informatii-legale">
       <div className="informatii-legale__content">
+        <div className="mobile-header">
+          <IconButton
+            onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+            className="mobile-back-btn"
+            disableRipple
+            disableFocusRipple
+            aria-label="Înapoi"
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h5" className="mobile-header-title">Legal</Typography>
+        </div>
         <ul className="account-mobile__menu">
           <li>
             <button className="account-mobile__menu-btn" onClick={() => navigate('/termeni')}>

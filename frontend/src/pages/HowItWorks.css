@@ -532,8 +532,8 @@
 /* ─── Tablet (max 768px) ─── */
 @media (max-width: 768px) {
   .how-it-works-page {
-    padding: 20px 0 60px;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+    padding: 24px 0 60px;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
   }
 
   .how-it-works-container { padding: 0 16px; }

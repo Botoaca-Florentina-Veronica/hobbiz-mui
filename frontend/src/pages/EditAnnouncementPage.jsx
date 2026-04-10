@@ -391,7 +391,7 @@ export default function EditAnnouncementPage() {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
 
   return (
-    <div className="add-announcement-container">
+    <div className="add-announcement-container edit-announcement-container">
       {/* Mobile header: back + title (same style as Chat/Favorites) */}
       <Box sx={{
         display: { xs: 'flex', md: 'none' },

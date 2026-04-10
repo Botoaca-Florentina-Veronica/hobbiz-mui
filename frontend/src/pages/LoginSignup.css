@@ -43,6 +43,12 @@
   gap: 1rem;
 }
 
+@media (min-width: 900px) {
+  .email-login {
+    gap: 0.8rem;
+  }
+}
+
 .email-login input {
   width: 100%;
   height: 44px;
@@ -81,6 +87,12 @@
   min-width: 0;
 }
 
+@media (min-width: 900px) {
+  .login-links {
+    margin-top: 0.6rem;
+  }
+}
+
 .login-links a {
   color: var(--link-color);
   text-decoration: none;
@@ -114,6 +126,14 @@
   color: #355070;
   font-size: 0.9rem;
   line-height: 1.4;
+}
+
+@media (min-width: 900px) {
+  .social-auth-notice {
+    margin: -0.4rem 0 0.7rem;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
 }
 
 .social-auth-notice__icon {
@@ -193,6 +213,14 @@
   overflow-x: hidden;
 }
 
+@media (min-width: 900px) {
+  .login-page-wrapper {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 1.5rem;
+  }
+}
+
 .login-page-main {
   display: flex;
   align-items: stretch;
@@ -219,8 +247,21 @@
   justify-content: center;
 }
 
+@media (min-width: 900px) {
+  .login-page-main .login-container {
+    justify-content: flex-start;
+    padding: 1.5rem 1.5rem 1.8rem;
+  }
+}
+
 .login-page-main .login-container h2 {
   margin-bottom: 1.1rem;
+}
+
+@media (min-width: 900px) {
+  .login-page-main .login-container h2 {
+    margin-bottom: 0.8rem;
+  }
 }
 
 .login-page-main > picture,
@@ -488,7 +529,6 @@ body.login-page::before {
 
 body.login-page .footer,
 body.login-page .desktop-footer,
-body.login-page .footer-mobile-buttons,
 body.login-page .mobile-legal {
   background: #f4f8ff !important;
 }

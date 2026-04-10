@@ -972,6 +972,7 @@ body:not(.dark-mode) .ma-card {
    ---------------------------------------------------------- */
 @media (max-width: 1024px) {
   .ma-container {
-    margin-bottom: 2rem;
+    margin-bottom: 0;
+    padding-bottom: max(12px, calc(var(--ft-mobile-height, 65px) + 16px + env(safe-area-inset-bottom, 0px)));
   }
 }

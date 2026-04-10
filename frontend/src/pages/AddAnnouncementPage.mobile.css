@@ -753,7 +753,7 @@
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     /* Increased so the last category is visible on small phones */
-    max-height: 82%;
+    max-height: 92%;
     width: 100%;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
@@ -787,7 +787,7 @@
   .ma-modal-scroll {
     padding: 8px 20px;
     /* Match the modal height and add extra bottom padding so the last item is reachable */
-    max-height: calc(82vh - 70px);
+    max-height: calc(92vh - 70px);
     overflow-y: auto;
     padding-bottom: 20px;
   }
@@ -804,6 +804,14 @@
     border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s;
+  }
+
+  .ma-modal-option-empty {
+    background-color: transparent;
+    border-color: transparent;
+    pointer-events: none;
+    min-height: 48px;
+    margin: 6px 0;
   }
 
   .dark-mode .ma-modal-option {
@@ -888,6 +896,20 @@
     background: #3f3f3f !important;
     color: #ffffff !important;
     border: 1px solid #575757 !important;
+  }
+}
+
+/* Edit announcement page: keep enough bottom space for mobile footer without forcing extra page height */
+@media (max-width: 1024px) {
+  .add-announcement-container.edit-announcement-container {
+    margin-bottom: 0;
+    padding-bottom: max(12px, calc(var(--ft-mobile-height, 65px) + 16px + env(safe-area-inset-bottom, 0px)));
+  }
+}
+
+@media (max-width: 599px) {
+  .add-announcement-container.edit-announcement-container {
+    min-height: auto;
   }
 }
 

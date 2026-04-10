@@ -1003,6 +1003,7 @@ body:not(.dark-mode) .search-suggestions-dropdown {
   .main-stage {
     padding: calc(24px + env(safe-area-inset-top)) 16px calc(104px + env(safe-area-inset-bottom)) 16px;
     background-color: var(--app-bg);
+    min-height: auto;
   }
   
   .main-content {

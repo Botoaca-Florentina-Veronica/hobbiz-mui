@@ -14,7 +14,9 @@ import {
   Logout,
   DarkMode,
   VerifiedUser,
-  Close
+  Close,
+  SendRounded,
+  MailOutlineRounded
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
@@ -164,9 +166,9 @@ export default function AccountMenuMobile() {
   const secondaryMenuItems = [
     { icon: <MailOutline />, label: t('contactModal.title'), actionType: 'contact' },
     { icon: <Language />, label: t('language.change'), action: () => setShowLanguageModal(true) },
-    { icon: <InfoOutlined />, label: t('mainStage.about'), path: '/despre' },
-    { icon: <HelpOutline />, label: t('mainStage.howItWorks'), path: '/cum-functioneaza' },
-    { icon: <Gavel />, label: t('mainStage.legalInfo'), path: '/informatii-legale' }
+    { icon: <InfoOutlined />, label: t('legal.about'), path: '/despre' },
+    { icon: <HelpOutline />, label: t('legal.howItWorks'), path: '/cum-functioneaza' },
+    { icon: <Gavel />, label: t('legal.legal'), path: '/informatii-legale' }
   ];
 
   const selectLanguage = (lang) => {
@@ -206,6 +208,11 @@ export default function AccountMenuMobile() {
     } finally {
       setContactSending(false);
     }
+  };
+
+  const handleContactFieldChange = (field, value) => {
+    setContactForm((prev) => ({ ...prev, [field]: value }));
+    if (contactError) setContactError('');
   };
 
   return (
@@ -341,15 +348,15 @@ export default function AccountMenuMobile() {
 
       {showLanguageModal && (
         <div className="account-modal-overlay" onClick={() => setShowLanguageModal(false)}>
-          <div className="account-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="account-modal-card account-modal-card--language" onClick={(e) => e.stopPropagation()}>
             <button className="account-modal-close" onClick={() => setShowLanguageModal(false)} aria-label={t('common.close')}>
               <Close />
             </button>
             <h3>{t('language.change')}</h3>
             <div className="account-lang-list">
-              <button type="button" className="account-modal-btn" onClick={() => selectLanguage('ro')}>{t('language.ro')}</button>
-              <button type="button" className="account-modal-btn" onClick={() => selectLanguage('en')}>{t('language.en')}</button>
-              <button type="button" className="account-modal-btn" onClick={() => selectLanguage('es')}>{t('language.es')}</button>
+              <button type="button" className={`account-modal-btn ${currentLang === 'ro' ? 'is-active' : ''}`} onClick={() => selectLanguage('ro')}>{t('language.ro')}</button>
+              <button type="button" className={`account-modal-btn ${currentLang === 'en' ? 'is-active' : ''}`} onClick={() => selectLanguage('en')}>{t('language.en')}</button>
+              <button type="button" className={`account-modal-btn ${currentLang === 'es' ? 'is-active' : ''}`} onClick={() => selectLanguage('es')}>{t('language.es')}</button>
             </div>
           </div>
         </div>
@@ -361,30 +368,55 @@ export default function AccountMenuMobile() {
             <button className="account-modal-close" onClick={() => setShowContactModal(false)} aria-label={t('contactModal.closeAria')}>
               <Close />
             </button>
-            <h3>{t('contactModal.title')}</h3>
-            <p>{t('contactModal.intro')}</p>
-            <label>{t('contactModal.nameLabel')}</label>
-            <input
-              type="text"
-              value={contactForm.name}
-              onChange={(e) => setContactForm((prev) => ({ ...prev, name: e.target.value }))}
-            />
-            <label>{t('contactModal.emailLabel')}</label>
-            <input
-              type="email"
-              value={contactForm.email}
-              onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
-            />
-            <label>{t('contactModal.messageLabel')}</label>
-            <textarea
-              rows={4}
-              value={contactForm.message}
-              onChange={(e) => setContactForm((prev) => ({ ...prev, message: e.target.value }))}
-            />
+            <div className="account-contact-head" aria-hidden>
+              <div className="account-contact-icon-wrap">
+                <MailOutlineRounded />
+              </div>
+              <h3>{t('contactModal.title')}</h3>
+              <p>{t('contactModal.email')}</p>
+            </div>
+
+            <div className="account-contact-form" role="form" aria-label={t('contactModal.title')}>
+              <p className="account-contact-intro">{t('contactModal.intro')}</p>
+
+              <div className="account-contact-row">
+                <input
+                  type="text"
+                  value={contactForm.name}
+                  onChange={(e) => handleContactFieldChange('name', e.target.value)}
+                  maxLength={100}
+                  placeholder={`${t('contactModal.nameLabel')} *`}
+                  aria-label={t('contactModal.nameLabel')}
+                  autoComplete="name"
+                />
+                <input
+                  type="email"
+                  value={contactForm.email}
+                  onChange={(e) => handleContactFieldChange('email', e.target.value)}
+                  maxLength={200}
+                  placeholder={`${t('contactModal.emailLabel')} *`}
+                  aria-label={t('contactModal.emailLabel')}
+                  autoComplete="email"
+                />
+              </div>
+
+              <textarea
+                rows={5}
+                value={contactForm.message}
+                onChange={(e) => handleContactFieldChange('message', e.target.value)}
+                maxLength={3000}
+                placeholder={`${t('contactModal.messageLabel')} *`}
+                aria-label={t('contactModal.messageLabel')}
+              />
+
+              <div className="account-contact-counter">{contactForm.message.length} / 3000</div>
+            </div>
+
             {contactError ? <p className="account-contact-error">{contactError}</p> : null}
             <div className="account-modal-actions">
               <button type="button" className="account-modal-btn ghost" onClick={() => setShowContactModal(false)}>{t('contactModal.cancelButton')}</button>
               <button type="button" className="account-modal-btn primary" onClick={submitContact} disabled={contactSending}>
+                {!contactSending ? <SendRounded fontSize="small" /> : null}
                 {contactSending ? t('contactModal.sending') : t('contactModal.sendButton')}
               </button>
             </div>

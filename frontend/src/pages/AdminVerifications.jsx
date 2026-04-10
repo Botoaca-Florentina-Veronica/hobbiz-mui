@@ -164,11 +164,19 @@ export default function AdminVerifications() {
     <div className="av-page">
       <Container maxWidth="lg" className="av-container">
 
-        {/* Header */}
-        <div className="av-back-row">
-          <IconButton className="av-back-btn" onClick={() => navigate(-1)}>
+        {/* Mobile Header (similar to VerificationDocuments) */}
+        <div className="mobile-header">
+          <IconButton
+            onClick={() => navigate(-1)}
+            className="mobile-back-btn"
+            disableRipple
+            aria-label="Înapoi"
+          >
             <ArrowBackIcon />
           </IconButton>
+          <Typography variant="h5" className="mobile-header-title" sx={{ fontFamily: 'Poppins, sans-serif !important' }}>
+            {t('header.adminVerifications')}
+          </Typography>
         </div>
 
         <h1 className="av-title">{t('header.adminVerifications')}</h1>

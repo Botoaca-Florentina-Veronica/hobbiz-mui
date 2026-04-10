@@ -361,8 +361,8 @@
    ---------------------------------------------------------- */
 @media (max-width: 768px) {
   .privacy-policy {
-    padding: 20px 0;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+    padding: 24px 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
   }
   
   .privacy-policy__container {

@@ -312,8 +312,8 @@
    Switches from Desktop Header to Mobile Header logic */
 @media (max-width: 1200px) {
   .terms-conditions {
-    padding: 20px 0;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+    padding: 24px 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
   }
   
   .terms-conditions__header { display: none; }
@@ -358,7 +358,7 @@
   align-items: center;
   padding: 20px 0;
   margin-bottom: 20px;
-  margin-top: 1rem !important;
+  margin-top: -1rem !important;
   gap: 16px;
 }
 

@@ -90,6 +90,12 @@
   position: relative;
 }
 
+@media (max-width: 1024px) {
+  .content {
+    min-height: auto;
+  }
+}
+
 .dark-mode .content {
   /* Use the same variable so dark-mode values from theme.css apply */
   background-color: var(--bg-secondary);

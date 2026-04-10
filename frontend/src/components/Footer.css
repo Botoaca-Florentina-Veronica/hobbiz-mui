@@ -143,40 +143,45 @@
   /* Hide Desktop elements */
   .desktop-footer { display: none !important; }
 
-  /* Mobile Bar Container */
+  /* Mobile Bar Container (Liquid Glass Dock) */
   .footer-mobile-buttons {
-    position: fixed !important; left: 0; bottom: 0;
-    width: 100%; height: var(--ft-mobile-height);
-    --footer-height: var(--ft-mobile-height);
+    position: fixed !important;
+    left: 50% !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 32px);
+    max-width: none;
+    height: var(--ft-mobile-height);
+    --footer-height: calc(var(--ft-mobile-height) + 16px + env(safe-area-inset-bottom, 0px));
     display: flex !important;
-    flex-direction: column; justify-content: flex-end; align-items: center;
-    background: var(--ft-mob-bg);
-    border-top: 1px solid var(--ft-mob-border);
-    box-shadow: var(--ft-mob-shadow);
-    z-index: 1000; padding: 0;
+    flex-direction: column; justify-content: center; align-items: center;
+    /* Match desktop header frosted look */
+    background: linear-gradient(rgba(53,80,112,0.24), rgba(53,80,112,0.18)) !important;
+    backdrop-filter: blur(8px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+    border: 1px solid rgba(53,80,112,0.08) !important;
+    border-top: 1px solid rgba(53,80,112,0.08) !important;
+    border-radius: 40px !important; /* pill shape */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    z-index: 1000; padding: 0 8px !important;
     min-height: var(--ft-mobile-min-height); max-height: var(--ft-mobile-max-height);
-    /* Safe Area */
-    padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
   }
 
-  /* Active Indicator */
+  .dark-mode .footer-mobile-buttons,
+  body.dark-mode .footer-mobile-buttons {
+    background-color: rgba(18, 18, 18, 0.48) !important;
+    background-image: linear-gradient(rgba(18,18,18,0.44), rgba(18,18,18,0.36));
+    -webkit-backdrop-filter: blur(10px) saturate(125%);
+    backdrop-filter: blur(10px) saturate(125%);
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Active Indicator - ascuns pentru a lăsa iconițele curate (stil iOS) */
   .footer-active-indicator {
-    position: absolute; top: 0; height: var(--ft-active-indicator-height);
-    background: var(--primary);
-    border-radius: 0 0 2px 2px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1001; opacity: 0; transform: translateY(-1px);
+    display: none !important;
   }
   
-  .footer-mobile-buttons:has(.footer-icon.active) .footer-active-indicator { opacity: 1; transform: translateY(0); }
-  
-  /* Indicator Positioning Logic */
-  .footer-mobile-buttons:has(.footer-icon:nth-child(1).active) .footer-active-indicator { left: 0%; width: 20%; }
-  .footer-mobile-buttons:has(.footer-icon:nth-child(2).active) .footer-active-indicator { left: 20%; width: 20%; }
-  .footer-mobile-buttons:has(.footer-publish.active) .footer-active-indicator { left: 40%; width: 20%; }
-  .footer-mobile-buttons:has(.footer-icon:nth-child(4).active) .footer-active-indicator { left: 60%; width: 20%; }
-  .footer-mobile-buttons:has(.footer-icon:nth-child(5).active) .footer-active-indicator { left: 80%; width: 20%; }
-
   /* Icons Container */
   .footer-mobile-buttons .footer-icons {
     display: flex; justify-content: space-around; align-items: center;
@@ -192,12 +197,13 @@
     font-size: var(--ft-icon-label-size); gap: var(--ft-icon-gap);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none; border: none; background: none;
-    padding: 0.5rem; position: relative;
+    padding: 0.2rem; position: relative; min-width: 0;
     -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
 
   .footer-mobile-buttons .footer-icon:hover { color: var(--ft-mob-icon-active); transform: translateY(-1px); }
   .footer-mobile-buttons .footer-icon:active { transform: translateY(0px) scale(0.96); }
+
   .footer-mobile-buttons .footer-icon.active { color: var(--primary); }
 
   /* Icon SVG & Text */
@@ -205,6 +211,7 @@
     width: var(--ft-icon-size); height: var(--ft-icon-size); margin-bottom: var(--ft-icon-gap);
     stroke: currentColor; fill: currentColor; stroke-width: 1.5;
     transition: transform 0.2s; position: relative; z-index: 1;
+    flex-shrink: 0;
   }
   .footer-mobile-buttons .footer-icon:hover svg { transform: scale(1.1); color: var(--ft-mob-icon-active); stroke: var(--ft-mob-icon-active); }
   .footer-mobile-buttons .footer-icon.active svg { transform: scale(1.05); }
@@ -212,6 +219,7 @@
   .footer-mobile-buttons .footer-icon span {
     font-size: var(--ft-icon-label-size); font-weight: 500; color: inherit;
     transition: transform 0.2s; position: relative; z-index: 1;
+    white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   }
   .footer-mobile-buttons .footer-icon:hover span { 
     transform: scale(1.05); color: var(--ft-mob-icon-active); 
@@ -305,6 +313,10 @@
   .mobile-legal__group:last-of-type { margin-bottom: 0; }
   .mobile-legal__group:last-of-type .mobile-legal__list { margin-bottom: var(--mobile-legal-last-list-margin-bottom); }
 
+  .mobile-legal-spacer {
+    display: none;
+  }
+
   .mobile-legal__list a,
   .mobile-legal-link {
     background: none;
@@ -321,6 +333,14 @@
   
   /* Legacy Desktop Legal Override hide */
   .legal-section { display: none !important; }
+  .footer.hide-legal-upto-1200 .mobile-legal-spacer { display: none; }
+}
+
+@media (max-width: 1024px) {
+  .footer.hide-legal-upto-1200 .mobile-legal-spacer {
+    display: block;
+    height: 36px;
+  }
 }
 
 
@@ -362,16 +382,97 @@
 }
 
 
-/* 8. RESPONSIVE UTILITIES
-   ---------------------------------------------------------- */
-/* Small Phones */
-@media (max-width: 320px) {
+/* Standard Mobile/Tablet adjustments */
+@media (max-width: 480px) {
   .footer-mobile-buttons {
-    --ft-mobile-height: 60px;
-    --ft-icon-size: 20px;
-    --ft-icon-label-size: 0.65rem;
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 12px);
+    min-width: 0;
+    padding: 0 10px !important;
+  }
+  
+  .footer-mobile-buttons .footer-icons {
+    justify-content: space-between;
+    gap: 0;
+    width: 100%;
+  }
+
+  .footer-mobile-buttons .footer-icon {
+    flex: 1 1 0;
+    padding: 0.12rem 0.1rem;
+    min-width: 0;
+  }
+}
+
+/* Very small phones: equal spacing and tighter grouping */
+@media (max-width: 399px) {
+  .footer-mobile-buttons {
+    width: calc(100% - 10px) !important;
+    padding: 0 6px !important;
+  }
+
+  .footer-mobile-buttons .footer-icons {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+    width: 100%;
+    gap: 0;
+  }
+
+  .footer-mobile-buttons .footer-icon {
+    width: 100%;
+    min-width: 0;
+    padding: 0.08rem 0.02rem;
+    justify-self: center;
+    gap: 0.08rem;
+  }
+}
+
+/* Small Phones 370px and below */
+@media (max-width: 370px) {
+  .footer-mobile-buttons {
+    --ft-mobile-height: 54px;
+    --ft-icon-size: 19px;
+    --ft-icon-label-size: 0.6rem;
     --ft-pub-size: 28px;
     --ft-pub-svg-size: 18px;
+    padding: 0 12px !important;
+    min-width: auto;
+    width: calc(100% - 12px) !important;
+  }
+  
+  .footer-mobile-buttons .footer-icon {
+    padding: 0.15rem;
+    gap: 0.1rem;
+    min-width: 48px;
+  }
+  
+  .footer-mobile-buttons .footer-icons {
+    gap: 4px;
+    justify-content: center;
+  }
+}
+
+/* Extra small phones 320px and below */
+@media (max-width: 320px) {
+  .footer-mobile-buttons {
+    --ft-mobile-height: 50px;
+    --ft-icon-size: 17px;
+    --ft-icon-label-size: 0.55rem;
+    --ft-pub-size: 24px;
+    --ft-pub-svg-size: 14px;
+    padding: 0 8px !important;
+    width: calc(100% - 8px) !important;
+  }
+  
+  .footer-mobile-buttons .footer-icon {
+    padding: 0 0.1rem;
+    gap: 0.05rem;
+    min-width: 42px;
+  }
+  
+  .footer-mobile-buttons .footer-icons {
+    gap: 2px;
   }
 }
 
