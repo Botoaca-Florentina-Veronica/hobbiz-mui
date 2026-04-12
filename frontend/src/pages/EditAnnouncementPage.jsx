@@ -26,6 +26,10 @@ export default function EditAnnouncementPage() {
   const { t } = useTranslation();
   const entireCountryLabel = t('addAnnouncement.labels.entireCountry');
   const judete = [entireCountryLabel, ...Object.keys(localitatiPeJudet)];
+  const [viewportWidth, setViewportWidth] = useState(() => {
+    if (typeof window === 'undefined') return 1280;
+    return window.innerWidth;
+  });
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [titleChars, setTitleChars] = useState(0);
@@ -387,13 +391,38 @@ export default function EditAnnouncementPage() {
 
   const categoryOpen = Boolean(categoryAnchorEl);
   const categoryId = categoryOpen ? 'category-popover' : undefined;
-  // Keep mobile category UI below 500px for consistency with Add page
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
+  // Keep mobile category UI below 600px for consistency with Add page
+  const isMobile = viewportWidth < 600;
+  const isSellAppLike = viewportWidth <= 1024;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 1024px)');
+    const onResize = () => setViewportWidth(window.innerWidth);
+
+    window.addEventListener('resize', onResize);
+
+    if (media.addEventListener) {
+      media.addEventListener('change', onResize);
+    } else {
+      media.addListener(onResize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      if (media.addEventListener) {
+        media.removeEventListener('change', onResize);
+      } else {
+        media.removeListener(onResize);
+      }
+    };
+  }, []);
 
   return (
-    <div className="add-announcement-container edit-announcement-container">
+    <div className={`add-announcement-container edit-announcement-container ${isSellAppLike ? 'sell-applike' : ''}`}>
       {/* Mobile header: back + title (same style as Chat/Favorites) */}
-      <Box sx={{
+      <Box className="sell-mobile-header" sx={{
         display: { xs: 'flex', md: 'none' },
         alignItems: 'center',
         gap: 2,
@@ -403,6 +432,7 @@ export default function EditAnnouncementPage() {
       }}>
         <IconButton
           onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+          className="sell-mobile-back-btn"
           sx={{
             backgroundColor: 'var(--chat-elev)',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -414,10 +444,10 @@ export default function EditAnnouncementPage() {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>{t('addAnnouncement.editMobileHeaderTitle')}</Typography>
+        <Typography variant="h5" className="sell-mobile-header-title" sx={{ fontWeight: 600, color: 'var(--chat-text)' }}>{t('addAnnouncement.editMobileHeaderTitle')}</Typography>
       </Box>
       <h1 className="add-announcement-title">{t('addAnnouncement.editPageTitle')}</h1>
-      <form className="add-announcement-form" onSubmit={e => e.preventDefault()} style={{marginBottom: 0}}>
+      <form className="add-announcement-form" onSubmit={e => e.preventDefault()}>
         {success && (
           <div className="add-announcement-message add-announcement-success">
             <div className="add-announcement-success-icon">

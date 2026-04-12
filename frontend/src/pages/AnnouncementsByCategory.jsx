@@ -47,6 +47,17 @@ export default function AnnouncementsByCategory() {
   const [viewMode, setViewMode] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [showLoginToast, setShowLoginToast] = useState(false);
+
+  // App-like mode state
+  const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isAppLike = viewportWidth <= 1024;
   
   const userId = localStorage.getItem('userId');
   const FAVORITES_KEY = userId ? `favoriteAnnouncements_${userId}` : 'favoriteAnnouncements_guest';
@@ -214,29 +225,44 @@ export default function AnnouncementsByCategory() {
     fetchAnnouncements();
   }, [category]);
 
-  if (loading) return <div>{t('allAnnouncements.loading')}</div>;
+  if (loading) return <div style={{ padding: '80px 24px' }}>{t('allAnnouncements.loading')}</div>;
 
   return (
-    <div className="my-announcements-container announcements-by-category">
+    <div className={`my-announcements-container announcements-by-category ${isAppLike ? 'abc-applike' : ''}`}>
       <Toast
         message={t('favorites.loginRequired')}
         type="info"
         visible={showLoginToast}
         onClose={() => setShowLoginToast(false)}
       />
-      <div className="mobile-back-container" onClick={() => window.history.back()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && window.history.back()}>
-        <button className="mobile-back-btn" aria-label={t('common.back')}>
-          {/* left arrow svg */}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6" stroke="#23484a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <span className="mobile-back-label">{t('common.back')}</span>
-      </div>
+      
+      {isAppLike ? (
+        <div className="abc-mobile-header">
+          <button className="abc-mobile-back-btn" onClick={() => window.history.back()} aria-label={t('common.back')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <h1 className="abc-mobile-header-title">{translateCategory(category, t)}</h1>
+        </div>
+      ) : (
+        <div className="mobile-back-container" onClick={() => window.history.back()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && window.history.back()}>
+          <button className="mobile-back-btn" aria-label={t('common.back')}>
+            {/* left arrow svg */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="#23484a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <span className="mobile-back-label">{t('common.back')}</span>
+        </div>
+      )}
+      
       <div className="abc-align-container">
-        <Typography variant="h4" className="my-announcements-title" gutterBottom>
-          {translateCategory(category, t)}
-        </Typography>
+        {!isAppLike && (
+          <Typography variant="h4" className="my-announcements-title" gutterBottom>
+            {translateCategory(category, t)}
+          </Typography>
+        )}
         {/* Searchbar și filtre */}
         <div className="abc-searchbar">
           <Stack spacing={2} sx={{ width: '100%' }}>

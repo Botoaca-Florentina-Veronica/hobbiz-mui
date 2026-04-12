@@ -664,3 +664,83 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   }
   .announcements-by-category .my-announcement-category { display: none; }
 }
+
+/* 9. APPLIKE MODE
+   ---------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .announcements-by-category.my-announcements-container.abc-applike {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    margin: 0;
+    background: var(--abc-bg-page);
+  }
+
+  .abc-applike .abc-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    margin-bottom: 0;
+  }
+
+  .dark-mode .abc-applike .abc-mobile-header {
+    background: #121212;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .abc-applike .abc-mobile-back-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    margin-left: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--abc-text-primary);
+    cursor: pointer;
+  }
+
+  .abc-applike .abc-mobile-header-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--abc-text-primary);
+    margin: 0 0 0 8px;
+    padding: 0;
+    line-height: 1;
+    font-family: 'Poppins', sans-serif !important;
+  }
+
+  .abc-applike .abc-align-container {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .abc-applike .abc-searchbar {
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+    margin-bottom: 16px;
+  }
+
+  .dark-mode .abc-applike .abc-searchbar {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .abc-applike .my-announcement-card {
+    border-radius: var(--abc-radius-mobile);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .dark-mode .abc-applike .my-announcement-card {
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  }
+}

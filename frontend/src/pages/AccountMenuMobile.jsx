@@ -163,9 +163,7 @@ export default function AccountMenuMobile() {
     ] : [])
   ];
 
-  const secondaryMenuItems = [
-    { icon: <MailOutline />, label: t('contactModal.title'), actionType: 'contact' },
-    { icon: <Language />, label: t('language.change'), action: () => setShowLanguageModal(true) },
+  const infoMenuItems = [
     { icon: <InfoOutlined />, label: t('legal.about'), path: '/despre' },
     { icon: <HelpOutline />, label: t('legal.howItWorks'), path: '/cum-functioneaza' },
     { icon: <Gavel />, label: t('legal.legal'), path: '/informatii-legale' }
@@ -234,8 +232,16 @@ export default function AccountMenuMobile() {
 
         <div className="account-mobile__greeting">
           <span className="account-mobile__greeting-hello">{greetingByLang[currentLang]} </span>
-          <span className="account-mobile__greeting-name">{displayFirstName}<br />{displayLastName}!</span>
-          <span className="account-mobile__greeting-emoji" aria-hidden>👋</span>
+          <span className="account-mobile__greeting-name">
+            {displayFirstName}
+            {displayLastName ? (
+              <>
+                <br />
+                {displayLastName}
+              </>
+            ) : null}
+            {' !'} <span className="account-mobile__greeting-emoji" aria-hidden>👋</span>
+          </span>
         </div>
       </div>
 
@@ -296,19 +302,31 @@ export default function AccountMenuMobile() {
               <div className="account-mobile__menu-control"><Switch checked={isDarkMode} onChange={toggleDarkMode} /></div>
             </div>
           </div>
+
+          <div className="account-mobile__menu-item-wrap" role="none">
+            <button role="menuitem" className="account-mobile__menu-btn" onClick={openContactModal}>
+              <span className="account-mobile__menu-icon" aria-hidden><MailOutline /></span>
+              <span className="account-mobile__menu-label">{t('contactModal.title')}</span>
+              <span className="account-mobile__chevron" aria-hidden>&#8250;</span>
+            </button>
+          </div>
+          
+          <div className="account-mobile__menu-item-wrap" role="none">
+            <button role="menuitem" className="account-mobile__menu-btn" onClick={() => setShowLanguageModal(true)}>
+              <span className="account-mobile__menu-icon" aria-hidden><Language /></span>
+              <span className="account-mobile__menu-label">{t('language.change')}</span>
+              <span className="account-mobile__chevron" aria-hidden>&#8250;</span>
+            </button>
+          </div>
         </section>
 
         <section className="account-mobile__menu-group" role="menu">
-          {secondaryMenuItems.map((item, idx) => (
+          {infoMenuItems.map((item, idx) => (
             <div key={item.path || `sec-${idx}`} role="none" className="account-mobile__menu-item-wrap">
               <button
                 role="menuitem"
                 className="account-mobile__menu-btn"
                 onClick={() => {
-                  if (item.actionType === 'contact') {
-                    openContactModal();
-                    return;
-                  }
                   if (item.action) {
                     item.action();
                     return;
@@ -323,7 +341,9 @@ export default function AccountMenuMobile() {
               </button>
             </div>
           ))}
+        </section>
 
+        <section className="account-mobile__menu-group account-mobile__logout-group" role="menu">
           <div className="account-mobile__menu-item-wrap">
             <button className="account-mobile__menu-btn account-mobile__logout" onClick={() => setShowLogoutConfirm(true)}>
               <span className="account-mobile__menu-icon" aria-hidden><Logout /></span>

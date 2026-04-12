@@ -542,9 +542,8 @@ body:not(.dark-mode) .profile-location-card {
 
 .profile-announcements-sidebar {
   background: var(--pf-card-bg);
-  border: none;
+  border: 1px solid var(--pf-border);
   border-radius: var(--pf-card-radius);
-}
   box-shadow: var(--pf-shadow);
   padding: 1.25rem;
   margin-right: var(--pf-right-offset);
@@ -1186,11 +1185,38 @@ body:not(.dark-mode) .profile-about-card {
   justify-content: center;
 }
 
+.mobile-profile-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
 .mobile-rating-badge {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 4px;
+}
+
+.mobile-admin-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #f51866;
+  border-radius: 999px;
+  padding: 3px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.mobile-verified-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--pf-verified-text);
+  background: var(--pf-verified-bg);
+  border-radius: 999px;
+  padding: 3px 8px;
 }
 
 .mobile-rating-star {
@@ -1215,6 +1241,29 @@ body:not(.dark-mode) .profile-about-card {
   font-size: 12px;
   color: var(--pf-text-muted);
   margin: 0;
+}
+
+.mobile-balance-card {
+  margin-top: 12px;
+  border: 1px solid var(--pf-border);
+  background: var(--pf-bg);
+  border-radius: 12px;
+  padding: 10px 12px;
+  max-width: 220px;
+}
+
+.mobile-balance-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pf-text-muted);
+  text-transform: uppercase;
+}
+
+.mobile-balance-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--pf-primary);
+  margin-top: 2px;
 }
 
 /* Mobile Location Section */
@@ -1284,6 +1333,50 @@ body:not(.dark-mode) .profile-about-card {
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   border: 1px solid var(--pf-divider);
+}
+
+.mobile-announcements-card {
+  background: var(--pf-card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid var(--pf-divider);
+}
+
+.mobile-announcement-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.mobile-announcement-stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.mobile-announcement-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pf-text);
+}
+
+.mobile-announcement-stat-label {
+  font-size: 11px;
+  color: var(--pf-text-muted);
+}
+
+.mobile-announcement-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--pf-divider);
+}
+
+.mobile-announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .mobile-card-header {
@@ -1410,8 +1503,8 @@ body:not(.dark-mode) .profile-about-card {
   display: none;
 }
 
-/* Mobile header (shown <= 1024px) */
-@media (max-width: 1024px) {
+/* Mobile header (shown <= 768px) */
+@media (max-width: 768px) {
   .mobile-header {
     display: flex !important;
     align-items: center !important;
@@ -1457,6 +1550,17 @@ body:not(.dark-mode) .profile-about-card {
     margin: 0 !important;
     flex: 0 0 auto !important;
     margin-left: 4px !important;
+  }
+
+  .profile-mobile-layout {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: 8px;
+  }
+
+  .profile-page-container {
+    --pf-card-radius: 16px;
   }
 }
 
@@ -1679,12 +1783,30 @@ body:not(.dark-mode) .profile-about-card {
     margin-bottom: 12px;
   }
 
+  .mobile-announcements-card {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
   .mobile-card-header {
     margin-bottom: 12px;
   }
 
   .mobile-card-title {
     font-size: 14px;
+  }
+
+  .mobile-balance-card {
+    margin-top: 10px;
+    padding: 8px 10px;
+  }
+
+  .mobile-balance-label {
+    font-size: 10px;
+  }
+
+  .mobile-balance-value {
+    font-size: 17px;
   }
 
   .mobile-edit-button {
@@ -1718,6 +1840,14 @@ body:not(.dark-mode) .profile-about-card {
 
   .mobile-contact-value {
     font-size: 12px;
+  }
+
+  .mobile-announcement-stat-value {
+    font-size: 17px;
+  }
+
+  .mobile-announcement-stat-label {
+    font-size: 10px;
   }
 
   .mobile-contact-input {

@@ -1114,3 +1114,270 @@
       font-size: 26px;
     }
   }
+
+/* =============================================================
+   Final sell-applike alignment with mobile app (small devices)
+   ============================================================= */
+@media (max-width: 1024px) {
+  .add-announcement-container.sell-applike {
+    background: #ffffff;
+    padding: calc(env(safe-area-inset-top, 0px) + 10px) 0 calc(90px + env(safe-area-inset-bottom, 0px));
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike {
+    background: #000000;
+  }
+
+  .add-announcement-container.sell-applike .sell-mobile-header {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    width: min(100%, 760px);
+    margin: 0 auto;
+    padding: 6px 16px 10px;
+    box-sizing: border-box;
+  }
+
+  .add-announcement-container.sell-applike .sell-mobile-back-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #f2f4f7;
+    color: #183642;
+    box-shadow: none;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .sell-mobile-back-btn {
+    border-color: #3f3f3f;
+    background: #1b1b1b;
+    color: #ffffff;
+  }
+
+  .add-announcement-container.sell-applike .sell-mobile-header-title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.15;
+    color: #111315;
+    margin: 0;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .sell-mobile-header-title {
+    color: #ffffff;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-title {
+    display: none !important;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-form,
+  .add-announcement-container.sell-applike .add-announcement-images-section,
+  .add-announcement-container.sell-applike .add-announcement-description-section,
+  .add-announcement-container.sell-applike .add-announcement-location-section,
+  .add-announcement-container.sell-applike .add-announcement-contact-section,
+  .add-announcement-container.sell-applike .add-announcement-actions-section {
+    width: min(100%, 760px);
+    margin: 0 auto 16px;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    background: #ffffff;
+    box-shadow: none;
+    box-sizing: border-box;
+    gap: 20px;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-form,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-images-section,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-description-section,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-location-section,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-contact-section,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-actions-section {
+    border-color: #3f3f3f;
+    background: #121212;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-subtitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-title-input,
+  .add-announcement-container.sell-applike .add-announcement-category-select,
+  .add-announcement-container.sell-applike .add-announcement-category-select-button,
+  .add-announcement-container.sell-applike .add-announcement-location-input,
+  .add-announcement-container.sell-applike .add-announcement-contact-input,
+  .add-announcement-container.sell-applike .add-announcement-contact-input[type='email'],
+  .add-announcement-container.sell-applike .add-announcement-contact-input[type='tel'],
+  .add-announcement-container.sell-applike .add-announcement-contact-input[type='number'] {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    padding: 14px 18px;
+    font-size: 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #f3f5f6;
+    color: #183642;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-description-input {
+    width: 100%;
+    min-height: 140px;
+    padding: 18px;
+    font-size: 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #f3f5f6;
+    color: #183642;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-title-input,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-category-select,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-category-select-button,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-location-input,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-contact-input,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-contact-input[type='email'],
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-contact-input[type='tel'],
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-contact-input[type='number'],
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-description-input {
+    border-color: #575757;
+    background: #2c2c2c;
+    color: #ffffff;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-location-input-wrapper,
+  .add-announcement-container.sell-applike .add-announcement-contact-input-wrapper {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 0;
+    margin-top: 0;
+    background: transparent;
+    border: none;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-char-helper-row,
+  .add-announcement-container.sell-applike .add-announcement-helper,
+  .add-announcement-container.sell-applike .add-announcement-charcount,
+  .add-announcement-container.sell-applike .add-announcement-images-helper {
+    font-size: 12px;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-images-grid {
+    gap: 14px;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-image-upload,
+  .add-announcement-container.sell-applike .image-preview-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 14px;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-actions-section {
+    margin-bottom: 0;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-actions-left {
+    display: none;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-actions-right {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-preview,
+  .add-announcement-container.sell-applike .add-announcement-submit {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 24px;
+    padding: 14px 18px;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: none;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-preview {
+    background: #ffffff;
+    color: #355070;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-preview:hover {
+    background: #ffffff;
+    color: #355070;
+    border-color: rgba(0, 0, 0, 0.24);
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-preview {
+    background: #121212;
+    color: #f51866;
+    border-color: #3f3f3f;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-preview:hover {
+    background: #121212;
+    color: #f51866;
+    border-color: #575757;
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-submit,
+  .add-announcement-container.sell-applike .add-announcement-submit:hover {
+    background: #355070;
+    color: #f9faf8;
+    border: 1px solid #355070;
+  }
+
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-submit,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-submit:hover {
+    background: #f51866;
+    color: #ffffff;
+    border-color: #f51866;
+  }
+}
+
+@media (max-width: 700px) {
+  .add-announcement-container.sell-applike .sell-mobile-header,
+  .add-announcement-container.sell-applike .add-announcement-form,
+  .add-announcement-container.sell-applike .add-announcement-images-section,
+  .add-announcement-container.sell-applike .add-announcement-description-section,
+  .add-announcement-container.sell-applike .add-announcement-location-section,
+  .add-announcement-container.sell-applike .add-announcement-contact-section,
+  .add-announcement-container.sell-applike .add-announcement-actions-section {
+    width: calc(100% - 24px);
+  }
+
+  .add-announcement-container.sell-applike .add-announcement-form,
+  .add-announcement-container.sell-applike .add-announcement-images-section,
+  .add-announcement-container.sell-applike .add-announcement-description-section,
+  .add-announcement-container.sell-applike .add-announcement-location-section,
+  .add-announcement-container.sell-applike .add-announcement-contact-section,
+  .add-announcement-container.sell-applike .add-announcement-actions-section {
+    padding: 16px;
+  }
+
+  .add-announcement-container.sell-applike .sell-mobile-header-title {
+    font-size: 22px;
+  }
+}

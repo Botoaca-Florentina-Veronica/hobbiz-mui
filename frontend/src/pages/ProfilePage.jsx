@@ -605,9 +605,13 @@ export default function ProfilePage() {
         </button>
       </div>
       <div className="mobile-profile-info">
-        <div className="mobile-rating-badge">
-          <span className="mobile-rating-star">★</span>
-          <span className="mobile-rating-text">—</span>
+        <div className="mobile-profile-badges-row">
+          <div className="mobile-rating-badge">
+            <span className="mobile-rating-star">★</span>
+            <span className="mobile-rating-text">—</span>
+          </div>
+          {profile?.isAdmin && <span className="mobile-admin-badge">Admin</span>}
+          {profile?.isVerified && <span className="mobile-verified-badge">{t('profile.verifiedMember')}</span>}
         </div>
         <h1 className="mobile-user-name">
           {(profile?.firstName || '') + (profile?.lastName ? ' ' + profile.lastName : '') || t('profile.mobileTitle')}
@@ -621,6 +625,12 @@ export default function ProfilePage() {
               })
             : ''}
         </p>
+        <div className="mobile-balance-card">
+          <div className="mobile-balance-label">BALANCE</div>
+          <div className="mobile-balance-value">
+            {Number(profile?.balance || 0).toFixed(2)} RON
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -743,6 +753,53 @@ export default function ProfilePage() {
       )}
     </div>
   );
+
+  const renderMobileAnnouncementsCard = () => {
+    const total = userAnnouncements.length;
+    const active = userAnnouncements.filter((a) => a.status === 'active').length;
+    const views = userAnnouncements.reduce((sum, a) => sum + (a.views || 0), 0);
+
+    return (
+      <div className="mobile-announcements-card">
+        <div className="mobile-card-header">
+          <h2 className="mobile-card-title">{t('profile.myAnnouncements')}</h2>
+          <button className="mobile-edit-button" onClick={() => navigate('/my-announcements')}>
+            {t('profile.viewAll')}
+          </button>
+        </div>
+
+        <div className="mobile-announcement-stats">
+          <div className="mobile-announcement-stat-item">
+            <div className="mobile-announcement-stat-value">{active}</div>
+            <div className="mobile-announcement-stat-label">{t('profile.activeSales')}</div>
+          </div>
+          <div className="mobile-announcement-stat-divider" />
+          <div className="mobile-announcement-stat-item">
+            <div className="mobile-announcement-stat-value">{total}</div>
+            <div className="mobile-announcement-stat-label">{t('profile.totalListings')}</div>
+          </div>
+          <div className="mobile-announcement-stat-divider" />
+          <div className="mobile-announcement-stat-item">
+            <div className="mobile-announcement-stat-value">{views}</div>
+            <div className="mobile-announcement-stat-label">{t('profile.profileViews')}</div>
+          </div>
+        </div>
+
+        {announcementsLoading ? (
+          <Box className="profile-announcements-loading">
+            <CircularProgress size={20} />
+            <span className="profile-loading-inline-text">{t('profile.loading')}</span>
+          </Box>
+        ) : userAnnouncements.length === 0 ? (
+          <Box className="profile-empty-state">{t('profile.emptyAnnouncements')}</Box>
+        ) : (
+          <div className="mobile-announcements-list">
+            {userAnnouncements.slice(0, 3).map(renderAnnouncementCard)}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderAnnouncementCard = (announcement) => (
     <div
@@ -1030,6 +1087,7 @@ export default function ProfilePage() {
         {renderMobileProfileHeader()}
         {renderMobileLocationSection()}
         {renderMobileContactCard()}
+        {renderMobileAnnouncementsCard()}
       </div>
 
       {/* Image Crop Modal */}
