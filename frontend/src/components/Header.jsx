@@ -399,7 +399,10 @@ export default function Header() {
           location.pathname.startsWith('/anunturi-categorie') ||
           // Hide MobileHeader on add/edit announcement pages
           location.pathname.startsWith('/adauga-anunt') ||
-          location.pathname.startsWith('/edit-announcement')
+          location.pathname.startsWith('/edit-announcement') ||
+          // Hide MobileHeader on archived announcements page (web has its own local header)
+          location.pathname.startsWith('/archived-announcements') ||
+          location.pathname.startsWith('/anunturi-arhivate')
         ) ? null : (
           <MobileHeader 
             notificationCount={unreadCount} 

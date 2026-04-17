@@ -64,6 +64,10 @@ export default function AllAnnouncements() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showLoginToast, setShowLoginToast] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 700px)').matches;
+  });
 
   // ============================================
   // STATE: FAVORITES & LOCAL STORAGE
@@ -141,6 +145,23 @@ export default function AllAnnouncements() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, sortBy, priceFilter, locationFilter, categoryFilter]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 700px)');
+    const onChange = (event) => setIsSmallScreen(event.matches);
+
+    setIsSmallScreen(media.matches);
+
+    if (media.addEventListener) {
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    }
+
+    media.addListener(onChange);
+    return () => media.removeListener(onChange);
+  }, []);
 
   // ============================================
   // EFFECTS: FETCH ANNOUNCEMENTS
@@ -250,9 +271,10 @@ export default function AllAnnouncements() {
   // ============================================
   // PAGINATION CALCULATIONS
   // ============================================
-  const totalPages = Math.ceil(filteredAndSortedAnnouncements.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const effectiveItemsPerPage = isSmallScreen ? Math.max(filteredAndSortedAnnouncements.length, 1) : itemsPerPage;
+  const totalPages = Math.ceil(filteredAndSortedAnnouncements.length / effectiveItemsPerPage);
+  const startIndex = (currentPage - 1) * effectiveItemsPerPage;
+  const endIndex = startIndex + effectiveItemsPerPage;
   const currentItems = filteredAndSortedAnnouncements.slice(startIndex, endIndex);
 
   // ============================================
@@ -302,6 +324,12 @@ export default function AllAnnouncements() {
     return d.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' });
   };
 
+  const resolveImageSrc = (image) => {
+    if (!image) return '';
+    if (image.startsWith('http') || image.startsWith('/uploads')) return image;
+    return `/uploads/${image.replace(/^.*[\\/]/, '')}`;
+  };
+
   // ============================================
   // RENDER
   // ============================================
@@ -313,12 +341,15 @@ export default function AllAnnouncements() {
         visible={showLoginToast}
         onClose={() => setShowLoginToast(false)}
       />
-      {/* MOBILE HEADER - BACK BUTTON & TITLE */}
-      <Box className="mobile-header">
-        <IconButton onClick={() => navigate(-1)}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h6">{t('allAnnouncements.title')}</Typography>
+      {/* MOBILE HEADER - APP-LIKE */}
+      <Box className="aa-mobile-header">
+        <Box className="aa-mobile-header-left">
+          <IconButton onClick={() => navigate(-1)} className="aa-mobile-back-btn">
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" className="aa-mobile-title">{t('allAnnouncements.title')}</Typography>
+        </Box>
+        <Typography className="aa-mobile-count">{filteredAndSortedAnnouncements.length}</Typography>
       </Box>
 
       <Box className="all-announcements-wrapper">
@@ -479,6 +510,49 @@ export default function AllAnnouncements() {
               {t('allAnnouncements.noResultsDescription')}
             </Typography>
           </Box>
+        ) : isSmallScreen ? (
+          <div className="aa-mobile-list">
+            {filteredAndSortedAnnouncements.map((announcement) => (
+              <div
+                key={announcement._id}
+                className="aa-mobile-card"
+                onClick={() => navigate(`/announcement/${announcement._id}`)}
+              >
+                <div className="aa-mobile-image-wrap">
+                  {announcement.images && announcement.images[0] ? (
+                    <img
+                      src={resolveImageSrc(announcement.images[0])}
+                      alt="imagine principala"
+                      className="aa-mobile-image"
+                    />
+                  ) : (
+                    <div className="aa-mobile-image aa-mobile-image-placeholder" />
+                  )}
+
+                  <div
+                    className={`aa-mobile-heart ${favoriteIds.includes(announcement._id) ? 'filled' : ''}`}
+                    onClick={(ev) => { ev.stopPropagation(); handleToggleFavorite(announcement._id, ev); }}
+                  >
+                    {favoriteIds.includes(announcement._id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                  </div>
+
+                  <div className="aa-mobile-gradient" />
+
+                  <div className="aa-mobile-overlay-content">
+                    <div className="aa-mobile-badges">
+                      <span className="aa-mobile-badge category">
+                        {translateCategory(announcement.category, t).toUpperCase()}
+                      </span>
+                      {announcement.location ? (
+                        <span className="aa-mobile-badge location">{announcement.location.toUpperCase()}</span>
+                      ) : null}
+                    </div>
+                    <h2 className="aa-mobile-title-text">{announcement.title}</h2>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           // Announcements Cards & Pagination
           <>

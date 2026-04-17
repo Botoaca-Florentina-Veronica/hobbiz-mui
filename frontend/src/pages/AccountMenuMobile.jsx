@@ -170,7 +170,9 @@ export default function AccountMenuMobile() {
   ];
 
   const selectLanguage = (lang) => {
-    i18n.changeLanguage(lang);
+    i18n.changeLanguage(lang).then(() => {
+      window.location.reload();
+    });
     setShowLanguageModal(false);
   };
 

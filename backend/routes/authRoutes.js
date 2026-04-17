@@ -38,6 +38,27 @@ function normalizeOrigin(value = '') {
   return String(value).replace(/\/+$/, '').trim();
 }
 
+function isTrustedFrontendOrigin(origin = '') {
+  const normalized = normalizeOrigin(origin);
+  if (!normalized) return false;
+
+  let host;
+  try {
+    host = new URL(normalized).hostname.toLowerCase();
+  } catch (e) {
+    return false;
+  }
+
+  if (!host) return false;
+  if (host === 'hobbiz.ro' || host === 'www.hobbiz.ro') return true;
+  if (host === 'hobbiz.netlify.app' || host === 'hobbiz-mui.netlify.app') return true;
+  if (host === 'localhost' || host === '127.0.0.1') return true;
+  if (/\.netlify\.app$/.test(host)) return true;
+  if (/\.ondigitalocean\.app$/.test(host)) return true;
+
+  return false;
+}
+
 function getOriginFromUrl(rawUrl = '') {
   try {
     if (!rawUrl) return '';
@@ -49,13 +70,13 @@ function getOriginFromUrl(rawUrl = '') {
 
 function getFrontendBaseURL(req) {
   const fromEnv = normalizeOrigin(process.env.FRONTEND_URL || '');
-  if (fromEnv) return fromEnv;
+  if (fromEnv && isTrustedFrontendOrigin(fromEnv)) return fromEnv;
 
   const fromOrigin = getOriginFromUrl(req.get('origin') || '');
-  if (fromOrigin) return fromOrigin;
+  if (fromOrigin && isTrustedFrontendOrigin(fromOrigin)) return fromOrigin;
 
   const fromReferer = getOriginFromUrl(req.get('referer') || req.get('referrer') || '');
-  if (fromReferer) return fromReferer;
+  if (fromReferer && isTrustedFrontendOrigin(fromReferer)) return fromReferer;
 
   if (process.env.NODE_ENV === 'production') {
     // Safe fallback for production deploy when FRONTEND_URL is missing.

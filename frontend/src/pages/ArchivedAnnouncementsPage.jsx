@@ -18,7 +18,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Paper
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -32,6 +37,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import Toast from '../components/Toast';
 import './AllAnnouncements.css';
 import './FavoriteAnnouncements.css';
+import './ArchivedAnnouncementsPage.css';
 
 export default function ArchivedAnnouncementsPage() {
   const { t } = useTranslation();
@@ -52,6 +58,10 @@ export default function ArchivedAnnouncementsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showLoginToast, setShowLoginToast] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, announcementId: null });
+  const [isMobile, setIsMobile] = useState(() => (
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  ));
 
   const itemsPerPage = 12;
 
@@ -68,6 +78,22 @@ export default function ArchivedAnnouncementsPage() {
         setAnnouncements([]);
       });
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode('grid');
+      setShowFilters(false);
+    }
+  }, [isMobile]);
 
   const uniqueLocations = useMemo(() => {
     const locations = announcements.map(a => a.location).filter(Boolean);
@@ -200,8 +226,15 @@ export default function ArchivedAnnouncementsPage() {
     }
   };
 
-  // Delete an announcement
-  const handleDelete = async (announcementId) => {
+  // Delete an announcement (open dialog)
+  const handleDeleteClick = (announcementId) => {
+    setDeleteDialog({ open: true, announcementId });
+  };
+
+  const handleConfirmDelete = async () => {
+    const { announcementId } = deleteDialog;
+    if (!announcementId) return;
+
     try {
       await apiClient.delete(`/api/users/my-announcements/${announcementId}`);
       setAnnouncements(prev => prev.filter(a => a._id !== announcementId));
@@ -209,22 +242,28 @@ export default function ArchivedAnnouncementsPage() {
     } catch (err) {
       console.error('Delete error', err);
       window.showToast?.(t('myAnnouncements.deleteError'), 'error');
+    } finally {
+      setDeleteDialog({ open: false, announcementId: null });
     }
   };
 
+  const handleCancelDelete = () => {
+    setDeleteDialog({ open: false, announcementId: null });
+  };
+
   return (
-    <Box className="my-announcements-page">
+    <Box className="my-announcements-page archived-announcements-page">
       <Toast
         message={t('favorites.loginRequired')}
         type="info"
         visible={showLoginToast}
         onClose={() => setShowLoginToast(false)}
       />
-      <Box className="mobile-header">
-        <IconButton onClick={() => navigate(-1)}>
+      <Box className="mobile-header archived-mobile-header">
+        <IconButton className="archived-mobile-back-btn" onClick={() => navigate(-1)}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h6">{t('myAnnouncements.archivedPageTitle')}</Typography>
+        <Typography variant="h6" className="archived-mobile-title">{t('myAnnouncements.archivedPageTitle')}</Typography>
       </Box>
 
       <Box className="all-announcements-wrapper">
@@ -232,7 +271,7 @@ export default function ArchivedAnnouncementsPage() {
           <Typography variant="h3">{t('myAnnouncements.archivedPageTitle')}</Typography>
         </Box>
 
-        <Paper elevation={0} className="search-filters-bar">
+        <Paper elevation={0} className="search-filters-bar archived-search-filters-bar">
           <Stack spacing={2}>
             <TextField
               fullWidth
@@ -250,22 +289,59 @@ export default function ArchivedAnnouncementsPage() {
               sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'var(--ma-search-input-bg)' }, '& .MuiInputBase-input': { color: 'var(--ma-text-primary)' } }}
             />
 
-            <Box className="filters-controls">
-              <Button startIcon={<FilterIcon />} onClick={() => setShowFilters(!showFilters)} className="filters-toggle-btn">
-                {showFilters ? t('allAnnouncements.hideFilters') : t('allAnnouncements.showFilters')}
-              </Button>
+            {isMobile ? (
+              <Box className="archived-mobile-filter-row">
+                <FormControl size="small" className="archived-mobile-filter-field">
+                  <Select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="archived-mobile-select"
+                    displayEmpty
+                  >
+                    <MenuItem value="all">{t('allAnnouncements.allCategories')}</MenuItem>
+                    {uniqueCategories.map(cat => (
+                      <MenuItem key={cat} value={cat}>{translateCategory(cat, t)}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-              <ButtonGroup size="small" className="view-mode-toggle">
-                <Button onClick={() => setViewMode('grid')} variant={viewMode === 'grid' ? 'contained' : 'outlined'} className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}>
-                  <GridViewIcon fontSize="small" />
-                </Button>
-                <Button onClick={() => setViewMode('list')} variant={viewMode === 'list' ? 'contained' : 'outlined'} className={`view-mode-button ${viewMode === 'list' ? 'active' : ''}`}>
-                  <ListViewIcon fontSize="small" />
-                </Button>
-              </ButtonGroup>
-            </Box>
+                <FormControl size="small" className="archived-mobile-filter-field">
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="archived-mobile-select"
+                    displayEmpty
+                  >
+                    <MenuItem value="recent">{t('allAnnouncements.recent')}</MenuItem>
+                    <MenuItem value="oldest">{t('allAnnouncements.oldest')}</MenuItem>
+                    <MenuItem value="price-low">{t('allAnnouncements.priceLow')}</MenuItem>
+                    <MenuItem value="price-high">{t('allAnnouncements.priceHigh')}</MenuItem>
+                    <MenuItem value="title">{t('allAnnouncements.titleSort')}</MenuItem>
+                  </Select>
+                </FormControl>
 
-            {showFilters && (
+                <Typography className="archived-mobile-results-count">
+                  {filteredAndSortedAnnouncements.length} {t('allAnnouncements.results')}
+                </Typography>
+              </Box>
+            ) : (
+              <Box className="filters-controls">
+                <Button startIcon={<FilterIcon />} onClick={() => setShowFilters(!showFilters)} className="filters-toggle-btn">
+                  {showFilters ? t('allAnnouncements.hideFilters') : t('allAnnouncements.showFilters')}
+                </Button>
+
+                <ButtonGroup size="small" className="view-mode-toggle">
+                  <Button onClick={() => setViewMode('grid')} variant={viewMode === 'grid' ? 'contained' : 'outlined'} className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}>
+                    <GridViewIcon fontSize="small" />
+                  </Button>
+                  <Button onClick={() => setViewMode('list')} variant={viewMode === 'list' ? 'contained' : 'outlined'} className={`view-mode-button ${viewMode === 'list' ? 'active' : ''}`}>
+                    <ListViewIcon fontSize="small" />
+                  </Button>
+                </ButtonGroup>
+              </Box>
+            )}
+
+            {showFilters && !isMobile && (
               <Grid container spacing={2} className="filters-grid">
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth size="small">
@@ -372,7 +448,7 @@ export default function ArchivedAnnouncementsPage() {
                         <div className="favorite-announcement-actions">
                           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                             <Button size="small" variant="outlined" onClick={(ev) => { ev.stopPropagation(); handleUnarchive(announcement._id); }}>{t('myAnnouncements.unarchive')}</Button>
-                            <Button size="small" variant="outlined" color="error" onClick={(ev) => { ev.stopPropagation(); if (window.confirm(t('myAnnouncements.confirmDeleteTitle') || 'Delete announcement?')) handleDelete(announcement._id); }}>{t('myAnnouncements.deleteBtn') || t('myAnnouncements.delete')}</Button>
+                            <Button size="small" variant="outlined" color="error" onClick={(ev) => { ev.stopPropagation(); handleDeleteClick(announcement._id); }}>{t('myAnnouncements.deleteBtn') || t('myAnnouncements.delete')}</Button>
                           </div>
                         </div>
 
@@ -401,7 +477,7 @@ export default function ArchivedAnnouncementsPage() {
                           <div className="ma-card-price">{announcement.price ? `${announcement.price} RON` : ''}</div>
                           <div className="announcement-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
                             <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleUnarchive(announcement._id); }}>{t('myAnnouncements.unarchive')}</Button>
-                            <Button variant="outlined" size="small" color="error" onClick={(e) => { e.stopPropagation(); if (window.confirm(t('myAnnouncements.confirmDeleteTitle') || 'Delete announcement?')) handleDelete(announcement._id); }}>{t('myAnnouncements.deleteBtn') || t('myAnnouncements.delete')}</Button>
+                            <Button variant="outlined" size="small" color="error" onClick={(e) => { e.stopPropagation(); handleDeleteClick(announcement._id); }}>{t('myAnnouncements.deleteBtn') || t('myAnnouncements.delete')}</Button>
                           </div>
                         </div>
                       </div>
@@ -433,6 +509,36 @@ export default function ArchivedAnnouncementsPage() {
           )}
         </Box>
       </Box>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialog.open}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          style: {
+            backgroundColor: 'var(--bg-secondary, #ffffff)',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'var(--text-primary, #111)', fontWeight: '700' }}>
+          {t('myAnnouncements.deleteTitle') || t('myAnnouncements.confirmDeleteTitle') || 'Șterge anunț'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'var(--text-secondary, #444)' }}>
+            {t('myAnnouncements.deleteMessage') || t('myAnnouncements.confirmDeleteDescription') || 'Sigur vrei să ștergi acest anunț? Această acțiune nu poate fi anulată.'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button onClick={handleCancelDelete} sx={{ color: 'var(--text-secondary, #444)', fontWeight: 600 }}>
+            {t('myAnnouncements.cancel') || t('cancel') || 'Anulează'}
+          </Button>
+          <Button onClick={handleConfirmDelete} variant="contained" color="error" disableElevation sx={{ borderRadius: '10px', fontWeight: 600, textTransform: 'none' }} autoFocus>
+            {t('myAnnouncements.deleteBtn') || 'Șterge'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -1557,6 +1557,7 @@ body:not(.dark-mode) .profile-about-card {
     flex-direction: column;
     gap: 0;
     padding-bottom: 8px;
+    margin-top: 86px !important;
   }
 
   .profile-page-container {

@@ -498,7 +498,7 @@
   .notifications-page {
     /* Reduce top padding as we use MobileHeader logic */
     padding: 20px 0;
-    padding-top: 20px;
+    padding-top: 100px; /* Increased top padding so the container is not cut off by mobile status bars */
   }
   
   .notifications-container { padding: 0 16px; }

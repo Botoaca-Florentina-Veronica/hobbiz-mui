@@ -763,7 +763,7 @@ export default function ProfilePage() {
       <div className="mobile-announcements-card">
         <div className="mobile-card-header">
           <h2 className="mobile-card-title">{t('profile.myAnnouncements')}</h2>
-          <button className="mobile-edit-button" onClick={() => navigate('/my-announcements')}>
+          <button className="mobile-edit-button" onClick={() => navigate('/toate-anunturile')}>
             {t('profile.viewAll')}
           </button>
         </div>
@@ -1015,7 +1015,7 @@ export default function ProfilePage() {
       <div className="profile-announcements-sidebar">
         <div className="profile-announcements-header">
           <h3 className="profile-section-title">{t('profile.myAnnouncements')} ({userAnnouncements.length})</h3>
-          <button className="profile-view-all-button" onClick={() => navigate('/my-announcements')}>{t('profile.viewAll')}</button>
+          <button className="profile-view-all-button" onClick={() => navigate('/toate-anunturile')}>{t('profile.viewAll')}</button>
         </div>
 
         {announcementsLoading ? (

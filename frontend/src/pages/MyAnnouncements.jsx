@@ -14,7 +14,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
+  Button,
+  Typography
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -245,19 +246,19 @@ export default function MyAnnouncements() {
         </div>
 
         {/* Mobile header shown only on small screens */}
-        <div className="ma-mobile-header">
+        <div className="mobile-header">
           <IconButton
             onClick={() => navigate(-1)}
-            className="ma-mobile-back"
+            className="mobile-back-btn"
             disableRipple
+            disableFocusRipple
             aria-label="Back"
-            size="small"
           >
             <ArrowBackIcon />
           </IconButton>
-          <div className="ma-mobile-title">{t('myAnnouncements.title')}</div>
-          {/* spacer keeps title visually centered when a left back button is present */}
-          <div className="ma-mobile-spacer" aria-hidden="true" />
+          <Typography variant="h5" className="mobile-header-title">
+            {t('myAnnouncements.title')}
+          </Typography>
         </div>
 
         <h1 className="ma-page-title">{t('myAnnouncements.title')}</h1>

@@ -292,7 +292,7 @@ function App() {
         <Route path="/setari-notificari" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-            <Header />
+            {!isSmallExploreViewport && <Header />}
             <NotificationSettingsPage />
             <Footer hideOnMobile />
           </>

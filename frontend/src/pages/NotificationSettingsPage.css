@@ -2,6 +2,8 @@
   background-color: #ffffff;
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  z-index: 100;
 }
 
 .dark-mode .notification-settings-page-wrapper {
@@ -125,9 +127,67 @@
   .setting-item .setting-desc { font-size: 0.95rem; }
 }
 
+/* Mobile header styling (hidden on larger screens) */
+.mobile-header { display: none; }
+
 /* Extra small screens: make buttons fill width with equal side padding */
 @media (max-width: 600px) {
+  .notification-title { display: none; }
+  .settings-header { display: none !important; }
+  .settings-header { display: none !important; }
+
+  .mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 0px !important;
+    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    color: var(--text-primary) !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    background-color: var(--bg-primary);
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+  }
+
+  .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--bg-secondary) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  }
+  .mobile-back-btn:hover { background-color: var(--bg-hover) !important; }
+
+  .mobile-header .MuiSvgIcon-root {
+    font-size: 24px !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mobile-header-title {
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    font-size: 24px !important;
+    line-height: 1.334 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    margin-left: 4px !important;
+    padding-right: 2rem !important;
+  }
+
   .notification-settings-container {
+    padding-top: 72px;
     align-items: stretch;
     padding-left: 12px;
     padding-right: 12px;
@@ -136,35 +196,40 @@
   .settings-paper {
     width: 100%;
     max-width: none;
-    margin: 12px 0;
-    padding: 6px;
+    margin: 22px 0 0 0 !important;
+    padding: 0;
+    background-color: var(--bg-secondary) !important;
   }
 
   .setting-item {
-    padding: 12px 12px !important;
-    flex-direction: column !important;
-    align-items: flex-start;
-    gap: 8px;
+    padding: 16px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px;
   }
 
   .setting-item .MuiListItemText-root {
-    width: 100%;
+    width: auto;
+    flex: 1;
   }
 
-  /* put the switch on a separate row to avoid overflow on very small screens */
+  /* Keep the switch next to the text on mobile (native style) */
   .setting-item .MuiListItemSecondaryAction-root {
     position: relative !important;
     right: 0 !important;
     margin-left: 0 !important;
-    width: 100%;
-    display: flex; justify-content: flex-end; padding-top: 6px;
+    width: auto;
+    display: flex; 
+    justify-content: flex-end; 
+    padding-top: 0;
   }
 
   .setting-item .MuiListItemText-primary {
     font-size: 1rem !important;
+    font-weight: 600 !important;
   }
 
-  .setting-item .setting-desc { font-size: 0.95rem; }
+  .setting-item .setting-desc { font-size: 0.85rem; }
 }
 
 /* Responsive design for larger screens */

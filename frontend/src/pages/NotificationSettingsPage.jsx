@@ -99,6 +99,21 @@ export default function NotificationSettingsPage() {
 
   return (
     <div className="notification-settings-page-wrapper">
+      <div className="mobile-header">
+        <IconButton
+          onClick={() => navigate(-1)}
+          className="mobile-back-btn"
+          disableRipple
+          disableFocusRipple
+          aria-label="Back"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" className="mobile-header-title">
+          {t('notificationSettings.title')}
+        </Typography>
+      </div>
+
       <Container maxWidth="lg" className="notification-settings-container">
         <Box display="flex" alignItems="center" justifyContent="center" mb={3} mt={2} className="settings-header">
           <h1 className="notification-title">{t('notificationSettings.title')}</h1>

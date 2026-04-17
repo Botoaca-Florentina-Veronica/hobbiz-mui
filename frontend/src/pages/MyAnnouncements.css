@@ -179,70 +179,67 @@
 }
 
 /* Mobile: hide the small header (back + small title from desktop header) and show compact mobile header */
-.ma-mobile-header { display: none; }
+.mobile-header { display: none; }
 
 @media (max-width: 600px) {
   .ma-header { display: none !important; }
 
   .ma-page-title { display: none; } /* hide the large centered H1 on small screens (mobile header will be used) */
 
-  .ma-mobile-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px; /* reduce gap so title more likely fits */
-    padding: 12px;
-    padding-top: max(env(safe-area-inset-top), 12px);
-    background-color: var(--ma-bg);
-    border-bottom: none;
-    /* make space similar to the previous H1 margin */
-    margin-bottom: 8px;
-    /* Keep mobile header above overlays and prevent bleed-through */
+  .mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 24px !important;
+    padding-top: clamp(8px, 3vh, 24px) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    color: var(--chat-text) !important;
     position: sticky;
     top: 0;
     z-index: 1100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    background-color: var(--ma-bg);
   }
 
-  .ma-mobile-back {
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--ma-border);
-    background-color: var(--ma-surface);
-    color: var(--ma-text);
-    cursor: pointer;
-    padding: 6px;
-    flex: none;
+  .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--chat-elev) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  }
+  .mobile-back-btn:hover { background-color: var(--chat-surface) !important; }
+
+  .mobile-header .MuiSvgIcon-root {
+    font-size: 24px !important;
+    color: #333333 !important;
   }
 
-  .ma-mobile-title {
-    font-size: 1.8rem; /* slightly smaller so the title fits on one line */
-    font-weight: 700;
-    color: var(--ma-text);
-    flex: 1;
-    text-align: center; /* keep centered even with back button */
-    padding: 0 8px;
-    line-height: 1.1;
-    white-space: nowrap; /* prevent wrapping */
-    overflow: hidden;
-    text-overflow: ellipsis; /* gracefully truncate if needed */
+  .dark-mode .mobile-header .MuiSvgIcon-root {
+    color: #ffffff !important;
   }
 
-  .ma-mobile-spacer {
-    width: 40px;
-    height: 40px;
-    flex: none;
+  .mobile-header-title {
+    font-weight: 600 !important;
+    color: var(--chat-text) !important;
+    font-size: 24px !important;
+    line-height: 1.334 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    margin-left: 4px !important;
+    padding-right: 2rem !important;
   }
 
-  .dark-mode .ma-mobile-title {
-    color: #f51866;
-  }
+  .ma-container { padding-top: calc(env(safe-area-inset-top) + 8px); }
 
-  .ma-container { padding-top: env(safe-area-inset-top); }
+  .ma-search-section {
+    margin-top: 64px;
+  }
 }
 /* 4. SEARCH SECTION
    ---------------------------------------------------------- */
