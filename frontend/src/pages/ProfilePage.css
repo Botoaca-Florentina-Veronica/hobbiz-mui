@@ -1124,17 +1124,21 @@ body:not(.dark-mode) .profile-about-card {
 }
 
 .mobile-avatar-container {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   margin-right: 16px;
   position: relative;
   flex-shrink: 0;
+  border-radius: 50%;
+  border: 4px solid var(--pf-card-bg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: var(--pf-divider);
 }
 
 .mobile-avatar-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -1143,10 +1147,10 @@ body:not(.dark-mode) .profile-about-card {
 }
 
 .mobile-avatar-placeholder {
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
-  background: var(--pf-divider);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1505,6 +1509,17 @@ body:not(.dark-mode) .profile-about-card {
 
 /* Mobile header (shown <= 768px) */
 @media (max-width: 768px) {
+  .profile-page-container,
+  .profile-page-container *,
+  .profile-mobile-layout,
+  .profile-mobile-layout *,
+  .mobile-profile-header-card,
+  .mobile-profile-header-card *,
+  .mobile-header,
+  .mobile-header * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+
   .mobile-header {
     display: flex !important;
     align-items: center !important;

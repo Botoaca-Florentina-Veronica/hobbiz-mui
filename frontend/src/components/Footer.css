@@ -24,7 +24,7 @@
   --ft-mob-bg: var(--bg-secondary);
   --ft-mob-border: var(--border-color);
   --ft-mob-shadow: 0 -2px 12px rgba(0,0,0,0.1);
-  --ft-mob-icon: var(--text-secondary);
+  --ft-mob-icon: #25354d; /* Darker shade for better visibility in light mode */
   --ft-mob-icon-active: var(--primary);
   
   /* Publish Button */
@@ -193,7 +193,7 @@
     flex: 1; display: flex !important;
     flex-direction: column; align-items: center; justify-content: center;
     height: 100%; cursor: pointer;
-    color: var(--ft-mob-icon);
+    color: var(--ft-mob-icon) !important;
     font-size: var(--ft-icon-label-size); gap: var(--ft-icon-gap);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none; border: none; background: none;
@@ -517,6 +517,25 @@
     --ft-icon-label-size: 0.75rem;
     --ft-pub-size: 36px;
     --ft-pub-svg-size: 24px;
+  }
+}
+
+/* Wider mobile/tablet widths where the footer can be larger */
+@media (min-width: 600px) and (max-width: 1000px) {
+  .footer-mobile-buttons {
+    --ft-mobile-height: 86px;
+    --ft-icon-size: 30px;
+    --ft-icon-label-size: 0.85rem;
+    --ft-pub-size: 44px;
+    --ft-pub-svg-size: 26px;
+    width: calc(100% - 60px) !important;
+    max-width: 460px;
+    padding: 0 12px !important;
+  }
+
+  .footer-mobile-buttons .footer-icon {
+    padding: 0.3rem;
+    gap: 0.3rem;
   }
 }
 

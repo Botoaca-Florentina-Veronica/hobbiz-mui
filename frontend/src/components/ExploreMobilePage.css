@@ -64,12 +64,17 @@
 }
 
 .explore-mobile-section {
-  margin-top: 4px;
-  margin-bottom: 14px;
+  margin-top: 32px;
+  margin-bottom: 40px;
   width: 100%;
   max-width: 760px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.explore-mobile-section,
+.explore-mobile-section * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .explore-mobile-section-header {

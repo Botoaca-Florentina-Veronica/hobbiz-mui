@@ -544,17 +544,44 @@ export default function ChatPage() {
         
         {/* Sidebar */}
         <aside className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`} style={isDesktop ? { width: sidebarWidth } : {}}>
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 2, mb: 1, pt: 'clamp(36px, 7vh, 72px)', px: 2 }}>
-            <IconButton onClick={() => navigate('/')} sx={{ color: 'var(--c-text-primary)' }}><ArrowBack /></IconButton>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--c-text-primary)' }}>Chat</Typography>
-          </Box>
+          {/* Default Desktop Header / Legacy Mobile header replaced by gradient on mobile */}
+          {!isMobile && (
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 2, mb: 1, pt: 'clamp(36px, 7vh, 72px)', px: 2 }}>
+              <IconButton onClick={() => navigate('/')} sx={{ color: 'var(--c-text-primary)' }}><ArrowBack /></IconButton>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--c-text-primary)' }}>Chat</Typography>
+            </Box>
+          )}
+          
+          {isMobile ? (
+            <div className="chat-mobile-gradient-header">
+              <div className="chat-mobile-header-top">
+                <div className="chat-mobile-header-title-section">
+                  <Typography variant="h5" className="list-header-title">
+                    {t('chat.conversations', 'Mesaje')} ({conversations?.length || 0})
+                  </Typography>
+                  <Typography variant="subtitle2" className="list-header-subtitle">
+                    {t('chat.continueConversations', 'Continuă conversațiile')}
+                  </Typography>
+                </div>
+              </div>
+              
+              <div className="chat-mobile-filter-segment">
+                <button className={`chat-mobile-filter-btn ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>
+                  <span className="chat-mobile-filter-text">{t('chat.buying')}</span>
+                </button>
+                <button className={`chat-mobile-filter-btn ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>
+                  <span className="chat-mobile-filter-text">{t('chat.selling')}</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="chat-tabs">
+              <button className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>{t('chat.buying')}</button>
+              <button className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>{t('chat.selling')}</button>
+            </div>
+          )}
 
-          <div className="chat-tabs">
-            <button className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>{t('chat.buying')}</button>
-            <button className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>{t('chat.selling')}</button>
-          </div>
-
-          <div className="chat-conversation-list">
+          <div className="chat-conversation-list mobile-flat-list">
             {unreadConvs.length > 0 && <div className="chat-section-label">{t('chat.unread')}</div>}
             {unreadConvs.map(c => (
               <div key={c.conversationId} className={`chat-conversation-item unread ${selectedConversation?.conversationId === c.conversationId ? 'selected' : ''}`} onClick={() => { setSelectedConversation(c); setIsSidebarOpen(false); }}>

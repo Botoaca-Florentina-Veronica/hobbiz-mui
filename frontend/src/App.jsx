@@ -8,7 +8,6 @@ import Content from './components/Content';
 import Categories from './components/Categories';
 import ChooseUs from './components/ChooseUs';
 import PromoSection from './components/PromoSection';
-import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 import DarkModeToggle from './components/DarkModeToggle';
 import Toast from './components/Toast';
@@ -252,7 +251,6 @@ function App() {
                   <ChooseUs />
                   <PromoSection />
                   <Categories />
-                  <CallToAction />
                 </>
               )}
             <Footer hideLegalUpTo1200 />
@@ -275,7 +273,6 @@ function App() {
             <ChooseUs />
             <PromoSection />
             <Categories />
-            <CallToAction />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
             <CookieConsent />

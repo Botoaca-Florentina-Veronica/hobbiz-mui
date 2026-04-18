@@ -54,6 +54,13 @@
   padding: 0 0 120px 0;
 }
 
+@media (max-width: 768px) {
+  .my-announcements-page,
+  .my-announcements-page * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+}
+
 .all-announcements-wrapper {
   max-width: 1400px;
   margin: 0 auto;

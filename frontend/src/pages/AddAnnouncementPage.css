@@ -101,7 +101,9 @@
 
 .add-announcement-container * {
   font-family: 'Poppins', sans-serif !important;
-}/* Mobile & Tablet Overrides (No !important needed) */
+}
+
+/* Mobile & Tablet Overrides (No !important needed) */
 @media (max-width: 1024px) {
   .add-announcement-container {
     margin-top: 0;

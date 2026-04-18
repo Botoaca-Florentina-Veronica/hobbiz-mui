@@ -53,6 +53,19 @@
   font-family: 'Poppins', sans-serif;
 }
 
+.account-mobile,
+.account-mobile *,
+.account-mobile button,
+.account-mobile input,
+.account-mobile select,
+.account-mobile textarea,
+.account-mobile .MuiTypography-root,
+.account-mobile .MuiButtonBase-root,
+.account-mobile .MuiSwitch-root,
+.account-mobile .MuiSwitch-root * {
+  font-family: 'Poppins', sans-serif !important;
+}
+
 /* Header (mobile-only) - further enlarged solid pink area */
 .account-mobile__header{
   position:relative;
@@ -75,7 +88,7 @@
 .account-mobile__title{ font-weight:700; font-size:1.14rem; margin-left:4px; color: #fff; }
 /* Even bigger greeting to emphasize the pink area */
 .account-mobile__greeting{ font-size:4.0rem; font-weight:900; color:#fff; line-height:1; margin:20px 0 32px 0; padding: 0 6px; }
-.account-mobile__greeting-name{ color: #000000; background: transparent; padding: 0; border-radius: 0; display:inline; margin-left:8px; font-weight:900; text-shadow: none; }
+.account-mobile__greeting-name{ color: #000000 !important; background: transparent; padding: 0; border-radius: 0; display:inline; margin-left:8px; font-weight:900; text-shadow: none; }
 
 /* Ensure user card name is also bold */
 .account-mobile__name{ font-weight:900;  }
@@ -93,7 +106,7 @@
   /* align header horizontal padding with page content for consistent edges */
   .account-mobile__header{ padding: calc(28px + env(safe-area-inset-top)) 16px 60px 16px; }
   .account-mobile__usercard{ margin: -18px auto 0; width:100%; }
-  .account-mobile__avatar{ width:76px; height:76px; }
+  .account-mobile__avatar{ width:100px; height:100px; }
 } 
 
 
@@ -104,8 +117,9 @@
 /* User card (keeps previous aesthetics) */
 .account-mobile__usercard{ position:relative; display:flex; flex-direction:column; align-items:center; background:var(--acc-user-card); border:none; padding:18px 16px 16px; border-radius:14px; box-shadow: 0 6px 18px rgba(0,0,0,0.18); width:100%; max-width:440px; margin: -40px auto 0; z-index:1; box-sizing:border-box; }
 .account-mobile__avatar-wrap{ position:absolute; top:0; left:50%; transform:translate(-50%, -50%); }
-.account-mobile__avatar{ width:88px; height:88px; border-radius:50%; overflow:hidden; background:var(--acc-avatar-bg); display:flex; align-items:center; justify-content:center; border:4px solid var(--acc-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
-.account-mobile__avatar img{ width:100%; height:100%; object-fit:cover; }.account-mobile__info { display:flex; flex-direction:column; align-items:center; width:100%; text-align:center; }.account-mobile__name{ font-weight:700; color:var(--acc-user-name); font-size:1.15rem; margin-top:42px; text-align:center; }
+  .account-mobile__avatar{ width:110px; height:110px; border-radius:50%; overflow:hidden; background:var(--acc-avatar-bg); display:flex; align-items:center; justify-content:center; border:4px solid var(--acc-bg); box-shadow: none; }
+.dark-mode .account-mobile__avatar { border-color: var(--acc-user-card); }
+.account-mobile__avatar img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:50%; }.account-mobile__info { display:flex; flex-direction:column; align-items:center; width:100%; text-align:center; }.account-mobile__name{ font-weight:700; color:var(--acc-user-name); font-size:1.15rem; margin-top:42px; text-align:center; }
 .account-mobile__admin-badge{ display:inline-flex; align-items:center; gap:6px; margin-top:8px; font-size:0.8rem; font-weight:600; }
 .account-mobile.account-mobile--applike .account-mobile__admin-badge {
   border: 1.5px solid #355070;
@@ -124,11 +138,16 @@
 .account-mobile__menu-btn{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border-radius:10px; background:var(--acc-card); border:1px solid var(--acc-border); color:var(--acc-text); text-align:left; font-weight:600; cursor:pointer; box-shadow:none; }
 .account-mobile__menu-btn:hover{ transform:translateY(-2px); background:var(--acc-hover); }
 .account-mobile__menu-icon{ width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(255,255,255,0.06); color:var(--acc-primary); }
-.account-mobile__menu-label{ flex:1; }
+.account-mobile__menu-label{ flex:1; font-family: 'Poppins', sans-serif !important; }
 
 /* Row for switches (dark mode) */
 .account-mobile__menu-row{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; background:var(--acc-card); border:1px solid var(--acc-border); }
+.account-mobile__menu-row .account-mobile__menu-label{ margin-right: 4px; }
 .account-mobile__menu-control{ margin-left:auto; }
+.account-mobile__menu-control .MuiSwitch-root,
+.account-mobile__menu-control .MuiSwitch-root * {
+  font-family: 'Poppins', sans-serif !important;
+}
 
 /* Logout button style */
 .account-mobile__logout{ background: linear-gradient(90deg, rgba(245,24,102,0.12), rgba(245,24,102,0.06)); color:var(--acc-primary-alt); border:1px solid rgba(245,24,102,0.14); font-weight:700; }
@@ -283,7 +302,7 @@
 }
 
 .account-mobile.account-mobile--applike .account-mobile__greeting-name {
-  color: var(--acc-app-name-light);
+  color: #000000 !important;
   font-weight: 900;
   background: transparent;
   text-shadow: none;
@@ -322,14 +341,24 @@
 }
 
 .account-mobile.account-mobile--applike .account-mobile__avatar {
-  width: 108px;
-  height: 108px;
-  border-radius: 54px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
   border: 6px solid #ffffff;
+  box-shadow: none;
+}
+
+.account-mobile.account-mobile--applike .account-mobile__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
 }
 
 .dark-mode .account-mobile.account-mobile--applike .account-mobile__avatar {
-  border-color: #121212;
+  border-color: var(--acc-user-card);
 }
 
 .account-mobile.account-mobile--applike .account-mobile__name {
@@ -346,7 +375,7 @@
 .account-mobile.account-mobile--applike .account-mobile__menu-group {
   margin: 20px;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
   background: var(--acc-app-surface-light);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -391,7 +420,7 @@
   background: transparent;
   box-shadow: none;
   border-radius: 0;
-  padding: 16px;
+  padding: 16px 10px 16px 16px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -417,6 +446,7 @@
   flex: 1;
   font-size: 16px;
   font-weight: 500;
+  margin-right: 4px;
 }
 
 .account-mobile.account-mobile--applike .account-mobile__chevron {
@@ -431,6 +461,8 @@
 
 .account-mobile.account-mobile--applike .account-mobile__menu-control {
   margin-left: auto;
+  padding-right: 8px;
+  flex-shrink: 0;
 }
 
 .account-mobile.account-mobile--applike .account-mobile__logout {
@@ -486,9 +518,19 @@
   }
 
   .account-mobile.account-mobile--applike .account-mobile__avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 48px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .account-mobile.account-mobile--applike .account-mobile__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
   }
 }
 

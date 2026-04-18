@@ -152,6 +152,13 @@ body.dark-mode.chat-page::before {
   background: #121212 !important;
 }
 
+@media (max-width: 768px) {
+  body.chat-page,
+  body.chat-page * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+}
+
 /* Force common app/main containers to be white on Chat page in light mode to avoid theme bleed */
 body.chat-page .app,
 body.chat-page .main-stage,
@@ -791,4 +798,51 @@ body.dark-mode.chat-page .chat-emoji-picker button { color: var(--c-bubble-other
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-top: 8px solid var(--c-main-header-bg);
+}
+
+/* =========================================================
+   MOBILE REACT NATIVE STYLE OVERRIDES
+   ========================================================= */
+@media (max-width: 1024px) {
+  /* Mobile Header Gradient */
+  .chat-mobile-gradient-header {
+    background: linear-gradient(135deg, #355070 0%, rgba(53, 80, 112, 0.75) 50%, #ffffff 100%);
+    padding: calc(env(safe-area-inset-top) + 24px) 24px 36px 24px;
+    display: flex; flex-direction: column; gap: 24px; border-radius: 0;
+  }
+  body.dark-mode .chat-mobile-gradient-header {
+    background: linear-gradient(135deg, #f51866 0%, transparent 100%);
+  }
+
+  .chat-mobile-header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .chat-mobile-header-title-section { display: flex; flex-direction: column; gap: 8px; }
+  .list-header-title { font-size: 28px !important; font-weight: 700 !important; color: #ffffff !important; letter-spacing: 0.4px !important; margin: 0 !important; }
+  .list-header-subtitle { font-size: 14px !important; color: rgba(255, 255, 255, 0.75) !important; margin: 0 !important; }
+
+  .chat-mobile-filter-segment { display: flex; flex-direction: row; background: rgba(255, 255, 255, 0.22); padding: 4px; border-radius: 999px; align-self: flex-start; gap: 4px; }
+  body.dark-mode .chat-mobile-filter-segment { background: rgba(255, 255, 255, 0.15); }
+  .chat-mobile-filter-btn { padding: 10px 22px; border-radius: 999px; border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
+  .chat-mobile-filter-btn.active { background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  body.dark-mode .chat-mobile-filter-btn.active { background: #1c1c1f; }
+  .chat-mobile-filter-text { font-size: 14px !important; font-weight: 600 !important; color: rgba(255, 255, 255, 0.8) !important; }
+  .chat-mobile-filter-btn.active .chat-mobile-filter-text { color: #355070 !important; }
+  body.dark-mode .chat-mobile-filter-btn.active .chat-mobile-filter-text { color: #ffffff !important; }
+
+  .mobile-flat-list { background: transparent !important; padding: 0 0 !important; padding-bottom: 80px !important; border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; }
+  .chat-conversation-item { border-radius: 0 !important; border: none !important; border-bottom: 1px solid var(--c-sidebar-border) !important; padding: 14px 20px !important; margin-bottom: 0 !important; background: transparent !important; box-shadow: none !important; position: relative; width: 100% !important; box-sizing: border-box; display: flex; }
+  .chat-conversation-item:last-child { border-bottom: none !important; }
+  .chat-conversation-item.unread { border-left: 4px solid var(--c-indicator) !important; background: linear-gradient(90deg, rgba(245, 24, 102, 0.08) 0%, transparent 100%) !important; }
+  body.dark-mode .chat-conversation-item.unread { background: linear-gradient(90deg, rgba(245, 24, 102, 0.12) 0%, transparent 100%) !important; }
+  .chat-avatar { width: 50px !important; height: 50px !important; border-radius: 12px !important; margin-right: 14px !important; }
+  .chat-conversation-item.unread .chat-avatar { border: 2px solid var(--c-indicator) !important; }
+
+  /* Ensure standard RN chat list alignment */
+  .chat-conversation-info { flex: 1; display: flex; flex-direction: column; justify-content: center !important; }
+  .chat-conversation-title { font-size: 16px !important; font-weight: 600 !important; color: var(--c-text-primary) !important; margin-bottom: 4px !important; line-height: 1.2 !important; }
+  .chat-conversation-item.unread .chat-conversation-title { font-weight: 800 !important; }
+  .chat-conversation-message { font-size: 14px !important; color: var(--c-text-secondary) !important; line-height: 1.4 !important; }
+  .chat-conversation-owner, .chat-conversation-time { display: none !important; }
+
+  .chat-mobile-topbar { display: none !important; }
+}
 }

@@ -80,12 +80,11 @@ function getFrontendBaseURL(req) {
 
   if (process.env.NODE_ENV === 'production') {
     // Safe fallback for production deploy when FRONTEND_URL is missing.
-    return 'https://hobbiz.netlify.app' ;
+    return 'https://hobbiz.netlify.app';
   }
 
   return 'http://localhost:5173';
 }
-
 
 // Inițiază autentificarea cu Google
 // Acceptă opțional parametri "state=mobile" sau "mobile=1" pentru a redirecționa către aplicația mobilă după login
