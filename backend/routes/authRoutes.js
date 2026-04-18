@@ -51,7 +51,7 @@ function isTrustedFrontendOrigin(origin = '') {
 
   if (!host) return false;
   if (host === 'hobbiz.ro' || host === 'www.hobbiz.ro') return true;
-  if (host === 'hobbiz.netlify.app' || host === 'hobbiz-mui.netlify.app') return true;
+  if (host === 'hobbiz.netlify.app') return true;
   if (host === 'localhost' || host === '127.0.0.1') return true;
   if (/\.netlify\.app$/.test(host)) return true;
   if (/\.ondigitalocean\.app$/.test(host)) return true;
@@ -80,11 +80,12 @@ function getFrontendBaseURL(req) {
 
   if (process.env.NODE_ENV === 'production') {
     // Safe fallback for production deploy when FRONTEND_URL is missing.
-    return 'https://hobbiz-mui.netlify.app';
+    return 'https://hobbiz.netlify.app' ;
   }
 
   return 'http://localhost:5173';
 }
+
 
 // Inițiază autentificarea cu Google
 // Acceptă opțional parametri "state=mobile" sau "mobile=1" pentru a redirecționa către aplicația mobilă după login
