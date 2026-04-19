@@ -12,7 +12,12 @@ export function GoogleLoginButton() {
     // Use Render backend as safe production fallback when VITE_API_URL is not provided at build time
     const base = import.meta.env.VITE_API_URL || 'https://hobbiz-mui.onrender.com';
     const baseNoSlash = base.replace(/\/+$/, '');
-    window.location.href = `${baseNoSlash}/auth/google`;
+    const redirectOrigin = window.location.origin;
+    const query = new URLSearchParams({
+      state: 'web',
+      redirect: redirectOrigin,
+    });
+    window.location.href = `${baseNoSlash}/auth/google?${query.toString()}`;
   };
   return (
     <button className="social-btn google" onClick={handleGoogleLogin}>

@@ -68,6 +68,19 @@ function getOriginFromUrl(rawUrl = '') {
   }
 }
 
+function getRedirectFromState(stateValue = '') {
+  try {
+    const marker = '::redirect:';
+    const idx = stateValue.indexOf(marker);
+    if (idx === -1) return '';
+    const encoded = stateValue.slice(idx + marker.length);
+    if (!encoded) return '';
+    return normalizeOrigin(decodeURIComponent(encoded));
+  } catch (e) {
+    return '';
+  }
+}
+
 function getFrontendBaseURL(req) {
   const fromEnv = normalizeOrigin(process.env.FRONTEND_URL || '');
   if (fromEnv && isTrustedFrontendOrigin(fromEnv)) return fromEnv;
@@ -98,14 +111,21 @@ router.get('/google', (req, res, next) => {
     }
   } catch (e) {}
   const rawState = typeof req.query.state === 'string' ? req.query.state : undefined;
+  const requestedRedirect = typeof req.query.redirect === 'string'
+    ? normalizeOrigin(req.query.redirect)
+    : '';
+  const trustedRequestedRedirect = isTrustedFrontendOrigin(requestedRedirect)
+    ? requestedRedirect
+    : '';
   const isMobile = rawState === 'mobile' || req.query.mobile === '1';
   if (req.session) {
     req.session.oauthDestination = isMobile ? 'mobile' : 'web';
+    req.session.oauthWebRedirect = undefined;
   }
   // If a client provided an explicit redirect URI (mobile app deep link), store it in session
-  if (isMobile && typeof req.query.redirect === 'string' && req.session) {
+  if (isMobile && trustedRequestedRedirect && req.session) {
     try {
-      req.session.oauthRedirect = req.query.redirect;
+      req.session.oauthRedirect = trustedRequestedRedirect;
     } catch (e) { /* ignore session write errors */ }
   }
   const callbackURL = getGoogleCallbackURL(req);
@@ -121,12 +141,18 @@ router.get('/google', (req, res, next) => {
   if (isMobile) {
     const mobileState = `mobile_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     // If the client sent a redirect URI, encode it into the state so it survives without session cookies
-    if (typeof req.query.redirect === 'string' && req.query.redirect) {
-      const encoded = encodeURIComponent(req.query.redirect);
+    if (trustedRequestedRedirect) {
+      const encoded = encodeURIComponent(trustedRequestedRedirect);
       options.state = `${mobileState}::redirect:${encoded}`;
     } else {
       options.state = mobileState;
     }
+  } else if (trustedRequestedRedirect) {
+    if (req.session) {
+      req.session.oauthWebRedirect = trustedRequestedRedirect;
+    }
+    const encoded = encodeURIComponent(trustedRequestedRedirect);
+    options.state = `${rawState || 'web'}::redirect:${encoded}`;
   } else if (rawState) {
     options.state = rawState;
   }
@@ -147,7 +173,7 @@ router.get('/google/callback',
     return next();
   },
   (req, res, next) => passport.authenticate('google', {
-    failureRedirect: '/login',
+    failureRedirect: `${getFrontendBaseURL(req)}/login`,
     session: true,
     callbackURL: getGoogleCallbackURL(req),
   })(req, res, next),
@@ -169,6 +195,7 @@ router.get('/google/callback',
 
     // Redirect mobil dacă state=mobile
     const returnedState = typeof req.query.state === 'string' ? req.query.state : '';
+    const redirectFromState = getRedirectFromState(returnedState);
     const sessionDest = req.session ? req.session.oauthDestination : undefined;
     if (req.session) {
       req.session.oauthDestination = undefined;
@@ -177,18 +204,7 @@ router.get('/google/callback',
     const isMobile = stateSaysMobile || sessionDest === 'mobile';
     if (isMobile) {
       // Try to extract redirect encoded in state (preferred) to avoid relying on session cookies
-      let stateRedirect;
-      try {
-        const st = typeof req.query.state === 'string' ? req.query.state : '';
-        const marker = '::redirect:';
-        const idx = st.indexOf(marker);
-        if (idx !== -1) {
-          const enc = st.slice(idx + marker.length);
-          stateRedirect = decodeURIComponent(enc);
-        }
-      } catch (e) {
-        stateRedirect = undefined;
-      }
+      const stateRedirect = redirectFromState;
 
       let mobileRedirect;
       if (stateRedirect) {
@@ -222,7 +238,18 @@ router.get('/google/callback',
     }
 
     // Redirecționează către frontend web cu tokenul în query string
-    const frontendUrl = getFrontendBaseURL(req);
+    let frontendUrl = '';
+    if (redirectFromState && isTrustedFrontendOrigin(redirectFromState)) {
+      frontendUrl = redirectFromState;
+    } else if (req.session && req.session.oauthWebRedirect && isTrustedFrontendOrigin(req.session.oauthWebRedirect)) {
+      frontendUrl = req.session.oauthWebRedirect;
+    } else {
+      frontendUrl = getFrontendBaseURL(req);
+    }
+
+    if (req.session) {
+      req.session.oauthWebRedirect = undefined;
+    }
 
     return res.redirect(`${frontendUrl}/oauth-success?token=${token}`);
   }
