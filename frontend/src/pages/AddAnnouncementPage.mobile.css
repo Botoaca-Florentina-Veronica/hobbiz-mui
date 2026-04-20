@@ -917,7 +917,7 @@
      App-like Sell Mode (mobile/tablet only)
      Activated via .sell-applike class from JSX
      ============================================================= */
-  @media (max-width: 1024px) {
+  @media (max-width: 1100px) {
     .add-announcement-container.sell-applike {
       min-height: calc(100vh - env(safe-area-inset-top));
       background: #ffffff;
@@ -1118,7 +1118,7 @@
 /* =============================================================
    Final sell-applike alignment with mobile app (small devices)
    ============================================================= */
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .add-announcement-container.sell-applike {
     background: #ffffff;
     padding: calc(env(safe-area-inset-top, 0px) + 10px) 0 calc(90px + env(safe-area-inset-bottom, 0px));

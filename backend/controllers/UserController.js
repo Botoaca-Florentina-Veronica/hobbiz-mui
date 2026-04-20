@@ -333,6 +333,9 @@ const register = async (req, res) => {
 // Autentificare utilizator
 const login = async (req, res) => {
   try {
+  const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+  const WARNING_ATTEMPT = 4;
+  const BLOCK_MINUTES = 10;
   let { email, password } = req.body;
   const normalizedEmail = normalizeEmail(email);
 
@@ -348,10 +351,52 @@ const login = async (req, res) => {
       return res.status(401).json({ error: 'Date de autentificare invalide' });
     }
 
+    // Dacă utilizatorul este blocat temporar, nu permitem autentificarea.
+    if (user.loginBlockedUntil && user.loginBlockedUntil > new Date()) {
+      return res.status(429).json({
+        error: 'Ai încercat de prea multe ori. Așteaptă 10 minute înainte să încerci din nou.'
+      });
+    }
+
+    // Blocarea a expirat -> resetăm contorul.
+    if (user.loginBlockedUntil && user.loginBlockedUntil <= new Date()) {
+      user.loginBlockedUntil = null;
+      user.failedLoginAttempts = 0;
+      try { await user.save(); } catch (_) {}
+    }
+
     // Verifică parola
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      const nextFailedAttempts = (user.failedLoginAttempts || 0) + 1;
+
+      if (nextFailedAttempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
+        user.failedLoginAttempts = 0;
+        user.loginBlockedUntil = new Date(Date.now() + BLOCK_MINUTES * 60 * 1000);
+        try { await user.save(); } catch (_) {}
+
+        return res.status(429).json({
+          error: 'Ai încercat de prea multe ori. Așteaptă 10 minute înainte să încerci din nou.'
+        });
+      }
+
+      user.failedLoginAttempts = nextFailedAttempts;
+      try { await user.save(); } catch (_) {}
+
+      if (nextFailedAttempts === WARNING_ATTEMPT) {
+        return res.status(401).json({
+          error: 'Atenție: următoarea încercare este ultima înainte de blocarea temporară de 10 minute.'
+        });
+      }
+
       return res.status(401).json({ error: 'Date de autentificare invalide' });
+    }
+
+    // Autentificare reușită -> resetăm eventualele încercări eșuate.
+    if (user.failedLoginAttempts || user.loginBlockedUntil) {
+      user.failedLoginAttempts = 0;
+      user.loginBlockedUntil = null;
+      try { await user.save(); } catch (_) {}
     }
 
     // Generează token

@@ -151,9 +151,7 @@ router.get('/google', (req, res, next) => {
     if (req.session) {
       req.session.oauthWebRedirect = trustedRequestedRedirect;
     }
-    const encoded = encodeURIComponent(trustedRequestedRedirect);
-    options.state = `${rawState || 'web'}::redirect:${encoded}`;
-  } else if (rawState) {
+  } else if (rawState && rawState !== 'web') {
     options.state = rawState;
   }
   return passport.authenticate('google', options)(req, res, next);

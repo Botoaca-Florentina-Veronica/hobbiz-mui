@@ -14,7 +14,6 @@ export function GoogleLoginButton() {
     const baseNoSlash = base.replace(/\/+$/, '');
     const redirectOrigin = window.location.origin;
     const query = new URLSearchParams({
-      state: 'web',
       redirect: redirectOrigin,
     });
     window.location.href = `${baseNoSlash}/auth/google?${query.toString()}`;

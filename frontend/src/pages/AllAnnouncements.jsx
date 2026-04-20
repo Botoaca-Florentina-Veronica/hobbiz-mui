@@ -556,7 +556,7 @@ export default function AllAnnouncements() {
         ) : (
           // Announcements Cards & Pagination
           <>
-            <div className="favorite-announcements-list">
+            <div className={`favorite-announcements-list ${viewMode === 'list' ? 'list-view' : 'grid-view'}`}>
               {currentItems.map((announcement) => (
                 <div
                   key={announcement._id}

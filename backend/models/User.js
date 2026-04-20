@@ -67,6 +67,10 @@ const userSchema = new mongoose.Schema({
   // Password reset (email code)
   passwordResetCodeHash: { type: String },
   passwordResetExpires: { type: Date },
+
+  // Login protection against repeated invalid credentials
+  failedLoginAttempts: { type: Number, default: 0 },
+  loginBlockedUntil: { type: Date, default: null },
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)
