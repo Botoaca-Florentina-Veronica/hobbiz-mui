@@ -181,11 +181,30 @@ router.get('/google/callback',
     } catch (e) {}
     return next();
   },
-  (req, res, next) => passport.authenticate('google', {
-    failureRedirect: `${getFrontendBaseURL(req)}/login`,
-    session: true,
-    callbackURL: getGoogleCallbackURL(req),
-  })(req, res, next),
+  (req, res, next) => {
+    passport.authenticate('google', {
+      session: false,
+      callbackURL: getGoogleCallbackURL(req),
+    }, (err, user, info) => {
+      const frontendUrl = getFrontendBaseURL(req);
+      
+      if (err) {
+        console.error('[Auth] Google authenticate error:', err);
+        const errorMessage = err.message || 'Eroare la server în timpul autentificării cu Google.';
+        return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(errorMessage)}`);
+      }
+      
+      if (!user) {
+        console.warn('[Auth] Google authenticate no user. Info:', info);
+        const errorMessage = (info && info.message) || 'Autentificarea cu Google a eșuat sau a fost anulată.';
+        return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(errorMessage)}`);
+      }
+      
+      console.log('[Auth] Google authenticate success for user:', user.email);
+      req.user = user;
+      return next();
+    })(req, res, next);
+  },
   (req, res) => {
     // Generează JWT pentru utilizatorul autentificat
     const user = req.user;
@@ -260,6 +279,7 @@ router.get('/google/callback',
       req.session.oauthWebRedirect = undefined;
     }
 
+    console.log(`[Auth] Redirecting to frontend: ${frontendUrl}/oauth-success`);
     return res.redirect(`${frontendUrl}/oauth-success?token=${token}`);
   }
 );

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GoogleLoginButton, FacebookLoginButton, AppleLoginButton } from './SocialButtons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import '../pages/LoginSignup.css';
@@ -23,8 +23,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const loginRef = useRef(null);
   const imgRef = useRef(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const googleError = params.get('error');
+    if (googleError) {
+      setError(googleError);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     document.body.classList.add('login-page');
