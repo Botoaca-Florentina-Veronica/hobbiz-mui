@@ -82,7 +82,23 @@ function getRedirectFromState(stateValue = '') {
 }
 
 function getFrontendBaseURL(req) {
+  const canonicalProdFrontend = 'https://hobbiz.ro';
   const fromEnv = normalizeOrigin(process.env.FRONTEND_URL || '');
+  const isRenderRuntime = Boolean(process.env.RENDER || process.env.RENDER_EXTERNAL_URL);
+
+  if (process.env.NODE_ENV === 'production' || isRenderRuntime) {
+    // Pin production redirects to the primary domain to avoid stale netlify redirects.
+    if (fromEnv && isTrustedFrontendOrigin(fromEnv)) {
+      try {
+        const envHost = new URL(fromEnv).hostname.toLowerCase();
+        if (envHost === 'hobbiz.ro' || envHost === 'www.hobbiz.ro') {
+          return fromEnv;
+        }
+      } catch (e) {}
+    }
+    return canonicalProdFrontend;
+  }
+
   if (fromEnv && isTrustedFrontendOrigin(fromEnv)) return fromEnv;
 
   const fromOrigin = getOriginFromUrl(req.get('origin') || '');
@@ -90,11 +106,6 @@ function getFrontendBaseURL(req) {
 
   const fromReferer = getOriginFromUrl(req.get('referer') || req.get('referrer') || '');
   if (fromReferer && isTrustedFrontendOrigin(fromReferer)) return fromReferer;
-
-  if (process.env.NODE_ENV === 'production') {
-    // Safe fallback for production deploy when FRONTEND_URL is missing.
-    return 'https://hobbiz.netlify.app';
-  }
 
   return 'http://localhost:5173';
 }
