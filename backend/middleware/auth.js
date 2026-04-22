@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'jwt_secret';
+
 module.exports = async (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
@@ -11,13 +13,13 @@ module.exports = async (req, res, next) => {
     const token = authHeader.replace('Bearer ', '');
     console.log('Token primit:', token);
     console.log('🔍 Verificare token în middleware auth:', token);
-    console.log('🔍 JWT_SECRET utilizat:', process.env.JWT_SECRET);
+    console.log('🔍 JWT_SECRET utilizat:', process.env.JWT_SECRET ? '***SET***' : 'fallback jwt_secret');
     
     if (!token) {
       return res.status(401).json({ error: 'Acces neautorizat' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId || decoded.id; // <-- Fix pentru Google OAuth
     
     // Verifică tokenVersion pentru a invalida sesiunile vechi

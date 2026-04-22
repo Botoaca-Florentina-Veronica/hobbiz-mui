@@ -159,6 +159,10 @@ router.get('/google', (req, res, next) => {
       options.state = mobileState;
     }
   } else if (trustedRequestedRedirect) {
+    // Mirror web redirect in OAuth state so callback can recover it even if session cookie is missing.
+    const webState = `web_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const encoded = encodeURIComponent(trustedRequestedRedirect);
+    options.state = `${webState}::redirect:${encoded}`;
     if (req.session) {
       req.session.oauthWebRedirect = trustedRequestedRedirect;
     }
@@ -286,9 +290,43 @@ router.get('/google/callback',
 
 // Logout
 router.get('/logout', (req, res) => {
-  req.logout(() => {
-    const frontendUrl = getFrontendBaseURL(req);
-    res.redirect(frontendUrl);
+  const frontendUrl = getFrontendBaseURL(req);
+  const wantsJson = req.xhr || (req.get('accept') || '').includes('application/json');
+
+  req.logout((logoutErr) => {
+    if (logoutErr) {
+      console.error('[Auth] Logout error:', logoutErr);
+    }
+
+    // Clear any OAuth transient session state to avoid reuse on next login attempt.
+    if (req.session) {
+      try {
+        req.session.oauthDestination = undefined;
+        req.session.oauthRedirect = undefined;
+        req.session.oauthWebRedirect = undefined;
+      } catch (e) { /* ignore session cleanup errors */ }
+    }
+
+    const finishResponse = () => {
+      if (wantsJson) {
+        return res.status(200).json({ ok: true });
+      }
+      return res.redirect(frontendUrl);
+    };
+
+    if (!req.session) {
+      return finishResponse();
+    }
+
+    req.session.destroy((destroyErr) => {
+      if (destroyErr) {
+        console.warn('[Auth] Failed to destroy session on logout:', destroyErr.message);
+      }
+      try {
+        res.clearCookie('connect.sid');
+      } catch (e) { /* ignore cookie clear errors */ }
+      return finishResponse();
+    });
   });
 });
 

@@ -8,10 +8,23 @@ import '../pages/SocialButtons.css';
 export function GoogleLoginButton() {
   const { t } = useTranslation();
   const handleGoogleLogin = () => {
-    // Ensure we don't end up with a double slash if VITE_API_URL ends with '/'
-    // Use Render backend as safe production fallback when VITE_API_URL is not provided at build time
-    const base = import.meta.env.VITE_API_URL || 'https://hobbiz-mui.onrender.com';
-    const baseNoSlash = base.replace(/\/+$/, '');
+    // Keep OAuth entry on the same backend used by the main API client to avoid token issuer mismatches.
+    let base = import.meta.env.VITE_API_URL;
+    if (!base) {
+      const isDev = import.meta.env.MODE === 'development';
+      if (isDev) {
+        base = '';
+      } else if (typeof window !== 'undefined') {
+        const host = window.location.hostname;
+        if (/\.netlify\.app$/.test(host)) {
+          base = 'https://hobbiz-mui.onrender.com';
+        } else {
+          base = window.location.origin;
+        }
+      }
+    }
+
+    const baseNoSlash = (base || '').replace(/\/+$/, '');
     const redirectOrigin = window.location.origin;
     const query = new URLSearchParams({
       redirect: redirectOrigin,

@@ -20,8 +20,26 @@ export default function OAuthSuccess() {
         console.warn('Failed to clear old tokens:', e);
       }
       localStorage.setItem('token', token);
-      // Re-hidratează AuthContext imediat după OAuth (altfel user/favorite apar cu întârziere)
-      refreshUser?.({ force: true }).finally(() => navigate('/'));
+
+      const finalizeOAuth = async () => {
+        try {
+          // Re-hidratează AuthContext imediat după OAuth (altfel user/favorite apar cu întârziere)
+          await refreshUser?.({ force: true });
+        } catch (e) {
+          // Ignore and validate from localStorage below.
+        }
+
+        // If middleware/interceptors invalidated token during refresh, avoid redirecting to home loop.
+        const currentToken = localStorage.getItem('token');
+        if (!currentToken) {
+          navigate('/login?error=' + encodeURIComponent('Sesiunea Google a expirat. Te rugăm să încerci din nou.'));
+          return;
+        }
+
+        navigate('/');
+      };
+
+      finalizeOAuth();
     } else {
       navigate('/login');
     }
