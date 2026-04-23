@@ -64,8 +64,10 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         const currentToken = localStorage.getItem('token');
-        // Doar dacă există un token (pentru a evita looping)
-        if (currentToken) {
+        const requestToken = error.config?.headers?.Authorization?.replace('Bearer ', '');
+        
+        // Doar dacă există un token curent și tokenul respins este același (pentru a preveni ștergerea noului token la login/OAuth)
+        if (currentToken && requestToken === currentToken) {
           console.warn('Token invalid sau expirat - curățare automată');
           localStorage.removeItem('token');
           localStorage.removeItem('userId');

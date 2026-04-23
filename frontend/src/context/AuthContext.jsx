@@ -117,6 +117,13 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       console.warn('Hydrate failed:', e.response?.data || e.message);
       if (e.response?.status === 401) {
+        // Asigură-te că nu ștergem un token abia setat de OAuthSuccess
+        const currentToken = localStorage.getItem('token');
+        if (token && currentToken && token !== currentToken) {
+          console.warn('Ignor 401: a apărut un token nou în timpul cererii.');
+          return;
+        }
+        
         // token invalid - șterge toate datele de autentificare + cache-ul de favorite
         try {
           const uid = localStorage.getItem('userId');
