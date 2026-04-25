@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/api';
 import FooterPublishButton from './FooterPublishButton';
 import './Footer.css';
@@ -16,6 +17,7 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { favorites } = useAuth() || { favorites: [] };
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [googleAvatar, setGoogleAvatar] = useState(null);
@@ -131,8 +133,16 @@ export default function Footer({ hideOnMobile = false, hideLegalUpTo1200 = false
                 navigate('/favorite-announcements');
               }
             }}
+            style={{ position: 'relative' }}
           >
-            <FavoriteBorderOutlinedIcon />
+            <div style={{ position: 'relative', display: 'inline-flex' }}>
+              <FavoriteBorderOutlinedIcon />
+              {isAuthenticated && favorites && favorites.length > 0 && (
+                <span className="footer-favorite-badge">
+                  {favorites.length > 99 ? '99+' : favorites.length}
+                </span>
+              )}
+            </div>
             <span>{t('footer.favorites')}</span>
           </div>
           

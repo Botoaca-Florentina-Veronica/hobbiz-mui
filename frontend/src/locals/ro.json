@@ -1317,6 +1317,7 @@
     "sortBy": "Sortează după"
   },
   "verification": {
+    "menuLabel": "Verificare documente",
     "title": "Verificări documente",
     "uploadTitle": "Încarcă document nou",
     "infoTitle": "De ce să îți verifici profilul?",

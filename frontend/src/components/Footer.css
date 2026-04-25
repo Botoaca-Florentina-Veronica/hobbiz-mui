@@ -543,3 +543,30 @@
 .chat-mobile-active .footer-mobile-buttons {
   display: none !important;
 }
+
+/* Badge simplu pentru favorite footer-mobile */
+.footer-favorite-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  padding: 0;
+  background-color: var(--primary, #e53935);
+  color: #ffffff !important;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 50%;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px var(--app-bg, #fff);
+  z-index: 10;
+}
+
+.dark-mode .footer-favorite-badge {
+  box-shadow: 0 0 0 2px var(--app-bg, #121212);
+  color: white;
+}

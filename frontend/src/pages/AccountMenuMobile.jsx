@@ -157,7 +157,7 @@ export default function AccountMenuMobile() {
     { icon: <Settings />, label: t('header.settings'), path: '/setari-cont' },
     { icon: <Campaign />, label: t('header.myAnnouncements'), path: '/anunturile-mele' },
     { icon: <Person />, label: t('header.profile'), path: '/profil' },
-    { icon: <VerifiedUser />, label: 'Verificare Documente', path: '/verificare-documente' },
+    { icon: <VerifiedUser />, label: t('verification.menuLabel'), path: '/verificare-documente' },
     ...(userProfile?.isAdmin ? [
       { icon: <VerifiedUser />, label: t('header.adminVerifications'), path: '/admin/setari', style: { color: '#f51866' } }
     ] : [])

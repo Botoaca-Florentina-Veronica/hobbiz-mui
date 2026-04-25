@@ -17,6 +17,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import VariableProximity from './VariableProximity';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 import './MainStage.css';
 import useSearchSuggestions from '../hooks/useSearchSuggestions';
 
@@ -206,6 +208,8 @@ export default function MainStage() {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const windowWidth = useWindowWidth();
+  const containerRef = useRef(null);
   
   // State
   const [anchorEl, setAnchorEl] = useState(null);
@@ -800,10 +804,21 @@ export default function MainStage() {
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className="main-content" ref={containerRef}>
         <div className="main-text">
           <h1 id="main-title">
-            {t('mainStage.title')}
+            {windowWidth > 1100 ? (
+              <VariableProximity
+                text={t('mainStage.title')}
+                fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                toFontVariationSettings="'wght' 1000, 'opsz' 40"
+                containerRef={containerRef}
+                radius={120}
+                falloff="linear"
+              />
+            ) : (
+              t('mainStage.title')
+            )}
           </h1>
           <p>{t('mainStage.subtitle')}</p>
           <button className="sign-up-button" onClick={() => navigate('/signup')}>

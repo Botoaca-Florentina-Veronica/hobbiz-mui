@@ -1317,6 +1317,7 @@
     "sortBy": "Sort by"
   },
   "verification": {
+    "menuLabel": "Verify documents",
     "title": "Verification Documents",
     "uploadTitle": "Upload new document",
     "infoTitle": "Why verify your profile?",

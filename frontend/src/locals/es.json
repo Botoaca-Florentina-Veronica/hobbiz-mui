@@ -1312,6 +1312,7 @@
     "sortBy": "Ordenar por"
   },
   "verification": {
+    "menuLabel": "Verificación de documentos",
     "title": "Documentos de verificación",
     "uploadTitle": "Subir nuevo documento",
     "infoTitle": "¿Por qué verificar tu perfil?",

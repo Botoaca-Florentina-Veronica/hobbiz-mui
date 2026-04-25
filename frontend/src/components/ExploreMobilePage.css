@@ -209,6 +209,11 @@
   width: 100%;
 }
 
+.dark-mode .explore-mobile-details-btn {
+  background: #f51865da;
+  color: #ffffff;
+}
+
 .explore-mobile-placeholder {
   align-items: center;
   justify-content: center;

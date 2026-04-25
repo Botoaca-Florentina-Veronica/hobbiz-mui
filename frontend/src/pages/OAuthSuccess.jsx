@@ -1,12 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function OAuthSuccess() {
   const navigate = useNavigate();
   const { refreshUser } = useAuth() || {};
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     // Extrage tokenul din query string
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
