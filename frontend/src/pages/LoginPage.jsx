@@ -14,14 +14,81 @@ import introImgEs from '../assets/images/intro-web3.png';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
+// errorType: 'error' | 'warning' | 'locked'
+function LoginError({ type, message, attemptsLeft, lockedUntil, onUnlock, t }) {
+  const [countdown, setCountdown] = useState('');
+
+  useEffect(() => {
+    if (type !== 'locked' || !lockedUntil) {
+      setCountdown('');
+      return;
+    }
+    const tick = () => {
+      const diff = lockedUntil.getTime() - Date.now();
+      if (diff <= 0) {
+        setCountdown('');
+        onUnlock?.();
+        return;
+      }
+      const totalSecs = Math.ceil(diff / 1000);
+      const mins = Math.floor(totalSecs / 60);
+      const secs = totalSecs % 60;
+      setCountdown(`${mins}:${String(secs).padStart(2, '0')}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [type, lockedUntil, onUnlock]);
+
+  if (!message && type !== 'locked') return null;
+
+  if (type === 'warning') {
+    return (
+      <div className="warning-message" role="alert">
+        <span className="warning-message__icon" aria-hidden="true">⚠️</span>
+        <span>{message}</span>
+      </div>
+    );
+  }
+
+  if (type === 'locked') {
+    return (
+      <div className="error-message error-message--locked" role="alert">
+        <span className="error-message--locked__icon" aria-hidden="true">🔒</span>
+        <span>
+          {message}
+          {countdown && (
+            <span className="error-message--locked__countdown"> ({countdown})</span>
+          )}
+        </span>
+      </div>
+    );
+  }
+
+  // eroare normală
+  return (
+    <div className="error-message" role="alert">
+      <div>{message}</div>
+      {attemptsLeft > 0 && attemptsLeft <= 3 && (
+        <div className="attempts-left">
+          {t('auth.loginErrors.attemptsLeft', { count: attemptsLeft })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LoginPage() {
   const { t, i18n } = useTranslation();
   const { refreshUser } = useAuth() || {};
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [errorType, setErrorType] = useState('error'); // 'error' | 'warning' | 'locked'
+  const [attemptsLeft, setAttemptsLeft] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [lockedUntil, setLockedUntil] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const loginRef = useRef(null);
@@ -31,7 +98,8 @@ export default function LoginPage() {
     const params = new URLSearchParams(location.search);
     const googleError = params.get('error');
     if (googleError) {
-      setError(googleError);
+      setErrorMsg(googleError);
+      setErrorType('error');
     }
   }, [location.search]);
 
@@ -40,26 +108,46 @@ export default function LoginPage() {
     return () => document.body.classList.remove('login-page');
   }, []);
 
+  const clearError = () => {
+    setErrorMsg('');
+    setErrorType('error');
+    setAttemptsLeft(0);
+    setLockedUntil(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    clearError();
 
     try {
-      // Trimite cererea la backend folosind apiClient (gestionează automat baseURL și token)
       const response = await apiClient.post('/api/users/login', { email, password });
-
-      // Salvează NOUL token în localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data.userId);
-
-      // Re-hidratează AuthContext imediat (altfel user/favorite apar cu întârziere de până la 60s)
       await refreshUser?.({ force: true });
-
-      // Redirect către pagina principală sau dashboard
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || t('auth.loginError'));
+      const data = err.response?.data;
+      const code = data?.code;
+
+      if (code === 'warning_last_attempt') {
+        setErrorType('warning');
+        setErrorMsg(t('auth.loginErrors.warningLastAttempt'));
+      } else if (code === 'account_locked') {
+        const until = data?.lockedUntil
+          ? new Date(data.lockedUntil)
+          : new Date(Date.now() + 60 * 60 * 1000);
+        const minutes = Math.max(1, Math.ceil((until.getTime() - Date.now()) / 60000));
+        setErrorType('locked');
+        setLockedUntil(until);
+        setErrorMsg(t('auth.loginErrors.accountLocked', { count: minutes }));
+      } else {
+        setErrorType('error');
+        setErrorMsg(t('auth.loginErrors.invalidCredentials'));
+        if (typeof data?.attemptsLeft === 'number') {
+          setAttemptsLeft(data.attemptsLeft);
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -78,24 +166,8 @@ export default function LoginPage() {
     <div className="login-page-wrapper">
       <div className="login-page-main">
         {useIntroEs || useIntroEn ? (
-        <img
-          src={useIntroEs ? introImgEs : introImgEn}
-          alt="Intro"
-          className="login-intro-image"
-          ref={imgRef}
-          width="800"
-          height="800"
-          loading="eager"
-        />
-      ) : (
-        <picture>
-          <source
-            type="image/webp"
-            srcSet={`${introImg400} 400w, ${introImg800} 800w, ${introImg1200} 1200w`}
-            sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px"
-          />
           <img
-            src={introImgFallback}
+            src={useIntroEs ? introImgEs : introImgEn}
             alt="Intro"
             className="login-intro-image"
             ref={imgRef}
@@ -103,75 +175,96 @@ export default function LoginPage() {
             height="800"
             loading="eager"
           />
-        </picture>
-      )}
-      <div className="login-container" ref={loginRef}>
-        <h2>{t('auth.signIn')}</h2>
-        
-        {/* Butoane sociale */}
-        <div className="social-login">
-          <GoogleLoginButton />
-          <FacebookLoginButton disabled />
-          <AppleLoginButton disabled />
-        </div>
-
-        <div className="social-auth-notice" role="status" aria-live="polite">
-          <span className="social-auth-notice__icon" aria-hidden="true">i</span>
-          <span>{socialAuthNotice}</span>
-        </div>
-
-        <div className="divider">{t('auth.or')}</div>
-
-        {/* Formular clasic */}
-        <form onSubmit={handleSubmit} className="email-login">
-          {error && <div className="error-message">{error}</div>}
-          
-          <input
-            type="email"
-            placeholder={t('auth.placeholders.emailAddress')}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <div className="password-field-wrapper">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder={t('auth.placeholders.password')}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              aria-label={t('auth.placeholders.password')}
-              autoComplete="current-password"
+        ) : (
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={`${introImg400} 400w, ${introImg800} 800w, ${introImg1200} 1200w`}
+              sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px"
             />
-            <button
-              type="button"
-              className="toggle-password-btn"
-              aria-pressed={showPassword}
-              aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
-              onClick={() => setShowPassword(p => !p)}
-            >
-              {showPassword ? (
-                <VisibilityOffIcon fontSize="small" />
-              ) : (
-                <VisibilityIcon fontSize="small" />
-              )}
-            </button>
-          </div>
-          <button 
-            className="submit-btn" 
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? t('common.loading') : t('auth.signInButton')}
-          </button>
-        </form>
+            <img
+              src={introImgFallback}
+              alt="Intro"
+              className="login-intro-image"
+              ref={imgRef}
+              width="800"
+              height="800"
+              loading="eager"
+            />
+          </picture>
+        )}
+        <div className="login-container" ref={loginRef}>
+          <h2>{t('auth.signIn')}</h2>
 
-        <div className="login-links">
-          <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
-          <Link to="/signup">{t('auth.createAccount')}</Link>
+          <div className="social-login">
+            <GoogleLoginButton />
+            <FacebookLoginButton disabled />
+            <AppleLoginButton disabled />
+          </div>
+
+          <div className="social-auth-notice" role="status" aria-live="polite">
+            <span className="social-auth-notice__icon" aria-hidden="true">i</span>
+            <span>{socialAuthNotice}</span>
+          </div>
+
+          <div className="divider">{t('auth.or')}</div>
+
+          <form onSubmit={handleSubmit} className="email-login">
+            <LoginError
+              type={errorType}
+              message={errorMsg}
+              attemptsLeft={attemptsLeft}
+              lockedUntil={lockedUntil}
+              onUnlock={clearError}
+              t={t}
+            />
+
+            <input
+              type="email"
+              placeholder={t('auth.placeholders.emailAddress')}
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); clearError(); }}
+              required
+            />
+            <div className="password-field-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder={t('auth.placeholders.password')}
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); clearError(); }}
+                required
+                aria-label={t('auth.placeholders.password')}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="toggle-password-btn"
+                aria-pressed={showPassword}
+                aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
+                onClick={() => setShowPassword(p => !p)}
+              >
+                {showPassword ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </button>
+            </div>
+            <button
+              className="submit-btn"
+              type="submit"
+              disabled={loading || errorType === 'locked'}
+            >
+              {loading ? t('common.loading') : t('auth.signInButton')}
+            </button>
+          </form>
+
+          <div className="login-links">
+            <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
+            <Link to="/signup">{t('auth.createAccount')}</Link>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

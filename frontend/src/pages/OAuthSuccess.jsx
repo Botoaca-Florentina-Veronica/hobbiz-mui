@@ -11,11 +11,14 @@ export default function OAuthSuccess() {
     if (hasRun.current) return;
     hasRun.current = true;
 
-    // Extrage tokenul din query string
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+
+    // Elimină token-ul din URL imediat — nu rămâne în istoricul browserului
+    // și nu apare în header-ul Referer dacă userul navighează mai departe
+    window.history.replaceState({}, document.title, window.location.pathname);
+
     if (token) {
-      // IMPORTANT: Șterge token-urile vechi ÎNAINTE de a seta noul token
       try {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
@@ -27,13 +30,11 @@ export default function OAuthSuccess() {
 
       const finalizeOAuth = async () => {
         try {
-          // Re-hidratează AuthContext imediat după OAuth (altfel user/favorite apar cu întârziere)
           await refreshUser?.({ force: true });
         } catch (e) {
           // Ignore and validate from localStorage below.
         }
 
-        // If middleware/interceptors invalidated token during refresh, avoid redirecting to home loop.
         const currentToken = localStorage.getItem('token');
         if (!currentToken) {
           navigate('/login?error=' + encodeURIComponent('Sesiunea Google a expirat. Te rugăm să încerci din nou.'));

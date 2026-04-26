@@ -75,6 +75,14 @@
       "google": "Continuă cu Google",
       "facebook": "Continuă cu Facebook",
       "apple": "Continuă cu Apple"
+    },
+    "loginErrors": {
+      "invalidCredentials": "Email sau parolă incorecte.",
+      "attemptsLeft_one": "Atenție: mai ai {{count}} încercare înainte de blocare.",
+      "attemptsLeft_other": "Atenție: mai ai {{count}} încercări înainte de blocare.",
+      "warningLastAttempt": "Ultima șansă! O parolă greșită în plus și contul va fi blocat 1 oră.",
+      "accountLocked_one": "Prea multe încercări eșuate. Încearcă din nou în {{count}} minut.",
+      "accountLocked_other": "Prea multe încercări eșuate. Încearcă din nou în {{count}} minute."
     }
   },
   "mobileHeader": {

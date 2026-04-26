@@ -75,6 +75,14 @@
       "google": "Continuar con Google",
       "facebook": "Continuar con Facebook",
       "apple": "Continuar con Apple"
+    },
+    "loginErrors": {
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "attemptsLeft_one": "Atención: te queda {{count}} intento antes del bloqueo.",
+      "attemptsLeft_other": "Atención: te quedan {{count}} intentos antes del bloqueo.",
+      "warningLastAttempt": "¡Última oportunidad! Una contraseña incorrecta más y tu cuenta será bloqueada 1 hora.",
+      "accountLocked_one": "Demasiados intentos fallidos. Inténtalo en {{count}} minuto.",
+      "accountLocked_other": "Demasiados intentos fallidos. Inténtalo en {{count}} minutos."
     }
   },
   "mobileHeader": {

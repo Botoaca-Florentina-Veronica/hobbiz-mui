@@ -1,6 +1,16 @@
 // backend/server.js
 require('dotenv').config();
 
+// Validate required secrets at startup — fail fast rather than run insecurely
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET environment variable is not set. Server cannot start.');
+  process.exit(1);
+}
+if (!process.env.SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET environment variable is not set. Server cannot start.');
+  process.exit(1);
+}
+
 // Error handling pentru uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('💥 UNCAUGHT EXCEPTION! Shutting down...');
@@ -8,7 +18,7 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-console.log('🔍 DEBUG ENV VARS:');
+console.log('🔍 ENV CHECK:');
 console.log('JWT_SECRET:', process.env.JWT_SECRET ? '***SET***' : 'NOT SET');
 console.log('MONGODB_URI:', process.env.MONGODB_URI ? '***SET***' : 'NOT SET');
 console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -17,15 +27,17 @@ console.log('PORT:', process.env.PORT || 5000);
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const socketIo = require('socket.io');
-const connectDB = require('./config/db'); // Importă conexiunea
+const MongoStore = require('connect-mongo');
+const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes'); // Importă rutele de autentificare
-const session = require('express-session'); // Import express-session
-const passport = require('passport'); // Import passport
+const authRoutes = require('./routes/authRoutes');
+const session = require('express-session');
+const passport = require('passport');
 const announcementRoutes = require('./routes/announcementRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
-const { execFile } = require('child_process');
 const path = require('path');
 const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
@@ -42,65 +54,70 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
+// Security headers
+app.use(helmet({
+  // Allow cross-origin resources needed for the SPA (images, fonts, etc.)
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false,
+}));
+
 // Utility: detect private/local hosts (LAN IPs, localhost)
 function isPrivateHostname(hostname) {
   if (!hostname) return false;
   if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
-  // 10.0.0.0/8
   if (/^10\./.test(hostname)) return true;
-  // 192.168.0.0/16
   if (/^192\.168\./.test(hostname)) return true;
-  // 172.16.0.0 - 172.31.255.255
   if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)) return true;
   return false;
+}
+
+// Exact allowed origins — no wildcards
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://hobbiz.ro',
+  'https://www.hobbiz.ro',
+  'https://hobbiz.netlify.app',
+  'https://hobbiz-mui.netlify.app',
+  'https://hobbiz-mui.onrender.com',
+  'https://hobbiz-app-kkull.ondigitalocean.app',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:8081',
+  'http://localhost:19000',
+  'http://localhost:19006',
+].filter(Boolean);
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // server-to-server or curl
+  try {
+    const hostname = new URL(origin).hostname;
+    return allowedOrigins.includes(origin) || isPrivateHostname(hostname);
+  } catch (e) {
+    return false;
+  }
 }
 
 // Configure Socket.IO with CORS
 const io = socketIo(server, {
   cors: {
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      try {
-        const hostname = new URL(origin).hostname;
-        const isNetlify = /\.netlify\.app$/.test(hostname);
-        const isDigitalOcean = /\.ondigitalocean\.app$/.test(hostname);
-        const allowedOrigins = [
-          process.env.FRONTEND_URL,
-          'https://hobbiz.ro',
-          'https://www.hobbiz.ro',
-          'https://hobbiz-app-kkull.ondigitalocean.app/',
-          'https://hobbiz.netlify.app',
-          'https://hobbiz-mui.netlify.app',
-          'https://hobbiz-mui.onrender.com',
-          'http://localhost:5173',
-          'http://localhost:5174',
-          'http://localhost:8081', // Expo Dev Server
-          'http://localhost:19000', // Expo alternative port
-          'http://localhost:19006'  // Expo web
-        ].filter(Boolean);
-        if (allowedOrigins.includes(origin) || isNetlify || isDigitalOcean || isPrivateHostname(hostname)) {
-          return callback(null, true);
-        }
-        return callback(new Error('Not allowed by CORS'));
-      } catch (e) {
-        return callback(new Error('Not allowed by CORS'));
-      }
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
 // Store active users and their typing status
-const activeUsers = new Map(); // userId -> socketId
-const typingUsers = new Map(); // conversationId -> Set of userIds
-const activeConversations = new Map(); // userId -> conversationId (which conversation they're currently viewing)
+const activeUsers = new Map();
+const typingUsers = new Map();
+const activeConversations = new Map();
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('🔌 User connected:', socket.id);
 
-  // User joins with their ID
   socket.on('join', (userId) => {
     activeUsers.set(userId, socket.id);
     socket.userId = userId;
@@ -108,23 +125,18 @@ io.on('connection', (socket) => {
     io.emit('userStatus', { userId, status: 'online' });
   });
 
-  // User enters a specific conversation
   socket.on('joinConversation', ({ userId, conversationId }) => {
     if (userId && conversationId) {
       activeConversations.set(userId, conversationId);
-      console.log(`💬 User ${userId} is now viewing conversation ${conversationId}`);
     }
   });
 
-  // User leaves a conversation
   socket.on('leaveConversation', ({ userId }) => {
     if (userId) {
       activeConversations.delete(userId);
-      console.log(`👋 User ${userId} left their active conversation`);
     }
   });
 
-  // Check user status
   socket.on('checkStatus', (targetUserId, callback) => {
     const isOnline = activeUsers.has(targetUserId);
     if (typeof callback === 'function') {
@@ -132,23 +144,17 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle typing events
   socket.on('typing', ({ conversationId, isTyping }) => {
     if (!socket.userId) return;
-    
+
     if (!typingUsers.has(conversationId)) {
       typingUsers.set(conversationId, new Set());
     }
-    
+
     const typingSet = typingUsers.get(conversationId);
-    
-    if (isTyping) {
-      typingSet.add(socket.userId);
-    } else {
-      typingSet.delete(socket.userId);
-    }
-    
-    // Broadcast typing status to other users in the conversation
+    if (isTyping) typingSet.add(socket.userId);
+    else typingSet.delete(socket.userId);
+
     const participantIds = conversationId.split('-');
     participantIds.forEach(participantId => {
       if (participantId !== socket.userId) {
@@ -157,24 +163,21 @@ io.on('connection', (socket) => {
           io.to(participantSocketId).emit('userTyping', {
             conversationId,
             userId: socket.userId,
-            isTyping
+            isTyping,
           });
         }
       }
     });
   });
 
-  // Handle disconnect
   socket.on('disconnect', () => {
     if (socket.userId) {
       activeUsers.delete(socket.userId);
       activeConversations.delete(socket.userId);
       io.emit('userStatus', { userId: socket.userId, status: 'offline' });
-      // Remove from all typing conversations
       typingUsers.forEach((typingSet, conversationId) => {
         if (typingSet.has(socket.userId)) {
           typingSet.delete(socket.userId);
-          // Notify others that user stopped typing
           const participantIds = conversationId.split('-');
           participantIds.forEach(participantId => {
             if (participantId !== socket.userId) {
@@ -183,7 +186,7 @@ io.on('connection', (socket) => {
                 io.to(participantSocketId).emit('userTyping', {
                   conversationId,
                   userId: socket.userId,
-                  isTyping: false
+                  isTyping: false,
                 });
               }
             }
@@ -195,65 +198,57 @@ io.on('connection', (socket) => {
   });
 });
 
-// Make io available to routes
 app.set('io', io);
 app.set('activeUsers', activeUsers);
 app.set('activeConversations', activeConversations);
 
-// Middleware
-// CORS cu whitelist flexibil pentru prod/dev și suport pentru domeniile Netlify și DigitalOcean
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'https://hobbiz.ro',
-  'https://www.hobbiz.ro',
-  'https://hobbiz.netlify.app',
-  'https://hobbiz-mui.netlify.app',
-  'https://hobbiz-mui.onrender.com',
-  'https://hobbiz-app-kkull.ondigitalocean.app/',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:8081', // Expo Dev Server
-  'http://localhost:19000', // Expo alternative port
-  'http://localhost:19006'  // Expo web
-].filter(Boolean);
-
+// CORS
 const corsOptions = {
   origin: (origin, callback) => {
-    // Permite tool-uri server-to-server sau curl fără origin
-    if (!origin) return callback(null, true);
-    try {
-      const hostname = new URL(origin).hostname;
-      const isNetlify = /\.netlify\.app$/.test(hostname);
-      const isDigitalOcean = /\.ondigitalocean\.app$/.test(hostname);
-      if (allowedOrigins.includes(origin) || isNetlify || isDigitalOcean || isPrivateHostname(hostname)) {
-        return callback(null, true);
-      }
-      console.warn(`CORS blocat pentru origin: ${origin}`);
-      return callback(new Error('Not allowed by CORS'));
-    } catch (e) {
-      console.warn('CORS origin parse error:', e.message);
-      return callback(new Error('Not allowed by CORS'));
-    }
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    console.warn(`CORS blocat pentru origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 app.use(cors(corsOptions));
-// Accept larger JSON bodies (for base64 images) and urlencoded payloads
+
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+
+// Rate limiting — aplicat pe toate rutele de autentificare
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minute
+  max: 20,
+  message: { error: 'Prea multe încercări. Încearcă din nou după 15 minute.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false,
+});
+app.use('/auth/', authLimiter);
+app.use('/api/users/login', authLimiter);
+app.use('/api/users/register', authLimiter);
+
 app.use('/api/notifications', notificationRoutes);
 
-// Configure session middleware
+// Session cu MongoDB store persistent
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'a_very_secret_key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    ttl: 24 * 60 * 60, // 1 zi în secunde
+    autoRemove: 'native',
+  }),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
-  }
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000, // 1 zi în ms
+  },
 }));
 
 // Initialize Passport
@@ -261,38 +256,35 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Conectare la baza de date
-connectDB(); // Apelează funcția exportată
+connectDB();
 
 // Rute
 app.use('/api/users', userRoutes);
-app.use('/auth', authRoutes); // Adaugă rutele de autentificare
+app.use('/auth', authRoutes);
 
-app.use('/api/announcements', announcementRoutes); // Rute pentru anunturi publice
-app.use('/api/favorites', favoriteRoutes); // Rute pentru favorite persistente
-app.use('/api/messages', messageRoutes); // Rute pentru mesaje chat
-app.use('/api/reviews', reviewRoutes); // Rute pentru recenzii (create/list)
-app.use('/api/negotiations', negotiationRoutes); // Rute pentru negocieri
-app.use('/api/contact', contactRoutes); // Rute pentru formularul de contact
-app.use('/api/reports', reportRoutes); // Rute pentru raportari anunturi
+app.use('/api/announcements', announcementRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/negotiations', negotiationRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/reports', reportRoutes);
 
-// Servire imagini uploadate din frontend/public/uploads
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));
 
 app.get('/', (req, res) => {
   res.send('🚀 Serverul rulează!');
 });
 
-// Health check endpoint pentru Render
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.status(200).json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
-// DB healthcheck endpoint
 app.get('/health/db', (req, res) => {
   try {
     const mongoose = require('mongoose');
@@ -304,15 +296,11 @@ app.get('/health/db', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  // Continuă login-ul normal (aici pui logica ta de autentificare)
   res.json({ success: true });
 });
 
 // Pornire server
 const PORT = process.env.PORT || 5000;
-// Print LAN IPs to help debugging from physical devices
 try {
   const os = require('os');
   const nets = os.networkInterfaces();
@@ -331,19 +319,16 @@ try {
   // ignore
 }
 
-// Listen on all interfaces so physical devices on the same LAN can reach the server
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🔥 Server pe http://0.0.0.0:${PORT} (accessible on LAN)`);
   console.log(`🔌 Socket.IO enabled for real-time chat`);
 });
 
-// Error handling pentru server
 server.on('error', (err) => {
   console.error('💥 Server Error:', err);
   process.exit(1);
 });
 
-// Gestionare închidere grațioasă (opțional)
 const mongoose = require('mongoose');
 process.on('SIGINT', async () => {
   console.log('🔄 Shutting down gracefully...');
@@ -355,7 +340,6 @@ process.on('SIGINT', async () => {
   });
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('💥 UNHANDLED REJECTION! Shutting down...');
   console.error(err.name, err.message);

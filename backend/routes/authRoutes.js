@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
+const { randomBytes } = require('crypto');
 
 const router = express.Router();
 
@@ -150,7 +151,7 @@ router.get('/google', (req, res, next) => {
 
   // Passport will use this state value to send to Google and validate on return. We prefix to know this is a mobile flow.
   if (isMobile) {
-    const mobileState = `mobile_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const mobileState = `mobile_${randomBytes(16).toString('hex')}`;
     // If the client sent a redirect URI, encode it into the state so it survives without session cookies
     if (trustedRequestedRedirect) {
       const encoded = encodeURIComponent(trustedRequestedRedirect);
@@ -160,7 +161,7 @@ router.get('/google', (req, res, next) => {
     }
   } else if (trustedRequestedRedirect) {
     // Mirror web redirect in OAuth state so callback can recover it even if session cookie is missing.
-    const webState = `web_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const webState = `web_${randomBytes(16).toString('hex')}`;
     const encoded = encodeURIComponent(trustedRequestedRedirect);
     options.state = `${webState}::redirect:${encoded}`;
     if (req.session) {
@@ -339,7 +340,7 @@ router.post('/logout-all-devices', async (req, res) => {
     }
 
     const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwt_secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     const User = require('../models/User');
     const userId = decoded.userId || decoded.id;

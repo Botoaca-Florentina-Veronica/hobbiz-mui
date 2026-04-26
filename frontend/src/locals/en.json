@@ -75,6 +75,14 @@
       "google": "Continue with Google",
       "facebook": "Continue with Facebook",
       "apple": "Continue with Apple"
+    },
+    "loginErrors": {
+      "invalidCredentials": "Incorrect email or password.",
+      "attemptsLeft_one": "Warning: {{count}} attempt remaining before lockout.",
+      "attemptsLeft_other": "Warning: {{count}} attempts remaining before lockout.",
+      "warningLastAttempt": "Last chance! One more wrong password and your account will be locked for 1 hour.",
+      "accountLocked_one": "Too many failed attempts. Try again in {{count}} minute.",
+      "accountLocked_other": "Too many failed attempts. Try again in {{count}} minutes."
     }
   },
   "mobileHeader": {

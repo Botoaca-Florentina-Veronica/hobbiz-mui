@@ -1,13 +1,23 @@
 import api from './api';
 import storage from './storage';
 
+export interface LoginError extends Error {
+  code?: string;
+  attemptsLeft?: number;
+  lockedUntil?: string;
+}
+
 export async function loginWithCredentials(email: string, password: string) {
   try {
     const res = await api.post('/api/users/login', { email, password });
     return res.data;
   } catch (e: any) {
-    const msg = e?.response?.data?.error || 'Eroare la autentificare';
-    throw new Error(msg);
+    const data = e?.response?.data;
+    const err = new Error(data?.error || 'Eroare la autentificare') as LoginError;
+    err.code = data?.code;
+    err.attemptsLeft = data?.attemptsLeft;
+    err.lockedUntil = data?.lockedUntil;
+    throw err;
   }
 }
 
