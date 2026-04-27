@@ -570,3 +570,10 @@
   box-shadow: 0 0 0 2px var(--app-bg, #121212);
   color: white;
 }
+
+@media (max-width: 1024px) {
+  .footer-favorite-badge {
+    top: -4px;
+    right: 0px;
+  }
+}

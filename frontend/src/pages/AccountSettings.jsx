@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './AccountSettings.css';
 import './NotificationSettingsPage.css';
-import { updateEmail, updatePassword, detectMitm, deleteAccount, resetUserData, logout, getProfile } from '../api/api';
+import { updateEmail, updatePassword, detectMitm, deleteAccount, resetUserData, logout, logoutAllDevices, getProfile } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, Typography, Container, Paper, List, ListItem, ListItemText } from '@mui/material';
@@ -20,6 +20,7 @@ export default function AccountSettings() {
   const [mitmLoading, setMitmLoading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showLogoutAllDialog, setShowLogoutAllDialog] = useState(false);
   const [successDelete, setSuccessDelete] = useState(false);
   const [successReset, setSuccessReset] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
@@ -48,6 +49,22 @@ export default function AccountSettings() {
     } catch (error) {
       setShowDeleteDialog(false);
       setMessage({ type: 'error', text: t('accountSettings.messages.deleteError') });
+    }
+  };
+
+  const handleLogoutAllDevices = async () => {
+    try {
+      await logoutAllDevices();
+      setShowLogoutAllDialog(false);
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      try { localStorage.removeItem('lastAvatarUrl'); } catch {}
+      window.dispatchEvent(new Event('logout'));
+      navigate('/');
+      setTimeout(() => { window.location.reload(); }, 100);
+    } catch (error) {
+      setShowLogoutAllDialog(false);
+      setMessage({ type: 'error', text: t('accountSettings.messages.logoutAllError') });
     }
   };
 
@@ -327,10 +344,10 @@ export default function AccountSettings() {
       {/* Logout All */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
-          <ListItem className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
-            <ListItemText 
-              primary={t('accountSettings.menu.logoutAll')} 
-              primaryTypographyProps={{ fontWeight: 'bold' }} 
+          <ListItem button onClick={() => setShowLogoutAllDialog(true)} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
+            <ListItemText
+              primary={t('accountSettings.menu.logoutAll')}
+              primaryTypographyProps={{ fontWeight: 'bold' }}
               className="mobile-setting-text"
             />
           </ListItem>
@@ -362,6 +379,16 @@ export default function AccountSettings() {
           </ListItem>
         </List>
       </Paper>
+
+      <ConfirmDialog
+        open={showLogoutAllDialog}
+        onClose={() => setShowLogoutAllDialog(false)}
+        onConfirm={handleLogoutAllDevices}
+        title={t('accountSettings.confirm.logoutAllTitle')}
+        description={t('accountSettings.confirm.logoutAllDescription')}
+        confirmText={t('accountSettings.buttons.confirmLogoutAll')}
+        cancelText={t('accountSettings.buttons.cancel')}
+      />
 
       <ConfirmDialog
         open={showResetDialog}

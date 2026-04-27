@@ -138,4 +138,7 @@ export const searchAnnouncements = (query, signal, location) => {
 // Logout request (pentru sesiuni/cookie-uri)
 export const logout = () => apiClient.get('/auth/logout', { withCredentials: true });
 
+// Logout from all devices - invalidates all existing tokens via tokenVersion increment
+export const logoutAllDevices = () => apiClient.post('/auth/logout-all-devices');
+
 export default apiClient;

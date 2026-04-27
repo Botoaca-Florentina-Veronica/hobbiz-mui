@@ -54,6 +54,8 @@
     "or": "OR",
     "signupSuccess": "Account created successfully! You can now sign in.",
     "signupError": "Registration failed",
+    "emailAlreadyExists": "An account with this email already exists. Only one account per person is allowed on this platform.",
+    "phoneAlreadyExists": "An account with this phone number already exists. Only one account per person is allowed on this platform.",
     "loginError": "Authentication failed",
     "placeholders": {
       "firstName": "First Name",
@@ -1119,19 +1121,24 @@
       "save": "Save",
       "confirmReset": "Yes, reset data",
       "confirmDelete": "Yes, delete account",
+      "confirmLogoutAll": "Yes, log me out",
       "cancel": "Cancel"
     },
     "confirm": {
       "resetTitle": "Are you sure you want to reset your account data?",
       "resetDescription": "This action removes your saved data (announcements, messages, reviews, favorites, notifications, and extended profile), but keeps your account active.",
       "deleteTitle": "Are you sure you want to delete your account?",
-      "deleteDescription": "This action is irreversible. All your announcements will be deleted."
+      "deleteDescription": "This action is irreversible. All your announcements will be deleted.",
+      "logoutAllTitle": "Log out from all devices?",
+      "logoutAllDescription": "You will be logged out from all devices, including this one. You will need to sign in again."
     },
     "messages": {
       "resetSuccess": "Your account data was reset successfully.",
       "resetError": "Error resetting account data.",
       "deleteSuccess": "Your account was deleted successfully!",
       "deleteError": "Error deleting account.",
+      "logoutAllSuccess": "You have been logged out from all devices.",
+      "logoutAllError": "Error logging out from all devices.",
       "enterEmail": "Please enter the new email address.",
       "enterPasswords": "Please enter both passwords.",
       "updateEmailError": "Error updating email.",

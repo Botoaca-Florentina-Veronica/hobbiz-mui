@@ -54,6 +54,8 @@
     "or": "SAU",
     "signupSuccess": "Cont creat cu succes! Te poți autentifica.",
     "signupError": "Înregistrare eșuată",
+    "emailAlreadyExists": "Există deja un cont cu această adresă de email. Pe platformă este permis un singur cont per persoană.",
+    "phoneAlreadyExists": "Există deja un cont cu acest număr de telefon. Pe platformă este permis un singur cont per persoană.",
     "loginError": "Autentificare eșuată",
     "placeholders": {
       "firstName": "Prenume",
@@ -1119,19 +1121,24 @@
       "save": "Salvează",
       "confirmReset": "Da, resetează datele",
       "confirmDelete": "Da, șterge contul",
+      "confirmLogoutAll": "Da, deconectează-mă",
       "cancel": "Anulează"
     },
     "confirm": {
       "resetTitle": "Sigur vrei să resetezi datele contului?",
       "resetDescription": "Această acțiune va șterge datele salvate de tine (anunțuri, mesaje, recenzii, favorite, notificări și profil extins), dar contul rămâne activ.",
       "deleteTitle": "Sigur vrei să ștergi contul?",
-      "deleteDescription": "Această acțiune este ireversibilă. Toate anunțurile tale vor fi șterse."
+      "deleteDescription": "Această acțiune este ireversibilă. Toate anunțurile tale vor fi șterse.",
+      "logoutAllTitle": "Ieși din cont de pe toate dispozitivele?",
+      "logoutAllDescription": "Vei fi deconectat de pe toate dispozitivele, inclusiv cel curent. Va trebui să te autentifici din nou."
     },
     "messages": {
       "resetSuccess": "Datele contului au fost resetate cu succes.",
       "resetError": "Eroare la resetarea datelor contului.",
       "deleteSuccess": "Contul tău a fost șters cu succes!",
       "deleteError": "Eroare la ștergerea contului.",
+      "logoutAllSuccess": "Ai ieșit din cont de pe toate dispozitivele.",
+      "logoutAllError": "Eroare la deconectarea de pe toate dispozitivele.",
       "enterEmail": "Introduceți noua adresă de e-mail.",
       "enterPasswords": "Introduceți ambele parole.",
       "updateEmailError": "Eroare la actualizarea emailului.",

@@ -100,20 +100,39 @@ export const AuthProvider = ({ children }) => {
       ]);
       const profile = profileRes.data;
       const favData = favRes.data || {};
-      
+
+      if (profile?._id) {
+        localStorage.setItem('userId', String(profile._id));
+      }
       setUser(profile);
       
       // Aplică pending toggles peste ce vine de la server ca să nu facă revert la UI
-      const finalIds = applyPendingToggles(favData.favoriteIds || []);
+      const finalIds = [...new Set(applyPendingToggles(favData.favoriteIds || []))];
       setFavorites(finalIds);
-      
+
       // Persistă în localStorage astfel încât la refresh paginile de listing
       // să citească imediat starea corectă (fără flash de favorite goale)
       try {
         localStorage.setItem(`favoriteAnnouncements_${profile._id}`, JSON.stringify(finalIds));
       } catch {}
-      
-      setFullFavorites(favData.favorites || []);
+
+      // Aplică și la fullFavorites: scoate obiectele a căror ID a fost eliminat
+      // prin pending toggles (altfel heart-ul apare gol pe un item vizibil în pagină).
+      // Deduplicăm și după _id: dacă user.favorites din BD are un ID de 2x (race condition
+      // la click rapid), obiectul apărea de 2x în fullFavorites iar filtrul îl trecea de 2x
+      // → indexul creștea cu 2 la adăugarea unui singur anunț.
+      const pendingRemovedIds = new Set();
+      pendingTogglesRef.current.forEach((action, id) => {
+        if (action === 'removed') pendingRemovedIds.add(id);
+      });
+      const seenFullIds = new Set();
+      const filteredFull = (favData.favorites || []).filter(item => {
+        const id = String(item._id);
+        if (pendingRemovedIds.has(id) || seenFullIds.has(id)) return false;
+        seenFullIds.add(id);
+        return true;
+      });
+      setFullFavorites(filteredFull);
     } catch (e) {
       console.warn('Hydrate failed:', e.response?.data || e.message);
       if (e.response?.status === 401) {
@@ -198,7 +217,11 @@ export const AuthProvider = ({ children }) => {
       if (payload?.favoriteIds) {
         // Din nou, protejăm modificările "în zbor"
         const finalIds = applyPendingToggles(payload.favoriteIds);
-        setFavorites(finalIds);
+        setFavorites([...new Set(finalIds)]);
+
+        // Sincronizăm și fullFavorites eliminând ce nu mai este în lista de favorite finală
+        setFullFavorites(prev => prev.filter(item => finalIds.includes(String(item._id))));
+
         window.dispatchEvent(new Event('favorites:updated'));
       } else {
         hydrate();
@@ -236,6 +259,11 @@ export const AuthProvider = ({ children }) => {
       : [...favoritesRef.current, announcementId];
 
     setFavorites(optimisticIds);
+
+    // Eliminăm optimisic elementul și din fullFavorites (dacă a fost scos) pentru a actualiza instant numărul ("indexul")
+    if (isFav) {
+      setFullFavorites(prev => prev.filter(item => String(item._id) !== String(announcementId)));
+    }
 
     // 2. Persist
     if (!user) {
@@ -295,6 +323,12 @@ export const AuthProvider = ({ children }) => {
       // Acum curăț pending și emit pentru ca paginile dependente să se reîncarchie (daca nu e socket)
       pendingTogglesRef.current.delete(announcementId);
       window.dispatchEvent(new Event('favorites:updated'));
+
+      // Dacă am adăugat un favorit, frontend-ul are nevoie de obiectul complet (titlu, imagine, etc.)
+      // pentru a-l afișa în pagina de Favorite. Forțăm o sincronizare (re-fetch) de la server.
+      if (!isFav) {
+        hydrate({ force: true });
+      }
     } catch (e) {
       // Revert on error — inclusiv în localStorage
       console.error("Favorites toggle error", e);
@@ -305,6 +339,12 @@ export const AuthProvider = ({ children }) => {
         : favoritesRef.current.filter(id => id !== announcementId);
       setFavorites(revertedIds);
       try { localStorage.setItem(`favoriteAnnouncements_${user._id}`, JSON.stringify(revertedIds)); } catch {}
+      
+      // Dacă am eșuat la ștergerea de pe server, forțăm o reîncărcare completă pentru a reface obiectele din `fullFavorites`
+      if (isFav) {
+        hydrate();
+      }
+
       return { error: e.response?.data?.error || 'Eroare la actualizare favorite' };
     }
   };

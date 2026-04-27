@@ -166,15 +166,17 @@ export default function LoginPage() {
     <div className="login-page-wrapper">
       <div className="login-page-main">
         {useIntroEs || useIntroEn ? (
-          <img
-            src={useIntroEs ? introImgEs : introImgEn}
-            alt="Intro"
-            className="login-intro-image"
-            ref={imgRef}
-            width="800"
-            height="800"
-            loading="eager"
-          />
+          <picture>
+            <img
+              src={useIntroEs ? introImgEs : introImgEn}
+              alt="Intro"
+              className="login-intro-image"
+              ref={imgRef}
+              width="800"
+              height="800"
+              loading="eager"
+            />
+          </picture>
         ) : (
           <picture>
             <source

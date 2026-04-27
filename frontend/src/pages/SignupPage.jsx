@@ -41,7 +41,14 @@ export default function SignupPage() {
       // Redirecționează către login cu mesaj de succes
       navigate('/login', { state: { success: t('auth.signupSuccess') } });
     } catch (err) {
-      setError(err.response?.data?.error || t('auth.signupError'));
+      const code = err.response?.data?.code;
+      if (code === 'EMAIL_ALREADY_EXISTS') {
+        setError(t('auth.emailAlreadyExists'));
+      } else if (code === 'PHONE_ALREADY_EXISTS') {
+        setError(t('auth.phoneAlreadyExists'));
+      } else {
+        setError(err.response?.data?.error || t('auth.signupError'));
+      }
     } finally {
       setLoading(false);
     }

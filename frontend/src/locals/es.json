@@ -54,6 +54,8 @@
     "or": "O",
     "signupSuccess": "Cuenta creada correctamente. Ahora puedes iniciar sesión.",
     "signupError": "Registro fallido",
+    "emailAlreadyExists": "Ya existe una cuenta con este correo electrónico. Solo se permite una cuenta por persona en esta plataforma.",
+    "phoneAlreadyExists": "Ya existe una cuenta con este número de teléfono. Solo se permite una cuenta por persona en esta plataforma.",
     "loginError": "Autenticación fallida",
     "placeholders": {
       "firstName": "Nombre",
@@ -1114,19 +1116,24 @@
       "save": "Guardar",
       "confirmReset": "Sí, restablecer datos",
       "confirmDelete": "Sí, eliminar cuenta",
+      "confirmLogoutAll": "Sí, cerrar sesión",
       "cancel": "Cancelar"
     },
     "confirm": {
       "resetTitle": "¿Seguro que quieres restablecer los datos de tu cuenta?",
       "resetDescription": "Esta acción elimina tus datos guardados (anuncios, mensajes, reseñas, favoritos, notificaciones y perfil extendido), pero mantiene tu cuenta activa.",
       "deleteTitle": "¿Estás seguro de eliminar tu cuenta?",
-      "deleteDescription": "Esta acción es irreversible. Todos tus anuncios serán eliminados."
+      "deleteDescription": "Esta acción es irreversible. Todos tus anuncios serán eliminados.",
+      "logoutAllTitle": "¿Cerrar sesión en todos los dispositivos?",
+      "logoutAllDescription": "Se cerrará tu sesión en todos los dispositivos, incluido este. Deberás iniciar sesión de nuevo."
     },
     "messages": {
       "resetSuccess": "Los datos de tu cuenta se restablecieron correctamente.",
       "resetError": "Error al restablecer los datos de la cuenta.",
       "deleteSuccess": "¡Tu cuenta fue eliminada correctamente!",
       "deleteError": "Error al eliminar la cuenta.",
+      "logoutAllSuccess": "Has cerrado sesión en todos los dispositivos.",
+      "logoutAllError": "Error al cerrar sesión en todos los dispositivos.",
       "enterEmail": "Por favor ingresa el nuevo email.",
       "enterPasswords": "Por favor ingresa ambas contraseñas.",
       "updateEmailError": "Error al actualizar el email.",

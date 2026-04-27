@@ -294,7 +294,22 @@ const register = async (req, res) => {
     // Verifică dacă emailul există
     const existingUser = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
     if (existingUser) {
-      return res.status(400).json({ error: 'Emailul este deja înregistrat' });
+      return res.status(400).json({
+        error: 'Există deja un cont asociat acestui email. Pe platformă este permis un singur cont per persoană.',
+        code: 'EMAIL_ALREADY_EXISTS'
+      });
+    }
+
+    // Verifică dacă numărul de telefon există (dacă a fost furnizat)
+    const normalizedPhone = phone ? phone.trim() : null;
+    if (normalizedPhone) {
+      const existingPhone = await User.findOne({ phone: normalizedPhone });
+      if (existingPhone) {
+        return res.status(400).json({
+          error: 'Există deja un cont asociat acestui număr de telefon. Pe platformă este permis un singur cont per persoană.',
+          code: 'PHONE_ALREADY_EXISTS'
+        });
+      }
     }
 
     // Creează utilizator nou
@@ -303,7 +318,7 @@ const register = async (req, res) => {
       lastName,
       email: normalizedEmail,
       password,
-      phone
+      phone: normalizedPhone || undefined
     });
 
     await user.save();

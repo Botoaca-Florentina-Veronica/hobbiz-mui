@@ -13,7 +13,16 @@ router.get('/', auth, async (req, res) => {
     });
     if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
     // Filter out null entries (archived announcements that were matched out)
-    const activeFavorites = user.favorites.filter(f => f != null);
+    // Deduplicăm după _id: dacă user.favorites din BD are un ID de două ori (race condition
+    // la click rapid), evităm să returnăm același obiect de două ori.
+    const seen = new Set();
+    const activeFavorites = user.favorites.filter(f => {
+      if (f == null) return false;
+      const id = String(f._id);
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
     res.json({ favoriteIds: activeFavorites.map(a => a._id), favorites: activeFavorites });
   } catch (e) {
     console.error('Eroare GET /favorites:', e);

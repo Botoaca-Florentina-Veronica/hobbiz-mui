@@ -171,7 +171,12 @@ export default function FavoriteAnnouncements() {
   };
 
   // Calculate pagination
-  const favoritesList = isAuthenticated ? fullFavorites : guestAnnouncements;
+  // Filtrăm fullFavorites prin authFavoriteIds (source of truth pentru starea toggle).
+  // Fără acest filtru, un item scos din favorite rămânea vizibil cu inimioara goală
+  // până la următorul hydrate, deoarece fullFavorites nu primea update optimist.
+  const favoritesList = isAuthenticated
+    ? (fullFavorites || []).filter(a => (authFavoriteIds || []).includes(String(a._id)))
+    : guestAnnouncements;
   const isMobile = viewportWidth <= 1024;
   const isTwoColumnMobile = viewportWidth > 700;
   const itemsPerPage = 12;
@@ -226,9 +231,9 @@ export default function FavoriteAnnouncements() {
         ) : null}
         <h1 className="my-announcements-title">
           {t('favorites.myFavorites')}
-          <span className="my-announcements-title-count">({isAuthenticated ? (fullFavorites?.length || 0) : guestAnnouncements.length}/150)</span>
+          <span className="my-announcements-title-count">({isAuthenticated ? (favoritesList?.length || 0) : guestAnnouncements.length}/150)</span>
         </h1>
-        {(isAuthenticated ? (fullFavorites?.length === 0) : (guestAnnouncements.length === 0)) ? (
+        {(isAuthenticated ? (favoritesList?.length === 0) : (guestAnnouncements.length === 0)) ? (
           <div className="favorites-empty">
             <div className="favorites-empty-icon">
               <img src={gumballSiDarwin} alt="Favorite goale" />

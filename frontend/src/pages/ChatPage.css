@@ -820,10 +820,10 @@ body.dark-mode.chat-page .chat-emoji-picker button { color: var(--c-bubble-other
   .list-header-subtitle { font-size: 14px !important; color: rgba(255, 255, 255, 0.75) !important; margin: 0 !important; }
 
   .chat-mobile-filter-segment { display: flex; flex-direction: row; background: rgba(255, 255, 255, 0.22); padding: 4px; border-radius: 999px; align-self: flex-start; gap: 4px; }
-  body.dark-mode .chat-mobile-filter-segment { background: rgba(255, 255, 255, 0.15); }
+  body.dark-mode .chat-mobile-filter-segment { background: rgba(0, 0, 0, 0.28); }
   .chat-mobile-filter-btn { padding: 10px 22px; border-radius: 999px; border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
   .chat-mobile-filter-btn.active { background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  body.dark-mode .chat-mobile-filter-btn.active { background: #1c1c1f; }
+  body.dark-mode .chat-mobile-filter-btn.active { background: rgba(200, 15, 75, 0.65); box-shadow: 0 2px 10px rgba(245, 24, 102, 0.3); }
   .chat-mobile-filter-text { font-size: 14px !important; font-weight: 600 !important; color: rgba(255, 255, 255, 0.8) !important; }
   .chat-mobile-filter-btn.active .chat-mobile-filter-text { color: #355070 !important; }
   body.dark-mode .chat-mobile-filter-btn.active .chat-mobile-filter-text { color: #ffffff !important; }

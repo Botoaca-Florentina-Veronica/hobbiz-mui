@@ -163,6 +163,12 @@ export default function AnnouncementDetails() {
     setRatingValue(5);
     setRatingComment('');
   };
+
+  const handleCategoryClick = () => {
+    if (!announcement?.category) return;
+    navigate(`/anunturi-categorie/${encodeURIComponent(announcement.category)}`);
+  };
+
   /**
    * Trimite evaluarea către backend și redirecționează către profilul public al vânzătorului.
    * Nu alterează comportamentul existent; doar docstring.
@@ -471,9 +477,9 @@ export default function AnnouncementDetails() {
     e.preventDefault();
   };
 
-  const loggedUserId = localStorage.getItem('userId');
+  const loggedUserId = localStorage.getItem('userId') || user?._id;
   const token = localStorage.getItem('token');
-  const isOwnAnnouncement = loggedUserId && announcement.user._id === loggedUserId;
+  const isOwnAnnouncement = !!loggedUserId && String(announcement.user._id) === String(loggedUserId);
 
   const handleChatClick = () => {
     console.log('🔍 Chat button clicked:', { loggedUserId, isOwnAnnouncement, announcementUserId: announcement.user._id, showChat });
@@ -719,11 +725,14 @@ export default function AnnouncementDetails() {
                     {announcement.category && (
                       <Chip
                         label={translateCategory(announcement.category, t)}
+                        clickable
+                        onClick={handleCategoryClick}
                         variant="outlined"
                         sx={{
                           borderColor: getAccentCss(),
                           color: getAccentCss(),
-                          mb: 2
+                          mb: 2,
+                          cursor: 'pointer'
                         }}
                       />
                     )}
