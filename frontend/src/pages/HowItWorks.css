@@ -1,4 +1,4 @@
-/* ─────────────────────────────────────────────────────
+﻿/* ─────────────────────────────────────────────────────
    Pagina How It Works – Modern UI/UX
    ───────────────────────────────────────────────────── */
 
@@ -13,7 +13,7 @@
   --hw-bg-page: #f8fafc;
 
   /* Hero */
-  --hw-bg-hero: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  --hw-bg-hero: linear-gradient(135deg, #2D4361 0%, #4A5F7F 100%);
   --hw-bg-hero-overlay: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08) 0%, transparent 60%);
   --hw-text-hero: #ffffff;
   --hw-badge-bg: rgba(255,255,255,0.15);
@@ -27,7 +27,7 @@
   --hw-bg-surface: #ffffff;
   --hw-bg-surface-alt: #f1f5f9;
   --hw-border-card: #e2e8f0;
-  --hw-border-card-hover: #355070;
+  --hw-border-card-hover: #2D4361;
 
   /* Text */
   --hw-text-heading: #1e293b;
@@ -35,28 +35,28 @@
   --hw-text-muted: #94a3b8;
 
   /* Accent */
-  --hw-accent: #355070;
-  --hw-accent-light: #406b92;
-  --hw-accent-bg: rgba(53,80,112,0.08);
-  --hw-gradient-bar: linear-gradient(90deg, #355070, #6d97c4);
+  --hw-accent: #2D4361;
+  --hw-accent-light: #4A5F7F;
+  --hw-accent-bg: rgba(45,67,97,0.08);
+  --hw-gradient-bar: linear-gradient(90deg, #2D4361, #7C92B4);
 
   /* Step number */
-  --hw-step-bg: linear-gradient(135deg, #355070, #406b92);
+  --hw-step-bg: linear-gradient(135deg, #2D4361, #4A5F7F);
   --hw-step-text: #ffffff;
 
   /* Feature icon */
-  --hw-icon-bg: linear-gradient(135deg, #355070, #406b92);
+  --hw-icon-bg: linear-gradient(135deg, #2D4361, #4A5F7F);
   --hw-icon-color: #ffffff;
 
   /* CTA */
-  --hw-bg-cta: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  --hw-bg-cta: linear-gradient(135deg, #2D4361 0%, #4A5F7F 100%);
   --hw-cta-text: #ffffff;
 
   /* Shadows */
-  --hw-shadow-hero: 0 20px 60px rgba(53,80,112,0.2);
+  --hw-shadow-hero: 0 20px 60px rgba(45,67,97,0.2);
   --hw-shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  --hw-shadow-card-hover: 0 8px 32px rgba(53,80,112,0.14);
-  --hw-shadow-icon: 0 6px 20px rgba(53,80,112,0.18);
+  --hw-shadow-card-hover: 0 8px 32px rgba(45,67,97,0.14);
+  --hw-shadow-icon: 0 6px 20px rgba(45,67,97,0.18);
 }
 
 /* ─── Dark Mode ─── */

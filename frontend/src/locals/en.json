@@ -119,8 +119,10 @@
     "button": "Join now"
   },
   "mainStage": {
+    "tagline": "Turn passion into profit",
     "title": "Got a cool hobby and think it's useless? Find people willing to pay for it!",
     "subtitle": "Turn your passion into a source of income!",
+    "howItWorks": "See how it works",
     "signUp": "Sign up",
     "searchPlaceholder": "What are you looking for?",
     "locationPlaceholder": "Entire country",

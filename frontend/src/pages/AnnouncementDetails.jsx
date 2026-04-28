@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AnnouncementDetails
  * ------------------------------------------------------------
  * Pagina de detalii pentru un anunț.
@@ -245,8 +245,8 @@ export default function AnnouncementDetails() {
   // ========== Dark mode helpers and accent palette ==========
   const [isDarkMode, setIsDarkMode] = useState(false);
   const getIsDarkMode = () => isDarkMode;
-  const getAccentCss = () => (isDarkMode ? '#f51866' : '#355070');
-  const getAccentHover = () => (isDarkMode ? '#fa4875' : '#406b92');
+  const getAccentCss = () => (isDarkMode ? '#f51866' : '#2D4361');
+  const getAccentHover = () => (isDarkMode ? '#fa4875' : '#4A5F7F');
 
   // i18n
   const { t } = useTranslation();
@@ -254,7 +254,7 @@ export default function AnnouncementDetails() {
   // Tooltip simplu și centrat pentru butoanele de acțiune
   const getTooltipStyles = () => ({
     tooltip: {
-      backgroundColor: getIsDarkMode() ? '#1a1a1a' : '#2c3e50',
+      backgroundColor: getIsDarkMode() ? '#1a1a1a' : '#324866',
       color: '#ffffff',
       fontSize: '0.75rem',
       fontWeight: 500,
@@ -262,10 +262,10 @@ export default function AnnouncementDetails() {
       borderRadius: '8px',
       boxShadow: getIsDarkMode() 
         ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
-        : '0 4px 12px rgba(44, 62, 80, 0.3)'
+        : '0 4px 12px rgba(50, 72, 102, 0.3)'
     },
     arrow: {
-      color: getIsDarkMode() ? '#1a1a1a' : '#2c3e50'
+      color: getIsDarkMode() ? '#1a1a1a' : '#324866'
     }
   });
 
@@ -613,7 +613,7 @@ export default function AnnouncementDetails() {
             mb: 3, 
             color: getAccentCss(),
             display: { xs: 'inline-flex', sm: 'inline-flex', md: 'none' },
-            '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)' }
+            '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(45, 67, 97, 0.08)' }
           }}
         >
           {t('common.back')}
@@ -758,7 +758,7 @@ export default function AnnouncementDetails() {
                           '&:hover': {
                             bgcolor: isFavorite 
                               ? (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(229, 62, 62, 0.08)')
-                              : (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)'),
+                              : (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(45, 67, 97, 0.08)'),
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s'
@@ -784,7 +784,7 @@ export default function AnnouncementDetails() {
                         sx={{
                           color: getAccentCss(),
                           '&:hover': {
-                            bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(53, 80, 112, 0.08)',
+                            bgcolor: getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(45, 67, 97, 0.08)',
                             transform: 'scale(1.1)'
                           },
                           transition: 'all 0.2s'
@@ -821,7 +821,7 @@ export default function AnnouncementDetails() {
                     mt: 4,
                     pt: 2.5,
                     borderTop: '1px solid',
-                    borderColor: getIsDarkMode() ? 'rgba(255,255,255,0.12)' : 'rgba(53,80,112,0.25)',
+                    borderColor: getIsDarkMode() ? 'rgba(255,255,255,0.12)' : 'rgba(45,67,97,0.25)',
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'row',

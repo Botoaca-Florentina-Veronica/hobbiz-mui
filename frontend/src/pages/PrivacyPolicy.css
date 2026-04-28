@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    PRIVACY POLICY PAGE STYLES
    Refactorizat: Structură modulară și Variabile CSS
    ============================================================= */
@@ -17,7 +17,7 @@
   --pp-bg-page: var(--bg-secondary);
   
   /* Header / Hero */
-  --pp-bg-header: #355070;
+  --pp-bg-header: #2D4361;
   --pp-bg-header-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
   --pp-text-header: #ffffff;
   
@@ -36,21 +36,21 @@
   /* Content Body */
   --pp-bg-content: #ffffff;
   --pp-border-content: transparent;
-  --pp-gradient-top: linear-gradient(90deg, #355070, #ffffff);
+  --pp-gradient-top: linear-gradient(90deg, #2D4361, #ffffff);
   
   /* Text & Typography */
-  --pp-text-heading: #355070;
+  --pp-text-heading: #2D4361;
   --pp-text-body: #4a5568;
-  --pp-text-strong: #355070;
-  --pp-text-link: #355070;
+  --pp-text-strong: #2D4361;
+  --pp-text-link: #2D4361;
   --pp-text-link-hover: #ffffff;
-  --pp-list-bullet: #355070;
+  --pp-list-bullet: #2D4361;
   
   /* Icons & Decor */
   --pp-icon-main: inherit; /* Moștenește culoarea textului în header */
   
   /* Shadows */
-  --pp-shadow-header: 0 12px 48px rgba(53, 80, 112, 0.25);
+  --pp-shadow-header: 0 12px 48px rgba(45, 67, 97, 0.25);
   --pp-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.08);
   --pp-shadow-infobox: 0 8px 24px rgba(0, 0, 0, 0.1);
 }

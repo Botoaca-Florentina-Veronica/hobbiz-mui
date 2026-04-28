@@ -119,8 +119,10 @@
     "button": "Únete ahora"
   },
   "mainStage": {
+    "tagline": "Convierte la pasión en ganancia",
     "title": "¿Tienes un hobby genial y crees que no sirve? ¡Encuentra personas dispuestas a pagar por él!",
     "subtitle": "¡Convierte tu pasión en una fuente de ingresos!",
+    "howItWorks": "Ver cómo funciona",
     "signUp": "Registrarse",
     "searchPlaceholder": "¿Qué estás buscando?",
     "locationPlaceholder": "Todo el país",

@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    1. CSS Variables - Customizable theme colors & spacing
    ============================================ */
 :root {
@@ -30,8 +30,8 @@
   /* Light Mode Colors */
   --aa-light-bg: #ffffff;
   --aa-light-border: #121212;
-  --aa-light-border-hover: rgba(53, 80, 112, 0.3);
-  --aa-light-accent: #355070;
+  --aa-light-border-hover: rgba(45, 67, 97, 0.3);
+  --aa-light-accent: #2D4361;
   --aa-light-accent-hover: #2a4058;
 
   /* MA Variables - Light Mode */

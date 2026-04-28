@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    ANNOUNCEMENT DETAILS PAGE STYLES
    ============================================================= */
 
@@ -13,19 +13,19 @@
   
   /* Cards & Surfaces */
   --ad-card-bg: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
-  --ad-card-border: rgba(53, 80, 112, 0.08);
-  --ad-card-shadow: 0 8px 32px rgba(53, 80, 112, 0.08);
-  --ad-card-border-hover: rgba(53, 80, 112, 0.15);
-  --ad-card-shadow-hover: 0 12px 48px rgba(53, 80, 112, 0.12);
+  --ad-card-border: rgba(45, 67, 97, 0.08);
+  --ad-card-shadow: 0 8px 32px rgba(45, 67, 97, 0.08);
+  --ad-card-border-hover: rgba(45, 67, 97, 0.15);
+  --ad-card-shadow-hover: 0 12px 48px rgba(45, 67, 97, 0.12);
   
   /* Hero Overlay */
-  --ad-hero-bg: linear-gradient(135deg, rgba(53, 80, 112, 0.03) 0%, transparent 100%);
-  --ad-image-overlay: linear-gradient(135deg, rgba(53, 80, 112, 0.05) 0%, transparent 50%);
+  --ad-hero-bg: linear-gradient(135deg, rgba(45, 67, 97, 0.03) 0%, transparent 100%);
+  --ad-image-overlay: linear-gradient(135deg, rgba(45, 67, 97, 0.05) 0%, transparent 50%);
   
   /* Typography & Icons */
   --ad-text-primary: inherit; /* Mosteneste culoarea default a app-ului */
   --ad-text-secondary: inherit;
-  --ad-title-gradient: linear-gradient(135deg, #355070, #406b92);
+  --ad-title-gradient: linear-gradient(135deg, #2D4361, #4A5F7F);
   
   /* Buttons & Navigation */
   --ad-nav-btn-bg: rgba(255, 255, 255, 0.95);
@@ -34,16 +34,16 @@
   --ad-nav-btn-hover-bg: rgba(255, 255, 255, 1);
   --ad-nav-btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   
-  --ad-back-btn-hover: rgba(53, 80, 112, 0.08);
+  --ad-back-btn-hover: rgba(45, 67, 97, 0.08);
   
   /* Specific Elements */
-  --ad-divider-bg: linear-gradient(90deg, transparent, rgba(53, 80, 112, 0.2), transparent);
+  --ad-divider-bg: linear-gradient(90deg, transparent, rgba(45, 67, 97, 0.2), transparent);
   --ad-price-gradient: linear-gradient(135deg, #e53e3e, #ff6b6b);
   
   /* Scrollbar */
   --ad-scroll-track: #f1f1f1;
-  --ad-scroll-thumb: #355070;
-  --ad-scroll-thumb-hover: #406b92;
+  --ad-scroll-thumb: #2D4361;
+  --ad-scroll-thumb-hover: #4A5F7F;
 }
 
 /* --- Dark Mode Overrides --- */
@@ -251,7 +251,7 @@ body:not(.dark-mode) .MuiCard-root {
 
 /* Avatar */
 .MuiAvatar-root {
-  box-shadow: 0 4px 16px rgba(53,80,112,0.2) !important;
+  box-shadow: 0 4px 16px rgba(45,67,97,0.2) !important;
   border: 3px solid rgba(255,255,255,0.8) !important;
 }
 .dark-mode .MuiAvatar-root {
@@ -269,7 +269,7 @@ body:not(.dark-mode) .MuiCard-root {
 }
 .MuiChip-root:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 8px rgba(53,80,112,0.15) !important;
+  box-shadow: 0 2px 8px rgba(45,67,97,0.15) !important;
 }
 
 /* Buttons (Generic MUI) */
@@ -296,14 +296,14 @@ body:not(.dark-mode) .MuiCard-root {
 
 .MuiButton-root:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 20px rgba(53,80,112,0.2) !important;
+  box-shadow: 0 4px 20px rgba(45,67,97,0.2) !important;
 }
 .MuiIconButton-root { transition: all .2s cubic-bezier(0.4,0,0.2,1) !important; }
 .MuiIconButton-root:hover { transform: scale(1.05) !important; }
 
 /* Accessibility Focus */
 .MuiButton-root:focus-visible, .MuiIconButton-root:focus-visible {
-  outline: 2px solid #355070; outline-offset: 2px;
+  outline: 2px solid #2D4361; outline-offset: 2px;
 }
 .dark-mode .MuiButton-root:focus-visible, 
 .dark-mode .MuiIconButton-root:focus-visible {

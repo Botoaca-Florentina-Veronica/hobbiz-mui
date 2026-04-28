@@ -5,8 +5,8 @@
 
 /* â”€â”€ Page â”€â”€ */
 .pp-page {
-  --pp-accent: var(--pf-primary, #ec407a);
-  --pp-accent-hover: var(--pf-primary-hover, #d81b60);
+  --pp-accent: var(--pf-primary, #1A314E);
+  --pp-accent-hover: var(--pf-primary-hover, #021C38);
   --pp-bg: var(--pf-bg, #ffffff);
   --pp-card: var(--pf-card-bg, #ffffff);
   --pp-text: var(--pf-text, #1a1a1a);
@@ -87,7 +87,7 @@
 }
 .pp-hero-cover {
   height: 220px;
-  background: linear-gradient(135deg, #ec407a 0%, #ab47bc 100%);
+  background: linear-gradient(135deg, #324866 0%, #1A314E 100%);
   background-size: cover;
   background-position: center;
   border-radius: 0;
@@ -142,7 +142,7 @@
   color: var(--pp-text);
 }
 .pp-verified-icon {
-  color: var(--pf-verified-icon, #0ea5e9) !important;
+  color: var(--pf-verified-icon, #4A5F7F) !important;
   font-size: 22px !important;
 }
 .pp-verified-badge {
@@ -151,8 +151,8 @@
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 20px;
-  background: var(--pf-verified-bg, #f0f9ff);
-  color: var(--pf-verified-text, #0284c7);
+  background: var(--pf-verified-bg, #EBF1FF);
+  color: var(--pf-verified-text, #324866);
   margin-top: 4px;
 }
 .pp-hero-location {
@@ -210,12 +210,12 @@
   padding: 8px 20px !important;
   font-size: .9rem !important;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(236,64,122,.3) !important;
+  box-shadow: 0 2px 8px rgba(26, 49, 78, .28) !important;
   transition: all .2s !important;
 }
 .pp-msg-btn:hover {
   background: var(--pp-accent-hover) !important;
-  box-shadow: 0 4px 16px rgba(236,64,122,.4) !important;
+  box-shadow: 0 4px 16px rgba(26, 49, 78, .36) !important;
 }
 
 /* â”€â”€ Stats bar â”€â”€ */

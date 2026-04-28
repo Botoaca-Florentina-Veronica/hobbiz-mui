@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -81,13 +81,13 @@ export default function ContactModal({ open, onClose }) {
   const inputBg   = dark ? '#1a1a1a' : '#ffffff';
 
   // Brand colours: blue in light mode, pink in dark mode
-  const accent      = dark ? '#f51866' : '#355070';
-  const accentHover = dark ? '#fa4875' : '#2a4059';
-  const accentShadow = dark ? 'rgba(245,24,102,0.36)' : 'rgba(53,80,112,0.28)';
-  const accentShadowHover = dark ? 'rgba(245,24,102,0.45)' : 'rgba(53,80,112,0.38)';
-  const gradientMain  = dark ? 'linear-gradient(135deg,#f51866 0%,#c0134f 100%)' : 'linear-gradient(135deg,#355070 0%,#2a4059 100%)';
-  const gradientBtn   = dark ? 'linear-gradient(90deg,#f51866 0%,#c0134f 100%)'  : 'linear-gradient(90deg,#355070 0%,#2a4059 100%)';
-  const gradientBtnHv = dark ? 'linear-gradient(90deg,#d6164f 0%,#a81044 100%)'  : 'linear-gradient(90deg,#2a4059 0%,#1e3047 100%)';
+  const accent      = dark ? '#f51866' : '#2D4361';
+  const accentHover = dark ? '#fa4875' : '#1A314E';
+  const accentShadow = dark ? 'rgba(245,24,102,0.36)' : 'rgba(45,67,97,0.28)';
+  const accentShadowHover = dark ? 'rgba(245,24,102,0.45)' : 'rgba(45,67,97,0.38)';
+  const gradientMain  = dark ? 'linear-gradient(135deg,#f51866 0%,#c0134f 100%)' : 'linear-gradient(135deg,#2D4361 0%,#1A314E 100%)';
+  const gradientBtn   = dark ? 'linear-gradient(90deg,#f51866 0%,#c0134f 100%)'  : 'linear-gradient(90deg,#2D4361 0%,#1A314E 100%)';
+  const gradientBtnHv = dark ? 'linear-gradient(90deg,#d6164f 0%,#a81044 100%)'  : 'linear-gradient(90deg,#1A314E 0%,#021C38 100%)';
 
   const fieldSx = {
     '& .MuiOutlinedInput-root': {

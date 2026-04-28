@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    ADMIN CONTACT FALLBACKS
    ============================================================ */
 
@@ -63,7 +63,7 @@
   font-weight: 600 !important;
   font-size: 0.82rem !important;
   padding: 6px 14px !important;
-  border: 1px solid rgba(53, 80, 112, 0.2) !important;
+  border: 1px solid rgba(45, 67, 97, 0.2) !important;
   color: var(--as-text-primary, #183642) !important;
   min-height: 38px;
 }

@@ -1,4 +1,4 @@
-/* ArchivedAnnouncementsPage.css
+﻿/* ArchivedAnnouncementsPage.css
    Page-scoped mobile overrides so archived announcements on web mimic mobile app layout. */
 
 .archived-announcements-page {
@@ -93,7 +93,7 @@
     padding-bottom: 11px;
     font-size: 15px;
     font-weight: 600;
-    color: #355070;
+    color: #2D4361;
   }
 
   .dark-mode .archived-announcements-page .archived-mobile-select .MuiSelect-select {

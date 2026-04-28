@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    MAINSTAGE STYLES - FINAL (Cu fix pentru Search in Dark Mode)
    ============================================================= */
 
@@ -10,8 +10,8 @@
   --ms-bg-overlay: rgba(20, 20, 20, 0.4);
   
   /* Text */
-  --ms-text-primary: #2c3e50;
-  --ms-text-title: var(--primary);
+  --ms-text-primary: #324866;
+  --ms-text-title: #1A314E;
   
   /* Containers */
   --ms-card-bg: var(--app-elev);
@@ -19,15 +19,15 @@
   --ms-img-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   
   /* Categories Button */
-  --ms-cat-btn-bg: linear-gradient(135deg, #355070 0%, #2c4a63 100%);
+  --ms-cat-btn-bg: linear-gradient(135deg, #2D4361 0%, #324866 100%);
   --ms-cat-btn-border: rgba(255, 255, 255, 0.9);
   --ms-cat-btn-text: #fff;
-  --ms-cat-btn-shadow: 0 8px 24px rgba(53, 80, 112, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+  --ms-cat-btn-shadow: 0 8px 24px rgba(45, 67, 97, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
   
   /* Button Hover */
-  --ms-cat-btn-hover-bg: linear-gradient(135deg, #2c4a63 0%, #1e3a52 100%);
+  --ms-cat-btn-hover-bg: linear-gradient(135deg, #324866 0%, #1A314E 100%);
   --ms-cat-btn-hover-border: rgba(248, 177, 149, 0.8);
-  --ms-cat-btn-hover-shadow: 0 12px 32px rgba(53, 80, 112, 0.4), 0 6px 16px rgba(248,177,149,0.20);
+  --ms-cat-btn-hover-shadow: 0 12px 32px rgba(45, 67, 97, 0.4), 0 6px 16px rgba(248,177,149,0.20);
   
   /* Dropdowns Base */
   --ms-drop-bg: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
@@ -36,17 +36,17 @@
   
   /* List Items */
   --ms-item-bg: transparent;
-  --ms-item-hover-bg: linear-gradient(135deg, rgba(248,177,149,0.15) 0%, rgba(53,80,112,0.08) 100%);
+  --ms-item-hover-bg: linear-gradient(135deg, rgba(248,177,149,0.15) 0%, rgba(45,67,97,0.08) 100%);
   --ms-item-shadow-hover: 0 4px 12px rgba(248,177,149,0.20);
-  --ms-item-text: #2c3e50;
-  --ms-item-icon: #355070;
+  --ms-item-text: #324866;
+  --ms-item-icon: #2D4361;
   --ms-item-arrow: #ffffff;
   --ms-item-hover-icon: #ffffff;
-  --ms-item-hover-arrow: #355070;
+  --ms-item-hover-arrow: #2D4361;
   
   /* Details Panel */
   --ms-details-bg: linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(248,249,250,0.95) 100%);
-  --ms-details-title: #355070;
+  --ms-details-title: #2D4361;
   --ms-details-border: #ffffff;
   --ms-details-scrollbar: rgba(248,177,149,0.50);
   
@@ -58,7 +58,7 @@
   
   /* Chips */
   --ms-chip-bg: rgba(248,177,149,0.12);
-  --ms-chip-text: #2c3e50;
+  --ms-chip-text: #324866;
   --ms-chip-border: rgba(248,177,149,0.40);
   --ms-chip-hover-bg: rgba(248,177,149,0.25);
   --ms-chip-hover-border: #ffffff;
@@ -72,9 +72,9 @@
   --ms-loc-icon: var(--app-muted);
   
   /* Buttons */
-  --ms-btn-primary-bg: var(--primary);
+  --ms-btn-primary-bg: #1A314E;
   --ms-btn-primary-text: var(--primary-contrast);
-  --ms-btn-hover-bg: var(--primary-hover);
+  --ms-btn-hover-bg: #021C38;
   /* Global radius for main-stage cards */
   --ms-radius: 20px;
 }
@@ -103,9 +103,9 @@
   --ms-cat-btn-hover-shadow: 0 12px 32px rgba(245, 24, 102, 0.5), 0 6px 16px rgba(255, 255, 255, 0.2);
   
   /* Dropdowns */
-  --ms-drop-bg: #121212;
-  --ms-drop-border: #282828;
-  --ms-drop-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 8px 16px rgba(245, 24, 102, 0.1);
+  --ms-drop-bg: #2b2b2b;
+  --ms-drop-border: rgba(255, 255, 255, 0.08);
+  --ms-drop-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 8px 16px rgba(245, 24, 102, 0.15);
   
   /* List Items */
   --ms-item-hover-bg: rgba(245, 24, 102, 0.1);
@@ -118,7 +118,7 @@
   --ms-item-hover-arrow: #f51866;
   
   /* Details Panel */
-  --ms-details-bg: #121212;
+  --ms-details-bg: #2b2b2b;
   --ms-details-title: #f51866;
   --ms-details-border: #f51866;
   --ms-details-scrollbar: rgba(245, 24, 102, 0.6);
@@ -156,7 +156,7 @@
 .main-stage {
   display: flex;
   flex-direction: column;
-  background-color: var(--ms-bg-stage);
+  background: var(--ms-bg-stage);
   padding: 40px 100px 80px;
   align-items: center;
   position: relative;
@@ -198,6 +198,12 @@ body.dark-mode .main-stage::before,
 body.dark-mode .main-stage > *,
 .dark-mode .main-stage > * { position: relative; z-index: 1; }
 
+/* Restabilim z-index-ul top-bar în dark mode — fără asta backdrop-ul
+   din interiorul top-bar (stacking context z-index:1) e acoperit de
+   main-content (tot z-index:1, dar mai târziu în DOM). */
+body.dark-mode .main-stage > .top-bar,
+.dark-mode .main-stage > .top-bar { z-index: 20; }
+
 .main-content {
   display: flex; justify-content: space-between; align-items: stretch;
   width: 100%; flex: 1;
@@ -205,9 +211,9 @@ body.dark-mode .main-stage > *,
 
 .main-text {
   flex: 1; max-width: 680px; padding: 28px;
-  background-color: var(--ms-card-bg);
-  border-radius: var(--ms-radius, 28px);
-  box-shadow: var(--ms-card-shadow);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   margin-right: 30px; font-size: 1.25rem; line-height: 1.5;
   overflow: hidden;
   display: flex;
@@ -217,21 +223,92 @@ body.dark-mode .main-stage > *,
 .main-text {
   font-family: 'Poppins', sans-serif !important;
 }
-/* Light mode: add black border to match AnnouncementDetails and apply rounded corners */
-body:not(.dark-mode) .main-text {
-  border: 1px solid #121212 !important;
-  border-radius: 28px !important;
+.dark-mode .main-text {
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
-.dark-mode .main-text { 
-  border-color: var(--app-border);
-  border: 1px solid rgba(255,255,255,0.12); /* subtle white outline in dark mode */
-  box-shadow: 0 8px 24px rgba(255,255,255,0.02); /* soft light halo for depth */
-} 
+
+.main-tagline-pill {
+  display: inline-block;
+  background: #fde8e2;
+  color: #c0533a;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+  width: fit-content;
+}
+.dark-mode .main-tagline-pill {
+  background: rgba(248, 177, 149, 0.18);
+  color: #f8b195;
+}
+
+.main-cta-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  max-width: 480px;
+}
+
+.main-cta-buttons .how-it-works-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 44px;
+  gap: 2px;
+  padding: 0 20px;
+  background: transparent;
+  color: var(--ms-text-primary);
+  border: 1.5px solid var(--ms-text-primary);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+  box-sizing: border-box;
+  line-height: 1;
+}
+.main-cta-buttons .how-it-works-button:hover {
+  background: rgba(50, 72, 102, 0.08);
+}
+.dark-mode .main-cta-buttons .how-it-works-button {
+  color: var(--app-text);
+  border-color: var(--app-text);
+}
+.dark-mode .main-cta-buttons .how-it-works-button:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.how-it-works-icon {
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  flex-shrink: 0;
+}
 
 #main-title {
   color: var(--ms-text-title);
   font-size: 2.8rem; margin-bottom: 20px; margin-top: 0;
   line-height: 1.2;
+}
+
+.main-text > p {
+  color: #6b7280;
+}
+.dark-mode .main-text > p {
+  color: #f51866;
 }
 
 .main-stage-image {
@@ -240,34 +317,33 @@ body:not(.dark-mode) .main-text {
   border-radius: 28px;
   overflow: hidden;
 }
-/* Light mode: add black border to image container to match AnnouncementDetails */
-body:not(.dark-mode) .main-stage-image {
-  border: 1px solid #121212 !important;
-  border-radius: 28px;
-  padding: 0;
-}
 .main-stage-image img {
   width: 500px; height: auto;
   border-radius: 24px;
   box-shadow: var(--ms-img-shadow);
 }
 
-.sign-up-button {
-  display: inline-block;
-  padding: 8px 16px;
+.main-cta-buttons .sign-up-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 44px;
+  padding: 0 16px;
   background: var(--ms-btn-primary-bg);
   color: var(--ms-btn-primary-text);
-  border: none;
+  border: 1.5px solid transparent;
   border-radius: 12px;
   cursor: pointer;
-  font-size: 0.9rem;
-  margin-top: 12px;
+  font-size: 1rem;
+  margin-top: 0;
   transition: background 0.2s;
-  max-width: 180px;
   white-space: nowrap;
   text-align: center;
+  box-sizing: border-box;
+  line-height: 1;
 }
-.sign-up-button:hover { background: var(--ms-btn-hover-bg); }
+.main-cta-buttons .sign-up-button:hover { background: var(--ms-btn-hover-bg); }
 
 
 /* 3. TOP BAR & CATEGORIES BUTTON
@@ -313,13 +389,164 @@ body:not(.dark-mode) .main-stage-image {
   transform: translateY(-2px);
 }
 .categories-button:active {
-  transform: translateY(0); box-shadow: 0 6px 20px rgba(53, 80, 112, 0.3);
+  transform: translateY(0); box-shadow: 0 6px 20px rgba(45, 67, 97, 0.3);
 }
 
 .categories-button svg {
   font-size: 1.6em; transition: transform 0.3s ease;
 }
 .categories-button:hover svg { transform: rotate(90deg); }
+
+/* Staggered menu integration for Categories button */
+.mainstage-staggered-menu {
+  flex-shrink: 0;
+}
+
+.mainstage-staggered-menu.staggered-menu-wrapper.inline-menu {
+  z-index: 20;
+}
+
+.mainstage-staggered-menu .sm-backdrop {
+  z-index: 9998;
+}
+
+.mainstage-staggered-menu .sm-toggle-textWrap {
+  height: 1.3em;
+}
+
+.mainstage-staggered-menu .sm-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  background: var(--ms-cat-btn-bg);
+  border: 2px solid var(--ms-cat-btn-border);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ms-cat-btn-text);
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: var(--ms-cat-btn-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mainstage-staggered-menu .sm-toggle:hover,
+.mainstage-staggered-menu[data-open] .sm-toggle {
+  background: var(--ms-cat-btn-hover-bg);
+  border-color: var(--ms-cat-btn-hover-border);
+  box-shadow: var(--ms-cat-btn-hover-shadow);
+  transform: translateY(-2px);
+}
+
+.mainstage-staggered-menu .sm-toggle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 3px;
+}
+
+.mainstage-staggered-menu .sm-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+}
+
+.mainstage-staggered-menu .sm-icon-line {
+  height: 2.5px;
+  width: 100%;
+}
+
+.mainstage-staggered-menu .staggered-menu-panel {
+  background: var(--ms-drop-bg);
+  border: none;
+  box-shadow: var(--ms-drop-shadow);
+  backdrop-filter: blur(10px);
+  padding: 1.5em 1.5em;
+  border-radius: 0 0 16px 16px;
+}
+
+.dark-mode .mainstage-staggered-menu .staggered-menu-panel {
+  background: #2b2b2b !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 8px 0 40px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+
+.mainstage-staggered-menu:not([data-open]) .staggered-menu-panel {
+  visibility: hidden;
+  transition: visibility 0s 0.35s;
+}
+.mainstage-staggered-menu[data-open] .staggered-menu-panel {
+  visibility: visible;
+  transition: visibility 0s 0s;
+}
+
+.categories-open .mainstage-search-desktop,
+.categories-closing .mainstage-search-desktop {
+  z-index: 0;
+}
+
+.mainstage-staggered-menu .sm-item-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: var(--ms-item-icon);
+  margin-right: 10px;
+}
+
+.mainstage-staggered-menu .sm-panel-item {
+  display: flex;
+  align-items: center;
+}
+
+.mainstage-staggered-menu .sm-panel-inner {
+  gap: 0.5rem;
+}
+
+.mainstage-staggered-menu .sm-panel-list {
+  gap: 0.75rem;
+}
+
+.mainstage-staggered-menu .sm-panel-item {
+  width: 100%;
+  padding: 7px 40px 7px 10px;
+  border-radius: 12px;
+  color: var(--ms-item-text);
+  font-size: clamp(0.9rem, 1.25vw, 1.1rem);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.mainstage-staggered-menu .sm-panel-item:hover {
+  color: var(--ms-item-hover-icon);
+  background: var(--ms-item-hover-bg);
+  box-shadow: var(--ms-item-shadow-hover);
+}
+
+.mainstage-staggered-menu .sm-panel-list[data-numbering] .sm-panel-item::after {
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ms-item-icon);
+}
+
+.mainstage-staggered-menu .sm-panel-item:hover::after {
+  color: var(--ms-item-hover-icon);
+}
+
+.mainstage-staggered-menu .sm-toggle-staticLabel {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .mainstage-staggered-menu .sm-toggle {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+  }
+}
 
 
 /* 4. CATEGORIES DROPDOWN & OVERLAY
@@ -400,21 +627,20 @@ body:not(.dark-mode) .main-stage-image {
 /* 5. CATEGORY DETAILS PANEL (INCLUSIV LOGICA ANIMATING-OUT)
    ---------------------------------------------------------- */
 .category-details {
-  position: fixed !important; top: 70px !important; left: 460px !important;
+  position: fixed !important;
+  top: 68px !important; bottom: 20px !important;
+  left: 476px !important;
   background: var(--ms-drop-bg) !important;
-  border-radius: 0px !important;
+  border-radius: 0 !important;
   box-shadow: var(--ms-drop-shadow) !important;
   z-index: 9999 !important;
-  width: calc(100vw - 500px) !important; min-width: 450px !important; max-width: 650px !important;
-  height: 630px !important; overflow-y: auto !important;
-  padding: 0px !important; 
-  
-  /* BASE STATE: Visible */
+  width: calc(100vw - 460px) !important; min-width: 420px !important; max-width: 700px !important;
+  height: auto !important; overflow-y: auto !important;
+  padding: 0 !important;
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) scale(1) !important;
   transition: opacity 0.2s ease-out, transform 0.2s ease-out !important;
   will-change: opacity, transform !important;
-  
   border: 1px solid var(--ms-drop-border) !important;
   border-left: none !important;
 }
@@ -1005,23 +1231,23 @@ body:not(.dark-mode) .search-suggestions-dropdown {
     background-color: var(--app-bg);
     min-height: auto;
   }
-  
+
   .main-content {
     flex-direction: column; gap: 32px; align-items: stretch;
     background: transparent !important; margin-bottom: 0; padding: 0 16px;
   }
-  
+
   .main-text {
     padding: 20px; margin-right: 0; font-size: 1rem; width: 80vw; max-width: 560px;
     margin-left: auto; margin-right: auto;
-    background: var(--app-elev);
-    border-radius: 16px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    background: transparent;
+    border: none;
+    box-shadow: none;
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
-  
+
   #main-title { font-size: 2rem; line-height: 1.25; }
-  .sign-up-button { margin-top: 40px; }
+  .main-cta-buttons { margin-top: 24px; }
   
   .main-stage-image { display: none !important; }
   .top-bar { padding-top: calc(8px + env(safe-area-inset-top)); }

@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    HEADER STYLES - FIXED & REFACTORED
    ============================================================= */
 
@@ -9,15 +9,15 @@
   --hdr-text: var(--primary-contrast);
 
   /* --- Shared Light Mode Header Tokens --- */
-  --hdr-bg-light: rgba(53,80,112,0.28); /* frosted blue tint (homepage look) */
-  --hdr-gradient-light: linear-gradient(rgba(53,80,112,0.24), rgba(53,80,112,0.18));
-  --hdr-border-light: rgba(53,80,112,0.08);
+  --hdr-bg-light: rgba(45,67,97,0.28); /* frosted blue tint (homepage look) */
+  --hdr-gradient-light: linear-gradient(rgba(45,67,97,0.24), rgba(45,67,97,0.18));
+  --hdr-border-light: rgba(45,67,97,0.08);
   --hdr-shadow-light: 0 6px 18px rgba(0,0,0,0.06);
   
   /* --- Language Selector --- */
-  --lang-btn-color: #355070;
-  --lang-btn-border: #355070;
-  --lang-btn-bg-hover: #355070;
+  --lang-btn-color: #2D4361;
+  --lang-btn-border: #2D4361;
+  --lang-btn-bg-hover: #2D4361;
   --lang-btn-text-hover: #fff;
   --lang-dropdown-bg: #fff;
   --lang-dropdown-text: #183642;
@@ -126,6 +126,10 @@
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
+}
+
+body.categories-open .fixed-header {
+  z-index: 0;
 }
 
 .dark-mode .fixed-header {

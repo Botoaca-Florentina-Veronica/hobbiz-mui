@@ -1,9 +1,9 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    1. VARIABLES & THEME CONFIGURATION
    ========================================================================== */
 :root {
   /* --- Palette Definition --- */
-  --aa-primary: #355070;
+  --aa-primary: #2D4361;
   --aa-accent: #fe6585;
   --aa-success: #388e3c;
   --aa-danger: #d32f2f;
@@ -21,7 +21,7 @@
   --text-placeholder: #5b7a88;
   
   --border-color: transparent;
-  --border-focus: #355070;
+  --border-focus: #2D4361;
   
   --shadow-card: 0 2px 16px rgba(0,0,0,0.07);
   --shadow-hover: 0 4px 16px rgba(24,54,66,0.10);
@@ -510,8 +510,8 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 /* Preview Button */
 .add-announcement-preview {
   background: #f9faf8;
-  border: 2px solid #355070;
-  color: #355070;
+  border: 2px solid #2D4361;
+  color: #2D4361;
   margin-right: 12px;
 }
 .dark-mode .add-announcement-preview {
@@ -519,7 +519,7 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 }
 
 .add-announcement-preview:hover {
-  background: #355070; color: #f9faf8; border: 2px solid #355070;
+  background: #2D4361; color: #f9faf8; border: 2px solid #2D4361;
 }
 .dark-mode .add-announcement-preview:hover {
   background: #f51866; color: #ffffff; border-color: #f51866;
@@ -548,14 +548,14 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 
 /* Submit Button */
 .add-announcement-submit {
-  background: #355070; color: #f9faf8; border: 2px solid #355070;
+  background: #2D4361; color: #f9faf8; border: 2px solid #2D4361;
 }
 .dark-mode .add-announcement-submit {
   background: #f51866; color: #ffffff; border: 2px solid #f51866;
 }
 
 .add-announcement-submit:hover {
-  background: #f9faf8; color: #355070; border: 2px solid #355070;
+  background: #f9faf8; color: #2D4361; border: 2px solid #2D4361;
 }
 .dark-mode .add-announcement-submit:hover {
   background: #282828; color: #fe6585; border-color: #fe6585;

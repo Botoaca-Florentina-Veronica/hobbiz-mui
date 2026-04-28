@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import './AnnouncementLocationMap.css';
 import { Card, CardContent, Typography, Box, Divider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 // Componentă ce afișează un headline "Locație" + hartă Google Maps prin iframe.
 // Folosește cheia din Vite: import.meta.env.VITE_GOOGLE_MAPS_KEY (opțional).
 // Dacă nu există sau este invalidă, cade pe un embed public (search) fără cheie.
-export default function AnnouncementLocationMap({ location, darkMode = false, height = 260, accentColor = '#355070' }) {
+export default function AnnouncementLocationMap({ location, darkMode = false, height = 260, accentColor = '#2D4361' }) {
   const { t } = useTranslation();
   const [encoded, setEncoded] = useState('');
   const [src, setSrc] = useState('');

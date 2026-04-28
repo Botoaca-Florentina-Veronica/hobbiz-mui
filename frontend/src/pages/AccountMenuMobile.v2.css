@@ -1,4 +1,4 @@
-/* AccountMenuMobile - merged styles, preserving previous tokens and look, mobile-first */
+﻿/* AccountMenuMobile - merged styles, preserving previous tokens and look, mobile-first */
 
 /* Color tokens for Account page (light + dark via CSS vars) */
 :root {
@@ -11,11 +11,11 @@
   --acc-border: #e5e7eb;             /* neutral border */
   --acc-text: #0b0b0b;               /* main readable text (near black) */
   --acc-title: #0b0b0b;              /* headings */
-  --acc-primary: #355070;            /* primary blue used across site */
+  --acc-primary: #2D4361;            /* primary blue used across site */
   --acc-primary-alt: #ffffff;        /* lighter blue accent */
   --acc-divider: #e5e7eb;
   --acc-hover: rgba(31,111,235,0.06);/* subtle blue hover */
-  --acc-avatar-bg: #355070;          /* blue avatar background */
+  --acc-avatar-bg: #2D4361;          /* blue avatar background */
   --acc-avatar-icon: #ffffff;        /* white icon */
   --acc-user-name: #000000;
   --acc-user-info: #6b7280;
@@ -122,8 +122,8 @@
 .account-mobile__avatar img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:50%; }.account-mobile__info { display:flex; flex-direction:column; align-items:center; width:100%; text-align:center; }.account-mobile__name{ font-weight:700; color:var(--acc-user-name); font-size:1.15rem; margin-top:42px; text-align:center; }
 .account-mobile__admin-badge{ display:inline-flex; align-items:center; gap:6px; margin-top:8px; font-size:0.8rem; font-weight:600; }
 .account-mobile.account-mobile--applike .account-mobile__admin-badge {
-  border: 1.5px solid #355070;
-  color: #355070;
+  border: 1.5px solid #2D4361;
+  color: #2D4361;
   border-radius: 20px;
   padding: 4px 12px;
 }
@@ -216,9 +216,9 @@
   Enabled only when JSX adds .account-mobile--applike, so desktop stays unchanged.
 */
 .account-mobile.account-mobile--applike {
-  --acc-app-header-light: #355070;
+  --acc-app-header-light: #2D4361;
   --acc-app-name-light: #ffffff;
-  --acc-app-icon-light: #355070;
+  --acc-app-icon-light: #2D4361;
   --acc-app-surface-light: #ffffff;
   --acc-app-bg-light: #ffffff;
 
@@ -580,7 +580,7 @@
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: rgba(53, 80, 112, 0.08);
+  background: rgba(45, 67, 97, 0.08);
   color: var(--acc-primary);
   display: inline-flex;
   align-items: center;
@@ -617,12 +617,12 @@
 
 .account-mobile.account-mobile--applike .account-modal-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(53, 80, 112, 0.12);
+  box-shadow: 0 8px 18px rgba(45, 67, 97, 0.12);
 }
 
 .account-mobile.account-mobile--applike .account-modal-btn.is-active {
-  background: linear-gradient(135deg, rgba(53, 80, 112, 0.12), rgba(53, 80, 112, 0.06));
-  border-color: rgba(53, 80, 112, 0.28);
+  background: linear-gradient(135deg, rgba(45, 67, 97, 0.12), rgba(45, 67, 97, 0.06));
+  border-color: rgba(45, 67, 97, 0.28);
   color: var(--acc-primary);
 }
 
@@ -684,7 +684,7 @@
 }
 
 .account-mobile.account-mobile--applike .account-modal-card.contact .account-contact-head {
-  background: linear-gradient(135deg, #355070 0%, #2a4059 100%);
+  background: linear-gradient(135deg, #2D4361 0%, #1A314E 100%);
   color: #ffffff;
   padding: 14px 18px 12px;
   text-align: center;
@@ -769,8 +769,8 @@
 
 .account-mobile.account-mobile--applike .account-modal-card.contact input:focus,
 .account-mobile.account-mobile--applike .account-modal-card.contact textarea:focus {
-  border-color: #355070;
-  box-shadow: 0 0 0 3px rgba(53, 80, 112, 0.12);
+  border-color: #2D4361;
+  box-shadow: 0 0 0 3px rgba(45, 67, 97, 0.12);
 }
 
 .dark-mode .account-mobile.account-mobile--applike .account-modal-card.contact input:focus,
@@ -828,8 +828,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(90deg, #355070 0%, #2a4059 100%);
-  box-shadow: 0 8px 22px rgba(53, 80, 112, 0.3);
+  background: linear-gradient(90deg, #2D4361 0%, #1A314E 100%);
+  box-shadow: 0 8px 22px rgba(45, 67, 97, 0.3);
 }
 
 .dark-mode .account-mobile.account-mobile--applike .account-modal-card.contact .account-modal-btn.primary {

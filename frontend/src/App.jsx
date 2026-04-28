@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Routes, Route } from "react-router-dom";
 import { FiUser, FiHeart, FiCompass } from 'react-icons/fi';
 import { FiSun, FiMoon } from 'react-icons/fi';
@@ -396,7 +396,7 @@ function App() {
 
   return (
     <ClickSpark
-      sparkColor={darkMode ? '#f51866' : '#2a4059'}
+      sparkColor={darkMode ? '#f51866' : '#1A314E'}
       sparkSize={10}
       sparkRadius={15}
       sparkCount={8}

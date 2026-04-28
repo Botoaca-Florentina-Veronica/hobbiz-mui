@@ -1,4 +1,4 @@
-.cookie-consent-root {
+﻿.cookie-consent-root {
   position: fixed;
   right: 20px;
   bottom: 20px;
@@ -65,7 +65,7 @@
 
 .cookie-accept:hover {
   background: var(--primary-hover);
-  box-shadow: 0 8px 20px rgba(53,80,112,0.18);
+  box-shadow: 0 8px 20px rgba(45,67,97,0.18);
   transform: translateY(-2px);
 }
 
@@ -89,7 +89,7 @@
 
 /* focus styles */
 .cookie-accept:focus, .cookie-reject:focus, .cookie-settings:focus {
-  outline: 3px solid rgba(53,80,112,0.18);
+  outline: 3px solid rgba(45,67,97,0.18);
   outline-offset: 2px;
 }
 

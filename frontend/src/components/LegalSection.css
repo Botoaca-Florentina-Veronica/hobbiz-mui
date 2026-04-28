@@ -1,4 +1,4 @@
-.legal-section {
+﻿.legal-section {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -48,13 +48,13 @@
 }
 .legal-section__desc {
   font-size: 1rem;
-  color: #355070;
+  color: #2D4361;
   margin-bottom: 0.5rem;
 }
 .legal-section__column h4 {
   margin-bottom: 0.5rem;
   font-size: 1.3rem;
-  color: #355070;
+  color: #2D4361;
   margin-top: 0.5rem;
 }
 .legal-section__column ul {
@@ -66,7 +66,7 @@
   margin-bottom: 0.3rem;
 }
 .legal-section__column ul li a {
-  color: #355070;
+  color: #2D4361;
   text-decoration: none;
   transition: color 0.2s;
   font-size: 1.1rem;

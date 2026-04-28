@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ============================================
  * THEME.CSS - Sistem Centralizat Dark Mode
  * ============================================
@@ -35,8 +35,8 @@
   --text-title-special: #183642;   /* Titluri speciale */
   
   /* --- CULORI BRAND --- */
-  --primary: #355070;              /* Culoare primară */
-  --primary-hover: #2a4059;        /* Primary la hover */
+  --primary: #2D4361;              /* Culoare primară */
+  --primary-hover: #1A314E;        /* Primary la hover */
   --primary-contrast: #ffffff;     /* Text pe primary */
   
   --accent: #f51866;               /* Accent (butoane importante, notificări) */
@@ -49,14 +49,14 @@
   --chat-message-area-bg: #f8fafb; /* Fundal zonă mesaje */
   
   --chat-bubble-received: #f3f5f6; /* Bule mesaje primite */
-  --chat-bubble-sent: #355070;     /* Bule mesaje trimise */
+  --chat-bubble-sent: #2D4361;     /* Bule mesaje trimise */
   --chat-bubble-sent-text: #ffffff; /* Text în bulele trimise */
   
   --chat-input-bg: #ffffff;        /* Fundal input mesaj */
   --chat-input-border: #e8ecef;    /* Margine input mesaj */
   
   --chat-tab-bg: transparent;      /* Fundal tab-uri inactive */
-  --chat-tab-active-bg: #355070;   /* Fundal tab activ */
+  --chat-tab-active-bg: #2D4361;   /* Fundal tab activ */
   --chat-tab-border: #e8ecef;      /* Margine tab-uri */
   
   /* --- STĂRI & FEEDBACK --- */

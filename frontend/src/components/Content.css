@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    CONTENT & PROMO SECTION STYLES
    ============================================================= */
 
@@ -351,15 +351,15 @@
 
 /* Light Mode */
 .explore-all-button {
-  color: #355070;
+  color: #2D4361;
   background-color: #ffffff;
-  border-color: #355070;
+  border-color: #2D4361;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .explore-all-button:hover {
   color: #ffffff;
-  background-color: #355070;
+  background-color: #2D4361;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }

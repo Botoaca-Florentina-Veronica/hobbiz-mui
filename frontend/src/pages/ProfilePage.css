@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    PROFILE PAGE STYLES
    ============================================
    
@@ -34,11 +34,11 @@
   --pf-text: #1a1a1a;
   --pf-text-muted: #6b7280;
   --pf-border: #e5e7eb;
-  --pf-primary: #ec407a;
-  --pf-primary-hover: #d81b60;
-  --pf-verified-bg: #f0f9ff;
-  --pf-verified-text: #0284c7;
-  --pf-verified-icon: #0ea5e9;
+  --pf-primary: #1A314E;
+  --pf-primary-hover: #021C38;
+  --pf-verified-bg: #EBF1FF;
+  --pf-verified-text: #324866;
+  --pf-verified-icon: #4A5F7F;
   --pf-shadow: 0 1px 3px rgba(0,0,0,0.1);
   --pf-shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
   --pf-card-radius: 16px;
@@ -147,7 +147,7 @@ body:not(.dark-mode) .profile-header-unified {
   position: absolute;
   bottom: 12px;
   right: 16px;
-  background: linear-gradient(180deg, var(--pf-primary) 0%, rgba(53,80,112,0.92) 100%);
+  background: linear-gradient(180deg, var(--pf-primary) 0%, rgba(45,67,97,0.92) 100%);
   color: #fff;
   border: none;
   border-radius: 9999px;
@@ -156,19 +156,19 @@ body:not(.dark-mode) .profile-header-unified {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(53,80,112,0.18), inset 0 1px 0 rgba(255,255,255,0.04);
+  box-shadow: 0 8px 24px rgba(45,67,97,0.18), inset 0 1px 0 rgba(255,255,255,0.04);
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .profile-cover-upload-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 36px rgba(53,80,112,0.22), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: 0 12px 36px rgba(45,67,97,0.22), inset 0 1px 0 rgba(255,255,255,0.06);
   background: linear-gradient(180deg, var(--pf-primary-hover) 0%, rgba(30,58,78,0.92) 100%);
 }
 
 .profile-cover-upload-btn:focus {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(53,80,112,0.12), 0 8px 24px rgba(53,80,112,0.18);
+  box-shadow: 0 0 0 4px rgba(45,67,97,0.12), 0 8px 24px rgba(45,67,97,0.18);
 }
 
 /* === Avatar Section === */
@@ -204,7 +204,7 @@ body:not(.dark-mode) .profile-header-unified {
 }
 
 .profile-avatar-unified.clickable:focus-visible {
-  outline: 3px solid rgba(236, 64, 122, 0.45);
+  outline: 3px solid rgba(26, 49, 78, 0.35);
   outline-offset: 3px;
 }
 
@@ -291,7 +291,7 @@ body:not(.dark-mode) .profile-header-unified {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f51866;
+  background: #1A314E;
   color: #ffffff;
   padding: 4px 12px;
   border-radius: 12px;
@@ -341,13 +341,13 @@ body:not(.dark-mode) .profile-header-unified {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(236, 64, 122, 0.3);
+  box-shadow: 0 2px 8px rgba(26, 49, 78, 0.28);
 }
 
 .profile-edit-profile-button:hover {
   background: var(--pf-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(236, 64, 122, 0.4);
+  box-shadow: 0 4px 12px rgba(26, 49, 78, 0.36);
 }
 
 .profile-location-text {
@@ -586,7 +586,7 @@ body:not(.dark-mode) .profile-location-card {
 }
 
 .profile-view-all-button:hover {
-  background: rgba(236,64,122,0.06);
+  background: rgba(26, 49, 78, 0.08);
 }
 
 /* Loading & empty states */
@@ -763,12 +763,12 @@ body:not(.dark-mode) .profile-stats-card {
 .profile-stat-icon {
   width: 44px;
   height: 44px;
-  background: #e8f4ff;
+  background: #D4E3FF;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0ea5e9;
+  color: #4A5F7F;
   flex-shrink: 0;
 }
 
@@ -961,7 +961,7 @@ body:not(.dark-mode) .profile-about-card {
 .profile-field-input:focus {
   outline: none;
   border-color: var(--pf-primary);
-  box-shadow: 0 0 0 2px rgba(53, 80, 112, 0.1);
+  box-shadow: 0 0 0 2px rgba(45, 67, 97, 0.1);
 }
 
 /* Actions section */
@@ -1207,7 +1207,7 @@ body:not(.dark-mode) .profile-about-card {
   font-size: 10px;
   font-weight: 700;
   color: #ffffff;
-  background: #f51866;
+  background: #1A314E;
   border-radius: 999px;
   padding: 3px 8px;
   text-transform: uppercase;

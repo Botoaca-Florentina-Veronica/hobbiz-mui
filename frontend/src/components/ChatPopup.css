@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    CHAT POPUP STYLES
    ============================================================= */
 
@@ -17,7 +17,7 @@
   --cp-text-primary: #333333;
   --cp-text-secondary: #888888;
   --cp-text-inverse: #ffffff;
-  --cp-text-placeholder: #355070; /* Avatar placeholder */
+  --cp-text-placeholder: #2D4361; /* Avatar placeholder */
   
   /* Accents */
   --cp-accent: #f51866;

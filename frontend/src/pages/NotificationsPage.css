@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    NOTIFICATIONS PAGE STYLES
    ============================================================= */
 
@@ -17,39 +17,39 @@
   --nt-text-title: #183642;
   --nt-text-primary: #183642;
   --nt-text-secondary: #6b7280;
-  --nt-text-sender: #355070;
+  --nt-text-sender: #2D4361;
   
   /* Containers */
   --nt-bg-content: #fff;
   --nt-bg-item: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
   --nt-bg-item-unread: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  --nt-bg-item-hover: rgba(53, 80, 112, 0.02);
+  --nt-bg-item-hover: rgba(45, 67, 97, 0.02);
   
   /* Borders */
   --nt-border-item: #e8ecef;
-  --nt-border-unread: #355070;
-  --nt-border-hover: #355070;
-  --nt-accent-bar: linear-gradient(to bottom, #355070, #406b92);
+  --nt-border-unread: #2D4361;
+  --nt-border-hover: #2D4361;
+  --nt-accent-bar: linear-gradient(to bottom, #2D4361, #4A5F7F);
   
   /* Indicators */
-  --nt-indicator-color: #355070;
+  --nt-indicator-color: #2D4361;
   
   /* Actions & Avatars */
-  --nt-avatar-border: #355070;
+  --nt-avatar-border: #2D4361;
   --nt-btn-delete-color: #6b7280;
   --nt-btn-delete-hover-bg: rgba(239, 68, 68, 0.1);
   --nt-btn-delete-hover-text: #ef4444;
   
   /* Links */
-  --nt-link-text: #355070;
-  --nt-link-bg: rgba(53, 80, 112, 0.1);
-  --nt-link-border: rgba(53, 80, 112, 0.2);
-  --nt-link-hover-bg: rgba(53, 80, 112, 0.2);
+  --nt-link-text: #2D4361;
+  --nt-link-bg: rgba(45, 67, 97, 0.1);
+  --nt-link-border: rgba(45, 67, 97, 0.2);
+  --nt-link-hover-bg: rgba(45, 67, 97, 0.2);
   
   /* Shadows */
   --nt-shadow-content: 0 4px 20px rgba(0,0,0,0.08);
-  --nt-shadow-unread: 0 2px 8px rgba(53, 80, 112, 0.1);
-  --nt-shadow-hover: 0 8px 25px rgba(53, 80, 112, 0.15);
+  --nt-shadow-unread: 0 2px 8px rgba(45, 67, 97, 0.1);
+  --nt-shadow-hover: 0 8px 25px rgba(45, 67, 97, 0.15);
   
   /* Mobile Header */
   --nt-mob-header-text: var(--chat-text, #183642);
@@ -377,7 +377,7 @@
 .loading-spinner {
   width: 40px; height: 40px;
   border: 3px solid #e8ecef;
-  border-top: 3px solid #355070;
+  border-top: 3px solid #2D4361;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -469,7 +469,7 @@
 .notif-strip-review     { background: linear-gradient(160deg, #ff9800, #e65100); }
 .notif-strip-verification { background: linear-gradient(160deg, #4caf50, #1b5e20); }
 .notif-strip-document   { background: linear-gradient(160deg, #9c27b0, #4a148c); }
-.notif-strip-general    { background: linear-gradient(160deg, #355070, #1c3045); }
+.notif-strip-general    { background: linear-gradient(160deg, #2D4361, #021C38); }
 
 /* Announcement context chip */
 .notif-ann-context {
@@ -481,7 +481,7 @@
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 500;
-  background: rgba(53,80,112,0.08);
+  background: rgba(45,67,97,0.08);
   color: var(--nt-text-secondary);
   max-width: 100%;
   overflow: hidden;

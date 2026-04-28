@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    FOOTER STYLES
    ============================================================= */
 
@@ -156,11 +156,11 @@
     display: flex !important;
     flex-direction: column; justify-content: center; align-items: center;
     /* Match desktop header frosted look */
-    background: linear-gradient(rgba(53,80,112,0.24), rgba(53,80,112,0.18)) !important;
+    background: linear-gradient(rgba(45,67,97,0.24), rgba(45,67,97,0.18)) !important;
     backdrop-filter: blur(8px) saturate(120%) !important;
     -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
-    border: 1px solid rgba(53,80,112,0.08) !important;
-    border-top: 1px solid rgba(53,80,112,0.08) !important;
+    border: 1px solid rgba(45,67,97,0.08) !important;
+    border-top: 1px solid rgba(45,67,97,0.08) !important;
     border-radius: 40px !important; /* pill shape */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05) !important;
     z-index: 1000; padding: 0 6px !important;

@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    FAVORITE ANNOUNCEMENTS PAGE
    ============================================================= */
 
@@ -705,7 +705,7 @@ body.dark-mode .favorite-announcement-card {
   /* --- Price --- */
   .favorite-price {
     font-size: 15px;
-    color: #355070; /* Accent light mode mobile */
+    color: #2D4361; /* Accent light mode mobile */
     margin-top: auto;
     margin-bottom: 0;
     align-self: flex-end;

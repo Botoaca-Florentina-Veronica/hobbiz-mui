@@ -119,8 +119,10 @@
     "button": "Înregistrează-te"
   },
   "mainStage": {
+    "tagline": "Transformă pasiunea în profit",
     "title": "Ai vreun hobby fain și crezi că e inutil? Găsește oameni care sunt dispuși să plătească pentru el!",
     "subtitle": "Fă din pasiunea ta o sursă de venit!",
+    "howItWorks": "Vezi cum funcționează",
     "signUp": "Sign up",
     "searchPlaceholder": "Ce anume cauți?",
     "locationPlaceholder": "Toată țara",

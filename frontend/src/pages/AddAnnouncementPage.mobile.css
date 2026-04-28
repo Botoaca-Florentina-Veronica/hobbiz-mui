@@ -1,4 +1,4 @@
-/* AddAnnouncementPage.mobile.css - Stiluri dedicate pentru mobile (max-width: 599px) */
+﻿/* AddAnnouncementPage.mobile.css - Stiluri dedicate pentru mobile (max-width: 599px) */
 
 @media (max-width: 599px) {
   /* Ensure no child overflows its container due to padding/border */
@@ -1076,8 +1076,8 @@
     .add-announcement-container.sell-applike .add-announcement-preview {
       background: none;
       border: none;
-      border-bottom: 2px solid #355070;
-      color: #355070;
+      border-bottom: 2px solid #2D4361;
+      color: #2D4361;
       border-radius: 0;
       padding: 0 8px 2px;
       margin: 0;
@@ -1320,13 +1320,13 @@
 
   .add-announcement-container.sell-applike .add-announcement-preview {
     background: #ffffff;
-    color: #355070;
+    color: #2D4361;
     border: 1px solid rgba(0, 0, 0, 0.14);
   }
 
   .add-announcement-container.sell-applike .add-announcement-preview:hover {
     background: #ffffff;
-    color: #355070;
+    color: #2D4361;
     border-color: rgba(0, 0, 0, 0.24);
   }
 
@@ -1344,9 +1344,9 @@
 
   .add-announcement-container.sell-applike .add-announcement-submit,
   .add-announcement-container.sell-applike .add-announcement-submit:hover {
-    background: #355070;
+    background: #2D4361;
     color: #f9faf8;
-    border: 1px solid #355070;
+    border: 1px solid #2D4361;
   }
 
   .dark-mode .add-announcement-container.sell-applike .add-announcement-submit,

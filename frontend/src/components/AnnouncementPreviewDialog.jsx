@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogContent, DialogActions, Button, Box, Grid,
   Card, CardMedia, CardContent, Paper, Avatar, Chip,
@@ -160,7 +160,7 @@ export default function AnnouncementPreviewDialog({
               boxShadow: (theme) =>
                 theme.palette.mode === 'dark'
                   ? '0 8px 32px rgba(0,0,0,0.6)'
-                  : '0 8px 32px rgba(53,80,112,0.08)',
+                  : '0 8px 32px rgba(45,67,97,0.08)',
             }}>
               <Box sx={{ position: 'relative', height: { xs: '58vw', sm: 380, md: 460 } }}>
                 {imagePreviews.length > 0 ? (
@@ -235,7 +235,7 @@ export default function AnnouncementPreviewDialog({
               boxShadow: (theme) =>
                 theme.palette.mode === 'dark'
                   ? '0 8px 32px rgba(0,0,0,0.6)'
-                  : '0 8px 32px rgba(53,80,112,0.08)',
+                  : '0 8px 32px rgba(45,67,97,0.08)',
               bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
             }}>
               <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
@@ -244,13 +244,13 @@ export default function AnnouncementPreviewDialog({
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                   <Box sx={{ flex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                      <AccessTimeIcon sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070', fontSize: 20 }} />
+                      <AccessTimeIcon sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361', fontSize: 20 }} />
                       <Typography variant="body2" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#888' : '#6b7280' }}>
                         {new Date().toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </Typography>
                     </Box>
                     <Typography variant="h4" component="h1" sx={{
-                      color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                      color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
                       fontWeight: 700, mb: 2,
                       fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' },
                       textAlign: 'center',
@@ -262,18 +262,18 @@ export default function AnnouncementPreviewDialog({
                         label={translateCategory(category, t)}
                         variant="outlined"
                         sx={{
-                          borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                          borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
+                          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
                           mb: 2, fontWeight: 600,
                         }}
                       />
                     )}
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070' }}>
+                    <IconButton sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361' }}>
                       <FavoriteBorderIcon />
                     </IconButton>
-                    <IconButton sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070' }}>
+                    <IconButton sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361' }}>
                       <ShareIcon />
                     </IconButton>
                   </Box>
@@ -282,7 +282,7 @@ export default function AnnouncementPreviewDialog({
                 <Divider sx={{ mb: 3, borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)' }} />
 
                 {/* Descriere */}
-                <Typography variant="h6" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070', mb: 2, fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361', mb: 2, fontWeight: 600 }}>
                   {t('addAnnouncement.preview.description')}
                 </Typography>
                 <Typography variant="body1" sx={{
@@ -297,14 +297,14 @@ export default function AnnouncementPreviewDialog({
                 <Box sx={{
                   mt: 4, pt: 2.5,
                   borderTop: '1px solid',
-                  borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(53,80,112,0.25)',
+                  borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(45,67,97,0.25)',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1,
                 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.75, letterSpacing: '.5px', color: (theme) => theme.palette.mode === 'dark' ? '#bbb' : '#6b7280' }}>ID:</Typography>
                     <Typography variant="caption" sx={{ fontFamily: 'monospace', opacity: 0.9, color: (theme) => theme.palette.mode === 'dark' ? '#bbb' : '#6b7280' }}>——</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <VisibilityIcon sx={{ fontSize: 16, color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070', opacity: 0.85 }} />
+                      <VisibilityIcon sx={{ fontSize: 16, color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361', opacity: 0.85 }} />
                       <Typography variant="caption" sx={{ fontWeight: 500, color: (theme) => theme.palette.mode === 'dark' ? '#bbb' : '#6b7280' }}>0 vizualizări</Typography>
                     </Box>
                   </Box>
@@ -317,7 +317,7 @@ export default function AnnouncementPreviewDialog({
                 {price && (
                   <>
                     <Divider sx={{ my: 3, borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)' }} />
-                    <Typography variant="h6" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070', mb: 1, fontWeight: 600 }}>
+                    <Typography variant="h6" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361', mb: 1, fontWeight: 600 }}>
                       Preț
                     </Typography>
                     <Typography variant="h5" sx={{ color: '#e53e3e', fontWeight: 700 }}>
@@ -340,11 +340,11 @@ export default function AnnouncementPreviewDialog({
                 boxShadow: (theme) =>
                   theme.palette.mode === 'dark'
                     ? '0 8px 32px rgba(0,0,0,0.6)'
-                    : '0 8px 32px rgba(53,80,112,0.08)',
+                    : '0 8px 32px rgba(45,67,97,0.08)',
                 bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
               }}>
                 <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-                  <Typography variant="h6" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070', mb: 3, fontWeight: 600 }}>
+                  <Typography variant="h6" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361', mb: 3, fontWeight: 600 }}>
                     {t('addAnnouncement.preview.sellerInfo')}
                   </Typography>
 
@@ -354,9 +354,9 @@ export default function AnnouncementPreviewDialog({
                       src={user?.avatar || undefined}
                       sx={{
                         width: 60, height: 60, mr: 2,
-                        background: 'linear-gradient(135deg, #f51866 0%, #355070 100%)',
+                        background: 'linear-gradient(135deg, #f51866 0%, #2D4361 100%)',
                         fontSize: '1.2rem', fontWeight: 600,
-                        boxShadow: '0 4px 16px rgba(53,80,112,0.2)',
+                        boxShadow: '0 4px 16px rgba(45,67,97,0.2)',
                         border: (theme) => theme.palette.mode === 'dark' ? '3px solid rgba(245,24,102,0.3)' : '3px solid rgba(255,255,255,0.8)',
                       }}
                     >
@@ -386,11 +386,11 @@ export default function AnnouncementPreviewDialog({
                       <Button
                         variant="outlined" size="small" disabled
                         sx={{
-                          borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                          borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
+                          color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
                           '&.Mui-disabled': {
-                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(53,80,112,0.4)',
-                            color: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.5)' : 'rgba(53,80,112,0.4)',
+                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(45,67,97,0.4)',
+                            color: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.5)' : 'rgba(45,67,97,0.4)',
                           },
                           textTransform: 'none', fontWeight: 600, px: 1.25, py: 0.5, ml: 2,
                         }}
@@ -408,9 +408,9 @@ export default function AnnouncementPreviewDialog({
                       variant="contained" fullWidth disabled
                       startIcon={<MessageIcon />}
                       sx={{
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
                         '&.Mui-disabled': {
-                          bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(53,80,112,0.4)',
+                          bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(45,67,97,0.4)',
                           color: '#fff',
                         },
                         borderRadius: 2, py: 1.5,
@@ -427,13 +427,13 @@ export default function AnnouncementPreviewDialog({
                     }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <PhoneIcon sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070', fontSize: 20 }} />
+                          <PhoneIcon sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361', fontSize: 20 }} />
                           <Typography variant="body1" sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : 'inherit', letterSpacing: 2 }}>
                             {contactPhone ? 'xxx xxx xxx' : 'N/A'}
                           </Typography>
                         </Box>
                         {contactPhone && (
-                          <Button size="small" disabled sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866 !important' : '#355070 !important' }}>
+                          <Button size="small" disabled sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#f51866 !important' : '#2D4361 !important' }}>
                             Arată
                           </Button>
                         )}
@@ -443,11 +443,11 @@ export default function AnnouncementPreviewDialog({
                     <Button
                       variant="outlined" fullWidth disabled
                       sx={{
-                        borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
-                        color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#355070',
+                        borderColor: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
+                        color: (theme) => theme.palette.mode === 'dark' ? '#f51866' : '#2D4361',
                         '&.Mui-disabled': {
-                          borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(53,80,112,0.4)',
-                          color: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(53,80,112,0.4)',
+                          borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(45,67,97,0.4)',
+                          color: (theme) => theme.palette.mode === 'dark' ? 'rgba(245,24,102,0.4)' : 'rgba(45,67,97,0.4)',
                         },
                         borderRadius: 2, py: 1.5,
                       }}
@@ -463,7 +463,7 @@ export default function AnnouncementPreviewDialog({
                 <AnnouncementLocationMap
                   location={[selectedLocalitate, selectedJudet].filter(Boolean).join(', ')}
                   darkMode={theme.palette.mode === 'dark'}
-                  accentColor={theme.palette.mode === 'dark' ? '#f51866' : '#355070'}
+                  accentColor={theme.palette.mode === 'dark' ? '#f51866' : '#2D4361'}
                   height={220}
                 />
               )}

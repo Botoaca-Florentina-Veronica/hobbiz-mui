@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    MY ANNOUNCEMENTS PAGE STYLES - Mobile App Design
    ============================================================= */
 
@@ -13,15 +13,15 @@
   --ma-text: #183642;
   --ma-muted: #6b7280;
   --ma-placeholder: #9ca3af;
-  --ma-primary: #355070;
+  --ma-primary: #2D4361;
   --ma-border: #e8ecef;
   --ma-border-neutral: #cbd5e1;
   --ma-elev: #f3f5f6;
   --ma-dark-container: #ffffff;
   
   /* Buttons */
-  --ma-btn-primary-border: #355070;
-  --ma-btn-primary-text: #355070;
+  --ma-btn-primary-border: #2D4361;
+  --ma-btn-primary-text: #2D4361;
   --ma-btn-danger-border: #dc3545;
   --ma-btn-danger-text: #dc3545;
   --ma-btn-secondary-border: #6b7280;

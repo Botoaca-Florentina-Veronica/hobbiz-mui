@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    DARK MODE & TOGGLE STYLES
    Refactorizat: Variabile CSS, Performanță
    ============================================================= */
@@ -7,9 +7,9 @@
    ---------------------------------------------------------- */
 :root {
   /* --- Toggle Switch Colors --- */
-  --toggle-border: #355070;
+  --toggle-border: #2D4361;
   --toggle-bg: rgba(255, 255, 255, 0.95);
-  --toggle-thumb: #355070;
+  --toggle-thumb: #2D4361;
   --toggle-thumb-text: #ffffff;
   --toggle-hover-thumb: #2a4a65;
   --toggle-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -26,9 +26,9 @@
   --main-text-color: inherit;
   
   /* Buttons */
-  --btn-signup-bg: #355070;
+  --btn-signup-bg: #2D4361;
   --btn-signup-text: #ffffff;
-  --btn-signup-hover-bg: #355070; /* sau o nuanță mai închisă */
+  --btn-signup-hover-bg: #2D4361; /* sau o nuanță mai închisă */
   
   --btn-second-bg: #dfccaf;
   --btn-second-text: #ffffff;
@@ -41,11 +41,11 @@
   --cat-title: inherit;
   --search-input-bg: #fff;
   --search-input-border: #ccc;
-  --search-btn-bg: #355070;
+  --search-btn-bg: #2D4361;
   
   /* Icons & Actions */
   --icon-fav-color: inherit;
-  --action-add-bg: #355070;
+  --action-add-bg: #2D4361;
 }
 
 /* --- Dark Mode Overrides --- */
@@ -102,6 +102,10 @@ body.dark-mode {
   position: fixed;
   top: 18px; right: 24px;
   z-index: 1200;
+}
+
+body.categories-open .dark-mode-toggle {
+  z-index: 0;
 }
 
 .toggle-switch {

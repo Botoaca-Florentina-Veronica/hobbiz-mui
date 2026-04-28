@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    ABOUT PAGE STYLES
    ============================================================= */
 
@@ -16,7 +16,7 @@
   --ab-bg-page: var(--bg-secondary);
   
   /* Hero */
-  --ab-bg-hero: linear-gradient(135deg, #355070 0%, #406b92 100%);
+  --ab-bg-hero: linear-gradient(135deg, #2D4361 0%, #4A5F7F 100%);
   --ab-bg-hero-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
   --ab-text-hero: #ffffff;
   --ab-badge-bg: rgba(255, 255, 255, 0.15);
@@ -30,42 +30,42 @@
   --ab-bg-surface: #ffffff;
   --ab-bg-surface-alt: #f7fafc; /* pt pillars */
   --ab-border-card: transparent; /* border invizibil pe light */
-  --ab-border-card-hover: #355070;
+  --ab-border-card-hover: #2D4361;
   
   /* Text */
   --ab-text-heading: #2d3748;
-  --ab-text-heading-alt: #355070;
+  --ab-text-heading-alt: #2D4361;
   --ab-text-body: #4a5568;
   --ab-text-muted: #718096;
   
   /* Icons & Accents */
-  --ab-icon-bg: linear-gradient(135deg, #355070, #406b92);
+  --ab-icon-bg: linear-gradient(135deg, #2D4361, #4A5F7F);
   --ab-icon-color: #ffffff;
-  --ab-accent-primary: #355070;
+  --ab-accent-primary: #2D4361;
   --ab-accent-secondary: #ffffff;
-  --ab-gradient-bar: linear-gradient(90deg, #355070, #ffffff);
+  --ab-gradient-bar: linear-gradient(90deg, #2D4361, #ffffff);
   
   /* Value Cards Borders (Light) */
-  --ab-val-border-1: #355070;
-  --ab-val-border-2: #406b92;
+  --ab-val-border-1: #2D4361;
+  --ab-val-border-2: #4A5F7F;
   --ab-val-border-3: #ffffff;
 
   /* CTA */
   --ab-bg-cta: linear-gradient(135deg, #ffffff 0%, #f4a261 100%);
   --ab-text-cta: #ffffff;
   --ab-btn-bg: #ffffff;
-  --ab-btn-text: #355070;
+  --ab-btn-text: #2D4361;
   --ab-btn-hover-bg: #ffffff;
 
   /* Shadows */
-  --ab-shadow-hero: 0 12px 48px rgba(53, 80, 112, 0.25);
+  --ab-shadow-hero: 0 12px 48px rgba(45, 67, 97, 0.25);
   --ab-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.08);
-  --ab-shadow-hover: 0 8px 40px rgba(53, 80, 112, 0.12);
-  --ab-shadow-icon: 0 8px 24px rgba(53, 80, 112, 0.2);
+  --ab-shadow-hover: 0 8px 40px rgba(45, 67, 97, 0.12);
+  --ab-shadow-icon: 0 8px 24px rgba(45, 67, 97, 0.2);
   
   /* FAQ */
-  --ab-faq-q-bg: #355070;
-  --ab-faq-q-hover: #406b92;
+  --ab-faq-q-bg: #2D4361;
+  --ab-faq-q-hover: #4A5F7F;
   --ab-faq-q-text: #ffffff;
 }
 
@@ -545,7 +545,7 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, rgba(53, 80, 112, 0.02) 0%, transparent 50%);
+  background: linear-gradient(135deg, rgba(45, 67, 97, 0.02) 0%, transparent 50%);
   pointer-events: none;
 }
 .dark-mode .how-it-works::before {
@@ -589,7 +589,7 @@
   position: absolute;
   top: 30px; left: 60px; right: 60px;
   height: 2px;
-  background: linear-gradient(90deg, #355070, #406b92, #ffffff);
+  background: linear-gradient(90deg, #2D4361, #4A5F7F, #ffffff);
   z-index: 1;
 }
 .dark-mode .timeline-line { background: linear-gradient(90deg, #f51866, #fa4875, #fe6585); }
@@ -608,14 +608,14 @@
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 20px auto;
   position: relative;
-  box-shadow: 0 4px 15px rgba(53, 80, 112, 0.3);
+  box-shadow: 0 4px 15px rgba(45, 67, 97, 0.3);
   transition: all 0.3s ease;
 }
 .dark-mode .step-circle { box-shadow: 0 4px 15px rgba(245, 24, 102, 0.4); }
 
 .step-circle:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(53, 80, 112, 0.4);
+  box-shadow: 0 6px 20px rgba(45, 67, 97, 0.4);
 }
 .dark-mode .step-circle:hover { box-shadow: 0 6px 20px rgba(245, 24, 102, 0.5); }
 
@@ -623,7 +623,7 @@
   content: '';
   position: absolute;
   width: 80px; height: 80px;
-  border: 2px solid rgba(53, 80, 112, 0.2);
+  border: 2px solid rgba(45, 67, 97, 0.2);
   border-radius: 50%;
   animation: ripple 2s infinite;
 }

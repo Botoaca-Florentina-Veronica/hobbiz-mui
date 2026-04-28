@@ -1,8 +1,8 @@
-import { FaSearch, FaBars, FaMapMarkerAlt } from "react-icons/fa";
+import { FaSearch, FaMapMarkerAlt } from "react-icons/fa";
 import { HiOutlineBell } from 'react-icons/hi';
 import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
 import hobby from '../assets/images/hobby_img.jpg';
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import translateCategory from '../utils/translateCategory';
@@ -18,6 +18,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import './MainStage.css';
+import StaggeredMenu from './StaggeredMenu';
 import useSearchSuggestions from '../hooks/useSearchSuggestions';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
@@ -210,9 +211,9 @@ export default function MainStage() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedJudet, setSelectedJudet] = useState(null);
   const [selectedLocalitate, setSelectedLocalitate] = useState("");
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
-  const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [categoryDetailsAnimating, setCategoryDetailsAnimating] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [detailsVisible, setDetailsVisible] = useState(false);
   
   // Search autocomplete (hook handles debounce + AbortController)
   const {
@@ -233,10 +234,40 @@ export default function MainStage() {
   } = useSearchSuggestions();
   
   // Refs
-  const categoriesButtonRef = useRef(null);
-  const hoverTimeoutRef = useRef(null);
   const searchContainerRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  // Hover logic for category details panel
+  useEffect(() => {
+    if (!menuOpen) {
+      setSelectedCategory(null);
+      setDetailsVisible(false);
+      return;
+    }
+    const animDuration = 2650;
+    const timer = setTimeout(() => {
+      const panel = document.querySelector('.mainstage-staggered-menu .staggered-menu-panel');
+      if (!panel) return;
+      setDetailsVisible(true);
+      const handleMouseOver = (e) => {
+        const item = e.target.closest('.sm-panel-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.index, 10) - 1;
+        const original = categoriesList[idx];
+        if (original && categoriesDetails[original]) setSelectedCategory(original);
+      };
+      panel.addEventListener('mouseover', handleMouseOver);
+      panel._cleanupHover = () => {
+        panel.removeEventListener('mouseover', handleMouseOver);
+      };
+    }, animDuration);
+
+    return () => {
+      clearTimeout(timer);
+      const panel = document.querySelector('.mainstage-staggered-menu .staggered-menu-panel');
+      panel?._cleanupHover?.();
+    };
+  }, [menuOpen]);
 
   // Whether the search input is focused (controls dropdown visibility for recent/empty states)
   const [inputFocused, setInputFocused] = useState(false);
@@ -322,22 +353,6 @@ export default function MainStage() {
   }, [showDropdown, showRecentPanel, activeIndex, totalItems, recentSearches, searchSuggestions, searchTerm, hasTypedEnough]);
 
   // Event Handlers
-  const handleCategoryHover = (category) => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    setCategoryDetailsAnimating(false);
-    setHoveredCategory(category);
-  };
-
-  const handleCategoryLeave = () => {
-    setCategoryDetailsAnimating(true);
-    hoverTimeoutRef.current = setTimeout(() => {
-      setHoveredCategory(null);
-      setCategoryDetailsAnimating(false);
-    }, 200);
-  };
-
   const handleInputClick = (event) => {
     setAnchorEl(event.currentTarget);
     setSelectedJudet(null);
@@ -349,45 +364,11 @@ export default function MainStage() {
     setSelectedJudet(null);
   };
 
-  const handleJudetClick = (event, judet) => {
-    setSelectedJudet(judet);
-  };
-
   const handleLocalitateClick = (localitate) => {
     setSelectedLocalitate(localitate);
     setAnchorEl(null);
     setSelectedJudet(null);
   };
-
-  const handleCategoriesClick = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setCategoriesOpen(prev => !prev);
-  };
-
-  const handleCloseCategories = () => {
-    setCategoriesOpen(false);
-    setCategoryDetailsAnimating(true);
-    setHoveredCategory(null);
-    setCategoryDetailsAnimating(false);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-  };
-
-  const handleCategoryClick = (category) => {
-    handleCloseCategories();
-    navigate(`/anunturi-categorie/${encodeURIComponent(category)}`);
-  };
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const handleSuggestionClick = (announcementId) => {
     clearSearch();
@@ -441,6 +422,24 @@ export default function MainStage() {
       );
     } catch { return text; }
   };
+
+  const categoryMenuItems = useMemo(
+    () =>
+      categoriesList.map((category) => ({
+        label: t(`categories.${category}`),
+        icon: categoryIcons[category] || null,
+        ariaLabel: t('mainStage.categoryAriaLabel', {
+          defaultValue: `Deschide categoria ${t(`categories.${category}`)}`,
+          category: t(`categories.${category}`),
+        }),
+        link: `/anunturi-categorie/${encodeURIComponent(category)}`,
+        onClick: (event) => {
+          event.preventDefault();
+          navigate(`/anunturi-categorie/${encodeURIComponent(category)}`);
+        },
+      })),
+    [navigate, t]
+  );
 
   // Render the dropdown panel (recent, loading, suggestions, no-results)
   const renderSearchDropdown = (isMobileVariant) => {
@@ -579,81 +578,31 @@ export default function MainStage() {
 
   return (
     <div className="main-stage">
-      {/* Categories Dropdown */}
-      {categoriesOpen && (
-        <>
-          <div className="categories-overlay" onClick={handleCloseCategories}></div>
-          <Paper className="category-dropdown" elevation={0}>
-            <Box className="category-dropdown-container">
-              {categoriesList.map((cat) => (
-                <Box
-                  key={cat}
-                  className="category-item"
-                  onClick={() => handleCategoryClick(cat)}
-                  onMouseEnter={() => handleCategoryHover(cat)}
-                  onMouseLeave={handleCategoryLeave}
-                >
-                  <Box className="category-icon">
-                    {categoryIcons[cat]}
-                  </Box>
-                  <Typography className="category-text">
-                    {t(`categories.${cat}`)}
-                  </Typography>
-                  <ArrowForwardIosIcon className="category-arrow" fontSize="small" />
-                </Box>
-              ))}
-            </Box>
-          </Paper>
-          
-          {/* Category Details Panel */}
-          {hoveredCategory && categoriesDetails[hoveredCategory] && (
-            <Paper
-              className={`category-details ${categoryDetailsAnimating ? 'animating-out' : ''}`}
-              onMouseEnter={() => handleCategoryHover(hoveredCategory)}
-              onMouseLeave={handleCategoryLeave}
-            >
-              <CardContent className="category-details-content">
-                <Typography className="category-details-title">
-                  {t(`categories.${hoveredCategory}`)}
-                </Typography>
-                <Box className="category-details-grid">
-                  {categoriesDetails[hoveredCategory].columns.map((col, idx) => (
-                    <Box key={idx} className="detail-column">
-                      <Typography className="detail-title">
-                        {t(`categoryDetails.${categorySlugs[hoveredCategory] || hoveredCategory}.columns.${idx}.title`, { defaultValue: col.title })}
-                      </Typography>
-                          <Box className="detail-items">
-                            {col.items.map((item, i) => (
-                              <Chip
-                                key={i}
-                                label={t(`categoryDetails.${categorySlugs[hoveredCategory] || hoveredCategory}.columns.${idx}.items.${i}`, { defaultValue: item })}
-                                variant="outlined"
-                                size="small"
-                                className="detail-chip"
-                              />
-                            ))}
-                          </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </CardContent>
-            </Paper>
-          )}
-        </>
-      )}
-
       {/* Top Bar */}
       <div className="top-bar">
         {!isMobile && (
-          <button 
-            className={`categories-button ${categoriesOpen ? 'menu-open' : ''}`}
-            onClick={handleCategoriesClick}
-            type="button"
-            ref={categoriesButtonRef}
-          >
-            <FaBars />
-            <span>{t('mainStage.categoriesButton')}</span>
-          </button>
+          <StaggeredMenu
+            className="mainstage-staggered-menu"
+            inline={true}
+            position="left"
+            items={categoryMenuItems}
+            socialItems={[]}
+            displaySocials={false}
+            displayItemNumbering={true}
+            showLogo={false}
+            closedLabel={t('mainStage.categoriesButton')}
+            openLabel={t('mainStage.closeMenu', 'Închide')}
+            menuButtonColor="var(--ms-cat-btn-text)"
+            openMenuButtonColor="var(--ms-cat-btn-text)"
+            changeMenuColorOnOpen={false}
+            colors={['#7C92B4', '#324866', '#1A314E']}
+            accentColor="#1A314E"
+            closeOnClickAway={true}
+            showHamburger={true}
+            disableButtonAnimation={true}
+            onMenuOpen={() => { document.body.classList.add('categories-open'); setMenuOpen(true); }}
+            onMenuClose={() => { document.body.classList.remove('categories-open'); document.body.classList.add('categories-closing'); setMenuOpen(false); setTimeout(() => document.body.classList.remove('categories-closing'), 380); }}
+          />
         )}
 
         {!isMobile ? (
@@ -801,18 +750,45 @@ export default function MainStage() {
       {/* Main Content */}
       <div className="main-content">
         <div className="main-text">
+          <span className="main-tagline-pill">{t('mainStage.tagline')}</span>
           <h1 id="main-title">
             {t('mainStage.title')}
           </h1>
           <p>{t('mainStage.subtitle')}</p>
-          <button className="sign-up-button" onClick={() => navigate('/signup')}>
-            {t('mainStage.signUp')}
-          </button>
+          <div className="main-cta-buttons">
+            <button className="sign-up-button" onClick={() => navigate('/signup')}>
+              {t('mainStage.signUp')}
+            </button>
+            <button className="how-it-works-button">
+              <span className="how-it-works-icon">&#9654;</span>
+              {t('mainStage.howItWorks')}
+            </button>
+          </div>
         </div>
         <div className="main-stage-image">
           <img src={hobby} alt="hobby" />
         </div>
       </div>
+
+      {menuOpen && detailsVisible && selectedCategory && categoriesDetails[selectedCategory] && (
+        <div className="category-details">
+          <div className="category-details-content">
+            <h3 className="category-details-title">{selectedCategory}</h3>
+            <div className="category-details-grid">
+              {categoriesDetails[selectedCategory].columns.map((col, i) => (
+                <div key={i} className="detail-column">
+                  <div className="detail-title">{col.title}</div>
+                  <div className="detail-items">
+                    {col.items.map((item, j) => (
+                      <Chip key={j} label={item} className="detail-chip" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

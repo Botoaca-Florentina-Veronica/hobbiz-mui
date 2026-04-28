@@ -43,7 +43,7 @@
   width: 38px !important;
   height: 38px !important;
   font-size: 0.9rem !important;
-  border: 2px solid var(--pp-accent, #ec407a);
+  border: 2px solid var(--pp-accent, #1A314E);
   flex-shrink: 0;
 }
 .ar-header-text {
@@ -118,12 +118,12 @@
   white-space: nowrap;
 }
 .ar-sort-chip:hover {
-  border-color: var(--pp-accent, #ec407a);
-  color: var(--pp-accent, #ec407a);
+  border-color: var(--pp-accent, #1A314E);
+  color: var(--pp-accent, #1A314E);
 }
 .ar-sort-chip.active {
-  background: var(--pp-accent, #ec407a);
-  border-color: var(--pp-accent, #ec407a);
+  background: var(--pp-accent, #1A314E);
+  border-color: var(--pp-accent, #1A314E);
   color: #fff;
   font-weight: 600;
 }
@@ -192,7 +192,7 @@
 }
 .ar-review-ann {
   font-size: 0.76rem;
-  color: var(--pp-accent, #ec407a);
+  color: var(--pp-accent, #1A314E);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

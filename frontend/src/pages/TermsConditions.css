@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
    TERMS & CONDITIONS PAGE STYLES
    ============================================================= */
 
@@ -16,7 +16,7 @@
   --tc-bg-page: var(--bg-secondary);
   
   /* Header */
-  --tc-bg-header: #355070;
+  --tc-bg-header: #2D4361;
   --tc-bg-header-overlay: radial-gradient(circle, rgba(248, 181, 149, 0.15) 0%, transparent 70%);
   --tc-text-header: #ffffff;
   
@@ -32,20 +32,20 @@
   --tc-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
   
   /* Text Typography */
-  --tc-text-heading: #355070;     /* H1, H2 */
+  --tc-text-heading: #2D4361;     /* H1, H2 */
   --tc-text-subheading: #2d3748;  /* H3, Strong */
   --tc-text-body: #4a5568;        /* Paragraphs */
-  --tc-text-accent: #355070;      /* em, bold */
+  --tc-text-accent: #2D4361;      /* em, bold */
   --tc-accent-color: #f8b595;     /* underlinings, bullets */
   
   /* Footer */
   --tc-bg-footer: #f8fafc;
-  --tc-border-footer: #355070;
+  --tc-border-footer: #2D4361;
   --tc-text-footer: #64748b;
   
   /* Mobile Header */
   --tc-mobile-btn-bg: #ffffff;
-  --tc-mobile-btn-text: #355070;
+  --tc-mobile-btn-text: #2D4361;
 }
 
 /* Dark Mode Overrides */
@@ -131,7 +131,7 @@
   margin-top: var(--tc-spacing-top);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(53, 80, 112, 0.25);
+  box-shadow: 0 12px 48px rgba(45, 67, 97, 0.25);
 }
 
 .terms-conditions__header::before {
@@ -392,7 +392,7 @@
   
   .terms-conditions__header {
     display: block !important;
-    background: #355070 !important;
+    background: #2D4361 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

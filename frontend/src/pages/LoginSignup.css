@@ -1,4 +1,4 @@
-/* ========================================
+﻿/* ========================================
    Login / Signup Shared Base Styles
 ======================================== */
 .login-container {
@@ -199,9 +199,9 @@
   padding: 10px 12px;
   margin: -0.5rem 0 1rem;
   border-radius: 10px;
-  border: 1px solid rgba(53, 80, 112, 0.18);
-  background: rgba(53, 80, 112, 0.06);
-  color: #355070;
+  border: 1px solid rgba(45, 67, 97, 0.18);
+  background: rgba(45, 67, 97, 0.06);
+  color: #2D4361;
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -223,7 +223,7 @@
   justify-content: center;
   font-size: 12px;
   font-weight: 700;
-  background: #355070;
+  background: #2D4361;
   color: #fff;
   flex: 0 0 18px;
   margin-top: 1px;
@@ -256,7 +256,7 @@
   border: none;
   border-radius: 50%;
   background: none;
-  color: #355070;
+  color: #2D4361;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -267,7 +267,7 @@
 
 .toggle-password-btn:hover,
 .toggle-password-btn:focus-visible {
-  background: rgba(53, 80, 112, 0.08);
+  background: rgba(45, 67, 97, 0.08);
   outline: none;
 }
 
@@ -612,7 +612,7 @@ body.login-page .mobile-legal {
 }
 
 body.login-page .footer-separator {
-  background: rgba(53, 80, 112, 0.06) !important;
+  background: rgba(45, 67, 97, 0.06) !important;
 }
 
 .dark-mode body.login-page::before,
