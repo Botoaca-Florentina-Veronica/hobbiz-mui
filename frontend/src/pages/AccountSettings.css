@@ -464,3 +464,101 @@ body:not(.dark-mode) .mobile-setting-item {
   min-height: 100vh;
   width: 100%;
 }
+
+/* ── Mobile single-card layout ── */
+.as-mobile-card {
+  display: none; /* ascuns pe desktop */
+}
+
+.as-desktop-papers {
+  display: block; /* vizibil pe desktop */
+}
+
+@media (max-width: 1024px) {
+  .as-desktop-papers { display: none; }
+
+  .as-mobile-card {
+    display: block;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .dark-mode .as-mobile-card {
+    background: #1e1e1e;
+    border-color: #3a3a3c;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .as-mobile-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 22px 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+  }
+
+  .as-mobile-item:active {
+    background: rgba(0,0,0,0.03);
+  }
+
+  .dark-mode .as-mobile-item:active {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .as-mobile-ico {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #1A314E;
+  }
+
+  .as-mobile-ico .MuiSvgIcon-root {
+    font-size: 20px !important;
+    stroke-width: 0.3;
+  }
+
+  .dark-mode .as-mobile-ico {
+    color: #a0b4c8;
+  }
+
+  .as-mobile-label {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #1a1a1a;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .dark-mode .as-mobile-label {
+    color: #ffffff;
+  }
+
+  .as-mobile-divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 0;
+  }
+
+  .dark-mode .as-mobile-divider {
+    background: #3a3a3c;
+  }
+
+  .as-mobile-form .email-change-section {
+    padding: 0 24px 20px !important;
+    margin-bottom: 6px !important;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .dark-mode .as-mobile-form {
+    border-top-color: #3a3a3c;
+  }
+}

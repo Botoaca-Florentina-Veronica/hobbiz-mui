@@ -399,10 +399,10 @@
   gap: 3px;
   font-weight: 700;
   font-size: .85rem;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 8px;
-  background: #fef3c7;
-  color: #92400e;
+  background: #fbbf24;
+  color: #78350f;
   flex-shrink: 0;
 }
 body.dark-mode .pp-rev-badge { background: #422006; color: #fbbf24; }

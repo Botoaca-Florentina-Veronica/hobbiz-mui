@@ -21,6 +21,10 @@ export const AuthProvider = ({ children }) => {
   const [fullFavorites, setFullFavorites] = useState([]); // obiecte populate
   const [loading, setLoading] = useState(true);
   const lastHydrateRef = useRef(0);
+  // Counter monoton: fiecare apel hydrate primește o generație unică.
+  // Înainte de a aplica rezultatele, verificăm că nu a pornit un hydrate mai recent.
+  // Asta previne fluctuațiile cauzate de hydrate-uri concurente care se termină în ordine greșită.
+  const hydrateGenerationRef = useRef(0);
   // Ref sincronizat cu starea `favorites` pentru a preveni stale closure în toggleFavorite
   // (util când userul face toggle rapid de 2x pe același anunț)
   const favoritesRef = useRef([]);
@@ -57,17 +61,23 @@ export const AuthProvider = ({ children }) => {
     // Throttling: dacă apelurile sunt prea dese (<3s) și nu e forced
     if (!opts.force && now - lastHydrateRef.current < 3000) return;
     lastHydrateRef.current = now;
-    
+
+    // Fiecare apel hydrate primește o generație unică. Dacă un hydrate mai recent
+    // pornește în timp ce acesta așteaptă răspunsul rețelei, rezultatele celui vechi
+    // sunt aruncate — asta elimină fluctuațiile cauzate de răspunsuri care ajung
+    // în ordine inversă față de ordinea apelurilor.
+    const myGeneration = ++hydrateGenerationRef.current;
+
     let token = null;
     try {
       token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     } catch (e) {
       console.warn('Failed to get token from localStorage:', e);
     }
-    
+
     if (!token) {
       setUser(null);
-      
+
       // Guest logic: load from localStorage
       try {
         const local = localStorage.getItem('favoriteAnnouncements_guest');
@@ -92,12 +102,17 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return;
     }
-    
+
     try {
       const [profileRes, favRes] = await Promise.all([
         getProfile(),
         apiClient.get('/api/favorites')
       ]);
+
+      // Un hydrate mai recent a pornit între timp — aruncăm rezultatele noastre
+      // pentru a nu suprascrie starea deja actualizată de cel mai recent apel.
+      if (myGeneration !== hydrateGenerationRef.current) return;
+
       const profile = profileRes.data;
       const favData = favRes.data || {};
 
@@ -105,7 +120,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('userId', String(profile._id));
       }
       setUser(profile);
-      
+
       // Aplică pending toggles peste ce vine de la server ca să nu facă revert la UI
       const finalIds = [...new Set(applyPendingToggles(favData.favoriteIds || []))];
       setFavorites(finalIds);
@@ -134,6 +149,7 @@ export const AuthProvider = ({ children }) => {
       });
       setFullFavorites(filteredFull);
     } catch (e) {
+      if (myGeneration !== hydrateGenerationRef.current) return;
       console.warn('Hydrate failed:', e.response?.data || e.message);
       if (e.response?.status === 401) {
         // Asigură-te că nu ștergem un token abia setat de OAuthSuccess
@@ -142,7 +158,7 @@ export const AuthProvider = ({ children }) => {
           console.warn('Ignor 401: a apărut un token nou în timpul cererii.');
           return;
         }
-        
+
         // token invalid - șterge toate datele de autentificare + cache-ul de favorite
         try {
           const uid = localStorage.getItem('userId');
@@ -206,23 +222,25 @@ export const AuthProvider = ({ children }) => {
     if (!userId) return; // așteaptă user autentificat
 
     const handleFavoritesUpdated = (payload) => {
-      // Ignora socket events dacă recent am făcut un toggle confirm la server
-      // Asta previne ca datele "vechi" din socket să rescrie starea nou-actualizată
+      // Ignoră socket events în fereastra de după un toggle recent.
       if (Date.now() < ignoreSocketEventsUntilRef.current) {
         console.debug('Ignoring stale socket event');
         return;
       }
 
-      // payload: { favoriteIds? } - dacă nu există, facem hydrate complet
       if (payload?.favoriteIds) {
-        // Din nou, protejăm modificările "în zbor"
-        const finalIds = applyPendingToggles(payload.favoriteIds);
-        setFavorites([...new Set(finalIds)]);
-
-        // Sincronizăm și fullFavorites eliminând ce nu mai este în lista de favorite finală
-        setFullFavorites(prev => prev.filter(item => finalIds.includes(String(item._id))));
-
-        window.dispatchEvent(new Event('favorites:updated'));
+        if (pendingTogglesRef.current.size > 0) {
+          // Există toggles în zbor: aplicăm corecția pending direct din socket data.
+          const finalIds = applyPendingToggles(payload.favoriteIds);
+          setFavorites([...new Set(finalIds)]);
+          setFullFavorites(prev => prev.filter(item => finalIds.includes(String(item._id))));
+          window.dispatchEvent(new Event('favorites:updated'));
+        } else {
+          // Niciun pending activ: delegăm la hydrate ca să fie protejat de contorul
+          // de generație — evităm ca un socket event mai vechi să suprascrie un hydrate
+          // mai recent care s-a terminat deja cu date corecte.
+          hydrate();
+        }
       } else {
         hydrate();
       }
@@ -315,34 +333,35 @@ export const AuthProvider = ({ children }) => {
         await apiClient.post(`/api/favorites/${announcementId}`);
       }
 
-      // API success! Semnalizez că recent am schimbat ceva, deci ignor socket events
-      // Astea "vechi" pt următoarele 800ms. Asta previne race condition unde serverul
-      // emite stare cached/veche pe socket înainte de a vedea schimbarea.
+      // API success! Ignorăm socket events pentru 800ms (fereastra acoperă hydrate-ul de mai jos).
       ignoreSocketEventsUntilRef.current = Date.now() + 800;
-      
-      // Acum curăț pending și emit pentru ca paginile dependente să se reîncarchie (daca nu e socket)
-      pendingTogglesRef.current.delete(announcementId);
+
       window.dispatchEvent(new Event('favorites:updated'));
 
-      // Dacă am adăugat un favorit, frontend-ul are nevoie de obiectul complet (titlu, imagine, etc.)
-      // pentru a-l afișa în pagina de Favorite. Forțăm o sincronizare (re-fetch) de la server.
-      if (!isFav) {
-        hydrate({ force: true });
-      }
+      // Așteptăm hydrate-ul cu pending activ → applyPendingToggles corectează date vechi de la server.
+      await hydrate({ force: true });
+      pendingTogglesRef.current.delete(announcementId);
+
+      // Extindem fereastra de ignorare DUPĂ ce hydrate + pending sunt gata.
+      // Motivul: socket events întârziate (> 800ms de la API) ajungeau după ce pending
+      // era șters → setFavorites(date_vechi) nu mai putea fi corectat → fluctuații.
+      // 2s extra acoperă orice întârziere realistă de rețea a socket event-ului nostru.
+      ignoreSocketEventsUntilRef.current = Date.now() + 2000;
     } catch (e) {
       // Revert on error — inclusiv în localStorage
       console.error("Favorites toggle error", e);
       pendingTogglesRef.current.delete(announcementId);
-      
+
       const revertedIds = isFav
         ? [...favoritesRef.current, announcementId]
         : favoritesRef.current.filter(id => id !== announcementId);
       setFavorites(revertedIds);
       try { localStorage.setItem(`favoriteAnnouncements_${user._id}`, JSON.stringify(revertedIds)); } catch {}
-      
-      // Dacă am eșuat la ștergerea de pe server, forțăm o reîncărcare completă pentru a reface obiectele din `fullFavorites`
+
+      // Forțăm re-fetch complet pentru a restaura fullFavorites la starea corectă din server.
+      // Folosim force:true ca să nu fie blocat de throttle-ul de 3s.
       if (isFav) {
-        hydrate();
+        hydrate({ force: true });
       }
 
       return { error: e.response?.data?.error || 'Eroare la actualizare favorite' };

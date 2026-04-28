@@ -56,6 +56,17 @@
   box-sizing: border-box;
   width: 100%;
   min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+.announcements-by-category.my-announcements-container *,
+.announcements-by-category.my-announcements-container .MuiTypography-root,
+.announcements-by-category.my-announcements-container .MuiInputBase-root,
+.announcements-by-category.my-announcements-container .MuiMenuItem-root,
+.announcements-by-category.my-announcements-container .MuiInputLabel-root,
+.announcements-by-category.my-announcements-container .MuiButton-root,
+.announcements-by-category.my-announcements-container .MuiChip-root {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Align the page title with the inner `.abc-align-container` so it lines up with searchbar and cards */

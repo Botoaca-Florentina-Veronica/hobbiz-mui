@@ -318,9 +318,9 @@ body.dark-mode .main-stage > .top-bar,
   overflow: hidden;
 }
 .main-stage-image img {
-  width: 500px; height: auto;
+  width: 470px; height: auto;
   border-radius: 24px;
-  box-shadow: var(--ms-img-shadow);
+  box-shadow: none;
 }
 
 .main-cta-buttons .sign-up-button {
@@ -1117,93 +1117,128 @@ body:not(.dark-mode) .search-suggestions-dropdown {
 
 /* Location Popover Styles */
 .location-popover {
-  width: 300px !important;
-  max-height: 400px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
-  margin-top: 4px !important;
+  width: 260px !important;
+  max-height: 420px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06) !important;
+  margin-top: 8px !important;
   overflow: hidden !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  background: #ffffff !important;
 }
 
 .dark-mode .location-popover {
-  background-color: var(--ms-drop-bg) !important;
-  border: 1px solid var(--ms-drop-border) !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+  background: #1e1e1e !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5) !important;
 }
 
 .popover-title {
-  padding: 16px 20px 8px !important;
+  padding: 14px 16px 10px !important;
   font-weight: 600 !important;
-  color: var(--ms-text-primary) !important;
-  font-size: 1rem !important;
-  background-color: var(--ms-drop-bg) !important;
-  border-bottom: 1px solid var(--ms-drop-border) !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.6px !important;
+  text-transform: uppercase !important;
+  color: #9ca3af !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+.dark-mode .popover-title {
+  background: #1e1e1e !important;
+  color: #6b7280 !important;
+  border-bottom-color: rgba(255,255,255,0.06) !important;
 }
 
 .popover-list {
-  padding: 0 !important;
+  padding: 4px 0 !important;
   overflow-y: auto !important;
-  max-height: 340px !important;
-  background-color: var(--ms-drop-bg) !important;
+  max-height: 360px !important;
+  background: #ffffff !important;
+}
+
+.dark-mode .popover-list {
+  background: #1e1e1e !important;
 }
 
 .popover-list .MuiListItemButton-root {
-  padding: 12px 20px !important;
-  transition: background-color 0.2s !important;
-  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  padding: 11px 16px !important;
+  transition: background-color 0.15s !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+.popover-list .MuiListItemButton-root:last-child {
+  border-bottom: none !important;
 }
 
 .dark-mode .popover-list .MuiListItemButton-root {
-  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  border-bottom-color: rgba(255,255,255,0.05) !important;
 }
 
 .popover-list .MuiListItemButton-root:hover {
-  background-color: var(--ms-item-hover-bg) !important;
+  background-color: #f9fafb !important;
+}
+
+.dark-mode .popover-list .MuiListItemButton-root:hover {
+  background-color: rgba(255,255,255,0.05) !important;
+}
+
+.popover-list .MuiListItemText-primary {
+  font-size: 0.9rem !important;
+  color: #1a1a1a !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.dark-mode .popover-list .MuiListItemText-primary {
+  color: #e5e7eb !important;
 }
 
 .judet-all {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ms-text-title);
-  display: flex;
-  align-items: center;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
 }
 
 .back-to-judete {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ms-text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 0.9rem;
 }
 
 .back-to-judete::before {
   content: '←';
-  font-size: 1.2em;
+  font-size: 1em;
   color: var(--ms-item-icon);
 }
 
 .localitate-item {
-  color: var(--ms-text-primary) !important;
+  color: #1a1a1a !important;
+  font-size: 0.9rem !important;
+}
+
+.dark-mode .localitate-item {
+  color: #e5e7eb !important;
 }
 
 /* Sticky Back Button */
 .popover-list .MuiListItemButton-root:has(.back-to-judete) {
   position: sticky !important;
   top: 0 !important;
-  background-color: var(--ms-drop-bg) !important;
+  background: #ffffff !important;
   z-index: 2 !important;
-  border-bottom: 1px solid var(--ms-drop-border) !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+  border-bottom: 1px solid #f3f4f6 !important;
 }
 
 .dark-mode .popover-list .MuiListItemButton-root:has(.back-to-judete) {
-  background-color: var(--ms-drop-bg) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  background: #1e1e1e !important;
+  border-bottom-color: rgba(255,255,255,0.06) !important;
 }
 
 .localitate-button:hover .localitate-item {
-  color: var(--ms-item-hover-text) !important;
+  color: var(--ms-text-title) !important;
 }
 
 

@@ -2,12 +2,12 @@ import React, { useEffect, useState, useMemo } from 'react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Box, 
-  TextField, 
-  InputAdornment, 
-  IconButton, 
-  Button, 
+import {
+  Box,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Button,
   ButtonGroup,
   Typography,
   Chip,
@@ -17,7 +17,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Paper
+  Paper,
+  useTheme
 } from '@mui/material';
 import { 
   Search as SearchIcon, 
@@ -26,6 +27,7 @@ import {
   ViewList as ListViewIcon,
   Sort as SortIcon 
 } from '@mui/icons-material';
+import miel1 from '../assets/images/miel1.png';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +38,7 @@ import './AnnouncementsByCategory.css';
 
 export default function AnnouncementsByCategory() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { category } = useParams();
   const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState([]);
@@ -421,8 +424,20 @@ export default function AnnouncementsByCategory() {
         {/* Rezultate */}
         {filteredAndSortedAnnouncements.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
-              {announcements.length === 0 
+            {announcements.length === 0 && (
+              <Box sx={{ mb: 2 }}>
+                <img src={miel1} alt="" style={{ maxWidth: 220, width: '100%', borderRadius: 12, opacity: 0.85 }} />
+              </Box>
+            )}
+            <Typography
+              variant="h6"
+              sx={{
+                color: announcements.length === 0
+                  ? (theme.palette.mode === 'light' ? '#021C38' : 'text.secondary')
+                  : 'text.secondary',
+              }}
+            >
+              {announcements.length === 0
                 ? t('allAnnouncements.noCategoryAnnouncements')
                 : t('allAnnouncements.noFilteredAnnouncements')}
             </Typography>

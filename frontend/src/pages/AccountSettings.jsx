@@ -4,6 +4,14 @@ import './NotificationSettingsPage.css';
 import { updateEmail, updatePassword, detectMitm, deleteAccount, resetUserData, logout, logoutAllDevices, getProfile } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import MoveToInboxOutlinedIcon from '@mui/icons-material/MoveToInboxOutlined';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import SmartphoneOutlinedIcon from '@mui/icons-material/SmartphoneOutlined';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { IconButton, Typography, Container, Paper, List, ListItem, ListItemText } from '@mui/material';
 import ConfirmDialog from './ConfirmDialog';
 import Toast from '../components/Toast';
@@ -196,20 +204,114 @@ export default function AccountSettings() {
       <Container maxWidth="lg" className="notification-settings-container">
         {/* Mobile header: back + title */}
         <div className="mobile-header">
-        <IconButton
-          onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
-          className="mobile-back-btn"
-          disableRipple
-          disableFocusRipple
-          aria-label="Înapoi"
-        >
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h5" className="mobile-header-title">{t('accountSettings.mobileHeaderTitle')}</Typography>
-      </div>
-      
-      <h1 className="notification-title">{t('accountSettings.pageTitle')}</h1>
-      
+          <IconButton
+            onClick={() => { if (window.history.length > 1) { navigate(-1); } else { navigate('/'); } }}
+            className="mobile-back-btn"
+            disableRipple
+            disableFocusRipple
+            aria-label="Înapoi"
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h5" className="mobile-header-title">{t('accountSettings.mobileHeaderTitle')}</Typography>
+        </div>
+
+        <h1 className="notification-title">{t('accountSettings.pageTitle')}</h1>
+
+        {/* ── MOBILE CARD (vizibil doar pe ≤1024px) ── */}
+        <div className="as-mobile-card">
+
+          {/* Schimbă parola */}
+          <button className="as-mobile-item" onClick={handlePasswordChangeClick}>
+            <span className="as-mobile-ico"><VpnKeyOutlinedIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.changePassword')}</span>
+          </button>
+          {showPasswordChange && (
+            <div className="email-change-section as-mobile-form">
+              {message && <div className={`message ${message.type}`}>{message.text}</div>}
+              <label htmlFor="m-current-password">{t('accountSettings.labels.currentPassword')}</label>
+              <input type="password" id="m-current-password" value={passwords.currentPassword}
+                onChange={e => setPasswords(p => ({ ...p, currentPassword: e.target.value }))}
+                placeholder={t('accountSettings.placeholders.currentPassword')} />
+              <label htmlFor="m-new-password">{t('accountSettings.labels.newPassword')}</label>
+              <input type="password" id="m-new-password" value={passwords.newPassword}
+                onChange={e => setPasswords(p => ({ ...p, newPassword: e.target.value }))}
+                placeholder={t('accountSettings.placeholders.newPassword')} />
+              <button onClick={handleSavePassword}>{t('accountSettings.buttons.save')}</button>
+            </div>
+          )}
+
+          <div className="as-mobile-divider" />
+
+          {/* Schimbă email-ul */}
+          <button className="as-mobile-item" onClick={handleEmailChangeClick}>
+            <span className="as-mobile-ico"><MailOutlineIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.changeEmail')}</span>
+          </button>
+          {showEmailChange && (
+            <div className="email-change-section as-mobile-form">
+              {message && <div className={`message ${message.type}`}>{message.text}</div>}
+              <label htmlFor="m-new-email">{t('accountSettings.labels.newEmail')}</label>
+              <input type="email" id="m-new-email" value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
+                placeholder={t('accountSettings.placeholders.newEmail')} />
+              <button onClick={handleSaveEmail}>{t('accountSettings.buttons.save')}</button>
+            </div>
+          )}
+
+          <div className="as-mobile-divider" />
+
+          {/* Anunțuri arhivate */}
+          <button className="as-mobile-item" onClick={() => navigate('/archived-announcements')}>
+            <span className="as-mobile-ico"><MoveToInboxOutlinedIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.archivedAnnouncements') || t('myAnnouncements.archived')}</span>
+          </button>
+
+          <div className="as-mobile-divider" />
+
+          {/* Setează notificările */}
+          <button className="as-mobile-item" onClick={() => navigate('/setari-notificari')}>
+            <span className="as-mobile-ico"><NotificationsNoneIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.notifications')}</span>
+          </button>
+
+          <div className="as-mobile-divider" />
+
+          {/* Descarcă datele mele */}
+          <button className="as-mobile-item" onClick={handleDownloadData}>
+            <span className="as-mobile-ico"><FileDownloadOutlinedIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.billing')}</span>
+          </button>
+
+          <div className="as-mobile-divider" />
+
+          {/* Ieși din cont de pe toate dispozitivele */}
+          <button className="as-mobile-item" onClick={() => setShowLogoutAllDialog(true)}>
+            <span className="as-mobile-ico"><SmartphoneOutlinedIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.logoutAll')}</span>
+          </button>
+
+          <div className="as-mobile-divider" />
+
+          {/* Resetează datele contului */}
+          <button className="as-mobile-item" onClick={() => setShowResetDialog(true)}>
+            <span className="as-mobile-ico"><RefreshOutlinedIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.resetUserData')}</span>
+          </button>
+
+          <div className="as-mobile-divider" />
+
+          {/* Șterge contul */}
+          <button className="as-mobile-item" onClick={() => setShowDeleteDialog(true)}>
+            <span className="as-mobile-ico"><DeleteOutlinedIcon /></span>
+            <span className="as-mobile-label">{t('accountSettings.menu.deleteAccount')}</span>
+          </button>
+
+        </div>
+
+        {/* ── DESKTOP: Papers individuale (ascunse pe mobile) ── */}
+        <div className="as-desktop-papers">
+
       {/* Change Password */}
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
@@ -371,16 +473,18 @@ export default function AccountSettings() {
       <Paper elevation={0} className="settings-paper" style={{ marginBottom: '20px' }}>
         <List disablePadding>
           <ListItem button onClick={() => setShowDeleteDialog(true)} className="setting-item mobile-setting-item" style={{ borderBottom: 'none' }}>
-            <ListItemText 
-              primary={t('accountSettings.menu.deleteAccount')} 
-              primaryTypographyProps={{ fontWeight: 'bold', color: 'error.main' }} 
+            <ListItemText
+              primary={t('accountSettings.menu.deleteAccount')}
+              primaryTypographyProps={{ fontWeight: 'bold', color: 'error.main' }}
               className="mobile-setting-text"
             />
           </ListItem>
         </List>
       </Paper>
 
-      <ConfirmDialog
+        </div>{/* end as-desktop-papers */}
+
+        <ConfirmDialog
         open={showLogoutAllDialog}
         onClose={() => setShowLogoutAllDialog(false)}
         onConfirm={handleLogoutAllDevices}

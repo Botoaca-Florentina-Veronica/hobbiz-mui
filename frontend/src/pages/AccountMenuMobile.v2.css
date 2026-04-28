@@ -71,7 +71,7 @@
   position:relative;
   display:block;
   /* extra large top + bottom padding for a dominant pink section */
-  padding: calc(40px + env(safe-area-inset-top)) 14px 110px 14px;
+  padding: calc(40px + env(safe-area-inset-top)) 14px 150px 14px;
   background: var(--acc-primary-alt); /* solid deep pink */
   color:#fff;
   border-bottom-left-radius: 0;
@@ -104,7 +104,7 @@
 @media (max-width: 480px) {
   .account-mobile__greeting { font-size: 3.0rem; margin: 14px 0 32px 0; }
   /* align header horizontal padding with page content for consistent edges */
-  .account-mobile__header{ padding: calc(28px + env(safe-area-inset-top)) 16px 60px 16px; }
+  .account-mobile__header{ padding: calc(28px + env(safe-area-inset-top)) 16px 100px 16px; }
   .account-mobile__usercard{ margin: -18px auto 0; width:100%; }
   .account-mobile__avatar{ width:100px; height:100px; }
 } 
@@ -337,7 +337,7 @@
 }
 
 .account-mobile.account-mobile--applike .account-mobile__avatar-wrap {
-  top: 0;
+  top: 1rem;
 }
 
 .account-mobile.account-mobile--applike .account-mobile__avatar {

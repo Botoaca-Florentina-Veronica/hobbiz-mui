@@ -29,9 +29,14 @@ import {
   Email as EmailIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
-  CalendarMonth as CalendarMonthIcon
+  CalendarMonth as CalendarMonthIcon,
+  Star as StarIcon,
+  StarBorder as StarBorderIcon,
+  ThumbUp as ThumbUpIcon,
+  ThumbDown as ThumbDownIcon
 } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Avatar } from '@mui/material';
 import apiClient from '../api/api';
 import ImageCropModal from '../components/ImageCropModal';
 import ImageZoomModal from '../components/ImageZoomModal';
@@ -76,6 +81,9 @@ export default function ProfilePage() {
   // Announcements
   const [userAnnouncements, setUserAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+
+  // Reviews
+  const [myReviews, setMyReviews] = useState([]);
   
   // UI preferences
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -153,6 +161,14 @@ export default function ProfilePage() {
     }
     fetchUserAnnouncements();
   }, []);
+
+  // Încărcare recenzii proprii (după ce profilul e încărcat)
+  useEffect(() => {
+    if (!profile?._id) return;
+    apiClient.get(`/api/reviews/${profile._id}`)
+      .then(res => setMyReviews(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setMyReviews([]));
+  }, [profile?._id]);
 
   // ============================================
   // EVENT HANDLERS - Profile Edit
@@ -608,7 +624,11 @@ export default function ProfilePage() {
         <div className="mobile-profile-badges-row">
           <div className="mobile-rating-badge">
             <span className="mobile-rating-star">★</span>
-            <span className="mobile-rating-text">—</span>
+            <span className="mobile-rating-text">
+              {myReviews.length > 0
+                ? (myReviews.reduce((s, r) => s + Number(r.score || r.rating || 0), 0) / myReviews.length).toFixed(1)
+                : '—'}
+            </span>
           </div>
           {profile?.isAdmin && <span className="mobile-admin-badge">Admin</span>}
           {profile?.isVerified && <span className="mobile-verified-badge">{t('profile.verifiedMember')}</span>}
@@ -753,6 +773,88 @@ export default function ProfilePage() {
       )}
     </div>
   );
+
+  const renderMobileReviewsCard = () => {
+    if (!myReviews || myReviews.length === 0) return null;
+
+    const avgRating = myReviews.reduce((sum, r) => sum + Number(r.score || r.rating || 0), 0) / myReviews.length;
+
+    return (
+      <div className="mobile-reviews-card">
+        <div className="mobile-card-header">
+          <h2 className="mobile-card-title">{t('profile.reviewsTitle')}</h2>
+        </div>
+
+        <div className="mobile-reviews-overview">
+          <div className="mobile-reviews-left">
+            <span className="mobile-reviews-score">{avgRating.toFixed(1)}</span>
+            <div className="mobile-reviews-stars">
+              {[1,2,3,4,5].map(i =>
+                i <= Math.round(avgRating)
+                  ? <StarIcon key={i} className="mobile-rev-star mobile-rev-star--on" />
+                  : <StarBorderIcon key={i} className="mobile-rev-star mobile-rev-star--off" />
+              )}
+            </div>
+            <span className="mobile-reviews-count">{myReviews.length} {t('publicProfile.reviews').toLowerCase()}</span>
+          </div>
+          <div className="mobile-reviews-bars">
+            {[5,4,3,2,1].map(star => {
+              const cnt = myReviews.filter(r => Number(r.score || r.rating || 0) === star).length;
+              const pct = myReviews.length ? (cnt / myReviews.length * 100) : 0;
+              return (
+                <div key={star} className="mobile-rev-bar-row">
+                  <span className="mobile-rev-bar-num">{star}</span>
+                  <StarIcon className="mobile-rev-bar-star" />
+                  <div className="mobile-rev-bar-track">
+                    <div className="mobile-rev-bar-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="mobile-rev-bar-cnt">{cnt}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mobile-reviews-list">
+          {myReviews.slice(0, 3).map(r => (
+            <div key={r._id} className="mobile-rev-item">
+              <Avatar
+                src={r.authorAvatar || r.avatar || undefined}
+                alt={r.authorName || 'U'}
+                className="mobile-rev-avatar"
+              >
+                {(r.authorName || r.name || 'U').charAt(0)}
+              </Avatar>
+              <div className="mobile-rev-content">
+                <div className="mobile-rev-top">
+                  <div className="mobile-rev-meta">
+                    <span className="mobile-rev-name">{r.authorName || r.name || 'Utilizator'}</span>
+                    <span className="mobile-rev-date">
+                      {r.createdAt ? new Date(r.createdAt).toLocaleDateString('ro-RO') : ''}
+                    </span>
+                  </div>
+                  <span className="mobile-rev-badge">
+                    {Number(r.score || r.rating || 0).toFixed(1)}
+                  </span>
+                </div>
+                <p className="mobile-rev-text">{r.comment}</p>
+                <div className="mobile-rev-foot">
+                  <span className="mobile-rev-reaction">
+                    <ThumbUpIcon className="mobile-rev-reaction-ico" />
+                    {(r.likes || []).length}
+                  </span>
+                  <span className="mobile-rev-reaction">
+                    <ThumbDownIcon className="mobile-rev-reaction-ico" />
+                    {(r.unlikes || []).length}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const renderMobileAnnouncementsCard = () => {
     const total = userAnnouncements.length;
@@ -1087,6 +1189,7 @@ export default function ProfilePage() {
         {renderMobileProfileHeader()}
         {renderMobileLocationSection()}
         {renderMobileContactCard()}
+        {renderMobileReviewsCard()}
         {renderMobileAnnouncementsCard()}
       </div>
 

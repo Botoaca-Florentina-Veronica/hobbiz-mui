@@ -685,8 +685,8 @@ export default function MainStage() {
           open={open}
           anchorEl={anchorEl}
           onClose={handleClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 160 }}
           PaperProps={{ 
             className: "location-popover",
           }}

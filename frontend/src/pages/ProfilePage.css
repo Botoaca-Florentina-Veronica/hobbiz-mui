@@ -34,6 +34,7 @@
   --pf-text: #1a1a1a;
   --pf-text-muted: #6b7280;
   --pf-border: #e5e7eb;
+  --pf-divider: #e5e7eb;
   --pf-primary: #1A314E;
   --pf-primary-hover: #021C38;
   --pf-verified-bg: #EBF1FF;
@@ -636,54 +637,53 @@ body:not(.dark-mode) .profile-location-card {
 
 .announcement-card-vertical {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  flex-direction: column;
   border-radius: 12px;
   background: var(--pf-card-bg);
   border: 1px solid var(--pf-border);
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   cursor: pointer;
+  overflow: hidden;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .announcement-card-vertical:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
 }
 
-/* Announcement thumbnail */
+/* Announcement image — full width, vertical card */
 .announcement-image {
-  width: 64px;
-  height: 64px;
+  width: 100%;
+  height: 110px;
   object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
+  display: block;
+  border-radius: 0;
 }
 
 .announcement-image-placeholder {
-  width: 64px;
-  height: 64px;
-  border-radius: 8px;
+  width: 100%;
+  height: 110px;
+  border-radius: 0;
   background-color: var(--pf-border);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 11px;
   color: var(--pf-text-muted);
 }
 
 .announcement-card-body {
-  padding: 0;
+  padding: 8px 10px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  flex: 1;
+  gap: 2px;
   min-width: 0;
 }
 
 .announcement-title {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--pf-text);
   overflow: hidden;
@@ -693,15 +693,18 @@ body:not(.dark-mode) .profile-location-card {
 
 .announcement-price {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--pf-primary);
 }
 
 .announcement-location {
   margin: 0;
-  font-size: 0.8rem;
-  color: #999;
+  font-size: 0.75rem;
+  color: var(--pf-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ============================================
@@ -1339,6 +1342,169 @@ body:not(.dark-mode) .profile-about-card {
   border: 1px solid var(--pf-divider);
 }
 
+/* Mobile Reviews Card */
+.mobile-reviews-card {
+  background: var(--pf-card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid var(--pf-divider);
+}
+
+.mobile-reviews-overview {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.mobile-reviews-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+}
+
+.mobile-reviews-score {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--pf-text);
+}
+
+.mobile-reviews-stars {
+  display: flex;
+  gap: 1px;
+  margin: 5px 0 3px;
+}
+
+.mobile-rev-star { font-size: 16px !important; }
+.mobile-rev-star--on  { color: #fbbf24; }
+.mobile-rev-star--off { color: var(--pf-divider); }
+
+.mobile-reviews-count {
+  font-size: 0.72rem;
+  color: var(--pf-text-muted);
+  text-align: center;
+}
+
+.mobile-reviews-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-rev-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mobile-rev-bar-num {
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: 10px;
+  text-align: right;
+  color: var(--pf-text-muted);
+}
+
+.mobile-rev-bar-star { font-size: 12px !important; color: #fbbf24; }
+
+.mobile-rev-bar-track {
+  flex: 1;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--pf-divider);
+  overflow: hidden;
+}
+
+.mobile-rev-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  transition: width 0.4s ease;
+}
+
+.mobile-rev-bar-cnt {
+  font-size: 0.72rem;
+  width: 14px;
+  color: var(--pf-text-muted);
+}
+
+/* Individual review items */
+.mobile-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mobile-rev-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--pf-divider);
+}
+
+.mobile-rev-item:last-child { border-bottom: none; }
+
+.mobile-rev-avatar {
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 0.85rem !important;
+  flex-shrink: 0;
+}
+
+.mobile-rev-content { flex: 1; min-width: 0; }
+
+.mobile-rev-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.mobile-rev-meta { display: flex; flex-direction: column; gap: 1px; }
+.mobile-rev-name { font-weight: 600; font-size: 0.88rem; color: var(--pf-text); }
+.mobile-rev-date { font-size: 0.74rem; color: var(--pf-text-muted); }
+
+.mobile-rev-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #fbbf24;
+  color: #78350f;
+  flex-shrink: 0;
+}
+
+.mobile-rev-text {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--pf-text);
+  margin: 6px 0 5px;
+  word-break: break-word;
+}
+
+.mobile-rev-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-rev-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--pf-text-muted);
+}
+
+.mobile-rev-reaction-ico { font-size: 14px !important; }
+
 .mobile-announcements-card {
   background: var(--pf-card-bg);
   border-radius: 16px;
@@ -1363,7 +1529,7 @@ body:not(.dark-mode) .profile-about-card {
 .mobile-announcement-stat-value {
   font-size: 20px;
   font-weight: 700;
-  color: var(--pf-text);
+  color: var(--pf-primary);
 }
 
 .mobile-announcement-stat-label {
@@ -1378,9 +1544,9 @@ body:not(.dark-mode) .profile-about-card {
 }
 
 .mobile-announcements-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .mobile-card-header {
@@ -1406,6 +1572,16 @@ body:not(.dark-mode) .profile-about-card {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Butonul de navigare din cardul de anunțuri arată ca săgeată simplă, fără border */
+.mobile-announcements-card .mobile-card-header .mobile-edit-button {
+  border: none;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pf-text);
+  background: transparent;
 }
 
 .mobile-contact-grid {
