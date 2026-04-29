@@ -10,6 +10,7 @@ const announcementSchema = new mongoose.Schema({
   contactEmail: { type: String },
   contactPhone: { type: String },
   price: { type: Number }, // Optional price field - compatible with existing announcements
+  tags: { type: [String], default: [] },
   images: [String],
   favoritesCount: { type: Number, default: 0 },
   // Track number of views for displaying in announcement footer

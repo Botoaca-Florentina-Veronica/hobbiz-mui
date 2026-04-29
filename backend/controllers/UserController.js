@@ -685,7 +685,7 @@ const addAnnouncement = async (req, res) => {
     console.log('--- [addAnnouncement] req.file:', req.file);
     console.log('--- [addAnnouncement] req.userId:', req.userId);
     const userId = req.userId;
-    const { title, category, description, location, contactPerson, contactEmail, contactPhone, price } = req.body;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone, price, tags } = req.body;
     if (!title || !category || !description || !location || !contactPerson) {
       return res.status(400).json({ error: 'Toate câmpurile obligatorii trebuie completate.' });
     }
@@ -693,6 +693,14 @@ const addAnnouncement = async (req, res) => {
     let images = [];
     if (req.files && req.files.length > 0) {
       images = req.files.map(f => f.path);
+    }
+    // Parse tags: pot veni ca JSON string sau array
+    let parsedTags = [];
+    if (tags) {
+      try {
+        parsedTags = typeof tags === 'string' ? JSON.parse(tags) : tags;
+        if (!Array.isArray(parsedTags)) parsedTags = [];
+      } catch { parsedTags = []; }
     }
     const announcement = new Announcement({
       user: userId,
@@ -704,6 +712,7 @@ const addAnnouncement = async (req, res) => {
       contactEmail,
       contactPhone,
       price: price ? Number(price) : undefined,
+      tags: parsedTags,
       images
     });
     await announcement.save();
@@ -799,7 +808,7 @@ const updateAnnouncement = async (req, res) => {
   try {
     const userId = req.userId;
     const { id } = req.params;
-    const { title, category, description, location, contactPerson, contactEmail, contactPhone, price, existingImages } = req.body;
+    const { title, category, description, location, contactPerson, contactEmail, contactPhone, price, existingImages, tags } = req.body;
     let announcement = await Announcement.findOne({ _id: id, user: userId });
     if (!announcement) {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit' });
@@ -813,6 +822,13 @@ const updateAnnouncement = async (req, res) => {
     announcement.contactEmail = contactEmail;
     announcement.contactPhone = contactPhone;
     announcement.price = price ? Number(price) : undefined;
+    // Actualizează tagurile
+    if (tags !== undefined) {
+      try {
+        const parsedTags = typeof tags === 'string' ? JSON.parse(tags) : tags;
+        announcement.tags = Array.isArray(parsedTags) ? parsedTags : [];
+      } catch { announcement.tags = []; }
+    }
     
     // Gestionează imaginile
     let finalImages = [];

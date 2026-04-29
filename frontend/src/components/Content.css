@@ -79,7 +79,7 @@
 /* 3. CONTENT SECTION BASE
    ---------------------------------------------------------- */
 .content {
-  padding: 120px 0 180px;
+  padding: 60px 0 180px;
   color: var(--ct-text-primary);
   background-color: var(--bg-secondary);
   min-height: 85vh;

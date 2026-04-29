@@ -585,7 +585,7 @@ export default function ChatPage() {
             {unreadConvs.length > 0 && <div className="chat-section-label">{t('chat.unread')}</div>}
             {unreadConvs.map(c => (
               <div key={c.conversationId} className={`chat-conversation-item unread ${selectedConversation?.conversationId === c.conversationId ? 'selected' : ''}`} onClick={() => { setSelectedConversation(c); setIsSidebarOpen(false); }}>
-                <img className="chat-avatar" src={c.avatar} alt="av" onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${(c.displayTitle||'U').slice(0,1)}&background=${getAccentHex()}&color=fff`; }}/>
+                <img className="chat-avatar" src={c.avatar} alt="av" style={{cursor: c.announcementId ? 'pointer' : 'default'}} onClick={(e) => { if (c.announcementId) { e.stopPropagation(); navigate(`/announcement/${c.announcementId}`); } }} onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${(c.displayTitle||'U').slice(0,1)}&background=${getAccentHex()}&color=fff`; }}/>
                 <div className="chat-conversation-info">
                   <div className="chat-conversation-owner">{c.announcementOwnerName}</div>
                   <div className="chat-conversation-title">{c.displayTitle}</div>
@@ -597,7 +597,7 @@ export default function ChatPage() {
             {readConvs.length > 0 && <div className="chat-section-label">{t('chat.read')}</div>}
             {readConvs.map(c => (
               <div key={c.conversationId} className={`chat-conversation-item read ${selectedConversation?.conversationId === c.conversationId ? 'selected' : ''}`} onClick={() => { setSelectedConversation(c); setIsSidebarOpen(false); }}>
-                <img className="chat-avatar" src={c.avatar} alt="av" onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${(c.displayTitle||'U').slice(0,1)}&background=${getAccentHex()}&color=fff`; }}/>
+                <img className="chat-avatar" src={c.avatar} alt="av" style={{cursor: c.announcementId ? 'pointer' : 'default'}} onClick={(e) => { if (c.announcementId) { e.stopPropagation(); navigate(`/announcement/${c.announcementId}`); } }} onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${(c.displayTitle||'U').slice(0,1)}&background=${getAccentHex()}&color=fff`; }}/>
                 <div className="chat-conversation-info">
                   <div className="chat-conversation-owner">{c.announcementOwnerName}</div>
                   <div className="chat-conversation-title">{c.displayTitle}</div>

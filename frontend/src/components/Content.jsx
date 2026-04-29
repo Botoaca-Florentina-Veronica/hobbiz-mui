@@ -32,7 +32,19 @@ export default function Content() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const isDarkMode = document.body.classList.contains('dark-mode');
+  const [isDarkMode, setIsDarkMode] = useState(() => document.body.classList.contains('dark-mode'));
+  const accent = isDarkMode ? '#f51866' : '#1A314E';
+  const accentHover = isDarkMode ? '#d01456' : '#0f2237';
+  const [scrollPage, setScrollPage] = useState(0);
+
+  // Re-render when dark mode class changes on <body>
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(document.body.classList.contains('dark-mode'));
+    });
+    observer.observe(document.body, { attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Format date in Romanian like "09 septembrie 2025"
   const formatRoDate = (date) => {
@@ -98,6 +110,19 @@ export default function Content() {
     return () => controller.abort();
   }, [location.search]);
 
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      const total = popular.length || searchResults.length;
+      const dots = Math.max(1, Math.ceil(total / 5));
+      setScrollPage(max > 0 ? Math.round((el.scrollLeft / max) * (dots - 1)) : 0);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [popular, searchResults]);
+
   return (
     <section className="content">
       <Box sx={{ textAlign: 'center', mb: 6 }}>
@@ -131,7 +156,7 @@ export default function Content() {
         position: 'relative',
         px: { xs: 0, lg: 2 }
       }}>
-        <IconButton 
+        <IconButton
           onClick={() => handleScroll('left')}
           sx={{
             position: 'absolute',
@@ -139,18 +164,20 @@ export default function Content() {
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 10,
-            background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
+            background: accent,
             color: 'white',
             width: 48,
             height: 48,
             display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' },
-            boxShadow: '0 4px 20px rgba(245, 24, 102, 0.3)',
+            boxShadow: `0 4px 20px rgba(0,0,0,0.2)`,
             '&:hover': {
-              background: 'linear-gradient(135deg, #d01456 0%, #e55888 100%)',
-              transform: 'translateY(-50%) scale(1.05)',
-              boxShadow: '0 6px 25px rgba(245, 24, 102, 0.4)',
+              background: accentHover,
+              transform: 'translateY(-50%) !important',
+              boxShadow: `0 6px 25px rgba(0,0,0,0.3)`,
             },
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            '&:focus': { transform: 'translateY(-50%) !important' },
+            '&:active': { transform: 'translateY(-50%) !important' },
+            transition: 'background 0.2s ease, box-shadow 0.2s ease !important'
           }}
         >
           <ChevronLeft fontSize="large" />
@@ -180,7 +207,7 @@ export default function Content() {
               display: { xs: 'none', lg: 'block' }
             },
             '&::-webkit-scrollbar-thumb': {
-              background: 'linear-gradient(90deg, #f51866 0%, #ff6b9d 100%)',
+              background: accent,
               borderRadius: '10px'
             },
             '&::-webkit-scrollbar-track': {
@@ -196,17 +223,17 @@ export default function Content() {
               <Card
                 key={index}
                 sx={{
-                  width: { xs: '100%', lg: 340 },
-                  minWidth: { lg: 340 },
-                  maxWidth: { lg: 340 },
-                  height: { xs: 280, sm: 320, md: 360, lg: 400 },
+                  width: { xs: '100%', lg: 220 },
+                  minWidth: { lg: 220 },
+                  maxWidth: { lg: 220 },
+                  height: { xs: 260, sm: 280, md: 300, lg: 270 },
                   flexShrink: 0,
                   borderRadius: 4,
                   overflow: 'hidden',
-                  background: isDarkMode 
+                  background: isDarkMode
                     ? 'linear-gradient(145deg, #1a1a1a 0%, #141414 100%)'
                     : 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                  boxShadow: isDarkMode 
+                  boxShadow: isDarkMode
                     ? '0 8px 32px rgba(0,0,0,0.4)'
                     : '0 8px 32px rgba(0,0,0,0.06)',
                   border: isDarkMode ? '1px solid #2a2a2a' : 'none'
@@ -266,33 +293,33 @@ export default function Content() {
                 key={a._id || index}
                 onClick={() => a?._id && navigate(`/announcement/${a._id}`)}
                 sx={{
-                  width: { xs: '100%', lg: 340 },
-                  minWidth: { lg: 340 },
-                  maxWidth: { lg: 340 },
-                  height: { xs: 280, sm: 320, md: 360, lg: 400 },
+                  width: { xs: '100%', lg: 220 },
+                  minWidth: { lg: 220 },
+                  maxWidth: { lg: 220 },
+                  height: { xs: 260, sm: 280, md: 300, lg: 270 },
                   flexShrink: 0,
                   cursor: 'pointer',
                   borderRadius: 4,
                   overflow: 'hidden',
                   position: 'relative',
-                  background: isDarkMode 
+                  background: isDarkMode
                     ? 'linear-gradient(145deg, #1a1a1a 0%, #141414 100%)'
                     : 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                  border: isDarkMode 
-                    ? '1px solid rgba(255,255,255,0.08)' 
+                  border: isDarkMode
+                    ? '1px solid rgba(255,255,255,0.08)'
                     : '1px solid rgba(0,0,0,0.06)',
-                  boxShadow: isDarkMode 
+                  boxShadow: isDarkMode
                     ? '0 8px 32px rgba(0,0,0,0.4)'
                     : '0 8px 32px rgba(0,0,0,0.06)',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    transform: 'translateY(-12px) scale(1.02)',
-                    boxShadow: isDarkMode 
-                      ? '0 20px 60px rgba(245, 24, 102, 0.25)'
-                      : '0 20px 60px rgba(245, 24, 102, 0.15)',
-                    border: isDarkMode 
-                      ? '1px solid rgba(245, 24, 102, 0.3)' 
-                      : '1px solid rgba(245, 24, 102, 0.2)',
+                    transform: 'translateY(-8px) scale(1.02)',
+                    boxShadow: isDarkMode
+                      ? `0 20px 60px rgba(245, 24, 102, 0.25)`
+                      : `0 20px 40px rgba(26, 49, 78, 0.15)`,
+                    border: isDarkMode
+                      ? '1px solid rgba(245, 24, 102, 0.3)'
+                      : '1px solid rgba(26, 49, 78, 0.2)',
                     '& .card-image': {
                       transform: 'scale(1.1)',
                     },
@@ -303,9 +330,9 @@ export default function Content() {
                 }}
               >
                 {/* Image Section with Gradient Overlay */}
-                <Box sx={{ 
-                  position: 'relative', 
-                  height: { xs: 180, sm: 200, md: 240, lg: 260 }, 
+                <Box sx={{
+                  position: 'relative',
+                  height: { xs: 155, sm: 165, md: 175, lg: 160 },
                   overflow: 'hidden',
                   backgroundColor: '#f0f0f0'
                 }}>
@@ -398,23 +425,23 @@ export default function Content() {
                         position: 'absolute',
                         top: 12,
                         left: 12,
-                        background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
+                        background: accent,
                         color: 'white',
                         fontWeight: 600,
                         fontSize: '0.75rem',
                         height: '28px',
                         textTransform: 'capitalize',
                         border: 'none',
-                        boxShadow: '0 4px 12px rgba(245, 24, 102, 0.3)'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                       }}
                     />
                   )}
                 </Box>
-                
+
                 {/* Content Section - Modern Layout */}
-                <CardContent sx={{ 
-                  p: { xs: 1.5, sm: 2, md: 2.5 }, 
-                  height: { xs: 100, sm: 120, md: 120, lg: 140 }, 
+                <CardContent sx={{
+                  p: { xs: 1.5, sm: 2, md: 2 },
+                  height: { xs: 100, sm: 110, md: 110, lg: 110 },
                   display: 'flex', 
                   flexDirection: 'column',
                   justifyContent: 'space-between'
@@ -447,9 +474,9 @@ export default function Content() {
                         alignItems: 'center', 
                         gap: 0.8 
                       }}>
-                        <LocationOn sx={{ 
-                          fontSize: { xs: 16, md: 18 }, 
-                          color: '#f51866',
+                        <LocationOn sx={{
+                          fontSize: { xs: 16, md: 18 },
+                          color: accent,
                           flexShrink: 0
                         }} />
                         <Typography 
@@ -515,17 +542,17 @@ export default function Content() {
                 <Card
                   key={a._id || index}
                   sx={{
-                    width: { xs: '100%', lg: 340 },
-                    minWidth: { lg: 340 },
-                    maxWidth: { lg: 340 },
-                    height: { xs: 280, sm: 320, md: 360, lg: 400 },
+                    width: { xs: '100%', lg: 220 },
+                    minWidth: { lg: 220 },
+                    maxWidth: { lg: 220 },
+                    height: { xs: 260, sm: 280, md: 300, lg: 270 },
                     flexShrink: 0,
                     borderRadius: 4,
                     overflow: 'hidden',
-                    background: isDarkMode 
+                    background: isDarkMode
                       ? 'linear-gradient(145deg, #1a1a1a 0%, #141414 100%)'
                       : 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                    boxShadow: isDarkMode 
+                    boxShadow: isDarkMode
                       ? '0 8px 32px rgba(0,0,0,0.4)'
                       : '0 8px 32px rgba(0,0,0,0.06)',
                     border: isDarkMode ? '1px solid #2a2a2a' : 'none',
@@ -533,17 +560,18 @@ export default function Content() {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                       transform: 'translateY(-8px) scale(1.02)',
-                      boxShadow: isDarkMode 
+                      boxShadow: isDarkMode
                         ? '0 20px 40px rgba(0,0,0,0.6)'
-                        : '0 20px 40px rgba(0,0,0,0.15)',
+                        : `0 20px 40px rgba(26, 49, 78, 0.15)`,
+                      border: isDarkMode ? '1px solid #2a2a2a' : `1px solid rgba(26, 49, 78, 0.2)`,
                     }
                   }}
                   onClick={() => navigate(`/announcement/${a._id}`)}
                 >
                   {/* Image Section */}
-                  <Box sx={{ 
-                    position: 'relative', 
-                    height: { xs: 180, sm: 200, md: 240, lg: 260 }, 
+                  <Box sx={{
+                    position: 'relative',
+                    height: { xs: 155, sm: 165, md: 175, lg: 160 },
                     overflow: 'hidden',
                     backgroundColor: '#f0f0f0'
                   }}>
@@ -636,23 +664,23 @@ export default function Content() {
                           position: 'absolute',
                           top: 12,
                           left: 12,
-                          background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
+                          background: accent,
                           color: 'white',
                           fontWeight: 600,
                           fontSize: '0.75rem',
                           height: '28px',
                           textTransform: 'capitalize',
                           border: 'none',
-                          boxShadow: '0 4px 12px rgba(245, 24, 102, 0.3)'
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                         }}
                       />
                     )}
                   </Box>
                   
                   {/* Content Section - Modern Layout */}
-                  <CardContent sx={{ 
-                    p: { xs: 1.5, sm: 2, md: 2.5 }, 
-                    height: { xs: 100, sm: 120, md: 120, lg: 140 }, 
+                  <CardContent sx={{
+                    p: { xs: 1.5, sm: 2, md: 2 },
+                    height: { xs: 100, sm: 110, md: 110, lg: 110 },
                     display: 'flex', 
                     flexDirection: 'column',
                     justifyContent: 'space-between'
@@ -685,9 +713,9 @@ export default function Content() {
                           alignItems: 'center', 
                           gap: 0.8 
                         }}>
-                          <LocationOn sx={{ 
-                            fontSize: { xs: 16, md: 18 }, 
-                            color: '#f51866',
+                          <LocationOn sx={{
+                            fontSize: { xs: 16, md: 18 },
+                            color: accent,
                             flexShrink: 0
                           }} />
                           <Typography 
@@ -746,23 +774,51 @@ export default function Content() {
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 10,
-            background: 'linear-gradient(135deg, #f51866 0%, #ff6b9d 100%)',
+            background: accent,
             color: 'white',
             width: 48,
             height: 48,
             display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex' },
-            boxShadow: '0 4px 20px rgba(245, 24, 102, 0.3)',
+            boxShadow: `0 4px 20px rgba(0,0,0,0.2)`,
             '&:hover': {
-              background: 'linear-gradient(135deg, #d01456 0%, #e55888 100%)',
-              transform: 'translateY(-50%) scale(1.05)',
-              boxShadow: '0 6px 25px rgba(245, 24, 102, 0.4)',
+              background: accentHover,
+              transform: 'translateY(-50%) !important',
+              boxShadow: `0 6px 25px rgba(0,0,0,0.3)`,
             },
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            '&:focus': { transform: 'translateY(-50%) !important' },
+            '&:active': { transform: 'translateY(-50%) !important' },
+            transition: 'background 0.2s ease, box-shadow 0.2s ease !important'
           }}
         >
           <ChevronRight fontSize="large" />
         </IconButton>
       </Box>
+
+      {/* Pagination dots */}
+      {!isSearching && (popular.length > 0 || searchResults.length > 0) && (
+        <Box sx={{ display: { xs: 'none', lg: 'flex' }, justifyContent: 'center', alignItems: 'center', gap: 1, mt: 2 }}>
+          {Array.from({ length: Math.ceil((popular.length || searchResults.length) / 5) }).map((_, i) => (
+            <Box
+              key={i}
+              onClick={() => {
+                if (carouselRef.current) {
+                  const el = carouselRef.current;
+                  const total = Math.ceil((popular.length || searchResults.length) / 5);
+                  el.scrollLeft = (i / Math.max(1, total - 1)) * (el.scrollWidth - el.clientWidth);
+                }
+              }}
+              sx={{
+                width: i === scrollPage ? 22 : 8,
+                height: 8,
+                borderRadius: 4,
+                background: i === scrollPage ? accent : (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(26,49,78,0.2)'),
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+            />
+          ))}
+        </Box>
+      )}
 
       {/* Button to explore all announcements */}
       <Box sx={{ 

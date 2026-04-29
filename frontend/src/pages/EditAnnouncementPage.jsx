@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
+import { categoryTagsMap } from '../utils/categoryTags';
 
 // Fix: Ensure all category images are imported and used for mobile/tablet
 // This is the same array as in Categories.jsx, so images are imported there and exported as 'categories'.
@@ -42,6 +43,8 @@ export default function EditAnnouncementPage() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [price, setPrice] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const MAX_TAGS = 10;
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
@@ -116,6 +119,7 @@ export default function EditAnnouncementPage() {
       setContactEmail(a.contactEmail || '');
       setContactPhone(a.contactPhone || '');
       setPrice(a.price || '');
+      setSelectedTags(Array.isArray(a.tags) ? a.tags : []);
       setAnnouncementId(a._id);
       
       // Setează imaginile existente
@@ -258,7 +262,16 @@ export default function EditAnnouncementPage() {
 
   const handleCategorySelect = (selectedCategory) => {
     setCategory(selectedCategory);
+    setSelectedTags([]);
     handleCategoryClose();
+  };
+
+  const handleTagToggle = (tag) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tag)) return prev.filter(t => t !== tag);
+      if (prev.length >= MAX_TAGS) return prev;
+      return [...prev, tag];
+    });
   };
 
   const handleSubmit = async () => {
@@ -344,7 +357,8 @@ export default function EditAnnouncementPage() {
       formData.append('contactEmail', contactEmail);
       formData.append('contactPhone', contactPhone);
       if (price.trim()) formData.append('price', price);
-      
+      if (selectedTags.length > 0) formData.append('tags', JSON.stringify(selectedTags));
+
       // Adaugă doar imaginile noi (File objects)
       images.filter(img => img instanceof File).forEach((img) => {
         formData.append('images', img);
@@ -574,6 +588,57 @@ export default function EditAnnouncementPage() {
             </div>
           )}
         </Popover>
+
+        {/* Tags Section */}
+        {category && categoryTagsMap[category] && (
+          <div className="add-announcement-tags-section">
+            <label className="add-announcement-label add-announcement-tags-label">
+              {t('categoryTags.label')}
+              {selectedTags.length > 0 && (
+                <span className="add-announcement-tags-count">
+                  {selectedTags.length}/{MAX_TAGS}
+                </span>
+              )}
+            </label>
+            <p className="add-announcement-tags-helper">
+              {t('categoryTags.helper')}
+            </p>
+            {categoryTagsMap[category].map(({ groupKey, tagKeys }) => (
+              <div key={groupKey} className="add-announcement-tags-group">
+                <span className="add-announcement-tags-group-title">
+                  {t(`categoryTags.groups.${groupKey}`)}
+                </span>
+                <div className="add-announcement-tags-chips">
+                  {tagKeys.map(tagKey => {
+                    const selected = selectedTags.includes(tagKey);
+                    const disabled = !selected && selectedTags.length >= MAX_TAGS;
+                    return (
+                      <button
+                        key={tagKey}
+                        type="button"
+                        className={`add-announcement-tag-chip${selected ? ' selected' : ''}${disabled ? ' disabled' : ''}`}
+                        onClick={() => !disabled && handleTagToggle(tagKey)}
+                        aria-pressed={selected}
+                        disabled={disabled}
+                      >
+                        {t(`categoryTags.tags.${tagKey}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                type="button"
+                className="add-announcement-tags-clear"
+                onClick={() => setSelectedTags([])}
+              >
+                {t('categoryTags.clear')}
+              </button>
+            )}
+          </div>
+        )}
       </form>
       <div className="add-announcement-images-section">
         {/* Mesaj de eroare pentru imagini */}

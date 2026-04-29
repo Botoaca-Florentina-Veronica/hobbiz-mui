@@ -525,7 +525,7 @@ export default function PublicProfile() {
         </MenuItem>
       </Menu>
 
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm" className="pp-edit-review-dialog" PaperProps={{ sx: { borderRadius: '16px' } }}>
         <DialogTitle sx={{ fontWeight: 700 }}>{t('publicProfile.editReview')}</DialogTitle>
         <DialogContent dividers>
           <TextField label={t('publicProfile.editReviewScore')} type="number" inputProps={{ min: 0, max: 5, step: 0.5 }}
@@ -550,7 +550,7 @@ export default function PublicProfile() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} PaperProps={{ sx: { borderRadius: 3 } }}>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} className="pp-delete-review-dialog" PaperProps={{ sx: { borderRadius: '16px' } }}>
         <DialogTitle sx={{ fontWeight: 700 }}>{t('publicProfile.deleteReview')}</DialogTitle>
         <DialogContent dividers>
           <Typography>{t('publicProfile.deleteReviewMessage')}</Typography>
@@ -561,6 +561,7 @@ export default function PublicProfile() {
             try {
               await apiClient.delete(`/api/reviews/${deleteTargetId}`);
               setProfile(prev => ({ ...prev, reviews: prev.reviews.filter(rr => rr._id !== deleteTargetId) }));
+              setToastMessage(t('publicProfile.deleteReviewSuccess')); setToastType('success'); setToastVisible(true);
             } catch { setToastMessage(t('publicProfile.deleteReviewError')); setToastType('error'); setToastVisible(true); }
             finally { setDeleteDialogOpen(false); }
           }}>{t('publicProfile.delete')}</Button>

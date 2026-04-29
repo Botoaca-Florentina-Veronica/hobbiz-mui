@@ -24,6 +24,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
 import { categories } from '../components/Categories.jsx';
+import { categoryTagsMap } from '../utils/categoryTags';
 
 // Fix: Ensure all category images are imported and used for mobile/tablet
 // This is the same array as in Categories.jsx, so images are imported there and exported as 'categories'.
@@ -96,6 +97,8 @@ export default function AddAnnouncementPage() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [price, setPrice] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const MAX_TAGS = 10;
   const imageInputRef = useRef(null);
   const [images, setImages] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
@@ -232,6 +235,7 @@ export default function AddAnnouncementPage() {
       setContactEmail(data.contactEmail || '');
       setContactPhone(data.contactPhone || '');
       setPrice(data.price || '');
+      setSelectedTags(data.tags || []);
       setIsEdit(false);
       setAnnouncementId(null);
       // Restaurează preview-ul imaginii principale dacă există
@@ -269,9 +273,10 @@ export default function AddAnnouncementPage() {
       selectedLocalitate,
       contactPerson,
       contactEmail,
-      contactPhone
+      contactPhone,
+      tags: selectedTags
     }));
-  }, [title, category, description, selectedJudet, selectedLocalitate, contactPerson, contactEmail, contactPhone]);
+  }, [title, category, description, selectedJudet, selectedLocalitate, contactPerson, contactEmail, contactPhone, selectedTags]);
 
   // Salvează preview-ul imaginii principale ca DataURL în localStorage
   useEffect(() => {
@@ -481,6 +486,7 @@ export default function AddAnnouncementPage() {
       formData.append('contactEmail', contactEmail);
       formData.append('contactPhone', contactPhone);
       if (price.trim()) formData.append('price', price);
+      if (selectedTags.length > 0) formData.append('tags', JSON.stringify(selectedTags));
       // Adaugă toate imaginile
       images.forEach((img) => {
         formData.append('images', img);
@@ -548,7 +554,16 @@ export default function AddAnnouncementPage() {
 
   const handleCategorySelect = (selectedCategory) => {
     setCategory(selectedCategory);
+    setSelectedTags([]);
     handleCategoryClose();
+  };
+
+  const handleTagToggle = (tag) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tag)) return prev.filter(t => t !== tag);
+      if (prev.length >= MAX_TAGS) return prev;
+      return [...prev, tag];
+    });
   };
 
   const open = Boolean(anchorEl);
@@ -750,6 +765,57 @@ export default function AddAnnouncementPage() {
             ))}
           </div>
         </Popover>
+        )}
+
+        {/* Tags Section – shown only after a category with tags is selected */}
+        {category && categoryTagsMap[category] && (
+          <div className="add-announcement-tags-section">
+            <label className="add-announcement-label add-announcement-tags-label">
+              {t('categoryTags.label')}
+              {selectedTags.length > 0 && (
+                <span className="add-announcement-tags-count">
+                  {selectedTags.length}/{MAX_TAGS}
+                </span>
+              )}
+            </label>
+            <p className="add-announcement-tags-helper">
+              {t('categoryTags.helper')}
+            </p>
+            {categoryTagsMap[category].map(({ groupKey, tagKeys }) => (
+              <div key={groupKey} className="add-announcement-tags-group">
+                <span className="add-announcement-tags-group-title">
+                  {t(`categoryTags.groups.${groupKey}`)}
+                </span>
+                <div className="add-announcement-tags-chips">
+                  {tagKeys.map(tagKey => {
+                    const selected = selectedTags.includes(tagKey);
+                    const disabled = !selected && selectedTags.length >= MAX_TAGS;
+                    return (
+                      <button
+                        key={tagKey}
+                        type="button"
+                        className={`add-announcement-tag-chip${selected ? ' selected' : ''}${disabled ? ' disabled' : ''}`}
+                        onClick={() => !disabled && handleTagToggle(tagKey)}
+                        aria-pressed={selected}
+                        disabled={disabled}
+                      >
+                        {t(`categoryTags.tags.${tagKey}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                type="button"
+                className="add-announcement-tags-clear"
+                onClick={() => setSelectedTags([])}
+              >
+                {t('categoryTags.clear')}
+              </button>
+            )}
+          </div>
         )}
 
         {/* Category Modal for Mobile */}

@@ -1,6 +1,7 @@
 /* Stiluri pentru Categories */
 .categories-container {
   padding: 2rem;
+  padding-top: 9rem;
   text-align: center;
   /* Use secondary background (white in light mode) so Explore section stays white on desktop */
   background-color: var(--bg-secondary);

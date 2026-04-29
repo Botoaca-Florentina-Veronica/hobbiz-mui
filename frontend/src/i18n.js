@@ -44,4 +44,13 @@ i18n
     }
   });
 
+// Keep <html lang> in sync so Chrome never detects a language mismatch
+const syncLang = (lng) => {
+  const code = (lng || 'ro').split('-')[0];
+  document.documentElement.lang = code;
+};
+
+i18n.on('languageChanged', syncLang);
+syncLang(i18n.language);
+
 export default i18n;

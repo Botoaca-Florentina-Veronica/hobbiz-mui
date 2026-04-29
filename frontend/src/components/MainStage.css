@@ -744,7 +744,7 @@ body.dark-mode .main-stage > .top-bar,
   /* --- FIX DARK MODE Z-INDEX --- */
   z-index: 20;
   background: transparent;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 32px;
 }
 .dark-mode .search-container {

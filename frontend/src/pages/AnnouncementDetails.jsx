@@ -287,6 +287,7 @@ export default function AnnouncementDetails() {
       try {
         const res = await apiClient.get(`/api/announcements/${id}`);
         console.log('Announcement fetched:', res.data);
+        console.log('[AnnouncementDetails] tags received:', res.data?.tags);
         setAnnouncement(res.data);
       } catch (e) {
         console.error('Error fetching announcement:', e);
@@ -722,19 +723,33 @@ export default function AnnouncementDetails() {
                     <Typography variant="h4" component="h1" sx={{ color: getAccentCss(), fontWeight: 700, mb: 2, fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' }, textAlign: 'center' }}>
                       {announcement.title}
                     </Typography>
-                    {announcement.category && (
-                      <Chip
-                        label={translateCategory(announcement.category, t)}
-                        clickable
-                        onClick={handleCategoryClick}
-                        variant="outlined"
-                        sx={{
-                          borderColor: getAccentCss(),
-                          color: getAccentCss(),
-                          mb: 2,
-                          cursor: 'pointer'
-                        }}
-                      />
+                    {(announcement.category || (Array.isArray(announcement.tags) && announcement.tags.length > 0)) && (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                        {announcement.category && (
+                          <Chip
+                            label={translateCategory(announcement.category, t)}
+                            clickable
+                            onClick={handleCategoryClick}
+                            variant="outlined"
+                            sx={{
+                              borderColor: getAccentCss(),
+                              color: getAccentCss(),
+                              cursor: 'pointer'
+                            }}
+                          />
+                        )}
+                        {Array.isArray(announcement.tags) && announcement.tags.map(tagKey => (
+                          <Chip
+                            key={tagKey}
+                            label={t(`categoryTags.tags.${tagKey}`, tagKey)}
+                            variant="outlined"
+                            sx={{
+                              borderColor: getAccentCss(),
+                              color: getAccentCss(),
+                            }}
+                          />
+                        ))}
+                      </Box>
                     )}
                   </Box>
                   
@@ -1154,7 +1169,7 @@ export default function AnnouncementDetails() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleRateClose} sx={{ color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: getIsDarkMode() ? '#ffffff' : 'inherit', fontFamily: "'Poppins', sans-serif" }}>{t('announcementDetails.submit')}</Button>
+          <Button variant="contained" onClick={handleRateSubmit} sx={{ bgcolor: getAccentCss(), '&:hover': { bgcolor: getAccentHover() }, color: '#ffffff', fontFamily: "'Poppins', sans-serif" }}>{t('announcementDetails.submit')}</Button>
         </DialogActions>
       </Dialog>
 

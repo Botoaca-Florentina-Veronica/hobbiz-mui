@@ -152,11 +152,9 @@ body.dark-mode.chat-page::before {
   background: #121212 !important;
 }
 
-@media (max-width: 768px) {
-  body.chat-page,
-  body.chat-page * {
-    font-family: 'Poppins', sans-serif !important;
-  }
+body.chat-page,
+body.chat-page * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Force common app/main containers to be white on Chat page in light mode to avoid theme bleed */
@@ -414,7 +412,7 @@ body.dark-mode.chat-page .terms-conditions {
   word-wrap: break-word;
   box-shadow: var(--c-shadow-bubble);
   font-size: 16px; line-height: 1; /* reduced line-height for shorter bubbles */
-  font-family: monospace;
+  font-family: 'Poppins', sans-serif;
   border: 1px solid transparent;
   overflow: visible; /* allow reply preview / reactions to be visible when positioned near edges */
 }
@@ -537,8 +535,8 @@ body.dark-mode.chat-page .terms-conditions {
 }
 @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-.chat-message.own .reaction-picker { left: 0; }
-.chat-message:not(.own) .reaction-picker { right: 0; }
+.chat-message.own .reaction-picker { right: 0; }
+.chat-message:not(.own) .reaction-picker { left: 0; }
 
 .reaction-option {
   background: transparent; border: none; font-size: 20px;

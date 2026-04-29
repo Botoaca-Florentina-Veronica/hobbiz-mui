@@ -607,11 +607,11 @@ export default function MainStage() {
 
         {!isMobile ? (
           <div className="search-container mainstage-search-desktop" ref={searchContainerRef} role="combobox" aria-expanded={showDropdown} aria-haspopup="listbox">
-            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', flex: 1, position: 'relative' }}>
-              <input 
+            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', flex: 1 }}>
+              <input
                 ref={searchInputRef}
-                type="text" 
-                placeholder={t('mainStage.searchPlaceholder')} 
+                type="text"
+                placeholder={t('mainStage.searchPlaceholder')}
                 className="search-input"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -623,9 +623,9 @@ export default function MainStage() {
               />
               <div className="location-section" onClick={handleInputClick}>
                 <FaMapMarkerAlt className="location-icon" />
-                <input 
-                  type="text" 
-                  placeholder={t('mainStage.locationPlaceholder')} 
+                <input
+                  type="text"
+                  placeholder={t('mainStage.locationPlaceholder')}
                   className="location-input"
                   value={selectedLocalitate || selectedJudet || t('mainStage.locationPlaceholder')}
                   readOnly
@@ -635,10 +635,10 @@ export default function MainStage() {
                 <span>{t('mainStage.searchButton')}</span>
                 <FaSearch className="search-icon" />
               </button>
-              
-              {/* Suggestions / Recent Dropdown */}
-              {showDropdown && renderSearchDropdown(false)}
             </form>
+
+            {/* Suggestions / Recent Dropdown – rendered outside <form> so it's positioned relative to .search-container */}
+            {showDropdown && renderSearchDropdown(false)}
           </div>
         ) : (
           <Box className="mainstage-search-mobile" ref={searchContainerRef} sx={{ position: 'relative', width: '100%' }}>
