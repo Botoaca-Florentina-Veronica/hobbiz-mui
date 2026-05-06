@@ -69,11 +69,3 @@ mobile-app/google-services.json
 **/lucrare_licenta.docx
 **/lucrare_licenta.txt
 
-#opswat
-**/Jenkinsfile
-**/docker-compose.jenkins.yml
-**/docker-compose.yml
-backend/.dockerignore
-backend/Dockerfile
-frontend/.dockerignore
-frontend/Dockerfile
