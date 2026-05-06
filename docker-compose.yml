@@ -26,7 +26,6 @@ services:
       - ./backend/.env
     environment:
       NODE_ENV: development
-      MONGODB_URI: mongodb://mongodb:27017/hobbiz_db
       PORT: 5000
 
   frontend:

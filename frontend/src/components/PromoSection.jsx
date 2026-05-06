@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import img1 from '../../../device-view_images/1.png';
-import img2 from '../../../device-view_images/2.png';
-import img3 from '../../../device-view_images/3.png';
-import img4 from '../../../device-view_images/4.png';
+import img1 from '../assets/device-view_images/1.png';
+import img2 from '../assets/device-view_images/2.png';
+import img3 from '../assets/device-view_images/3.png';
+import img4 from '../assets/device-view_images/4.png';
 import img9 from '../assets/images/9.png';
 import img10 from '../assets/images/10.png';
 import img11 from '../assets/images/11.png';
