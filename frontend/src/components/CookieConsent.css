@@ -1,111 +1,223 @@
-﻿.cookie-consent-root {
+/* CookieConsent — mobile-only bottom-sheet (≤1024px) */
+
+/* ── Backdrop ─────────────────────────────────────────── */
+.cc-backdrop {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 1200;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: flex-end;
+  animation: cc-fade-in 0.28s ease both;
 }
 
-.cookie-consent-card {
-  max-width: 520px;
-  /* Fully opaque surface so text is always readable */
-  background: var(--app-surface);
+.cc-backdrop--exit {
+  animation: cc-fade-out 0.3s ease both;
+}
+
+@keyframes cc-fade-in  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes cc-fade-out { from { opacity: 1 } to { opacity: 0 } }
+
+/* ── Sheet ────────────────────────────────────────────── */
+.cc-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 28px 28px 0 0;
+  padding: 12px 24px 36px;
+  box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.18);
+  text-align: center;
+  animation: cc-slide-up 0.34s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+.dark-mode .cc-sheet {
+  background: #1a1a1a;
+  box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.6);
+}
+
+.cc-sheet--exit {
+  animation: cc-slide-down 0.3s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes cc-slide-up {
+  from { transform: translateY(100%) }
+  to   { transform: translateY(0) }
+}
+@keyframes cc-slide-down {
+  from { transform: translateY(0) }
+  to   { transform: translateY(110%) }
+}
+
+/* ── Drag handle ──────────────────────────────────────── */
+.cc-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: #d1d5db;
+  margin: 0 auto 20px;
+}
+
+.dark-mode .cc-handle {
+  background: #3a3a3a;
+}
+
+/* ── Close button ─────────────────────────────────────── */
+.cc-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cc-close:hover { background: #e5e7eb; color: #374151; }
+.cc-close svg   { width: 14px; height: 14px; }
+
+.dark-mode .cc-close          { background: #2a2a2a; color: #9ca3af; }
+.dark-mode .cc-close:hover    { background: #333;    color: #e5e7eb; }
+
+/* ── Hero image ───────────────────────────────────────── */
+.cc-img-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.cc-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.12));
+  animation: cc-bounce-in 0.5s cubic-bezier(0.34, 1.5, 0.64, 1) 0.15s both;
+}
+
+@keyframes cc-bounce-in {
+  from { transform: scale(0.6) translateY(20px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+/* ── Text ─────────────────────────────────────────────── */
+.cc-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 10px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+}
+
+.dark-mode .cc-title { color: #f9fafb; }
+
+.cc-desc {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #6b7280;
+  margin: 0 0 22px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.cc-desc em {
+  font-style: normal;
+  font-weight: 700;
+  color: #2D4361;
+}
+
+.dark-mode .cc-desc       { color: #9ca3af; }
+.dark-mode .cc-desc em    { color: #f51866; }
+
+/* ── Action buttons ───────────────────────────────────── */
+.cc-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cc-btn-accept {
+  flex: 1;
+  padding: 13px 18px;
   border-radius: 14px;
-  padding: 22px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
-  border: 1px solid var(--app-border);
-  color: var(--app-text);
+  border: none;
+  background: linear-gradient(135deg, #2D4361 0%, #4A6FA5 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 14px rgba(45, 67, 97, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.cookie-consent-card h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
+.cc-btn-accept:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(45, 67, 97, 0.22);
 }
 
-.cookie-consent-card p {
-  margin: 0 0 14px 0;
-  color: var(--app-muted);
-  line-height: 1.4;
+.dark-mode .cc-btn-accept {
+  background: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  box-shadow: 0 4px 14px rgba(245, 24, 102, 0.35);
 }
 
-.cookie-settings {
+.cc-btn-reject {
+  padding: 13px 18px;
+  border-radius: 14px;
+  border: 1.5px solid #e5e7eb;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cc-btn-reject:hover  { background: #f9fafb; color: #374151; }
+.cc-btn-reject:active { background: #f3f4f6; }
+
+.dark-mode .cc-btn-reject       { border-color: #2a2a2a; color: #9ca3af; }
+.dark-mode .cc-btn-reject:hover { background: #222; color: #e5e7eb; }
+
+/* ── Settings link ────────────────────────────────────── */
+.cc-settings-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: transparent;
   border: none;
-  color: var(--primary);
+  color: #9ca3af;
+  font-size: 12px;
   font-weight: 500;
-  margin-bottom: 12px;
+  font-family: 'Poppins', sans-serif;
   cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
 }
 
-.cookie-settings:hover {
-  color: var(--primary-hover);
-  transform: translateY(-2px);
-}
+.cc-settings-link:hover { color: #6b7280; }
 
-.gear { font-size: 1.05rem; }
+.dark-mode .cc-settings-link       { color: #4b5563; }
+.dark-mode .cc-settings-link:hover { color: #9ca3af; }
 
-.cookie-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.cookie-accept {
-  background: var(--primary);
-  color: var(--primary-contrast);
-  border: none;
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.cookie-accept:hover {
-  background: var(--primary-hover);
-  box-shadow: 0 8px 20px rgba(45,67,97,0.18);
-  transform: translateY(-2px);
-}
-
-.cookie-reject {
-  /* Use surface fill so it reads well on top of the card; in dark-mode this becomes a dark button */
-  background: var(--app-elev);
-  color: var(--app-text);
-  border: 1px solid var(--app-border);
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.cookie-reject:hover {
-  background: linear-gradient(180deg, var(--app-elev), var(--app-surface));
-  border-color: var(--primary);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-  transform: translateY(-1px);
-}
-
-/* focus styles */
-.cookie-accept:focus, .cookie-reject:focus, .cookie-settings:focus {
-  outline: 3px solid rgba(45,67,97,0.18);
-  outline-offset: 2px;
-}
-
-/* Smooth transitions and reduced-motion respect */
-.cookie-settings, .cookie-accept, .cookie-reject {
-  transition: transform 180ms ease, box-shadow 220ms ease, background-color 180ms ease, color 140ms ease, border-color 160ms ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cookie-settings, .cookie-accept, .cookie-reject { transition: none; transform: none; }
-}
-
-/* Dark mode overrides: rely on CSS variables already set in .dark-mode */
-@media (max-width: 760px) {
-  .cookie-consent-root { right: 12px; left: 12px; bottom: 16px; }
-  .cookie-consent-card { width: 100%; max-width: none; padding: 16px; border-radius: 12px; }
-  .cookie-accept, .cookie-reject { flex: 1; }
-  .cookie-actions { gap: 8px; }
+/* ── Only show on small screens ───────────────────────── */
+@media (min-width: 1025px) {
+  .cc-backdrop { display: none !important; }
 }

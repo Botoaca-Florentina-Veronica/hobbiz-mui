@@ -45,6 +45,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const negotiationRoutes = require('./routes/negotiationRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const shareRoutes = require('./routes/shareRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -270,6 +271,7 @@ app.use('/api/negotiations', negotiationRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/reports', reportRoutes);
 
+app.use('/share', shareRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));
 
 app.get('/', (req, res) => {

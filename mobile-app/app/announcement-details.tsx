@@ -456,8 +456,13 @@ export default function AnnouncementDetailsScreen() {
           <TouchableOpacity
             onPress={async () => {
               try {
-                const shareUrl = `${api.defaults.baseURL}/announcements/${id}`;
-                await Share.share({ message: `${announcement.title}\n\n${announcement.description}\n\n${shareUrl}` });
+                const shareUrl = `${api.defaults.baseURL}/share/${id}`;
+                const priceText = announcement.price != null ? `\n${announcement.price.toLocaleString('ro-RO')} RON` : '';
+                await Share.share({
+                  title: announcement.title,
+                  message: `${announcement.title}${priceText}\n${shareUrl}`,
+                  url: shareUrl,
+                });
               } catch (e) {
                 console.warn('Share error', e);
               }
