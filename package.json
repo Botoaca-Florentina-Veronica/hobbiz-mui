@@ -29,5 +29,8 @@
     "express": "^5.2.1",
     "mailersend": "^2.6.0",
     "motion": "^12.38.0"
+  },
+  "devDependencies": {
+    "docx": "^9.6.1"
   }
 }

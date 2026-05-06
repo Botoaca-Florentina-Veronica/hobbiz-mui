@@ -90,12 +90,6 @@
   position: relative;
 }
 
-@media (max-width: 1024px) {
-  .content {
-    min-height: auto;
-  }
-}
-
 .dark-mode .content {
   /* Use the same variable so dark-mode values from theme.css apply */
   background-color: var(--bg-secondary);
@@ -212,10 +206,18 @@
 }
 
 
-/* 5. RESPONSIVE STYLES
-   ---------------------------------------------------------- */
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
 
-/* Large Tablet (901px - 1024px) */
+/* ── ≤1024px: TABLETĂ — înălțime automată ───────────────────── */
+@media (max-width: 1024px) {
+  .content {
+    min-height: auto;
+  }
+}
+
+/* ── 901px–1024px: TABLETĂ MARE ─────────────────────────────── */
 @media (min-width: 901px) and (max-width: 1024px) {
   .content {
     padding: 100px 0;
@@ -250,7 +252,7 @@
   .popular-announcements-container svg { width: 13px !important; height: 13px !important; }
 }
 
-/* Small Tablet (701px - 900px) */
+/* ── 701px–900px: TABLETĂ MIC ────────────────────────────────── */
 @media (min-width: 701px) and (max-width: 900px) {
   .content {
     padding: 80px 0;
@@ -285,7 +287,7 @@
   .popular-announcements-container svg { width: 11px !important; height: 11px !important; }
 }
 
-/* Mobile (max-width 700px) */
+/* ── ≤700px: TELEFON ────────────────────────────────────────── */
 @media (max-width: 700px) {
   .content {
     padding: 60px 0;

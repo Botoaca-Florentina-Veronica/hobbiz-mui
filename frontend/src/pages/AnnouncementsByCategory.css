@@ -102,11 +102,6 @@
   align-items: stretch; /* use full inner width so title/search/cards align */
 }
 
-@media (min-width: 901px) {
-  .announcements-by-category.my-announcements-container {
-    padding-top: 80px;
-  }
-}
 
 
 /* 3. SEARCHBAR
@@ -467,10 +462,18 @@ body.dark-mode .announcements-by-category .my-announcement-card {
 }
 
 
-/* 8. RESPONSIVE DESIGN - MEDIA QUERIES
-   ---------------------------------------------------------- */
+/* =============================================================
+   8. RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
 
-/* Extra Large Screens (>1700px) */
+/* ── ≥901px: DESKTOP — padding top ──────────────────────────── */
+@media (min-width: 901px) {
+  .announcements-by-category.my-announcements-container {
+    padding-top: 80px;
+  }
+}
+
+/* ── ≥1700px: ECRANE EXTRA MARI ─────────────────────────────── */
 @media (min-width: 1700px) {
   .announcements-by-category .abc-align-container { max-width: 1600px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
@@ -486,7 +489,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   .announcements-by-category .mobile-back-container { display: none; }
 }
 
-/* Ecrane mari (1400px - 1699px) */
+/* ── 1400px–1699px: ECRANE MARI ─────────────────────────────── */
 @media (min-width: 1400px) and (max-width: 1699px) {
   .announcements-by-category .abc-align-container { max-width: 1320px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
@@ -501,7 +504,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   .announcements-by-category .mobile-back-container { display: none; }
 }
 
-/* Laptop (1200px - 1399px) */
+/* ── 1200px–1399px: LAPTOP ───────────────────────────────────── */
 @media (min-width: 1200px) and (max-width: 1399px) {
   .announcements-by-category .abc-align-container { max-width: 1140px; }
   .announcements-by-category .favorite-announcements-list.grid-view {
@@ -516,7 +519,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   .announcements-by-category .mobile-back-container { display: none; }
 }
 
-/* Laptop (1025px - 1199px) */
+/* ── ≤1199px: LAPTOP MIC ─────────────────────────────────────── */
 @media (max-width: 1199px) {
   .announcements-by-category.my-announcements-container {
     padding-left: 60px; padding-right: 60px;
@@ -527,34 +530,9 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   }
 }
 
-/* Tablet mare (901px - 1024px) */
+/* ── ≤1024px: TABLETĂ MARE + TABLETĂ ────────────────────────── */
 @media (max-width: 1024px) {
-  .announcements-by-category.my-announcements-container {
-    padding-left: 40px; padding-right: 40px;
-  }
-  .announcements-by-category .abc-align-container { padding: 0 12px; }
-  .announcements-by-category .abc-searchbar { padding: 20px; margin-bottom: 28px; }
-  
-  .announcements-by-category .favorite-announcements-list.grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;
-  }
-  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 290px; max-width: 100%;
-  }
-  .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
-    height: 130px;
-  }
-  .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
-    margin-bottom: 12px;
-  }
-  .announcements-by-category .my-announcement-info { padding: 10px; }
-  .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
-    width: 35%;
-  }
-}
-
-/* Tablet (768px - 1024px) */
-@media (max-width: 1024px) {
+  /* Valorile din al doilea bloc suprascriu natural pe cele din primul */
   .announcements-by-category.my-announcements-container {
     padding-left: 30px; padding-right: 30px;
   }
@@ -566,18 +544,22 @@ body.dark-mode .announcements-by-category .my-announcement-card {
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-card {
-    min-height: 280px;
+    min-height: 280px; max-width: 100%;
   }
   .announcements-by-category .favorite-announcements-list.grid-view .my-announcement-image {
     height: 120px;
   }
+  .announcements-by-category .favorite-announcements-list.list-view .my-announcement-card {
+    margin-bottom: 12px;
+  }
   .announcements-by-category .favorite-announcements-list.list-view .my-announcement-image {
     width: 40%;
   }
+  .announcements-by-category .my-announcement-info { padding: 10px; }
   .announcements-by-category .my-announcement-title { font-size: 0.95rem; }
 }
 
-/* Tablet mic (700px - 767px) */
+/* ── ≤767px: TABLETĂ MIC ─────────────────────────────────────── */
 @media (max-width: 767px) {
   .announcements-by-category.my-announcements-container {
     padding-left: 20px; padding-right: 20px;
@@ -604,7 +586,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   .announcements-by-category .my-announcement-location { font-size: 11px; }
 }
 
-/* Dispozitive medii (460px - 699px) */
+/* ── 460px–699px: TELEFON MARE ───────────────────────────────── */
 @media (min-width: 460px) and (max-width: 699px) {
   .announcements-by-category .favorite-announcements-list.grid-view {
     grid-template-columns: repeat(2, 1fr); gap: 12px;
@@ -623,7 +605,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   .announcements-by-category .my-announcement-price { font-size: 0.9rem; }
 }
 
-/* Telefoane mari (361px - 459px) */
+/* ── ≤459px: TELEFON ─────────────────────────────────────────── */
 @media (max-width: 459px) {
   .announcements-by-category.my-announcements-container {
     padding-left: 16px; padding-right: 16px;
@@ -656,7 +638,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   }
 }
 
-/* Telefoane mici (până în 360px) */
+/* ── ≤360px: TELEFON MIC ─────────────────────────────────────── */
 @media (max-width: 360px) {
   .announcements-by-category.my-announcements-container {
     padding-left: 12px; padding-right: 12px;
@@ -679,8 +661,7 @@ body.dark-mode .announcements-by-category .my-announcement-card {
   .announcements-by-category .my-announcement-category { display: none; }
 }
 
-/* 9. APPLIKE MODE
-   ---------------------------------------------------------- */
+/* ── ≤1024px: MOD APP-LIKE (.abc-applike — clase separate) ───── */
 @media (max-width: 1024px) {
   .announcements-by-category.my-announcements-container.abc-applike {
     padding-left: 0;

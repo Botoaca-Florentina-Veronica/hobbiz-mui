@@ -1,34 +1,32 @@
-﻿/* =============================================================
+/* =============================================================
    FAVORITE ANNOUNCEMENTS PAGE
    ============================================================= */
 
-/* 1. CONFIGURARE & VARIABILE
-   ---------------------------------------------------------- */
+
+/* ─────────────────────────────────────────────────────────────
+   1. VARIABILE & CONFIGURARE
+   ───────────────────────────────────────────────────────────── */
 :root {
-  /* Dimensiuni & Layout */
   --fav-card-width: 300px;
   --fav-card-radius: 18px;
-  
-  /* Culori Light Mode (Default) */
+
   --fav-bg-card: #ffffff;
-  --fav-border: 1px solid rgba(0,0,0,0.06);
-  --fav-shadow: 0 4px 16px rgba(0,0,0,0.06);
-  --fav-shadow-hover: 0 8px 24px rgba(0,0,0,0.08);
-  
+  --fav-border: 1px solid rgba(0, 0, 0, 0.06);
+  --fav-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --fav-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+
   --fav-text-title: #183642;
   --fav-text-category: #575757;
-  --fav-text-meta: #717171; /* Locație, Dată */
-  --fav-text-price: #3f3f3f; /* Desktop default */
-  
+  --fav-text-meta: #717171;
+  --fav-text-price: #3f3f3f;
+
   --fav-icon-heart: #575757;
   --fav-icon-heart-filled: #f51866;
-  
-  /* Mobile Header specific */
+
   --fav-mobile-header-text: var(--chat-text, #3f3f3f);
   --fav-mobile-btn-bg: var(--chat-elev, #f5f5f5);
-} 
+}
 
-/* Dark Mode Overrides */
 .dark-mode {
   --fav-bg-card: #121212;
   --fav-border: 1px solid rgba(245, 24, 102, 0.3);
@@ -39,32 +37,32 @@
   --fav-text-title: #ffffff;
   --fav-text-category: #e0e0e0;
   --fav-text-meta: #d6d6d6;
-  --fav-text-price: #f51866; /* Preț accentuat în dark mode */
+  --fav-text-price: #f51866;
 
   --fav-icon-heart: #e0e0e0;
   --fav-icon-heart-filled: #f51866;
 }
 
-/* Main Container - Ensure it allows full expansion on mobile */
+
+/* ─────────────────────────────────────────────────────────────
+   2. CONTAINER PRINCIPAL
+   ───────────────────────────────────────────────────────────── */
 .my-announcements-container {
   background-color: var(--fav-bg-page, #ffffff);
   min-height: 100vh;
-  height: auto; /* Remove any fixed height */
-  overflow: visible; /* Ensure content is not clipped */
-  padding-bottom: 40px; /* Increased space at bottom for last card */
+  height: auto;
+  overflow: visible;
+  padding-top: 100px;
+  padding-bottom: 40px;
   width: 100%;
   box-sizing: border-box;
-  padding-top: 100px; /* Clear header */
 }
 
 .dark-mode .my-announcements-container {
   background-color: #121212;
 }
 
-/*
-  Mobile app-like mode for Favorites page.
-  Applied only when .favorites-applike class exists on container (set from JSX on <=1024px).
-*/
+/* Mod app-like — activ pe ≤1024px (clasa pusă din JSX) */
 .my-announcements-container.favorites-applike {
   padding-top: calc(12px + env(safe-area-inset-top));
   padding-bottom: calc(88px + env(safe-area-inset-bottom));
@@ -75,17 +73,15 @@
   background: #000000;
 }
 
+/* Titlul desktop e ascuns în modul app-like */
 .my-announcements-container.favorites-applike .my-announcements-title {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .my-announcements-container,
-  .my-announcements-container * {
-    font-family: 'Poppins', sans-serif !important;
-  }
-}
 
+/* ─────────────────────────────────────────────────────────────
+   3. HEADER MOBIL (vizibil doar pe ≤1024px, gestionat din JSX)
+   ───────────────────────────────────────────────────────────── */
 .favorites-app-header {
   display: flex;
   align-items: center;
@@ -138,6 +134,10 @@
   color: #f51866;
 }
 
+
+/* ─────────────────────────────────────────────────────────────
+   4. GRILĂ MOBILĂ (vizibilă doar pe ≤1024px, gestionată din JSX)
+   ───────────────────────────────────────────────────────────── */
 .favorites-app-list {
   width: min(100%, 960px);
   margin: 0 auto;
@@ -194,7 +194,12 @@
   right: 0;
   bottom: 0;
   height: 64%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 56%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.45) 56%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 
 .favorites-app-heart {
@@ -272,63 +277,25 @@
   overflow: hidden;
 }
 
-.my-announcements-container.favorites-applike .favorites-empty {
-  margin-top: 32px;
-}
 
-@media (max-width: 700px) {
-  .favorites-app-header {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .favorites-app-header-title {
-    font-size: 26px !important;
-  }
-
-  .favorites-app-list {
-    padding-left: 12px;
-    padding-right: 12px;
-    gap: 12px;
-  }
-
-  .favorites-app-card {
-    height: 210px;
-    border-radius: 20px;
-  }
-
-  .favorites-app-heart {
-    top: 12px;
-    right: 12px;
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-  }
-
-  .favorites-app-title {
-    font-size: 18px;
-  }
-}
-
-
-/* 2. LAYOUT PRINCIPAL (DESKTOP FIRST)
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   5. LISTĂ & CARD DESKTOP (vizibile doar pe >1024px)
+   ───────────────────────────────────────────────────────────── */
 .favorite-announcements-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
   max-width: 1800px;
-  margin: 0 auto;
+  margin: 32px auto 0;
   padding: 0 16px;
   gap: 24px;
-  overflow: visible; /* Ensure content is not clipped */
+  overflow: visible;
 }
 
-/* Card Base Style (Desktop: Vertical) */
 .favorite-announcement-card {
   display: flex;
-  flex-direction: column; /* Vertical pe desktop */
+  flex-direction: column;
   position: relative;
   width: var(--fav-card-width);
   max-width: var(--fav-card-width);
@@ -347,31 +314,28 @@
   transform: translateY(-6px);
   box-shadow: var(--fav-shadow-hover);
 }
-/* Dark mode border hover specific */
+
 .dark-mode .favorite-announcement-card:hover {
   border-color: var(--fav-border-hover-color);
 }
 
-/* Light-mode: subtle border on favorite cards */
 body:not(.dark-mode) .favorite-announcement-card {
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-/* Dark-mode: ensure favorite cards use dark surface and white border */
 body.dark-mode .favorite-announcement-card {
   background: #121212 !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-} 
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
 
 
-/* 3. ELEMENTE INTERNE CARD
-   ---------------------------------------------------------- */
-/* Imagine */
+/* ─────────────────────────────────────────────────────────────
+   6. ELEMENTE INTERNE CARD DESKTOP
+   ───────────────────────────────────────────────────────────── */
 .favorite-announcement-image {
   width: 100%;
   display: block;
-  /* Reseturi pentru consistență */
-  margin: 0; 
+  margin: 0;
   flex-shrink: 0;
 }
 
@@ -382,13 +346,12 @@ body.dark-mode .favorite-announcement-card {
   display: block;
   border-top-left-radius: var(--fav-card-radius);
   border-top-right-radius: var(--fav-card-radius);
-} 
+}
 
 .favorite-announcement-img.placeholder {
   background: #ffebf0;
 }
 
-/* Info Container */
 .favorite-announcement-info {
   padding: 16px;
   display: flex;
@@ -404,7 +367,6 @@ body.dark-mode .favorite-announcement-card {
   margin-bottom: 4px;
 }
 
-/* Heart Icon - Poziționare Desktop (Absolută) */ 
 .favorite-heart {
   position: absolute;
   top: 12px;
@@ -420,20 +382,29 @@ body.dark-mode .favorite-announcement-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
   padding: 0;
 }
 
-.favorite-heart:hover { transform: scale(1.05); }
-.favorite-heart.filled { color: var(--fav-icon-heart-filled); background: #ffffff; box-shadow: 0 6px 20px rgba(245,24,102,0.08); }
-.favorite-heart .MuiSvgIcon-root { font-size: 22px; } 
+.favorite-heart:hover {
+  transform: scale(1.05);
+}
 
-/* Typography */
+.favorite-heart.filled {
+  color: var(--fav-icon-heart-filled);
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(245, 24, 102, 0.08);
+}
+
+.favorite-heart .MuiSvgIcon-root {
+  font-size: 22px;
+}
+
 .favorite-announcement-title {
   font-size: 18px;
   font-weight: 700;
-  margin: 6px 0 6px 0;
+  margin: 6px 0;
   color: var(--fav-text-title);
   line-height: 1.2;
 }
@@ -468,30 +439,6 @@ body.dark-mode .favorite-announcement-card {
   margin-top: 12px;
 }
 
-/* Actions placed at bottom of the card */
-.favorite-announcement-actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-.favorite-announcement-actions .MuiButton-root {
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
-/* Actions used in list view */
-.announcement-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-.announcement-actions .MuiButton-root {
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
-/* Page Header Elements */
 .favorite-count {
   text-align: center;
   font-weight: 600;
@@ -500,17 +447,10 @@ body.dark-mode .favorite-announcement-card {
   line-height: 1.3;
 }
 
-/* Give the announcements list some breathing room under the title */
-.favorite-announcements-list {
-  margin-top: 32px;
-}
-
-/* Title - match Notifications page title (light & dark modes) */
 .my-announcements-title {
   font-size: 2.8rem;
   font-weight: bold;
-  color: var(--nt-text-title, #183642); /* fallback to #183642 if var undefined */
-  /* increased bottom margin for clearer separation from announcements list */
+  color: var(--nt-text-title, #183642);
   margin-bottom: 80px;
   text-align: center;
   letter-spacing: -1px;
@@ -518,7 +458,6 @@ body.dark-mode .favorite-announcement-card {
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Count next to title should inherit the same visual style */
 .my-announcements-title-count {
   font-size: inherit;
   font-weight: inherit;
@@ -527,285 +466,37 @@ body.dark-mode .favorite-announcement-card {
   font-family: inherit;
 }
 
-/* Dark mode override to match Notifications accent */
 .dark-mode .my-announcements-title {
   color: #f51866;
 }
 
-@media (min-width: 1025px) {
-  .favorite-count { margin: 32px 0 24px 0; }
-  .my-announcements-title { margin-top: 80px; }
+.favorite-announcement-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.favorite-announcement-actions .MuiButton-root {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.announcement-actions .MuiButton-root {
+  padding: 6px 10px;
+  font-size: 13px;
 }
 
 
-/* 4. MEDIA QUERIES - DESKTOP & TABLET ADJUSTMENTS
-   ---------------------------------------------------------- */
-/* Large Screens */
-@media (min-width: 1200px) {
-  .favorite-announcements-list {
-    gap: 20px;
-    padding: 0 32px;
-    max-width: 1200px;
-  }
-  .favorite-announcement-img { height: 140px; }
-}
-
-/* Tablet Portrait */
-@media (max-width: 768px) and (min-width: 701px) {
-  .favorite-announcements-list {
-    gap: 18px;
-    padding: 0 20px;
-    justify-content: center;
-  }
-  .favorite-announcement-card {
-    width: 300px;
-    max-width: 300px;
-  }
-}
-
-
-/* 5. MOBILE OVERHAUL (max-width: 1024px)
-   Transformare din Vertical în Orizontal - FĂRĂ !IMPORTANT
-   Scriind aceste reguli aici, ele suprascriu natural regulile de mai sus.
-   ---------------------------------------------------------- */
-@media (max-width: 1024px) {
-  
-  /* --- Hide Desktop Elements --- */
-  .my-announcements-title { display: none; }
-
-  /* --- List Layout --- */
-  .favorite-announcements-list {
-    gap: 12px;
-    padding: 0 12px 40px; /* Increased bottom padding */
-    flex-direction: column; /* Listă verticală */
-    max-width: 100%;
-    margin-top: 16px; /* Reduce margin on mobile */
-    margin-bottom: 20px; /* Extra margin for safety */
-  }
-
-  /* --- Card Layout (Switch to Row) --- */
-  .favorite-announcement-card {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-height: 130px;
-    flex-direction: row; /* Orizontal pe mobil */
-    align-items: stretch;
-    padding: 16px;
-    gap: 12px;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(63,63,63,0.12);
-  }
-
-  /* Mobile: white border for light mode */
-  body:not(.dark-mode) .favorite-announcement-card {
-    border: 2px solid #ffffff;
-  }
-
-  body.dark-mode .favorite-announcement-card {
-    border: 2px solid rgba(255, 255, 255, 0.15);
-  }
-
-  .favorite-announcement-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(63,63,63,0.18);
-  }
-
-  /* --- Image --- */
-  .favorite-announcement-image {
-    width: 90px;
-    height: 90px;
-    margin: 0;
-    align-self: center;
-  }
-
-  .favorite-announcement-img {
-    width: 90px;
-    height: 90px;
-    border-radius: 12px;
-  }
-
-  /* --- Info Wrapper --- */
-  .favorite-announcement-info {
-    padding: 0;
-    justify-content: space-between;
-    height: auto;
-    min-height: 90px;
-    margin: 0;
-  }
-
-  /* --- Top Section (Date + Heart) --- */
-  /* Redefinim .favorite-info-top sau folosim primul div */
-  .favorite-announcement-info > div:first-child {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-    margin-bottom: 6px;
-  }
-
-  /* Date Text */
-  .favorite-date {
-    font-size: 10px;
-    margin-right: 8px;
-    flex: 1;
-  }
-
-  /* Heart Icon - Repositioning static */
-  .favorite-heart {
-    position: static; /* Nu mai e absolut */
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    margin: 0;
-    transform: none;
-    /* Resetări specifice mobil */
-    right: auto;
-    bottom: auto;
-  }
-
-  .favorite-heart .MuiSvgIcon-root {
-    font-size: 22px;
-  }
-
-  /* --- Content --- */
-  .favorite-announcement-title {
-    font-size: 14px;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 6px;
-    /* Truncate text */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    width: 100%;
-  }
-
-  /* Meta wrapper (Category + Location) */
-  .favorite-meta-info {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-bottom: 8px;
-  }
-
-  .favorite-announcement-category,
-  .favorite-announcement-location {
-    font-size: 11px;
-    margin-bottom: 0;
-    width: 100%;
-    display: block;
-  }
-
-  /* --- Price --- */
-  .favorite-price {
-    font-size: 15px;
-    color: #2D4361; /* Accent light mode mobile */
-    margin-top: auto;
-    margin-bottom: 0;
-    align-self: flex-end;
-    width: 100%;
-  }
-  
-  /* Dark mode override for mobile price color logic from original CSS */
-  .dark-mode .favorite-price {
-     color: #f51866;
-  }
-
-  /* --- Mobile Header & Utility --- */
-  /* Need specificity or !important here only if overriding external MUI/Theme styles */
-  .mobile-header {
-    display: flex !important;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    margin-bottom: 8px;
-    padding: 2px 8px 0 8px;
-    color: var(--fav-mobile-header-text);
-  }
-
-  .my-announcements-container .mobile-back-btn {
-    width: 40px !important;
-    height: 40px !important;
-    padding: 8px !important;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--fav-mobile-btn-bg);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-top: -2rem !important;
-    color: #333333;
-  }
-
-  .dark-mode .my-announcements-container .mobile-back-btn {
-    color: #ffffff;
-  }
-  
-  .my-announcements-container .mobile-header-title {
-    font-size: 24px !important;
-    font-weight: 600;
-    color: var(--fav-mobile-header-text);
-    margin: -2rem 0 0 4px !important;
-    line-height: 1.334;
-  }
-}
-
-
-/* 6. VERY SMALL MOBILE (max-width: 480px)
-   Fine-tuning dimensions
-   ---------------------------------------------------------- */
-@media (max-width: 480px) {
-  .favorite-announcements-list {
-    padding: 0 8px 40px; /* Increased bottom padding */
-    gap: 10px;
-    margin-top: 12px; /* Further reduce margin on small screens */
-    margin-bottom: 20px; /* Extra margin for safety */
-  }
-  
-  .favorite-announcement-card {
-    padding: 8px;
-    height: auto;
-    min-height: 110px;
-  }
-  
-  .favorite-announcement-image,
-  .favorite-announcement-img {
-    width: 75px;
-    height: 75px;
-  }
-  .favorite-announcement-image { margin-right: 8px; }
-  .favorite-announcement-img { border-radius: 8px; }
-  
-  .favorite-announcement-info {
-    min-height: 75px;
-  }
-  
-  .favorite-date { font-size: 10px; }
-  .favorite-heart { width: 28px; height: 28px; }
-  
-  .favorite-announcement-title {
-    font-size: 13px;
-    margin-bottom: 3px;
-  }
-  
-  .favorite-announcement-category,
-  .favorite-announcement-location {
-    font-size: 10px;
-    margin-bottom: 2px;
-  }
-  
-  .favorite-price { font-size: 14px; }
-}
-
-
-/* 7. EMPTY STATE
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   7. STAREA GOALĂ
+   ───────────────────────────────────────────────────────────── */
 .favorites-empty {
   display: flex;
   flex-direction: column;
@@ -815,8 +506,12 @@ body.dark-mode .favorite-announcement-card {
   padding: 40px 16px;
   color: #6b7280;
   text-align: center;
-  margin-top: 2rem; /* Reduced from 5rem */
-  margin-bottom: 2rem; /* Changed from -9rem to positive */
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.my-announcements-container.favorites-applike .favorites-empty {
+  margin-top: 32px;
 }
 
 .favorites-empty-icon img {
@@ -833,20 +528,10 @@ body.dark-mode .favorite-announcement-card {
   color: var(--fav-text-title);
 }
 
-@media (max-width: 1024px) {
-  .favorites-empty { margin-top: 12rem; }
-  .favorites-empty-icon img { width: 350px; }
-  .favorites-empty-text { font-size: 1rem; padding: 0 8px; }
-}
 
-@media (max-width: 500px) {
-  .favorites-empty { margin-top: 8rem; }
-  .favorites-empty-icon img { width: 270px; }
-}
-
-
-/* 8. PAGINATION
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   8. PAGINARE (apare doar pe >1024px)
+   ───────────────────────────────────────────────────────────── */
 .pagination-container {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -933,7 +618,6 @@ body.dark-mode .favorite-announcement-card {
   padding: 0 4px;
 }
 
-/* Dark mode pagination */
 .dark-mode .pagination-btn,
 .dark-mode .pagination-number {
   border: 1px solid rgba(245, 24, 102, 0.3);
@@ -945,9 +629,255 @@ body.dark-mode .favorite-announcement-card {
   border-color: rgba(245, 24, 102, 0.5);
 }
 
+
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
+
+/* ── ECRANE MARI (≥1200px) ──────────────────────────────────── */
+@media (min-width: 1200px) {
+  .favorite-announcements-list {
+    gap: 20px;
+    padding: 0 32px;
+    max-width: 1200px;
+  }
+
+  .favorite-announcement-img {
+    height: 140px;
+  }
+}
+
+/* ── DESKTOP (≥1025px) ──────────────────────────────────────── */
+@media (min-width: 1025px) {
+  .favorite-count {
+    margin: 32px 0 24px 0;
+  }
+
+  .my-announcements-title {
+    margin-top: 80px;
+  }
+}
+
+/* ── TABLETĂ LANDSCAPE + TELEFON (≤1024px) ──────────────────── */
+/* La această lățime JSX trece la modul app-like (grilă cu imagini) */
+@media (max-width: 1024px) {
+
+  /* Font global pentru ecrane mici */
+  .my-announcements-container,
+  .my-announcements-container * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+
+  /* Titlul desktop e ascuns (headerul mobil îl înlocuiește) */
+  .my-announcements-title {
+    display: none;
+  }
+
+  /* Lista desktop trece la coloană verticală */
+  .favorite-announcements-list {
+    flex-direction: column;
+    max-width: 100%;
+    margin-top: 16px;
+    margin-bottom: 20px;
+    padding: 0 12px 40px;
+    gap: 12px;
+  }
+
+  /* Card desktop — layout orizontal (imagine stânga, text dreapta) */
+  .favorite-announcement-card {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 130px;
+    flex-direction: row;
+    align-items: stretch;
+    padding: 16px;
+    gap: 12px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(63, 63, 63, 0.12);
+  }
+
+  body:not(.dark-mode) .favorite-announcement-card {
+    border: 2px solid #ffffff;
+  }
+
+  body.dark-mode .favorite-announcement-card {
+    border: 2px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .favorite-announcement-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(63, 63, 63, 0.18);
+  }
+
+  /* Imaginea card desktop — pătrat mic aliniat la stânga */
+  .favorite-announcement-image {
+    width: 90px;
+    height: 90px;
+    margin: 0;
+    align-self: center;
+  }
+
+  .favorite-announcement-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+  }
+
+  /* Zona de text a cardului */
+  .favorite-announcement-info {
+    padding: 0;
+    justify-content: space-between;
+    height: auto;
+    min-height: 90px;
+    margin: 0;
+  }
+
+  .favorite-announcement-info > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .favorite-date {
+    font-size: 10px;
+    margin-right: 8px;
+    flex: 1;
+  }
+
+  /* Inimă — trece din poziție absolută la statică */
+  .favorite-heart {
+    position: static;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0;
+    transform: none;
+    right: auto;
+    bottom: auto;
+  }
+
+  .favorite-heart .MuiSvgIcon-root {
+    font-size: 22px;
+  }
+
+  .favorite-announcement-title {
+    font-size: 14px;
+    line-height: 1.3;
+    margin-top: 0;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .favorite-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 8px;
+  }
+
+  .favorite-announcement-category,
+  .favorite-announcement-location {
+    font-size: 11px;
+    margin-bottom: 0;
+    width: 100%;
+    display: block;
+  }
+
+  .favorite-price {
+    font-size: 15px;
+    color: #2D4361;
+    margin-top: auto;
+    margin-bottom: 0;
+    align-self: flex-end;
+    width: 100%;
+  }
+
+  .dark-mode .favorite-price {
+    color: #f51866;
+  }
+
+  /* Starea goală */
+  .favorites-empty {
+    margin-top: 12rem;
+  }
+
+  .favorites-empty-icon img {
+    width: 350px;
+  }
+
+  .favorites-empty-text {
+    font-size: 1rem;
+    padding: 0 8px;
+  }
+
+  /* Header & butoane utilitare vechi (pot fi folosite din alte pagini) */
+  .mobile-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 2px 8px 0 8px;
+    color: var(--fav-mobile-header-text);
+  }
+
+  .my-announcements-container .mobile-back-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--fav-mobile-btn-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: -2rem !important;
+    color: #333333;
+  }
+
+  .dark-mode .my-announcements-container .mobile-back-btn {
+    color: #ffffff;
+  }
+
+  .my-announcements-container .mobile-header-title {
+    font-size: 24px !important;
+    font-weight: 600;
+    color: var(--fav-mobile-header-text);
+    margin: -2rem 0 0 4px !important;
+    line-height: 1.334;
+  }
+}
+
+/* ── TABLETĂ PORTRAIT — interval exclusiv (701px – 768px) ───── */
+/* La această lățime JSX e tot în modul app-like; regulile de mai jos
+   ajustează cardul desktop pentru cazul în care alte pagini îl afișează */
+@media (max-width: 768px) and (min-width: 701px) {
+  .favorite-announcements-list {
+    gap: 18px;
+    padding: 0 20px;
+    justify-content: center;
+  }
+
+  .favorite-announcement-card {
+    width: 300px;
+    max-width: 300px;
+  }
+}
+
+/* ── TABLETĂ PORTRAIT + TELEFON (≤768px) ────────────────────── */
 @media (max-width: 768px) {
   .pagination-container {
-    grid-template-columns: 1fr auto 1fr;
     gap: 8px;
     margin: 20px auto 6px;
     padding: 8px 12px;
@@ -966,11 +896,58 @@ body.dark-mode .favorite-announcement-card {
   }
 }
 
+/* ── TELEFON MARE (≤700px) ───────────────────────────────────── */
+/* Ajustări fine ale grilei app-like cu o singură coloană */
+@media (max-width: 700px) {
+  .favorites-app-header {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .favorites-app-header-title {
+    font-size: 26px !important;
+  }
+
+  .favorites-app-list {
+    padding-left: 12px;
+    padding-right: 12px;
+    gap: 12px;
+  }
+
+  .favorites-app-card {
+    height: 210px;
+    border-radius: 20px;
+  }
+
+  .favorites-app-heart {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+
+  .favorites-app-title {
+    font-size: 18px;
+  }
+}
+
+/* ── TELEFON MIC (≤500px) ────────────────────────────────────── */
 @media (max-width: 500px) {
+  /* Starea goală */
+  .favorites-empty {
+    margin-top: 8rem;
+  }
+
+  .favorites-empty-icon img {
+    width: 270px;
+  }
+
+  /* Paginare */
   .pagination-container {
     grid-template-columns: auto 1fr auto;
     gap: 6px;
-    margin: 12px auto 6px; /* reduced vertical spacing on small screens */
+    margin: 12px auto 6px;
     padding: 6px 8px;
   }
 
@@ -992,6 +969,61 @@ body.dark-mode .favorite-announcement-card {
   }
 }
 
-.dark-mode .my-announcements-container {
-  background-color: #121212;
+/* ── TELEFON FOARTE MIC (≤480px) ─────────────────────────────── */
+/* Dimensiuni reduse pentru cardul desktop în modul orizontal */
+@media (max-width: 480px) {
+  .favorite-announcements-list {
+    padding: 0 8px 40px;
+    gap: 10px;
+    margin-top: 12px;
+    margin-bottom: 20px;
+  }
+
+  .favorite-announcement-card {
+    padding: 8px;
+    height: auto;
+    min-height: 110px;
+  }
+
+  .favorite-announcement-image,
+  .favorite-announcement-img {
+    width: 75px;
+    height: 75px;
+  }
+
+  .favorite-announcement-image {
+    margin-right: 8px;
+  }
+
+  .favorite-announcement-img {
+    border-radius: 8px;
+  }
+
+  .favorite-announcement-info {
+    min-height: 75px;
+  }
+
+  .favorite-date {
+    font-size: 10px;
+  }
+
+  .favorite-heart {
+    width: 28px;
+    height: 28px;
+  }
+
+  .favorite-announcement-title {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .favorite-announcement-category,
+  .favorite-announcement-location {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .favorite-price {
+    font-size: 14px;
+  }
 }

@@ -293,3 +293,88 @@
   width: 100%;
   padding: 12px 20px;
 }
+
+
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
+
+/* ── ≤600px: TABLETĂ MIC + TELEFON ─────────────────────────── */
+@media (max-width: 600px) {
+
+  /* Dialog principal — padding mai mic, colțuri mai mici */
+  .collab-dialog {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .collab-dialog-header {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .collab-dialog-header h3 {
+    font-size: 17px;
+  }
+
+  .collab-dialog-message {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  /* Butoanele de confirmare — stivuite vertical */
+  .collab-dialog-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .collab-dialog-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Dialog status — padding redus */
+  .collab-status-dialog {
+    padding: 20px 16px 16px;
+  }
+
+  .collab-status-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 14px;
+  }
+
+  .collab-status-message {
+    font-size: 14px;
+  }
+}
+
+/* ── ≤400px: TELEFON MIC ────────────────────────────────────── */
+@media (max-width: 400px) {
+
+  /* Butoanele accept/decline din bulă — stivuite vertical */
+  .collaboration-buttons {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .collab-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* Dialog — padding minim */
+  .collab-dialog {
+    padding: 16px 12px;
+  }
+
+  .collab-dialog-header h3 {
+    font-size: 15px;
+  }
+
+  .collab-dialog-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}

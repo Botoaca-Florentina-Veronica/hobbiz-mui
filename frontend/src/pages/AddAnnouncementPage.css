@@ -1,97 +1,99 @@
-﻿/* ==========================================================================
-   1. VARIABLES & THEME CONFIGURATION
+/* ==========================================================================
+   ADD ANNOUNCEMENT PAGE — stiluri de bază (desktop-first)
+   Toate regulile responsive sunt grupate la final în secțiunea RESPONSIVE.
    ========================================================================== */
+
+
+/* ─────────────────────────────────────────────────────────────
+   1. VARIABILE & CONFIGURARE TEMĂ
+   ───────────────────────────────────────────────────────────── */
 :root {
-  /* --- Palette Definition --- */
+  /* Paletă */
   --aa-primary: #2D4361;
   --aa-accent: #fe6585;
   --aa-success: #388e3c;
   --aa-danger: #d32f2f;
   --aa-muted: #5b7a88;
 
-  /* --- Dynamic Theme Variables (Light Mode Defaults) --- */
+  /* Variabile dinamice — Light Mode */
   --bg-app: #ffffff;
   --bg-surface: #ffffff;
   --bg-input: #f3f5f6;
   --bg-input-focus: #f8fafb;
-  
+
   --text-main: #183642;
   --text-secondary: #5b7a88;
-  --text-title-special: #183642; /* Titlul principal */
+  --text-title-special: #183642;
   --text-placeholder: #5b7a88;
-  
+
   --border-color: transparent;
   --border-focus: #2D4361;
-  
-  --shadow-card: 0 2px 16px rgba(0,0,0,0.07);
-  --shadow-hover: 0 4px 16px rgba(24,54,66,0.10);
 
-  /* --- Feedback Colors --- */
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.07);
+  --shadow-hover: 0 4px 16px rgba(24, 54, 66, 0.10);
+
+  /* Feedback */
   --bg-error: #fff0f0;
   --border-error: #ffcdd2;
   --text-error: #d32f2f;
-  
+
   --bg-success: #e8f5e9;
   --border-success: #a5d6a7;
   --text-success: #388e3c;
 
-  /* --- Specific Elements --- */
+  /* Elemente specifice */
   --upload-bg-main: #fff8e6;
   --upload-underline: #ffd600;
-  
-  /* MUI Popovers defaults */
+
+  /* MUI Popovers */
   --mui-paper-bg: #fff;
   --mui-paper-color: inherit;
   --mui-border: #e5e7eb;
 }
 
-/* --- Dark Mode Overrides --- */
+/* Dark Mode */
 .dark-mode {
   --bg-app: #121212;
-  --bg-surface: #121212; /* Surface a0 */
+  --bg-surface: #121212;
   --bg-input: #2c2c2c;
-  --bg-input-focus: #575757; /* Surface a30 */
-  
-  --text-main: #ffffff;
-  --text-secondary: #8b8b8b; /* Surface a50 */
-  --text-title-special: #f51866; /* Primary a0 */
-  --text-placeholder: #717171; /* Surface a40 */
-  
-  --border-color: #3f3f3f; /* Surface a20 */
-  --border-focus: #fe6585; /* Primary a20 */
-  
-  --shadow-card: 0 2px 16px rgba(0,0,0,0.3);
-  --shadow-hover: 0 4px 16px rgba(0,0,0,0.5);
+  --bg-input-focus: #575757;
 
-  /* Feedback Colors Dark */
+  --text-main: #ffffff;
+  --text-secondary: #8b8b8b;
+  --text-title-special: #f51866;
+  --text-placeholder: #717171;
+
+  --border-color: #3f3f3f;
+  --border-focus: #fe6585;
+
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.5);
+
   --bg-error: #3f3f3f;
   --border-error: #f51866;
   --text-error: #ff7e95;
-  
+
   --bg-success: #282828;
   --border-success: #fe6585;
   --text-success: #fe6585;
 
-  /* Specific Elements Dark */
   --upload-bg-main: #2c2c2c;
   --upload-underline: #ffabb7;
 
-  /* MUI Popovers Dark */
   --mui-paper-bg: #121212;
   --mui-paper-color: #ffffff;
   --mui-border: #575757;
 }
 
-/* ==========================================================================
-   2. BASE LAYOUT & CONTAINERS
-   ========================================================================== */
 
+/* ─────────────────────────────────────────────────────────────
+   2. LAYOUT DE BAZĂ & CONTAINERE
+   ───────────────────────────────────────────────────────────── */
 .add-announcement-container {
   background: var(--bg-app);
   min-height: 120vh;
   padding: 40px 0;
   color: var(--text-main);
-  /* Desktop margin default */
   margin-top: 0;
   padding-top: 4rem;
   font-family: 'Poppins', sans-serif;
@@ -103,14 +105,7 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Mobile & Tablet Overrides (No !important needed) */
-@media (max-width: 1024px) {
-  .add-announcement-container {
-    margin-top: 0;
-  }
-}
-
-/* Common Card Style for all sections */
+/* Stil comun pentru toate secțiunile-card */
 .add-announcement-form,
 .add-announcement-actions-section,
 .add-announcement-description-section,
@@ -124,11 +119,10 @@
   padding: 36px 48px;
   box-shadow: var(--shadow-card);
   display: flex;
-  /* Border is transparent in light mode, visible in dark mode via variable */
   border: 1px solid var(--border-color);
 }
 
-/* Light-mode: ensure containers have a thin black outline (match other pages) */
+/* Light mode: bordură subțire neagră */
 body:not(.dark-mode) .add-announcement-form,
 body:not(.dark-mode) .add-announcement-actions-section,
 body:not(.dark-mode) .add-announcement-description-section,
@@ -162,10 +156,10 @@ body:not(.dark-mode) .add-announcement-images-section {
   gap: 12px;
 }
 
-/* ==========================================================================
-   3. TYPOGRAPHY & INPUTS
-   ========================================================================== */
 
+/* ─────────────────────────────────────────────────────────────
+   3. TIPOGRAFIE & INPUTURI
+   ───────────────────────────────────────────────────────────── */
 .add-announcement-title {
   text-align: center;
   color: var(--text-title-special);
@@ -190,24 +184,19 @@ body:not(.dark-mode) .add-announcement-images-section {
   margin-bottom: 6px;
 }
 
-/* --- Shared Input Styles --- */
+/* Inputuri partajate */
 .add-announcement-title-input,
 .add-announcement-category-select,
 .add-announcement-description-input {
   width: 100%;
-  border-radius: 8px; /* Unified radius slightly if acceptable, else keep separate */
-  border: none;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
   background: var(--bg-input);
   color: var(--text-main);
   resize: none;
-  /* Border logic for Dark Mode is handled by border: 1px solid var(--border-color) override below if needed, 
-     but original code had 'border: none' for light and 'border: 1px solid' for dark.
-     We simulate this via transparent border in light mode variables or override. */
-  border: 1px solid var(--border-color); 
   transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Light-mode: ensure main inputs have a thin black outline */
 body:not(.dark-mode) .add-announcement-title-input,
 body:not(.dark-mode) .add-announcement-category-select,
 body:not(.dark-mode) .add-announcement-description-input {
@@ -220,7 +209,6 @@ body:not(.dark-mode) .add-announcement-description-input:focus {
   border-color: transparent !important;
 }
 
-/* Specific Adjustments per Input */
 .add-announcement-title-input {
   height: 30px;
   font-size: 1.2rem;
@@ -245,7 +233,6 @@ body:not(.dark-mode) .add-announcement-description-input:focus {
   box-sizing: border-box;
 }
 
-/* Shared Focus State */
 .add-announcement-title-input:focus,
 .add-announcement-category-select:focus,
 .add-announcement-description-input:focus {
@@ -253,27 +240,39 @@ body:not(.dark-mode) .add-announcement-description-input:focus {
   background: var(--bg-input-focus);
 }
 
-/* Placeholders & Caret */
 ::placeholder {
   color: var(--text-placeholder);
 }
+
 input, textarea, select {
-  caret-color: var(--text-title-special); /* Usually matches primary/title color in dark mode */
+  caret-color: var(--text-title-special);
 }
 
-/* --- Helpers --- */
+/* Helpere */
 .add-announcement-charcount,
 .add-announcement-helper,
 .add-announcement-images-helper {
   color: var(--text-secondary);
   font-size: 1rem;
 }
-.add-announcement-charcount { text-align: right; margin-bottom: 2px; }
-.add-announcement-char-helper-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-.add-announcement-images-helper { margin-bottom: 18px; }
 
+.add-announcement-charcount {
+  text-align: right;
+  margin-bottom: 2px;
+}
 
-/* --- Location & Contact Inputs Wrappers --- */
+.add-announcement-char-helper-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.add-announcement-images-helper {
+  margin-bottom: 18px;
+}
+
+/* Inputuri locație & contact */
 .add-announcement-location-input-wrapper,
 .add-announcement-contact-input-wrapper {
   background: var(--bg-input);
@@ -289,7 +288,6 @@ input, textarea, select {
   transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 }
 
-/* Light-mode: ensure input wrappers have a thin black outline */
 body:not(.dark-mode) .add-announcement-location-input-wrapper,
 body:not(.dark-mode) .add-announcement-contact-input-wrapper {
   border-color: #121212 !important;
@@ -310,7 +308,6 @@ body:not(.dark-mode) .add-announcement-contact-input-wrapper:focus-within {
   width: 100%;
 }
 
-/* Specific Contact Inputs (Email/Tel) */
 .add-announcement-contact-input[type="email"],
 .add-announcement-contact-input[type="tel"] {
   font-size: 1.3rem;
@@ -318,7 +315,7 @@ body:not(.dark-mode) .add-announcement-contact-input-wrapper:focus-within {
   background: var(--bg-input);
   border-radius: 10px;
   padding: 18px 32px;
-  color: var(--text-main); /* Changed from generic specific color to var for dark mode compat */
+  color: var(--text-main);
   width: 60%;
   min-width: 300px;
   max-width: 600px;
@@ -326,7 +323,7 @@ body:not(.dark-mode) .add-announcement-contact-input-wrapper:focus-within {
   outline: none;
   transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 }
-/* Light-mode: ensure specific contact inputs have a thin black outline */
+
 body:not(.dark-mode) .add-announcement-contact-input[type="email"],
 body:not(.dark-mode) .add-announcement-contact-input[type="tel"] {
   border-color: #121212 !important;
@@ -336,7 +333,7 @@ body:not(.dark-mode) .add-announcement-contact-input[type="email"]:focus,
 body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   border-color: transparent !important;
 }
-/* Revert text color for Light Mode specific if needed to match strictly #5b7a88 */
+
 :root:not(.dark-mode) .add-announcement-contact-input[type="email"],
 :root:not(.dark-mode) .add-announcement-contact-input[type="tel"] {
   color: #5b7a88;
@@ -346,20 +343,22 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 .add-announcement-contact-input[type="tel"]:focus {
   background: var(--bg-input-focus);
   outline: 2px solid var(--border-focus);
-  border-color: var(--border-focus); /* For dark mode consistency */
+  border-color: var(--border-focus);
 }
 
-/* Icons Colors */
 .location-icon,
 .add-announcement-location-check {
-  color: var(--border-focus); /* Uses accent color in dark mode */
+  color: var(--border-focus);
 }
-/* Force original green for light mode check if strictly required, otherwise var is fine */
-:root:not(.dark-mode) .add-announcement-location-check { color: inherit; } 
 
-/* ==========================================================================
-   4. CATEGORIES POPOVER (GRID & CARDS)
-   ========================================================================== */
+:root:not(.dark-mode) .add-announcement-location-check {
+  color: inherit;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   4. POPOVER CATEGORII (GRILĂ & CARDURI)
+   ───────────────────────────────────────────────────────────── */
 .categories-grid-popover {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -376,111 +375,96 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
-  background: #fff; /* Default white in light mode */
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
   cursor: pointer;
   padding: 1.1rem;
-  width: 170px; /* Fixed width as per original */
+  width: 170px;
   height: auto;
   min-height: 140px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s, box-shadow 0.2s;
   justify-content: flex-start;
 }
 
-/* Dark Mode Card Overrides */
 .dark-mode .category-card-popover {
   background: transparent !important;
-  border-color: rgba(255,255,255,0.18) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
   color: #ffffff;
-  box-shadow: 0 6px 20px rgba(255,255,255,0.02) !important;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.02) !important;
 }
 
-/* Responsive Grid Logic (Preserved Exact Breakpoints) */
-@media (min-width: 500px) and (max-width: 699px) {
-  .categories-grid-popover { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  .category-card-popover { width: 100%; min-height: 160px; padding: 0.8rem; }
-}
-
-@media (min-width: 700px) and (max-width: 899px) {
-  .categories-grid-popover { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-  .category-card-popover { width: 100%; min-height: 170px; }
-}
-
-@media (min-width: 900px) {
-  .categories-grid-popover { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-  .category-card-popover { width: 100%; min-height: 170px; }
-}
-
-@media (min-width: 1400px) {
-  .categories-grid-popover { grid-template-columns: repeat(5, 1fr); }
-}
-
-/* Hover Effects */
 .category-card-popover:hover {
   transform: scale(1.04);
   box-shadow: var(--shadow-hover);
 }
+
 .dark-mode .category-card-popover:hover {
-  background: #575757; /* Surface a30 */
+  background: #575757;
   border-color: var(--border-focus);
 }
 
-@media (max-width: 1024px) {
-  .category-card-popover:hover {
-    transform: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-}
-
-/* Inner Card Elements */
+/* Elemente interioare card */
 .image-container-popover {
-  width: 54px; height: 54px; margin-bottom: 10px;
-  display: flex; align-items: center; justify-content: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .category-image-popover {
-  width: 65px; height: 65px; object-fit: contain; border-radius: 8px;
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  border-radius: 8px;
 }
+
 .category-title-popover {
-  font-size: 1rem; color: var(--text-main); font-weight: 500;
-  text-align: center; margin-top: 0.5rem; display: block;
+  font-size: 1rem;
+  color: var(--text-main);
+  font-weight: 500;
+  text-align: center;
+  margin-top: 0.5rem;
+  display: block;
 }
-.category-description-popover, .category-hint-popover {
-  text-align: center; display: block;
-}
+
+.category-description-popover,
 .category-hint-popover {
-  color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.1rem; line-height: 1.2;
+  text-align: center;
+  display: block;
 }
+
+.category-hint-popover {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+  line-height: 1.2;
+}
+
 .category-description-popover {
-  color: var(--text-main); font-size: 0.95rem; line-height: 1.25; margin-top: 0.25rem;
-  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
-  -webkit-box-orient: vertical; word-break: break-word; min-height: calc(1.25em * 2);
-  display: none; /* Mobile default */
+  color: var(--text-main);
+  font-size: 0.95rem;
+  line-height: 1.25;
+  margin-top: 0.25rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  min-height: calc(1.25em * 2);
+  display: none;
 }
 
-/* Display Toggles for Popover Content */
-@media (min-width: 500px) {
-  .category-title-popover { display: none; } /* Original logic seemed to hide title here? Adjusted below based on orig code: */
-  /* Wait, original said .category-title-popover display: none !important at min-width 500. */
-  /* Re-reading carefully: Original hides .category-title-popover on >500px but shows description/hint. */
-  
-  .category-title-popover { display: none !important; }
-  
-  .category-description-popover,
-  .category-hint-popover { display: block !important; }
-  
-  /* Mobile header elements hide */
-  .categories-popover-header-mobile,
-  .categories-popover-close,
-  .categories-popover-title { display: none !important; }
-}
-
-/* Selected State */
 .dark-mode .category-card-popover.selected {
-  background: #f51866; border-color: #f51866; color: #ffffff;
+  background: #f51866;
+  border-color: #f51866;
+  color: #ffffff;
 }
-/* Ensure text colors force to white in dark mode inside cards */
+
 .dark-mode .category-card-popover .category-title-popover,
 .dark-mode .category-card-popover .category-description-popover,
 .dark-mode .category-card-popover .category-hint-popover {
@@ -488,53 +472,74 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 }
 
 
-/* ==========================================================================
-   5. ACTION BUTTONS & UPLOAD
-   ========================================================================== */
-
+/* ─────────────────────────────────────────────────────────────
+   5. BUTOANE ACȚIUNI & UPLOAD
+   ───────────────────────────────────────────────────────────── */
 .add-announcement-actions-section {
-  flex-direction: row; align-items: center; justify-content: center; gap: 32px;
-}
-.add-announcement-actions-left { display: none; }
-.add-announcement-actions-right {
-  display: flex; flex-direction: row; align-items: center; gap: 24px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
 }
 
-/* Buttons */
+.add-announcement-actions-left {
+  display: none;
+}
+
+.add-announcement-actions-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+}
+
 .add-announcement-preview,
 .add-announcement-submit {
-  font-size: 1.15rem; font-weight: 700; border-radius: 10px; padding: 12px 32px;
-  cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
-/* Preview Button */
+/* Buton Preview */
 .add-announcement-preview {
   background: #f9faf8;
   border: 2px solid #2D4361;
   color: #2D4361;
   margin-right: 12px;
 }
+
 .dark-mode .add-announcement-preview {
-  background: #282828; border-color: #f51866; color: #ffffff;
+  background: #282828;
+  border-color: #f51866;
+  color: #ffffff;
 }
 
 .add-announcement-preview:hover {
-  background: #2D4361; color: #f9faf8; border: 2px solid #2D4361;
-}
-.dark-mode .add-announcement-preview:hover {
-  background: #f51866; color: #ffffff; border-color: #f51866;
+  background: #2D4361;
+  color: #f9faf8;
+  border: 2px solid #2D4361;
 }
 
-/* Preview Dialog - ensure dark background when dark-mode is active */
+.dark-mode .add-announcement-preview:hover {
+  background: #f51866;
+  color: #ffffff;
+  border-color: #f51866;
+}
+
+/* Dialog Preview */
 .add-announcement-preview-paper {
   border-radius: 12px;
   font-family: 'Poppins', sans-serif !important;
-} 
+}
 
 .dark-mode .add-announcement-preview-paper {
   background-color: #121212 !important;
   color: #ffffff !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
   border: 1px solid #3f3f3f !important;
 }
 
@@ -546,144 +551,202 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Submit Button */
+/* Buton Submit */
 .add-announcement-submit {
-  background: #2D4361; color: #f9faf8; border: 2px solid #2D4361;
+  background: #2D4361;
+  color: #f9faf8;
+  border: 2px solid #2D4361;
 }
+
 .dark-mode .add-announcement-submit {
-  background: #f51866; color: #ffffff; border: 2px solid #f51866;
+  background: #f51866;
+  color: #ffffff;
+  border: 2px solid #f51866;
 }
 
 .add-announcement-submit:hover {
-  background: #f9faf8; color: #2D4361; border: 2px solid #2D4361;
-}
-.dark-mode .add-announcement-submit:hover {
-  background: #282828; color: #fe6585; border-color: #fe6585;
+  background: #f9faf8;
+  color: #2D4361;
+  border: 2px solid #2D4361;
 }
 
-/* Upload */
-.add-announcement-images-grid { display: flex; gap: 24px; flex-wrap: wrap; }
+.dark-mode .add-announcement-submit:hover {
+  background: #282828;
+  color: #fe6585;
+  border-color: #fe6585;
+}
+
+/* Upload imagini */
+.add-announcement-images-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 
 .add-announcement-image-upload {
-  width: 200px; height: 160px;
+  width: 200px;
+  height: 160px;
   background: var(--bg-input);
   color: var(--text-main);
-  border: none; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; position: relative;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
   transition: box-shadow 0.2s, background 0.2s;
-  font-size: 1.2rem; outline: none;
+  font-size: 1.2rem;
+  outline: none;
 }
+
 .add-announcement-image-upload:hover {
   background: var(--bg-input-focus);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.35); /* Dark mode shadow logic included via var if desired, but hardcoded in orig */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 .add-announcement-image-upload-main {
   background: var(--upload-bg-main);
   border: 2px solid var(--upload-bg-main);
-  flex-direction: column; align-items: flex-start; justify-content: flex-end;
-  padding: 24px 18px 18px 24px; font-weight: 600;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 24px 18px 18px 24px;
+  font-weight: 600;
 }
-.dark-mode .add-announcement-image-upload-main { border-color: var(--border-color); }
+
+.dark-mode .add-announcement-image-upload-main {
+  border-color: var(--border-color);
+}
 
 .add-announcement-image-upload-text {
-  font-size: 1.1rem; color: var(--text-main); font-weight: 600; margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: var(--text-main);
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
 .add-announcement-image-upload-underline {
-  display: block; width: 60px; height: 3px;
+  display: block;
+  width: 60px;
+  height: 3px;
   background: var(--upload-underline);
-  border-radius: 2px; margin-top: 4px;
+  border-radius: 2px;
+  margin-top: 4px;
 }
-.dark-mode .add-announcement-image-upload-icon svg { fill: #fe6585; color: #fe6585; }
+
+.dark-mode .add-announcement-image-upload-icon svg {
+  fill: #fe6585;
+  color: #fe6585;
+}
 
 
-/* ==========================================================================
-   6. FEEDBACK MESSAGES
-   ========================================================================== */
+/* ─────────────────────────────────────────────────────────────
+   6. MESAJE DE FEEDBACK
+   ───────────────────────────────────────────────────────────── */
 .add-announcement-message {
-  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
 }
 
 .add-announcement-error,
 .add-announcement-success {
-  border-radius: 10px; padding: 12px 24px; font-weight: 600; font-size: 1.1rem;
-  display: flex; align-items: center; gap: 10px;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .add-announcement-error {
   color: var(--text-error);
   background: var(--bg-error);
   border: 1px solid var(--border-error);
-  box-shadow: 0 2px 8px rgba(211,47,47,0.08);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.08);
 }
 
 .add-announcement-success {
   color: var(--text-success);
   background: var(--bg-success);
   border: 1px solid var(--border-success);
-  box-shadow: 0 2px 8px rgba(56,142,60,0.08);
+  box-shadow: 0 2px 8px rgba(56, 142, 60, 0.08);
 }
 
 .dark-mode .add-announcement-error-icon svg { fill: #ff7e95; }
 .dark-mode .add-announcement-success-icon svg { fill: #fe6585; }
 
-/* ==========================================================================
-   7. MUI OVERRIDES & UTILITIES (KEEP !IMPORTANT)
-   ========================================================================== */
-/* These styles must use !important to override Material UI dynamic styles */
 
+/* ─────────────────────────────────────────────────────────────
+   7. MUI OVERRIDES & UTILITARE (cu !important — necesar)
+   ───────────────────────────────────────────────────────────── */
 .dark-mode .MuiPopover-paper,
 .dark-mode .MuiPaper-root.MuiPopover-paper,
-.dark-mode #category-popover > .MuiPaper-root,
-.dark-mode .MuiPopover-paper,
-.dark-mode .MuiPaper-root.MuiPopover-paper {
+.dark-mode #category-popover > .MuiPaper-root {
   background: #121212 !important;
   border: 1px solid #575757 !important;
   color: #ffffff !important;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
 }
 
-/* Remove only the outer border for the categories popover in dark mode (user requested) */
+/* Elimină bordura exterioară a popover-ului de categorii în dark mode */
 .dark-mode #category-popover > .MuiPaper-root {
   border: none !important;
 }
 
-
-/* Location Popover Internals */
+/* Popover locație — internale */
 .dark-mode #location-popover .MuiBox-root,
 .dark-mode #location-popover .MuiTypography-root,
 .dark-mode #location-popover .MuiListItemButton-root {
   background: transparent !important;
   color: #ffffff !important;
 }
-.dark-mode #location-popover .MuiDivider-root { border-color: var(--mui-border) !important; }
-.dark-mode #location-popover .MuiListItemButton-root:hover { background: rgba(254, 101, 133, 0.12) !important; }
-.dark-mode #location-popover .MuiInputBase-input { color: #ffffff !important; }
-.dark-mode #location-popover .MuiInputBase-input::placeholder { color: #8b8b8b !important; }
+
+.dark-mode #location-popover .MuiDivider-root {
+  border-color: var(--mui-border) !important;
+}
+
+.dark-mode #location-popover .MuiListItemButton-root:hover {
+  background: rgba(254, 101, 133, 0.12) !important;
+}
+
+.dark-mode #location-popover .MuiInputBase-input {
+  color: #ffffff !important;
+}
+
+.dark-mode #location-popover .MuiInputBase-input::placeholder {
+  color: #8b8b8b !important;
+}
 
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root {
   background: #1e1e1e !important;
   color: #ffffff !important;
 }
+
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-notchedOutline {
   border-color: var(--mui-border) !important;
 }
+
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline,
 .dark-mode #location-popover .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #fe6585 !important;
 }
 
-/* Backdrops */
+/* Backdrop */
 .dark-mode #location-popover .MuiBackdrop-root {
-  backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.4) !important;
-}
-#location-popover .MuiBackdrop-root {
-  backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Scrollbars */
+#location-popover .MuiBackdrop-root {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Scrollbar */
 #location-popover .MuiBox-root::-webkit-scrollbar { width: 6px; }
 #location-popover .MuiBox-root::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
 #location-popover .MuiBox-root::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 3px; }
@@ -692,7 +755,7 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 .dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb { background: #575757; }
 .dark-mode #location-popover .MuiBox-root::-webkit-scrollbar-thumb:hover { background: #fe6585; }
 
-/* Image Preview & Utility */
+/* Preview imagini & utilitare */
 .image-preview { position: relative; display: inline-block; margin-right: 12px; }
 .image-preview-img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc; display: block; }
 .image-preview-img.main { border: 2px solid var(--aa-success); }
@@ -702,9 +765,10 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
 .visually-hidden { display: none; }
 .remove-icon { font-weight: 700; color: var(--aa-danger); }
 
-/* ==========================================================================
-   TAGS SECTION
-   ========================================================================== */
+
+/* ─────────────────────────────────────────────────────────────
+   8. SECȚIUNEA TAGURI
+   ───────────────────────────────────────────────────────────── */
 .add-announcement-tags-section {
   margin-top: 20px;
   padding: 20px;
@@ -834,10 +898,96 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   color: #c0144e;
 }
 
+
+/* ==========================================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ========================================================================== */
+
+/* ── GRILĂ CATEGORII: 5 coloane (≥1400px) ──────────────────── */
+@media (min-width: 1400px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ── GRILĂ CATEGORII: 4 coloane (≥900px) ───────────────────── */
+@media (min-width: 900px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-card-popover {
+    width: 100%;
+    min-height: 170px;
+  }
+}
+
+/* ── GRILĂ CATEGORII: 3 coloane (700px–899px) ──────────────── */
+@media (min-width: 700px) and (max-width: 899px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-card-popover {
+    width: 100%;
+    min-height: 170px;
+  }
+}
+
+/* ── CONȚINUT POPOVER CATEGORII — afișat pe ≥500px ─────────── */
+/* Pe ecrane mici (<500px) titlul e vizibil; pe ≥500px se afișează descrierea */
+@media (min-width: 500px) {
+  .category-title-popover {
+    display: none !important;
+  }
+
+  .category-description-popover,
+  .category-hint-popover {
+    display: block !important;
+  }
+
+  .categories-popover-header-mobile,
+  .categories-popover-close,
+  .categories-popover-title {
+    display: none !important;
+  }
+}
+
+/* ── GRILĂ CATEGORII: 2 coloane (500px–699px) ──────────────── */
+@media (min-width: 500px) and (max-width: 699px) {
+  .categories-grid-popover {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .category-card-popover {
+    width: 100%;
+    min-height: 160px;
+    padding: 0.8rem;
+  }
+}
+
+/* ── TABLETĂ + TELEFON (≤1024px) ───────────────────────────── */
+@media (max-width: 1024px) {
+  .add-announcement-container {
+    margin-top: 0;
+  }
+
+  /* Dezactivează hover transform pe touch */
+  .category-card-popover:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+}
+
+/* ── TELEFON MIC (≤600px) ───────────────────────────────────── */
 @media (max-width: 600px) {
   .add-announcement-tags-section {
     padding: 14px 12px;
   }
+
   .add-announcement-tag-chip {
     font-size: 0.78rem;
     padding: 4px 11px;

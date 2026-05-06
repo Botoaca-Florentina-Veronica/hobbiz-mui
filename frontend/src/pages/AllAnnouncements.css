@@ -1,8 +1,12 @@
-﻿/* ============================================
-   1. CSS Variables - Customizable theme colors & spacing
-   ============================================ */
+/* ============================================================
+   ALL ANNOUNCEMENTS PAGE STYLES
+   ============================================================ */
+
+
+/* ─────────────────────────────────────────────────────────────
+   1. VARIABILE
+   ───────────────────────────────────────────────────────────── */
 :root {
-  /* Spacing values - adjust for compact/spacious layout */
   --aa-spacing-xs: 8px;
   --aa-spacing-sm: 12px;
   --aa-spacing-md: 16px;
@@ -10,31 +14,27 @@
   --aa-spacing-xl: 24px;
   --aa-spacing-2xl: 32px;
 
-  /* Border radius - used for cards, buttons, inputs */
   --aa-border-radius: 12px;
-
-  /* Z-index layering */
   --aa-z-header: 100;
 
-  /* Transitions - smooth animations for interactions */
   --aa-transition: all 0.3s ease;
   --aa-transition-fast: 0.2s ease;
 
-  /* Dark Mode Colors */
+  /* Dark mode */
   --aa-dark-bg: #121212;
   --aa-dark-border: #3f3f3f;
   --aa-dark-border-hover: rgba(255, 255, 255, 0.4);
   --aa-dark-accent: #f51866;
   --aa-dark-accent-hover: #d01456;
 
-  /* Light Mode Colors */
+  /* Light mode */
   --aa-light-bg: #ffffff;
   --aa-light-border: #121212;
   --aa-light-border-hover: rgba(45, 67, 97, 0.3);
   --aa-light-accent: #2D4361;
   --aa-light-accent-hover: #2a4058;
 
-  /* MA Variables - Light Mode */
+  /* MA variables */
   --ma-bg-page: #ffffff;
   --ma-card-bg: #ffffff;
   --ma-search-input-bg: #ffffff;
@@ -45,20 +45,14 @@
   --ma-text-title: #183642;
 }
 
-/* ============================================
-   2. Page Container - Main wrapper & responsive layout
-   ============================================ */
+
+/* ─────────────────────────────────────────────────────────────
+   2. CONTAINER PRINCIPAL
+   ───────────────────────────────────────────────────────────── */
 .my-announcements-page {
   min-height: 100vh;
   background-color: var(--ma-bg-page);
   padding: 0 0 120px 0;
-}
-
-@media (max-width: 768px) {
-  .my-announcements-page,
-  .my-announcements-page * {
-    font-family: 'Poppins', sans-serif !important;
-  }
 }
 
 .all-announcements-wrapper {
@@ -67,19 +61,10 @@
   padding: 0 var(--aa-spacing-md);
 }
 
-@media (min-width: 960px) {
-  .my-announcements-page {
-    padding-top: var(--aa-spacing-2xl);
-  }
 
-  .all-announcements-wrapper {
-    padding: 0 var(--aa-spacing-lg);
-  }
-}
-
-/* ============================================
-   3. Mobile Header - Back button & title (mobile only)
-   ============================================ */
+/* ─────────────────────────────────────────────────────────────
+   3. HEADER MOBIL (back button + titlu — vizibil doar pe mobil)
+   ───────────────────────────────────────────────────────────── */
 .aa-mobile-header {
   display: flex;
   align-items: center;
@@ -118,33 +103,15 @@
   color: #e0245e;
 }
 
-.dark-mode .aa-mobile-header {
-  background-color: #000000;
-}
+.dark-mode .aa-mobile-header { background-color: #000000; }
+.dark-mode .aa-mobile-back-btn { background: #1a1a1a !important; color: #ffffff !important; }
+.dark-mode .aa-mobile-title { color: #ffffff; }
+.dark-mode .aa-mobile-count { color: #f51866; }
 
-.dark-mode .aa-mobile-back-btn {
-  background: #1a1a1a !important;
-  color: #ffffff !important;
-}
 
-.dark-mode .aa-mobile-title {
-  color: #ffffff;
-}
-
-.dark-mode .aa-mobile-count {
-  color: #f51866;
-}
-
-/* Hide mobile header on desktop */
-@media (min-width: 960px) {
-  .aa-mobile-header {
-    display: none;
-  }
-}
-
-/* ============================================
-   4. Desktop Header - Page title & subtitle (desktop only)
-   ============================================ */
+/* ─────────────────────────────────────────────────────────────
+   4. HEADER DESKTOP (titlu + subtitlu — ascuns pe mobil)
+   ───────────────────────────────────────────────────────────── */
 .page-header {
   display: none;
   margin-bottom: 4rem;
@@ -162,24 +129,16 @@
   font-family: 'Poppins', sans-serif;
 }
 
-.dark-mode .page-header .MuiTypography-h3 {
-  color: #f51866;
-}
+.dark-mode .page-header .MuiTypography-h3 { color: #f51866; }
 
 .page-header .MuiTypography-body1 {
   color: var(--ma-text-secondary);
 }
 
-/* Show desktop header only on desktop */
-@media (min-width: 960px) {
-  .page-header {
-    display: block;
-  }
-}
 
-/* ============================================
-   5. Search & Filters Bar - Main container
-   ============================================ */
+/* ─────────────────────────────────────────────────────────────
+   5. BARA DE CĂUTARE & FILTRE
+   ───────────────────────────────────────────────────────────── */
 .search-filters-bar {
   padding: var(--aa-spacing-lg);
   margin-bottom: 60px;
@@ -189,8 +148,6 @@
   max-width: 1168px;
   margin-left: auto;
   margin-right: auto;
-
-  /* Light mode - black border */
   border: 1px solid var(--aa-light-border);
 }
 
@@ -211,50 +168,26 @@
   --ma-text-title: #ffffff;
 }
 
-/* ============================================
-   6. Search Input - Search field styling
-   ============================================ */
-.search-input-wrapper .MuiOutlinedInput-root {
-  background-color: var(--ma-search-input-bg);
-}
 
-.search-input-wrapper .MuiInputBase-input {
-  color: var(--ma-text-primary);
-}
+/* ─────────────────────────────────────────────────────────────
+   6. CÂMPUL DE CĂUTARE
+   ───────────────────────────────────────────────────────────── */
+.search-input-wrapper .MuiOutlinedInput-root { background-color: var(--ma-search-input-bg); }
+.search-input-wrapper .MuiInputBase-input { color: var(--ma-text-primary); }
+.search-icon { color: var(--ma-text-secondary); }
 
-.search-icon {
-  color: var(--ma-text-secondary);
-}
+.dark-mode .search-input-wrapper .MuiOutlinedInput-notchedOutline { border-color: #fff !important; }
+.dark-mode .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: #fff !important; }
+.dark-mode .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: #fff !important; }
 
-/* Dark Mode - Search Input Borders */
-.dark-mode .search-input-wrapper .MuiOutlinedInput-notchedOutline {
-  border-color: #fff !important;
-}
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-notchedOutline { border-color: var(--aa-light-border); }
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: var(--aa-light-border-hover); }
+:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: var(--aa-light-accent); }
 
-.dark-mode .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #fff !important;
-}
 
-.dark-mode .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #fff !important;
-}
-
-/* Light Mode - Search Input Borders */
-:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-light-border);
-}
-
-:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-light-border-hover);
-}
-
-:not(.dark-mode) .search-input-wrapper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-light-accent);
-}
-
-/* ============================================
-   7. Filter Controls - Toggle button & view mode
-   ============================================ */
+/* ─────────────────────────────────────────────────────────────
+   7. CONTROALE FILTRE
+   ───────────────────────────────────────────────────────────── */
 .filters-controls {
   display: flex;
   justify-content: space-between;
@@ -269,10 +202,7 @@
   transition: var(--aa-transition);
 }
 
-/* View Mode Toggle Buttons */
-.view-mode-toggle {
-  border-color: var(--ma-card-border) !important;
-}
+.view-mode-toggle { border-color: var(--ma-card-border) !important; }
 
 .view-mode-button {
   border-color: var(--ma-card-border);
@@ -280,44 +210,21 @@
   transition: var(--aa-transition);
 }
 
-.view-mode-button.active {
-  color: #ffffff;
-}
+.view-mode-button.active { color: #ffffff; }
 
-/* Dark Mode - View Mode Button Styles */
-.dark-mode .view-mode-button.active {
-  background-color: var(--aa-dark-accent) !important;
-}
+.dark-mode .view-mode-button.active { background-color: var(--aa-dark-accent) !important; }
+.dark-mode .view-mode-button.active:hover { background-color: var(--aa-dark-accent-hover) !important; }
+.dark-mode .view-mode-button:not(.active):hover { background-color: var(--ma-search-input-bg); }
 
-.dark-mode .view-mode-button.active:hover {
-  background-color: var(--aa-dark-accent-hover) !important;
-}
+:not(.dark-mode) .view-mode-button.active { background-color: var(--aa-light-accent) !important; }
+:not(.dark-mode) .view-mode-button.active:hover { background-color: var(--aa-light-accent-hover) !important; }
+:not(.dark-mode) .view-mode-button:not(.active):hover { background-color: var(--ma-search-input-bg); }
 
-.dark-mode .view-mode-button:not(.active):hover {
-  background-color: var(--ma-search-input-bg);
-}
 
-/* Light Mode - View Mode Button Styles */
-:not(.dark-mode) .view-mode-button.active {
-  background-color: var(--aa-light-accent) !important;
-}
-
-:not(.dark-mode) .view-mode-button.active:hover {
-  background-color: var(--aa-light-accent-hover) !important;
-}
-
-:not(.dark-mode) .view-mode-button:not(.active):hover {
-  background-color: var(--ma-search-input-bg);
-}
-
-/* ============================================
-   8. Filter Select Fields - Dropdown styling
-   ============================================ */
+/* ─────────────────────────────────────────────────────────────
+   8. CÂMPURI FILTRE (DROPDOWN)
+   ───────────────────────────────────────────────────────────── */
 .filters-grid {
-  /* Ensure grid spans full width and has symmetric outer gutters
-     matching the search bar padding so the outer filters are aligned
-     equally from the container edges. Keeps 4 columns on one row when
-     there is enough horizontal space. */
   width: 100%;
   padding: 0 var(--aa-spacing-lg);
   box-sizing: border-box;
@@ -330,56 +237,25 @@
   transition: var(--aa-transition);
 }
 
-.filter-select-label {
-  color: var(--ma-text-secondary);
-}
+.filter-select-label { color: var(--ma-text-secondary); }
 
-/* Dark Mode - Select Field Labels */
-.dark-mode .filter-select-label {
-  color: #fff;
-}
-
-/* Dark Mode - Select displayed value and input text */
+.dark-mode .filter-select-label { color: #fff; }
 .dark-mode .filter-select .MuiSelect-select,
 .dark-mode .filter-select .MuiInputBase-input,
-.dark-mode .filter-select .MuiSelect-outlined {
-  color: #fff !important;
-}
+.dark-mode .filter-select .MuiSelect-outlined { color: #fff !important; }
+.dark-mode .filter-select .MuiList-root .MuiMenuItem-root { color: #fff !important; }
+.dark-mode .filter-select .MuiOutlinedInput-notchedOutline { border-color: #fff !important; }
+.dark-mode .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: #fff !important; }
+.dark-mode .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: #fff !important; }
 
-/* Dark Mode - Dropdown items (MenuItem) */
-.dark-mode .filter-select .MuiList-root .MuiMenuItem-root {
-  color: #fff !important;
-}
+:not(.dark-mode) .filter-select .MuiOutlinedInput-notchedOutline { border-color: var(--aa-light-border); }
+:not(.dark-mode) .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: var(--aa-light-border-hover); }
+:not(.dark-mode) .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: var(--aa-light-accent); }
 
-/* Dark Mode - Select Field Borders */
-.dark-mode .filter-select .MuiOutlinedInput-notchedOutline {
-  border-color: #fff !important;
-}
 
-.dark-mode .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #fff !important;
-}
-
-.dark-mode .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #fff !important;
-}
-
-/* Light Mode - Select Field Borders */
-:not(.dark-mode) .filter-select .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-light-border);
-}
-
-:not(.dark-mode) .filter-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-light-border-hover);
-}
-
-:not(.dark-mode) .filter-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--aa-light-accent);
-}
-
-/* ============================================
-   9. Empty States - Loading & no results messages
-   ============================================ */
+/* ─────────────────────────────────────────────────────────────
+   9. STĂRI GOALE (loading & niciun rezultat)
+   ───────────────────────────────────────────────────────────── */
 .results-count {
   margin-bottom: var(--aa-spacing-md);
   color: var(--ma-text-secondary);
@@ -394,26 +270,17 @@
 
 .loading-text,
 .no-results-title,
-.no-results-description {
-  color: var(--ma-text-secondary);
-}
+.no-results-description { color: var(--ma-text-secondary); }
 
-.no-results-title {
-  margin-bottom: var(--aa-spacing-xs);
-}
+.no-results-title { margin-bottom: var(--aa-spacing-xs); }
+.no-results-description { opacity: 0.7; }
 
-.no-results-description {
-  opacity: 0.7;
-}
 
-/* ============================================
-   10. Announcements - Card styles
-   
-   NOTE: Announcement card styles are inherited from
-   FavoriteAnnouncements.css to maintain design consistency.
-   Classes used: .favorite-announcements-list, .favorite-announcement-card
-   ============================================ */
-
+/* ─────────────────────────────────────────────────────────────
+   10. CARDURI ANUNȚURI
+   Stiluri moștenite din FavoriteAnnouncements.css pentru consistență.
+   Clase utilizate: .favorite-announcements-list, .favorite-announcement-card
+   ───────────────────────────────────────────────────────────── */
 .favorite-announcements-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -425,40 +292,10 @@
   grid-template-columns: 1fr;
 }
 
-@media (min-width: 701px) {
-  .favorite-announcements-list.list-view .favorite-announcement-card {
-    width: 100%;
-    max-width: 100%;
-    flex-direction: row;
-    height: 200px; /* Set a strict fixed height for consistency */
-    min-height: 200px;
-  }
-  .favorite-announcements-list.list-view .favorite-announcement-image {
-    width: 280px;
-    height: 100%; /* Take full exact height of the card */
-    flex-shrink: 0;
-    margin: 0;
-  }
-  .favorite-announcements-list.list-view .favorite-announcement-img {
-    width: 100%;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .favorite-announcements-list.list-view .favorite-announcement-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-left: var(--aa-spacing-xl);
-  }
-}
 
-/* ============================================
-   11. Pagination - Page navigation controls
-   ============================================ */
-
-/* Pagination Container - Grid layout for buttons & numbers */
+/* ─────────────────────────────────────────────────────────────
+   11. PAGINARE
+   ───────────────────────────────────────────────────────────── */
 .pagination-container {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -471,7 +308,6 @@
   box-sizing: border-box;
 }
 
-/* Pagination Buttons - Previous/Next */
 .pagination-btn {
   padding: 10px 20px;
   border: none;
@@ -485,13 +321,8 @@
   box-shadow: var(--ma-card-shadow);
 }
 
-.pagination-btn:first-child {
-  justify-self: start;
-}
-
-.pagination-btn:last-child {
-  justify-self: end;
-}
+.pagination-btn:first-child { justify-self: start; }
+.pagination-btn:last-child { justify-self: end; }
 
 .pagination-btn:hover:not(:disabled) {
   background: var(--aa-dark-accent);
@@ -505,7 +336,6 @@
   cursor: not-allowed;
 }
 
-/* Pagination Numbers Container */
 .pagination-numbers {
   display: flex;
   align-items: center;
@@ -513,7 +343,6 @@
   justify-content: center;
 }
 
-/* Individual Page Number Buttons */
 .pagination-number {
   min-width: 40px;
   height: 40px;
@@ -542,14 +371,12 @@
   box-shadow: var(--ma-card-shadow-hover);
 }
 
-/* Pagination Dots (ellipsis) */
 .pagination-dots {
   color: var(--ma-text-secondary);
   font-size: 1.2rem;
   padding: 0 4px;
 }
 
-/* Dark Mode - Pagination Border Styling */
 .dark-mode .pagination-btn,
 .dark-mode .pagination-number {
   border: 1px solid rgba(245, 24, 102, 0.3);
@@ -561,8 +388,76 @@
   border-color: rgba(245, 24, 102, 0.5);
 }
 
-/* Mobile - Pagination Responsive */
+
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
+
+/* ── ≥960px: DESKTOP — layout standard ──────────────────────── */
+@media (min-width: 960px) {
+
+  /* Container cu spațiu suplimentar */
+  .my-announcements-page {
+    padding-top: var(--aa-spacing-2xl);
+  }
+
+  .all-announcements-wrapper {
+    padding: 0 var(--aa-spacing-lg);
+  }
+
+  /* Headerul mobil ascuns pe desktop */
+  .aa-mobile-header {
+    display: none;
+  }
+
+  /* Headerul desktop vizibil */
+  .page-header {
+    display: block;
+  }
+}
+
+/* ── ≥701px: LIST VIEW — card orizontal (imagine stânga) ─────── */
+@media (min-width: 701px) {
+  .favorite-announcements-list.list-view .favorite-announcement-card {
+    width: 100%;
+    max-width: 100%;
+    flex-direction: row;
+    height: 200px;
+    min-height: 200px;
+  }
+
+  .favorite-announcements-list.list-view .favorite-announcement-image {
+    width: 280px;
+    height: 100%;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .favorite-announcements-list.list-view .favorite-announcement-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .favorite-announcements-list.list-view .favorite-announcement-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: var(--aa-spacing-xl);
+  }
+}
+
+/* ── ≤768px: TABLETĂ + TELEFON ──────────────────────────────── */
 @media (max-width: 768px) {
+
+  /* Font global Poppins */
+  .my-announcements-page,
+  .my-announcements-page * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+
+  /* Paginare mai compactă */
   .pagination-container {
     grid-template-columns: 1fr auto 1fr;
     gap: var(--aa-spacing-sm);
@@ -582,12 +477,16 @@
     font-size: 0.9rem;
   }
 
+  /* Grilă carduri mai compactă */
   .favorite-announcements-list {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
 
+/* ── ≤700px: TELEFON — layout app-like cu carduri-imagine ────── */
 @media (max-width: 700px) {
+
+  /* Fundal și padding */
   .my-announcements-page {
     background: #ffffff;
     padding-bottom: calc(92px + env(safe-area-inset-bottom));
@@ -601,11 +500,13 @@
     padding: 0 12px;
   }
 
+  /* Bara de filtre și headerul desktop ascunse */
   .search-filters-bar,
   .page-header {
     display: none;
   }
 
+  /* Header mobil */
   .aa-mobile-header {
     padding: calc(8px + env(safe-area-inset-top)) 12px 10px;
   }
@@ -614,6 +515,7 @@
     font-size: 26px !important;
   }
 
+  /* Lista mobilă — carduri cu imagine full */
   .aa-mobile-list {
     display: grid;
     grid-template-columns: 1fr;
@@ -642,14 +544,10 @@
     display: block;
   }
 
-  .aa-mobile-image-placeholder {
-    background: #e0e0e0;
-  }
+  .aa-mobile-image-placeholder { background: #e0e0e0; }
+  .dark-mode .aa-mobile-image-placeholder { background: #1a1a1a; }
 
-  .dark-mode .aa-mobile-image-placeholder {
-    background: #1a1a1a;
-  }
-
+  /* Butonul inimă */
   .aa-mobile-heart {
     position: absolute;
     top: 12px;
@@ -666,21 +564,22 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
   }
 
-  .aa-mobile-heart .MuiSvgIcon-root {
-    font-size: 22px;
-  }
+  .aa-mobile-heart .MuiSvgIcon-root { font-size: 22px; }
+  .aa-mobile-heart.filled { color: #f51866; }
 
-  .aa-mobile-heart.filled {
-    color: #f51866;
-  }
-
+  /* Gradient și conținut suprapus pe imagine */
   .aa-mobile-gradient {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     height: 64%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 56%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.45) 56%,
+      rgba(0, 0, 0, 0) 100%
+    );
     z-index: 1;
   }
 
@@ -713,13 +612,8 @@
     letter-spacing: 0.08em;
   }
 
-  .aa-mobile-badge.category {
-    background: rgba(245, 24, 102, 0.88);
-  }
-
-  .aa-mobile-badge.location {
-    background: rgba(50, 50, 50, 0.86);
-  }
+  .aa-mobile-badge.category { background: rgba(245, 24, 102, 0.88); }
+  .aa-mobile-badge.location { background: rgba(50, 50, 50, 0.86); }
 
   .aa-mobile-title-text {
     margin: 0;

@@ -1077,10 +1077,11 @@ body:not(.dark-mode) .profile-about-card {
 }
 
 /* ============================================
-   8. MOBILE RESPONSIVENESS
+   8. MOBILE RESPONSIVENESS — MEDIA QUERIES
+   Toate breakpointurile, de la mare la mic.
    ============================================ */
 
-/* Responsive scaling for wider container variables */
+/* ── ≤1200px: ECRAN LARG ──────────────────────────────────── */
 @media (max-width: 1200px) {
   .profile-page-container {
     max-width: 1200px;
@@ -1091,6 +1092,7 @@ body:not(.dark-mode) .profile-about-card {
   }
 }
 
+/* ── ≤980px: DESKTOP MIC ───────────────────────────────────── */
 @media (max-width: 980px) {
   .profile-page-container {
     max-width: 900px;
@@ -1683,7 +1685,7 @@ body:not(.dark-mode) .profile-about-card {
   display: none;
 }
 
-/* Show mobile-like header for medium desktop widths */
+/* ── 601px–1100px: DESKTOP MEDIU — header mobil vizibil ─────── */
 @media (min-width: 601px) and (max-width: 1100px) {
   .mobile-header {
     display: flex !important;
@@ -1737,7 +1739,7 @@ body:not(.dark-mode) .profile-about-card {
   }
 }
 
-/* Mobile header (shown <= 768px) */
+/* ── ≤768px: TABLETĂ + TELEFON — layout mobil complet ───────── */
 @media (max-width: 768px) {
   .profile-page-container,
   .profile-page-container *,
@@ -1808,11 +1810,8 @@ body:not(.dark-mode) .profile-about-card {
   .profile-page-container {
     --pf-card-radius: 16px;
   }
-}
 
-/* Tablet (max-width: 768px) */
-@media (max-width: 768px) {
-  /* Hide desktop layout, show mobile layout */
+  /* Ascunde layout desktop, afișează layout mobil */
   .profile-desktop-layout {
     display: none !important;
   }
@@ -1933,7 +1932,7 @@ body:not(.dark-mode) .profile-about-card {
   }
 }
 
-/* Mobile phones (max-width: 600px) */
+/* ── ≤600px: TELEFON ────────────────────────────────────────── */
 @media (max-width: 600px) {
   html, body {
     background: #ffffff !important;
@@ -2118,7 +2117,7 @@ body:not(.dark-mode) .profile-about-card {
   }
 }
 
-/* Extra small phones (max-width: 480px) */
+/* ── ≤480px: TELEFON MIC ────────────────────────────────────── */
 @media (max-width: 480px) {
   .profile-name-title-unified {
     font-size: 1.3rem;
@@ -2147,7 +2146,7 @@ body:not(.dark-mode) .profile-about-card {
   }
 }
 
-/* Very small phones (max-width: 360px) */
+/* ── ≤360px: TELEFON FOARTE MIC ─────────────────────────────── */
 @media (max-width: 360px) {
   .profile-page-container {
     padding: 0 8px;

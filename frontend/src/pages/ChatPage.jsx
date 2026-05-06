@@ -42,6 +42,7 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(380);
@@ -141,13 +142,13 @@ export default function ChatPage() {
 
     on('user:online', handleUserOnline);
     on('user:offline', handleUserOffline);
-    on('typing', handleTypingStatus);
+    on('userTyping', handleTypingStatus);
     on('online:users', handleOnlineUsersList);
 
     return () => {
       off('user:online', handleUserOnline);
       off('user:offline', handleUserOffline);
-      off('typing', handleTypingStatus);
+      off('userTyping', handleTypingStatus);
       off('online:users', handleOnlineUsersList);
     };
   }, [userId, on, off]);
@@ -282,6 +283,15 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Scroll when typing indicator appears so it's fully visible
+  useEffect(() => {
+    if (!typingUsers.size) return;
+    const id = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+    return () => clearTimeout(id);
+  }, [typingUsers.size]);
+
   // --- Collaboration Helpers ---
   const isCollaborationRequestMessage = (msg) => {
     return msg.messageType === 'collaboration_request' || 
@@ -400,6 +410,8 @@ export default function ChatPage() {
     e.preventDefault();
     if (!newMessage.trim() && !selectedImage) return;
     if (newMessage.length > 2000) return;
+    clearTimeout(typingTimeoutRef.current);
+    if (selectedConversation) emitTyping([userId, selectedConversation.id].sort().join('-'), false);
     const tempId = Date.now().toString();
     const payload = {
       _id: tempId, conversationId: selectedConversation.conversationId, senderId: userId,
@@ -805,6 +817,9 @@ export default function ChatPage() {
                     </React.Fragment>
                   );
                 })}
+                {typingUsers.has(selectedConversation?.otherParticipant?.id) && (
+                  <TypingIndicator />
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
@@ -822,7 +837,13 @@ export default function ChatPage() {
                     <button type="button" className="chat-input-button" onClick={() => fileInputRef.current?.click()}>📎</button>
                     <button type="button" className="chat-input-button" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😊</button>
                   </div>
-                  <input className="chat-input" placeholder={t('chat.messagePlaceholder')} value={newMessage} maxLength={2000} onChange={e => { setNewMessage(e.target.value); emitTyping([userId, selectedConversation.id].sort().join('-'), true); }}/>
+                  <input className="chat-input" placeholder={t('chat.messagePlaceholder')} value={newMessage} maxLength={2000} onChange={e => {
+                    setNewMessage(e.target.value);
+                    const convId = [userId, selectedConversation.id].sort().join('-');
+                    emitTyping(convId, true);
+                    clearTimeout(typingTimeoutRef.current);
+                    typingTimeoutRef.current = setTimeout(() => emitTyping(convId, false), 2000);
+                  }}/>
                   <button type="submit" className="chat-send-button" disabled={!newMessage && !selectedImage}>➤</button>
                 </div>
                 <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleImageSelect} />

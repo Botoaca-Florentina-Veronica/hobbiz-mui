@@ -402,87 +402,160 @@ export default function ArchivedAnnouncementsPage() {
           ) : (
             <>
               {viewMode === 'grid' ? (
-                <div className="favorite-announcements-list">
-                  {currentItems.map((announcement) => (
-                    <div
-                      key={announcement._id}
-                      className="favorite-announcement-card"
-                      onClick={e => {
-                        if (e.target.closest('.favorite-heart')) return;
-                        navigate(`/announcement/${announcement._id}`);
-                      }}
-                    >
-                      <div className="favorite-announcement-image">
-                        {announcement.images && announcement.images[0] ? (
-                          <img
-                            src={announcement.images[0].startsWith('http') || announcement.images[0].startsWith('/uploads')
-                              ? announcement.images[0]
-                              : `/uploads/${announcement.images[0].replace(/^.*[\\/]/, '')}`}
-                            alt="imagine principala"
-                            className="favorite-announcement-img"
-                          />
-                        ) : (
-                          <div className="favorite-announcement-img placeholder" />
-                        )}
-                      </div>
-                      <div className="favorite-announcement-info">
-                        <div className="favorite-info-top">
-                          <span className="favorite-date">
-                            {announcement.createdAt
-                              ? new Date(announcement.createdAt).toLocaleDateString('ro-RO', {
-                                day: '2-digit',
-                                month: 'long',
-                                year: 'numeric'
-                              })
-                              : ''}
-                          </span>
-
+                <div className="arch-grid-list">
+                  {currentItems.map((announcement) => {
+                    const imgSrc = announcement.images?.[0]
+                      ? (announcement.images[0].startsWith('http') || announcement.images[0].startsWith('/uploads')
+                          ? announcement.images[0]
+                          : `/uploads/${announcement.images[0].replace(/^.*[\\/]/, '')}`)
+                      : null;
+                    return (
+                      <div
+                        key={announcement._id}
+                        className="arch-card"
+                        onClick={e => {
+                          if (e.target.closest('.arch-actions')) return;
+                          navigate(`/announcement/${announcement._id}`);
+                        }}
+                      >
+                        {/* Image */}
+                        <div className="arch-card-image">
+                          {imgSrc
+                            ? <img src={imgSrc} alt={announcement.title} className="arch-card-img" />
+                            : <div className="arch-card-img" />
+                          }
+                          <div className="arch-card-image-overlay" />
+                          <span className="arch-badge-archived">Arhivat</span>
+                          {announcement.category && (
+                            <span className="arch-badge-category">
+                              {translateCategory(announcement.category, t)}
+                            </span>
+                          )}
                         </div>
-                        <h2 className="favorite-announcement-title">{announcement.title}</h2>
-                        <div className="favorite-announcement-category">{translateCategory(announcement.category, t)}</div>
-                        <div className="favorite-announcement-location">{announcement.location}</div>
-                        {announcement.price && (
-                          <div className="favorite-price">{announcement.price} RON</div>
-                        )}
 
-                        <div className="favorite-announcement-actions">
-                          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                            <Button size="small" variant="outlined" onClick={(ev) => { ev.stopPropagation(); handleUnarchive(announcement._id); }}>{t('myAnnouncements.unarchive')}</Button>
-                            <Button size="small" variant="outlined" color="error" onClick={(ev) => { ev.stopPropagation(); handleDeleteClick(announcement._id); }}>{t('myAnnouncements.deleteBtn') || t('myAnnouncements.delete')}</Button>
+                        {/* Body */}
+                        <div className="arch-card-body">
+                          <h2 className="arch-card-title">{announcement.title}</h2>
+
+                          <div className="arch-card-meta">
+                            {announcement.location && (
+                              <span className="arch-meta-location">
+                                <span className="arch-meta-location-icon">📍</span>
+                                {announcement.location}
+                              </span>
+                            )}
+                            <span className="arch-meta-date">
+                              {announcement.createdAt
+                                ? new Date(announcement.createdAt).toLocaleDateString('ro-RO', {
+                                    day: '2-digit', month: 'short', year: 'numeric',
+                                  })
+                                : ''}
+                            </span>
+                          </div>
+
+                          <div className="arch-card-footer">
+                            <span className={`arch-card-price${!announcement.price ? ' no-price' : ''}`}>
+                              {announcement.price ? `${announcement.price} RON` : 'Preț negociabil'}
+                            </span>
+                            <div className="arch-actions">
+                              <button
+                                className="arch-btn-unarchive"
+                                onClick={ev => { ev.stopPropagation(); handleUnarchive(announcement._id); }}
+                              >
+                                {t('myAnnouncements.unarchive')}
+                              </button>
+                              <button
+                                className="arch-btn-delete"
+                                title={t('myAnnouncements.deleteBtn') || 'Șterge'}
+                                onClick={ev => { ev.stopPropagation(); handleDeleteClick(announcement._id); }}
+                              >
+                                🗑
+                              </button>
+                            </div>
                           </div>
                         </div>
-
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="announcement-list">
-                  {currentItems.map(announcement => (
-                    <div key={announcement._id} className="announcement-list-item" onClick={() => navigate(`/announcement/${announcement._id}`)}>
-                      <div className="announcement-list-left">
-                        {announcement.images && announcement.images.length > 0 ? (
-                          <img src={announcement.images[0]} alt={announcement.title} />
-                        ) : (
-                          <div className="ma-card-no-image" />
-                        )}
-                      </div>
-                      <div className="announcement-list-right">
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <div style={{ fontWeight: 700 }}>{announcement.title}</div>
-                          <div style={{ fontSize: 12, color: 'var(--ma-muted)' }}>{new Date(announcement.createdAt).toLocaleDateString()}</div>
+                <div className="arch-list-container">
+                  {currentItems.map(announcement => {
+                    const imgSrc = announcement.images?.[0]
+                      ? (announcement.images[0].startsWith('http') || announcement.images[0].startsWith('/uploads')
+                          ? announcement.images[0]
+                          : `/uploads/${announcement.images[0].replace(/^.*[\\/]/, '')}`)
+                      : null;
+                    return (
+                      <div
+                        key={announcement._id}
+                        className="arch-list-card"
+                        onClick={e => {
+                          if (e.target.closest('.arch-actions')) return;
+                          navigate(`/announcement/${announcement._id}`);
+                        }}
+                      >
+                        {/* Image */}
+                        <div className="arch-list-image">
+                          {imgSrc
+                            ? <img src={imgSrc} alt={announcement.title} className="arch-list-img" />
+                            : <div className="arch-list-img" />
+                          }
+                          <span className="arch-badge-archived">Arhivat</span>
                         </div>
-                        <div style={{ marginTop: 8, color: 'var(--ma-muted)' }}>{announcement.description}</div>
-                        <div style={{ marginTop: 12 }}>
-                          <div className="ma-card-price">{announcement.price ? `${announcement.price} RON` : ''}</div>
-                          <div className="announcement-actions" style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-                            <Button variant="outlined" size="small" onClick={(e) => { e.stopPropagation(); handleUnarchive(announcement._id); }}>{t('myAnnouncements.unarchive')}</Button>
-                            <Button variant="outlined" size="small" color="error" onClick={(e) => { e.stopPropagation(); handleDeleteClick(announcement._id); }}>{t('myAnnouncements.deleteBtn') || t('myAnnouncements.delete')}</Button>
+
+                        {/* Body */}
+                        <div className="arch-list-body">
+                          <div className="arch-list-top">
+                            <h2 className="arch-list-title">{announcement.title}</h2>
+                            <span className="arch-list-date">
+                              {announcement.createdAt
+                                ? new Date(announcement.createdAt).toLocaleDateString('ro-RO', {
+                                    day: '2-digit', month: 'short', year: 'numeric',
+                                  })
+                                : ''}
+                            </span>
+                          </div>
+
+                          {announcement.description && (
+                            <p className="arch-list-desc">{announcement.description}</p>
+                          )}
+
+                          <div className="arch-list-tags">
+                            {announcement.category && (
+                              <span className="arch-tag">
+                                {translateCategory(announcement.category, t)}
+                              </span>
+                            )}
+                            {announcement.location && (
+                              <span className="arch-tag">📍 {announcement.location}</span>
+                            )}
+                          </div>
+
+                          <div className="arch-list-footer">
+                            <span className={`arch-card-price${!announcement.price ? ' no-price' : ''}`}>
+                              {announcement.price ? `${announcement.price} RON` : 'Preț negociabil'}
+                            </span>
+                            <div className="arch-actions">
+                              <button
+                                className="arch-btn-unarchive"
+                                onClick={e => { e.stopPropagation(); handleUnarchive(announcement._id); }}
+                              >
+                                {t('myAnnouncements.unarchive')}
+                              </button>
+                              <button
+                                className="arch-btn-delete"
+                                title={t('myAnnouncements.deleteBtn') || 'Șterge'}
+                                onClick={e => { e.stopPropagation(); handleDeleteClick(announcement._id); }}
+                              >
+                                🗑
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

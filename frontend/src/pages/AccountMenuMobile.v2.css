@@ -1,37 +1,40 @@
-﻿/* AccountMenuMobile - merged styles, preserving previous tokens and look, mobile-first */
+/* AccountMenuMobile.v2 — stiluri mobile/tabletă, mobile-first */
 
-/* Color tokens for Account page (light + dark via CSS vars) */
+
+/* ─────────────────────────────────────────────────────────────
+   1. VARIABILE
+   ───────────────────────────────────────────────────────────── */
 :root {
-  --header-height: 72px; /* match Header.fixed height */
-  --footer-height: 65px; /* match Footer mobile bar */
-  /* Light-mode tokens (white / blue / black) */
-  --acc-bg: #ffffff;                 /* page background */
-  --acc-card: #ffffff;               /* card surfaces */
-  --acc-user-card: #f3f6ff;          /* soft blue-tinted user card */
-  --acc-border: #e5e7eb;             /* neutral border */
-  --acc-text: #0b0b0b;               /* main readable text (near black) */
-  --acc-title: #0b0b0b;              /* headings */
-  --acc-primary: #2D4361;            /* primary blue used across site */
-  --acc-primary-alt: #ffffff;        /* lighter blue accent */
+  --header-height: 72px;
+  --footer-height: 65px;
+
+  /* Light mode */
+  --acc-bg: #ffffff;
+  --acc-card: #ffffff;
+  --acc-user-card: #f3f6ff;
+  --acc-border: #e5e7eb;
+  --acc-text: #0b0b0b;
+  --acc-title: #0b0b0b;
+  --acc-primary: #2D4361;
+  --acc-primary-alt: #ffffff;
   --acc-divider: #e5e7eb;
-  --acc-hover: rgba(31,111,235,0.06);/* subtle blue hover */
-  --acc-avatar-bg: #2D4361;          /* blue avatar background */
-  --acc-avatar-icon: #ffffff;        /* white icon */
+  --acc-hover: rgba(31, 111, 235, 0.06);
+  --acc-avatar-bg: #2D4361;
+  --acc-avatar-icon: #ffffff;
   --acc-user-name: #000000;
   --acc-user-info: #6b7280;
-} 
+}
 
 .dark-mode {
-  /* Dark-mode tokens (preserved previous dark theme) */
-  --acc-bg: #121212;      /* Surface a0 */
-  --acc-card: #2c2c2e;    /* Surface a10 */
+  --acc-bg: #121212;
+  --acc-card: #2c2c2e;
   --acc-user-card: #2c2c2e;
-  --acc-border: #3a3a3c;  /* Surface a20 */
-  --acc-text: #ffffff;    /* readable text */
-  --acc-title: #ffffff;   /* headings */
-  --acc-primary: #f51866; /* accent preserved in dark */
+  --acc-border: #3a3a3c;
+  --acc-text: #ffffff;
+  --acc-title: #ffffff;
+  --acc-primary: #f51866;
   --acc-primary-alt: #f51866;
-  --acc-divider: #3a3a3c; /* Surface a30 */
+  --acc-divider: #3a3a3c;
   --acc-hover: #3a3a3c;
   --acc-avatar-bg: #3a3a3c;
   --acc-avatar-icon: #5a8db8;
@@ -39,16 +42,18 @@
   --acc-user-info: #9ca3af;
 }
 
-/* Container */
+
+/* ─────────────────────────────────────────────────────────────
+   2. CONTAINER PRINCIPAL
+   ───────────────────────────────────────────────────────────── */
 .account-mobile {
   box-sizing: border-box;
   padding-top: calc(var(--header-height));
   padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom));
-  /* Keep mobile-friendly height without forcing 100dvh to avoid scroll duplication */
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
   background: var(--acc-bg);
   color: var(--acc-text);
-  overflow: visible; /* body handles scrolling */
+  overflow: visible;
   -webkit-overflow-scrolling: touch;
   font-family: 'Poppins', sans-serif;
 }
@@ -66,124 +71,278 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Header (mobile-only) - further enlarged solid pink area */
-.account-mobile__header{
-  position:relative;
-  display:block;
-  /* extra large top + bottom padding for a dominant pink section */
+
+/* ─────────────────────────────────────────────────────────────
+   3. HEADER
+   ───────────────────────────────────────────────────────────── */
+.account-mobile__header {
+  position: relative;
+  display: block;
   padding: calc(40px + env(safe-area-inset-top)) 14px 150px 14px;
-  background: var(--acc-primary-alt); /* solid deep pink */
-  color:#fff;
+  background: var(--acc-primary-alt);
+  color: #fff;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   overflow: visible;
 }
-.account-mobile__header-inner{ display:flex; align-items:center; gap:12px; }
-.account-mobile__backbtn{
-  width:48px; height:48px; display:inline-flex; align-items:center; justify-content:center;
-  background: rgba(255,255,255,0.18); border-radius: 50%; border: none; color: #fff;
-  backdrop-filter: blur(8px); box-shadow: none; margin-right:10px;
+
+.account-mobile__header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.account-mobile__backbtn svg{ color: #fff; }
-.account-mobile__title{ font-weight:700; font-size:1.14rem; margin-left:4px; color: #fff; }
-/* Even bigger greeting to emphasize the pink area */
-.account-mobile__greeting{ font-size:4.0rem; font-weight:900; color:#fff; line-height:1; margin:20px 0 32px 0; padding: 0 6px; }
-.account-mobile__greeting-name{ color: #000000 !important; background: transparent; padding: 0; border-radius: 0; display:inline; margin-left:8px; font-weight:900; text-shadow: none; }
 
-/* Ensure user card name is also bold */
-.account-mobile__name{ font-weight:900;  }
-/* removed .account-mobile__decor (emoji) per request */
+.account-mobile__backbtn {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  border: none;
+  color: #fff;
+  backdrop-filter: blur(8px);
+  box-shadow: none;
+  margin-right: 10px;
+}
 
-/* adjust user card overlap to match much larger header */
-.account-mobile__usercard{ margin: -24px auto 0; }
+.account-mobile__backbtn svg { color: #fff; }
 
-/* NOTE: width is unified later to match horizontal padding and avoid uneven edges on small screens */
-.account-mobile__name{ margin-top:72px; font-size:1.2rem; }
+.account-mobile__title {
+  font-weight: 700;
+  font-size: 1.14rem;
+  margin-left: 4px;
+  color: #fff;
+}
 
-/* Responsive guards: make sure header/greeting scale down on small phones */
-@media (max-width: 480px) {
-  .account-mobile__greeting { font-size: 3.0rem; margin: 14px 0 32px 0; }
-  /* align header horizontal padding with page content for consistent edges */
-  .account-mobile__header{ padding: calc(28px + env(safe-area-inset-top)) 16px 100px 16px; }
-  .account-mobile__usercard{ margin: -18px auto 0; width:100%; }
-  .account-mobile__avatar{ width:100px; height:100px; }
-} 
+.account-mobile__greeting {
+  font-size: 4.0rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  margin: 20px 0 32px 0;
+  padding: 0 6px;
+}
+
+.account-mobile__greeting-name {
+  color: #000000 !important;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  display: inline;
+  margin-left: 8px;
+  font-weight: 900;
+  text-shadow: none;
+}
+
+.account-mobile__name {
+  font-weight: 900;
+  margin-top: 72px;
+  font-size: 1.2rem;
+}
+
+/* Card utilizator — se suprapune peste header */
+.account-mobile__usercard {
+  margin: -24px auto 0;
+}
 
 
+/* ─────────────────────────────────────────────────────────────
+   4. CONȚINUT & CARD UTILIZATOR
+   ───────────────────────────────────────────────────────────── */
+.account-mobile__content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-/* Main content */
-.account-mobile__content{ max-width:720px; margin:0 auto; padding:0 16px 16px; display:flex; flex-direction:column; gap:14px; }
+.account-mobile__usercard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--acc-user-card);
+  border: none;
+  padding: 18px 16px 16px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  width: 100%;
+  max-width: 440px;
+  margin: -40px auto 0;
+  z-index: 1;
+  box-sizing: border-box;
+}
 
-/* User card (keeps previous aesthetics) */
-.account-mobile__usercard{ position:relative; display:flex; flex-direction:column; align-items:center; background:var(--acc-user-card); border:none; padding:18px 16px 16px; border-radius:14px; box-shadow: 0 6px 18px rgba(0,0,0,0.18); width:100%; max-width:440px; margin: -40px auto 0; z-index:1; box-sizing:border-box; }
-.account-mobile__avatar-wrap{ position:absolute; top:0; left:50%; transform:translate(-50%, -50%); }
-  .account-mobile__avatar{ width:110px; height:110px; border-radius:50%; overflow:hidden; background:var(--acc-avatar-bg); display:flex; align-items:center; justify-content:center; border:4px solid var(--acc-bg); box-shadow: none; }
-.dark-mode .account-mobile__avatar { border-color: var(--acc-user-card); }
-.account-mobile__avatar img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:50%; }.account-mobile__info { display:flex; flex-direction:column; align-items:center; width:100%; text-align:center; }.account-mobile__name{ font-weight:700; color:var(--acc-user-name); font-size:1.15rem; margin-top:42px; text-align:center; }
-.account-mobile__admin-badge{ display:inline-flex; align-items:center; gap:6px; margin-top:8px; font-size:0.8rem; font-weight:600; }
+.account-mobile__avatar-wrap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.account-mobile__avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--acc-avatar-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--acc-bg);
+  box-shadow: none;
+}
+
+.dark-mode .account-mobile__avatar {
+  border-color: var(--acc-user-card);
+}
+
+.account-mobile__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+
+.account-mobile__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.account-mobile__name {
+  font-weight: 700;
+  color: var(--acc-user-name);
+  font-size: 1.15rem;
+  margin-top: 42px;
+  text-align: center;
+}
+
+.account-mobile__admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .account-mobile.account-mobile--applike .account-mobile__admin-badge {
   border: 1.5px solid #2D4361;
   color: #2D4361;
   border-radius: 20px;
   padding: 4px 12px;
 }
+
 .dark-mode .account-mobile.account-mobile--applike .account-mobile__admin-badge {
   border-color: #f51866;
   color: #f51866;
 }
-.account-mobile__email{ color:var(--acc-user-info); font-size:0.875rem; text-align:center; }
 
-/* Menu list - styled like previous cards */
-.account-mobile__menu{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px; }
-.account-mobile__menu-btn{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border-radius:10px; background:var(--acc-card); border:1px solid var(--acc-border); color:var(--acc-text); text-align:left; font-weight:600; cursor:pointer; box-shadow:none; }
-.account-mobile__menu-btn:hover{ transform:translateY(-2px); background:var(--acc-hover); }
-.account-mobile__menu-icon{ width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(255,255,255,0.06); color:var(--acc-primary); }
-.account-mobile__menu-label{ flex:1; font-family: 'Poppins', sans-serif !important; }
+.account-mobile__email {
+  color: var(--acc-user-info);
+  font-size: 0.875rem;
+  text-align: center;
+}
 
-/* Row for switches (dark mode) */
-.account-mobile__menu-row{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; background:var(--acc-card); border:1px solid var(--acc-border); }
-.account-mobile__menu-row .account-mobile__menu-label{ margin-right: 4px; }
-.account-mobile__menu-control{ margin-left:auto; }
+
+/* ─────────────────────────────────────────────────────────────
+   5. MENIU
+   ───────────────────────────────────────────────────────────── */
+.account-mobile__menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-mobile__menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--acc-card);
+  border: 1px solid var(--acc-border);
+  color: var(--acc-text);
+  text-align: left;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.account-mobile__menu-btn:hover {
+  transform: translateY(-2px);
+  background: var(--acc-hover);
+}
+
+.account-mobile__menu-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--acc-primary);
+}
+
+.account-mobile__menu-label {
+  flex: 1;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.account-mobile__menu-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--acc-card);
+  border: 1px solid var(--acc-border);
+}
+
+.account-mobile__menu-row .account-mobile__menu-label {
+  margin-right: 4px;
+}
+
+.account-mobile__menu-control {
+  margin-left: auto;
+}
+
 .account-mobile__menu-control .MuiSwitch-root,
 .account-mobile__menu-control .MuiSwitch-root * {
   font-family: 'Poppins', sans-serif !important;
 }
 
-/* Logout button style */
-.account-mobile__logout{ background: linear-gradient(90deg, rgba(245,24,102,0.12), rgba(245,24,102,0.06)); color:var(--acc-primary-alt); border:1px solid rgba(245,24,102,0.14); font-weight:700; }
-
-/* Footer spacer keeps the footer area free */
-.account-mobile__footer-spacer{ height: calc(var(--footer-height) + env(safe-area-inset-bottom)); }
-
-/* Ensure body matches background on mobile */
-@media (max-width: 1024px){
-  body { background-color: var(--acc-bg) !important; }
+/* Buton deconectare */
+.account-mobile__logout {
+  background: linear-gradient(90deg, rgba(245, 24, 102, 0.12), rgba(245, 24, 102, 0.06));
+  color: var(--acc-primary-alt);
+  border: 1px solid rgba(245, 24, 102, 0.14);
+  font-weight: 700;
 }
 
-/* Responsive adjustments */
-@media (max-width: 480px){
-  .account-mobile__avatar{ width:64px; height:64px; }
-  /* Larger and bolder greeting on small phones */
-  .account-mobile__greeting{ font-size:3.2rem; font-weight:900; margin:14px 0 32px 0; }
-  .account-mobile__greeting-name{ font-weight:900; color:#000; }
-  .account-mobile__menu-btn{ padding:10px 12px; }
-  .account-mobile__usercard{ width:100%; margin-top:-48px; }
+/* Spațiu footer */
+.account-mobile__footer-spacer {
+  height: calc(var(--footer-height) + env(safe-area-inset-bottom));
 }
 
-@media (min-width: 1024px){
-  .account-mobile{ padding-top: 16px; padding-bottom: 24px; min-height: auto; }
-  .account-mobile__header{ display:none; }
-  .account-mobile__content{ padding:0; max-width:900px; }
-}
 
-/* On small screens remove outer padding previously reserved for global header (we use our own header) */
-@media (max-width: 1024px) {
-  .account-mobile { padding-top: 0 !important; }
-}
-
-/* Backward-compatible aliases for the previous CSS classnames
-   so we preserve most of the original styling without changing JSX further */
-.mobile-account-menu { /* container alias */
+/* ─────────────────────────────────────────────────────────────
+   6. ALIASURI BACKWARD-COMPATIBLE (pentru clasele vechi)
+   ───────────────────────────────────────────────────────────── */
+.mobile-account-menu {
   box-sizing: border-box;
   padding-top: calc(var(--header-height));
   padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom));
@@ -195,26 +354,17 @@
 }
 
 .mobile-account-header-gradient { display: none; }
-.mobile-account-greeting { font-weight:900; color:#fff; }
-.mobile-account-user-card { display:block; }
-.mobile-account-avatar { width:64px; height:64px; border-radius:50%; overflow:hidden; background:var(--acc-avatar-bg); }
-.mobile-account-menu__list { display:flex; flex-direction:column; gap:12px; }
-.menu-item, .mobile-menu-items-wrapper .MuiCardContent-root { /* style compat */
-  padding: 12px 14px;
-}
+.mobile-account-greeting { font-weight: 900; color: #fff; }
+.mobile-account-user-card { display: block; }
+.mobile-account-avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; background: var(--acc-avatar-bg); }
+.mobile-account-menu__list { display: flex; flex-direction: column; gap: 12px; }
+.menu-item, .mobile-menu-items-wrapper .MuiCardContent-root { padding: 12px 14px; }
 
-/* Ensure on mobile the body background matches */
-@media (max-width: 1024px) {
-  .mobile-account-header-gradient { display:block !important; }
-  .mobile-account-user-card { display:flex !important; }
-  body { background-color: var(--acc-bg) !important; }
-  .mobile-account-menu { min-height: auto !important; overflow-y: visible !important; }
-}
 
-/*
-  App-like replica mode for mobile/tablet portrait.
-  Enabled only when JSX adds .account-mobile--applike, so desktop stays unchanged.
-*/
+/* ─────────────────────────────────────────────────────────────
+   7. MOD APP-LIKE (.account-mobile--applike)
+   Activat din JSX pe mobil/tabletă — desktopul rămâne neschimbat
+   ───────────────────────────────────────────────────────────── */
 .account-mobile.account-mobile--applike {
   --acc-app-header-light: #2D4361;
   --acc-app-name-light: #ffffff;
@@ -497,43 +647,10 @@
   height: calc(66px + env(safe-area-inset-bottom));
 }
 
-@media (max-width: 480px) {
-  .account-mobile.account-mobile--applike .account-mobile__header {
-    padding: calc(14px + env(safe-area-inset-top)) 16px 108px;
-  }
 
-  .account-mobile.account-mobile--applike .account-mobile__title {
-    font-size: 26px;
-  }
-
-  .account-mobile.account-mobile--applike .account-mobile__greeting {
-    font-size: 34px;
-    line-height: 38px;
-  }
-
-  .account-mobile.account-mobile--applike .account-mobile__usercard,
-  .account-mobile.account-mobile--applike .account-mobile__menu-group {
-    margin-left: 16px;
-    margin-right: 16px;
-  }
-
-  .account-mobile.account-mobile--applike .account-mobile__avatar {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: none;
-  }
-
-  .account-mobile.account-mobile--applike .account-mobile__avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 50%;
-  }
-}
-
+/* ─────────────────────────────────────────────────────────────
+   8. MODALE APP-LIKE
+   ───────────────────────────────────────────────────────────── */
 .account-mobile.account-mobile--applike .account-modal-overlay {
   position: fixed;
   inset: 0;
@@ -674,6 +791,10 @@
   transform: none;
 }
 
+
+/* ─────────────────────────────────────────────────────────────
+   9. MODAL CONTACT (app-like)
+   ───────────────────────────────────────────────────────────── */
 .account-mobile.account-mobile--applike .account-modal-card.contact {
   width: min(92vw, 560px);
   padding: 0;
@@ -849,7 +970,138 @@
   border-color: rgba(255, 255, 255, 0.16);
 }
 
+
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
+
+/* ── ≥1024px: DESKTOP — header mobil ascuns ─────────────────── */
+@media (min-width: 1024px) {
+  .account-mobile {
+    padding-top: 16px;
+    padding-bottom: 24px;
+    min-height: auto;
+  }
+
+  .account-mobile__header {
+    display: none;
+  }
+
+  .account-mobile__content {
+    padding: 0;
+    max-width: 900px;
+  }
+}
+
+/* ── ≤1024px: TABLETĂ + TELEFON ────────────────────────────── */
+@media (max-width: 1024px) {
+
+  /* Body fundal matching */
+  body {
+    background-color: var(--acc-bg) !important;
+  }
+
+  /* Înlătură padding-ul standard — headerul custom preia controlul */
+  .account-mobile {
+    padding-top: 0 !important;
+  }
+
+  /* Aliasuri backward-compatible */
+  .mobile-account-header-gradient {
+    display: block !important;
+  }
+
+  .mobile-account-user-card {
+    display: flex !important;
+  }
+
+  .mobile-account-menu {
+    min-height: auto !important;
+    overflow-y: visible !important;
+  }
+}
+
+/* ── ≤480px: TELEFON MIC ────────────────────────────────────── */
 @media (max-width: 480px) {
+
+  /* Header greeting */
+  .account-mobile__greeting {
+    font-size: 3.0rem;
+    margin: 14px 0 32px 0;
+  }
+
+  .account-mobile__header {
+    padding: calc(28px + env(safe-area-inset-top)) 16px 100px 16px;
+  }
+
+  .account-mobile__usercard {
+    margin: -18px auto 0;
+    width: 100%;
+  }
+
+  .account-mobile__avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  /* Greeting alias */
+  .account-mobile__greeting {
+    font-size: 3.2rem;
+    font-weight: 900;
+    margin: 14px 0 32px 0;
+  }
+
+  .account-mobile__greeting-name {
+    font-weight: 900;
+    color: #000;
+  }
+
+  .account-mobile__menu-btn {
+    padding: 10px 12px;
+  }
+
+  .account-mobile__usercard {
+    width: 100%;
+    margin-top: -48px;
+  }
+
+  /* App-like: header mai compact */
+  .account-mobile.account-mobile--applike .account-mobile__header {
+    padding: calc(14px + env(safe-area-inset-top)) 16px 108px;
+  }
+
+  .account-mobile.account-mobile--applike .account-mobile__title {
+    font-size: 26px;
+  }
+
+  .account-mobile.account-mobile--applike .account-mobile__greeting {
+    font-size: 34px;
+    line-height: 38px;
+  }
+
+  .account-mobile.account-mobile--applike .account-mobile__usercard,
+  .account-mobile.account-mobile--applike .account-mobile__menu-group {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .account-mobile.account-mobile--applike .account-mobile__avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .account-mobile.account-mobile--applike .account-mobile__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+  }
+
+  /* Modal app-like pe telefon mic */
   .account-mobile.account-mobile--applike .account-modal-overlay {
     place-items: center;
     padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
@@ -875,6 +1127,7 @@
     flex-direction: column;
   }
 
+  /* Modal contact pe telefon mic */
   .account-mobile.account-mobile--applike .account-modal-card.contact {
     width: min(92vw, 440px);
     border-radius: 20px;
@@ -912,4 +1165,3 @@
     gap: 8px;
   }
 }
-

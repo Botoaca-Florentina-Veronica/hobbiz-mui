@@ -2,109 +2,101 @@
    ACCOUNT SETTINGS PAGE STYLES
    ============================================================= */
 
-/* 1. CONFIGURARE & VARIABILE
-   ---------------------------------------------------------- */
+
+/* ─────────────────────────────────────────────────────────────
+   1. VARIABILE & CONFIGURARE
+   ───────────────────────────────────────────────────────────── */
 :root {
-  /* --- Layout --- */
   --as-radius: 8px;
   --as-container-padding-top: 4rem;
-  
-  /* --- Colors (Light Mode Default) --- */
+
   --as-bg-page: #ffffff;
-  
-  /* Text */
+
   --as-text-title: #183642;
   --as-text-primary: #183642;
   --as-text-label: #0B2D5A;
-  
-  /* Menu & Items */
+
   --as-bg-menu: #fff;
   --as-border-menu: transparent;
   --as-bg-item: #f3f5f6;
   --as-bg-item-hover: #f8fafb;
-  
-  /* Forms */
+
   --as-bg-input: #f0f0f0;
   --as-border-input: #ccc;
   --as-border-input-focus: #0B2D5A;
-  
-  /* Buttons */
+
   --as-btn-bg: #0B2D5A;
   --as-btn-text: #fff;
   --as-btn-hover: #0D47A1;
-  
-  /* Messages */
+
   --as-msg-success-bg: #E3F2FD;
   --as-msg-success-text: #0D47A1;
   --as-msg-success-border: #BBDEFB;
-  
+
   --as-msg-error-bg: #f8d7da;
   --as-msg-error-text: #721c24;
   --as-msg-error-border: #f5c6cb;
-  
-  /* Shadows */
-  --as-shadow-menu: 0 2px 16px rgba(0,0,0,0.07);
-  --as-shadow-item: 0 2px 8px rgba(0,0,0,0.04);
-  --as-shadow-item-hover: 0 4px 16px rgba(24,54,66,0.08);
 
-  /* Mobile Header */
+  --as-shadow-menu: 0 2px 16px rgba(0, 0, 0, 0.07);
+  --as-shadow-item: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --as-shadow-item-hover: 0 4px 16px rgba(24, 54, 66, 0.08);
+
   --as-mob-header-text: var(--chat-text, #183642);
   --as-mob-btn-bg: var(--chat-elev, #ffffff);
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode */
 .dark-mode {
   --as-bg-page: #121212;
-  
-  /* Text */
+
   --as-text-title: #f51866;
   --as-text-primary: #ffffff;
   --as-text-label: #ffffff;
-  
-  /* Menu & Items */
+
   --as-bg-menu: #121212;
   --as-border-menu: 1px solid #3f3f3f;
   --as-bg-item: #282828;
   --as-bg-item-hover: #575757;
-  
-  /* Forms */
+
   --as-bg-input: #282828;
   --as-border-input: #575757;
   --as-border-input-focus: #fe6585;
-  
-  /* Buttons */
+
   --as-btn-bg: #f51866;
   --as-btn-text: #ffffff;
   --as-btn-hover: #fe6585;
-  
-  /* Messages */
+
   --as-msg-success-bg: #282828;
   --as-msg-success-text: #ffffff;
   --as-msg-success-border: #fe6585;
-  
+
   --as-msg-error-bg: #3f3f3f;
   --as-msg-error-text: #ff7e95;
   --as-msg-error-border: #f51866;
-  
-  /* Shadows */
-  --as-shadow-menu: 0 2px 16px rgba(0,0,0,0.3);
-  --as-shadow-item: 0 2px 8px rgba(0,0,0,0.2);
-  --as-shadow-item-hover: 0 4px 16px rgba(0,0,0,0.4);
-  
-  /* Mobile Header */
+
+  --as-shadow-menu: 0 2px 16px rgba(0, 0, 0, 0.3);
+  --as-shadow-item: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --as-shadow-item-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+
   --as-mob-header-text: #ffffff;
   --as-mob-btn-bg: #2a3f56;
 }
 
 
-/* 2. LAYOUT PRINCIPAL
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   2. LAYOUT PRINCIPAL
+   ───────────────────────────────────────────────────────────── */
+.account-settings-page-container {
+  background-color: var(--as-bg-page);
+  min-height: 100vh;
+  width: 100%;
+}
+
 .account-settings-container {
   background: var(--as-bg-page);
   min-height: 100vh;
   padding: 40px 20px;
   margin-top: var(--as-container-padding-top);
-  /* Reseturi implicite simplificate */
   width: 100%;
   box-sizing: border-box;
   transition: background-color 0.3s ease;
@@ -120,9 +112,9 @@
   font-weight: bold;
   color: var(--as-text-title);
   margin-bottom: 32px;
-  /* Centrat pe desktop logic, nu cu margin-left hardcodat ci prin container width */
   max-width: 900px;
-  margin-left: auto; margin-right: auto; 
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
   letter-spacing: -1px;
   line-height: 1.1;
@@ -144,13 +136,12 @@
   border: var(--as-border-menu);
 }
 
-/* Light mode: thin black border to match AnnouncementDetails */
+/* Light mode: bordură neagră subțire */
 body:not(.dark-mode) .settings-menu,
 body:not(.dark-mode) .settings-paper {
   border: 1px solid #121212 !important;
 }
 
-/* Note: individual items should not have an extra outline — container border is used for the page look */
 body:not(.dark-mode) .settings-item,
 body:not(.dark-mode) .setting-item,
 body:not(.dark-mode) .mobile-setting-item {
@@ -159,8 +150,9 @@ body:not(.dark-mode) .mobile-setting-item {
 }
 
 
-/* 3. SETTINGS ITEMS
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   3. ELEMENTE SETĂRI
+   ───────────────────────────────────────────────────────────── */
 .settings-item {
   background: var(--as-bg-item);
   border-radius: var(--as-radius);
@@ -184,10 +176,11 @@ body:not(.dark-mode) .mobile-setting-item {
 }
 
 
-/* 4. EMAIL CHANGE SECTION
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   4. SECȚIUNEA SCHIMBARE EMAIL
+   ───────────────────────────────────────────────────────────── */
 .email-change-section {
-  background: transparent; /* inherit Paper background to avoid visible gap */
+  background: transparent;
   border-radius: var(--as-radius);
   padding: 18px 24px 24px 24px;
   margin-bottom: 0;
@@ -201,7 +194,8 @@ body:not(.dark-mode) .mobile-setting-item {
   border: none;
   border-top: 1px solid #ffffff;
 }
-.dark-mode .email-change-section { 
+
+.dark-mode .email-change-section {
   border-top-color: #575757;
 }
 
@@ -255,8 +249,9 @@ body:not(.dark-mode) .mobile-setting-item {
 }
 
 
-/* 5. MESSAGES (Success/Error)
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   5. MESAJE (Succes / Eroare)
+   ───────────────────────────────────────────────────────────── */
 .message {
   padding: 12px;
   border-radius: var(--as-radius);
@@ -278,134 +273,12 @@ body:not(.dark-mode) .mobile-setting-item {
 }
 
 
-/* 6. RESPONSIVE / MOBILE
-   ---------------------------------------------------------- */
-
-/* Standard Mobile & Tablet (<1024px) */
-@media (max-width: 1024px) {
-  .account-settings-container {
-    padding: clamp(16px, 4vh, 28px) 12px 16px;
-    margin-top: 0;
-    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 16px);
-    min-height: 100dvh;
-  }
-
-  /* Mobile header visible on mobile */
-  .mobile-header { display: flex; }
-
-  /* Hide Desktop Title */
-  .settings-title { display: none; }
-
-  /* Make menu and items use full available width and responsive padding */
-  .settings-menu {
-    width: 100%;
-    max-width: 100%;
-    padding: clamp(12px, 4vw, 20px);
-    border-radius: 12px;
-    gap: 14px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-    margin: 0 0 12px 0;
-    box-sizing: border-box;
-  }
-
-  .settings-item {
-    width: 100%;
-    padding: clamp(12px, 3.5vw, 16px);
-    font-size: 1rem;
-    border-radius: 10px;
-    margin: 0 0 10px 0;
-    display: block;
-    box-sizing: border-box;
-  }
-
-  .email-change-section {
-    padding: clamp(12px, 3.5vw, 16px);
-    gap: 12px;
-    margin-top: 0;
-  }
-
-  .email-change-section label { font-size: 1rem; }
-
-  .email-change-section input[type="email"],
-  .email-change-section input[type="password"] {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 1rem;
-    box-sizing: border-box;
-  }
-
-  .email-change-section button,
-  .settings-menu button,
-  .settings-menu .MuiButton-root {
-    width: 100%;
-    padding: 10px 14px;
-    font-size: 1rem;
-    min-width: 0;
-  }
-
-  .message { font-size: 0.95rem; }
-
-  /* Respect safe-area insets and use full viewport width on notched devices */
-  .account-settings-container, .settings-menu { padding-left: env(safe-area-inset-left, 12px); padding-right: env(safe-area-inset-right, 12px); }
-}
-
-/* Very small screens (<420px) - tighter spacing */
-@media (max-width: 420px) {
-  .settings-menu {
-    padding: 10px;
-    border-radius: 8px;
-    gap: 10px;
-  }
-
-  .settings-item {
-    padding: 10px;
-    font-size: 0.95rem;
-    border-radius: 8px;
-  }
-
-  .email-change-section { padding: 10px; }
-}
-
-/* Touch Optimizations (<1000px) */
-@media (max-width: 1000px) {
-  .settings-item {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 0.95rem;
-    box-sizing: border-box;
-  }
-  
-  .email-change-section button,
-  .settings-menu button,
-  .settings-menu .MuiButton-root {
-    width: 100%;
-    min-width: 0;
-    font-size: 0.95rem;
-    padding: 10px 14px;
-  }
-}
-
-/* Extra small screens (<600px) - smaller buttons */
-@media (max-width: 600px) {
-  .settings-item {
-    padding: 12px 14px;
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-  
-  .email-change-section button,
-  .settings-menu button,
-  .settings-menu .MuiButton-root {
-    padding: 12px 14px;
-    font-size: 1rem;
-  }
-}
-
-
-/* 7. MOBILE HEADER (Custom Implementation)
-   ---------------------------------------------------------- */
+/* ─────────────────────────────────────────────────────────────
+   6. HEADER MOBIL
+   ───────────────────────────────────────────────────────────── */
+/* Ascuns pe desktop — afișat prin media query */
 .mobile-header {
-  display: none; /* Hidden on desktop */
+  display: none;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
@@ -416,13 +289,8 @@ body:not(.dark-mode) .mobile-setting-item {
   color: var(--as-mob-header-text);
 }
 
-.mobile-header .MuiIconButton-root {
-  color: #333333;
-}
-
-.dark-mode .mobile-header .MuiIconButton-root {
-  color: #ffffff;
-}
+.mobile-header .MuiIconButton-root { color: #333333; }
+.dark-mode .mobile-header .MuiIconButton-root { color: #ffffff; }
 
 .mobile-back-btn {
   width: 40px;
@@ -433,10 +301,10 @@ body:not(.dark-mode) .mobile-setting-item {
   align-items: center;
   justify-content: center;
   background-color: var(--as-mob-btn-bg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 .mobile-back-btn:hover {
-  /* Slightly darker on hover via filter to save vars */
   filter: brightness(0.95);
 }
 
@@ -455,34 +323,116 @@ body:not(.dark-mode) .mobile-setting-item {
   margin-left: 4px;
 }
 
-@media (max-width: 1024px) {
-  .mobile-header { display: flex; }
-}
 
-.account-settings-page-container {
-  background-color: var(--as-bg-page);
-  min-height: 100vh;
-  width: 100%;
-}
-
-/* ── Mobile single-card layout ── */
+/* ─────────────────────────────────────────────────────────────
+   7. LAYOUT CARD MOBIL vs. DESKTOP
+   ───────────────────────────────────────────────────────────── */
+/* Ascuns pe desktop — afișat prin media query */
 .as-mobile-card {
-  display: none; /* ascuns pe desktop */
+  display: none;
 }
 
+/* Vizibil pe desktop */
 .as-desktop-papers {
-  display: block; /* vizibil pe desktop */
+  display: block;
 }
 
+
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
+
+/* ── ≤1024px: TABLETĂ + TELEFON ────────────────────────────── */
 @media (max-width: 1024px) {
-  .as-desktop-papers { display: none; }
+
+  /* Container principal */
+  .account-settings-container {
+    padding: clamp(16px, 4vh, 28px) 12px 16px;
+    margin-top: 0;
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom) + 16px);
+    min-height: 100dvh;
+    padding-left: env(safe-area-inset-left, 12px);
+    padding-right: env(safe-area-inset-right, 12px);
+  }
+
+  /* Header mobil vizibil */
+  .mobile-header {
+    display: flex;
+  }
+
+  /* Titlul desktop ascuns */
+  .settings-title {
+    display: none;
+  }
+
+  /* Meniu */
+  .settings-menu {
+    width: 100%;
+    max-width: 100%;
+    padding: clamp(12px, 4vw, 20px);
+    padding-left: env(safe-area-inset-left, 12px);
+    padding-right: env(safe-area-inset-right, 12px);
+    border-radius: 12px;
+    gap: 14px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+    margin: 0 0 12px 0;
+    box-sizing: border-box;
+  }
+
+  /* Item */
+  .settings-item {
+    width: 100%;
+    padding: clamp(12px, 3.5vw, 16px);
+    font-size: 1rem;
+    border-radius: 10px;
+    margin: 0 0 10px 0;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  /* Secțiunea email */
+  .email-change-section {
+    padding: clamp(12px, 3.5vw, 16px);
+    gap: 12px;
+    margin-top: 0;
+  }
+
+  .email-change-section label {
+    font-size: 1rem;
+  }
+
+  .email-change-section input[type="email"],
+  .email-change-section input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .email-change-section button,
+  .settings-menu button,
+  .settings-menu .MuiButton-root {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    min-width: 0;
+  }
+
+  .message {
+    font-size: 0.95rem;
+  }
+
+  /* Layout card mobil */
+  .as-desktop-papers {
+    display: none;
+  }
 
   .as-mobile-card {
     display: block;
     background: #ffffff;
     border-radius: 16px;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     margin-bottom: 16px;
   }
@@ -490,7 +440,7 @@ body:not(.dark-mode) .mobile-setting-item {
   .dark-mode .as-mobile-card {
     background: #1e1e1e;
     border-color: #3a3a3c;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .as-mobile-item {
@@ -507,11 +457,11 @@ body:not(.dark-mode) .mobile-setting-item {
   }
 
   .as-mobile-item:active {
-    background: rgba(0,0,0,0.03);
+    background: rgba(0, 0, 0, 0.03);
   }
 
   .dark-mode .as-mobile-item:active {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
   }
 
   .as-mobile-ico {
@@ -560,5 +510,59 @@ body:not(.dark-mode) .mobile-setting-item {
 
   .dark-mode .as-mobile-form {
     border-top-color: #3a3a3c;
+  }
+}
+
+/* ── ≤1000px: OPTIMIZĂRI TOUCH ──────────────────────────────── */
+@media (max-width: 1000px) {
+  .settings-item {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+  }
+
+  .email-change-section button,
+  .settings-menu button,
+  .settings-menu .MuiButton-root {
+    width: 100%;
+    min-width: 0;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+  }
+}
+
+/* ── ≤600px: ECRANE MICI ────────────────────────────────────── */
+@media (max-width: 600px) {
+  .settings-item {
+    padding: 12px 14px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .email-change-section button,
+  .settings-menu button,
+  .settings-menu .MuiButton-root {
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+}
+
+/* ── ≤420px: TELEFOANE FOARTE MICI ──────────────────────────── */
+@media (max-width: 420px) {
+  .settings-menu {
+    padding: 10px;
+    border-radius: 8px;
+    gap: 10px;
+  }
+
+  .settings-item {
+    padding: 10px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .email-change-section {
+    padding: 10px;
   }
 }

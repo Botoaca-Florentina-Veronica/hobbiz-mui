@@ -590,7 +590,11 @@ body.dark-mode .pp-bar-track {
   background: #3d3d3d;
 }
 
-/* â”€â”€ Responsive â”€â”€ */
+/* =============================================================
+   RESPONSIVE — de la mare la mic
+   ============================================================= */
+
+/* ── ≤1024px: TABLETĂ ──────────────────────────────────────── */
 @media (max-width: 1024px) {
   .pp-grid {
     grid-template-columns: 1fr 300px;
@@ -599,6 +603,7 @@ body.dark-mode .pp-bar-track {
   .pp-hero-body { padding: 0 20px; }
   .pp-stats { margin-left: 20px; margin-right: 20px; }
 }
+/* ── ≤768px: TELEFON ────────────────────────────────────────── */
 @media (max-width: 768px) {
   .pp-mobile-header { display: flex; }
 
@@ -638,6 +643,7 @@ body.dark-mode .pp-bar-track {
   .pp-rating-box { flex-direction: column; gap: 16px; }
   .pp-rating-left { flex-direction: row; gap: 12px; }
 }
+/* ── ≤480px: TELEFON MIC ────────────────────────────────────── */
 @media (max-width: 480px) {
   .pp-hero-cover { height: 130px; }
   .pp-hero-avatar { width: 80px; height: 80px; }

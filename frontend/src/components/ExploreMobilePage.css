@@ -270,6 +270,11 @@
   text-align: center;
 }
 
+/* =============================================================
+   RESPONSIVE — de la mare la mic
+   ============================================================= */
+
+/* ── ≤420px: TELEFON MIC ────────────────────────────────────── */
 @media (max-width: 420px) {
   .explore-mobile-page {
     padding: 8px 12px max(24px, calc(var(--ft-mobile-height, 65px) + 16px + env(safe-area-inset-bottom, 0px)));

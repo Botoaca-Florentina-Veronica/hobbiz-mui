@@ -50,6 +50,7 @@ import SyncFavoritesModal from './components/SyncFavoritesModal.jsx';
 import CookieConsent from './components/CookieConsent';
 import ClickSpark from './components/ClickSpark';
 import LoadingOverlay from './components/LoadingOverlay';
+import MobileAppBanner from './components/MobileAppBanner';
 import i18n from './i18n';
 
 function App() {
@@ -404,6 +405,7 @@ function App() {
     >
       <LoadingOverlay />
       {appView}
+      <MobileAppBanner />
       <Toast
         message={toast.message}
         type={toast.type}

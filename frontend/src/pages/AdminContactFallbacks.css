@@ -299,6 +299,11 @@
   color: #cbd5e1 !important;
 }
 
+/* =============================================================
+   RESPONSIVE — de la mare la mic
+   ============================================================= */
+
+/* ── ≤900px: TABLETĂ ───────────────────────────────────────── */
 @media (max-width: 900px) {
   .acf-title-row {
     flex-direction: column;
@@ -306,6 +311,7 @@
   }
 }
 
+/* ── ≤600px: TELEFON ────────────────────────────────────────── */
 @media (max-width: 600px) {
   .acf-container {
     padding-top: calc(88px + env(safe-area-inset-top, 0px)) !important;

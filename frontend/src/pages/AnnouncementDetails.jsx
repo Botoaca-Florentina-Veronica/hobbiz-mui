@@ -59,6 +59,7 @@ import {
   Visibility as VisibilityIcon
 } from '@mui/icons-material';
 import StarIcon from '@mui/icons-material/Star';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import apiClient from '../api/api';
 import { createAnnouncementReport } from '../api/api';
 import Toast from '../components/Toast';
@@ -130,6 +131,11 @@ export default function AnnouncementDetails() {
   const [ratingValue, setRatingValue] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
 
+  // ========== Error modal ==========
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState('');
+  const showErrorModal = (message) => { setErrorModalMessage(message); setErrorModalOpen(true); };
+
   // ========== Report dialog ==========
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('spam');
@@ -178,7 +184,7 @@ export default function AnnouncementDetails() {
       // Ensure we have the target user id
       const reviewedUserId = announcement?.user?._id || announcement?.user?.id;
       if (!reviewedUserId) {
-        alert(t('announcementDetails.userNotAvailable'));
+        showErrorModal(t('announcementDetails.userNotAvailable'));
         return;
       }
 
@@ -196,9 +202,9 @@ export default function AnnouncementDetails() {
       console.error('Eroare la trimiterea recenziei:', err);
       // Provide user feedback
       if (err?.response?.data?.error) {
-        alert(`${t('common.error')}: ${err.response.data.error}`);
+        showErrorModal(err.response.data.error);
       } else {
-        alert(t('announcementDetails.reviewError'));
+        showErrorModal(t('announcementDetails.reviewError'));
       }
     }
   };
@@ -1274,6 +1280,105 @@ export default function AnnouncementDetails() {
             sx={{ bgcolor: '#e5533d', '&:hover': { bgcolor: '#cd412b' }, color: '#ffffff', fontFamily: "'Poppins', sans-serif" }}
           >
             {t('announcementDetails.reportDialog.submit')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========== Error Modal ========== */}
+      <Dialog
+        open={errorModalOpen}
+        onClose={() => setErrorModalOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: '24px',
+            maxWidth: '380px',
+            width: '100%',
+            background: getIsDarkMode() ? '#1a1a2e' : '#ffffff',
+            boxShadow: getIsDarkMode()
+              ? '0 32px 64px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06)'
+              : '0 32px 64px rgba(0,0,0,0.14)',
+            overflow: 'visible',
+          }
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(0,0,0,0.45)',
+            }
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', pt: 5, pb: 2, px: 4 }}>
+          <Box sx={{
+            width: 72,
+            height: 72,
+            borderRadius: '50%',
+            background: getIsDarkMode()
+              ? 'linear-gradient(135deg, #f51866 0%, #fa4875 100%)'
+              : 'linear-gradient(135deg, #2D4361 0%, #4A6FA5 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            boxShadow: getIsDarkMode()
+              ? '0 10px 28px rgba(245,24,102,0.4)'
+              : '0 10px 28px rgba(45,67,97,0.32)',
+          }}>
+            <LockOutlinedIcon sx={{ color: '#fff', fontSize: 30 }} />
+          </Box>
+          <Typography sx={{
+            fontWeight: 700,
+            mb: 1.5,
+            fontFamily: "'Poppins', sans-serif",
+            color: getIsDarkMode() ? '#f9fafb' : '#111827',
+            fontSize: '1.1rem',
+            lineHeight: 1.3,
+          }}>
+            Acces restricționat
+          </Typography>
+          <Typography sx={{
+            color: getIsDarkMode() ? '#9ca3af' : '#6b7280',
+            lineHeight: 1.7,
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: '0.88rem',
+          }}>
+            {errorModalMessage}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 4, pt: 1.5 }}>
+          <Button
+            onClick={() => setErrorModalOpen(false)}
+            variant="contained"
+            disableElevation
+            sx={{
+              borderRadius: '14px',
+              padding: '11px 40px',
+              background: getIsDarkMode()
+                ? 'linear-gradient(135deg, #f51866 0%, #fa4875 100%)'
+                : 'linear-gradient(135deg, #2D4361 0%, #4A6FA5 100%)',
+              color: '#fff',
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              letterSpacing: '0.01em',
+              boxShadow: getIsDarkMode()
+                ? '0 4px 16px rgba(245,24,102,0.35)'
+                : '0 4px 16px rgba(45,67,97,0.28)',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: getIsDarkMode()
+                  ? 'linear-gradient(135deg, #e0145a 0%, #f03d6c 100%)'
+                  : 'linear-gradient(135deg, #1A314E 0%, #2D4361 100%)',
+                transform: 'translateY(-1px)',
+                boxShadow: getIsDarkMode()
+                  ? '0 8px 24px rgba(245,24,102,0.45)'
+                  : '0 8px 24px rgba(45,67,97,0.38)',
+              },
+            }}
+          >
+            Am înțeles
           </Button>
         </DialogActions>
       </Dialog>

@@ -10,12 +10,20 @@
   z-index: 50;
   background: var(--pp-card, #ffffff);
   border-bottom: 1px solid var(--pp-border, #e5e7eb);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Pe ecrane mari headerul principal al site-ului este fix (4.5rem înălțime).
+   Fără compensare, .ar-header apare în spatele lui la încărcare și la scroll.
+   Soluție: îl poziționăm dedesubt cu margin-top (poziție inițială) și top (sticky). */
+@media (min-width: 641px) {
+  .ar-header {
+    margin-top: 4.5rem;
+    top: 4.5rem;
+  }
 }
 .ar-header-inner {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -232,7 +240,11 @@
   gap: 8px;
 }
 
-/* ── Responsive ── */
+/* =============================================================
+   RESPONSIVE — de la mare la mic
+   ============================================================= */
+
+/* ── ≤640px: TELEFON ────────────────────────────────────────── */
 @media (max-width: 640px) {
   .ar-header-inner {
     padding: 12px 16px;
@@ -264,7 +276,7 @@
 
 /* ── Dark mode adjustments ── */
 body.dark-mode .ar-header {
-  background: rgba(18, 18, 18, 0.92);
+  background: #121212;
   border-bottom-color: var(--pp-border);
 }
 body.dark-mode .ar-summary-card,

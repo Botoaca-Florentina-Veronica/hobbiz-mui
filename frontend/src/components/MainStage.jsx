@@ -725,8 +725,20 @@ export default function MainStage() {
               <Typography className="popover-title">Alege localitatea</Typography>
               <List className="popover-list">
                 <ListItemButton onClick={() => setSelectedJudet(null)} divider>
-                  <ListItemText 
-                    primary={<span className="back-to-judete">{t('mainStage.backToCounties')}</span>} 
+                  <ListItemText
+                    primary={<span className="back-to-judete">{t('mainStage.backToCounties')}</span>}
+                  />
+                </ListItemButton>
+                <ListItemButton
+                  onClick={() => {
+                    setSelectedLocalitate("");
+                    setAnchorEl(null);
+                  }}
+                  divider
+                  className="tot-judetul-button"
+                >
+                  <ListItemText
+                    primary={<span className="tot-judetul">Tot județul {selectedJudet}</span>}
                   />
                 </ListItemButton>
                 {getLocalitatiForJudet(selectedJudet).map((localitate) => (

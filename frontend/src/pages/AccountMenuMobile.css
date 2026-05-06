@@ -1,4 +1,11 @@
-﻿/* Color tokens for Account page (light + dark via CSS vars) */
+/* =============================================================
+   ACCOUNT MENU MOBILE — stiluri de bază
+   ============================================================= */
+
+
+/* ─────────────────────────────────────────────────────────────
+   1. VARIABILE
+   ───────────────────────────────────────────────────────────── */
 :root {
   --acc-bg: #f8f9fa;
   --acc-card: #ffffff;
@@ -6,8 +13,8 @@
   --acc-border: #e5e7eb;
   --acc-text: #1a1a1a;
   --acc-title: #1a1a1a;
-  --acc-primary: #2D4361; /* Primary a0 */
-  --acc-primary-alt: #f51866; /* Primary a10 */
+  --acc-primary: #2D4361;
+  --acc-primary-alt: #f51866;
   --acc-divider: #e5e7eb;
   --acc-hover: #f8fafc;
   --acc-avatar-bg: #5a8db8;
@@ -17,27 +24,31 @@
 }
 
 .dark-mode {
-  --acc-bg: #000000;      /* Surface a0 */
-  --acc-card: #2c2c2e;    /* Surface a10 */
+  --acc-bg: #000000;
+  --acc-card: #2c2c2e;
   --acc-user-card: #2c2c2e;
-  --acc-border: #3a3a3c;  /* Surface a20 */
-  --acc-text: #ffffff;    /* Surface a50 as readable text */
-  --acc-title: #ffffff;   /* Primary a50 for headings */
-  --acc-primary: #f51866; /* Primary a0 */
-  --acc-primary-alt: #f51866; /* Primary a10 */
-  --acc-divider: #3a3a3c; /* Surface a30 */
-  --acc-hover: #3a3a3c;   /* Surface a20 */
+  --acc-border: #3a3a3c;
+  --acc-text: #ffffff;
+  --acc-title: #ffffff;
+  --acc-primary: #f51866;
+  --acc-primary-alt: #f51866;
+  --acc-divider: #3a3a3c;
+  --acc-hover: #3a3a3c;
   --acc-avatar-bg: #3a3a3c;
   --acc-avatar-icon: #5a8db8;
   --acc-user-name: #ffffff;
   --acc-user-info: #9ca3af;
 }
 
+
+/* ─────────────────────────────────────────────────────────────
+   2. CONTAINER & ELEMENTE
+   ───────────────────────────────────────────────────────────── */
 .mobile-account-menu {
   max-width: 720px;
   margin: 0 auto;
   padding: 16px 16px calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
-  min-height: 100dvh; /* ensure full height on mobile with dynamic viewport */
+  min-height: 100dvh;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -79,116 +90,6 @@
   font-weight: 600;
 }
 
-/* Hide the specific "Contul tău" menu card on mobile devices */
-@media (max-width: 1024px) {
-  .mobile-account-menu__list [data-menu-key="/contul-tau"] {
-    display: none !important;
-  }
-}
-
-/* Apply mobile-specific styles only on small screens */
-@media (max-width: 1024px) {
-  /* Mobile header gradient visible */
-  .mobile-account-header-gradient {
-    display: block !important;
-  }
-
-  /* Mobile user info card styling */
-  .mobile-account-user-card {
-    display: flex !important;
-  }
-
-  /* Adjust padding for mobile */
-  .mobile-menu-items-wrapper {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
-  /* Ensure body background matches on mobile */
-  body {
-    background-color: var(--acc-bg) !important;
-  }
-
-  /* Smaller gap between cards on mobile */
-  .mobile-account-menu__list {
-    gap: 8px !important;
-  }
-
-  /* Fix double scrollbars on small screens: let the body handle scrolling
-     and avoid forcing a full 100dvh container which can cause extra scrollbars */
-  .mobile-account-menu {
-    min-height: auto !important;
-    overflow-y: visible !important;
-    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom)) !important;
-  }
-}
-
-/* For very small phones */
-@media (max-width: 480px) {
-  /* Smaller font for greeting text */
-  .mobile-account-greeting {
-    font-size: 1.5rem !important;
-  }
-
-  /* Smaller avatar on very small screens */
-  .mobile-account-avatar {
-    width: 64px !important;
-    height: 64px !important;
-  }
-
-  /* Reduce padding in cards */
-  .mobile-account-menu__list .MuiCardContent-root {
-    padding: 10px 12px !important;
-  }
-}
-
-/* For extra small phones */
-@media (max-width: 360px) {
-  .mobile-account-greeting {
-    font-size: 1.3rem !important;
-  }
-
-  .mobile-account-avatar {
-    width: 56px !important;
-    height: 56px !important;
-  }
-
-  /* Smaller padding on very small screens */
-  .mobile-menu-items-wrapper {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-
-  /* Further reduce padding in cards */
-  .mobile-account-menu__list .MuiCardContent-root {
-    padding: 8px 10px !important;
-  }
-}
-
-/* On larger screens, use simpler layout */
-@media (min-width: 1025px) {
-  /* Hide mobile-specific gradient header */
-  .mobile-account-header-gradient {
-    display: none !important;
-  }
-
-  /* Hide or adjust mobile user card */
-  .mobile-account-user-card {
-    display: none !important;
-  }
-
-  /* Show simple header on desktop */
-  .desktop-account-header {
-    display: flex !important;
-  }
-
-  /* Add padding back for desktop */
-  .mobile-menu-items-wrapper {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-  }
-}
-
 .mobile-account-menu__footer {
   margin-top: 24px;
 }
@@ -209,3 +110,106 @@
 .dark-mode .back-btn { background: var(--dm-bg-elev); border-color: var(--dm-border); color: var(--dm-text); }
 .dark-mode .menu-item { background: var(--dm-bg-elev); border-color: var(--dm-border); color: var(--dm-text); }
 .dark-mode .logout-btn { background: var(--dm-pink); }
+
+
+/* =============================================================
+   RESPONSIVE — toate breakpointurile, de la mare la mic
+   ============================================================= */
+
+/* ── ≥1025px: DESKTOP — elemente mobile ascunse ────────────── */
+@media (min-width: 1025px) {
+  .mobile-account-header-gradient {
+    display: none !important;
+  }
+
+  .mobile-account-user-card {
+    display: none !important;
+  }
+
+  .desktop-account-header {
+    display: flex !important;
+  }
+
+  .mobile-menu-items-wrapper {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+/* ── ≤1024px: TABLETĂ + TELEFON ────────────────────────────── */
+@media (max-width: 1024px) {
+
+  /* Ascunde elementul de meniu "Contul tău" pe mobil */
+  .mobile-account-menu__list [data-menu-key="/contul-tau"] {
+    display: none !important;
+  }
+
+  /* Header gradient și card utilizator vizibile pe mobil */
+  .mobile-account-header-gradient {
+    display: block !important;
+  }
+
+  .mobile-account-user-card {
+    display: flex !important;
+  }
+
+  /* Padding ajustat pentru mobil */
+  .mobile-menu-items-wrapper {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Fundalul body-ului să corespundă cu pagina */
+  body {
+    background-color: var(--acc-bg) !important;
+  }
+
+  /* Spațiere mai mică între carduri */
+  .mobile-account-menu__list {
+    gap: 8px !important;
+  }
+
+  /* Evită scroll dublu — body gestionează scroll-ul */
+  .mobile-account-menu {
+    min-height: auto !important;
+    overflow-y: visible !important;
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ── ≤480px: TELEFOANE MICI ─────────────────────────────────── */
+@media (max-width: 480px) {
+  .mobile-account-greeting {
+    font-size: 1.5rem !important;
+  }
+
+  .mobile-account-avatar {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .mobile-account-menu__list .MuiCardContent-root {
+    padding: 10px 12px !important;
+  }
+}
+
+/* ── ≤360px: TELEFOANE FOARTE MICI ──────────────────────────── */
+@media (max-width: 360px) {
+  .mobile-account-greeting {
+    font-size: 1.3rem !important;
+  }
+
+  .mobile-account-avatar {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .mobile-menu-items-wrapper {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .mobile-account-menu__list .MuiCardContent-root {
+    padding: 8px 10px !important;
+  }
+}

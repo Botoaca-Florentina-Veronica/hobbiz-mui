@@ -5,6 +5,8 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Popover } from '@mui/material';
 import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessage } from '../api/api';
+import useSocket from '../hooks/useSocket';
+import TypingIndicator from './TypingIndicator';
 import './ChatPopup.css';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
@@ -32,6 +34,8 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
   const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
   const [emojiClosing, setEmojiClosing] = useState(false);
 
   // Obține userId din localStorage dacă nu e pasat ca prop; dacă lipsește dar avem token, încearcă să-l afli din profil
@@ -61,6 +65,33 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     // Nu sortăm, ordinea e: sellerId, userId, announcementId
     return [sellerId, effectiveUserId, announcementId].join('-');
   }, [seller, effectiveUserId, announcement]);
+
+  // Socket — typing support
+  const { emitTyping, on, off } = useSocket(effectiveUserId);
+
+  useEffect(() => {
+    if (!conversationId || !effectiveUserId) return;
+
+    const handleUserTyping = (data) => {
+      if (data.conversationId === conversationId && data.userId !== effectiveUserId) {
+        setIsOtherUserTyping(data.isTyping);
+      }
+    };
+
+    on('userTyping', handleUserTyping);
+    return () => {
+      off('userTyping', handleUserTyping);
+      clearTimeout(typingTimeoutRef.current);
+    };
+  }, [conversationId, effectiveUserId, on, off]);
+
+  const handleTypingInput = (text) => {
+    setInput(text);
+    if (!conversationId) return;
+    emitTyping(conversationId, true);
+    clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => emitTyping(conversationId, false), 2000);
+  };
 
   // Persist lightweight chat metadata locally for conversation list fallbacks
   useEffect(() => {
@@ -111,6 +142,16 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  // Scroll when typing indicator appears so it's fully visible
+  useEffect(() => {
+    if (!isOtherUserTyping) return;
+    // Small delay so the element has rendered before we scroll
+    const id = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+    return () => clearTimeout(id);
+  }, [isOtherUserTyping]);
 
   // Enable/disable resizable mode based on viewport width
   useEffect(() => {
@@ -188,6 +229,8 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const handleSend = async (e) => {
     e.preventDefault();
     if (sending || !conversationId) return;
+    clearTimeout(typingTimeoutRef.current);
+    emitTyping(conversationId, false);
 
     const hasText = !!input.trim();
     const hasFile = !!selectedFile;
@@ -463,6 +506,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               </div>
             ))
           )}
+          {isOtherUserTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
         <div className="chat-popup-input-row">
@@ -596,7 +640,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               className="chat-popup-input"
               placeholder={sending ? "Se trimite..." : selectedFile ? "Sau scrie un mesaj..." : "Scrie mesajul tău..."}
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={e => handleTypingInput(e.target.value)}
               maxLength={2000}
               disabled={sending}
               autoFocus

@@ -20,6 +20,7 @@ import {
   findNodeHandle,
   Linking,
   ViewStyle,
+  Animated,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { ThemedText } from '../components/themed-text';
@@ -104,6 +105,34 @@ interface Message {
   };
 }
 
+
+// Animated dot for the typing indicator bubble
+function TypingDot({ delay, isDark, primary }: { delay: number; isDark: boolean; primary: string }) {
+  const anim = React.useRef(new Animated.Value(0)).current;
+  React.useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(anim, { toValue: -6, duration: 300, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0,  duration: 300, useNativeDriver: true }),
+        Animated.delay(700),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [anim, delay]);
+
+  return (
+    <Animated.View
+      style={{
+        width: 7, height: 7, borderRadius: 3.5,
+        backgroundColor: isDark ? '#6b7280' : '#b0b8c4',
+        transform: [{ translateY: anim }],
+        marginHorizontal: 2,
+      }}
+    />
+  );
+}
 
 export default function ConversationScreen() {
   const { tokens, isDark } = useAppTheme();
@@ -970,6 +999,8 @@ export default function ConversationScreen() {
 
   const handleSendMessage = async () => {
     if (!userId || !newMessage.trim() || !selectedConversation) return;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    if (socket && selectedConversation) socket.emit('typing', { conversationId: selectedConversation.conversationId, isTyping: false });
     const capturedReply = replyTo;
 
     const tempMessage: Message = {
@@ -1916,6 +1947,19 @@ export default function ConversationScreen() {
               })}
             </>
           )}
+
+          {/* Typing indicator */}
+          {isOtherUserTyping && (
+            <View style={styles.typingRow}>
+              <View style={[styles.typingBubble, { backgroundColor: isDark ? '#2a2a2a' : '#f0f2f5' }]}>
+                <View style={styles.typingDots}>
+                  <TypingDot delay={0}    isDark={isDark} primary={tokens.colors.primary} />
+                  <TypingDot delay={190}  isDark={isDark} primary={tokens.colors.primary} />
+                  <TypingDot delay={380}  isDark={isDark} primary={tokens.colors.primary} />
+                </View>
+              </View>
+            </View>
+          )}
         </ScrollView>
 
     {replyTo && replyTo.messageId && (
@@ -2334,6 +2378,22 @@ export default function ConversationScreen() {
 }
 
 const styles = StyleSheet.create({
+  typingRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingHorizontal: 16,
+    paddingBottom: 6,
+  },
+  typingBubble: {
+    borderRadius: 18,
+    borderBottomLeftRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  typingDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   container: { flex: 1 },
   loadingContainer: {
     flex: 1,
@@ -2391,6 +2451,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    width: '100%',
     gap: 14,
     marginLeft: 0,
   },

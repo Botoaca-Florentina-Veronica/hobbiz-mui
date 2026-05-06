@@ -1,72 +1,50 @@
-.typing-indicator {
+/* TypingIndicator — WhatsApp-style animated bubble */
+
+.ti-wrapper {
   display: flex;
+  align-items: flex-end;
+  padding: 2px 16px 6px;
+  animation: ti-enter 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes ti-enter {
+  from { opacity: 0; transform: translateY(8px) scale(0.88); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+.ti-bubble {
+  display: inline-flex;
   align-items: center;
-  padding: 8px 16px;
-  margin-bottom: 8px;
-  opacity: 0.8;
+  gap: 5px;
+  padding: 11px 16px;
+  background: var(--chat-bubble-received, #f0f2f5);
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.typing-indicator-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f0f0f0;
-  padding: 8px 12px;
-  border-radius: 18px;
-  font-size: 0.9rem;
+.dark-mode .ti-bubble {
+  background: #2a2a2a;
+  box-shadow: none;
 }
 
-.dark-mode .typing-indicator-content {
-  background: #3a3a3a;
-  color: #ffffff;
-}
-
-.typing-user {
-  color: #666;
-  font-style: italic;
-}
-
-.dark-mode .typing-user {
-  color: #ccc;
-}
-
-.typing-dots {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-}
-
-.typing-dot {
-  width: 4px;
-  height: 4px;
+.ti-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: #999;
-  animation: typing-bounce 1.4s infinite ease-in-out;
+  background: #b0b8c4;
+  animation: ti-bounce 1.3s infinite ease-in-out;
 }
 
-.dark-mode .typing-dot {
-  background-color: #bbb;
+.dark-mode .ti-dot {
+  background: #6b7280;
 }
 
-.typing-dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
+.ti-dot:nth-child(1) { animation-delay: 0s;     }
+.ti-dot:nth-child(2) { animation-delay: 0.19s;  }
+.ti-dot:nth-child(3) { animation-delay: 0.38s;  }
 
-.typing-dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-.typing-dot:nth-child(3) {
-  animation-delay: 0s;
-}
-
-@keyframes typing-bounce {
-  0%, 80%, 100% {
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
+@keyframes ti-bounce {
+  0%, 55%, 100% { transform: translateY(0);    opacity: 0.45; }
+  27%           { transform: translateY(-6px); opacity: 1;    }
 }

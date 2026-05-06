@@ -1,0 +1,270 @@
+/* MobileAppBanner — bottom-sheet suggestion for mobile/tablet users */
+
+/* ── Backdrop ───────────────────────────────────────────────── */
+.mab-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-end;
+  animation: mab-fade-in 0.28s ease both;
+}
+
+.mab-backdrop--exit {
+  animation: mab-fade-out 0.3s ease both;
+}
+
+@keyframes mab-fade-in  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes mab-fade-out { from { opacity: 1 } to { opacity: 0 } }
+
+/* ── Sheet ──────────────────────────────────────────────────── */
+.mab-sheet {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  padding: 12px 20px 32px;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.18);
+  animation: mab-slide-up 0.32s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+.dark-mode .mab-sheet {
+  background: #1a1a1a;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
+}
+
+.mab-sheet--exit {
+  animation: mab-slide-down 0.3s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes mab-slide-up {
+  from { transform: translateY(100%) }
+  to   { transform: translateY(0) }
+}
+@keyframes mab-slide-down {
+  from { transform: translateY(0) }
+  to   { transform: translateY(110%) }
+}
+
+/* ── Handle ─────────────────────────────────────────────────── */
+.mab-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: #d1d5db;
+  margin: 0 auto 20px;
+}
+
+.dark-mode .mab-handle {
+  background: #3a3a3a;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.mab-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mab-logo-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.mab-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.mab-brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.3px;
+}
+
+.dark-mode .mab-brand {
+  color: #f9fafb;
+}
+
+.mab-android-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #3ddc84;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.mab-android-icon {
+  width: 13px;
+  height: 13px;
+  fill: #3ddc84;
+  flex-shrink: 0;
+}
+
+.mab-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mab-close:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.dark-mode .mab-close {
+  background: #2a2a2a;
+  color: #9ca3af;
+}
+
+.dark-mode .mab-close:hover {
+  background: #333;
+  color: #e5e7eb;
+}
+
+.mab-close svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Body ───────────────────────────────────────────────────── */
+.mab-body {
+  margin-bottom: 20px;
+}
+
+.mab-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.2px;
+}
+
+.dark-mode .mab-title {
+  color: #f9fafb;
+}
+
+.mab-desc {
+  font-size: 13.5px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.dark-mode .mab-desc {
+  color: #9ca3af;
+}
+
+/* ── Actions ────────────────────────────────────────────────── */
+.mab-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mab-btn-download {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2D4361 0%, #4A6FA5 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 14px rgba(45, 67, 97, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mab-btn-download:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(45, 67, 97, 0.25);
+}
+
+.dark-mode .mab-btn-download {
+  background: linear-gradient(135deg, #f51866 0%, #fa4875 100%);
+  box-shadow: 0 4px 14px rgba(245, 24, 102, 0.35);
+}
+
+.mab-btn-icon {
+  width: 18px;
+  height: 18px;
+  fill: #ffffff;
+  flex-shrink: 0;
+}
+
+.mab-btn-dismiss {
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1.5px solid #e5e7eb;
+  background: transparent;
+  color: #6b7280;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mab-btn-dismiss:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.mab-btn-dismiss:active {
+  background: #f3f4f6;
+}
+
+.dark-mode .mab-btn-dismiss {
+  border-color: #2a2a2a;
+  color: #9ca3af;
+}
+
+.dark-mode .mab-btn-dismiss:hover {
+  background: #222;
+  color: #e5e7eb;
+}
+
+/* Only show on small screens */
+@media (min-width: 1025px) {
+  .mab-backdrop {
+    display: none;
+  }
+}

@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CircularProgress, Avatar, IconButton } from '@mui/material';
+import {
+  CircularProgress, Avatar, IconButton,
+  Menu, MenuItem, ListItemIcon, ListItemText,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  Button, Typography,
+} from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import SortIcon from '@mui/icons-material/Sort';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -28,6 +35,9 @@ export default function PublicProfileAllReviews() {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [menuState, setMenuState] = useState({ anchorEl: null, reviewId: null });
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -77,6 +87,18 @@ export default function PublicProfileAllReviews() {
       default: return dateB - dateA; // newest
     }
   });
+
+  const getReviewAuthorId = (r) => {
+    if (!r) return null;
+    if (r.author && typeof r.author === 'object') {
+      if (r.author._id) return String(r.author._id);
+      if (r.author.id) return String(r.author.id);
+      try { return String(r.author); } catch (_) { return null; }
+    }
+    if (r.author) return String(r.author);
+    if (r.authorId) return String(r.authorId);
+    return null;
+  };
 
   const getAnnouncementTitle = (r) => {
     if (!r) return '';
@@ -268,6 +290,16 @@ export default function PublicProfileAllReviews() {
                       <ThumbUpIcon className="pp-like-ico" />
                       <span>{likedState[r._id]?.count ?? (r.likes || []).length}</span>
                     </button>
+                    {currentUserId && getReviewAuthorId(r) && String(currentUserId) === getReviewAuthorId(r) && (
+                      <IconButton
+                        size="small"
+                        className="pp-rev-menu"
+                        onClick={(e) => setMenuState({ anchorEl: e.currentTarget, reviewId: r._id })}
+                        aria-label="Opțiuni recenzie"
+                      >
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
+                    )}
                   </div>
                 </article>
               );
@@ -277,6 +309,66 @@ export default function PublicProfileAllReviews() {
           )}
         </div>
       </div>
+
+      {/* ── Delete menu ── */}
+      <Menu
+        anchorEl={menuState.anchorEl}
+        open={!!menuState.anchorEl}
+        onClose={() => setMenuState({ anchorEl: null, reviewId: null })}
+        PaperProps={{ sx: { borderRadius: 2.5, boxShadow: '0 8px 30px rgba(0,0,0,0.12)', minWidth: 160, py: 0.5 } }}
+      >
+        <MenuItem onClick={() => {
+          const id = menuState.reviewId;
+          setMenuState({ anchorEl: null, reviewId: null });
+          setDeleteTargetId(id);
+          setDeleteDialogOpen(true);
+        }}>
+          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>{t('publicProfile.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      {/* ── Delete confirmation dialog ── */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: '16px' } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('publicProfile.deleteReview')}</DialogTitle>
+        <DialogContent dividers>
+          <Typography>{t('publicProfile.deleteReviewMessage')}</Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} sx={{ borderRadius: 2 }}>
+            {t('publicProfile.cancel')}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            sx={{ borderRadius: 2 }}
+            onClick={async () => {
+              try {
+                await apiClient.delete(`/api/reviews/${deleteTargetId}`);
+                setProfile(prev => ({
+                  ...prev,
+                  reviews: prev.reviews.filter(rr => rr._id !== deleteTargetId),
+                }));
+                setToastMessage(t('publicProfile.deleteReviewSuccess'));
+                setToastType('success');
+                setToastVisible(true);
+              } catch {
+                setToastMessage(t('publicProfile.deleteReviewError'));
+                setToastType('error');
+                setToastVisible(true);
+              } finally {
+                setDeleteDialogOpen(false);
+              }
+            }}
+          >
+            {t('publicProfile.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
