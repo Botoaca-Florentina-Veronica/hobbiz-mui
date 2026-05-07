@@ -50,6 +50,9 @@ pipeline {
 
         stage('Deploy') {
             steps {
+                withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV')]) {
+                    sh 'cp $BACKEND_ENV backend/.env'
+                }
                 sh 'docker-compose down --remove-orphans || true'
                 sh 'docker-compose up -d --build'
             }
