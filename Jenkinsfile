@@ -51,7 +51,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV')]) {
-                    sh 'cp $BACKEND_ENV backend/.env'
+                    sh '''
+                        chmod 755 backend
+                        rm -f backend/.env
+                        cp "$BACKEND_ENV" backend/.env
+                    '''
                 }
                 sh 'docker rm -f hobbiz_mongo hobbiz_backend hobbiz_frontend || true'
                 sh 'docker-compose down --remove-orphans || true'
