@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'nodejs'
+    }
+
     environment {
         BACKEND_IMAGE  = 'hobbiz-backend'
         FRONTEND_IMAGE = 'hobbiz-frontend'
