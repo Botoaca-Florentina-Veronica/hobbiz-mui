@@ -73,6 +73,15 @@ pipeline {
         }
         always {
             echo 'Pipeline finished.'
+            sh """
+                docker images '${BACKEND_IMAGE}' --format '{{.Tag}}' \
+                    | sort -rn | tail -n +4 \
+                    | xargs -I{} docker rmi ${BACKEND_IMAGE}:{} || true
+                docker images '${FRONTEND_IMAGE}' --format '{{.Tag}}' \
+                    | sort -rn | tail -n +4 \
+                    | xargs -I{} docker rmi ${FRONTEND_IMAGE}:{} || true
+                docker image prune -f || true
+            """
         }
     }
 }
