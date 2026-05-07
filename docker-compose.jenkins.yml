@@ -16,6 +16,7 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /usr/bin/docker-compose:/usr/bin/docker-compose
     user: root
+    entrypoint: ["bash", "-c", "chmod 666 /var/run/docker.sock && exec /usr/bin/tini -- /usr/local/bin/jenkins.sh"]
 
 volumes:
   jenkins_home:
