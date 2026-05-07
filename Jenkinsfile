@@ -53,6 +53,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV')]) {
                     sh 'cp $BACKEND_ENV backend/.env'
                 }
+                sh 'docker rm -f hobbiz_mongo hobbiz_backend hobbiz_frontend || true'
                 sh 'docker-compose down --remove-orphans || true'
                 sh 'docker-compose up -d --build'
             }
