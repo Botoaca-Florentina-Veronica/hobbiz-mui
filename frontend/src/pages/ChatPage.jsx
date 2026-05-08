@@ -59,6 +59,7 @@ export default function ChatPage() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
+  const [longPressBarStyle, setLongPressBarStyle] = useState(null);
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const [selectedReply, setSelectedReply] = useState(null);
   const [reactionTargetId, setReactionTargetId] = useState(null);
@@ -194,7 +195,7 @@ export default function ChatPage() {
       // If clicking/touching inside reaction picker or message action buttons, keep state
       if (e.target.closest('.reaction-picker') || e.target.closest('.message-action-btn') || e.target.closest('.message-actions-bar')) return;
       if (reactionTargetId) setReactionTargetId(null);
-      if (hoveredMessageId) setHoveredMessageId(null);
+      if (hoveredMessageId) { setHoveredMessageId(null); setLongPressBarStyle(null); }
       if (copiedMessageId) setCopiedMessageId(null);
     };
     document.addEventListener('mousedown', handleDocClick);
@@ -693,7 +694,22 @@ export default function ChatPage() {
                       onTouchStart={(e) => {
                         // Start long press timer
                         if (e.touches && e.touches.length > 1) return; // ignore multi-touch
-                        longPressTimersRef.current[msg._id] = setTimeout(() => { setHoveredMessageId(msg._id); }, 500);
+                        const el = e.currentTarget;
+                        longPressTimersRef.current[msg._id] = setTimeout(() => {
+                          if (window.innerWidth <= MOBILE_BREAKPOINT) {
+                            const rect = el.getBoundingClientRect();
+                            const barHeight = 56;
+                            const topPx = Math.max(barHeight + 8, rect.top - barHeight - 6);
+                            setLongPressBarStyle({
+                              top: `${topPx}px`,
+                              bottom: 'auto',
+                              left: isOwn ? 'auto' : `${Math.max(8, rect.left)}px`,
+                              right: isOwn ? `${Math.max(8, window.innerWidth - rect.right)}px` : 'auto',
+                              transform: 'none',
+                            });
+                          }
+                          setHoveredMessageId(msg._id);
+                        }, 500);
                       }}
                       onTouchEnd={(e) => {
                         // Cancel long press timer if released quickly
@@ -768,7 +784,7 @@ export default function ChatPage() {
                             
                             {/* ACTIONS (hover or long-press on mobile) */}
                             {hoveredMessageId === msg._id && reactionTargetId !== msg._id && (
-                              <div className="message-actions-bar">
+                              <div className="message-actions-bar" style={longPressBarStyle || undefined}>
                                 <button className="message-action-btn" onClick={() => setSelectedReply({ messageId: msg._id, senderId: msg.senderId, senderName: isOwn ? t('common.you') : t('common.user'), text: msg.text, image: msg.image })}><ReplyIcon fontSize="small"/></button>
                                 <button className="message-action-btn" onClick={() => setReactionTargetId(msg._id)}><SentimentSatisfiedAltIcon fontSize="small"/></button>
                                 <button className="message-action-btn copy" onClick={() => { navigator.clipboard.writeText(msg.text||''); setCopiedMessageId(msg._id); setTimeout(()=>setCopiedMessageId(null), 1200); }}>

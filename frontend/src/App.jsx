@@ -30,6 +30,7 @@ import MyAnnouncements from './pages/MyAnnouncements';
 import ChatPage from './pages/ChatPage';
 
 import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
+import AnnouncementsBySubcategory from './pages/AnnouncementsBySubcategory';
 import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
 import AnnouncementDetails from './pages/AnnouncementDetails';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -160,6 +161,14 @@ function App() {
             <Footer hideOnMobile />
           </>
         } />
+        <Route path="/anunturi-subcategorie/:subcategory" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AnnouncementsBySubcategory />
+            <Footer hideOnMobile />
+          </>
+        } />
         <Route path="/toate-anunturile" element={
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -255,7 +264,6 @@ function App() {
                 </>
               )}
             <Footer hideLegalUpTo1200 />
-            <CookieConsent />
           </div>
         } />
         <Route path="/informatii-legale" element={
@@ -276,7 +284,6 @@ function App() {
             <Categories />
             {/* separatorul este inclus în Footer, nu mai este nevoie aici */}
             <Footer />
-            <CookieConsent />
           </div>
         } />
         <Route path="/setari-cont" element={
@@ -406,6 +413,7 @@ function App() {
       <LoadingOverlay />
       {appView}
       <MobileAppBanner />
+      <CookieConsent />
       <Toast
         message={toast.message}
         type={toast.type}

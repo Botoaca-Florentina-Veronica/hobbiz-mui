@@ -214,6 +214,13 @@ export default function MainStage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [detailsVisible, setDetailsVisible] = useState(false);
+
+  const closeMenu = useCallback(() => {
+    document.body.classList.remove('categories-open');
+    document.body.classList.add('categories-closing');
+    setMenuOpen(false);
+    setTimeout(() => document.body.classList.remove('categories-closing'), 380);
+  }, []);
   
   // Search autocomplete (hook handles debounce + AbortController)
   const {
@@ -236,6 +243,14 @@ export default function MainStage() {
   // Refs
   const searchContainerRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  // Cleanup body classes on unmount (navigation away from homepage)
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('categories-open');
+      document.body.classList.remove('categories-closing');
+    };
+  }, []);
 
   // Hover logic for category details panel
   useEffect(() => {
@@ -792,7 +807,17 @@ export default function MainStage() {
                   <div className="detail-title">{col.title}</div>
                   <div className="detail-items">
                     {col.items.map((item, j) => (
-                      <Chip key={j} label={item} className="detail-chip" />
+                      <Chip
+                        key={j}
+                        label={item}
+                        className="detail-chip"
+                        clickable
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={() => {
+                          navigate(`/anunturi-subcategorie/${encodeURIComponent(item)}`);
+                          closeMenu();
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
