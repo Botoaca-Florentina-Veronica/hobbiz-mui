@@ -37,7 +37,16 @@ tar czf "$ARCHIVE" \
     --exclude='node_modules' \
     --exclude='frontend/dist' \
     --exclude='frontend/.vite' \
+    --exclude='device-view_images' \
+    --exclude='.vscode' \
+    --exclude='docs' \
+    --exclude='package-lock.json' \
     --exclude='*.log' \
+    --exclude='*.png' \
+    --exclude='*.jpg' \
+    --exclude='*.jpeg' \
+    --exclude='*.gif' \
+    --exclude='*.ico' \
     --exclude="$ARCHIVE" \
     .
 echo "[MDSSC] Archive size: $(du -sh "$ARCHIVE" | cut -f1)"
