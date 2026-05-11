@@ -46,15 +46,25 @@ echo "[MDSSC] Archive size: $(du -sh "$ARCHIVE" | cut -f1)"
 echo "[MDSSC] Uploading to ${MDSSC_API_URL}/api/v1/scans/direct ..."
 
 UPLOAD_ARGS=(
-    -sf
+    -s
     -X POST
     -H "apikey: ${MDSSC_API_KEY}"
     -F "files=@${ARCHIVE}"
+    -w "\nHTTP_STATUS:%{http_code}"
 )
 [[ -n "${MDSSC_WORKFLOW_ID:-}" ]] && UPLOAD_ARGS+=(-F "workflowId=${MDSSC_WORKFLOW_ID}")
 
-UPLOAD_RESPONSE=$(curl "${UPLOAD_ARGS[@]}" "${MDSSC_API_URL}/api/v1/scans/direct")
-echo "[MDSSC] Upload response: $UPLOAD_RESPONSE"
+RAW_RESPONSE=$(curl "${UPLOAD_ARGS[@]}" "${MDSSC_API_URL}/api/v1/scans/direct")
+HTTP_STATUS=$(echo "$RAW_RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
+UPLOAD_RESPONSE=$(echo "$RAW_RESPONSE" | sed '/HTTP_STATUS:/d')
+
+echo "[MDSSC] HTTP status: $HTTP_STATUS"
+echo "[MDSSC] Response body: $UPLOAD_RESPONSE"
+
+if [[ "$HTTP_STATUS" != "200" ]]; then
+    echo "[MDSSC] ERROR: upload failed with HTTP $HTTP_STATUS — verifică URL-ul și API key-ul"
+    exit 1
+fi
 
 SCAN_ID=$(echo "$UPLOAD_RESPONSE" | jq -r '.scanIds[0] // empty')
 if [[ -z "$SCAN_ID" ]]; then
