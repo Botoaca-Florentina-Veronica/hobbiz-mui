@@ -61,6 +61,8 @@ tar czf "$ARCHIVE" \
     --exclude='.vscode' \
     --exclude='docs' \
     --exclude='package-lock.json' \
+    --exclude='*.env' \
+    --exclude='.env' \
     --exclude='*.log' \
     --exclude='*.png' \
     --exclude='*.jpg' \
@@ -68,7 +70,7 @@ tar czf "$ARCHIVE" \
     --exclude='*.gif' \
     --exclude='*.ico' \
     --exclude="$ARCHIVE" \
-    .
+    . || { RC=$?; [ $RC -eq 1 ] || exit $RC; }
 echo "[MDSSC] Archive size: $(du -sh "$ARCHIVE" | cut -f1)"
 
 # ── 2. Upload & start scan ────────────────────────────────────────────────────
@@ -114,13 +116,13 @@ while true; do
         "${MDSSC_API_URL}/api/v1/scans/${SCAN_ID}/overview")
 
     echo "[MDSSC] Overview response: $OVERVIEW"
-    SCANNING_STATE=$(json_get "$OVERVIEW" "0.scanStatus.scanningState")
-    SCAN_PROGRESS=$(json_get "$OVERVIEW"  "0.scanStatus.scanProgress")
+    SCANNING_STATE=$(json_get "$OVERVIEW" "scanStatus.scanningState")
+    SCAN_PROGRESS=$(json_get "$OVERVIEW"  "scanStatus.scanProgress")
 
     echo "[MDSSC] State: ${SCANNING_STATE:-unknown} | Progress: ${SCAN_PROGRESS:-0}%"
 
     case "${SCANNING_STATE:-}" in
-        completed|done|finished|failed|error)
+        Completed|completed|Done|done|Finished|finished|Failed|failed|Error|error)
             break
             ;;
     esac
@@ -134,21 +136,21 @@ while true; do
     ELAPSED=$((ELAPSED + POLL_INTERVAL))
 done
 
-if [[ "${SCANNING_STATE:-}" == "failed" || "${SCANNING_STATE:-}" == "error" ]]; then
+if [[ "${SCANNING_STATE:-}" == "Failed" || "${SCANNING_STATE:-}" == "failed" || "${SCANNING_STATE:-}" == "Error" || "${SCANNING_STATE:-}" == "error" ]]; then
     echo "[MDSSC] ERROR: scan ended in failure"
     exit 1
 fi
 
 # ── 4. Evaluate verdict ───────────────────────────────────────────────────────
-MALWARE=$(    json_get "$OVERVIEW" "0.scanInformation.malware")
-SECRETS=$(    json_get "$OVERVIEW" "0.scanInformation.secret")
-CRITICAL=$(   json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.critical")
-HIGH=$(       json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.high")
-MEDIUM=$(     json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.medium")
-LOW=$(        json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.low")
-BLOCKED_LIC=$(json_get "$OVERVIEW" "0.scanInformation.licenses.blockedLicensesCount")
-TOTAL_PKG=$(  json_get "$OVERVIEW" "0.scanInformation.package.totalPackages")
-VULN_PKG=$(   json_get "$OVERVIEW" "0.scanInformation.package.vulnerablePackages")
+MALWARE=$(    json_get "$OVERVIEW" "scanInformation.malware")
+SECRETS=$(    json_get "$OVERVIEW" "scanInformation.secret")
+CRITICAL=$(   json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.critical")
+HIGH=$(       json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.high")
+MEDIUM=$(     json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.medium")
+LOW=$(        json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.low")
+BLOCKED_LIC=$(json_get "$OVERVIEW" "scanInformation.licenses.blockedLicensesCount")
+TOTAL_PKG=$(  json_get "$OVERVIEW" "scanInformation.package.totalPackages")
+VULN_PKG=$(   json_get "$OVERVIEW" "scanInformation.package.vulnerablePackages")
 
 echo ""
 echo "══════════════ MDSSC Source Scan Results ══════════════"
