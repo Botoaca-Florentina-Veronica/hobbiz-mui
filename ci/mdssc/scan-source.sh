@@ -8,7 +8,7 @@
 #   4. Evaluate verdict – fail build on malware / secrets / critical vulns / blocked licenses
 #
 # Required Jenkins credentials (configure as Secret Text):
-#   mdssc-api-url  → exposed as MDSSC_API_URL 
+#   mdssc-api-url  → exposed as MDSSC_API_URL
 #   mdssc-api-key  → exposed as MDSSC_API_KEY
 #
 # Optional env vars:
@@ -19,7 +19,25 @@
 
 set -euo pipefail
 
-JQ=/usr/bin/jq
+# Folosim python3 pentru parsare JSON — disponibil pe orice Linux, fără dependințe externe
+PY=python3
+
+json_get() {
+    # json_get <json_string> <key_path>   (ex: json_get "$JSON" "ScanIds.0")
+    local json="$1" path="$2"
+    echo "$json" | "$PY" -c "
+import sys, json
+data = json.load(sys.stdin)
+keys = '$path'.split('.')
+val = data
+try:
+    for k in keys:
+        val = val[int(k)] if k.isdigit() else val.get(k) or val.get(k[0].upper()+k[1:])
+    print('' if val is None else str(val).lower() if isinstance(val, bool) else val)
+except Exception:
+    print('')
+"
+}
 
 : "${MDSSC_API_URL:?MDSSC_API_URL is not set — add it as a Jenkins credential}"
 : "${MDSSC_API_KEY:?MDSSC_API_KEY is not set — add it as a Jenkins credential}"
@@ -73,13 +91,13 @@ echo "[MDSSC] HTTP status: $HTTP_STATUS"
 echo "[MDSSC] Response body: $UPLOAD_RESPONSE"
 
 if [[ "$HTTP_STATUS" != "200" ]]; then
-    echo "[MDSSC] ERROR: upload failed with HTTP $HTTP_STATUS — verifică URL-ul și API key-ul"
+    echo "[MDSSC] ERROR: upload failed with HTTP $HTTP_STATUS"
     exit 1
 fi
 
-SCAN_ID=$(echo "$UPLOAD_RESPONSE" | $JQ -r '.ScanIds[0] // .scanIds[0] // empty')
+SCAN_ID=$(json_get "$UPLOAD_RESPONSE" "ScanIds.0")
 if [[ -z "$SCAN_ID" ]]; then
-    echo "[MDSSC] ERROR: no scanId returned — check credentials and server URL"
+    echo "[MDSSC] ERROR: no scanId returned"
     exit 1
 fi
 echo "[MDSSC] Scan ID: $SCAN_ID"
@@ -96,19 +114,19 @@ while true; do
         "${MDSSC_API_URL}/api/v1/scans/${SCAN_ID}/overview")
 
     echo "[MDSSC] Overview response: $OVERVIEW"
-    SCANNING_STATE=$(echo "$OVERVIEW" | $JQ -r '.[0].scanStatus.scanningState // .[0].ScanStatus.ScanningState // "unknown"')
-    SCAN_PROGRESS=$(echo "$OVERVIEW"  | $JQ -r '.[0].scanStatus.scanProgress  // .[0].ScanStatus.ScanProgress  // 0')
+    SCANNING_STATE=$(json_get "$OVERVIEW" "0.scanStatus.scanningState")
+    SCAN_PROGRESS=$(json_get "$OVERVIEW"  "0.scanStatus.scanProgress")
 
-    echo "[MDSSC] State: ${SCANNING_STATE} | Progress: ${SCAN_PROGRESS}%"
+    echo "[MDSSC] State: ${SCANNING_STATE:-unknown} | Progress: ${SCAN_PROGRESS:-0}%"
 
-    case "$SCANNING_STATE" in
+    case "${SCANNING_STATE:-}" in
         completed|done|finished|failed|error)
             break
             ;;
     esac
 
     if [[ $ELAPSED -ge $POLL_TIMEOUT ]]; then
-        echo "[MDSSC] ERROR: timed out after ${POLL_TIMEOUT}s (last state: ${SCANNING_STATE})"
+        echo "[MDSSC] ERROR: timed out after ${POLL_TIMEOUT}s (last state: ${SCANNING_STATE:-unknown})"
         exit 1
     fi
 
@@ -116,42 +134,41 @@ while true; do
     ELAPSED=$((ELAPSED + POLL_INTERVAL))
 done
 
-if [[ "$SCANNING_STATE" == "failed" || "$SCANNING_STATE" == "error" ]]; then
-    ERRORS=$(echo "$OVERVIEW" | $JQ -r '.[0].scanInformation.errors[]? // empty' | head -5)
-    echo "[MDSSC] ERROR: scan ended in failure — ${ERRORS:-no details}"
+if [[ "${SCANNING_STATE:-}" == "failed" || "${SCANNING_STATE:-}" == "error" ]]; then
+    echo "[MDSSC] ERROR: scan ended in failure"
     exit 1
 fi
 
 # ── 4. Evaluate verdict ───────────────────────────────────────────────────────
-MALWARE=$(echo "$OVERVIEW"    | $JQ -r '.[0].scanInformation.malware                           // false')
-SECRETS=$(echo "$OVERVIEW"    | $JQ -r '.[0].scanInformation.secret                            // false')
-CRITICAL=$(echo "$OVERVIEW"   | $JQ -r '.[0].scanInformation.vulnerabilityIssues.critical      // 0')
-HIGH=$(echo "$OVERVIEW"       | $JQ -r '.[0].scanInformation.vulnerabilityIssues.high          // 0')
-MEDIUM=$(echo "$OVERVIEW"     | $JQ -r '.[0].scanInformation.vulnerabilityIssues.medium        // 0')
-LOW=$(echo "$OVERVIEW"        | $JQ -r '.[0].scanInformation.vulnerabilityIssues.low           // 0')
-BLOCKED_LIC=$(echo "$OVERVIEW"| $JQ -r '.[0].scanInformation.licenses.blockedLicensesCount     // 0')
-TOTAL_PKG=$(echo "$OVERVIEW"  | $JQ -r '.[0].scanInformation.package.totalPackages             // 0')
-VULN_PKG=$(echo "$OVERVIEW"   | $JQ -r '.[0].scanInformation.package.vulnerablePackages        // 0')
+MALWARE=$(    json_get "$OVERVIEW" "0.scanInformation.malware")
+SECRETS=$(    json_get "$OVERVIEW" "0.scanInformation.secret")
+CRITICAL=$(   json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.critical")
+HIGH=$(       json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.high")
+MEDIUM=$(     json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.medium")
+LOW=$(        json_get "$OVERVIEW" "0.scanInformation.vulnerabilityIssues.low")
+BLOCKED_LIC=$(json_get "$OVERVIEW" "0.scanInformation.licenses.blockedLicensesCount")
+TOTAL_PKG=$(  json_get "$OVERVIEW" "0.scanInformation.package.totalPackages")
+VULN_PKG=$(   json_get "$OVERVIEW" "0.scanInformation.package.vulnerablePackages")
 
 echo ""
 echo "══════════════ MDSSC Source Scan Results ══════════════"
-printf "  %-25s %s\n" "Malware detected:"    "$MALWARE"
-printf "  %-25s %s\n" "Secrets detected:"    "$SECRETS"
-printf "  %-25s %s\n" "Critical vulns:"      "$CRITICAL"
-printf "  %-25s %s\n" "High vulns:"          "$HIGH"
-printf "  %-25s %s\n" "Medium vulns:"        "$MEDIUM"
-printf "  %-25s %s\n" "Low vulns:"           "$LOW"
-printf "  %-25s %s\n" "Blocked licenses:"    "$BLOCKED_LIC"
-printf "  %-25s %s / %s\n" "Vulnerable packages:" "$VULN_PKG" "$TOTAL_PKG"
+printf "  %-25s %s\n" "Malware detected:"    "${MALWARE:-false}"
+printf "  %-25s %s\n" "Secrets detected:"    "${SECRETS:-false}"
+printf "  %-25s %s\n" "Critical vulns:"      "${CRITICAL:-0}"
+printf "  %-25s %s\n" "High vulns:"          "${HIGH:-0}"
+printf "  %-25s %s\n" "Medium vulns:"        "${MEDIUM:-0}"
+printf "  %-25s %s\n" "Low vulns:"           "${LOW:-0}"
+printf "  %-25s %s\n" "Blocked licenses:"    "${BLOCKED_LIC:-0}"
+printf "  %-25s %s / %s\n" "Vulnerable packages:" "${VULN_PKG:-0}" "${TOTAL_PKG:-0}"
 echo "═══════════════════════════════════════════════════════"
 
 FAILED=false
 
-[[ "$MALWARE"     == "true"  ]]                          && { echo "[MDSSC] FAIL: malware detected";                  FAILED=true; }
-[[ "$SECRETS"     == "true"  ]]                          && { echo "[MDSSC] FAIL: secrets/credentials detected";      FAILED=true; }
-[[ "$CRITICAL"    -gt 0      ]]                          && { echo "[MDSSC] FAIL: $CRITICAL critical vulnerability/vulnerabilities"; FAILED=true; }
-[[ "$FAIL_ON_HIGH" == "true" && "$HIGH" -gt 0 ]]        && { echo "[MDSSC] FAIL: $HIGH high-severity vulnerability/vulnerabilities"; FAILED=true; }
-[[ "$BLOCKED_LIC" -gt 0      ]]                          && { echo "[MDSSC] FAIL: $BLOCKED_LIC blocked license(s)";  FAILED=true; }
+[[ "${MALWARE:-false}"     == "true" ]]                             && { echo "[MDSSC] FAIL: malware detected";                  FAILED=true; }
+[[ "${SECRETS:-false}"     == "true" ]]                             && { echo "[MDSSC] FAIL: secrets/credentials detected";      FAILED=true; }
+[[ "${CRITICAL:-0}"        -gt 0     ]]                             && { echo "[MDSSC] FAIL: ${CRITICAL} critical vulnerability/vulnerabilities"; FAILED=true; }
+[[ "$FAIL_ON_HIGH" == "true" && "${HIGH:-0}" -gt 0 ]]              && { echo "[MDSSC] FAIL: ${HIGH} high-severity vulnerability/vulnerabilities"; FAILED=true; }
+[[ "${BLOCKED_LIC:-0}"     -gt 0     ]]                             && { echo "[MDSSC] FAIL: ${BLOCKED_LIC} blocked license(s)"; FAILED=true; }
 
 if [[ "$FAILED" == "true" ]]; then
     exit 1
