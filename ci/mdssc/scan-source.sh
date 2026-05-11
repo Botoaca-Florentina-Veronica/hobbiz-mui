@@ -19,6 +19,11 @@
 
 set -euo pipefail
 
+# Jenkins rulează cu PATH minimal — adăugăm locațiile standard
+export PATH="/usr/bin:/usr/local/bin:$PATH"
+
+JQ=$(command -v $JQ) || { echo "[MDSSC] ERROR: $JQ nu e instalat pe agentul Jenkins"; exit 1; }
+
 : "${MDSSC_API_URL:?MDSSC_API_URL is not set — add it as a Jenkins credential}"
 : "${MDSSC_API_KEY:?MDSSC_API_KEY is not set — add it as a Jenkins credential}"
 
@@ -75,7 +80,7 @@ if [[ "$HTTP_STATUS" != "200" ]]; then
     exit 1
 fi
 
-SCAN_ID=$(echo "$UPLOAD_RESPONSE" | jq -r '.scanIds[0] // empty')
+SCAN_ID=$(echo "$UPLOAD_RESPONSE" | $JQ -r '.ScanIds[0] // .scanIds[0] // empty')
 if [[ -z "$SCAN_ID" ]]; then
     echo "[MDSSC] ERROR: no scanId returned — check credentials and server URL"
     exit 1
@@ -93,8 +98,9 @@ while true; do
         -H "apikey: ${MDSSC_API_KEY}" \
         "${MDSSC_API_URL}/api/v1/scans/${SCAN_ID}/overview")
 
-    SCANNING_STATE=$(echo "$OVERVIEW" | jq -r '.[0].scanStatus.scanningState // "unknown"')
-    SCAN_PROGRESS=$(echo "$OVERVIEW"  | jq -r '.[0].scanStatus.scanProgress  // 0')
+    echo "[MDSSC] Overview response: $OVERVIEW"
+    SCANNING_STATE=$(echo "$OVERVIEW" | $JQ -r '.[0].scanStatus.scanningState // .[0].ScanStatus.ScanningState // "unknown"')
+    SCAN_PROGRESS=$(echo "$OVERVIEW"  | $JQ -r '.[0].scanStatus.scanProgress  // .[0].ScanStatus.ScanProgress  // 0')
 
     echo "[MDSSC] State: ${SCANNING_STATE} | Progress: ${SCAN_PROGRESS}%"
 
@@ -114,21 +120,21 @@ while true; do
 done
 
 if [[ "$SCANNING_STATE" == "failed" || "$SCANNING_STATE" == "error" ]]; then
-    ERRORS=$(echo "$OVERVIEW" | jq -r '.[0].scanInformation.errors[]? // empty' | head -5)
+    ERRORS=$(echo "$OVERVIEW" | $JQ -r '.[0].scanInformation.errors[]? // empty' | head -5)
     echo "[MDSSC] ERROR: scan ended in failure — ${ERRORS:-no details}"
     exit 1
 fi
 
 # ── 4. Evaluate verdict ───────────────────────────────────────────────────────
-MALWARE=$(echo "$OVERVIEW"    | jq -r '.[0].scanInformation.malware                           // false')
-SECRETS=$(echo "$OVERVIEW"    | jq -r '.[0].scanInformation.secret                            // false')
-CRITICAL=$(echo "$OVERVIEW"   | jq -r '.[0].scanInformation.vulnerabilityIssues.critical      // 0')
-HIGH=$(echo "$OVERVIEW"       | jq -r '.[0].scanInformation.vulnerabilityIssues.high          // 0')
-MEDIUM=$(echo "$OVERVIEW"     | jq -r '.[0].scanInformation.vulnerabilityIssues.medium        // 0')
-LOW=$(echo "$OVERVIEW"        | jq -r '.[0].scanInformation.vulnerabilityIssues.low           // 0')
-BLOCKED_LIC=$(echo "$OVERVIEW"| jq -r '.[0].scanInformation.licenses.blockedLicensesCount     // 0')
-TOTAL_PKG=$(echo "$OVERVIEW"  | jq -r '.[0].scanInformation.package.totalPackages             // 0')
-VULN_PKG=$(echo "$OVERVIEW"   | jq -r '.[0].scanInformation.package.vulnerablePackages        // 0')
+MALWARE=$(echo "$OVERVIEW"    | $JQ -r '.[0].scanInformation.malware                           // false')
+SECRETS=$(echo "$OVERVIEW"    | $JQ -r '.[0].scanInformation.secret                            // false')
+CRITICAL=$(echo "$OVERVIEW"   | $JQ -r '.[0].scanInformation.vulnerabilityIssues.critical      // 0')
+HIGH=$(echo "$OVERVIEW"       | $JQ -r '.[0].scanInformation.vulnerabilityIssues.high          // 0')
+MEDIUM=$(echo "$OVERVIEW"     | $JQ -r '.[0].scanInformation.vulnerabilityIssues.medium        // 0')
+LOW=$(echo "$OVERVIEW"        | $JQ -r '.[0].scanInformation.vulnerabilityIssues.low           // 0')
+BLOCKED_LIC=$(echo "$OVERVIEW"| $JQ -r '.[0].scanInformation.licenses.blockedLicensesCount     // 0')
+TOTAL_PKG=$(echo "$OVERVIEW"  | $JQ -r '.[0].scanInformation.package.totalPackages             // 0')
+VULN_PKG=$(echo "$OVERVIEW"   | $JQ -r '.[0].scanInformation.package.vulnerablePackages        // 0')
 
 echo ""
 echo "══════════════ MDSSC Source Scan Results ══════════════"
