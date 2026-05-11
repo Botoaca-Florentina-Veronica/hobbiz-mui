@@ -19,19 +19,7 @@
 
 set -euo pipefail
 
-# Caută jq direct în căile comune, independent de PATH
-JQ=""
-for _jq_path in /usr/bin/jq /usr/local/bin/jq /bin/jq; do
-    if [ -x "$_jq_path" ]; then
-        JQ="$_jq_path"
-        break
-    fi
-done
-if [ -z "$JQ" ]; then
-    echo "[MDSSC] ERROR: jq nu este instalat pe agentul Jenkins"
-    exit 1
-fi
-echo "[MDSSC] jq găsit la: $JQ"
+JQ=/usr/bin/jq
 
 : "${MDSSC_API_URL:?MDSSC_API_URL is not set — add it as a Jenkins credential}"
 : "${MDSSC_API_KEY:?MDSSC_API_KEY is not set — add it as a Jenkins credential}"
