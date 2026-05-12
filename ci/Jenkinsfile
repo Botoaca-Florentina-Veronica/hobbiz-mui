@@ -5,9 +5,22 @@ pipeline {
         nodejs 'nodejs'
     }
 
+    triggers {
+        // Push-based: requires GitHub plugin + webhook in repo settings pointing to
+        // http://<jenkins-host>:8080/github-webhook/
+        githubPush()
+
+        // Fallback polling every 2 min in case the webhook is not reachable
+        pollSCM('H/2 * * * *')
+    }
+
     environment {
         BACKEND_IMAGE  = 'hobbiz-backend'
         FRONTEND_IMAGE = 'hobbiz-frontend'
+        MDSSC_API_KEY  = credentials('mdssc-api-key')  // Secret Text credential in Jenkins
+        MDSSC_API_URL  = credentials('mdssc-api-url')  // Secret Text credential in Jenkins
+        // MDSSC_WORKFLOW_ID  = ''        // optional: pin to a specific MDSSC workflow
+        // MDSSC_FAIL_ON_HIGH = 'false'   // set 'true' to also fail on high-severity vulns
     }
 
     stages {
@@ -18,7 +31,16 @@ pipeline {
             }
         }
 
-        stage('Install & Build Backend') {
+        // ── Stage 1: Source-code scan (MDSSC) ────────────────────────────────
+        stage('Scan Source Code') {
+            steps {
+                sh 'chmod +x ci/mdssc/scan-source.sh'
+                sh 'ci/mdssc/scan-source.sh'
+            }
+        }
+
+        // ── Stage 2: Build artifacts ──────────────────────────────────────────
+        stage('Build Backend') {
             steps {
                 dir('backend') {
                     sh 'npm ci'
@@ -26,7 +48,7 @@ pipeline {
             }
         }
 
-        stage('Install & Build Frontend') {
+        stage('Build Frontend') {
             steps {
                 dir('frontend') {
                     sh 'npm ci'
@@ -35,7 +57,7 @@ pipeline {
             }
         }
 
-        stage('Archive Artifact') {
+        stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'frontend/dist/**/*', fingerprint: true
             }
@@ -48,6 +70,22 @@ pipeline {
             }
         }
 
+        // ── Stage 3: Artifact scan (MDSSC) ───────────────────────────────────
+        // Disabled until the MDSSC integration is ready.
+        // When enabled, point the scanner at the built Docker images or the
+        // archived frontend/dist bundle:
+        //
+        // stage('Scan Artifacts') {
+        //     steps {
+        //         // Option A – CLI scanner on the dist archive
+        //         // sh 'mdssc scan --path frontend/dist --apikey $MDSSC_API_KEY'
+        //         //
+        //         // Option B – REST API  (see ci/mdssc/scan-artifacts.sh)
+        //         // sh 'ci/mdssc/scan-artifacts.sh'
+        //     }
+        // }
+
+        // ── Stage 4: Deploy ───────────────────────────────────────────────────
         stage('Deploy') {
             steps {
                 withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV')]) {
