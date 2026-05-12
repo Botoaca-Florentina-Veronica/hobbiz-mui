@@ -28,7 +28,9 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mailersend": "^2.6.0",
-    "motion": "^12.38.0"
+    "motion": "^12.38.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
   },
   "devDependencies": {
     "docx": "^9.6.1"
