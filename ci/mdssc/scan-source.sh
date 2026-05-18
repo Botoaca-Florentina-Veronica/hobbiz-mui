@@ -1,21 +1,3 @@
-#!/usr/bin/env bash
-# Stage 1 – Source-code scan via MDSSC REST API
-#
-# Flow:
-#   1. Archive source code (exclude git/node_modules/dist)
-#   2. POST /api/v1/scans/direct  → get scanId
-#   3. Poll GET /api/v1/scans/{id}/overview until scanningState is terminal
-#   4. Evaluate verdict – fail build on malware / secrets / critical vulns / blocked licenses
-#
-# Required Jenkins credentials (configure as Secret Text):
-#   mdssc-api-url  → exposed as MDSSC_API_URL
-#   mdssc-api-key  → exposed as MDSSC_API_KEY
-#
-# Optional env vars:
-#   MDSSC_WORKFLOW_ID   – specific workflow to use (default: server default)
-#   MDSSC_FAIL_ON_HIGH  – "true" to fail on high-severity vulns too (default: critical only)
-#   MDSSC_POLL_INTERVAL – seconds between poll attempts (default: 10)
-#   MDSSC_POLL_TIMEOUT  – max seconds to wait for scan completion (default: 300)
 
 set -euo pipefail
 
