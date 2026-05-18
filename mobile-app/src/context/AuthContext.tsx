@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from 'react';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import storage from '../services/storage';
@@ -159,9 +159,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     restore();
   }, [restore]);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
-    setIsGuest(false); // Immediately clear guest mode
+    setIsGuest(false);
     try {
       const data = await loginWithCredentials(email, password);
       if (data?.token) {
@@ -169,7 +169,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setToken(data.token);
         const profile = await fetchProfile();
 
-        // Register for push notifications
         try {
           const allowPush = profile?.notificationSettings?.push !== false;
           if (allowPush) {
@@ -179,9 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
             }
           }
-        } catch (e) {
-          // ignore
-        }
+        } catch (e) {}
 
         setLoading(false);
         return true;
@@ -189,17 +186,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
       return false;
     } catch (e: any) {
-      // eslint-disable-next-line no-console
       console.warn('[Auth] login failed', e?.message);
       setLoading(false);
-      throw e; // propagăm mesajul real
+      throw e;
     }
-  };
+  }, [fetchProfile]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     setLoading(true);
     try {
-      // Try to remove only this device token (use stored token first to avoid permission prompts)
       let tokenValue: string | null | undefined;
       try {
         tokenValue = await storage.getItemAsync('pushToken');
@@ -210,11 +205,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (_) {}
       }
 
-      try { 
+      try {
         if (tokenValue) {
-          await api.delete('/api/users/push-token', { data: { token: tokenValue } }); 
+          await api.delete('/api/users/push-token', { data: { token: tokenValue } });
         } else {
-          await api.delete('/api/users/push-token'); 
+          await api.delete('/api/users/push-token');
         }
       } catch (_) {}
 
@@ -225,19 +220,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const setGuestMode = (enabled: boolean) => {
+  const setGuestMode = useCallback((enabled: boolean) => {
     setIsGuest(enabled);
     if (enabled) {
-      // Clear any existing auth when entering guest mode
       setUser(null);
       setToken(null);
     }
-  };
+  }, []);
+
+  const isAuthenticated = !!user && !!token && !isGuest;
+
+  const contextValue = useMemo<AuthContextType>(() => ({
+    loading, user, token, isAuthenticated,
+    isGuest, login, logout, restore, refreshProfile, setGuestMode,
+  }), [loading, user, token, isAuthenticated, isGuest, login, logout, restore, refreshProfile, setGuestMode]);
 
   return (
-    <AuthContext.Provider value={{ loading, user, token, isAuthenticated: !!user && !!token && !isGuest, isGuest, login, logout, restore, refreshProfile, setGuestMode }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

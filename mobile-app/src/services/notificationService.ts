@@ -3,7 +3,9 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-// Configure how notifications are handled when the app is in foreground
+// expo-notifications remote push is not supported in Expo Go since SDK 53
+const isExpoGo = Constants.appOwnership === 'expo';
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -13,6 +15,11 @@ Notifications.setNotificationHandler({
 });
 
 export async function registerForPushNotificationsAsync() {
+  if (isExpoGo) {
+    console.log('Push notifications not supported in Expo Go (SDK 53+). Use a development build.');
+    return;
+  }
+
   let token;
 
   if (Platform.OS === 'android') {
@@ -35,11 +42,11 @@ export async function registerForPushNotificationsAsync() {
       console.log('Failed to get push token for push notification!');
       return;
     }
-    
+
     try {
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-      
+
       if (!projectId) {
         console.log('Project ID not found');
       }
@@ -47,7 +54,7 @@ export async function registerForPushNotificationsAsync() {
       token = (await Notifications.getExpoPushTokenAsync({
         projectId,
       })).data;
-      
+
       console.log('Expo Push Token:', token);
     } catch (e) {
       console.error('Error getting push token:', e);

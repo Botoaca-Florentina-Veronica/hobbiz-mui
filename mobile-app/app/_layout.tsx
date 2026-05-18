@@ -23,6 +23,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { ChatNotificationProvider } from '../src/context/ChatNotificationContext';
+import { FavoritesProvider } from '../src/context/FavoritesContext';
 import { NotificationProvider } from '../src/context/NotificationContext';
 import { LocaleProvider } from '../src/context/LocaleContext';
 import { setupNotificationListeners } from '../src/services/notificationService';
@@ -87,7 +88,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     'Poppins-Regular': Poppins_400Regular,
     'Poppins-Medium': Poppins_500Medium,
     'Poppins-SemiBold': Poppins_600SemiBold,
@@ -210,7 +211,7 @@ export default function RootLayout() {
     return cleanup;
   }, []);
 
-  if (!fontsLoaded || isCheckingPrivacy) {
+  if ((!fontsLoaded && !fontError) || isCheckingPrivacy) {
     return null;
   }
 
@@ -220,6 +221,7 @@ export default function RootLayout() {
         <AuthProvider>
           <NotificationProvider>
             <ChatNotificationProvider>
+              <FavoritesProvider>
               <SafeAreaProvider>
                 <NetworkStatus />
                 {/* Global toast for network / error feedback */}
@@ -268,6 +270,7 @@ export default function RootLayout() {
                 onAccept={handlePrivacyAccept}
               />
             </SafeAreaProvider>
+              </FavoritesProvider>
           </ChatNotificationProvider>
         </NotificationProvider>
       </AuthProvider>

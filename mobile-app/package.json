@@ -52,8 +52,8 @@
     "expo-web-browser": "~15.0.10",
     "firebase": "^12.6.0",
     "lottie-react-native": "~7.3.1",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-bottom-tabs": "^1.1.0",
     "react-native-gesture-handler": "~2.28.0",
@@ -79,6 +79,9 @@
     "typescript": "~5.9.2"
   },
   "overrides": {
+    "protobufjs": "7.5.8",
+    "@protobufjs/utf8": "1.1.1",
+    "@babel/plugin-transform-modules-systemjs": "7.29.4",
     "@tootallnate/once": "3.0.1",
     "@isaacs/brace-expansion": ">=5.0.5",
     "brace-expansion": "5.0.5",

@@ -20,13 +20,9 @@ import gumballChat from '../assets/images/gumballChat.jpg';
 
 import './ChatPage.css';
 import './ChatPageCollaboration.css';
+import { resolveMediaUrl } from '../utils/media';
 
-const resolveAvatarUrl = (src) => {
-  if (!src) return '';
-  if (src.startsWith('http') || src.startsWith('data:')) return src;
-  const cleaned = src.replace(/^\.\//, '').replace(/^\//, '');
-  return cleaned.startsWith('uploads/') ? `/${cleaned}` : `/uploads/${cleaned.replace(/^.*[\\\/]/, '')}`;
-};
+const resolveAvatarUrl = (src) => resolveMediaUrl(src);
 
 const getIsDarkMode = () => {
   if (typeof document === 'undefined') return false;

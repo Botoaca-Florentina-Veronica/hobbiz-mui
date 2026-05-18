@@ -342,7 +342,7 @@ export default function MainStage() {
         setShowSuggestions(false);
         setInputFocused(false);
         addRecentSearch(term);
-        navigate(`/?search=${encodeURIComponent(term)}`);
+        navigate(`/cautare?q=${encodeURIComponent(term)}`);
       }
       return;
     }
@@ -398,13 +398,13 @@ export default function MainStage() {
       setShowSuggestions(false);
       setInputFocused(false);
       const params = new URLSearchParams();
-      params.set('search', searchTerm.trim());
+      params.set('q', searchTerm.trim());
       if (selectedLocalitate) {
         params.set('location', selectedLocalitate);
       } else if (selectedJudet && selectedJudet !== 'Toată țara') {
         params.set('location', selectedJudet);
       }
-      navigate(`/?${params.toString()}`);
+      navigate(`/cautare?${params.toString()}`);
     }
   };
 
@@ -413,7 +413,7 @@ export default function MainStage() {
     addRecentSearch(term);
     setShowSuggestions(false);
     setInputFocused(false);
-    navigate(`/?search=${encodeURIComponent(term)}`);
+    navigate(`/cautare?q=${encodeURIComponent(term)}`);
   };
 
   const handleSearchFocus = () => {

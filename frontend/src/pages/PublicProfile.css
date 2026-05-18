@@ -896,3 +896,443 @@ body.dark-mode .pp-delete-review-dialog .MuiButton-contained:hover {
   background: #dc2626 !important;
   box-shadow: 0 6px 22px rgba(239, 68, 68, 0.5) !important;
 }
+
+/* =============================================================
+   PublicProfile — Modern mobile & tablet refinements
+   These rules layer on top of the existing responsive breakpoints
+   and only kick in on smaller screens — desktop layout untouched.
+   ============================================================= */
+
+/* ── Tablet & smaller (≤1024px): single-column layout ──────── */
+@media (max-width: 1024px) {
+  .pp-grid {
+    grid-template-columns: 1fr;
+    padding: 0 24px;
+    gap: 16px;
+  }
+  .pp-col-side { order: -1; }
+  .pp-side-card { position: static; }
+}
+
+/* ── Phone & small tablet (≤768px): elegant mobile layout ── */
+@media (max-width: 768px) {
+  .pp-page {
+    background: linear-gradient(180deg, var(--pp-bg) 0%, var(--pp-bg) 100%);
+    /* Clear the floating mobile footer (~65px tall + 16px gap from bottom) */
+    padding-bottom: calc(110px + env(safe-area-inset-bottom));
+  }
+
+  /* Mobile header — frosted, more polish */
+  .pp-mobile-header {
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    background: color-mix(in srgb, var(--pp-card) 88%, transparent);
+    padding: 10px 14px;
+    border-bottom: 1px solid color-mix(in srgb, var(--pp-border) 60%, transparent);
+  }
+  .pp-mobile-back {
+    width: 38px;
+    height: 38px;
+    border-radius: 50% !important;
+    background: color-mix(in srgb, var(--pp-border) 35%, transparent) !important;
+  }
+  .pp-mobile-title {
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -0.2px;
+  }
+
+  /* Hero — softer cover, polished avatar/text */
+  .pp-hero {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  .pp-hero-cover {
+    height: 140px;
+    background:
+      radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.18) 0%, transparent 55%),
+      radial-gradient(140% 100% at 100% 100%, rgba(0,0,0,0.20) 0%, transparent 60%),
+      linear-gradient(135deg, var(--pp-accent) 0%, color-mix(in srgb, var(--pp-accent) 70%, #000) 100%);
+    border-radius: 0 0 24px 24px;
+    position: relative;
+  }
+  .pp-hero-cover.has-cover {
+    background-blend-mode: overlay;
+  }
+  .pp-hero-body {
+    margin-top: -52px;
+    padding: 0 18px;
+    gap: 14px;
+  }
+  .pp-hero-avatar {
+    width: 104px;
+    height: 104px;
+    border: 4px solid var(--pp-card);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .pp-hero-info {
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .pp-hero-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+  .pp-verified-icon {
+    font-size: 19px !important;
+  }
+  .pp-verified-badge {
+    margin-top: 2px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--pp-accent) 12%, transparent);
+    color: var(--pp-accent);
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .pp-hero-status,
+  .pp-hero-location {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--pp-border) 35%, transparent);
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+  .pp-hero-status.online {
+    background: rgba(34,197,94,0.12);
+    color: #16A34A;
+  }
+
+  .pp-hero-actions {
+    margin-top: 12px;
+    padding-bottom: 0;
+  }
+  .pp-msg-btn {
+    width: 100% !important;
+    padding: 11px 18px !important;
+    font-size: 0.92rem !important;
+    border-radius: 14px !important;
+    box-shadow: 0 6px 18px rgba(26, 49, 78, 0.22) !important;
+  }
+
+  /* Stats — elegant 2x2 mini-card grid */
+  .pp-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
+    margin: 4px 16px 20px;
+    border-radius: 18px;
+  }
+  .pp-stat {
+    flex: 0;
+    padding: 12px 10px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--pp-border) 28%, transparent);
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .pp-stat-icon {
+    font-size: 22px !important;
+    background: color-mix(in srgb, var(--pp-accent) 12%, transparent);
+    border-radius: 10px;
+    padding: 6px;
+    box-sizing: content-box;
+    width: 22px;
+    height: 22px;
+  }
+  .pp-stat-icon--gold {
+    background: rgba(251,191,36,0.15);
+  }
+  .pp-stat-val {
+    font-size: 0.92rem;
+    font-weight: 800;
+  }
+  .pp-stat-lbl {
+    font-size: 0.66rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards — slightly more breathing room and softer corners */
+  .pp-grid {
+    padding: 0 16px;
+    gap: 14px;
+  }
+  .pp-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+  .pp-card-head {
+    margin-bottom: 14px;
+  }
+  .pp-card-title {
+    font-size: 1.05rem;
+    letter-spacing: -0.2px;
+  }
+  .pp-link-btn {
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--pp-accent) 10%, transparent) !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* Rating box — compact layout: score on top, bars below */
+  .pp-rating-box {
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 14px;
+  }
+  .pp-rating-left {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    width: 100%;
+  }
+  .pp-big-score {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .pp-stars-row {
+    margin: 0;
+  }
+  .pp-star {
+    font-size: 16px !important;
+  }
+  .pp-total-reviews {
+    margin-left: auto;
+    text-align: right;
+    font-weight: 600;
+  }
+  .pp-bars {
+    width: 100%;
+    gap: 4px;
+  }
+  .pp-bar-track {
+    height: 6px;
+  }
+
+  /* Individual reviews — tighter spacing, modern foot row */
+  .pp-rev {
+    gap: 12px;
+    padding: 14px 0;
+  }
+  .pp-rev-avatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .pp-rev-top {
+    gap: 8px;
+  }
+  .pp-rev-name {
+    font-size: 0.88rem;
+  }
+  .pp-rev-date {
+    font-size: 0.72rem;
+  }
+  .pp-rev-ann {
+    max-width: 100%;
+    font-size: 0.72rem;
+    margin-top: 2px;
+  }
+  .pp-rev-badge {
+    padding: 3px 8px;
+    font-size: 0.78rem;
+    border-radius: 999px;
+  }
+  .pp-rev-text {
+    font-size: 0.88rem;
+    margin: 6px 0 8px;
+  }
+  .pp-like-btn {
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+  }
+
+  /* Contact rows — modern row design with right-aligned value on small screens */
+  .pp-contacts {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .pp-contact-row {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--pp-border) 22%, transparent);
+    gap: 12px;
+  }
+  .pp-contact-ic {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+  .pp-contact-ic .MuiSvgIcon-root { font-size: 18px; }
+  .pp-contact-lbl {
+    font-size: 0.68rem;
+  }
+  .pp-contact-val {
+    font-size: 0.9rem;
+  }
+
+  /* Map — rounded card */
+  .pp-card--flush {
+    padding-bottom: 0;
+  }
+  .pp-map {
+    border-radius: 0 0 18px 18px;
+  }
+  .pp-map iframe {
+    height: 220px;
+  }
+
+  /* Sidebar / Announcements — horizontal scroll cards for richer browsing */
+  .pp-side-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+  .pp-side-title {
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    letter-spacing: -0.2px;
+  }
+  .pp-ann-list {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0;
+    padding-bottom: 6px;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pp-ann-list::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+  .pp-ann {
+    flex: 0 0 220px;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    background: var(--pp-card);
+    border: 1px solid var(--pp-border);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .pp-ann:hover,
+  .pp-ann:active {
+    transform: translateY(-2px);
+  }
+  .pp-ann-img {
+    width: 100%;
+    height: 120px;
+    border-radius: 0;
+    flex-shrink: 0;
+  }
+  .pp-ann-body {
+    padding: 10px 12px 12px;
+    gap: 4px;
+    min-height: 76px;
+  }
+  .pp-ann-title {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+    font-size: 0.85rem;
+  }
+  .pp-ann-price {
+    font-size: 0.95rem;
+  }
+  .pp-ann-loc {
+    font-size: 0.72rem;
+  }
+}
+
+/* ── Very small phones (≤480px): tighter tuning ──────────── */
+@media (max-width: 480px) {
+  .pp-hero-cover {
+    height: 120px;
+    border-radius: 0 0 20px 20px;
+  }
+  .pp-hero-body {
+    margin-top: -48px;
+    padding: 0 14px;
+  }
+  .pp-hero-avatar {
+    width: 92px;
+    height: 92px;
+    border-width: 3px;
+  }
+  .pp-hero-name {
+    font-size: 1.25rem;
+  }
+
+  .pp-stats {
+    margin: 4px 12px 16px;
+    padding: 6px;
+    gap: 6px;
+  }
+  .pp-stat {
+    padding: 10px 8px;
+    gap: 8px;
+  }
+  .pp-stat-icon {
+    font-size: 20px !important;
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+  }
+  .pp-stat-val { font-size: 0.85rem; }
+  .pp-stat-lbl { font-size: 0.62rem; }
+
+  .pp-grid { padding: 0 12px; gap: 12px; }
+  .pp-card { padding: 14px; border-radius: 16px; }
+  .pp-card-title { font-size: 1rem; }
+
+  .pp-rating-left { gap: 10px; }
+  .pp-big-score { font-size: 1.7rem; }
+
+  .pp-rev { gap: 10px; padding: 12px 0; }
+  .pp-rev-text { font-size: 0.85rem; line-height: 1.45; }
+
+  .pp-ann { flex: 0 0 180px; }
+  .pp-ann-img { height: 110px; }
+}
+
+/* ── Dark-mode tweaks for new mobile elements ─────────────── */
+body.dark-mode .pp-hero-cover {
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.08) 0%, transparent 55%),
+    radial-gradient(140% 100% at 100% 100%, rgba(0,0,0,0.35) 0%, transparent 60%),
+    linear-gradient(135deg, #ad1457 0%, #7b1fa2 100%);
+}
+body.dark-mode .pp-hero-status:not(.online),
+body.dark-mode .pp-hero-location {
+  background: rgba(255,255,255,0.06);
+}
+body.dark-mode .pp-hero-status.online {
+  background: rgba(34,197,94,0.16);
+}
+body.dark-mode .pp-stat {
+  background: rgba(255,255,255,0.04);
+}
+body.dark-mode .pp-stat-icon {
+  background: rgba(245,24,102,0.14);
+}
+body.dark-mode .pp-contact-row {
+  background: rgba(255,255,255,0.04);
+}
+body.dark-mode .pp-ann {
+  background: #1f1f1f;
+  border-color: rgba(255,255,255,0.06);
+}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../services/api';
 import { io, Socket } from 'socket.io-client';
@@ -100,16 +100,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => clearInterval(interval);
   }, [isAuthenticated, user?.id, refreshNotificationCount]);
 
+  const value = useMemo<NotificationContextType>(() => ({
+    unreadNotificationCount,
+    refreshNotificationCount,
+    decrementNotificationCount,
+    incrementNotificationCount,
+    setNotificationCount,
+  }), [unreadNotificationCount, refreshNotificationCount, decrementNotificationCount, incrementNotificationCount, setNotificationCount]);
+
   return (
-    <NotificationContext.Provider
-      value={{
-        unreadNotificationCount,
-        refreshNotificationCount,
-        decrementNotificationCount,
-        incrementNotificationCount,
-        setNotificationCount,
-      }}
-    >
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );

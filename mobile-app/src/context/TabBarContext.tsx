@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 type TabBarContextValue = {
   hidden: boolean; // true when one or more callers requested hide
@@ -17,12 +17,12 @@ export const TabBarProvider = ({ children }: { children: React.ReactNode }) => {
   const showTabBar = useCallback(() => setHideCount((c) => Math.max(0, c - 1)), []);
   const reset = useCallback(() => setHideCount(0), []);
 
-  const value: TabBarContextValue = {
+  const value = useMemo<TabBarContextValue>(() => ({
     hidden: hideCount > 0,
     hideTabBar,
     showTabBar,
     reset,
-  };
+  }), [hideCount, hideTabBar, showTabBar, reset]);
 
   return <TabBarContext.Provider value={value}>{children}</TabBarContext.Provider>;
 };

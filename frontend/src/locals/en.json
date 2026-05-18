@@ -65,6 +65,15 @@
       "password": "Password",
       "phone": "Phone"
     },
+    "passwordHints": {
+      "title": "For a stronger password:",
+      "minLength": "At least 8 characters",
+      "lowercase": "Lowercase letter",
+      "uppercase": "Uppercase letter",
+      "digit": "Number",
+      "special": "Special character",
+      "strong": "Strong password"
+    },
     "resetTitle": "Reset password",
     "resetCode": "Reset code",
     "resetNewPassword": "New password",
@@ -146,7 +155,17 @@
     "searchResultsCount": "{{count}} results",
     "searching": "Searching...",
     "noResultsFound": "No announcements found for your search. Try other keywords.",
-    "searchError": "Error searching announcements. Try again."
+    "searchError": "Error searching announcements. Try again.",
+    "resultsFor": "for",
+    "clearSearch": "Clear search",
+    "noResultsTitle": "Nothing found",
+    "noResultsHint": "Try different keywords or clear the search to see popular announcements.",
+    "sortRelevance": "Relevance",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "sortPriceAsc": "Price ↑",
+    "sortPriceDesc": "Price ↓",
+    "sortBy": "Sort"
   },
   "allAnnouncements": {
     "title": "All Announcements",

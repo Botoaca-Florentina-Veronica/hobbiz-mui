@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated, Platform, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '../themed-text';
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTabBar } from '../../src/context/TabBarContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
+import { useFavoritesCount } from '../../src/context/FavoritesContext';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { useRouter } from 'expo-router';
@@ -46,7 +47,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { isAuthenticated, isGuest, loading, user } = useAuth();
   const { hidden } = useTabBar();
   const { unreadCount } = useChatNotifications();
-  const [favoriteCount, setFavoriteCount] = useState(0);
+  const { favoritesCount: favoriteCount } = useFavoritesCount();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
   const tabLocale = normalizeLocale(locale);
@@ -110,17 +111,17 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
       const targetWidth = focusedConfig.special ? INDICATOR_SPECIAL_WIDTH : INDICATOR_REGULAR_WIDTH;
       const targetLeft = l.x + (l.width - targetWidth) / 2;
       Animated.parallel([
-        Animated.spring(indicatorLeft, { 
-          toValue: targetLeft, 
+        Animated.spring(indicatorLeft, {
+          toValue: targetLeft,
           useNativeDriver: false,
-          friction: 9,
-          tension: 60 
+          friction: 7,
+          tension: 80,
         }),
-        Animated.spring(indicatorWidth, { 
+        Animated.spring(indicatorWidth, {
           toValue: targetWidth,
           useNativeDriver: false,
-          friction: 9, 
-          tension: 60
+          friction: 7,
+          tension: 80,
         }),
       ]).start();
     }
@@ -132,31 +133,30 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   // Margin from bottom of screen (safe area + spacing)
   const bottomMargin = Math.max(insets.bottom, 20);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setFavoriteCount(0);
+  if (hidden) return null;
+
+  const handleTabPress = useCallback((routeKey: string, routeName: string, isFocused: boolean) => {
+    if (!loading && !isAuthenticated && routeName !== 'index') {
+      try {
+        router.replace('/login');
+      } catch (e) {
+        (navigation as any).replace('login');
+      }
       return;
     }
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: routeKey,
+      canPreventDefault: true,
+    });
+    if (!isFocused && !event.defaultPrevented) {
+      navigation.navigate(routeName);
+    }
+  }, [loading, isAuthenticated, router, navigation]);
 
-    let isMounted = true;
-    (async () => {
-      try {
-        const res = await api.get('/api/favorites');
-        if (isMounted) {
-          const count = Array.isArray(res.data?.favorites) ? res.data.favorites.length : 0;
-          setFavoriteCount(count);
-        }
-      } catch (e) {
-        // ignore errors; badge stays 0
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isAuthenticated, user?.id]);
-
-  if (hidden) return null;
+  const handleTabLongPress = useCallback((routeKey: string) => {
+    navigation.emit({ type: 'tabLongPress', target: routeKey });
+  }, [navigation]);
 
   const tabItems = (
     <View style={styles.contentRow}>
@@ -166,37 +166,14 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
         const base = TAB_CONFIG[route.name] || { icon: 'ellipse' };
         const config = { ...base, label: (TAB_LABELS as any)[route.name]?.[tabLocale] ?? route.name } as any;
 
-        const onPress = () => {
-          if (!loading && !isAuthenticated && route.name !== 'index') {
-            try {
-              router.replace('/login');
-            } catch (e) {
-              (navigation as any).replace('login');
-            }
-            return;
-          }
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        const onLongPress = () => {
-          navigation.emit({ type: 'tabLongPress', target: route.key });
-        };
-
         return (
           <Pressable
             key={route.key}
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
-            onPress={onPress}
-            onLongPress={onLongPress}
+            onPress={() => handleTabPress(route.key, route.name, isFocused)}
+            onLongPress={() => handleTabLongPress(route.key)}
             style={({ pressed }) => [
               styles.tab,
               pressed && !config.special && { opacity: 0.7 },
@@ -333,17 +310,70 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
           pointerEvents="none"
         />
 
-        {/* Animated "Bubble" Indicator */}
-        <Animated.View 
+        {/* Animated "Bubble" Indicator — Fluid Glass */}
+        <Animated.View
           style={[
-            styles.indicatorBubble, 
-            { 
-              transform: [{ translateX: indicatorLeft }], 
+            styles.indicatorBubble,
+            {
+              transform: [{ translateX: indicatorLeft }],
               width: indicatorWidth,
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.30)',
-            }
-          ]} 
-        />
+              overflow: 'hidden',
+            },
+          ]}
+        >
+          {isNative ? (
+            <>
+              <BlurView
+                intensity={isDark ? 65 : 55}
+                tint={isDark ? 'dark' : 'light'}
+                experimentalBlurMethod="dimezisBlurView"
+                style={StyleSheet.absoluteFill}
+              />
+              <LinearGradient
+                colors={isDark
+                  ? (['rgba(255,255,255,0.18)', 'rgba(255,255,255,0.05)'] as const)
+                  : (['rgba(255,255,255,0.75)', 'rgba(255,255,255,0.28)'] as const)}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={StyleSheet.absoluteFill}
+                pointerEvents="none"
+              />
+              {/* Glass edge highlight */}
+              <View
+                pointerEvents="none"
+                style={[
+                  StyleSheet.absoluteFill,
+                  {
+                    borderRadius: INDICATOR_HEIGHT / 2,
+                    borderWidth: 1,
+                    borderColor: isDark
+                      ? 'rgba(255,255,255,0.24)'
+                      : 'rgba(255,255,255,0.80)',
+                  },
+                ]}
+              />
+            </>
+          ) : (
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.14)'
+                    : 'rgba(255,255,255,0.55)',
+                } as any,
+                Platform.OS === 'web' && ({
+                  backdropFilter: 'blur(14px)',
+                  WebkitBackdropFilter: 'blur(14px)',
+                  borderWidth: 1,
+                  borderColor: isDark
+                    ? 'rgba(255,255,255,0.20)'
+                    : 'rgba(255,255,255,0.70)',
+                } as any),
+              ]}
+            />
+          )}
+        </Animated.View>
 
         {tabItems}
       </View>

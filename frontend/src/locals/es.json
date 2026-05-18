@@ -65,6 +65,15 @@
       "password": "Contraseña",
       "phone": "Teléfono"
     },
+    "passwordHints": {
+      "title": "Para una contraseña más fuerte:",
+      "minLength": "Al menos 8 caracteres",
+      "lowercase": "Letra minúscula",
+      "uppercase": "Letra mayúscula",
+      "digit": "Número",
+      "special": "Carácter especial",
+      "strong": "Contraseña fuerte"
+    },
     "resetTitle": "Restablecer contraseña",
     "resetCode": "Código de restablecimiento",
     "resetNewPassword": "Nueva contraseña",
@@ -146,7 +155,17 @@
     "searchResultsCount": "{{count}} resultados",
     "searching": "Buscando...",
     "noResultsFound": "No se encontraron anuncios para tu búsqueda. Prueba con otras palabras.",
-    "searchError": "Error al buscar anuncios. Inténtalo de nuevo."
+    "searchError": "Error al buscar anuncios. Inténtalo de nuevo.",
+    "resultsFor": "para",
+    "clearSearch": "Borrar búsqueda",
+    "noResultsTitle": "Sin resultados",
+    "noResultsHint": "Prueba con otras palabras o borra la búsqueda para ver los anuncios populares.",
+    "sortRelevance": "Relevancia",
+    "sortNewest": "Más recientes",
+    "sortOldest": "Más antiguos",
+    "sortPriceAsc": "Precio ↑",
+    "sortPriceDesc": "Precio ↓",
+    "sortBy": "Ordenar"
   },
   "allAnnouncements": {
     "title": "Todos los anuncios",

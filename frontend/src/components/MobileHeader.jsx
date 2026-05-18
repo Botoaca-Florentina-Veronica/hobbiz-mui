@@ -44,7 +44,7 @@ export default function MobileHeader({ notificationCount = 0, onSearchFocus, onN
     e.preventDefault();
     if (searchQuery.trim()) {
       setShowSuggestions(false);
-      navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/cautare?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
   

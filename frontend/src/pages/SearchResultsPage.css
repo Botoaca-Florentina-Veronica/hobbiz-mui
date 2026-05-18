@@ -1,0 +1,9 @@
+/* Page-level wrapper for the search results route. */
+.search-results-page {
+  min-height: calc(100vh - 80px);
+  font-family: 'Poppins', sans-serif;
+}
+
+.dark-mode .search-results-page {
+  background-color: #121212;
+}

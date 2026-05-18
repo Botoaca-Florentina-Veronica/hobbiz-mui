@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import storage from '../services/storage';
 
 type Locale = 'ro' | 'en' | 'es';
@@ -33,17 +33,19 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     return () => { mounted = false; };
   }, []);
 
-  const setLocale = async (newLocale: Locale) => {
+  const setLocale = useCallback(async (newLocale: Locale) => {
     try {
       await storage.setItemAsync('locale', newLocale);
       setLocaleState(newLocale);
     } catch (e) {
       console.warn('Failed to save locale', e);
     }
-  };
+  }, []);
+
+  const value = useMemo<LocaleContextType>(() => ({ locale, setLocale, isLoading }), [locale, setLocale, isLoading]);
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, isLoading }}>
+    <LocaleContext.Provider value={value}>
       {children}
     </LocaleContext.Provider>
   );

@@ -1,9 +1,31 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Modal,
+  Keyboard,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  ActivityIndicator,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedTextInput } from './themed-text-input';
 import { ThemedText } from './themed-text';
 import { useAppTheme } from '../src/context/ThemeContext';
+import { useLocale } from '../src/context/LocaleContext';
+import { getSearchTranslations } from '../src/i18n/search';
+import {
+  addRecentSearch,
+  clearRecentSearches,
+  getRecentSearches,
+  removeRecentSearch,
+} from '../src/services/searchHistory';
+import { CATEGORY_DEFS, translateCategory } from '../src/constants/categories';
 
 interface SearchSuggestion {
   _id: string;
@@ -17,354 +39,688 @@ interface SearchSuggestion {
 
 interface MobileHeaderProps {
   notificationCount?: number;
-  onSearchFocus?: () => void;
   onSearchSubmit?: (query: string) => void;
   onSearchChange?: (query: string) => void;
   onNotificationClick?: () => void;
   onSuggestionClick?: (id: string) => void;
+  onCategoryClick?: (categoryLabel: string) => void;
   searchValue?: string;
   searchSuggestions?: SearchSuggestion[];
   showSuggestions?: boolean;
   isSearching?: boolean;
 }
 
-export default function MobileHeader({ 
-  notificationCount = 0, 
-  onSearchFocus, 
+// Highlight matched portion of a string in bold. Case + diacritics insensitive.
+function highlightMatch(text: string, query: string, baseColor: string, accentColor: string) {
+  const q = (query || '').trim();
+  if (!q || !text) {
+    return (
+      <ThemedText style={[styles.suggestionTitle, { color: baseColor }]} numberOfLines={1}>
+        {text}
+      </ThemedText>
+    );
+  }
+  const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const haystack = normalize(text);
+  const needle = normalize(q);
+  const idx = haystack.indexOf(needle);
+  if (idx < 0) {
+    return (
+      <ThemedText style={[styles.suggestionTitle, { color: baseColor }]} numberOfLines={1}>
+        {text}
+      </ThemedText>
+    );
+  }
+  const before = text.slice(0, idx);
+  const match = text.slice(idx, idx + q.length);
+  const after = text.slice(idx + q.length);
+  return (
+    <ThemedText style={[styles.suggestionTitle, { color: baseColor }]} numberOfLines={1}>
+      {before}
+      <ThemedText style={[styles.suggestionTitle, styles.suggestionTitleMatch, { color: accentColor }]}>
+        {match}
+      </ThemedText>
+      {after}
+    </ThemedText>
+  );
+}
+
+export default function MobileHeader({
+  notificationCount = 0,
   onNotificationClick,
   onSearchSubmit,
   onSearchChange,
   onSuggestionClick,
+  onCategoryClick,
   searchValue,
   searchSuggestions = [],
   showSuggestions = false,
   isSearching = false,
 }: MobileHeaderProps) {
   const { tokens, isDark } = useAppTheme();
-  const webBox = (tokens as any)?.shadow?.elev1?.boxShadow;
-  const [query, setQuery] = React.useState('');
-  const [searchContainerLayout, setSearchContainerLayout] = React.useState<{ x: number; width: number } | null>(null);
-  
-  // Sync with external value
-  React.useEffect(() => {
+  const { locale } = useLocale();
+  const t = getSearchTranslations(locale);
+  const insets = useSafeAreaInsets();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [query, setQuery] = useState('');
+  const [recents, setRecents] = useState<string[]>([]);
+  const inputRef = useRef<TextInput>(null);
+
+  // Sync external value (so parent can reset)
+  useEffect(() => {
     if (searchValue !== undefined && searchValue !== query) {
       setQuery(searchValue);
     }
   }, [searchValue]);
 
+  const loadRecents = useCallback(async () => {
+    const list = await getRecentSearches();
+    setRecents(list);
+  }, []);
+
+  useEffect(() => { void loadRecents(); }, [loadRecents]);
+
+  const openModal = useCallback(() => {
+    setModalVisible(true);
+    void loadRecents();
+    // Defer focus so the modal animation can settle
+    setTimeout(() => inputRef.current?.focus(), 120);
+  }, [loadRecents]);
+
+  const closeModal = useCallback(() => {
+    Keyboard.dismiss();
+    setModalVisible(false);
+  }, []);
+
+  const submitSearch = useCallback(async (raw: string) => {
+    const q = (raw || '').trim();
+    if (q.length > 0) {
+      await addRecentSearch(q);
+      void loadRecents();
+    }
+    Keyboard.dismiss();
+    setModalVisible(false);
+    if (onSearchSubmit) onSearchSubmit(q);
+  }, [onSearchSubmit, loadRecents]);
+
+  const handleChangeText = useCallback((text: string) => {
+    setQuery(text);
+    if (onSearchChange) onSearchChange(text);
+  }, [onSearchChange]);
+
+  const handleClear = useCallback(() => {
+    setQuery('');
+    if (onSearchChange) onSearchChange('');
+    inputRef.current?.focus();
+  }, [onSearchChange]);
+
+  const handleRecentPress = useCallback((q: string) => {
+    setQuery(q);
+    if (onSearchChange) onSearchChange(q);
+    void submitSearch(q);
+  }, [onSearchChange, submitSearch]);
+
+  const handleRemoveRecent = useCallback(async (q: string) => {
+    await removeRecentSearch(q);
+    void loadRecents();
+  }, [loadRecents]);
+
+  const handleClearAllRecents = useCallback(async () => {
+    await clearRecentSearches();
+    setRecents([]);
+  }, []);
+
+  const handleCategoryPress = useCallback((label: string) => {
+    Keyboard.dismiss();
+    setModalVisible(false);
+    if (onCategoryClick) onCategoryClick(label);
+  }, [onCategoryClick]);
+
+  const handleSuggestionPress = useCallback(async (id: string) => {
+    const q = (query || '').trim();
+    if (q.length > 0) await addRecentSearch(q);
+    Keyboard.dismiss();
+    setModalVisible(false);
+    if (onSuggestionClick) onSuggestionClick(id);
+  }, [query, onSuggestionClick]);
+
+  const hasQuery = query.trim().length > 0;
+  const hasLiveResults = showSuggestions && hasQuery && query.trim().length >= 2;
+
+  const accent = tokens.colors.primary;
+  const surface = tokens.colors.surface;
+  const border = tokens.colors.border;
+  const text = tokens.colors.text;
+  const muted = tokens.colors.muted;
+  const bg = tokens.colors.bg;
+  const subtleSurface = isDark ? '#161616' : '#F4F5F7';
+  const inputBg = isDark ? (tokens.colors.darkModeContainer || surface) : '#F4F5F7';
+
+  const popularCategories = useMemo(() => CATEGORY_DEFS.slice(0, 8), []);
+
   return (
-    <View style={[styles.headerContainer, { backgroundColor: tokens.colors.bg }]}>
-    <View style={[styles.header, { backgroundColor: tokens.colors.bg }]}>
-      {/* Search Bar */}
-      <View style={styles.searchContainer}
-        onLayout={(event) => {
-          const { x, width } = event.nativeEvent.layout;
-          setSearchContainerLayout({ x, width });
-        }}
-      >
-        <View style={[
-          styles.searchBar, 
-          { 
-            backgroundColor: tokens.colors.surface,
-            borderColor: isDark ? tokens.colors.border : '#E0E0E0',
-          },
-          // Use boxShadow on web to avoid deprecated RN shadow props being forwarded
-          (typeof document !== 'undefined' && webBox) ? { boxShadow: webBox } : { shadowColor: '#000' }
-        ]}>
-          <View style={styles.searchIconWrapper}>
-            <Ionicons name="search-outline" size={20} color={tokens.colors.muted} />
-          </View>
-          <ThemedTextInput
-            style={[
-              styles.searchInput,
-              { color: tokens.colors.text }
+    <>
+      {/* Compact header: tappable fake search + notification */}
+      <View style={[styles.headerContainer, { backgroundColor: bg }]}>
+        <View style={styles.headerRow}>
+          <Pressable
+            onPress={openModal}
+            style={({ pressed }) => [
+              styles.searchPill,
+              { backgroundColor: inputBg, borderColor: isDark ? border : '#E5E7EB' },
+              pressed && { opacity: 0.85 },
             ]}
-            placeholder="Ce anume cauți?"
-            placeholderTextColor={tokens.colors.muted}
-            onFocus={onSearchFocus}
-            value={query}
-            onChangeText={(text) => {
-              setQuery(text);
-              if (onSearchChange) onSearchChange(text);
-            }}
-            returnKeyType="search"
-            onSubmitEditing={() => {
-              const q = (query || '').trim();
-              if (onSearchSubmit) onSearchSubmit(q);
-            }}
-          />
-          <TouchableOpacity
-            style={[styles.searchButton, { backgroundColor: tokens.colors.primary }]}
-            activeOpacity={0.85}
-            onPress={() => {
-              const q = (query || '').trim();
-              if (onSearchSubmit) onSearchSubmit(q);
-            }}
           >
-            <Ionicons name="search" size={22} color={tokens.colors.primaryContrast} />
+            <Ionicons name="search" size={20} color={muted} style={styles.searchIcon} />
+            <ThemedText style={[styles.searchPillText, { color: hasQuery ? text : muted }]} numberOfLines={1}>
+              {hasQuery ? query : t.placeholder}
+            </ThemedText>
+          </Pressable>
+
+          <TouchableOpacity
+            style={[styles.notificationButton, { backgroundColor: surface, borderColor: isDark ? border : '#E6E8EE' }]}
+            onPress={onNotificationClick}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="notifications-outline" size={22} color={text} />
+            {notificationCount > 0 && (
+              <View style={[styles.badge, { backgroundColor: accent }]}>
+                <View style={styles.badgeInner} />
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Notification Button */}
-      <TouchableOpacity
-        style={[
-          styles.notificationButton,
-          {
-            backgroundColor: tokens.colors.surface,
-            borderColor: isDark ? tokens.colors.border : '#E6E8EE',
-          },
-        ]}
-        onPress={onNotificationClick}
-        activeOpacity={0.7}
+      {/* Full-screen search modal */}
+      <Modal
+        visible={modalVisible}
+        animationType="fade"
+        transparent={false}
+        onRequestClose={closeModal}
+        statusBarTranslucent={Platform.OS === 'android'}
       >
-        <Ionicons 
-          name="notifications-outline" 
-          size={26} 
-          color={tokens.colors.text} 
-        />
-        {notificationCount > 0 && (
-          <View style={[styles.badge, { backgroundColor: tokens.colors.primary }]}>
-            <View style={styles.badgeInner} />
-          </View>
-        )}
-      </TouchableOpacity>
-    </View>
-    
-    {/* Search Suggestions Dropdown */}
-    {showSuggestions && query.trim().length >= 2 && searchContainerLayout && (
-      <View style={[
-        styles.suggestionsDropdown,
-        {
-          left: searchContainerLayout.x,
-          width: searchContainerLayout.width,
-        },
-        { 
-          backgroundColor: tokens.colors.surface,
-          borderColor: tokens.colors.border,
-        }
-      ]}>
-        {isSearching ? (
-          <View style={styles.suggestionItem}>
-            <ThemedText style={{ color: tokens.colors.muted }}>Se caută...</ThemedText>
-          </View>
-        ) : searchSuggestions.length === 0 ? (
-          <View style={styles.suggestionItem}>
-            <ThemedText style={{ color: tokens.colors.muted }}>Nu am găsit rezultate</ThemedText>
-          </View>
-        ) : (
-          <ScrollView 
-            style={styles.suggestionsScroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={true}
-          >
-            {searchSuggestions.map((suggestion) => (
-              <TouchableOpacity
-                key={suggestion._id}
-                style={[styles.suggestionItem, { borderBottomColor: tokens.colors.border }]}
-                onPress={() => {
-                  if (onSuggestionClick) onSuggestionClick(suggestion._id);
-                }}
-                activeOpacity={0.7}
-              >
-                <View style={styles.suggestionImageContainer}>
-                  {suggestion.images && suggestion.images.length > 0 ? (
-                    <Image 
-                      source={{ uri: suggestion.images[0] }} 
-                      style={styles.suggestionImage}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={[styles.noImagePlaceholder, { backgroundColor: tokens.colors.bg }]}>
-                      <Ionicons name="image-outline" size={20} color={tokens.colors.muted} />
-                    </View>
-                  )}
-                </View>
-                <View style={styles.suggestionContent}>
-                  <ThemedText 
-                    style={styles.suggestionTitle} 
-                    numberOfLines={1}
-                  >
-                    {suggestion.title || suggestion.description}
-                  </ThemedText>
-                  <View style={styles.suggestionMeta}>
-                    {suggestion.category && (
-                      <ThemedText style={[styles.suggestionMetaText, { color: tokens.colors.muted }]} numberOfLines={1}>
-                        {suggestion.category}
-                      </ThemedText>
-                    )}
-                    {suggestion.location && (
-                      <>
-                        <ThemedText style={{ color: tokens.colors.muted }}>•</ThemedText>
-                        <ThemedText style={[styles.suggestionMetaText, { color: tokens.colors.muted }]} numberOfLines={1}>
-                          {suggestion.location}
-                        </ThemedText>
-                      </>
-                    )}
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={bg} />
+        <View style={[styles.modalRoot, { backgroundColor: bg, paddingTop: insets.top + 8 }]}>
+          {/* Modal header */}
+          <View style={styles.modalHeaderRow}>
+            <TouchableOpacity
+              onPress={closeModal}
+              style={[styles.iconBtn, { backgroundColor: subtleSurface }]}
+              activeOpacity={0.7}
+              hitSlop={8}
+            >
+              <Ionicons name="chevron-back" size={22} color={text} />
+            </TouchableOpacity>
+
+            <View style={[styles.modalSearchBar, { backgroundColor: inputBg, borderColor: accent }]}>
+              <Ionicons name="search" size={20} color={accent} style={styles.searchIcon} />
+              <TextInput
+                ref={inputRef}
+                style={[styles.modalSearchInput, { color: text }]}
+                placeholder={t.placeholder}
+                placeholderTextColor={muted}
+                value={query}
+                onChangeText={handleChangeText}
+                returnKeyType="search"
+                onSubmitEditing={() => submitSearch(query)}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+              {hasQuery ? (
+                <TouchableOpacity onPress={handleClear} hitSlop={8} style={styles.clearBtn} activeOpacity={0.7}>
+                  <View style={[styles.clearCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)' }]}>
+                    <Ionicons name="close" size={14} color={isDark ? '#fff' : '#333'} />
                   </View>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </View>
+
+          {/* Modal content */}
+          <ScrollView
+            style={styles.modalScroll}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.modalContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {hasLiveResults ? (
+              isSearching ? (
+                <View style={styles.statusRow}>
+                  <ActivityIndicator size="small" color={accent} />
+                  <ThemedText style={[styles.statusText, { color: muted }]}>{t.searching}</ThemedText>
                 </View>
-                {suggestion.price !== undefined && (
-                  <View style={styles.suggestionPriceContainer}>
-                    <ThemedText style={[styles.suggestionPrice, { color: tokens.colors.primary }]}>
-                      {suggestion.price === 0 ? 'Gratuit' : `${suggestion.price} RON`}
+              ) : searchSuggestions.length === 0 ? (
+                <View style={styles.emptyResults}>
+                  <View style={[styles.emptyIconWrap, { backgroundColor: subtleSurface }]}>
+                    <Ionicons name="search-outline" size={36} color={muted} />
+                  </View>
+                  <ThemedText style={[styles.emptyResultsTitle, { color: text }]}>{t.noResultsTitle}</ThemedText>
+                  <ThemedText style={[styles.emptyResultsHint, { color: muted }]}>{t.noResultsHint}</ThemedText>
+                </View>
+              ) : (
+                <View style={styles.suggestionsList}>
+                  {searchSuggestions.slice(0, 10).map((suggestion, i) => (
+                    <Pressable
+                      key={suggestion._id}
+                      onPress={() => handleSuggestionPress(suggestion._id)}
+                      style={({ pressed }) => [
+                        styles.suggestionRow,
+                        i !== Math.min(searchSuggestions.length, 10) - 1 && {
+                          borderBottomColor: border,
+                          borderBottomWidth: StyleSheet.hairlineWidth,
+                        },
+                        pressed && { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
+                      ]}
+                    >
+                      <View style={[styles.suggestionThumb, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#EEF1F6' }]}>
+                        {suggestion.images && suggestion.images.length > 0 ? (
+                          <Image source={{ uri: suggestion.images[0] }} style={styles.suggestionImage} resizeMode="cover" />
+                        ) : (
+                          <Ionicons name="image-outline" size={20} color={muted} />
+                        )}
+                      </View>
+                      <View style={styles.suggestionInfo}>
+                        {highlightMatch(suggestion.title || suggestion.description || '', query, text, accent)}
+                        <View style={styles.suggestionMetaRow}>
+                          {suggestion.category && (
+                            <View style={[styles.suggestionChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#EEF1F6' }]}>
+                              <ThemedText style={[styles.suggestionChipText, { color: muted }]} numberOfLines={1}>
+                                {suggestion.category}
+                              </ThemedText>
+                            </View>
+                          )}
+                          {suggestion.location && (
+                            <View style={styles.suggestionLocation}>
+                              <Ionicons name="location-outline" size={11} color={muted} />
+                              <ThemedText style={[styles.suggestionLocationText, { color: muted }]} numberOfLines={1}>
+                                {suggestion.location}
+                              </ThemedText>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                      <Ionicons name="arrow-up-outline" size={18} color={muted} style={styles.suggestionArrow} />
+                    </Pressable>
+                  ))}
+
+                  <TouchableOpacity
+                    onPress={() => submitSearch(query)}
+                    activeOpacity={0.85}
+                    style={[styles.seeAllRow, { borderTopColor: border }]}
+                  >
+                    <Ionicons name="search" size={18} color={accent} />
+                    <ThemedText style={[styles.seeAllText, { color: accent }]} numberOfLines={1}>
+                      {t.seeAllResults} "{query.trim()}"
                     </ThemedText>
+                    <Ionicons name="chevron-forward" size={18} color={accent} />
+                  </TouchableOpacity>
+                </View>
+              )
+            ) : (
+              <>
+                {recents.length > 0 && (
+                  <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                      <ThemedText style={[styles.sectionTitle, { color: text }]}>{t.recent}</ThemedText>
+                      <TouchableOpacity onPress={handleClearAllRecents} hitSlop={6}>
+                        <ThemedText style={[styles.clearAllText, { color: muted }]}>{t.clearAll}</ThemedText>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.chipsWrap}>
+                      {recents.map((r) => (
+                        <View
+                          key={r}
+                          style={[
+                            styles.recentChip,
+                            {
+                              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F1F3F7',
+                              borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#E6E9EF',
+                            },
+                          ]}
+                        >
+                          <TouchableOpacity
+                            onPress={() => handleRecentPress(r)}
+                            activeOpacity={0.7}
+                            style={styles.recentChipBody}
+                          >
+                            <Ionicons name="time-outline" size={14} color={muted} />
+                            <ThemedText style={[styles.recentChipText, { color: text }]} numberOfLines={1}>
+                              {r}
+                            </ThemedText>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => handleRemoveRecent(r)} hitSlop={6} style={styles.recentChipClose}>
+                            <Ionicons name="close" size={14} color={muted} />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                    </View>
                   </View>
                 )}
-              </TouchableOpacity>
-            ))}
+
+                <View style={styles.section}>
+                  <ThemedText style={[styles.sectionTitle, { color: text, marginBottom: 14 }]}>{t.popularCategories}</ThemedText>
+                  <View style={styles.categoriesGrid}>
+                    {popularCategories.map((cat) => (
+                      <TouchableOpacity
+                        key={cat.key}
+                        onPress={() => handleCategoryPress(cat.label)}
+                        activeOpacity={0.7}
+                        style={styles.categoryItem}
+                      >
+                        <View style={[styles.categoryIcon, { backgroundColor: cat.color + '22' }]}>
+                          <Ionicons name={cat.icon as any} size={22} color={cat.color} />
+                        </View>
+                        <ThemedText style={[styles.categoryLabel, { color: text }]} numberOfLines={1}>
+                          {translateCategory(cat.key, locale)}
+                        </ThemedText>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </>
+            )}
           </ScrollView>
-        )}
-      </View>
-    )}
-    </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  // Compact header
   headerContainer: {
-    position: 'relative',
-    zIndex: 40,
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 8,
+    paddingTop: 8,
+    paddingBottom: 10,
   },
-  header: {
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  searchPill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+  },
+  searchPillText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  notificationButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeInner: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#fff',
+  },
+
+  // Modal
+  modalRoot: {
+    flex: 1,
+  },
+  modalHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  iconBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSearchBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1.5,
+    paddingHorizontal: 14,
+  },
+  modalSearchInput: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+    paddingVertical: 0,
+    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : null),
+  },
+  clearBtn: {
+    paddingLeft: 8,
+  },
+  clearCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalScroll: {
+    flex: 1,
+  },
+  modalContent: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    paddingBottom: 32,
+  },
+
+  // Sections
+  section: {
+    marginTop: 16,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-    gap: 12,
+    marginBottom: 10,
   },
-  suggestionsDropdown: {
-    position: 'absolute',
-    top: 66,
-    maxHeight: 400,
-    borderRadius: 16,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-    overflow: 'hidden',
-    zIndex: 1001,
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
-  suggestionsScroll: {
-    maxHeight: 400,
+  clearAllText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
-  suggestionItem: {
+  chipsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  recentChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderBottomWidth: 1,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingLeft: 12,
+    paddingRight: 6,
+    paddingVertical: 6,
+  },
+  recentChipBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    maxWidth: 200,
+  },
+  recentChipText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  recentChipClose: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
+  },
+
+  // Categories grid
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 12,
+    rowGap: 16,
+  },
+  categoryItem: {
+    width: '22%',
+    alignItems: 'center',
+    gap: 8,
+  },
+  categoryIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoryLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  // Status + empty + suggestions
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 4,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  emptyResults: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    gap: 8,
+  },
+  emptyIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  emptyResultsTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  emptyResultsHint: {
+    fontSize: 13,
+    textAlign: 'center',
+    paddingHorizontal: 24,
+    lineHeight: 18,
+  },
+  suggestionsList: {
+    paddingTop: 4,
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
     gap: 12,
   },
-  suggestionImageContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
+  suggestionThumb: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
     overflow: 'hidden',
   },
   suggestionImage: {
     width: '100%',
     height: '100%',
   },
-  noImagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  suggestionContent: {
+  suggestionInfo: {
     flex: 1,
     gap: 4,
   },
   suggestionTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  suggestionMeta: {
+  suggestionTitleMatch: {
+    fontWeight: '800',
+  },
+  suggestionMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     flexWrap: 'wrap',
   },
-  suggestionMetaText: {
-    fontSize: 12,
+  suggestionChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    maxWidth: 140,
   },
-  suggestionPriceContainer: {
-    alignItems: 'flex-end',
+  suggestionChipText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
-  suggestionPrice: {
+  suggestionLocation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  suggestionLocationText: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  suggestionArrow: {
+    transform: [{ rotate: '45deg' }],
+  },
+  seeAllRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 4,
+  },
+  seeAllText: {
+    flex: 1,
     fontSize: 14,
     fontWeight: '700',
   },
-  searchContainer: {
-    flex: 1,
-    maxWidth: '85%',
-  },  searchIconWrapper: {
-    position: 'absolute',
-    left: 16,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },  searchBar: {
-    flexDirection: 'row',
-    borderRadius: 18,
-    overflow: 'hidden',
-    borderWidth: 1,
-    height: 50,
-    alignItems: 'center',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 14,
-    elevation: 2,
-  },
-  searchInput: {
-    flex: 1,
-    paddingLeft: 46,
-    paddingRight: 10,
-    paddingVertical: 12,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  searchButton: {
-    marginRight: 4,
-    borderRadius: 14,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 40,
-  },
-  notificationButton: {
-    padding: 10,
-    borderRadius: 16,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-    borderWidth: 1,
-  },
-  badge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  badgeInner: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
 });
-

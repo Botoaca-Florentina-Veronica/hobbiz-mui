@@ -42,6 +42,7 @@ import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import InformatiiLegale from './pages/InformatiiLegale.jsx';
 import AllAnnouncements from './pages/AllAnnouncements.jsx';
+import SearchResultsPage from './pages/SearchResultsPage.jsx';
 import ArchivedAnnouncementsPage from './pages/ArchivedAnnouncementsPage.jsx';
 import useScrollToTop from './hooks/useScrollToTop';
 import './App.css';
@@ -174,6 +175,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AllAnnouncements />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/cautare" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <SearchResultsPage />
             <Footer hideOnMobile />
           </>
         } />

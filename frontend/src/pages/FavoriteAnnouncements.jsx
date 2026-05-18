@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -354,12 +354,46 @@ export default function FavoriteAnnouncements() {
     );
   };
 
-  // Filtrăm fullFavorites prin authFavoriteIds (source of truth pentru starea toggle).
-  // Fără acest filtru, un item scos din favorite rămânea vizibil cu inimioara goală
-  // până la următorul hydrate, deoarece fullFavorites nu primea update optimist.
-  const favoritesList = isAuthenticated
-    ? (fullFavorites || []).filter(a => (authFavoriteIds || []).includes(String(a._id)))
-    : guestAnnouncements;
+  // Display snapshot: the list of items shown stays stable while the page is
+  // open so users can change their mind. The heart icon and counter still
+  // reflect live state, but items aren't removed from the list until the next
+  // page refresh / re-mount.
+  const [displayList, setDisplayList] = useState([]);
+  const snapshotTakenRef = useRef(false);
+
+  useEffect(() => {
+    if (snapshotTakenRef.current) return;
+    if (isAuthenticated) {
+      // Wait until fullFavorites is ready: either it has items, or the user
+      // genuinely has no favorites (authFavoriteIds is empty too).
+      const ready =
+        (fullFavorites && fullFavorites.length > 0) ||
+        (authFavoriteIds && authFavoriteIds.length === 0);
+      if (ready) {
+        const initial = (fullFavorites || []).filter(a =>
+          (authFavoriteIds || []).includes(String(a._id))
+        );
+        setDisplayList(initial);
+        snapshotTakenRef.current = true;
+      }
+    } else {
+      // Guest mode — snapshot once guest data is ready
+      const ready =
+        guestAnnouncements.length > 0 || guestFavoriteIds.length === 0;
+      if (ready) {
+        setDisplayList(guestAnnouncements);
+        snapshotTakenRef.current = true;
+      }
+    }
+  }, [isAuthenticated, fullFavorites, authFavoriteIds, guestAnnouncements, guestFavoriteIds]);
+
+  // Items displayed in the grid (stable snapshot)
+  const favoritesList = displayList;
+
+  // Live counter: reflects the user's actual favorites count right now
+  const liveFavoritesCount = isAuthenticated
+    ? (authFavoriteIds?.length || 0)
+    : (guestFavoriteIds?.length || 0);
 
   const isMobile = viewportWidth <= 1024;
   const isTwoColumnMobile = viewportWidth > 700;
@@ -397,9 +431,9 @@ export default function FavoriteAnnouncements() {
     else navigate('/');
   };
 
-  const isEmpty = isAuthenticated
-    ? favoritesList?.length === 0
-    : guestAnnouncements.length === 0;
+  // Empty state mirrors the displayed list (snapshot) so once items are shown
+  // they don't disappear when the user toggles them off in the same session.
+  const isEmpty = (favoritesList?.length || 0) === 0;
 
   return (
     <>
@@ -408,7 +442,7 @@ export default function FavoriteAnnouncements() {
 
         {isMobile && (
           <MobileAppHeader
-            count={favoritesList?.length || 0}
+            count={liveFavoritesCount}
             onBack={handleBack}
             t={t}
           />
@@ -417,7 +451,7 @@ export default function FavoriteAnnouncements() {
         <h1 className="my-announcements-title">
           {t('favorites.myFavorites')}
           <span className="my-announcements-title-count">
-            ({isAuthenticated ? (favoritesList?.length || 0) : guestAnnouncements.length}/150)
+            ({liveFavoritesCount}/150)
           </span>
         </h1>
 

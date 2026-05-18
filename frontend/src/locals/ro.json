@@ -65,6 +65,15 @@
       "password": "Parolă",
       "phone": "Telefon"
     },
+    "passwordHints": {
+      "title": "Pentru o parolă mai puternică:",
+      "minLength": "Cel puțin 8 caractere",
+      "lowercase": "Literă mică",
+      "uppercase": "Literă mare",
+      "digit": "Cifră",
+      "special": "Caracter special",
+      "strong": "Parolă puternică"
+    },
     "resetTitle": "Resetare parolă",
     "resetCode": "Cod de resetare",
     "resetNewPassword": "Parola nouă",
@@ -146,7 +155,17 @@
     "searching": "Se caută...",
     "searchResultsCount": "S-au găsit {{count}} rezultate",
     "noResultsFound": "Nu s-au găsit anunțuri pentru căutarea ta. Încearcă alte cuvinte cheie.",
-    "searchError": "Eroare la căutarea anunțurilor. Încearcă din nou."
+    "searchError": "Eroare la căutarea anunțurilor. Încearcă din nou.",
+    "resultsFor": "pentru",
+    "clearSearch": "Șterge căutarea",
+    "noResultsTitle": "Nimic găsit",
+    "noResultsHint": "Încearcă alte cuvinte cheie sau șterge căutarea pentru a vedea anunțurile populare.",
+    "sortRelevance": "Relevanță",
+    "sortNewest": "Cele mai noi",
+    "sortOldest": "Cele mai vechi",
+    "sortPriceAsc": "Preț ↑",
+    "sortPriceDesc": "Preț ↓",
+    "sortBy": "Sortează"
   },
   "allAnnouncements": {
     "title": "Toate Anunțurile",

@@ -57,6 +57,7 @@ export default function PublicProfile() {
   const [error, setError] = useState('');
   const [announcements, setAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+  const [avatarBroken, setAvatarBroken] = useState(false);
 
   // Toast
   const [toastVisible, setToastVisible] = useState(false);
@@ -248,8 +249,12 @@ export default function PublicProfile() {
         />
         <div className="pp-hero-body">
           <div className="pp-hero-avatar">
-            {profile?.avatar ? (
-              <img src={resolveMediaUrl(profile.avatar)} alt={fullName} />
+            {profile?.avatar && !avatarBroken ? (
+              <img
+                src={resolveMediaUrl(profile.avatar)}
+                alt={fullName}
+                onError={() => setAvatarBroken(true)}
+              />
             ) : (
               <PersonIcon className="pp-hero-avatar-fallback" />
             )}

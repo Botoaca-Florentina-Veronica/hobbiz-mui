@@ -92,7 +92,7 @@ export default function CookieConsent() {
         <h2 className="cc-title">Cookie-urile noastre n-au calorii! 🍪</h2>
         <p className="cc-desc">
           Spre deosebire de cele cu ciocolată, ale noastre sunt 100% digitale.
-          Șaun confirmă că-s inofensive — le folosim doar ca să-ți facem
+          Le folosim doar ca să-ți facem
           experiența pe Hobbiz mai <em>beeee</em>-ună!
         </p>
 

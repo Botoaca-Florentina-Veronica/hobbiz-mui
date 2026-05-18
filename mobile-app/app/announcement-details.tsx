@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useAppTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
+import { useFavoritesCount } from '../src/context/FavoritesContext';
 import api from '../src/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ImageViewing from '../src/components/ImageViewer';
@@ -40,6 +41,7 @@ export default function AnnouncementDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { tokens, isDark } = useAppTheme();
   const { isAuthenticated, user: currentUser } = useAuth();
+  const { incrementFavoritesCount, decrementFavoritesCount } = useFavoritesCount();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -420,8 +422,12 @@ export default function AnnouncementDetailsScreen() {
 
               console.log('[Favorites] Current state:', { favorited, announcementId: id, isAuthenticated });
 
+              const wasFavorited = favorited;
+              // Optimistic update for the tab-bar badge
+              if (wasFavorited) decrementFavoritesCount(); else incrementFavoritesCount();
+
               try {
-                if (!favorited) {
+                if (!wasFavorited) {
                   console.log('[Favorites] Adding to favorites...');
                   const r = await api.post(`/api/favorites/${id}`);
                   console.log('[Favorites] POST response:', r.data);
@@ -443,6 +449,8 @@ export default function AnnouncementDetailsScreen() {
               } catch (err: any) {
                 console.error('[Favorites] Toggle failed:', err);
                 console.error('[Favorites] Error response:', err?.response?.data);
+                // Revert optimistic badge update
+                if (wasFavorited) incrementFavoritesCount(); else decrementFavoritesCount();
                 const errorMsg = err?.response?.data?.error || err?.response?.data?.message || t.favoriteFailed;
                 showToast(errorMsg, 'error');
               }

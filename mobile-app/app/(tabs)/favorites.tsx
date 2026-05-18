@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '../../components/themed-text';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+import { useFavoritesCount } from '../../src/context/FavoritesContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
@@ -50,6 +51,7 @@ export default function FavoritesScreen() {
   } as const;
   const colors = isDark ? darkPalette : tokens.colors;
   const { isAuthenticated } = useAuth();
+  const { incrementFavoritesCount, decrementFavoritesCount, setFavoritesCount } = useFavoritesCount();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -71,17 +73,20 @@ export default function FavoritesScreen() {
     try {
       setLoading(true);
       const res = await api.get('/api/favorites');
-      setFavorites(res.data?.favorites || []);
+      const list = res.data?.favorites || [];
+      setFavorites(list);
       // reset local optimistic state on fresh fetch
       setRemovedFavorites(new Set());
       setRemovingIds(new Set());
+      // Sync the global tab-bar badge to the authoritative server count
+      setFavoritesCount(list.length);
     } catch (e) {
       console.error('Error fetching favorites:', e);
       setFavorites([]);
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setFavoritesCount]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -97,30 +102,41 @@ export default function FavoritesScreen() {
     }, [fetchFavorites])
   );
 
-  const handleRemoveFavorite = async (id: string) => {
-    // Optimistic UI for the favorite button: mark as removing immediately
+  // Toggle: if currently removed (user previously unfavorited in this session),
+  // re-add to favorites. Otherwise, remove. The item stays visible in either
+  // case until the next page refresh / focus-effect.
+  const handleToggleFavorite = async (id: string) => {
+    const wasRemoved = removedFavorites.has(id);
+
     setRemovingIds(prev => new Set(Array.from(prev).concat(id)));
 
+    // Optimistic local update so the heart icon flips immediately
+    setRemovedFavorites(prev => {
+      const next = new Set(prev);
+      if (wasRemoved) next.delete(id); else next.add(id);
+      return next;
+    });
+
+    // Sync the global tab-bar badge optimistically
+    if (wasRemoved) incrementFavoritesCount(); else decrementFavoritesCount();
+
     try {
-      await api.delete(`/api/favorites/${id}`);
-      // Mark as removed locally so button updates, but keep item visible
+      if (wasRemoved) {
+        await api.post(`/api/favorites/${id}`);
+      } else {
+        await api.delete(`/api/favorites/${id}`);
+      }
+    } catch (e) {
+      console.error('Error toggling favorite:', e);
+      // revert optimistic update on failure
       setRemovedFavorites(prev => {
         const next = new Set(prev);
-        next.add(id);
+        if (wasRemoved) next.add(id); else next.delete(id);
         return next;
       });
-    } catch (e) {
-      console.error('Error removing favorite:', e);
-      // revert removing state
-      setRemovingIds(prev => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-      // fallback to informing the user
-      try { Alert.alert('Error', 'Could not remove favorite.'); } catch (_) {}
+      if (wasRemoved) decrementFavoritesCount(); else incrementFavoritesCount();
+      try { Alert.alert('Error', 'Could not update favorite.'); } catch (_) {}
     } finally {
-      // clear removing flag
       setRemovingIds(prev => {
         const next = new Set(prev);
         next.delete(id);
@@ -190,7 +206,7 @@ export default function FavoritesScreen() {
             </ThemedText>
           </View>
           <ThemedText style={[styles.countBadge, { color: isDark ? '#f51866' : '#E0245E' }]}>
-            {favorites.length}/150
+            {favorites.length - removedFavorites.size}/150
           </ThemedText>
         </View>
       </View>
@@ -298,7 +314,7 @@ export default function FavoritesScreen() {
                   <TouchableOpacity
                     onPress={(e) => {
                       e.stopPropagation();
-                      handleRemoveFavorite(ann._id);
+                      handleToggleFavorite(ann._id);
                     }}
                     style={styles.favoriteButton}
                     activeOpacity={0.7}

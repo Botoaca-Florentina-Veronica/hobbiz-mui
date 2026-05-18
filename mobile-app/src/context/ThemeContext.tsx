@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
 import storage from '../services/storage';
 import { lightTokens, darkTokens, Tokens } from '../theme/tokens';
@@ -34,20 +34,22 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     })();
   }, []);
 
-  const setMode = async (newMode: ThemeMode) => {
+  const setMode = useCallback(async (newMode: ThemeMode) => {
     setModeState(newMode);
     try {
       await storage.setItemAsync(THEME_KEY, newMode);
     } catch (e) {
       // Silently fail
     }
-  };
+  }, []);
 
   const isDark = mode === 'auto' ? systemScheme === 'dark' : mode === 'dark';
   const tokens = isDark ? darkTokens : lightTokens;
 
+  const value = useMemo<ThemeContextType>(() => ({ mode, setMode, isDark, tokens }), [mode, setMode, isDark, tokens]);
+
   return (
-    <ThemeContext.Provider value={{ mode, setMode, isDark, tokens }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

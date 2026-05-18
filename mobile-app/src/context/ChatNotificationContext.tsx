@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../services/api';
 import { io, Socket } from 'socket.io-client';
@@ -107,17 +107,17 @@ export const ChatNotificationProvider: React.FC<{ children: React.ReactNode }> =
     return () => clearInterval(interval);
   }, [isAuthenticated, user?.id, refreshUnreadCount]);
 
+  const value = useMemo<ChatNotificationContextType>(() => ({
+    unreadCount,
+    refreshUnreadCount,
+    decrementUnreadCount,
+    incrementUnreadCount,
+    setUnreadCount,
+    socket,
+  }), [unreadCount, refreshUnreadCount, decrementUnreadCount, incrementUnreadCount, socket]);
+
   return (
-    <ChatNotificationContext.Provider
-      value={{
-        unreadCount,
-        refreshUnreadCount,
-        decrementUnreadCount,
-        incrementUnreadCount,
-        setUnreadCount,
-        socket
-      }}
-    >
+    <ChatNotificationContext.Provider value={value}>
       {children}
     </ChatNotificationContext.Provider>
   );
