@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 set -euo pipefail
 
 : "${MDSSC_API_KEY:?MDSSC_API_KEY is not set}"

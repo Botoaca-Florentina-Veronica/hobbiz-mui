@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 set -euo pipefail
 
 # Folosim python3 pentru parsare JSON — disponibil pe orice Linux, fără dependințe externe
