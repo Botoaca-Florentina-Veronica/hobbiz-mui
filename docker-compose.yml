@@ -21,8 +21,7 @@ services:
     depends_on:
       - mongodb
     env_file:
-      - path: ./backend/.env
-        required: false
+      - ./backend/.env
     environment:
       NODE_ENV: development
       PORT: 5000
