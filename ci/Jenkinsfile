@@ -52,7 +52,8 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm ci'
-                    sh 'npm run build'
+                    // Mărim heap-ul Node ca să evităm OOM în timpul vite build pe agenți mici
+                    sh 'NODE_OPTIONS="--max-old-space-size=4096" npm run build'
                 }
             }
         }
