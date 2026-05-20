@@ -1,15 +1,4 @@
 services:
-  mongodb:
-    image: mongo:7
-    container_name: hobbiz_mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: hobbiz_db
-
   backend:
     build:
       context: ./backend
@@ -18,8 +7,6 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
-    depends_on:
-      - mongodb
     env_file:
       - ./backend/.env
     environment:
@@ -36,6 +23,3 @@ services:
       - "3000:80"
     depends_on:
       - backend
-
-volumes:
-  mongo_data:
