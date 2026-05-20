@@ -5,12 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import '../pages/LoginSignup.css';
-import introImg400 from '../assets/images/intro-web-400.webp';
-import introImg800 from '../assets/images/intro-web-800.webp';
-import introImg1200 from '../assets/images/intro-web-1200.webp';
-import introImgFallback from '../assets/images/intro-web.png';
-import introImgEn from '../assets/images/intro-web2.png';
-import introImgEs from '../assets/images/intro-web3.png';
+import vacaImg from '../assets/images/vaca.png';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
@@ -154,8 +149,8 @@ export default function LoginPage() {
   };
 
   const language = i18n?.language || 'ro';
-  const useIntroEs = language.startsWith('es');
   const useIntroEn = language.startsWith('en');
+  const useIntroEs = language.startsWith('es');
   const socialAuthNotice = useIntroEn
     ? 'Social login is currently available only with Google. Facebook and Apple login are in progress.'
     : useIntroEs
@@ -165,36 +160,15 @@ export default function LoginPage() {
   return (
     <div className="login-page-wrapper">
       <div className="login-page-main">
-        {useIntroEs || useIntroEn ? (
-          <picture>
-            <img
-              src={useIntroEs ? introImgEs : introImgEn}
-              alt="Intro"
-              className="login-intro-image"
-              ref={imgRef}
-              width="800"
-              height="800"
-              loading="eager"
-            />
-          </picture>
-        ) : (
-          <picture>
-            <source
-              type="image/webp"
-              srcSet={`${introImg400} 400w, ${introImg800} 800w, ${introImg1200} 1200w`}
-              sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px"
-            />
-            <img
-              src={introImgFallback}
-              alt="Intro"
-              className="login-intro-image"
-              ref={imgRef}
-              width="800"
-              height="800"
-              loading="eager"
-            />
-          </picture>
-        )}
+        <picture>
+          <img
+            src={vacaImg}
+            alt="Intro"
+            className="login-intro-image"
+            ref={imgRef}
+            loading="eager"
+          />
+        </picture>
         <div className="login-container" ref={loginRef}>
           <h2>{t('auth.signIn')}</h2>
 

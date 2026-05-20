@@ -64,27 +64,20 @@ pipeline {
             }
         }
 
+        // ── Stage 3: Artifact scan (MDSSC) ───────────────────────────────────
+        stage('Scan Artifacts') {
+            steps {
+                sh 'chmod +x ci/mdssc/scan-artifacts.sh'
+                sh 'ci/mdssc/scan-artifacts.sh'
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 sh "docker build -t ${BACKEND_IMAGE}:${BUILD_NUMBER} ./backend"
                 sh "docker build -t ${FRONTEND_IMAGE}:${BUILD_NUMBER} ./frontend"
             }
         }
-
-        // ── Stage 3: Artifact scan (MDSSC) ───────────────────────────────────
-        // Disabled until the MDSSC integration is ready.
-        // When enabled, point the scanner at the built Docker images or the
-        // archived frontend/dist bundle:
-        //
-        // stage('Scan Artifacts') {
-        //     steps {
-        //         // Option A – CLI scanner on the dist archive
-        //         // sh 'mdssc scan --path frontend/dist --apikey $MDSSC_API_KEY'
-        //         //
-        //         // Option B – REST API  (see ci/mdssc/scan-artifacts.sh)
-        //         // sh 'ci/mdssc/scan-artifacts.sh'
-        //     }
-        // }
 
         // ── Stage 4: Deploy ───────────────────────────────────────────────────
         stage('Deploy') {

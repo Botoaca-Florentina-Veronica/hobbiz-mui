@@ -156,6 +156,7 @@ export default function SearchResultsPage() {
       <Box className="search-results-headerbar" sx={{
         position: 'sticky',
         top: 0,
+        '@media (min-width: 769px)': { top: '72px' },
         zIndex: 5,
         background: isDarkMode ? 'rgba(18,18,18,0.92)' : 'rgba(255,255,255,0.92)',
         backdropFilter: 'saturate(180%) blur(10px)',

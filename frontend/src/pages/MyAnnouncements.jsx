@@ -6,14 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import translateCategory from '../utils/translateCategory';
-import { 
+import {
   CircularProgress,
   IconButton,
   Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Button,
   Typography
 } from '@mui/material';
@@ -499,17 +495,38 @@ export default function MyAnnouncements() {
         open={deleteDialogVisible}
         onClose={() => setDeleteDialogVisible(false)}
         aria-labelledby="delete-dialog-title"
+        PaperProps={{ className: 'ma-confirm-dialog-paper' }}
       >
-        <DialogTitle id="delete-dialog-title">{t('myAnnouncements.deleteTitle')}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{t('myAnnouncements.deleteMessage')}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogVisible(false)}>{t('myAnnouncements.cancel')}</Button>
-          <Button onClick={confirmDelete} color="error" autoFocus>
-            {t('myAnnouncements.deleteBtn')}
-          </Button>
-        </DialogActions>
+        <div className="ma-confirm-dialog-content">
+          <div className="ma-dialog-icon ma-dialog-icon--danger">
+            <DeleteIcon />
+          </div>
+
+          <div className="ma-dialog-title" id="delete-dialog-title">
+            {t('myAnnouncements.deleteTitle')}
+          </div>
+
+          <div className="ma-dialog-message">
+            {t('myAnnouncements.deleteMessage')}
+          </div>
+
+          <div className="ma-confirm-dialog-actions">
+            <Button
+              onClick={() => setDeleteDialogVisible(false)}
+              className="ma-dialog-cancel"
+            >
+              {t('myAnnouncements.cancel')}
+            </Button>
+
+            <Button
+              onClick={confirmDelete}
+              className="ma-dialog-confirm ma-dialog-confirm--danger"
+              autoFocus
+            >
+              {t('myAnnouncements.deleteBtn')}
+            </Button>
+          </div>
+        </div>
       </Dialog>
 
       {/* Archive Confirmation Dialog */}

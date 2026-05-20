@@ -1,7 +1,7 @@
 import { FaSearch, FaMapMarkerAlt } from "react-icons/fa";
 import { HiOutlineBell } from 'react-icons/hi';
 import { FaCamera, FaUtensils, FaBook, FaMoneyBillWave, FaVideo, FaBriefcase, FaGraduationCap, FaPalette, FaBroom, FaTools, FaMusic, FaSpa, FaCar, FaBuilding, FaTruck } from 'react-icons/fa';
-import hobby from '../assets/images/hobby_img.jpg';
+import hobby from '../assets/images/principala.jpg';
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

@@ -4,6 +4,13 @@
   font-family: 'Poppins', sans-serif;
 }
 
+/* Push content below the fixed global header on screens where it is visible
+   (≥769px). On smaller screens the global header is hidden, so no offset is
+   needed and the in-page sticky bar can sit at the very top. */
+@media (min-width: 769px) {
+  .search-results-page { padding-top: 88px; }
+}
+
 .dark-mode .search-results-page {
   background-color: #121212;
 }

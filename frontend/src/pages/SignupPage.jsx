@@ -54,33 +54,35 @@ function PasswordStrength({ password, t }) {
         ))}
       </div>
 
-      {allMet ? (
-        <div className="signup-strength-hints signup-strength-hints--ok" role="status">
-          <span className="signup-strength-hint signup-strength-hint--ok">
-            <span className="signup-strength-hint__icon" aria-hidden="true">✓</span>
-            {t('auth.passwordHints.strong')}
-          </span>
-        </div>
-      ) : (
-        <>
-          <div className="signup-strength-hints__title">
-            {t('auth.passwordHints.title')}
+      <div className="signup-strength-popover">
+        {allMet ? (
+          <div className="signup-strength-hints signup-strength-hints--ok" role="status">
+            <span className="signup-strength-hint signup-strength-hint--ok">
+              <span className="signup-strength-hint__icon" aria-hidden="true">✓</span>
+              {t('auth.passwordHints.strong')}
+            </span>
           </div>
-          <ul className="signup-strength-hints" aria-live="polite">
-            {rules.map((rule) => (
-              <li
-                key={rule.key}
-                className={`signup-strength-hint ${rule.ok ? 'signup-strength-hint--ok' : 'signup-strength-hint--missing'}`}
-              >
-                <span className="signup-strength-hint__icon" aria-hidden="true">
-                  {rule.ok ? '✓' : '○'}
-                </span>
-                {t(`auth.passwordHints.${rule.key}`)}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+        ) : (
+          <>
+            <div className="signup-strength-hints__title">
+              {t('auth.passwordHints.title')}
+            </div>
+            <ul className="signup-strength-hints" aria-live="polite">
+              {rules.map((rule) => (
+                <li
+                  key={rule.key}
+                  className={`signup-strength-hint ${rule.ok ? 'signup-strength-hint--ok' : 'signup-strength-hint--missing'}`}
+                >
+                  <span className="signup-strength-hint__icon" aria-hidden="true">
+                    {rule.ok ? '✓' : '○'}
+                  </span>
+                  {t(`auth.passwordHints.${rule.key}`)}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
     </div>
   );
 }
