@@ -15,6 +15,7 @@ import MobileHeader from './MobileHeader';
 import './MobileHeader.css';
 import { useTranslation } from 'react-i18next';
 import Toast from './Toast';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 const MOBILE_BREAKPOINT = 1024;
 
@@ -267,7 +268,7 @@ export default function Header() {
     typeof window !== 'undefined' && window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
   );
   const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1920
+    typeof window !== 'undefined' ? getEffectiveViewportWidth() : 1920
   );
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -278,7 +279,7 @@ export default function Header() {
     } else {
       mq.addListener(handler);
     }
-    const onResize = () => setWindowWidth(window.innerWidth);
+    const onResize = () => setWindowWidth(getEffectiveViewportWidth());
     window.addEventListener('resize', onResize);
     setIsMobile(mq.matches);
     return () => {

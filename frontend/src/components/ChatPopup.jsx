@@ -8,6 +8,7 @@ import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessag
 import useSocket from '../hooks/useSocket';
 import TypingIndicator from './TypingIndicator';
 import './ChatPopup.css';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
   const navigate = useNavigate();
@@ -156,7 +157,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   // Enable/disable resizable mode based on viewport width
   useEffect(() => {
     const check = () => {
-      const enable = window.innerWidth > 1024;
+      const enable = getEffectiveViewportWidth() > 1024;
       setIsResizable(enable);
       if (enable) {
         // Ensure box fits viewport height

@@ -35,6 +35,7 @@ import translateCategory from '../utils/translateCategory';
 import Toast from '../components/Toast';
 import './MyAnnouncements.css';
 import './AnnouncementsByCategory.css';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 export default function AnnouncementsByCategory() {
   const { t } = useTranslation();
@@ -52,10 +53,10 @@ export default function AnnouncementsByCategory() {
   const [showLoginToast, setShowLoginToast] = useState(false);
 
   // App-like mode state
-  const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? getEffectiveViewportWidth() : 1200);
 
   useEffect(() => {
-    const handleResize = () => setViewportWidth(window.innerWidth);
+    const handleResize = () => setViewportWidth(getEffectiveViewportWidth());
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

@@ -120,16 +120,28 @@ router.get('/search-index', async (req, res) => {
   }
 });
 
-// GET /api/announcements?category=CategoryName
+// GET /api/announcements?category=CategoryName&tag=tagKey&location=Loc
+// Filtrare pe categorie (exact match, case-insensitive), tag (string in array)
+// și/sau locație (substring match — astfel un judet selectat acoperă și localitățile lui).
 router.get('/', async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category, tag, location } = req.query;
     let filter = { archived: { $ne: true } };
     if (category) {
-      // Caută insensibil la majuscule/minuscule și ignoră spațiile
-      filter.category = { $regex: `^${category.trim()}$`, $options: 'i' };
+      // Caută insensibil la majuscule/minuscule (escape pe regex literals).
+      filter.category = { $regex: `^${escapeRegexLiteral(category.trim())}$`, $options: 'i' };
     }
-    console.log('Filtru categorie:', filter);
+    if (tag && tag.trim()) {
+      // tags este un [String] în model; egalitatea cu un string face match pe orice element din array.
+      filter.tags = tag.trim();
+    }
+    if (location && location.trim()) {
+      // Substring match: dacă userul alege judetul "Cluj", facem match și pe anunțurile
+      // cu `location: "Cluj-Napoca"`. Anchored la început nu am vrut pentru că tot ce
+      // începe cu termenul este suficient de relevant pentru context.
+      filter.location = { $regex: escapeRegexLiteral(location.trim()), $options: 'i' };
+    }
+    console.log('Filtru:', filter);
     const announcements = await Announcement.find(filter).sort({ createdAt: -1 });
     console.log('Anunturi gasite:', announcements.length);
     res.json(announcements);

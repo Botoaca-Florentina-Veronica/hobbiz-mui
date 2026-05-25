@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Platform, Dimensions, InteractionManager } from 'react-native';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,6 +13,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useNotifications } from '../../src/context/NotificationContext';
 import api from '../../src/services/api';
 import { useFocusEffect } from '@react-navigation/native';
+import { FlatList, Text } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../../src/services/storage';
@@ -92,15 +93,7 @@ export default function HomeScreen() {
   const { unreadNotificationCount, refreshNotificationCount } = useNotifications();
   const [popular, setPopular] = useState<any[]>([]);
   const [popularLoading, setPopularLoading] = useState(false);
-  const [imageAspects, setImageAspects] = useState<Record<string, number>>({});
   const { locale } = useLocale();
-
-  // Default aspect ratio (width / height) when image dimensions are not yet known.
-  // Slightly portrait — matches typical announcement photos.
-  const DEFAULT_POPULAR_ASPECT = 0.82;
-  // Clamp range to avoid extreme card heights.
-  const MIN_POPULAR_ASPECT = 0.6;  // taller than this -> too narrow / very tall card
-  const MAX_POPULAR_ASPECT = 1.4;  // wider than this -> too flat card
   
   // Search state
   const [searchTerm, setSearchTerm] = useState('');
@@ -224,191 +217,6 @@ export default function HomeScreen() {
     }
   }, [popular.length]);
 
-  // Stable callbacks for MobileHeader to prevent re-renders on every keystroke
-  const handleSearchChange = useCallback((text: string) => setSearchTerm(text), []);
-  const handleSearchSubmit = useCallback((q: string) => {
-    if (q && q.trim()) {
-      router.push(`/all-announcements?q=${encodeURIComponent(q)}`);
-    } else {
-      router.push('/all-announcements');
-    }
-  }, [router]);
-  const handleSuggestionClick = useCallback((id: string) => {
-    setSearchTerm('');
-    setSearchResults([]);
-    router.push(`/announcement-details?id=${id}`);
-  }, [router]);
-  const handleNotificationClick = useCallback(() => router.push('/notifications'), [router]);
-  const handleSeeAll = useCallback(() => {
-    try { router.push({ pathname: '/all-announcements' }); } catch (e) { router.push('/all-announcements'); }
-  }, [router]);
-  const handleCategoryPress = useCallback((description: string) => {
-    router.push(`/category-announcements?category=${encodeURIComponent(description)}`);
-  }, [router]);
-
-  // Layout computations for popular grid — only recalculate on screen width change
-  const popularLayout = useMemo(() => {
-    const cols = screenWidth && screenWidth < 360 ? 1 : 2;
-    const sectionPadding = 32; // popularSection padding (16 left + 16 right)
-    const gap = 12;
-    const cardWidth = Math.floor((Math.max(screenWidth || 360, 360) - sectionPadding - (cols - 1) * gap) / cols);
-    return { cols, cardWidth, gap };
-  }, [screenWidth]);
-
-  // Pre-fetch image dimensions so we can build a stable masonry layout.
-  // ExpoImage's onLoad will also fill in any aspects that this misses.
-  useEffect(() => {
-    const items = (Array.isArray(popular) ? popular : []).slice(0, 8);
-    items.forEach((item: any) => {
-      if (!item?._id) return;
-      if (imageAspects[item._id] !== undefined) return;
-      const url = item?.images?.[0];
-      if (!url) return;
-      Image.getSize(
-        url,
-        (w, h) => {
-          if (w > 0 && h > 0) {
-            setImageAspects(prev =>
-              prev[item._id] !== undefined ? prev : { ...prev, [item._id]: w / h }
-            );
-          }
-        },
-        () => {
-          // Failure: leave undefined, default aspect will be used.
-        }
-      );
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [popular]);
-
-  // Masonry distribution: place each item into the currently shortest column.
-  // Card height = image height (cardWidth / clampedAspect) + ~110px content area.
-  const popularColumns = useMemo(() => {
-    const { cols, cardWidth, gap } = popularLayout;
-    const items: any[] = Array.isArray(popular) ? popular.slice(0, 8) : [];
-    const result: any[][] = Array.from({ length: cols }, () => []);
-    if (items.length === 0) return result;
-
-    if (cols === 1) {
-      result[0] = [...items];
-      if (popular.length > 8) result[0].push({ _id: 'placeholder-show-all', placeholder: true });
-      return result;
-    }
-
-    const heights = new Array(cols).fill(0);
-    const estimateCardHeight = (item: any) => {
-      const raw = imageAspects[item._id] ?? DEFAULT_POPULAR_ASPECT;
-      const aspect = Math.max(MIN_POPULAR_ASPECT, Math.min(raw, MAX_POPULAR_ASPECT));
-      const imgH = Math.round(cardWidth / aspect);
-      return imgH + 110; // ≈ title + meta pills + details button + paddings
-    };
-
-    for (const item of items) {
-      let minIdx = 0;
-      for (let i = 1; i < cols; i++) if (heights[i] < heights[minIdx]) minIdx = i;
-      result[minIdx].push(item);
-      heights[minIdx] += estimateCardHeight(item) + gap;
-    }
-
-    if (popular.length > 8) {
-      let minIdx = 0;
-      for (let i = 1; i < cols; i++) if (heights[i] < heights[minIdx]) minIdx = i;
-      result[minIdx].push({ _id: 'placeholder-show-all', placeholder: true });
-    }
-
-    return result;
-  }, [popular, imageAspects, popularLayout]);
-
-  const renderPopularCard = useCallback((item: any) => {
-    const { cardWidth } = popularLayout;
-    const rawAspect = imageAspects[item._id] ?? DEFAULT_POPULAR_ASPECT;
-    const aspect = Math.max(MIN_POPULAR_ASPECT, Math.min(rawAspect, MAX_POPULAR_ASPECT));
-    const computedImageHeight = Math.round(cardWidth / aspect);
-
-    const cardBaseStyle = [
-      styles.popularCard,
-      {
-        backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface,
-        width: cardWidth,
-        ...containerBorderStyle,
-      },
-    ];
-
-    if (item && item.placeholder) {
-      return (
-        <TouchableOpacity
-          key={item._id}
-          activeOpacity={0.85}
-          style={[...cardBaseStyle, { minHeight: 140 }]}
-          onPress={handleSeeAll}
-        >
-          <View style={styles.placeholderBox}>
-            <ThemedText style={[styles.placeholderText, { color: tokens.colors.primary }]}>
-              {t.showAllAnnouncements}
-            </ThemedText>
-          </View>
-        </TouchableOpacity>
-      );
-    }
-
-    return (
-      <TouchableOpacity
-        key={item._id}
-        activeOpacity={0.9}
-        style={cardBaseStyle}
-        onPress={() => router.push(`/announcement-details?id=${item._id}`)}
-      >
-        <View style={[styles.popularImageWrap, { height: computedImageHeight }]}>
-          <ExpoImage
-            source={{ uri: item.images && item.images[0] ? item.images[0] : undefined }}
-            style={styles.popularImage}
-            contentFit="cover"
-            transition={220}
-            onLoad={(event: any) => {
-              const w = event?.source?.width ?? 0;
-              const h = event?.source?.height ?? 0;
-              if (w > 0 && h > 0) {
-                setImageAspects(prev =>
-                  prev[item._id] !== undefined ? prev : { ...prev, [item._id]: w / h }
-                );
-              }
-            }}
-          />
-        </View>
-        <View style={styles.popularContent}>
-          <ThemedText numberOfLines={2} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}>
-            {item.title || item.description || t.announcement}
-          </ThemedText>
-          {(item.location || item.createdAt) ? (
-            <View style={styles.popularMetaRow}>
-              {item.location ? (
-                <View style={[styles.metaPill, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' }]}>
-                  <ThemedText numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
-                    {item.location}
-                  </ThemedText>
-                </View>
-              ) : null}
-              {item.createdAt ? (
-                <View style={[styles.metaPill, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' }]}>
-                  <ThemedText numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
-                    {new Date(item.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' })}
-                  </ThemedText>
-                </View>
-              ) : null}
-            </View>
-          ) : null}
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => router.push(`/announcement-details?id=${item._id}`)}
-            style={[styles.detailsButton, { backgroundColor: isDark ? '#f51866' : DESIGN_BLUE }]}
-          >
-            <ThemedText style={styles.detailsButtonText}>{t.seeDetails}</ThemedText>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    );
-  }, [popularLayout, imageAspects, tokens, isDark, containerBorderStyle, router, t, handleSeeAll]);
-
   useFocusEffect(
     useCallback(() => {
       const interactionTask = InteractionManager.runAfterInteractions(() => {
@@ -478,17 +286,26 @@ export default function HomeScreen() {
   <ThemedView style={[styles.container, { backgroundColor: isDark ? '#0b0b0b' : tokens.colors.bg, paddingTop: insets.top }]}> 
       {checkeredBackground}
   <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <MobileHeader
+      <MobileHeader 
         notificationCount={unreadNotificationCount}
         searchValue={searchTerm}
         searchSuggestions={searchResults}
         showSuggestions={searchTerm.trim().length >= 2}
         isSearching={isSearching}
-        onSearchChange={handleSearchChange}
-        onSearchSubmit={handleSearchSubmit}
-        onSuggestionClick={handleSuggestionClick}
-        onCategoryClick={handleCategoryPress}
-        onNotificationClick={handleNotificationClick}
+        onSearchChange={(text) => setSearchTerm(text)}
+        onSearchSubmit={(q) => {
+          if (q && q.trim()) {
+            router.push(`/all-announcements?q=${encodeURIComponent(q)}`);
+          } else {
+            router.push('/all-announcements');
+          }
+        }}
+        onSuggestionClick={(id) => {
+          setSearchTerm('');
+          setSearchResults([]);
+          router.push(`/announcement-details?id=${id}`);
+        }}
+        onNotificationClick={() => router.push('/notifications')}
       />
   <View style={[styles.mainContent, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}> 
           {
@@ -573,7 +390,12 @@ export default function HomeScreen() {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <ThemedText style={[styles.popularTitle, { color: tokens.colors.text }]}>{t.popularTitle}</ThemedText>
             <TouchableOpacity
-              onPress={handleSeeAll}
+              onPress={() => {
+                try {
+                  console.log('[Explore] See all pressed - navigating to all-announcements');
+                } catch (e) {}
+                try { router.push({ pathname: '/all-announcements' }); } catch (e) { router.push('/all-announcements'); }
+              }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               accessibilityRole="button"
               activeOpacity={0.8}
@@ -584,13 +406,143 @@ export default function HomeScreen() {
           {popularLoading ? (
             <ThemedText style={{ color: tokens.colors.muted }}>{t.loading}</ThemedText>
           ) : (
-            <View style={{ flexDirection: 'row', gap: popularLayout.gap, paddingVertical: 4 }}>
-              {popularColumns.map((column, colIdx) => (
-                <View key={`popular-col-${colIdx}`} style={{ flex: 1, gap: popularLayout.gap }}>
-                  {column.map(item => renderPopularCard(item))}
-                </View>
-              ))}
-            </View>
+            (() => {
+              const cols = screenWidth && screenWidth < 360 ? 1 : 2;
+              const horizontalPadding = 32; // padding from container (16 + 16)
+              const gap = 12; // marginRight between cards
+              const cardWidth = Math.floor((Math.max(screenWidth || 360, 360) - horizontalPadding - (cols - 1) * gap) / cols);
+              const listData = (() => {
+                // Limit to 8 items to improve performance
+                const arr = Array.isArray(popular) ? popular.slice(0, 8) : [];
+                if (cols > 1) {
+                  const rem = arr.length % cols;
+                  if (rem !== 0) {
+                    const needed = cols - rem;
+                    for (let i = 0; i < needed; i++) arr.push({ _id: `placeholder-show-all-${i}`, placeholder: true });
+                  }
+                }
+                return arr;
+              })();
+
+              return (
+                <FlatList
+                  data={listData}
+                  key={cols} // force re-render when cols change
+                  numColumns={cols}
+                  nestedScrollEnabled
+                  scrollEnabled={false}
+                  columnWrapperStyle={cols > 1 ? { justifyContent: 'flex-start' } : undefined}
+                  contentContainerStyle={{ paddingVertical: 4 }}
+                  keyExtractor={(it) => it._id}
+                  renderItem={({ item, index }) => {
+                    const isLastInRow = cols > 1 && ((index % cols) === (cols - 1));
+                    // make the card border more subtle (like the 'cont' page): use themed border with low alpha
+                    const subtleBorder = (() => {
+                      try { return hexToRgba(tokens.colors.border || '#000000', 0.5); } catch { return tokens.colors.border; }
+                    })();
+
+                    const computedImageHeight = Math.max(150, Math.round(cardWidth * 0.5));
+
+                    const itemStyle = [
+                      styles.popularCard,
+                      {
+                        // Use dark-mode container token for inner cards; the outer popularSection remains unmodified (no border)
+                        backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface,
+                        width: cardWidth,
+                        marginRight: isLastInRow ? 0 : gap,
+                        marginBottom: 12,
+                        // soften the card shadow a bit so the contour looks more muted
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.04,
+                        shadowRadius: 6,
+                        elevation: 2,
+                        ...containerBorderStyle,
+                      },
+                    ];
+                    // render placeholder card (fills empty slot) with a single informative text
+                    if (item && item.placeholder) {
+                      return (
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          style={itemStyle}
+                          onPress={() => {
+                            try {
+                              router.push('/all-announcements');
+                            } catch (e) {
+                              router.push({ pathname: '/all-announcements' });
+                            }
+                          }}
+                        >
+                          <View style={styles.placeholderBox}>
+                            <ThemedText style={[styles.placeholderText, { color: tokens.colors.primary }]}>{t.showAllAnnouncements}</ThemedText>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    }
+
+                    return (
+                      <TouchableOpacity activeOpacity={0.9} style={itemStyle} onPress={() => router.push(`/announcement-details?id=${item._id}`)}>
+                        <View style={[styles.popularImageWrap, { height: computedImageHeight }]}> 
+                          <ExpoImage
+                            source={{ uri: item.images && item.images[0] ? item.images[0] : undefined }}
+                            style={[styles.popularImage, { height: '100%' }]}
+                            contentFit="cover"
+                            transition={200}
+                          />
+                          {/* star button removed per request */}
+                        </View>
+
+                        <ThemedText numberOfLines={1} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}>
+                          {item.title || item.description || t.announcement}
+                        </ThemedText>
+
+                        <View style={styles.popularMetaRow}>
+                          {item.location ? (
+                            <View
+                              style={[
+                                styles.metaPill,
+                                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
+                              ]}
+                            >
+                              <ThemedText numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}> 
+                                {item.location}
+                              </ThemedText>
+                            </View>
+                          ) : null}
+                          <View
+                            style={[
+                              styles.metaPill,
+                              { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F2F4FF' },
+                            ]}
+                          >
+                            <ThemedText numberOfLines={1} style={[styles.metaPillText, { color: tokens.colors.muted }]}>
+                              {item.createdAt
+                                ? new Date(item.createdAt).toLocaleDateString('ro-RO', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                  })
+                                : ''}
+                            </ThemedText>
+                          </View>
+                        </View>
+
+                        {/* details button at bottom of card */}
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={() => router.push(`/announcement-details?id=${item._id}`)}
+                          style={[
+                            styles.detailsButton,
+                            { backgroundColor: isDark ? '#f51866' : DESIGN_BLUE },
+                          ]}
+                        >
+                          <ThemedText style={[styles.detailsButtonText]}>{t.seeDetails}</ThemedText>
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+              );
+            })()
           )}
         </View>
 
@@ -599,7 +551,7 @@ export default function HomeScreen() {
             {t.exploreCategories}
           </ThemedText>
           {(() => {
-            const minCardWidth = 140;
+            const minCardWidth = 170;
             const gap = 12;
             const horizontalPadding = 32; // padding from section container (16 + 16)
             const avail = Math.max(screenWidth || 360, 320) - horizontalPadding;
@@ -647,7 +599,7 @@ export default function HomeScreen() {
                         width: cardWidth,
                       },
                     ]}
-                    onPress={() => handleCategoryPress(category.description)}
+                    onPress={() => router.push(`/category-announcements?category=${encodeURIComponent(category.description)}`)}
                   >
                     {/* Gradient fade background overlay (theme-aware intensity) */}
                     <LinearGradient
@@ -785,23 +737,38 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   popularCard: {
-    borderRadius: 18,
+    width: 140,
+    marginRight: 12,
+    borderRadius: 20,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: 'visible',
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    paddingTop: 10,
+    // dynamic height: allow the card to grow only as needed
+    minHeight: 240,
     flexDirection: 'column',
-    justifyContent: 'flex-start',
-    // soft elevation for modern card feel
+    justifyContent: 'space-between',
+    // cleaner elevation for card look
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   popularImageWrap: {
     width: '100%',
-    // height is computed dynamically per card
-    backgroundColor: '#f2f2f2',
+    height: 120,
+    borderRadius: 16,
     overflow: 'hidden',
+    marginBottom: 10,
+    backgroundColor: '#f2f2f2',
+    // subtle shadow for the image (iOS) and elevation on Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   /* star button removed */
@@ -811,37 +778,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
     resizeMode: 'cover' as any,
   },
-  popularContent: {
-    paddingHorizontal: 10,
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
   popularLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 17,
-    marginBottom: 4,
-    letterSpacing: -0.2,
+    fontSize: 16,
+    fontWeight: '900',
+    marginBottom: 8,
   },
   popularMetaText: {
-    fontSize: 11,
-    lineHeight: 14,
+    fontSize: 12,
+    lineHeight: 16,
   },
   popularMetaRow: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 6,
     flexWrap: 'wrap',
-    marginBottom: 2,
   },
   metaPill: {
     borderRadius: 999,
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   metaPillText: {
-    fontSize: 10,
-    lineHeight: 13,
-    fontWeight: '500',
+    fontSize: 11,
+    lineHeight: 14,
   },
   placeholderBox: {
     flex: 1,
@@ -855,9 +813,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   detailsButton: {
-    marginTop: 8,
-    height: 30,
-    borderRadius: 15,
+    marginTop: 10,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
@@ -865,8 +823,6 @@ const styles = StyleSheet.create({
   detailsButtonText: {
     color: '#ffffff',
     fontWeight: '600',
-    fontSize: 11.5,
-    letterSpacing: 0.1,
+    fontSize: 13,
   },
 });
-

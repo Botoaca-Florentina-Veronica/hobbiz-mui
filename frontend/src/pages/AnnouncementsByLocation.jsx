@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   TextField,
@@ -30,13 +30,11 @@ import './MyAnnouncements.css';
 import './AnnouncementsByCategory.css';
 import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
-export default function AnnouncementsBySubcategory() {
+export default function AnnouncementsByLocation() {
   const { t } = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { subcategory } = useParams(); // numele tag-ului (limbă-neutră, ex. "events")
-  const [searchParams] = useSearchParams();
-  const category = searchParams.get('category') || ''; // categoria părinte (opțional)
+  const { location } = useParams();
 
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +43,7 @@ export default function AnnouncementsBySubcategory() {
   const [viewMode, setViewMode] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [priceFilter, setPriceFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const [viewportWidth, setViewportWidth] = useState(
     typeof window !== 'undefined' ? getEffectiveViewportWidth() : 1200,
@@ -56,26 +55,20 @@ export default function AnnouncementsBySubcategory() {
   }, []);
   const isAppLike = viewportWidth <= 1024;
 
-  const decodedSubcategory = decodeURIComponent(subcategory || '');
-  // Numele afișat al tag-ului: încearcă i18n, fallback la cheia raw.
-  const tagLabel = t(`categoryTags.tags.${decodedSubcategory}`, decodedSubcategory);
-  const pageTitle = category
-    ? `${tagLabel} · ${translateCategory(category, t)}`
-    : tagLabel;
+  const decodedLocation = decodeURIComponent(location || '');
 
-  // Fetch anunțuri filtrate după tag (+ opțional categorie).
+  // Fetch anunțuri filtrate după locație.
   useEffect(() => {
     let cancelled = false;
     async function fetchAnnouncements() {
       setLoading(true);
       try {
-        const params = new URLSearchParams();
-        if (category) params.set('category', category);
-        if (decodedSubcategory) params.set('tag', decodedSubcategory);
-        const res = await apiClient.get(`/api/announcements?${params.toString()}`);
+        const res = await apiClient.get(
+          `/api/announcements?location=${encodeURIComponent(decodedLocation)}`,
+        );
         if (!cancelled) setAnnouncements(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error('Eroare la fetch anunțuri după tag:', err);
+        console.error('Eroare la fetch anunțuri după locație:', err);
         if (!cancelled) setAnnouncements([]);
       } finally {
         if (!cancelled) setLoading(false);
@@ -83,9 +76,16 @@ export default function AnnouncementsBySubcategory() {
     }
     fetchAnnouncements();
     return () => { cancelled = true; };
-  }, [category, decodedSubcategory]);
+  }, [decodedLocation]);
 
-  // Filtrare + sortare locală (pe rezultatele fetch-uite).
+  // Categoriile unice din rezultate (pentru filtru categorie).
+  const uniqueCategories = useMemo(() => {
+    const set = new Set();
+    announcements.forEach((a) => { if (a.category) set.add(a.category); });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ro'));
+  }, [announcements]);
+
+  // Filtrare + sortare locală.
   const filteredAndSortedAnnouncements = useMemo(() => {
     let filtered = announcements.slice();
     if (searchTerm.trim()) {
@@ -93,9 +93,11 @@ export default function AnnouncementsBySubcategory() {
       filtered = filtered.filter(
         (a) =>
           a.title?.toLowerCase().includes(q) ||
-          a.description?.toLowerCase().includes(q) ||
-          a.location?.toLowerCase().includes(q),
+          a.description?.toLowerCase().includes(q),
       );
+    }
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter((a) => a.category === categoryFilter);
     }
     if (priceFilter !== 'all') {
       filtered = filtered.filter((a) => {
@@ -121,7 +123,7 @@ export default function AnnouncementsBySubcategory() {
       }
     });
     return filtered;
-  }, [announcements, searchTerm, sortBy, priceFilter]);
+  }, [announcements, searchTerm, sortBy, priceFilter, categoryFilter]);
 
   if (loading) {
     return <div style={{ padding: '80px 24px' }}>{t('allAnnouncements.loading')}</div>;
@@ -140,7 +142,7 @@ export default function AnnouncementsBySubcategory() {
               <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <h1 className="abc-mobile-header-title">{pageTitle}</h1>
+          <h1 className="abc-mobile-header-title">{decodedLocation}</h1>
         </div>
       ) : (
         <div
@@ -162,7 +164,7 @@ export default function AnnouncementsBySubcategory() {
       <div className="abc-align-container">
         {!isAppLike && (
           <Typography variant="h4" className="my-announcements-title" gutterBottom>
-            {pageTitle}
+            {decodedLocation}
           </Typography>
         )}
 
@@ -236,6 +238,19 @@ export default function AnnouncementsBySubcategory() {
             </Box>
             {showFilters && (
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                <FormControl size="small" sx={{ minWidth: 180 }}>
+                  <InputLabel>{t('common.category', 'Categorie')}</InputLabel>
+                  <Select
+                    value={categoryFilter}
+                    label={t('common.category', 'Categorie')}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">{t('allAnnouncements.allCategories', 'Toate categoriile')}</MenuItem>
+                    {uniqueCategories.map((c) => (
+                      <MenuItem key={c} value={c}>{translateCategory(c, t)}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 <FormControl size="small" sx={{ minWidth: 150 }}>
                   <InputLabel>{t('allAnnouncements.priceLabel')}</InputLabel>
                   <Select
@@ -313,7 +328,7 @@ export default function AnnouncementsBySubcategory() {
                               key={tk}
                               label={t(`categoryTags.tags.${tk}`, tk)}
                               size="small"
-                              variant={tk === decodedSubcategory ? 'filled' : 'outlined'}
+                              variant="outlined"
                               sx={{ fontSize: '0.72rem' }}
                             />
                           ))}

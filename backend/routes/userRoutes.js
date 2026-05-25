@@ -5,7 +5,7 @@ const adminAuth = require('../middleware/adminAuth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
 const uploadDocuments = require('../config/cloudinaryDocuments');
-const { register, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, resetUserData, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
+const { register, registerChallenge, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, resetUserData, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
 router.delete('/avatar', auth, deleteAvatar);
@@ -18,6 +18,8 @@ router.delete('/delete-account', auth, deleteAccount);
 router.post('/reset-data', auth, resetUserData);
 
 // Rute
+// Challenge anti-bot pentru formularul de înregistrare (returneză un JWT cu iat).
+router.get('/register/challenge', registerChallenge);
 router.post('/register', register);  // User e folosit în controller
 router.post('/login', login);       // User e folosit în controller
 // Password reset (email code)

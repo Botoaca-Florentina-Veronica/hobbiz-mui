@@ -32,6 +32,7 @@ import '../components/Categories.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 const CATEGORIES = [
   'Electronics',
@@ -57,7 +58,7 @@ export default function AddAnnouncementPage() {
   const { user } = useAuth();
   const [viewportWidth, setViewportWidth] = useState(() => {
     if (typeof window === 'undefined') return 1280;
-    return window.innerWidth;
+    return getEffectiveViewportWidth();
   });
   // Șterge draftul de anunț la deconectare și resetează complet starea formularului
   useEffect(() => {
@@ -600,7 +601,7 @@ export default function AddAnnouncementPage() {
     if (typeof window === 'undefined') return;
 
     const media = window.matchMedia('(max-width: 1024px)');
-    const onResize = () => setViewportWidth(window.innerWidth);
+    const onResize = () => setViewportWidth(getEffectiveViewportWidth());
 
     window.addEventListener('resize', onResize);
 

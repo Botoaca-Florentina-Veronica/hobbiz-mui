@@ -69,6 +69,7 @@ import translateCategory from '../utils/translateCategory';
 import { resolveMediaUrl } from '../utils/media';
 // Header and Footer are provided by the App.jsx route layout
 import ChatPopup from '../components/ChatPopup';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -748,10 +749,16 @@ export default function AnnouncementDetails() {
                           <Chip
                             key={tagKey}
                             label={t(`categoryTags.tags.${tagKey}`, tagKey)}
+                            clickable
+                            onClick={() => navigate(
+                              `/anunturi-subcategorie/${encodeURIComponent(tagKey)}` +
+                              (announcement.category ? `?category=${encodeURIComponent(announcement.category)}` : '')
+                            )}
                             variant="outlined"
                             sx={{
                               borderColor: getAccentCss(),
                               color: getAccentCss(),
+                              cursor: 'pointer',
                             }}
                           />
                         ))}
@@ -896,7 +903,7 @@ export default function AnnouncementDetails() {
                       size="small"
                       onClick={handleOpenReport}
                       startIcon={
-                        <svg xmlns="http://www.w3.org/2000/svg" width={window.innerWidth < 600 ? "12" : "16"} height={window.innerWidth < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width={getEffectiveViewportWidth() < 600 ? "12" : "16"} height={getEffectiveViewportWidth() < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
                       }
                       sx={{
                         color: '#e5533d',

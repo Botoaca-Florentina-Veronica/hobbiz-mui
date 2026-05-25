@@ -31,6 +31,7 @@ import ChatPage from './pages/ChatPage';
 
 import AnnouncementsByCategory from './pages/AnnouncementsByCategory';
 import AnnouncementsBySubcategory from './pages/AnnouncementsBySubcategory';
+import AnnouncementsByLocation from './pages/AnnouncementsByLocation';
 import FavoriteAnnouncements from './pages/FavoriteAnnouncements';
 import AnnouncementDetails from './pages/AnnouncementDetails';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -167,6 +168,14 @@ function App() {
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <Header />
             <AnnouncementsBySubcategory />
+            <Footer hideOnMobile />
+          </>
+        } />
+        <Route path="/anunturi-locatie/:location" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <AnnouncementsByLocation />
             <Footer hideOnMobile />
           </>
         } />

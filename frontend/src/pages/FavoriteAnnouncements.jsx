@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/api';
 import './FavoriteAnnouncements.css';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 import gumballSiDarwin from '../assets/images/gumballSiDarwin.png';
 import translateCategory from '../utils/translateCategory';
 
@@ -250,13 +251,13 @@ export default function FavoriteAnnouncements() {
   const [showToast, setShowToast] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [viewportWidth, setViewportWidth] = useState(() =>
-    typeof window === 'undefined' ? 1280 : window.innerWidth
+    typeof window === 'undefined' ? 1280 : getEffectiveViewportWidth()
   );
 
   // Track viewport width for mobile/desktop layout switching
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const onResize = () => setViewportWidth(window.innerWidth);
+    const onResize = () => setViewportWidth(getEffectiveViewportWidth());
     const media = window.matchMedia('(max-width: 1024px)');
 
     window.addEventListener('resize', onResize);

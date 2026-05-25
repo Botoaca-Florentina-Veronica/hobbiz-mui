@@ -228,9 +228,25 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: false,
 });
+// Limită strictă specifică pentru creare cont: max 3 conturi noi de pe același IP / oră.
+// Aplicată ÎNAINTE de limiter-ul generic (cele 2 se cumulează).
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 oră
+  max: 3,
+  message: { error: 'Ai depășit limita de conturi create de pe acest IP. Încearcă peste o oră.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false,
+});
 app.use('/auth/', authLimiter);
 app.use('/api/users/login', authLimiter);
-app.use('/api/users/register', authLimiter);
+// Pe /api/users/register* aplicăm registerLimiter doar pentru POST (creare propriu-zisă),
+// nu și pentru GET /register/challenge (care doar emite token-ul anti-bot).
+app.use(
+  '/api/users/register',
+  (req, res, next) => (req.method === 'POST' ? registerLimiter(req, res, next) : next()),
+  authLimiter,
+);
 
 app.use('/api/notifications', notificationRoutes);
 

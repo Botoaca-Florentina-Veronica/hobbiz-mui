@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const DeletedAccount = require('../models/DeletedAccount');
 const Notification = require('../models/Notification');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -9,6 +10,8 @@ const Negotiation = require('../models/Negotiation');
 const Review = require('../models/Review');
 const Report = require('../models/Report');
 const ContactFallbackMessage = require('../models/ContactFallbackMessage');
+const { hashEmail, hashPhone } = require('../utils/hashIdentifier');
+const { isDisposableEmailDomain } = require('../utils/disposableEmailDomains');
 const multer = require('multer');
 const path = require('path');
 const cloudinaryUpload = require('../config/cloudinaryMulter');
@@ -183,10 +186,27 @@ async function mergeDuplicateUsersByEmail(normalizedEmail) {
   }
 }
 
-// Șterge utilizatorul și toate anunțurile sale
+// Șterge utilizatorul și toate anunțurile sale.
+// Înainte de ștergere salvăm hash-urile de email/telefon într-o colecție separată
+// `DeletedAccount` (TTL 30 zile) pentru a impune un cooldown la re-înregistrare.
 const deleteAccount = async (req, res) => {
   try {
     const userId = req.userId;
+    const user = await User.findById(userId).select('email phone');
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit.' });
+    }
+    // Salvăm hash-urile (NU păstrăm PII brut). TTL-ul de pe schema curăță automat.
+    const emailHash = hashEmail(user.email);
+    const phoneHash = hashPhone(user.phone);
+    if (emailHash || phoneHash) {
+      try {
+        await DeletedAccount.create({ emailHash, phoneHash, deletedAt: new Date() });
+      } catch (err) {
+        // Nu blocăm ștergerea contului dacă scrierea în blocklist eșuează.
+        console.warn('[deleteAccount] Eroare la scrierea în DeletedAccount:', err.message);
+      }
+    }
     // Șterge toate anunțurile utilizatorului
     await Announcement.deleteMany({ user: userId });
     // Șterge utilizatorul
@@ -280,18 +300,108 @@ const resetUserData = async (req, res) => {
   }
 };
 
+// Generează un token de challenge pentru formularul de înregistrare.
+// Frontend-ul îl cere la randarea formularului și îl trimite înapoi cu cererea de register.
+// Backend-ul verifică: (1) semnătura JWT, (2) că au trecut >= 2s de la emitere
+// (min form-fill-delay anti-bot), (3) că nu a expirat (max 15 min).
+const registerChallenge = (req, res) => {
+  try {
+    const token = jwt.sign(
+      { type: 'register-challenge' },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' },
+    );
+    res.json({ token });
+  } catch (err) {
+    console.error('Eroare la registerChallenge:', err);
+    res.status(500).json({ error: 'Eroare server' });
+  }
+};
+
+const MIN_FORM_FILL_MS = 2000; // bot signal: completare prea rapidă
+
 // Înregistrare utilizator
 const register = async (req, res) => {
-  try { 
+  try {
     let { firstName, lastName, email, password, phone } = req.body;
+    // Câmpuri anti-bot: `_trap` = honeypot ascuns vizual; `_formToken` = JWT challenge.
+    const honeypot = req.body && req.body._trap;
+    const formToken = req.body && req.body._formToken;
     const normalizedEmail = normalizeEmail(email);
 
-    // Validare date
+    // 1. HONEYPOT — utilizatorii reali nu văd câmpul ascuns; bot-ii naivi îl completează.
+    if (honeypot && String(honeypot).trim()) {
+      // Răspundem 400 generic ca să nu dezvăluim mecanismul.
+      console.warn('[register] honeypot completat - posibil bot');
+      return res.status(400).json({ error: 'Cerere invalidă' });
+    }
+
+    // 2. MIN FORM-FILL DELAY — verifică challenge-ul JWT și că au trecut >= 2s de la emitere.
+    if (!formToken) {
+      return res.status(400).json({
+        error: 'Sesiunea formularului a expirat. Reîncarcă pagina și încearcă din nou.',
+        code: 'FORM_TOKEN_MISSING',
+      });
+    }
+    try {
+      const decoded = jwt.verify(formToken, process.env.JWT_SECRET);
+      if (decoded.type !== 'register-challenge') {
+        return res.status(400).json({ error: 'Token invalid', code: 'FORM_TOKEN_INVALID' });
+      }
+      const ageMs = Date.now() - decoded.iat * 1000;
+      if (ageMs < MIN_FORM_FILL_MS) {
+        console.warn(`[register] form completat în ${ageMs}ms - posibil bot`);
+        return res.status(400).json({
+          error: 'Te rugăm să verifici datele introduse și să încerci din nou.',
+          code: 'FORM_TOO_FAST',
+        });
+      }
+    } catch (err) {
+      return res.status(400).json({
+        error: 'Sesiunea formularului a expirat. Reîncarcă pagina și încearcă din nou.',
+        code: 'FORM_TOKEN_INVALID',
+      });
+    }
+
+    // 3. Validare date
     if (!firstName || !lastName || !normalizedEmail || !password) {
       return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii' });
     }
 
-    // Verifică dacă emailul există
+    // 4. Email disposable (mailinator, tempmail etc.)
+    if (isDisposableEmailDomain(normalizedEmail)) {
+      return res.status(400).json({
+        error: 'Nu acceptăm adrese de email temporare. Folosește un email permanent.',
+        code: 'EMAIL_DISPOSABLE',
+      });
+    }
+
+    // 5. Blocklist conturi șterse (cooldown 30 zile)
+    const normalizedPhone = phone ? phone.trim() : null;
+    const emailHashValue = hashEmail(normalizedEmail);
+    const phoneHashValue = hashPhone(normalizedPhone);
+    const blocklistConditions = [];
+    if (emailHashValue) blocklistConditions.push({ emailHash: emailHashValue });
+    if (phoneHashValue) blocklistConditions.push({ phoneHash: phoneHashValue });
+    if (blocklistConditions.length > 0) {
+      const previouslyDeleted = await DeletedAccount.findOne({ $or: blocklistConditions });
+      if (previouslyDeleted) {
+        const daysLeft = Math.max(
+          1,
+          Math.ceil(
+            (previouslyDeleted.deletedAt.getTime() + 30 * 24 * 60 * 60 * 1000 - Date.now())
+              / (24 * 60 * 60 * 1000),
+          ),
+        );
+        return res.status(429).json({
+          error: `Acest cont a fost șters recent. Poți crea un cont nou cu aceste date după ${daysLeft} zile.`,
+          code: 'ACCOUNT_RECENTLY_DELETED',
+          daysLeft,
+        });
+      }
+    }
+
+    // 6. Verifică dacă emailul există
     const existingUser = await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') });
     if (existingUser) {
       return res.status(400).json({
@@ -300,8 +410,7 @@ const register = async (req, res) => {
       });
     }
 
-    // Verifică dacă numărul de telefon există (dacă a fost furnizat)
-    const normalizedPhone = phone ? phone.trim() : null;
+    // 7. Verifică dacă numărul de telefon există (dacă a fost furnizat)
     if (normalizedPhone) {
       const existingPhone = await User.findOne({ phone: normalizedPhone });
       if (existingPhone) {
@@ -1413,6 +1522,7 @@ module.exports = {
   deleteAccount,
   resetUserData,
   register,
+  registerChallenge,
   login,
   getProfile,
   updateEmail,

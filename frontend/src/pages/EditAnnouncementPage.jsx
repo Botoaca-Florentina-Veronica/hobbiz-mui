@@ -20,6 +20,7 @@ import '../components/Categories.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
@@ -29,7 +30,7 @@ export default function EditAnnouncementPage() {
   const judete = [entireCountryLabel, ...Object.keys(localitatiPeJudet)];
   const [viewportWidth, setViewportWidth] = useState(() => {
     if (typeof window === 'undefined') return 1280;
-    return window.innerWidth;
+    return getEffectiveViewportWidth();
   });
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -46,10 +47,15 @@ export default function EditAnnouncementPage() {
   const [selectedTags, setSelectedTags] = useState([]);
   const MAX_TAGS = 10;
   const imageInputRef = useRef(null);
+  // Imaginile existente ale anunțului (URL-uri Cloudinary care vor fi trimise înapoi la backend
+  // ca `existingImages` ca să nu fie șterse la salvare).
+  const [existingImageUrls, setExistingImageUrls] = useState([]);
+  // Fișierele noi adăugate de utilizator și data-URL-urile lor pentru previzualizare.
   const [images, setImages] = useState([]);
+  const [newImagePreviews, setNewImagePreviews] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
-  // Preview pentru toate imaginile
-  const [imagePreviews, setImagePreviews] = useState([]);
+  // Preview combinat (existente + noi) pentru randare.
+  const imagePreviews = [...existingImageUrls, ...newImagePreviews];
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -125,20 +131,20 @@ export default function EditAnnouncementPage() {
       // Setează imaginile existente
       if (a.images && a.images.length > 0) {
         setMainImagePreview(a.images[0]);
-        setImagePreviews(a.images);
+        setExistingImageUrls(a.images);
       }
     }
   }, [location.state]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    
-    // Verifică dacă utilizatorul încearcă să adauge prea multe imagini
-    if (images.length + files.length > 10) {
+
+    // Verifică dacă utilizatorul încearcă să adauge prea multe imagini (existente + noi + în curs).
+    if (existingImageUrls.length + images.length + files.length > 10) {
       setImageError(t('addAnnouncement.errors.maxImages'));
       return;
     }
-    
+
     // Acceptă doar imagini jpg/jpeg
     const validFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
     if (validFiles.length !== files.length) {
@@ -155,14 +161,14 @@ export default function EditAnnouncementPage() {
 
     setImageError("");
     setImages(prev => [...prev, ...validFiles]);
-    
+
     // Generează preview pentru fiecare imagine
-    validFiles.forEach((file, idx) => {
+    validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, reader.result]);
-        // Prima imagine devine mainImagePreview
-        if (imagePreviews.length === 0 && idx === 0) setMainImagePreview(reader.result);
+        setNewImagePreviews(prev => [...prev, reader.result]);
+        // Dacă nu exista nicio imagine principală setată, prima nouă devine main.
+        setMainImagePreview(prev => prev ?? reader.result);
       };
       reader.readAsDataURL(file);
     });
@@ -359,6 +365,9 @@ export default function EditAnnouncementPage() {
       if (price.trim()) formData.append('price', price);
       if (selectedTags.length > 0) formData.append('tags', JSON.stringify(selectedTags));
 
+      // Trimite URL-urile imaginilor existente care trebuie păstrate (backend-ul șterge tot ce nu primește aici).
+      formData.append('existingImages', JSON.stringify(existingImageUrls));
+
       // Adaugă doar imaginile noi (File objects)
       images.filter(img => img instanceof File).forEach((img) => {
         formData.append('images', img);
@@ -413,7 +422,7 @@ export default function EditAnnouncementPage() {
     if (typeof window === 'undefined') return;
 
     const media = window.matchMedia('(max-width: 1024px)');
-    const onResize = () => setViewportWidth(window.innerWidth);
+    const onResize = () => setViewportWidth(getEffectiveViewportWidth());
 
     window.addEventListener('resize', onResize);
 
@@ -686,10 +695,17 @@ export default function EditAnnouncementPage() {
                 type="button"
                 style={{position: 'absolute', top: 4, right: 4, background: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', padding: 2}}
                 onClick={() => {
-                  setImages(images.filter((_, i) => i !== idx));
-                  setImagePreviews(imagePreviews.filter((_, i) => i !== idx));
-                  if (idx === 0 && imagePreviews.length > 1) setMainImagePreview(imagePreviews[1]);
-                  if (imagePreviews.length === 1) setMainImagePreview(null);
+                  // idx pointează în array-ul combinat: [existente, ...noi].
+                  const existingCount = existingImageUrls.length;
+                  if (idx < existingCount) {
+                    setExistingImageUrls(prev => prev.filter((_, i) => i !== idx));
+                  } else {
+                    const newIdx = idx - existingCount;
+                    setImages(prev => prev.filter((_, i) => i !== newIdx));
+                    setNewImagePreviews(prev => prev.filter((_, i) => i !== newIdx));
+                  }
+                  const remaining = imagePreviews.filter((_, i) => i !== idx);
+                  setMainImagePreview(remaining[0] || null);
                 }}
                 title={t('addAnnouncement.imageRemoveTitle')}
               >

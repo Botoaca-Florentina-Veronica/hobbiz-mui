@@ -4,6 +4,10 @@
 /* Import sistem centralizat de teme */
 @import './styles/theme.css';
 
+/* Ajustări fluide pentru browser-e desktop cu ferestre înguste (~900-1280px).
+   Trebuie importat după theme.css și înainte de orice variabile legacy. */
+@import './styles/desktopCompact.css';
+
 /* ============================================
    VARIABILE LEGACY (pentru compatibilitate)
    ============================================

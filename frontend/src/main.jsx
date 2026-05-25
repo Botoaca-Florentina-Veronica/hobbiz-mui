@@ -1,4 +1,7 @@
 // main.jsx sau index.js
+// IMPORTANT: importul de mai jos trebuie să rămână primul - patch-uiește window.matchMedia
+// înainte ca orice modul React/MUI să-l folosească (vezi src/utils/devicePatch.js).
+import './utils/devicePatch';
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom"; // Adaugă această linie

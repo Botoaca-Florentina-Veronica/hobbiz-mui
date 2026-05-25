@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ContactModal from './ContactModal';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 // Compact mobile-only legal links inspired by the provided screenshot.
 // Uses native <details> for accessible collapsible groups.
@@ -27,7 +28,7 @@ export default function MobileLegal() {
     }
 
     // On small screens, re-try scrolling after a short delay to handle route render timing
-    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+    if (typeof window !== 'undefined' && getEffectiveViewportWidth() <= 768) {
       // immediate attempt
       try {
         window.scrollTo(0, 0);

@@ -21,6 +21,7 @@ import gumballChat from '../assets/images/gumballChat.jpg';
 import './ChatPage.css';
 import './ChatPageCollaboration.css';
 import { resolveMediaUrl } from '../utils/media';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 const resolveAvatarUrl = (src) => resolveMediaUrl(src);
 
@@ -69,8 +70,8 @@ export default function ChatPage() {
   const [collabStatusDialog, setCollabStatusDialog] = useState({ open: false, message: '', type: 'info' });
 
   const MOBILE_BREAKPOINT = 1024;
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= MOBILE_BREAKPOINT);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth <= MOBILE_BREAKPOINT);
+  const [isMobile, setIsMobile] = useState(() => getEffectiveViewportWidth() <= MOBILE_BREAKPOINT);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => getEffectiveViewportWidth() <= MOBILE_BREAKPOINT);
 
   const isChattingOnMobile = isMobile && !!selectedConversation;
   const isDesktop = !isMobile;
@@ -151,7 +152,7 @@ export default function ChatPage() {
   }, [userId, on, off]);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+    const handleResize = () => setIsMobile(getEffectiveViewportWidth() <= MOBILE_BREAKPOINT);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -692,7 +693,7 @@ export default function ChatPage() {
                         if (e.touches && e.touches.length > 1) return; // ignore multi-touch
                         const el = e.currentTarget;
                         longPressTimersRef.current[msg._id] = setTimeout(() => {
-                          if (window.innerWidth <= MOBILE_BREAKPOINT) {
+                          if (getEffectiveViewportWidth() <= MOBILE_BREAKPOINT) {
                             const rect = el.getBoundingClientRect();
                             const barHeight = 56;
                             const topPx = Math.max(barHeight + 8, rect.top - barHeight - 6);

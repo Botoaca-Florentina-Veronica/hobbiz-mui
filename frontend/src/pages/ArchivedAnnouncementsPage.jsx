@@ -38,6 +38,7 @@ import Toast from '../components/Toast';
 import './AllAnnouncements.css';
 import './FavoriteAnnouncements.css';
 import './ArchivedAnnouncementsPage.css';
+import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 export default function ArchivedAnnouncementsPage() {
   const { t } = useTranslation();
@@ -60,7 +61,7 @@ export default function ArchivedAnnouncementsPage() {
   const [showLoginToast, setShowLoginToast] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, announcementId: null });
   const [isMobile, setIsMobile] = useState(() => (
-    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+    typeof window !== 'undefined' ? getEffectiveViewportWidth() <= 768 : false
   ));
 
   const itemsPerPage = 12;
@@ -82,7 +83,7 @@ export default function ArchivedAnnouncementsPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    const onResize = () => setIsMobile(getEffectiveViewportWidth() <= 768);
     onResize();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);

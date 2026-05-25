@@ -101,11 +101,30 @@ export default function SignupPage() {
     email: '',
     password: '',
     phone: '',
+    _trap: '', // honeypot — utilizatorii reali nu îl văd (ascuns vizual); bot-ii îl completează
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  // Challenge anti-bot: cerem un JWT semnat de server la randarea formularului,
+  // pe care îl trimitem înapoi cu cererea de register pentru a verifica că au
+  // trecut min 2s între randare și submit (anti-fill-instant).
+  const [formToken, setFormToken] = useState(null);
   const navigate = useNavigate();
+
+  const fetchFormToken = async () => {
+    try {
+      const res = await apiClient.get('/api/users/register/challenge');
+      setFormToken(res.data?.token || null);
+    } catch (err) {
+      console.warn('Eroare la fetch register challenge:', err);
+      setFormToken(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchFormToken();
+  }, []);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -118,7 +137,10 @@ export default function SignupPage() {
     setError('');
 
     try {
-      await apiClient.post('/api/users/register', formData);
+      await apiClient.post('/api/users/register', {
+        ...formData,
+        _formToken: formToken,
+      });
       navigate('/login', { state: { success: t('auth.signupSuccess') } });
     } catch (err) {
       const code = err.response?.data?.code;
@@ -126,6 +148,17 @@ export default function SignupPage() {
         setError(t('auth.emailAlreadyExists'));
       } else if (code === 'PHONE_ALREADY_EXISTS') {
         setError(t('auth.phoneAlreadyExists'));
+      } else if (code === 'EMAIL_DISPOSABLE') {
+        setError(t('auth.emailDisposable', 'Nu acceptăm adrese de email temporare. Folosește un email permanent.'));
+      } else if (code === 'ACCOUNT_RECENTLY_DELETED') {
+        const days = err.response?.data?.daysLeft;
+        setError(
+          t('auth.accountRecentlyDeleted', { defaultValue: `Acest cont a fost șters recent. Poți crea un cont nou cu aceste date după {{days}} zile.`, days }),
+        );
+      } else if (code === 'FORM_TOO_FAST' || code === 'FORM_TOKEN_MISSING' || code === 'FORM_TOKEN_INVALID') {
+        // Token expirat sau lipsă - refacem și informăm utilizatorul să reîncerce
+        await fetchFormToken();
+        setError(t('auth.formExpired', 'Sesiunea formularului a expirat. Te rugăm să reîncerci.'));
       } else {
         setError(err.response?.data?.error || t('auth.signupError'));
       }
@@ -197,6 +230,33 @@ export default function SignupPage() {
                 <div>{error}</div>
               </div>
             )}
+
+            {/* Honeypot — utilizatorii reali NU văd câmpul (poziție off-screen).
+                Bot-ii naivi care fill-uiesc toate input-urile vor completa și acesta,
+                ceea ce face backend-ul să respingă cererea cu 400.
+                Folosim style inline + autoComplete=off + tabIndex=-1 + aria-hidden. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: '-10000px',
+                top: 'auto',
+                width: '1px',
+                height: '1px',
+                overflow: 'hidden',
+              }}
+            >
+              <label htmlFor="signup_website">Website (do not fill)</label>
+              <input
+                id="signup_website"
+                type="text"
+                name="_trap"
+                value={formData._trap}
+                onChange={handleChange}
+                autoComplete="off"
+                tabIndex={-1}
+              />
+            </div>
 
             <div className="signup-name-row">
               <input

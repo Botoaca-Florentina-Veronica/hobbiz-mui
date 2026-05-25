@@ -20,6 +20,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import './MainStage.css';
 import StaggeredMenu from './StaggeredMenu';
 import useSearchSuggestions from '../hooks/useSearchSuggestions';
+import { categoryTagsMap } from '../utils/categoryTags';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
@@ -58,6 +59,20 @@ const categoryIcons = {
   "Auto, Moto, Biciclete": <FaCar />,
   "Imobiliare, Construcții, Amenajari": <FaBuilding />,
   "Transport, Logistică, Curierat": <FaTruck />
+};
+
+// Mapează denumirile de categorii din meniu (lungi, „Prajituri, Băcănie, Gătit") la
+// cheile scurte din `categoryTagsMap` (cele folosite în pagina de adăugare/editare anunț,
+// salvate în DB ca `announcement.category`). Pentru categoriile fără mapping (Traduceri,
+// Finanțe etc.) cădem pe `categoriesDetails` (subcategorii hardcoded, comportament vechi).
+const categoryMenuToTagsKey = {
+  "Fotografie": "Fotografie",
+  "Prajituri, Băcănie, Gătit": "Prajituri",
+  "Meditații & Cursuri": "Meditații",
+  "Curatenie, Întreținere casă": "Curățenie",
+  "Reparații, Instalatii, Bricolaj": "Reparații",
+  "Muzică, Teatru, Dans": "Muzica",
+  "Auto, Moto, Biciclete": "Auto",
 };
 
 const categoriesDetails = {
@@ -269,7 +284,7 @@ export default function MainStage() {
         if (!item) return;
         const idx = parseInt(item.dataset.index, 10) - 1;
         const original = categoriesList[idx];
-        if (original && categoriesDetails[original]) setSelectedCategory(original);
+        if (original && (categoryMenuToTagsKey[original] || categoriesDetails[original])) setSelectedCategory(original);
       };
       panel.addEventListener('mouseover', handleMouseOver);
       panel._cleanupHover = () => {
@@ -393,19 +408,30 @@ export default function MainStage() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      addRecentSearch(searchTerm.trim());
+    const trimmedTerm = searchTerm.trim();
+    // Locația efectivă selectată din popover; "Toată țara" e tratat ca lipsă de filtru.
+    const effectiveLocation = selectedLocalitate
+      || (selectedJudet && selectedJudet !== 'Toată țara' ? selectedJudet : '');
+
+    if (trimmedTerm) {
+      // Are text de căutare → mergem pe pagina de rezultate căutare (cu / fără locație).
+      addRecentSearch(trimmedTerm);
       setShowSuggestions(false);
       setInputFocused(false);
       const params = new URLSearchParams();
-      params.set('q', searchTerm.trim());
-      if (selectedLocalitate) {
-        params.set('location', selectedLocalitate);
-      } else if (selectedJudet && selectedJudet !== 'Toată țara') {
-        params.set('location', selectedJudet);
-      }
+      params.set('q', trimmedTerm);
+      if (effectiveLocation) params.set('location', effectiveLocation);
       navigate(`/cautare?${params.toString()}`);
+      return;
     }
+
+    if (effectiveLocation) {
+      // Fără text dar cu locație → toate anunțurile din acea locație.
+      setShowSuggestions(false);
+      setInputFocused(false);
+      navigate(`/anunturi-locatie/${encodeURIComponent(effectiveLocation)}`);
+    }
+    // Fără text și fără locație → nu facem nimic (lăsăm utilizatorul să-și aleagă criteriul).
   };
 
   const handleRecentClick = (term) => {
@@ -797,35 +823,68 @@ export default function MainStage() {
         </div>
       </div>
 
-      {menuOpen && detailsVisible && selectedCategory && categoriesDetails[selectedCategory] && (
-        <div className="category-details">
-          <div className="category-details-content">
-            <h3 className="category-details-title">{selectedCategory}</h3>
-            <div className="category-details-grid">
-              {categoriesDetails[selectedCategory].columns.map((col, i) => (
-                <div key={i} className="detail-column">
-                  <div className="detail-title">{col.title}</div>
-                  <div className="detail-items">
-                    {col.items.map((item, j) => (
-                      <Chip
-                        key={j}
-                        label={item}
-                        className="detail-chip"
-                        clickable
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={() => {
-                          navigate(`/anunturi-subcategorie/${encodeURIComponent(item)}`);
-                          closeMenu();
-                        }}
-                      />
+      {menuOpen && detailsVisible && selectedCategory && (() => {
+        // Întâi încercăm să folosim tag-urile reale din `categoryTagsMap` (cele care pot
+        // fi atașate unui anunț). Dacă nu există mapping pentru această categorie, cădem
+        // pe `categoriesDetails` (subcategorii hardcoded - comportament vechi).
+        const tagsKey = categoryMenuToTagsKey[selectedCategory];
+        const tagGroups = tagsKey ? categoryTagsMap[tagsKey] : null;
+        const legacy = categoriesDetails[selectedCategory];
+        if (!tagGroups && !legacy) return null;
+
+        return (
+          <div className="category-details">
+            <div className="category-details-content">
+              <h3 className="category-details-title">{selectedCategory}</h3>
+              <div className="category-details-grid">
+                {tagGroups
+                  ? tagGroups.map((group, i) => (
+                      <div key={group.groupKey || i} className="detail-column">
+                        <div className="detail-title">{t(`categoryTags.groups.${group.groupKey}`)}</div>
+                        <div className="detail-items">
+                          {group.tagKeys.map((tagKey) => (
+                            <Chip
+                              key={tagKey}
+                              label={t(`categoryTags.tags.${tagKey}`, tagKey)}
+                              className="detail-chip"
+                              clickable
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onClick={() => {
+                                navigate(
+                                  `/anunturi-subcategorie/${encodeURIComponent(tagKey)}?category=${encodeURIComponent(tagsKey)}`,
+                                );
+                                closeMenu();
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  : legacy.columns.map((col, i) => (
+                      <div key={i} className="detail-column">
+                        <div className="detail-title">{col.title}</div>
+                        <div className="detail-items">
+                          {col.items.map((item, j) => (
+                            <Chip
+                              key={j}
+                              label={item}
+                              className="detail-chip"
+                              clickable
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onClick={() => {
+                                navigate(`/anunturi-subcategorie/${encodeURIComponent(item)}`);
+                                closeMenu();
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     ))}
-                  </div>
-                </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
