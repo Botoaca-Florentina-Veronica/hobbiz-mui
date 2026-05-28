@@ -33,9 +33,17 @@ pipeline {
 
         // ── Stage 1: Source-code scan (MDSSC) ────────────────────────────────
         stage('Scan Source Code') {
+            environment {
+                MDSSC_REPORTS_DIR = 'mdssc-reports/source'
+            }
             steps {
                 sh 'chmod +x ci/mdssc/scan-source.sh'
                 sh 'ci/mdssc/scan-source.sh'
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'mdssc-reports/source/**', allowEmptyArchive: true, fingerprint: true
+                }
             }
         }
 
@@ -66,9 +74,17 @@ pipeline {
 
         // ── Stage 3: Artifact scan (MDSSC) ───────────────────────────────────
         stage('Scan Artifacts') {
+            environment {
+                MDSSC_REPORTS_DIR = 'mdssc-reports/artifact'
+            }
             steps {
                 sh 'chmod +x ci/mdssc/scan-artifacts.sh'
                 sh 'ci/mdssc/scan-artifacts.sh'
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'mdssc-reports/artifact/**', allowEmptyArchive: true, fingerprint: true
+                }
             }
         }
 

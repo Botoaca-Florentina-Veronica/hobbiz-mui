@@ -380,6 +380,7 @@
     "chooseCategory": "Alege categoria",
     "imagesSubtitle": "Imagini",
     "imagesHelper": "Poți adăuga mai multe imagini. Prima va fi imaginea principală a anunțului tău.",
+    "imagesDndHint": "Sau trage și plasează imagini direct în această zonă.",
     "addImages": "Adaugă imagini",
     "descriptionLabel": "Descriere*",
     "descriptionPlaceholder": "Încearcă să scrii ce ai vrea tu să afli dacă te-ai uita la acest anunț",

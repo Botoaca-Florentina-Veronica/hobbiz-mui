@@ -583,6 +583,29 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   flex-wrap: wrap;
 }
 
+/* Stare drag-and-drop activă pe TOT containerul de imagini.
+   Tranziție smooth pentru border + fundal. Culoare după tema activă:
+   navy (#2D4361) pe light mode, pink/accent pe dark mode. */
+.add-announcement-images-section {
+  transition: border-color 0.2s ease, border-style 0.2s ease, background-color 0.2s ease;
+  position: relative;
+}
+
+body:not(.dark-mode) .add-announcement-images-section.is-dragging {
+  border: 2px dashed #2D4361 !important;
+  background-color: rgba(45, 67, 97, 0.06) !important;
+}
+.dark-mode .add-announcement-images-section.is-dragging {
+  border: 2px dashed #f51866 !important;
+  background-color: rgba(245, 24, 102, 0.10) !important;
+}
+
+.add-announcement-images-dnd-hint {
+  color: var(--text-secondary, #666);
+  font-style: italic;
+  font-size: 0.9em;
+}
+
 .add-announcement-image-upload {
   width: 200px;
   height: 160px;

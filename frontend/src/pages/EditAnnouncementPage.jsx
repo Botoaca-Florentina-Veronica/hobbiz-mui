@@ -20,7 +20,7 @@ import '../components/Categories.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
-import { getEffectiveViewportWidth } from '../utils/devicePatch';
+import { getEffectiveViewportWidth, isTouchPrimaryDevice } from '../utils/devicePatch';
 
 import { localitatiPeJudet } from '../assets/comunePeJudet';
 
@@ -136,8 +136,11 @@ export default function EditAnnouncementPage() {
     }
   }, [location.state]);
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
+  // Procesează un set de fișiere (input file sau drag-and-drop): validează count/format/size,
+  // le adaugă în state și generează preview-urile.
+  const processFiles = (filesList) => {
+    const files = Array.from(filesList || []);
+    if (files.length === 0) return;
 
     // Verifică dacă utilizatorul încearcă să adauge prea multe imagini (existente + noi + în curs).
     if (existingImageUrls.length + images.length + files.length > 10) {
@@ -172,6 +175,39 @@ export default function EditAnnouncementPage() {
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const handleImageChange = (e) => {
+    processFiles(e.target.files);
+    if (e.target) e.target.value = '';
+  };
+
+  // Drag-and-drop pentru imagini — disponibil doar pe desktop.
+  const [isDragging, setIsDragging] = useState(false);
+  const dndEnabled = !isTouchPrimaryDevice();
+
+  const handleDragOver = (e) => {
+    if (!dndEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    if (!isDragging) setIsDragging(true);
+  };
+  const handleDragLeave = (e) => {
+    if (!dndEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setIsDragging(false);
+  };
+  const handleDrop = (e) => {
+    if (!dndEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer && e.dataTransfer.files) {
+      processFiles(e.dataTransfer.files);
+    }
   };
 
   const handleTitleChange = (e) => {
@@ -649,7 +685,13 @@ export default function EditAnnouncementPage() {
           </div>
         )}
       </form>
-      <div className="add-announcement-images-section">
+      <div
+        className={`add-announcement-images-section${isDragging ? ' is-dragging' : ''}`}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {/* Mesaj de eroare pentru imagini */}
         {imageError && (
           <div className="add-announcement-message add-announcement-error" style={{marginBottom: 16}}>
@@ -660,8 +702,18 @@ export default function EditAnnouncementPage() {
           </div>
         )}
         <h2 className="add-announcement-subtitle">{t('addAnnouncement.imagesSubtitle')}</h2>
-        <div className="add-announcement-images-helper">{t('addAnnouncement.imagesHelper')}</div>
-        <div className="add-announcement-images-grid" style={{display: 'flex', gap: 16, flexWrap: 'wrap'}}>
+        <div className="add-announcement-images-helper">
+          {t('addAnnouncement.imagesHelper')}
+          {dndEnabled && (
+            <span className="add-announcement-images-dnd-hint">
+              {' '}{t('addAnnouncement.imagesDndHint', 'Poți trage și plasa imagini aici.')}
+            </span>
+          )}
+        </div>
+        <div
+          className="add-announcement-images-grid"
+          style={{display: 'flex', gap: 16, flexWrap: 'wrap'}}
+        >
           <button
             type="button"
             className="add-announcement-image-upload add-announcement-image-upload-main"

@@ -380,6 +380,7 @@
     "chooseCategory": "Choose category",
     "imagesSubtitle": "Images",
     "imagesHelper": "You can add multiple images. The first will be the main image of your ad.",
+    "imagesDndHint": "Or drag and drop images directly into this area.",
     "addImages": "Add images",
     "descriptionLabel": "Description*",
     "descriptionPlaceholder": "Try to write what you would want to know if you looked at this ad",

@@ -47,13 +47,13 @@ export default function ResultCard({
   const widthSx = isCarousel ? { xs: '100%', lg: 220 } : '100%';
   const minWidthSx = isCarousel ? { lg: 220 } : 'auto';
   const maxWidthSx = isCarousel ? { lg: 220 } : 'none';
-  const heightSx = isCarousel ? { xs: 260, sm: 280, md: 300, lg: 270 } : 'auto';
+  // Card-ul e mai înalt ca să încapă titlul de 2 linii + Stack-ul (locație + dată) +
+  // padding-bottom-ul crescut, fără ca data să fie împinsă peste padding pe cardurile
+  // cu titluri lungi.
+  const heightSx = isCarousel ? { xs: 285, sm: 305, md: 325, lg: 295 } : 'auto';
   const imageHeightSx = isCarousel
     ? { xs: 155, sm: 165, md: 175, lg: 160 }
     : { xs: 170, sm: 180, md: 190 };
-  const contentHeightSx = isCarousel
-    ? { xs: 100, sm: 110, md: 110, lg: 110 }
-    : 'auto';
 
   return (
     <Card
@@ -192,11 +192,21 @@ export default function ResultCard({
 
       <CardContent sx={{
         p: { xs: 1.5, sm: 2, md: 2 },
-        height: contentHeightSx,
+        // Pe cardurile din carouselul „anunțuri populare" lăsăm mai mult spațiu sub
+        // ultimul rând (data postării) ca să nu fie lipit de marginea de jos.
+        pb: isCarousel ? { xs: 2.5, sm: 3, md: 3 } : { xs: 1.5, sm: 2, md: 2 },
+        // NU mai fixăm înălțimea - lăsăm flex: 1 să umple spațiul rămas din Card după
+        // imagine. Așa, titluri de 2 linii nu mai împing data peste padding.
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         flex: 1,
+        minHeight: 0,
+        // MUI adaugă `&:last-child { padding-bottom: 24px }` care ar putea suprascrie
+        // pb-ul nostru pe carousel - îl forțăm.
+        '&:last-child': {
+          pb: isCarousel ? { xs: 2.5, sm: 3, md: 3 } : { xs: 1.5, sm: 2, md: 2 },
+        },
       }}>
         <Typography
           variant="h6"

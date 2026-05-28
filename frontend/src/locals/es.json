@@ -380,6 +380,7 @@
     "chooseCategory": "Elegir categoría",
     "imagesSubtitle": "Imágenes",
     "imagesHelper": "Puedes agregar varias imágenes. La primera será la imagen principal del anuncio.",
+    "imagesDndHint": "O arrastra y suelta imágenes directamente en esta zona.",
     "addImages": "Agregar imágenes",
     "descriptionLabel": "Descripción*",
     "descriptionPlaceholder": "Intenta escribir lo que te gustaría saber si vieras este anuncio",

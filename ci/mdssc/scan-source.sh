@@ -1,39 +1,23 @@
 #!/usr/bin/env bash
+#
+# scan-source.sh — scanează codul SURSĂ cu MetaDefender Software Supply Chain.
+# Flux: health → (rezolvă workflow) → scan direct → poll overview → rezultate
+#       detaliate → (scan indirect repo, opțional) → export SBOM/rapoarte → verdict.
+# Logica MDSSC e în lib.sh.
 set -euo pipefail
 
-# Folosim python3 pentru parsare JSON — disponibil pe orice Linux, fără dependințe externe
-PY=python3
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=ci/mdssc/lib.sh
+source "${SCRIPT_DIR}/lib.sh"
 
-json_get() {
-    # json_get <json_string> <key_path>   (ex: json_get "$JSON" "ScanIds.0")
-    local json="$1" path="$2"
-    echo "$json" | "$PY" -c "
-import sys, json
-data = json.load(sys.stdin)
-keys = '$path'.split('.')
-val = data
-try:
-    for k in keys:
-        val = val[int(k)] if k.isdigit() else val.get(k) or val.get(k[0].upper()+k[1:])
-    print('' if val is None else str(val).lower() if isinstance(val, bool) else val)
-except Exception:
-    print('')
-"
-}
+mdssc_require_env
 
-: "${MDSSC_API_URL:?MDSSC_API_URL is not set — add it as a Jenkins credential}"
-: "${MDSSC_API_KEY:?MDSSC_API_KEY is not set — add it as a Jenkins credential}"
-
-POLL_INTERVAL="${MDSSC_POLL_INTERVAL:-10}"
-POLL_TIMEOUT="${MDSSC_POLL_TIMEOUT:-300}"
-FAIL_ON_HIGH="${MDSSC_FAIL_ON_HIGH:-false}"
 ARCHIVE="mdssc-source-scan.tar.gz"
-
 cleanup() { rm -f "$ARCHIVE"; }
 trap cleanup EXIT
 
-# ── 1. Archive ────────────────────────────────────────────────────────────────
-echo "[MDSSC] Creating source archive..."
+# ── Arhivă sursă (împachetare) ───────────────────────────────────────────────────
+echo "[MDSSC] Creez arhiva sursă..."
 tar czf "$ARCHIVE" \
     --exclude='.git' \
     --exclude='node_modules' \
@@ -53,109 +37,22 @@ tar czf "$ARCHIVE" \
     --exclude='*.ico' \
     --exclude="$ARCHIVE" \
     . || { RC=$?; [ $RC -eq 1 ] || exit $RC; }
-echo "[MDSSC] Archive size: $(du -sh "$ARCHIVE" | cut -f1)"
+echo "[MDSSC] Dimensiune arhivă: $(du -sh "$ARCHIVE" | cut -f1)"
 
-# ── 2. Upload & start scan ────────────────────────────────────────────────────
-echo "[MDSSC] Uploading to ${MDSSC_API_URL}/api/v1/scans/direct ..."
+# ── Pipeline MDSSC ─────────────────────────────────────────────────────────────
+mdssc_health                                    # 1. GET /version
+mdssc_resolve_workflow                          # 2. GET /workflows/{id}
+SCAN_ID=$(mdssc_scan_direct "$ARCHIVE")         # 3. POST /scans/direct
+mdssc_poll_overview "$SCAN_ID"                  # 4. GET /scans/{id}/overview
+mdssc_scan_details "$SCAN_ID"                   # 5. GET /scans/{id}
 
-UPLOAD_ARGS=(
-    -s
-    -X POST
-    -H "apikey: ${MDSSC_API_KEY}"
-    -F "files=@${ARCHIVE}"
-    -w "\nHTTP_STATUS:%{http_code}"
-)
-[[ -n "${MDSSC_WORKFLOW_ID:-}" ]] && UPLOAD_ARGS+=(-F "workflowId=${MDSSC_WORKFLOW_ID}")
-
-RAW_RESPONSE=$(curl "${UPLOAD_ARGS[@]}" "${MDSSC_API_URL}/api/v1/scans/direct")
-HTTP_STATUS=$(echo "$RAW_RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
-UPLOAD_RESPONSE=$(echo "$RAW_RESPONSE" | sed '/HTTP_STATUS:/d')
-
-echo "[MDSSC] HTTP status: $HTTP_STATUS"
-echo "[MDSSC] Response body: $UPLOAD_RESPONSE"
-
-if [[ "$HTTP_STATUS" != "200" ]]; then
-    echo "[MDSSC] ERROR: upload failed with HTTP $HTTP_STATUS"
-    exit 1
+# 6. POST /scans — scan indirect al repo-ului conectat (opțional)
+if [[ "${MDSSC_INDIRECT_SCAN:-false}" == "true" ]]; then
+    INDIRECT_ID=$(mdssc_scan_indirect || true)
+    [[ -n "${INDIRECT_ID:-}" ]] && mdssc_poll_overview "$INDIRECT_ID" || true
 fi
 
-SCAN_ID=$(json_get "$UPLOAD_RESPONSE" "ScanIds.0")
-if [[ -z "$SCAN_ID" ]]; then
-    echo "[MDSSC] ERROR: no scanId returned"
-    exit 1
-fi
-echo "[MDSSC] Scan ID: $SCAN_ID"
+mdssc_export_reports "$SCAN_ID"                 # 7. GET /export/{spdx|cyclonedx|pdf|csv}
 
-# ── 3. Poll until complete ────────────────────────────────────────────────────
-echo "[MDSSC] Polling for completion (timeout: ${POLL_TIMEOUT}s, interval: ${POLL_INTERVAL}s)..."
-ELAPSED=0
-OVERVIEW=""
-SCANNING_STATE=""
-
-while true; do
-    OVERVIEW=$(curl -sf \
-        -H "apikey: ${MDSSC_API_KEY}" \
-        "${MDSSC_API_URL}/api/v1/scans/${SCAN_ID}/overview")
-
-    echo "[MDSSC] Overview response: $OVERVIEW"
-    SCANNING_STATE=$(json_get "$OVERVIEW" "scanStatus.scanningState")
-    SCAN_PROGRESS=$(json_get "$OVERVIEW"  "scanStatus.scanProgress")
-
-    echo "[MDSSC] State: ${SCANNING_STATE:-unknown} | Progress: ${SCAN_PROGRESS:-0}%"
-
-    case "${SCANNING_STATE:-}" in
-        Completed|completed|Done|done|Finished|finished|Failed|failed|Error|error)
-            break
-            ;;
-    esac
-
-    if [[ $ELAPSED -ge $POLL_TIMEOUT ]]; then
-        echo "[MDSSC] ERROR: timed out after ${POLL_TIMEOUT}s (last state: ${SCANNING_STATE:-unknown})"
-        exit 1
-    fi
-
-    sleep "$POLL_INTERVAL"
-    ELAPSED=$((ELAPSED + POLL_INTERVAL))
-done
-
-if [[ "${SCANNING_STATE:-}" == "Failed" || "${SCANNING_STATE:-}" == "failed" || "${SCANNING_STATE:-}" == "Error" || "${SCANNING_STATE:-}" == "error" ]]; then
-    echo "[MDSSC] ERROR: scan ended in failure"
-    exit 1
-fi
-
-# ── 4. Evaluate verdict ───────────────────────────────────────────────────────
-MALWARE=$(    json_get "$OVERVIEW" "scanInformation.malware")
-SECRETS=$(    json_get "$OVERVIEW" "scanInformation.secret")
-CRITICAL=$(   json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.critical")
-HIGH=$(       json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.high")
-MEDIUM=$(     json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.medium")
-LOW=$(        json_get "$OVERVIEW" "scanInformation.vulnerabilityIssues.low")
-BLOCKED_LIC=$(json_get "$OVERVIEW" "scanInformation.licenses.blockedLicensesCount")
-TOTAL_PKG=$(  json_get "$OVERVIEW" "scanInformation.package.totalPackages")
-VULN_PKG=$(   json_get "$OVERVIEW" "scanInformation.package.vulnerablePackages")
-
-echo ""
-echo "══════════════ MDSSC Source Scan Results ══════════════"
-printf "  %-25s %s\n" "Malware detected:"    "${MALWARE:-false}"
-printf "  %-25s %s\n" "Secrets detected:"    "${SECRETS:-false}"
-printf "  %-25s %s\n" "Critical vulns:"      "${CRITICAL:-0}"
-printf "  %-25s %s\n" "High vulns:"          "${HIGH:-0}"
-printf "  %-25s %s\n" "Medium vulns:"        "${MEDIUM:-0}"
-printf "  %-25s %s\n" "Low vulns:"           "${LOW:-0}"
-printf "  %-25s %s\n" "Blocked licenses:"    "${BLOCKED_LIC:-0}"
-printf "  %-25s %s / %s\n" "Vulnerable packages:" "${VULN_PKG:-0}" "${TOTAL_PKG:-0}"
-echo "═══════════════════════════════════════════════════════"
-
-FAILED=false
-
-[[ "${MALWARE:-false}"     == "true" ]]                             && { echo "[MDSSC] FAIL: malware detected";                  FAILED=true; }
-[[ "${SECRETS:-false}"     == "true" ]]                             && { echo "[MDSSC] FAIL: secrets/credentials detected";      FAILED=true; }
-[[ "${CRITICAL:-0}"        -gt 0     ]]                             && { echo "[MDSSC] WARNING: ${CRITICAL} critical vulnerability/vulnerabilities detected — review required"; }
-[[ "$FAIL_ON_HIGH" == "true" && "${HIGH:-0}" -gt 0 ]]              && { echo "[MDSSC] FAIL: ${HIGH} high-severity vulnerability/vulnerabilities"; FAILED=true; }
-[[ "${BLOCKED_LIC:-0}"     -gt 0     ]]                             && { echo "[MDSSC] FAIL: ${BLOCKED_LIC} blocked license(s)"; FAILED=true; }
-
-if [[ "$FAILED" == "true" ]]; then
-    exit 1
-fi
-
-echo "[MDSSC] Source scan passed."
+# ── Verdict ──────────────────────────────────────────────────────────────────────
+mdssc_evaluate "Source Scan"

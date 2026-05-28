@@ -32,7 +32,7 @@ import '../components/Categories.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../api/api';
 import Toast from '../components/Toast';
-import { getEffectiveViewportWidth } from '../utils/devicePatch';
+import { getEffectiveViewportWidth, isTouchPrimaryDevice } from '../utils/devicePatch';
 
 const CATEGORIES = [
   'Electronics',
@@ -338,15 +338,18 @@ export default function AddAnnouncementPage() {
     }
   }, [location.state]);
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    
+  // Procesează un set de fișiere (din input file sau din drag-and-drop): validează
+  // count/format/size, le adaugă în state și generează preview-urile.
+  const processFiles = (filesList) => {
+    const files = Array.from(filesList || []);
+    if (files.length === 0) return;
+
     // Verifică dacă utilizatorul încearcă să adauge prea multe imagini
     if (images.length + files.length > 10) {
       showToast(t('addAnnouncement.errors.maxImages'));
       return;
     }
-    
+
     // Acceptă doar imagini jpg/jpeg
     const validFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
     if (validFiles.length !== files.length) {
@@ -362,7 +365,7 @@ export default function AddAnnouncementPage() {
     }
 
     setImages(prev => [...prev, ...validFiles]);
-    
+
     // Generează preview pentru fiecare imagine
     validFiles.forEach((file, idx) => {
       const reader = new FileReader();
@@ -373,6 +376,42 @@ export default function AddAnnouncementPage() {
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const handleImageChange = (e) => {
+    processFiles(e.target.files);
+    // permite re-selectarea aceluiași fișier dacă userul îl șterge și îl re-adaugă
+    if (e.target) e.target.value = '';
+  };
+
+  // Drag-and-drop pentru imagini — disponibil doar pe desktop (touch device-urile
+  // nu au D&D nativ pentru fișiere).
+  const [isDragging, setIsDragging] = useState(false);
+  const dndEnabled = !isTouchPrimaryDevice();
+
+  const handleDragOver = (e) => {
+    if (!dndEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    if (!isDragging) setIsDragging(true);
+  };
+  const handleDragLeave = (e) => {
+    if (!dndEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // Setăm false doar dacă pointerul a părăsit cu adevărat containerul (nu un copil).
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setIsDragging(false);
+  };
+  const handleDrop = (e) => {
+    if (!dndEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer && e.dataTransfer.files) {
+      processFiles(e.dataTransfer.files);
+    }
   };
 
   const handleTitleChange = (e) => {
@@ -859,9 +898,22 @@ export default function AddAnnouncementPage() {
           </div>
         )}
       </form>
-      <div className="add-announcement-images-section">
+      <div
+        className={`add-announcement-images-section${isDragging ? ' is-dragging' : ''}`}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <h2 className="add-announcement-subtitle">{t('addAnnouncement.imagesSubtitle')}</h2>
-        <div className="add-announcement-images-helper">{t('addAnnouncement.imagesHelper')}</div>
+        <div className="add-announcement-images-helper">
+          {t('addAnnouncement.imagesHelper')}
+          {dndEnabled && (
+            <span className="add-announcement-images-dnd-hint">
+              {' '}{t('addAnnouncement.imagesDndHint', 'Poți trage și plasa imagini aici.')}
+            </span>
+          )}
+        </div>
         <div className="add-announcement-images-grid">
           <button
             type="button"
