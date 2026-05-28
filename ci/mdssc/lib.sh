@@ -3,11 +3,9 @@
 # lib.sh — bibliotecă comună pentru integrarea MetaDefender Software Supply Chain (MDSSC).
 # Se sursează (`source ci/mdssc/lib.sh`), nu se execută direct.
 #
-# Acoperă 7 metode din API-ul MDSSC v3.3.1 (vs. cele 2 folosite înainte — doar
-# /scans/direct + /scans/{id}/overview):
+# Acoperă 7 metode din API-ul MDSSC v3.3.1 
 #
 #   1. GET  /api/v1/version              — verificare conectivitate + versiune server
-#                                          (3.3.1 NU expune /health; /version e echivalentul)
 #   2. GET  /api/v1/workflows/{id}       — rezolvă StorageId (serviceId) + RepositoryId din workflow
 #   3. POST /api/v1/scans/direct         — încarcă arhiva sursă/artefact + pornește scanarea
 #   4. GET  /api/v1/scans/{id}/overview  — polling bogat (progres %, malware, secrete, licențe blocate)

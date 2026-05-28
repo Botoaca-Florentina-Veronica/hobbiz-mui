@@ -34,7 +34,12 @@ pipeline {
         // ── Stage 1: Source-code scan (MDSSC) ────────────────────────────────
         stage('Scan Source Code') {
             environment {
-                MDSSC_REPORTS_DIR = 'mdssc-reports/source'
+                MDSSC_REPORTS_DIR    = 'mdssc-reports/source'
+                // Scan indirect: MDSSC trage codul din repo-ul GitLab conectat.
+                // TODO: înlocuiește placeholder-ul cu workflowId real (din URL-ul workflow-ului în UI MDSSC).
+                MDSSC_INDIRECT_SCAN  = 'true'
+                MDSSC_WORKFLOW_ID    = '6a17f6814d67d6560f96f57e'
+                MDSSC_REPO_REFERENCE = 'main'
             }
             steps {
                 sh 'chmod +x ci/mdssc/scan-source.sh'
