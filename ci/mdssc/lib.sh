@@ -161,25 +161,24 @@ mdssc_scan_indirect() {
     fi
 
     local payload
-    payload=$("$MDSSC_PY" -c '
-import json, os, sys
-body = {
-    "storageId":   os.environ.get("STORAGE_ID", ""),
-    "scanType":    int(os.environ.get("SCAN_TYPE", "0") or 0),
-    "workflowId":  os.environ.get("WORKFLOW_ID", ""),
-    "repositoryId": os.environ.get("REPO_ID", ""),
-}
+    payload=$(STORAGE_ID="$storage_id" SCAN_TYPE="${MDSSC_SCAN_TYPE:-0}" WORKFLOW_ID="${MDSSC_WORKFLOW_ID:-}" \
+              REPO_ID="$repo_id" REPO_REFERENCE="$reference" \
+              "$MDSSC_PY" -c '
+import json, os
 ref = os.environ.get("REPO_REFERENCE", "")
-if ref:
-    body["repositoryReferences"] = [ref]
+body = {
+    "storageId":    os.environ.get("STORAGE_ID", ""),
+    "scanType":     int(os.environ.get("SCAN_TYPE", "0") or 0),
+    "workflowId":   os.environ.get("WORKFLOW_ID", ""),
+    "repositoryId": os.environ.get("REPO_ID", ""),
+    "repositoryReferences": [ref] if ref else [],
+}
 print(json.dumps(body))
-' )
+')
 
     echo "[MDSSC] Scan indirect repo (POST /api/v1/scans) — ref: ${reference:-default}..." >&2
     local raw status body
-    raw=$(STORAGE_ID="$storage_id" SCAN_TYPE="${MDSSC_SCAN_TYPE:-0}" WORKFLOW_ID="${MDSSC_WORKFLOW_ID:-}" \
-          REPO_ID="$repo_id" REPO_REFERENCE="$reference" \
-          curl -s -X POST -H "apikey: ${MDSSC_API_KEY}" -H "Content-Type: application/json" \
+    raw=$(curl -s -X POST -H "apikey: ${MDSSC_API_KEY}" -H "Content-Type: application/json" \
                -d "$payload" -w "\nHTTP_STATUS:%{http_code}" "${MDSSC_API_URL}/api/v1/scans")
     status=$(echo "$raw" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
     body=$(echo "$raw" | sed '/HTTP_STATUS:/d')
