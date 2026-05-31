@@ -46,7 +46,7 @@ const createReview = async (req, res) => {
     if (!hasCollaboration) {
       return res.status(403).json({
         error:
-          "Nu poți lăsa review. Trebuie să aveți un acord de colaborare confirmată.",
+          "Nu poți lăsa recenzia. Trebuie să aveți un acord de colaborare confirmat.",
       });
     }
 

@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router-dom"; // Adaugă această linie
 // import axios from 'axios';
 import App from "./App";
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ChatProvider } from './context/ChatContext.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import "./index.css";
 import './i18n';
@@ -20,7 +21,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <ChatProvider>
+          <App />
+        </ChatProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

@@ -73,18 +73,38 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
+                // Construiește artefactul backend: copie curată a sursei, fără node_modules,
+                // .env, log-uri sau teste — exact ce ajunge la deploy
+                sh '''
+                    rm -rf backend-artifact
+                    mkdir -p backend-artifact
+                    tar cf - \
+                        --exclude='node_modules' \
+                        --exclude='.env' --exclude='.env.*' \
+                        --exclude='*.log' --exclude='logs' \
+                        --exclude='__tests__' --exclude='tests' \
+                        --exclude='.git' \
+                        -C backend . | (cd backend-artifact && tar xf -)
+                '''
                 archiveArtifacts artifacts: 'frontend/dist/**/*', fingerprint: true
+                archiveArtifacts artifacts: 'backend-artifact/**/*', fingerprint: true
             }
         }
 
         // ── Stage 3: Artifact scan (MDSSC) ───────────────────────────────────
         stage('Scan Artifacts') {
-            environment {
-                MDSSC_REPORTS_DIR = 'mdssc-reports/artifact'
-            }
             steps {
                 sh 'chmod +x ci/mdssc/scan-artifacts.sh'
-                sh 'ci/mdssc/scan-artifacts.sh'
+
+                echo '──────── Scanare artefact BACKEND ────────'
+                withEnv(['MDSSC_ARTIFACT_DIR=backend-artifact', 'MDSSC_REPORTS_DIR=mdssc-reports/artifact/backend']) {
+                    sh 'ci/mdssc/scan-artifacts.sh'
+                }
+
+                echo '──────── Scanare artefact FRONTEND ────────'
+                withEnv(['MDSSC_ARTIFACT_DIR=frontend/dist', 'MDSSC_REPORTS_DIR=mdssc-reports/artifact/frontend']) {
+                    sh 'ci/mdssc/scan-artifacts.sh'
+                }
             }
             post {
                 always {

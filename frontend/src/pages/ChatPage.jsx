@@ -12,6 +12,7 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBack from '@mui/icons-material/ArrowBack';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -21,6 +22,7 @@ import gumballChat from '../assets/images/gumballChat.jpg';
 import './ChatPage.css';
 import './ChatPageCollaboration.css';
 import { resolveMediaUrl } from '../utils/media';
+import { useChatContext } from '../context/ChatContext';
 import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
 const resolveAvatarUrl = (src) => resolveMediaUrl(src);
@@ -77,6 +79,30 @@ export default function ChatPage() {
   const isDesktop = !isMobile;
 
   const { emitTyping, on, off } = useSocket(userId);
+  const { openPopupChat } = useChatContext();
+
+  const handlePopOut = () => {
+    if (!selectedConversation) return;
+    openPopupChat({
+      announcement: {
+        id: selectedConversation.announcementId,
+        _id: selectedConversation.announcementId,
+        title: selectedConversation.displayTitle || selectedConversation.announcementTitle,
+        images: selectedConversation.announcementImage
+          ? [resolveMediaUrl(selectedConversation.announcementImage)]
+          : [],
+      },
+      seller: {
+        _id: selectedConversation.id,
+        id: selectedConversation.id,
+        firstName: selectedConversation.participantName,
+        avatar: selectedConversation.participantAvatar,
+      },
+      userId,
+      userRole: 'cumparator',
+    });
+    navigate('/');
+  };
 
   // Add/remove body class for mobile chat
   useEffect(() => {
@@ -640,12 +666,23 @@ export default function ChatPage() {
                     )}
                   </p>
                 </div>
-                {/* Collaboration Button - aligned to right */}
-                <IconButton 
+                {/* Pop-out Button */}
+                <IconButton
+                  onClick={handlePopOut}
+                  sx={{
+                    marginLeft: 'auto',
+                    color: 'var(--c-text-primary)',
+                    '&:hover': { backgroundColor: 'var(--c-hover-bg)' }
+                  }}
+                  title={t('chat.popOut', 'Deschide în popup')}
+                >
+                  <OpenInNewIcon sx={{ fontSize: 22 }} />
+                </IconButton>
+                {/* Collaboration Button */}
+                <IconButton
                   onClick={handleSendCollaborationRequest}
                   disabled={sendingCollab}
-                  sx={{ 
-                    marginLeft: 'auto',
+                  sx={{
                     color: 'var(--c-text-primary)',
                     opacity: sendingCollab ? 0.5 : 1,
                     '&:hover': { backgroundColor: 'var(--c-hover-bg)' }

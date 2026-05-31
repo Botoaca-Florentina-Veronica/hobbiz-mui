@@ -33,6 +33,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import PendingIcon from '@mui/icons-material/Pending';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ConfirmDialog from './ConfirmDialog';
@@ -73,6 +74,9 @@ export default function VerificationDocuments() {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+  // Drag & Drop State
+  const [isDragOver, setIsDragOver] = useState(false);
+
   useEffect(() => {
     fetchDocuments();
   }, []);
@@ -89,6 +93,26 @@ export default function VerificationDocuments() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setUploadModalOpen(true);
     }
   };
 
@@ -268,8 +292,41 @@ export default function VerificationDocuments() {
               <CircularProgress />
             </Box>
           ) : documents.length === 0 ? (
-            <Box p={4} textAlign="center">
-              <Typography color="textSecondary" sx={poppinsFont}>{t('verification.noDocuments')}</Typography>
+            <Box
+              p={4}
+              textAlign="center"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => setUploadModalOpen(true)}
+              sx={{
+                cursor: 'pointer',
+                border: '2px dashed',
+                borderColor: isDragOver
+                  ? (theme) => theme.palette.mode === 'dark' ? '#4a7bb0' : '#0B2D5A'
+                  : (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+                borderRadius: 2,
+                transition: 'all 0.2s ease',
+                backgroundColor: isDragOver
+                  ? (theme) => theme.palette.mode === 'dark' ? 'rgba(74, 123, 176, 0.1)' : 'rgba(11, 45, 90, 0.05)'
+                  : 'transparent',
+                userSelect: 'none',
+              }}
+            >
+              <CloudUploadIcon
+                sx={{
+                  fontSize: 52,
+                  color: isDragOver ? 'primary.main' : 'text.disabled',
+                  mb: 1,
+                  transition: 'color 0.2s ease',
+                }}
+              />
+              <Typography color="textSecondary" sx={poppinsFont}>
+                {t('verification.noDocuments')}
+              </Typography>
+              <Typography variant="caption" color="textSecondary" sx={{ ...poppinsFont, mt: 0.5, display: 'block' }}>
+                {isDragOver ? 'Eliberează pentru a încărca' : 'Trage un document aici sau apasă pentru a selecta'}
+              </Typography>
             </Box>
           ) : (
             <List>

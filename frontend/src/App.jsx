@@ -46,6 +46,8 @@ import AllAnnouncements from './pages/AllAnnouncements.jsx';
 import SearchResultsPage from './pages/SearchResultsPage.jsx';
 import ArchivedAnnouncementsPage from './pages/ArchivedAnnouncementsPage.jsx';
 import useScrollToTop from './hooks/useScrollToTop';
+import ChatPopup from './components/ChatPopup';
+import { useChatContext } from './context/ChatContext';
 import './App.css';
 import './mediaQueries.css';
 import './components/Content.css';
@@ -57,8 +59,8 @@ import MobileAppBanner from './components/MobileAppBanner';
 import i18n from './i18n';
 
 function App() {
-  // Automatically scroll to top on route changes
   useScrollToTop();
+  const { popupChat, closePopupChat, toggleMinimize } = useChatContext();
 
   useEffect(() => {
     const checkCountry = async () => {
@@ -124,7 +126,13 @@ function App() {
   }, [darkMode]);
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    document.body.classList.add('no-transition');
+    setDarkMode(prev => !prev);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove('no-transition');
+      });
+    });
   };
 
   useEffect(() => {
@@ -430,6 +438,18 @@ function App() {
     >
       <LoadingOverlay />
       {appView}
+      {popupChat && (
+        <ChatPopup
+          open
+          minimized={popupChat.minimized}
+          onClose={closePopupChat}
+          onMinimize={toggleMinimize}
+          announcement={popupChat.announcement}
+          seller={popupChat.seller}
+          userId={popupChat.userId}
+          userRole={popupChat.userRole}
+        />
+      )}
       <MobileAppBanner />
       <CookieConsent />
       <Toast

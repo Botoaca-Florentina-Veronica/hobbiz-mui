@@ -122,6 +122,9 @@ export default function AnnouncementDetails() {
   // ========== Modal Zoom ==========
   const [zoomOpen, setZoomOpen] = useState(false);
   const [zoomIndex, setZoomIndex] = useState(0);
+
+  // ========== Image aspect ratio (landscape → cover, portrait/square → contain) ==========
+  const [imageFits, setImageFits] = useState({});
   
   // ========== Chat & Contact ==========
   const [showChat, setShowChat] = useState(false);
@@ -136,6 +139,10 @@ export default function AnnouncementDetails() {
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorModalMessage, setErrorModalMessage] = useState('');
   const showErrorModal = (message) => { setErrorModalMessage(message); setErrorModalOpen(true); };
+
+  // ========== Admin delete dialog ==========
+  const [adminDeleteOpen, setAdminDeleteOpen] = useState(false);
+  const [adminDeleting, setAdminDeleting] = useState(false);
 
   // ========== Report dialog ==========
   const [reportOpen, setReportOpen] = useState(false);
@@ -276,6 +283,19 @@ export default function AnnouncementDetails() {
     }
   });
 
+  // ========== Effects: preîncărcare imagini și detecție aspect ratio ==========
+  useEffect(() => {
+    if (!announcement?.images?.length) return;
+    announcement.images.forEach((imgSrc, idx) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const fit = img.naturalWidth > img.naturalHeight ? 'cover' : 'contain';
+        setImageFits(prev => ({ ...prev, [idx]: fit }));
+      };
+      img.src = resolveMediaUrl(imgSrc);
+    });
+  }, [announcement?.images]);
+
   // ========== Effects: sincronizare cu clasa globală dark-mode ==========
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -389,6 +409,21 @@ export default function AnnouncementDetails() {
     }
   };
 
+  // ========== Admin delete ==========
+  const handleAdminDelete = async () => {
+    try {
+      setAdminDeleting(true);
+      await apiClient.delete(`/api/announcements/${announcement._id}`);
+      setAdminDeleteOpen(false);
+      navigate('/');
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'Eroare la ștergerea anunțului.';
+      showErrorModal(msg);
+    } finally {
+      setAdminDeleting(false);
+    }
+  };
+
   // ========== Utilitare de format ==========
   const formatDate = (dateString) => {
     const locale = i18n.language === 'en' ? 'en-GB' : (i18n.language === 'es' ? 'es-ES' : 'ro-RO');
@@ -488,6 +523,7 @@ export default function AnnouncementDetails() {
   const loggedUserId = localStorage.getItem('userId') || user?._id;
   const token = localStorage.getItem('token');
   const isOwnAnnouncement = !!loggedUserId && String(announcement.user._id) === String(loggedUserId);
+  const isAdminUser = !!user?.isAdmin;
 
   const handleChatClick = () => {
     console.log('🔍 Chat button clicked:', { loggedUserId, isOwnAnnouncement, announcementUserId: announcement.user._id, showChat });
@@ -645,7 +681,7 @@ export default function AnnouncementDetails() {
                       sx={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'contain',
+                        objectFit: imageFits[imgIndex] ?? 'contain',
                         bgcolor: getIsDarkMode() ? '#121212' : '#ffffff',
                         opacity: fade ? 1 : 0,
                         transition: 'opacity 0.4s cubic-bezier(.4,0,.2,1)',
@@ -899,27 +935,48 @@ export default function AnnouncementDetails() {
                     </Box>
                   </Box>
                   {!isOwnAnnouncement && (
-                    <Button
-                      size="small"
-                      onClick={handleOpenReport}
-                      startIcon={
-                        <svg xmlns="http://www.w3.org/2000/svg" width={getEffectiveViewportWidth() < 600 ? "12" : "16"} height={getEffectiveViewportWidth() < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
-                      }
-                      sx={{
-                        color: '#e5533d',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(229,83,61,0.08)' : 'rgba(229,83,61,0.08)' },
-                        fontSize: { xs: '.65rem', sm: '.75rem' },
-                        letterSpacing: '.5px',
-                        minWidth: { xs: '70px', sm: 'auto' },
-                        px: { xs: 1, sm: 1.5 },
-                        py: { xs: 0.5, sm: 0.75 },
-                        flexShrink: 0
-                      }}
-                    >
-                      {t('announcementDetails.report')}
-                    </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      {isAdminUser && (
+                        <Button
+                          size="small"
+                          onClick={() => setAdminDeleteOpen(true)}
+                          sx={{
+                            color: '#e5533d',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': { bgcolor: 'rgba(229,83,61,0.08)' },
+                            fontSize: { xs: '.65rem', sm: '.75rem' },
+                            letterSpacing: '.5px',
+                            px: { xs: 1, sm: 1.5 },
+                            py: { xs: 0.5, sm: 0.75 },
+                            border: '1px solid #e5533d',
+                            borderRadius: 1.5,
+                          }}
+                        >
+                          Șterge (Admin)
+                        </Button>
+                      )}
+                      <Button
+                        size="small"
+                        onClick={handleOpenReport}
+                        startIcon={
+                          <svg xmlns="http://www.w3.org/2000/svg" width={getEffectiveViewportWidth() < 600 ? "12" : "16"} height={getEffectiveViewportWidth() < 600 ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16l-6 8 6 8H4z"/></svg>
+                        }
+                        sx={{
+                          color: '#e5533d',
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          '&:hover': { bgcolor: getIsDarkMode() ? 'rgba(229,83,61,0.08)' : 'rgba(229,83,61,0.08)' },
+                          fontSize: { xs: '.65rem', sm: '.75rem' },
+                          letterSpacing: '.5px',
+                          minWidth: { xs: '70px', sm: 'auto' },
+                          px: { xs: 1, sm: 1.5 },
+                          py: { xs: 0.5, sm: 0.75 },
+                        }}
+                      >
+                        {t('announcementDetails.report')}
+                      </Button>
+                    </Box>
                   )}
                 </Box>
 
@@ -934,6 +991,7 @@ export default function AnnouncementDetails() {
                     </Typography>
                   </>
                 )}
+
               </CardContent>
             </Card>
           </Grid>
@@ -1076,6 +1134,7 @@ export default function AnnouncementDetails() {
                     </Typography>
                   </Box>
                 )}
+
               </CardContent>
             </Card>
             {/* Map Section - va sta imediat sub card */}
@@ -1386,6 +1445,53 @@ export default function AnnouncementDetails() {
             }}
           >
             Am înțeles
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========== Admin Delete Confirmation Dialog ========== */}
+      <Dialog
+        open={adminDeleteOpen}
+        onClose={() => !adminDeleting && setAdminDeleteOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            bgcolor: getIsDarkMode() ? '#1a1a1a' : '#ffffff',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: getIsDarkMode() ? '#f5f5f5' : 'inherit', fontWeight: 700 }}>
+          Confirmare ștergere (Admin)
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: getIsDarkMode() ? '#d1d5db' : '#374151' }}>
+            Ești sigur că vrei să ștergi acest anunț? Acțiunea este ireversibilă.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button
+            onClick={() => setAdminDeleteOpen(false)}
+            disabled={adminDeleting}
+            sx={{ color: getIsDarkMode() ? '#9ca3af' : '#6b7280', textTransform: 'none' }}
+          >
+            Anulează
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleAdminDelete}
+            disabled={adminDeleting}
+            sx={{
+              bgcolor: '#e5533d',
+              '&:hover': { bgcolor: '#cd412b' },
+              color: '#fff',
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2
+            }}
+          >
+            {adminDeleting ? 'Se șterge...' : 'Șterge definitiv'}
           </Button>
         </DialogActions>
       </Dialog>

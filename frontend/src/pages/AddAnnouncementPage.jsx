@@ -1129,7 +1129,8 @@ export default function AddAnnouncementPage() {
                       key={judet}
                       onClick={() => {
                         if (judet === 'Toată țara') {
-                          setSelectedJudet(null);
+                          // Marker valid pentru backend: anunțul acoperă toată țara.
+                          setSelectedJudet('Toată țara');
                           setSelectedLocalitate('');
                           handleClose();
                         } else {

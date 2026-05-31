@@ -12,6 +12,8 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import SmartphoneOutlinedIcon from '@mui/icons-material/SmartphoneOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { IconButton, Typography, Container, Paper, List, ListItem, ListItemText } from '@mui/material';
 import ConfirmDialog from './ConfirmDialog';
 import Toast from '../components/Toast';
@@ -22,6 +24,8 @@ export default function AccountSettings() {
   const [showEmailChange, setShowEmailChange] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [newEmail, setNewEmail] = useState('');
+  const [emailPassword, setEmailPassword] = useState('');
+  const [showEmailPassword, setShowEmailPassword] = useState(false);
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '' });
   const [message, setMessage] = useState(null); // State for messages (success/error)
   const [mitmResult, setMitmResult] = useState(null);
@@ -80,8 +84,10 @@ export default function AccountSettings() {
     console.log('Schimbă email-ul clicked!');
     setShowEmailChange(!showEmailChange);
     setShowPasswordChange(false);
-    setMessage(null); // Clear messages when toggling
-    setNewEmail(''); // Clear input when toggling
+    setMessage(null);
+    setNewEmail('');
+    setEmailPassword('');
+    setShowEmailPassword(false);
   };
 
   const handleResetUserData = async () => {
@@ -105,18 +111,21 @@ export default function AccountSettings() {
   };
 
   const handleSaveEmail = async () => {
-    setMessage(null); // Clear previous messages
+    setMessage(null);
     if (!newEmail) {
       setMessage({ type: 'error', text: t('accountSettings.messages.enterEmail') });
       return;
     }
+    if (!emailPassword) {
+      setMessage({ type: 'error', text: t('accountSettings.messages.enterPasswordConfirm') });
+      return;
+    }
 
     try {
-      const response = await updateEmail({ newEmail });
+      const response = await updateEmail({ newEmail, password: emailPassword });
       setMessage({ type: 'success', text: response.data.message });
-      setNewEmail(''); // Clear input on success
-      // Optionally hide the section after a delay
-      // setTimeout(() => setShowEmailChange(false), 3000);
+      setNewEmail('');
+      setEmailPassword('');
     } catch (error) {
       console.error('Error updating email:', error);
       const errorMessage = error.response?.data?.error || t('accountSettings.messages.updateEmailError');
@@ -255,6 +264,20 @@ export default function AccountSettings() {
               <input type="email" id="m-new-email" value={newEmail}
                 onChange={e => setNewEmail(e.target.value)}
                 placeholder={t('accountSettings.placeholders.newEmail')} />
+              <label htmlFor="m-email-password">{t('accountSettings.labels.currentPassword')}</label>
+              <div className="password-input-wrapper">
+                <input type={showEmailPassword ? 'text' : 'password'} id="m-email-password" value={emailPassword}
+                  onChange={e => setEmailPassword(e.target.value)}
+                  placeholder={t('accountSettings.placeholders.currentPassword')} />
+                <IconButton
+                  className="eye-toggle"
+                  onClick={() => setShowEmailPassword(v => !v)}
+                  tabIndex={-1}
+                  size="small"
+                >
+                  {showEmailPassword ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}
+                </IconButton>
+              </div>
               <button onClick={handleSaveEmail}>{t('accountSettings.buttons.save')}</button>
             </div>
           )}
@@ -373,6 +396,24 @@ export default function AccountSettings() {
               onChange={e => setNewEmail(e.target.value)}
               placeholder={t('accountSettings.placeholders.newEmail')}
             />
+            <label htmlFor="email-password">{t('accountSettings.labels.currentPassword')}</label>
+            <div className="password-input-wrapper">
+              <input
+                type={showEmailPassword ? 'text' : 'password'}
+                id="email-password"
+                value={emailPassword}
+                onChange={e => setEmailPassword(e.target.value)}
+                placeholder={t('accountSettings.placeholders.currentPassword')}
+              />
+              <IconButton
+                className="eye-toggle"
+                onClick={() => setShowEmailPassword(v => !v)}
+                tabIndex={-1}
+                size="small"
+              >
+                {showEmailPassword ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}
+              </IconButton>
+            </div>
             <button onClick={handleSaveEmail}>{t('accountSettings.buttons.save')}</button>
           </div>
         )}

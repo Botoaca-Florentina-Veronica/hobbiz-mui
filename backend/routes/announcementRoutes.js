@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Announcement = require('../models/Announcement');
+const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 
 function escapeRegexLiteral(input) {
   return String(input || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -214,6 +216,21 @@ router.delete('/:id/favorite', async (req, res) => {
   } catch (error) {
     console.error('Eroare la favorite -1:', error);
     res.status(500).json({ error: 'Eroare server la actualizarea favorite' });
+  }
+});
+
+// DELETE /api/announcements/:id — admin only, poate șterge orice anunț
+router.delete('/:id', auth, adminAuth, async (req, res) => {
+  try {
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit.' });
+    }
+    await Announcement.deleteOne({ _id: req.params.id });
+    res.json({ message: 'Anunț șters de administrator.' });
+  } catch (error) {
+    console.error('Eroare la ștergerea admin a anunțului:', error);
+    res.status(500).json({ error: 'Eroare server la ștergerea anunțului.' });
   }
 });
 

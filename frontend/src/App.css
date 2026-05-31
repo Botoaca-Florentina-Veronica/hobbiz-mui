@@ -180,3 +180,11 @@ body.lang-changing *::after {
   animation: none !important;
 }
 
+/* Disable all transitions during dark mode toggle to prevent lag */
+body.no-transition *,
+body.no-transition *::before,
+body.no-transition *::after {
+  transition: none !important;
+  animation: none !important;
+}
+

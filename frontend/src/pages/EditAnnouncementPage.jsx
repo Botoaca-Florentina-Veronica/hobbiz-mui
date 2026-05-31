@@ -119,8 +119,15 @@ export default function EditAnnouncementPage() {
       setTitleChars(a.title ? a.title.length : 0);
       setDescription(a.description || '');
       setDescriptionChars(a.description ? a.description.length : 0);
-      setSelectedJudet(null);
-      setSelectedLocalitate(a.location || '');
+      // Dacă anunțul are location 'Toată țara' (sau traducerea ei) îl tratăm ca județ,
+      // ca să se vadă selectat în dropdown și să treacă validarea fără modificări.
+      if (a.location === 'Toată țara' || a.location === entireCountryLabel) {
+        setSelectedJudet('Toată țara');
+        setSelectedLocalitate('');
+      } else {
+        setSelectedJudet(null);
+        setSelectedLocalitate(a.location || '');
+      }
       setContactPerson(a.contactPerson || '');
       setContactEmail(a.contactEmail || '');
       setContactPhone(a.contactPhone || '');
@@ -832,7 +839,9 @@ export default function EditAnnouncementPage() {
                       key={judet}
                       onClick={() => {
                         if (judet === entireCountryLabel) {
-                          setSelectedJudet(null);
+                          // Folosim literal 'Toată țara' ca valoare stocată (consistent backend),
+                          // indiferent de limba activă în UI.
+                          setSelectedJudet('Toată țara');
                           setSelectedLocalitate("");
                           setAnchorEl(null);
                         } else {

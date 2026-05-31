@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ReplyIcon from '@mui/icons-material/Reply';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Popover } from '@mui/material';
 import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessage } from '../api/api';
 import useSocket from '../hooks/useSocket';
@@ -10,11 +13,13 @@ import TypingIndicator from './TypingIndicator';
 import './ChatPopup.css';
 import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
-export default function ChatPopup({ open, onClose, announcement, seller, userId, userRole, onMessageSent }) {
+export default function ChatPopup({ open, onClose, onMinimize, minimized, announcement, seller, userId, userRole, onMessageSent }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [hoveredMsgId, setHoveredMsgId] = useState(null);
-  const [deleteHover, setDeleteHover] = useState(false);
+  const [reactionTargetId, setReactionTargetId] = useState(null);
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
+  const [selectedReply, setSelectedReply] = useState(null);
   const [attachHover, setAttachHover] = useState(false);
   const [emojiHover, setEmojiHover] = useState(false);
   const [emojiAnchor, setEmojiAnchor] = useState(null);
@@ -34,6 +39,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   const startSizeRef = useRef({ w: 440, h: 450, x: 0, y: 0 });
   
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
+  const reactionEmojis = ['❤️','😂','😮','😢','😡','👍','👎','🎉','🔥','💯'];
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
@@ -154,6 +160,18 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
     return () => clearTimeout(id);
   }, [isOtherUserTyping]);
 
+  // Închide reaction picker la click în afara lui
+  useEffect(() => {
+    if (!reactionTargetId) return;
+    const handle = (e) => {
+      if (!e.target.closest('.cp-reaction-picker') && !e.target.closest('.cp-message-action-btn')) {
+        setReactionTargetId(null);
+      }
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [reactionTargetId]);
+
   // Enable/disable resizable mode based on viewport width
   useEffect(() => {
     const check = () => {
@@ -246,6 +264,10 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
 
     // Pregătim optimistic message
     const tempId = 'tmp-' + Date.now();
+    const replyToPayload = selectedReply
+      ? { messageId: selectedReply.messageId, text: selectedReply.text, image: selectedReply.image, senderId: selectedReply.senderId }
+      : undefined;
+
     const optimistic = {
       _id: tempId,
       conversationId,
@@ -255,13 +277,15 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       text: hasText ? textToSend : undefined,
       image: hasFile ? URL.createObjectURL(selectedFile) : undefined,
       imageFile: hasFile ? selectedFile.name : undefined,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      replyTo: replyToPayload,
     };
     setMessages(prev => [...prev, optimistic]);
 
     // Reset UI rapid
     setInput('');
     setSelectedFile(null);
+    setSelectedReply(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
 
     try {
@@ -274,6 +298,7 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
         formData.append('destinatarId', recipientId);
         formData.append('announcementId', announcement.id || announcement._id);
         if (hasText) formData.append('text', textToSend);
+        if (replyToPayload) formData.append('replyTo', JSON.stringify(replyToPayload));
         formData.append('image', selectedFile);
         formData.append('imageFile', selectedFile.name);
         response = await sendMessageMultipart(formData);
@@ -284,7 +309,8 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
           senderRole: 'cumparator',
           destinatarId: recipientId,
           announcementId: announcement.id || announcement._id,
-          text: textToSend
+          text: textToSend,
+          ...(replyToPayload && { replyTo: replyToPayload }),
         };
         response = await sendMessage(payload);
       }
@@ -323,6 +349,31 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
       console.error('❌ Eroare la ștergerea mesajului:', error);
       console.error('❌ Detalii eroare:', error.response?.data);
       // Nu mai afișăm popup - doar logăm eroarea
+    }
+  };
+
+  // Reacție pe mesaj
+  const handleReactToMessage = async (msgId, emoji) => {
+    setReactionTargetId(null);
+    setHoveredMsgId(null);
+    try {
+      setMessages(prev => prev.map(m => {
+        if (m._id !== msgId) return m;
+        const reactions = m.reactions || [];
+        const idx = reactions.findIndex(r => r.userId === effectiveUserId && r.emoji === emoji);
+        return {
+          ...m,
+          reactions: idx >= 0
+            ? reactions.filter((_, i) => i !== idx)
+            : [...reactions, { userId: effectiveUserId, emoji, createdAt: new Date() }]
+        };
+      }));
+      const res = await apiClient.post(`/api/messages/${msgId}/react`, { emoji });
+      if (res.data?.reactions) {
+        setMessages(prev => prev.map(m => m._id === msgId ? { ...m, reactions: res.data.reactions } : m));
+      }
+    } catch (e) {
+      console.error('Eroare reacție:', e);
     }
   };
 
@@ -388,8 +439,8 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
   return (
     <div className="chat-popup-overlay">
       <div
-        className={"chat-popup-box" + (isResizable ? " resizable" : "")}
-        style={isResizable ? { width: boxWidth + 'px', height: boxHeight + 'px' } : undefined}
+        className={"chat-popup-box" + (isResizable ? " resizable" : "") + (minimized ? " minimized" : "")}
+        style={isResizable && !minimized ? { width: boxWidth + 'px', height: boxHeight + 'px' } : undefined}
       >
         {isResizable && (
           <>
@@ -416,9 +467,18 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
             </div>
             <span className="chat-popup-username">{seller?.firstName || t('common.user')}</span>
           </div>
+          {onMinimize && (
+            <button className="chat-popup-minimize" onClick={onMinimize} title="Minimizează">
+              &#8722;
+            </button>
+          )}
           <button className="chat-popup-close" onClick={onClose}>&#10005;</button>
         </div>
-        <div className="chat-popup-announcement">
+        <div
+          className="chat-popup-announcement"
+          onClick={() => { const id = announcement?.id || announcement?._id; if (id) navigate(`/announcement/${id}`); }}
+          style={{ cursor: announcement?.id || announcement?._id ? 'pointer' : 'default' }}
+        >
           <img className="chat-popup-announcement-img" src={announcement?.images?.[0] || ''} alt="anunt" />
           <div className="chat-popup-announcement-info">
             <div className="chat-popup-announcement-title">{announcement?.title}</div>
@@ -436,80 +496,137 @@ export default function ChatPopup({ open, onClose, announcement, seller, userId,
               {t('chat.noConversation')}
             </div>
           ) : (
-            messages.map((msg, idx) => (
-              <div
-                key={msg._id || `msg-${idx}`}
-                className={
-                  "chat-popup-message-row " +
-                  (msg.senderId === effectiveUserId
-                    ? "chat-popup-message-own-row"
-                    : "chat-popup-message-other-row" 
-                  )
-                }
-              >
+            messages.map((msg, idx) => {
+              const isOwn = msg.senderId === effectiveUserId;
+              const reactionCounts = (msg.reactions || []).reduce((acc, r) => {
+                acc[r.emoji] = (acc[r.emoji] || 0) + 1;
+                return acc;
+              }, {});
+              const myReactions = (msg.reactions || [])
+                .filter(r => r.userId === effectiveUserId)
+                .map(r => r.emoji);
+
+              return (
                 <div
-                  className={
-                    "chat-popup-message " +
-                    (msg.senderId === effectiveUserId
-                      ? "chat-popup-message-own"
-                      : "chat-popup-message-other" 
-                    )
-                  }
-                  onMouseEnter={() => setHoveredMsgId(msg._id)}
-                  onMouseLeave={() => { setHoveredMsgId(null); setDeleteHover(false); }}
+                  key={msg._id || `msg-${idx}`}
+                  className={`chat-popup-message-row ${isOwn ? 'chat-popup-message-own-row' : 'chat-popup-message-other-row'}`}
                 >
-                  {msg.senderId === effectiveUserId && hoveredMsgId === msg._id && (
-                    <div className="chat-popup-message-delete">
-                      <button
-                        className="chat-popup-message-delete-btn"
-                        onMouseEnter={() => {
-                          setDeleteHover(msg._id);
-                          window.deleteTooltipTimeout = setTimeout(() => {
-                            setDeleteHover('show-' + msg._id);
-                          }, 1000);
-                        }}
-                        onMouseLeave={() => {
-                          setDeleteHover(false);
-                          clearTimeout(window.deleteTooltipTimeout);
-                        }}
-                        onClick={() => handleDeleteMessage(msg._id)}
-                        title={t('chat.deleteMessage')}
-                      >
-                        <DeleteIcon sx={{ fontSize: 18 }} />
-                      </button>
-                      {deleteHover === 'show-' + msg._id && (
-                        <span className="chat-popup-message-delete-tooltip">{t('chat.delete')}</span>
-                      )}
-                    </div>
-                  )}
-                  <div className="chat-popup-message-text">
-                    {msg.image && (
-                      <div className="chat-popup-image-wrapper">
-                        <img
-                          src={msg.image}
-                          alt={msg.imageFile || 'image'}
-                          className="chat-popup-image"
-                          onLoad={() => messagesEndRef.current?.scrollIntoView({behavior:'smooth'})}
-                        />
+                  <div
+                    className={`cp-msg-wrapper ${isOwn ? 'cp-msg-wrapper--own' : 'cp-msg-wrapper--other'}`}
+                    onMouseEnter={() => setHoveredMsgId(msg._id)}
+                    onMouseLeave={() => { if (reactionTargetId !== msg._id) setHoveredMsgId(null); }}
+                  >
+                    {/* Bara de acțiuni (hover) */}
+                    {hoveredMsgId === msg._id && reactionTargetId !== msg._id && (
+                      <div className={`cp-message-actions-bar ${isOwn ? 'own' : ''}`}>
+                        <button
+                          className="cp-message-action-btn"
+                          title="Răspunde"
+                          onClick={() => setSelectedReply({ messageId: msg._id, senderId: msg.senderId, text: msg.text, image: msg.image })}
+                        >
+                          <ReplyIcon sx={{ fontSize: 15 }} />
+                        </button>
+                        <button
+                          className="cp-message-action-btn"
+                          title="Reacție"
+                          onClick={() => setReactionTargetId(msg._id)}
+                        >
+                          <SentimentSatisfiedAltIcon sx={{ fontSize: 15 }} />
+                        </button>
+                        <button
+                          className="cp-message-action-btn copy"
+                          title="Copiază"
+                          onClick={() => {
+                            navigator.clipboard.writeText(msg.text || '');
+                            setCopiedMessageId(msg._id);
+                            setTimeout(() => setCopiedMessageId(null), 1200);
+                          }}
+                        >
+                          <ContentCopyIcon sx={{ fontSize: 15 }} />
+                          {copiedMessageId === msg._id && <span className="cp-copied-label">Copiat</span>}
+                        </button>
+                        {isOwn && (
+                          <button
+                            className="cp-message-action-btn delete"
+                            title="Șterge"
+                            onClick={() => handleDeleteMessage(msg._id)}
+                          >
+                            <DeleteIcon sx={{ fontSize: 15 }} />
+                          </button>
+                        )}
                       </div>
                     )}
-                    {msg.text && <div>{msg.text}</div>}
-                  </div>
-                  {msg.createdAt && (
-                    <div className="chat-popup-message-time">
-                      {new Date(msg.createdAt).toLocaleTimeString('ro-RO', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
+
+                    {/* Reaction picker */}
+                    {reactionTargetId === msg._id && (
+                      <div className={`cp-reaction-picker ${isOwn ? 'own' : ''}`}>
+                        {reactionEmojis.map(e => (
+                          <button key={e} className="cp-reaction-option" onClick={() => handleReactToMessage(msg._id, e)}>
+                            {e}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Bubble */}
+                    <div className={`chat-popup-message ${isOwn ? 'chat-popup-message-own' : 'chat-popup-message-other'}`}>
+                      {msg.replyTo && (
+                        <div className="cp-reply-preview">
+                          <span className="cp-reply-preview-text">{msg.replyTo.text || '📷 Imagine'}</span>
+                        </div>
+                      )}
+                      <div className="chat-popup-message-text">
+                        {msg.image && (
+                          <div className="chat-popup-image-wrapper">
+                            <img
+                              src={msg.image}
+                              alt={msg.imageFile || 'image'}
+                              className="chat-popup-image"
+                              onLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                            />
+                          </div>
+                        )}
+                        {msg.text && <div>{msg.text}</div>}
+                      </div>
+                      {msg.createdAt && (
+                        <div className="chat-popup-message-time">
+                          {new Date(msg.createdAt).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      )}
                     </div>
-                  )}
+
+                    {/* Reaction pills */}
+                    {Object.keys(reactionCounts).length > 0 && (
+                      <div className="cp-reaction-pills">
+                        {Object.entries(reactionCounts).map(([emoji, count]) => (
+                          <button
+                            key={emoji}
+                            className={`cp-reaction-chip ${myReactions.includes(emoji) ? 'mine' : ''}`}
+                            onClick={() => handleReactToMessage(msg._id, emoji)}
+                          >
+                            {emoji}
+                            {count > 1 && <span className="cp-reaction-count">{count}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
           {isOtherUserTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
+        {selectedReply && (
+          <div className="cp-reply-composer">
+            <div className="cp-reply-composer-content">
+              <span className="cp-reply-composer-label">Răspunzi la:</span>
+              <span className="cp-reply-composer-text">{selectedReply.text || '📷 Imagine'}</span>
+            </div>
+            <button className="cp-reply-composer-cancel" onClick={() => setSelectedReply(null)}>✕</button>
+          </div>
+        )}
         <div className="chat-popup-input-row">
           {/* Hidden file input */}
           <input
