@@ -44,6 +44,7 @@ mdssc_health                                    # 1. GET /version
 mdssc_resolve_workflow                          # 2. GET /workflows/{id}
 SCAN_ID=$(mdssc_scan_direct "$ARCHIVE")         # 3. POST /scans/direct
 mdssc_poll_overview "$SCAN_ID"                  # 4. GET /scans/{id}/overview
+MDSSC_DIRECT_OVERVIEW="$MDSSC_OVERVIEW"        # salvează overview-ul direct înainte de indirect
 mdssc_scan_details "$SCAN_ID"                   # 5. GET /scans/{id}
 
 # 6. POST /scans — scan indirect al repo-ului conectat (opțional)
@@ -51,6 +52,9 @@ if [[ "${MDSSC_INDIRECT_SCAN:-false}" == "true" ]]; then
     INDIRECT_ID=$(mdssc_scan_indirect || true)
     [[ -n "${INDIRECT_ID:-}" ]] && mdssc_poll_overview "$INDIRECT_ID" || true
 fi
+
+# Restaurează overview-ul direct pentru verdict — scanul indirect e informativ
+MDSSC_OVERVIEW="$MDSSC_DIRECT_OVERVIEW"
 
 mdssc_export_reports "$SCAN_ID"                 # 7. GET /export/{spdx|cyclonedx|pdf|csv}
 

@@ -319,7 +319,8 @@ mdssc_evaluate() {
     [[ "${secrets:-false}" == "true" ]] && { echo "[MDSSC] FAIL: secrete/credențiale detectate"; failed=true; }
     [[ "${crit:-0}" -gt 0 ]]            && { echo "[MDSSC] WARNING: ${crit} vulnerabilitate(ăți) critică(e) — revizuire necesară"; }
     [[ "${MDSSC_FAIL_ON_HIGH:-false}" == "true" && "${high:-0}" -gt 0 ]] && { echo "[MDSSC] FAIL: ${high} vulnerabilitate(ăți) high"; failed=true; }
-    [[ "${blocked:-0}" -gt 0 ]]         && { echo "[MDSSC] FAIL: ${blocked} licență(e) blocată(e)"; failed=true; }
+    [[ "${MDSSC_FAIL_ON_BLOCKED_LICENSES:-true}" == "true" && "${blocked:-0}" -gt 0 ]] && { echo "[MDSSC] FAIL: ${blocked} licență(e) blocată(e)"; failed=true; }
+    [[ "${MDSSC_FAIL_ON_BLOCKED_LICENSES:-true}" != "true" && "${blocked:-0}" -gt 0 ]] && { echo "[MDSSC] WARNING: ${blocked} licență(e) blocată(e) — revizuire necesară"; }
 
     [[ "$failed" == "true" ]] && return 1
     echo "[MDSSC] ${label}: trecut."
