@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import apiClient from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import ResultCard from './ResultCard';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Content() {
   const carouselRef = useRef(null);
@@ -24,6 +25,9 @@ export default function Content() {
   const accent = isDarkMode ? '#f51866' : '#1A314E';
   const accentHover = isDarkMode ? '#d01456' : '#0f2237';
   const [scrollPage, setScrollPage] = useState(0);
+
+  const planeRef = useRef(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(() => window.matchMedia('(pointer: coarse)').matches);
 
   // Re-render when dark mode class changes on <body>
   useEffect(() => {
@@ -76,7 +80,90 @@ export default function Content() {
     return () => el.removeEventListener('scroll', onScroll);
   }, [popular]);
 
+  useEffect(() => {
+    document.body.style.overflowX = 'hidden';
+    return () => { document.body.style.overflowX = ''; };
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(pointer: coarse)');
+    const handler = (e) => setIsTouchDevice(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (isTouchDevice || !planeRef.current) return;
+
+    const PLANE_SIZE = 180;
+    const HALF = PLANE_SIZE / 2;
+    const BUFFER = 250;   // px beyond plane edge before it appears/disappears
+    const DURATION = 22000; // ms per full pass
+    const BASE_Y = 70;
+    const AMPLITUDE = 35;
+    const WAVE_COUNT = 2;
+
+    let raf;
+    let startTime = null;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+
+      const w = window.innerWidth;
+      const startX = -(HALF + BUFFER);          // center fully off-screen left
+      const endX   = w + HALF + BUFFER;          // center fully off-screen right
+      const totalDist = endX - startX;
+
+      const elapsed = (timestamp - startTime) % DURATION;
+      const t = elapsed / DURATION;
+
+      const cx = startX + totalDist * t;
+      const cy = BASE_Y + Math.sin(t * Math.PI * 2 * WAVE_COUNT) * AMPLITUDE;
+
+      // lookahead for rotation angle
+      const dt = 50 / DURATION;
+      const nt = t + dt;
+      const ncx = startX + totalDist * nt;
+      const ncy = BASE_Y + Math.sin(nt * Math.PI * 2 * WAVE_COUNT) * AMPLITUDE;
+      const angle = Math.atan2(ncy - cy, ncx - cx) * (180 / Math.PI);
+
+      if (planeRef.current) {
+        planeRef.current.style.transform =
+          `translate(${cx - HALF}px, ${cy - HALF}px) rotate(${angle}deg)`;
+      }
+
+      raf = requestAnimationFrame(animate);
+    };
+
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [isTouchDevice]);
+
   return (
+    <>
+    {!isTouchDevice && (
+      <div style={{ position: 'relative', width: '100%', height: '140px', overflow: 'visible', marginBottom: '-60px', zIndex: 10 }}>
+        <div
+          ref={planeRef}
+          style={{
+            position: 'absolute',
+            width: '180px',
+            height: '180px',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+            transformOrigin: 'center center',
+          }}
+        >
+          <DotLottieReact
+            src="https://lottie.host/02c2376a-b63f-4c01-8e92-71c0bc80c662/YBmzfBifVm.lottie"
+            loop
+            autoplay
+            style={{ width: '100%', height: '100%' }}
+          />
+        </div>
+      </div>
+    )}
     <section className="content">
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h2" className="choose-us-title">
@@ -239,5 +326,6 @@ export default function Content() {
         </button>
       </Box>
     </section>
+    </>
   );
 }
