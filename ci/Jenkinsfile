@@ -17,9 +17,9 @@ pipeline {
     environment {
         BACKEND_IMAGE  = 'hobbiz-backend'
         FRONTEND_IMAGE = 'hobbiz-frontend'
-        MDSSC_API_KEY  = credentials('mdssc-api-key')  // Secret Text credential in Jenkins
-        MDSSC_API_URL  = credentials('mdssc-api-url')  // Secret Text credential in Jenkins
-        // MDSSC_WORKFLOW_ID  = ''        // optional: pin to a specific MDSSC workflow
+        MDSSC_API_KEY     = credentials('mdssc-api-key')       // Secret Text credential in Jenkins
+        MDSSC_API_URL     = credentials('mdssc-api-url')       // Secret Text credential in Jenkins
+        MDSSC_WORKFLOW_ID = credentials('mdssc-workflow-id')   // Secret Text credential in Jenkins
         // MDSSC_FAIL_ON_HIGH = 'false'   // set 'true' to also fail on high-severity vulns
     }
 
@@ -35,10 +35,7 @@ pipeline {
         stage('Scan Source Code') {
             environment {
                 MDSSC_REPORTS_DIR    = 'mdssc-reports/source'
-                // Scan indirect: MDSSC trage codul din repo-ul GitLab conectat.
-                // TODO: înlocuiește placeholder-ul cu workflowId real (din URL-ul workflow-ului în UI MDSSC).
                 MDSSC_INDIRECT_SCAN  = 'true'
-                MDSSC_WORKFLOW_ID    = '6a17f6814d67d6560f96f57e'
                 MDSSC_REPO_REFERENCE = 'main'
             }
             steps {

@@ -686,15 +686,16 @@ body.dark-mode .main-stage > .top-bar,
 }
 
 .category-details-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 24px !important;
+  columns: 2 !important;
+  column-gap: 24px !important;
+  display: block !important;
   height: calc(100% - 60px) !important;
 }
 
 /* Columns & Chips */
 .detail-column {
-  min-width: 180px !important; margin-bottom: 20px !important; height: fit-content !important;
+  break-inside: avoid !important;
+  min-width: 180px !important; margin-bottom: 24px !important; height: fit-content !important;
   padding: 16px !important; border-radius: 8px !important;
   background: var(--ms-col-bg) !important;
   border: 1px solid var(--ms-col-border) !important;
