@@ -48,6 +48,7 @@ import ImageViewing from '../src/components/ImageViewer';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
 import { useLocale } from '../src/context/LocaleContext';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { ReportContentModal } from '../components/ui/ReportContentModal';
 import negotiationService from '../src/services/negotiationService';
 import { getConversationTranslations } from '../src/i18n/conversation';
 
@@ -183,6 +184,9 @@ export default function ConversationScreen() {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const [confirmCollabVisible, setConfirmCollabVisible] = useState(false);
   const [sendingCollab, setSendingCollab] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportTargetMessage, setReportTargetMessage] = useState<any>(null);
+  const [reportSubmitting, setReportSubmitting] = useState(false);
   
   // Negotiation states
   const [activeNegotiation, setActiveNegotiation] = useState<any>(null);
@@ -1448,13 +1452,47 @@ export default function ConversationScreen() {
   };
 
   const handleReportMessage = () => {
-    Alert.alert(t.reportMessage, t.reportConfirm, [
-      { text: t.cancel, style: 'cancel' },
-      { text: t.report, onPress: () => {
-        Alert.alert(t.reported, t.messageReported);
-        closeContextMenu();
-      }},
-    ]);
+    const messageToReport = selectedMessage;
+    if (!messageToReport) return;
+
+    if (messageToReport.senderId === userId) {
+      Alert.alert(t.reportMessage, t.reportOwnMessage);
+      closeContextMenu();
+      return;
+    }
+
+    closeContextMenu();
+    setReportTargetMessage(messageToReport);
+    setReportModalVisible(true);
+  };
+
+  const closeReportModal = () => {
+    if (reportSubmitting) return;
+    setReportModalVisible(false);
+    setReportTargetMessage(null);
+  };
+
+  const handleSubmitMessageReport = async (reason: string, details: string) => {
+    if (!reportTargetMessage) return;
+
+    setReportSubmitting(true);
+    try {
+      await api.post('/api/reports/messages', { messageId: reportTargetMessage._id, reason, details });
+      setReportModalVisible(false);
+      setReportTargetMessage(null);
+      Alert.alert(t.reported, t.messageReported);
+    } catch (err: any) {
+      if (err?.response?.status === 409) {
+        Alert.alert(t.reportMessage, t.reportAlready);
+      } else if (err?.response?.status === 400) {
+        Alert.alert(t.reportMessage, t.reportOwnMessage);
+      } else {
+        console.error('Report message error:', err);
+        Alert.alert(t.reportMessage, t.reportError);
+      }
+    } finally {
+      setReportSubmitting(false);
+    }
   };
 
   if (!selectedConversation) {
@@ -2312,6 +2350,26 @@ export default function ConversationScreen() {
           icon="people-outline"
           onConfirm={confirmSendCollaborationRequest}
           onCancel={() => setConfirmCollabVisible(false)}
+        />
+        <ReportContentModal
+          visible={reportModalVisible}
+          title={t.reportDialogTitle}
+          description={t.reportDialogDescription}
+          reasonLabel={t.reportReasonLabel}
+          reasons={[
+            { value: 'spam', label: t.reportReasonSpam },
+            { value: 'abusive', label: t.reportReasonAbusive },
+            { value: 'harassment', label: t.reportReasonHarassment },
+            { value: 'inappropriate', label: t.reportReasonInappropriate },
+            { value: 'other', label: t.reportReasonOther },
+          ]}
+          detailsLabel={t.reportDetailsLabel}
+          detailsPlaceholder={t.reportDetailsPlaceholder}
+          submitText={t.reportSubmit}
+          cancelText={t.reportCancel}
+          submitting={reportSubmitting}
+          onSubmit={handleSubmitMessageReport}
+          onCancel={closeReportModal}
         />
 
         {/* Counter Offer Modal */}

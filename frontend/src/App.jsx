@@ -39,6 +39,7 @@ import About from './pages/About';
 import HowItWorks from './pages/HowItWorks';
 import CookiePolicy from './pages/CookiePolicy';
 import TermsConditions from './pages/TermsConditions';
+import DataDeletion from './pages/DataDeletion';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import AccountMenuMobile from './pages/AccountMenuMobile.jsx';
 import InformatiiLegale from './pages/InformatiiLegale.jsx';
@@ -264,6 +265,14 @@ function App() {
           <>
             <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             <CookiePolicy />
+          </>
+        } />
+        <Route path="/stergere-date" element={
+          <>
+            <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Header />
+            <DataDeletion />
+            <Footer hideLegalUpTo1200 />
           </>
         } />
         <Route path="/termeni" element={

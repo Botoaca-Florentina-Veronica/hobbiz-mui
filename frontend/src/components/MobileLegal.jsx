@@ -71,6 +71,7 @@ export default function MobileLegal() {
           <li><a href="/termeni" onClick={(e)=>go(e,'/termeni')}>{t('legal.terms')}</a></li>
           <li><a href="/confidentialitate" onClick={(e)=>go(e,'/confidentialitate')}>{t('legal.privacyPolicy')}</a></li>
           <li><a href="/cookie" onClick={(e)=>go(e,'/cookie')}>{t('legal.cookiePolicy')}</a></li>
+          <li><a href="/stergere-date" onClick={(e)=>go(e,'/stergere-date')}>{t('legal.dataDeletion')}</a></li>
         </ul>
       </section>
 

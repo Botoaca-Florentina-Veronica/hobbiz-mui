@@ -163,6 +163,35 @@ const DataDeletion = () => {
           </section>
         </div>
 
+        {/* Partial data deletion without deleting the account */}
+        <div className="data-deletion__content" id="stergere-partiala-date">
+          <section>
+            <h2>{t('dataDeletion.partialDeletion.title')}</h2>
+            <p>{t('dataDeletion.partialDeletion.intro')}</p>
+            <ul>
+              {t('dataDeletion.partialDeletion.steps', { returnObjects: true }).map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
+            </ul>
+
+            <h3>{t('dataDeletion.partialDeletion.deletedTitle')}</h3>
+            <ul>
+              {t('dataDeletion.partialDeletion.deletedList', { returnObjects: true }).map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+
+            <h3>{t('dataDeletion.partialDeletion.keptTitle')}</h3>
+            <ul>
+              {t('dataDeletion.partialDeletion.keptList', { returnObjects: true }).map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+
+            <p className="note">{t('dataDeletion.partialDeletion.note')}</p>
+          </section>
+        </div>
+
         {/* Need help */}
         <div className="data-deletion__content">
           <section>

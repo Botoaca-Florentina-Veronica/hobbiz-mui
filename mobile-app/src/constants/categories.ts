@@ -85,4 +85,28 @@ export function getCategoryKeyByLabel(label?: string): string | undefined {
   return category?.key;
 }
 
+// Canonical category names as stored on announcements (announcement.category).
+// These match the values used by the web app (frontend/src/components/Categories.jsx)
+// and by the Explore category grid — note some differ from CATEGORY_DEFS labels
+// in diacritics (e.g. 'Prajituri' vs the display label 'Prăjituri').
+export const CATEGORY_DB_NAME_BY_KEY: Record<string, string> = {
+  fotografie: 'Fotografie',
+  prajituri: 'Prajituri',
+  muzica: 'Muzica',
+  reparatii: 'Reparații',
+  dans: 'Dans',
+  curatenie: 'Curățenie',
+  gradinarit: 'Gradinarit',
+  sport: 'Sport',
+  arta: 'Arta',
+  tehnologie: 'Tehnologie',
+  auto: 'Auto',
+  meditatii: 'Meditații',
+};
+
+export function getCategoryDbName(key?: string): string | undefined {
+  if (!key) return undefined;
+  return CATEGORY_DB_NAME_BY_KEY[key.toLowerCase()];
+}
+
 export default CATEGORY_DEFS;

@@ -20,6 +20,7 @@ import { ThemedTextInput } from '../components/themed-text-input';
 import { useAppTheme } from '../src/context/ThemeContext';
 import api from '../src/services/api';
 import { useFocusEffect } from '@react-navigation/native';
+import { getCategoryTagSet } from '../src/constants/categoryTags';
 
 export default function CategoryAnnouncementsScreen() {
   const { tokens } = useAppTheme();
@@ -62,8 +63,18 @@ export default function CategoryAnnouncementsScreen() {
   const fetchAnnouncements = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/api/announcements?category=${encodeURIComponent(category)}`);
-      setAnnouncements(res.data || []);
+      // Show announcements that are either filed under this category, or carry
+      // tags that belong to this category (matches the web behavior where a
+      // category groups announcements by category-or-related-tags).
+      const res = await api.get('/api/announcements');
+      const all = Array.isArray(res.data) ? res.data : [];
+      const normalizedCategory = category.trim().toLowerCase();
+      const tagSet = getCategoryTagSet(category);
+      const filtered = all.filter((a: any) => {
+        if ((a.category || '').trim().toLowerCase() === normalizedCategory) return true;
+        return Array.isArray(a.tags) && a.tags.some((tag: string) => tagSet.has(tag));
+      });
+      setAnnouncements(filtered);
     } catch (e) {
       console.error('Error fetching category announcements:', e);
       setAnnouncements([]);

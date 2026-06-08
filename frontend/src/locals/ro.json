@@ -451,6 +451,7 @@
     "terms": "Termeni și condiții",
     "privacyPolicy": "Politică de Confidențialitate",
     "cookiePolicy": "Cookie Policy",
+    "dataDeletion": "Ștergerea datelor",
     "followUs": "Urmărește-ne"
   }
   ,
@@ -763,7 +764,7 @@
       "title": "3. Utilizarea platformei și anunțurile",
       "h1": "Publicarea anunțurilor",
       "p1": "Utilizatorii pot publica anunțuri pentru vânzarea de produse noi sau second-hand, prestarea de servicii, închirierea de bunuri sau alte tranzacții comerciale legale. Fiecare anunț trebuie să conțină o descriere fidelă și completă a produsului sau serviciului, fotografii reale și nemodificate și un preț corect și transparent.",
-      "p2": "Este strict interzisă publicarea de anunțuri pentru: produse contrafăcute sau piratate, substanțe interzise de lege, arme și muniții, animale protejate sau obținute ilegal, servicii ilegale sau imorale, conținut pentru adulți sau materiale care încalcă drepturile de autor. Monitorizăm activ conținutul prin algoritmi automați și moderare umană.",
+      "p2": "Este strict interzisă publicarea de anunțuri sau a oricărui alt conținut (inclusiv în mesaje, imagini, recenzii sau profil) care include: produse contrafăcute sau piratate, substanțe interzise de lege, arme și muniții, animale protejate sau obținute ilegal, servicii ilegale sau imorale, nuditate ori conținut cu caracter sexual explicit, reprezentări de violență explicită din lumea reală (în afara unui context jurnalistic sau educațional), discurs instigator la ură sau materiale care încalcă drepturile de autor. Monitorizăm activ conținutul prin algoritmi automați și moderare umană.",
       "h2": "Responsabilitățile utilizatorilor și moderarea conținutului",
       "p3": "Utilizatorii sunt pe deplin responsabili pentru conținutul postat. Hobbiz nu tolerează conținutul inacceptabil sau utilizatorii abuzivi. Utilizatorii pot raporta conținutul inacceptabil sau comportamentul abuziv direct prin intermediul funcției de raportare din aplicație sau contactând suportul. Echipa noastră va analiza rapoartele și va lua măsuri ferme (inclusiv ștergerea conținutului și suspendarea/blocarea utilizatorului) în termen de maxim 24 de ore de la primirea raportului.",
       "p4": "Comunicarea între utilizatori trebuie să se desfășoare într-o manieră respectuoasă. Hărțuirea, amenințările, limbajul vulgar sau discriminatoriu, spam-ul și tentativele de fraudă sunt strict interzise și vor duce la suspendarea imediată a contului."
@@ -832,6 +833,130 @@
       "p4": "Investigăm toate reclamațiile într-un mod imparțial."
     },
     "footer": "Documentul a fost actualizat la data de 13 Decembrie 2025 și intră în vigoare imediat. Pentru versiunile anterioare, contactați-ne la team.hobbiz@gmail.com."
+  },
+  "dataDeletion": {
+    "title": "Ștergerea datelor",
+    "subtitle": "Dreptul tău de a șterge datele",
+    "intro": {
+      "title": "Control complet asupra datelor tale",
+      "text": "La Hobbiz, respectăm dreptul tău la confidențialitate și ștergerea datelor conform GDPR. Ai control complet asupra datelor tale personale și poți solicita ștergerea oricând. Această pagină explică cum să ștergi toate datele asociate contului tău, inclusiv datele primite prin Facebook Login sau alte servicii de autentificare terțe."
+    },
+    "s1": {
+      "title": "1. Ce date vor fi șterse?",
+      "intro": "Când soliciți ștergerea contului, următoarele date vor fi eliminate permanent din sistemele noastre:",
+      "list": [
+        "Informații cont (nume, email, telefon, poză profil, imagine copertă)",
+        "Toate anunțurile create de tine (titluri, descrieri, imagini, detalii contact)",
+        "Anunțuri favorite/salvate",
+        "Credențiale login și token-uri autentificare (inclusiv date login Facebook/Google)",
+        "Date utilizare aplicație și preferințe"
+      ],
+      "note": "Notă: Unele date analitice anonime pot fi păstrate pentru îmbunătățirea platformei, dar aceste date nu pot fi legate de identitatea ta."
+    },
+    "s2": {
+      "title": "2. Cum să îți ștergi datele",
+      "intro": "Ai trei opțiuni pentru a-ți șterge contul Hobbiz și toate datele asociate:",
+      "optionA": {
+        "title": "Ștergere din Setări Aplicație (Recomandat)",
+        "steps": [
+          "Deschide aplicația Hobbiz și autentifică-te în cont",
+          "Mergi la Setări > Cont > Șterge Cont",
+          "Citește avertismentul și confirmă ștergerea",
+          "Introdu parola pentru confirmarea finală",
+          "Contul și datele tale sunt șterse imediat și definitiv — acțiunea nu poate fi anulată"
+        ]
+      },
+      "optionB": {
+        "title": "Ștergere prin Cerere Email",
+        "intro": "Trimite un email la team.hobbiz@gmail.com cu subiectul „Cerere Ștergere Date” și include:",
+        "steps": [
+          "Numele complet așa cum este înregistrat pe Hobbiz",
+          "Adresa de email asociată contului tău",
+          "Declarație confirmând că dorești ștergerea tuturor datelor"
+        ],
+        "note": "Vom verifica identitatea ta și vom procesa cererea în cel mult 30 de zile de la primire, conform termenelor legale privind protecția datelor (GDPR). Vei primi un răspuns prin email odată ce cererea este finalizată."
+      },
+      "optionC": {
+        "title": "Revocă Accesul Facebook",
+        "intro": "Dacă te-ai înregistrat folosind Facebook Login, poți revoca și accesul Hobbiz la datele tale Facebook:",
+        "steps": [
+          "Mergi la Setări Facebook > Aplicații și Site-uri Web",
+          "Găsește „Hobbiz” în lista aplicațiilor active",
+          "Click pe „Elimină” pentru a revoca toate permisiunile",
+          "Opțional, solicită ștergerea activității tale din aplicația Hobbiz pe Facebook"
+        ],
+        "note": "Notă: Revocarea accesului Facebook va deconecta doar aplicația de Facebook. Pentru a șterge complet datele contului Hobbiz, trebuie să folosești și Opțiunea A sau B de mai sus."
+      }
+    },
+    "s3": {
+      "title": "3. Ce se întâmplă când soliciți ștergerea",
+      "intro": "Modul în care procesăm cererea ta de ștergere depinde de opțiunea pe care o alegi:",
+      "day0": {
+        "title": "Ștergere din aplicație (Opțiunea A)",
+        "text": "Contul tău, anunțurile, datele de profil, preferințele și acreditările de autentificare sunt șterse imediat și definitiv din sistemele noastre active, chiar în momentul confirmării. Nu există nicio perioadă de grație."
+      },
+      "day7": {
+        "title": "Cerere prin email (Opțiunea B)",
+        "text": "Verificăm identitatea ta și procesăm cererea în cel mult 30 de zile de la primire, conform termenelor impuse de legislația privind protecția datelor (GDPR). Vei primi un răspuns prin email odată ce cererea este finalizată."
+      },
+      "day30": {
+        "title": "Date analitice și obligații legale",
+        "text": "Datele agregate și anonimizate, care nu te mai pot identifica, pot fi păstrate pentru îmbunătățirea platformei. De asemenea, putem reține anumite informații atât timp cât este necesar pentru a respecta obligații legale, precum prevenirea fraudei."
+      },
+      "recovery": "Important: ștergerea contului realizată din aplicație este imediată și ireversibilă. Îți recomandăm să descarci sau să salvezi orice informație de care ai nevoie înainte de a confirma ștergerea."
+    },
+    "s4": {
+      "title": "4. Considerații importante",
+      "retained": {
+        "title": "Date care pot fi păstrate",
+        "intro": "În anumite circumstanțe limitate, unele date pot fi păstrate chiar și după ștergere:",
+        "list": [
+          "Obligații legale: Putem păstra anumite înregistrări dacă este necesar prin lege sau pentru scopuri legale legitime (ex. prevenirea fraudei, conformitate reglementară)",
+          "Analize anonime: Date agregate, anonimizate de utilizare care nu pot fi legate de tine personal",
+          "Mesaje și recenzii: Conversațiile și recenziile schimbate cu alți utilizatori pot rămâne pe platformă, pentru a păstra integritatea istoricului acestora — eliminarea lor ar afecta și datele celorlalți utilizatori implicați",
+          "Copii terțe: Conținutul partajat public poate fi fost copiat de alți utilizatori înainte de ștergere. Nu putem controla sau șterge astfel de copii."
+        ]
+      },
+      "permanent": {
+        "title": "Această acțiune este permanentă",
+        "intro": "Ștergerea contului realizată din aplicație este imediată și ireversibilă, din momentul confirmării. Odată ce datele tale sunt șterse permanent:",
+        "list": [
+          "Nu poți recupera contul, anunțurile, mesajele sau recenziile",
+          "Dacă vrei să folosești Hobbiz din nou, trebuie să creezi un cont nou de la zero",
+          "Numele de utilizator și email-ul tău pot deveni disponibile pentru alții să se înregistreze"
+        ]
+      }
+    },
+    "partialDeletion": {
+      "title": "5. Ștergerea parțială a datelor (fără ștergerea contului)",
+      "intro": "Dacă vrei să îți păstrezi contul activ, dar să elimini conținutul și activitatea ta de pe platformă, poți folosi funcția „Resetează datele contului” direct din aplicație sau de pe site:",
+      "steps": [
+        "Autentifică-te în contul tău Hobbiz",
+        "Mergi la Setări > Cont > Resetează datele contului",
+        "Citește avertismentul și confirmă acțiunea"
+      ],
+      "deletedTitle": "Ce se șterge:",
+      "deletedList": [
+        "Toate anunțurile tale",
+        "Mesajele și conversațiile cu alți utilizatori",
+        "Negocierile la care ai participat",
+        "Notificările tale",
+        "Recenziile scrise de tine și recenziile scrise despre tine",
+        "Rapoartele și sesizările trimise sau primite"
+      ],
+      "keptTitle": "Ce rămâne neschimbat:",
+      "keptList": [
+        "Contul tău rămâne activ și poți continua să îl folosești normal",
+        "Datele de profil și acreditările de autentificare (nume, email, telefon, parolă, date de conectare Facebook/Google)"
+      ],
+      "note": "Notă: Această acțiune este permanentă și ireversibilă — datele eliminate nu pot fi recuperate."
+    },
+    "s5": {
+      "title": "6. Ai nevoie de ajutor?",
+      "p1": "Dacă ai întrebări despre ștergerea datelor sau întâmpini probleme, te rugăm să contactezi echipa noastră de suport la",
+      "response": "De obicei răspundem în 48 de ore.",
+      "p2": "Pentru mai multe informații despre cum gestionăm datele tale, te rugăm să consulți Politica de Confidențialitate și Termenii și Condițiile."
+    }
   },
   "privacy": {
     "title": "Politica de confidențialitate",

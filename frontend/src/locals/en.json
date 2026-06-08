@@ -450,6 +450,7 @@
     "terms": "Terms & Conditions",
     "privacyPolicy": "Privacy Policy",
     "cookiePolicy": "Cookie Policy",
+    "dataDeletion": "Data Deletion",
     "followUs": "Follow us"
   }
   ,
@@ -762,7 +763,7 @@
       "title": "3. Platform use and listings",
       "h1": "Posting listings",
       "p1": "Users can post listings for the sale of new or second-hand products, provision of services, rental of goods or other legal commercial transactions. Each listing must contain an accurate and complete description of the product or service, real and unmodified photos and a correct and transparent price.",
-      "p2": "Posting listings for the following is strictly prohibited: counterfeit or pirated products, substances prohibited by law, weapons and ammunition, protected or illegally obtained animals, illegal or immoral services, adult content or materials that violate copyright. We actively monitor content through automated algorithms and human moderation.",
+      "p2": "Posting listings or any other content (including in messages, images, reviews, or profiles) that includes the following is strictly prohibited: counterfeit or pirated products, substances prohibited by law, weapons and ammunition, protected or illegally obtained animals, illegal or immoral services, nudity or sexually explicit content, depictions of explicit real-world violence (outside of a journalistic or educational context), hate speech, or materials that violate copyright. We actively monitor content through automated algorithms and human moderation.",
       "h2": "User responsibilities and content moderation",
       "p3": "Users are fully responsible for the content posted. Hobbiz has zero tolerance for objectionable content or abusive users. Users can report objectionable content or abusive behavior directly through the in-app reporting feature or by contacting support. Our team will review reports and take firm action (including removing content and suspending/blocking the user) within a maximum of 24 hours of receiving the report.",
       "p4": "Communication between users must be conducted in a respectful manner. Harassment, threats, vulgar or discriminatory language, spam and fraud attempts are strictly prohibited and will result in immediate account suspension."
@@ -831,6 +832,130 @@
       "p4": "We investigate all complaints in an impartial and transparent manner, respecting the rights of all parties involved. Investigation results are communicated in writing, and for complex cases, we provide detailed explanations of the measures taken."
     },
     "footer": "This document was last updated on December 13, 2025 and takes effect immediately for all Hobbiz platform users. For previous versions of these terms, please contact us at team.hobbiz@gmail.com."
+  },
+  "dataDeletion": {
+    "title": "Data Deletion",
+    "subtitle": "Your right to data deletion",
+    "intro": {
+      "title": "Complete Control Over Your Data",
+      "text": "At Hobbiz, we respect your right to privacy and data deletion under GDPR. You have full control over your personal data and can request deletion at any time. This page explains how to delete all data associated with your account, including data received through Facebook Login or other third-party authentication services."
+    },
+    "s1": {
+      "title": "1. What data will be deleted?",
+      "intro": "When you request account deletion, the following data will be permanently removed from our systems:",
+      "list": [
+        "Account information (name, email, phone, profile picture, cover image)",
+        "All announcements you created (titles, descriptions, images, contact details)",
+        "Favorite/saved announcements",
+        "Login credentials and authentication tokens (including Facebook/Google login data)",
+        "App usage data and preferences"
+      ],
+      "note": "Note: Some anonymous analytics data may be retained for platform improvement, but this data cannot be linked back to your identity."
+    },
+    "s2": {
+      "title": "2. How to delete your data",
+      "intro": "You have three options to delete your Hobbiz account and all associated data:",
+      "optionA": {
+        "title": "Delete from App Settings (Recommended)",
+        "steps": [
+          "Open the Hobbiz app and log into your account",
+          "Go to Settings > Account > Delete Account",
+          "Read the warning and confirm deletion",
+          "Enter your password for final confirmation",
+          "Your account and data are deleted immediately and permanently — this action cannot be undone"
+        ]
+      },
+      "optionB": {
+        "title": "Delete via Email Request",
+        "intro": "Send an email to team.hobbiz@gmail.com with the subject line \"Data Deletion Request\" and include:",
+        "steps": [
+          "Your full name as registered on Hobbiz",
+          "Your email address associated with your account",
+          "Statement confirming you want to delete all your data"
+        ],
+        "note": "We will verify your identity and process your request within 30 days of receiving it, in line with data protection law (GDPR) deadlines. You will receive a reply by email once your request has been completed."
+      },
+      "optionC": {
+        "title": "Revoke Facebook Access",
+        "intro": "If you signed up using Facebook Login, you can also revoke Hobbiz's access to your Facebook data:",
+        "steps": [
+          "Go to Facebook Settings > Apps and Websites",
+          "Find \"Hobbiz\" in the list of active apps",
+          "Click \"Remove\" to revoke all permissions",
+          "Optionally, request deletion of your Hobbiz app activity on Facebook"
+        ],
+        "note": "Note: Revoking Facebook access will only disconnect the app from Facebook. To completely delete your Hobbiz account data, you must also use Option A or B above."
+      }
+    },
+    "s3": {
+      "title": "3. What happens when you request deletion",
+      "intro": "How we handle your deletion request depends on the option you choose:",
+      "day0": {
+        "title": "Deletion from the app (Option A)",
+        "text": "Your account, announcements, profile data, preferences and authentication credentials are deleted immediately and permanently from our active systems, right at the moment of confirmation. There is no grace period."
+      },
+      "day7": {
+        "title": "Email request (Option B)",
+        "text": "We verify your identity and process your request within 30 days of receiving it, in line with the deadlines set by data protection law (GDPR). You will receive a reply by email once your request has been completed."
+      },
+      "day30": {
+        "title": "Analytics data and legal obligations",
+        "text": "Aggregated, anonymized data that can no longer identify you may be retained to improve the platform. We may also retain certain information for as long as needed to comply with legal obligations, such as fraud prevention."
+      },
+      "recovery": "Important: account deletion performed from the app is immediate and irreversible. We recommend downloading or saving any information you need before confirming the deletion."
+    },
+    "s4": {
+      "title": "4. Important considerations",
+      "retained": {
+        "title": "Data that may be retained",
+        "intro": "In certain limited circumstances, some data may be retained even after deletion:",
+        "list": [
+          "Legal obligations: We may retain certain records if required by law or for legitimate legal purposes (e.g., fraud prevention, regulatory compliance)",
+          "Anonymous analytics: Aggregated, anonymized usage data that cannot be linked to you personally",
+          "Messages and reviews: Conversations and reviews exchanged with other users may remain on the platform to preserve the integrity of their history — removing them would also affect data belonging to those other users",
+          "Third-party copies: Content you shared publicly may have been copied by other users before deletion. We cannot control or delete such copies."
+        ]
+      },
+      "permanent": {
+        "title": "This action is permanent",
+        "intro": "Account deletion performed from the app is immediate and irreversible from the moment of confirmation. Once your data is permanently deleted:",
+        "list": [
+          "You cannot recover your account, announcements, messages, or reviews",
+          "If you want to use Hobbiz again, you must create a new account from scratch",
+          "Your username and email may become available for others to register"
+        ]
+      }
+    },
+    "partialDeletion": {
+      "title": "5. Partial data deletion (without deleting your account)",
+      "intro": "If you'd like to keep your account active but remove your content and activity from the platform, you can use the \"Reset Account Data\" feature directly in the app or on the website:",
+      "steps": [
+        "Log into your Hobbiz account",
+        "Go to Settings > Account > Reset Account Data",
+        "Read the warning and confirm the action"
+      ],
+      "deletedTitle": "What gets deleted:",
+      "deletedList": [
+        "All your announcements",
+        "Your messages and conversations with other users",
+        "Negotiations you took part in",
+        "Your notifications",
+        "Reviews you wrote and reviews others wrote about you",
+        "Reports and contact requests you sent or received"
+      ],
+      "keptTitle": "What stays unchanged:",
+      "keptList": [
+        "Your account remains active and you can keep using it normally",
+        "Your profile data and authentication credentials (name, email, phone, password, Facebook/Google login data)"
+      ],
+      "note": "Note: This action is permanent and irreversible — deleted data cannot be recovered."
+    },
+    "s5": {
+      "title": "6. Need help?",
+      "p1": "If you have questions about data deletion or encounter any issues, please contact our support team at",
+      "response": "We typically respond within 48 hours.",
+      "p2": "For more information about how we handle your data, please review our Privacy Policy and Terms and Conditions."
+    }
   },
   "privacy": {
     "title": "Privacy Policy",

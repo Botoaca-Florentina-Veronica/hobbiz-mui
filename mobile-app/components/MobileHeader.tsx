@@ -43,7 +43,7 @@ interface MobileHeaderProps {
   onSearchChange?: (query: string) => void;
   onNotificationClick?: () => void;
   onSuggestionClick?: (id: string) => void;
-  onCategoryClick?: (categoryLabel: string) => void;
+  onCategoryClick?: (categoryKey: string) => void;
   searchValue?: string;
   searchSuggestions?: SearchSuggestion[];
   showSuggestions?: boolean;
@@ -171,10 +171,10 @@ export default function MobileHeader({
     setRecents([]);
   }, []);
 
-  const handleCategoryPress = useCallback((label: string) => {
+  const handleCategoryPress = useCallback((key: string) => {
     Keyboard.dismiss();
     setModalVisible(false);
-    if (onCategoryClick) onCategoryClick(label);
+    if (onCategoryClick) onCategoryClick(key);
   }, [onCategoryClick]);
 
   const handleSuggestionPress = useCallback(async (id: string) => {
@@ -405,7 +405,7 @@ export default function MobileHeader({
                     {popularCategories.map((cat) => (
                       <TouchableOpacity
                         key={cat.key}
-                        onPress={() => handleCategoryPress(cat.label)}
+                        onPress={() => handleCategoryPress(cat.key)}
                         activeOpacity={0.7}
                         style={styles.categoryItem}
                       >

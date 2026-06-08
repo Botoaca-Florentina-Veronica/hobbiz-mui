@@ -4,7 +4,7 @@
 
 ## Pre-submission Checklist (Critical)
 Before submitting, please verify:
-1.  **Unused Packages**: The project contains `expo-location` in `package.json` but does not appear to use it in the code. **Action**: Run `npm uninstall expo-location` in the `mobile-app` folder. If you keep it, Google may detect the `ACCESS_FINE_LOCATION` permission and require you to declare that you collect location data (even if you don't use it).
+1.  ~~**Unused Packages**: The project contains `expo-location` in `package.json` but does not appear to use it in the code. **Action**: Run `npm uninstall expo-location` in the `mobile-app` folder.~~ **Done** — `expo-location` has been removed from `package.json`, so Google will no longer detect the `ACCESS_FINE_LOCATION` permission.
 2.  **Privacy Policy URL**: You must host a Privacy Policy on a public URL (e.g., on your website or a generated page). This document can serve as the basis for that policy.
 3.  **Account Deletion**: The app **does** have an in-app deletion feature (Settings -> Delete Account). Make sure to answer "Yes" to "Do you provide a way for users to delete their account within the app?".
 
@@ -50,7 +50,7 @@ For each data type we indicate: **Collected?** (Yes/No) — **Is it linked to yo
 
 ### Location
 - **Approximate location**: **Yes** — Linked: **No** (or Yes if linked to ID) — Purpose: Analytics (IP-based) and security.
-- **Precise Location (GPS)**: **No** — The app does not currently request or use precise GPS coordinates. Location is manually selected by the user. *(Note: Ensure `expo-location` is uninstalled if not used)*.
+- **Precise Location (GPS)**: **No** — The app does not request or use precise GPS coordinates. Location is manually selected by the user. (`expo-location` has been removed from the project — the `ACCESS_FINE_LOCATION` permission will not be present in the build.)
 
 ### Financial info
 - **No** — The platform is free; no payment processors are used.

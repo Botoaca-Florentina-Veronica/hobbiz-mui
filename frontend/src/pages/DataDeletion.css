@@ -1,237 +1,383 @@
-/* DataDeletion.css - Similar to PrivacyPolicy.css */
+/* =============================================================
+   DATA DELETION PAGE STYLES
+   Modern, elegant design — aligned with the Hobbiz brand and
+   the Privacy Policy / Terms pages (CSS variables + dark mode)
+   ============================================================= */
 
+/* 1. VARIABLES
+   ---------------------------------------------------------- */
+:root {
+  --dd-radius-lg: 24px;
+  --dd-radius-md: 20px;
+  --dd-radius-sm: 16px;
+  --dd-spacing-top-desktop: 4rem;
+
+  --dd-bg-page: var(--bg-secondary);
+
+  /* Hero header */
+  --dd-bg-header: #2D4361;
+  --dd-bg-header-overlay: radial-gradient(circle, rgba(211, 47, 47, 0.18) 0%, transparent 70%);
+  --dd-text-header: #ffffff;
+
+  /* Intro / highlight box */
+  --dd-bg-intro: linear-gradient(135deg, #ffe3dc 0%, #ffd0c4 100%);
+  --dd-border-intro: transparent;
+  --dd-text-intro-main: #7a2e1f;
+  --dd-text-intro-strong: #7a2e1f;
+  --dd-icon-intro: #d32f2f;
+
+  /* Content cards */
+  --dd-bg-content: #ffffff;
+  --dd-border-content: transparent;
+  --dd-gradient-top: linear-gradient(90deg, #2D4361, #d32f2f);
+
+  /* Typography */
+  --dd-text-heading: #2D4361;
+  --dd-text-subheading: #2d3748;
+  --dd-text-body: #4a5568;
+  --dd-text-strong: #2D4361;
+  --dd-text-link: #2D4361;
+  --dd-text-link-hover: #d32f2f;
+  --dd-list-bullet: #d32f2f;
+
+  /* Step cards & timeline */
+  --dd-step-bg: var(--bg-secondary);
+  --dd-step-border: var(--border-color);
+  --dd-badge-bg: #2D4361;
+  --dd-badge-text: #ffffff;
+  --dd-timeline-marker: #d32f2f;
+  --dd-timeline-line: rgba(211, 47, 47, 0.3);
+
+  /* Notes */
+  --dd-note-bg: rgba(45, 67, 97, 0.06);
+  --dd-note-border: rgba(45, 67, 97, 0.12);
+  --dd-note-text: var(--text-secondary);
+
+  /* Mobile header button */
+  --dd-mobile-btn-bg: #ffffff;
+  --dd-mobile-btn-text: #2D4361;
+
+  /* Shadows */
+  --dd-shadow-header: 0 12px 48px rgba(45, 67, 97, 0.25);
+  --dd-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.08);
+  --dd-shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.dark-mode {
+  --dd-bg-page: #121212;
+
+  --dd-bg-header: #282828;
+  --dd-bg-header-overlay: radial-gradient(circle, rgba(244, 67, 54, 0.22) 0%, transparent 70%);
+
+  --dd-bg-intro: linear-gradient(135deg, rgba(244, 67, 54, 0.16) 0%, rgba(244, 67, 54, 0.05) 100%);
+  --dd-border-intro: 1px solid rgba(244, 67, 54, 0.28);
+  --dd-text-intro-main: #ffffff;
+  --dd-text-intro-strong: #ffffff;
+  --dd-icon-intro: #f44336;
+
+  --dd-bg-content: linear-gradient(135deg, #282828 0%, #3f3f3f 100%);
+  --dd-border-content: 1px solid rgba(245, 24, 102, 0.25);
+  --dd-gradient-top: linear-gradient(90deg, #f51866, #f44336);
+
+  --dd-text-heading: #ffffff;
+  --dd-text-subheading: #e0e0e0;
+  --dd-text-body: #d6d6d6;
+  --dd-text-strong: #f51866;
+  --dd-text-link: #ffffff;
+  --dd-text-link-hover: #f44336;
+  --dd-list-bullet: #f44336;
+
+  --dd-step-bg: rgba(255, 255, 255, 0.04);
+  --dd-step-border: rgba(255, 255, 255, 0.1);
+  --dd-badge-bg: #f51866;
+  --dd-badge-text: #ffffff;
+  --dd-timeline-marker: #f44336;
+  --dd-timeline-line: rgba(244, 67, 54, 0.35);
+
+  --dd-note-bg: rgba(255, 255, 255, 0.05);
+  --dd-note-border: rgba(255, 255, 255, 0.08);
+  --dd-note-text: #d6d6d6;
+
+  --dd-mobile-btn-bg: #1e1e1e;
+  --dd-mobile-btn-text: #f8b595;
+
+  --dd-shadow-header: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --dd-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.35);
+  --dd-shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. LAYOUT
+   ---------------------------------------------------------- */
 .data-deletion {
+  background: var(--dd-bg-page);
   min-height: 100vh;
-  background: var(--bg-secondary);
-  padding: 2rem 1rem;
+  padding: 40px 0;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
+  transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.data-deletion * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .data-deletion__container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
-  /* Use elevated surface background (white in light mode) to keep legal pages white */
-  background: var(--bg-elevated);
-  border-radius: 16px;
-  padding: 3rem 2.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 0 20px;
+  margin-top: var(--dd-spacing-top-desktop);
 }
 
-.mobile-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.mobile-back-btn {
-  color: var(--text-primary) !important;
-}
-
-.mobile-header-title {
-  color: var(--text-primary) !important;
-  font-weight: 600 !important;
-}
-
+/* 3. HERO HEADER
+   ---------------------------------------------------------- */
 .data-deletion__header {
   text-align: center;
-  margin-bottom: 3rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #100e9aff 0%, #6366f1 100%);
-  border-radius: 20px;
-  color: white;
+  background: var(--dd-bg-header);
+  color: var(--dd-text-header);
+  padding: 60px 40px;
+  border-radius: var(--dd-radius-lg);
+  margin-bottom: 40px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--dd-shadow-header);
 }
 
 .data-deletion__header::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 300px;
-  height: 300px;
-  background: rgba(252, 194, 46, 0.15);
-  border-radius: 50%;
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: var(--dd-bg-header-overlay);
+  transform: rotate(30deg);
+  pointer-events: none;
 }
 
 .data-deletion__icon {
   font-size: 4rem;
+  margin-bottom: 20px;
   display: block;
-  margin-bottom: 1rem;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .data-deletion__header h1 {
-  font-size: 2.2rem;
+  font-size: 3rem;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 16px 0;
+  letter-spacing: -1px;
+  line-height: 1.1;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  color: inherit;
 }
 
 .data-deletion__date {
-  font-size: 1rem;
-  opacity: 0.95;
+  font-size: 1.1rem;
+  opacity: 0.9;
   margin: 0;
+  font-weight: 500;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  color: inherit !important;
 }
 
+/* 4. INTRO / HIGHLIGHT BOX
+   ---------------------------------------------------------- */
 .data-deletion__intro {
-  background: linear-gradient(135deg, #fcc22eff 0%, #ffd97d 100%);
-  padding: 2rem;
-  border-radius: 16px;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 4px 16px rgba(252, 194, 46, 0.15);
+  background: var(--dd-bg-intro);
+  border: var(--dd-border-intro);
+  border-radius: var(--dd-radius-md);
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: var(--dd-shadow-card);
+  position: relative;
+  overflow: hidden;
 }
 
 .data-deletion__intro-content {
   display: flex;
-  gap: 1.5rem;
   align-items: flex-start;
+  gap: 20px;
 }
 
 .data-deletion__intro-icon {
   font-size: 2rem;
   flex-shrink: 0;
+  margin-top: 4px;
+  color: var(--dd-icon-intro);
 }
 
 .data-deletion__intro-content strong {
   display: block;
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #2c5f7a;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--dd-text-intro-strong);
 }
 
 .data-deletion__intro-content p {
-  color: #2c5f7a;
-  line-height: 1.6;
   margin: 0;
+  line-height: 1.6;
+  font-size: 1.05rem;
+  color: var(--dd-text-intro-main);
 }
 
+/* 5. CONTENT CARDS
+   ---------------------------------------------------------- */
 .data-deletion__content {
-  margin-bottom: 2.5rem;
+  margin-bottom: 30px;
 }
 
 .data-deletion__content section {
-  background: var(--surface);
-  padding: 2rem;
-  border-radius: 16px;
-  border-left: 4px solid var(--accent-primary);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  background: var(--dd-bg-content);
+  border: var(--dd-border-content);
+  border-radius: var(--dd-radius-md);
+  padding: 40px;
+  box-shadow: var(--dd-shadow-card);
+  position: relative;
+  overflow: hidden;
 }
 
+.data-deletion__content section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: var(--dd-gradient-top);
+}
+
+/* Typography */
 .data-deletion__content h2 {
-  font-size: 1.6rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 1.5rem 0;
-  color: var(--text-primary);
+  margin: 0 0 24px 0;
+  color: var(--dd-text-heading);
 }
 
 .data-deletion__content h3 {
   font-size: 1.3rem;
   font-weight: 600;
-  margin: 1.5rem 0 1rem 0;
-  color: var(--text-primary);
+  margin: 32px 0 16px 0;
+  color: var(--dd-text-subheading);
 }
 
 .data-deletion__content p {
-  line-height: 1.8;
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
+  color: var(--dd-text-body);
+  line-height: 1.7;
+  margin-bottom: 18px;
+  font-size: 1.05rem;
 }
 
+/* Lists with elegant arrow bullets */
 .data-deletion__content ul {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
-  color: var(--text-secondary);
+  margin: 0 0 18px 0;
+  padding-left: 0;
+  list-style: none;
 }
 
 .data-deletion__content li {
-  margin-bottom: 0.75rem;
+  position: relative;
+  padding-left: 26px;
+  margin-bottom: 12px;
+  color: var(--dd-text-body);
   line-height: 1.6;
 }
 
+.data-deletion__content li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--dd-list-bullet);
+  font-weight: bold;
+}
+
+/* Links */
 .data-deletion__content a {
-  color: var(--accent-primary);
+  color: var(--dd-text-link);
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 1px;
 }
 
 .data-deletion__content a:hover {
-  color: var(--accent-secondary);
-  text-decoration: underline;
+  color: var(--dd-text-link-hover);
+  border-bottom-color: currentColor;
 }
 
+/* Notes */
 .note {
   font-style: italic;
-  background: rgba(100, 116, 139, 0.1);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-top: 1rem !important;
+  background: var(--dd-note-bg);
+  border: 1px solid var(--dd-note-border);
+  color: var(--dd-note-text);
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 0.96rem;
+  line-height: 1.6;
 }
 
-/* Step cards */
+/* 6. STEP CARDS (Option A / B / C)
+   ---------------------------------------------------------- */
 .step-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: var(--dd-step-bg);
+  border: 1px solid var(--dd-step-border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--dd-shadow-soft);
+}
+
+.step-card:last-child {
+  margin-bottom: 0;
 }
 
 .step-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 14px;
+  margin-bottom: 12px;
 }
 
 .step-number {
-  width: 36px;
-  height: 36px;
-  background: var(--accent-primary);
-  color: white;
-  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--dd-badge-bg);
+  color: var(--dd-badge-text);
+  border-radius: 50%;
   font-weight: 700;
-  font-size: 1.1rem;
-  flex-shrink: 0;
+  font-size: 1.05rem;
 }
 
 .step-header h3 {
   margin: 0 !important;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   flex: 1;
+  color: var(--dd-text-heading);
 }
 
-.step-card ul {
-  margin-left: 2.5rem;
-}
-
+.step-card ul,
 .step-card .note {
-  margin-left: 2.5rem;
+  margin-left: 52px;
 }
 
-/* Timeline */
+/* 7. TIMELINE
+   ---------------------------------------------------------- */
 .timeline {
   position: relative;
-  padding-left: 2rem;
-  margin: 1.5rem 0;
+  margin: 24px 0;
+  padding-left: 8px;
 }
 
 .timeline-item {
   position: relative;
-  padding-bottom: 2rem;
-  border-left: 3px solid var(--accent-primary);
-  padding-left: 2rem;
+  padding-left: 32px;
+  padding-bottom: 28px;
+  border-left: 2px solid var(--dd-timeline-line);
 }
 
 .timeline-item:last-child {
@@ -242,18 +388,18 @@
 .timeline-marker {
   position: absolute;
   left: -8px;
-  top: 0;
+  top: 2px;
   width: 14px;
   height: 14px;
-  background: var(--accent-primary);
+  background: var(--dd-timeline-marker);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px var(--bg-primary);
+  box-shadow: 0 0 0 4px var(--dd-bg-content);
 }
 
 .timeline-content h3 {
-  margin: 0 0 0.5rem 0 !important;
+  margin: 0 0 6px 0 !important;
   font-size: 1.1rem;
-  color: var(--accent-primary);
+  color: var(--dd-text-strong);
 }
 
 .timeline-content p {
@@ -261,76 +407,110 @@
   line-height: 1.6;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .data-deletion {
-    background: var(--bg-primary);
-  }
-  
-  .data-deletion__intro {
-    background: linear-gradient(135deg, rgba(252, 194, 46, 0.15) 0%, rgba(255, 217, 125, 0.15) 100%);
-  }
-  
-  .data-deletion__intro-content strong,
-  .data-deletion__intro-content p {
-    color: #fcc22eff;
-  }
-  
-  .step-card {
-    background: rgba(255, 255, 255, 0.03);
-  }
-  
-  .note {
-    background: rgba(255, 255, 255, 0.05);
+/* 8. RESPONSIVE
+   ---------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .data-deletion__header { display: none; }
+
+  .data-deletion .mobile-header {
+    display: flex !important; /* Activăm headerul mobil, peste regulile globale */
   }
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .data-deletion {
-    padding: 1rem 0.5rem;
+    padding: 24px 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
   }
-  
+
   .data-deletion__container {
-    padding: 2rem 1.5rem;
-    border-radius: 12px;
+    padding: 0 16px;
+    margin-top: 1rem;
   }
-  
-  .data-deletion__header {
-    padding: 1.5rem;
-  }
-  
-  .data-deletion__header h1 {
-    font-size: 1.8rem;
-  }
-  
+
   .data-deletion__intro {
-    padding: 1.5rem;
+    padding: 28px 20px;
+    margin-bottom: 30px;
   }
-  
+
   .data-deletion__intro-content {
     flex-direction: column;
-    gap: 1rem;
+    text-align: center;
+    gap: 14px;
   }
-  
+
+  .data-deletion__intro-icon { font-size: 1.8rem; margin-top: 0; }
+  .data-deletion__intro-content strong { font-size: 1.15rem; }
+
   .data-deletion__content section {
-    padding: 1.5rem;
+    padding: 28px 20px;
   }
-  
-  .step-card {
-    padding: 1.25rem;
-  }
-  
+
+  .data-deletion__content h2 { font-size: 1.6rem; }
+  .data-deletion__content h3 { font-size: 1.15rem; margin: 24px 0 12px 0; }
+  .data-deletion__content p { font-size: 1rem; }
+
+  .step-card { padding: 18px; }
   .step-card ul,
   .step-card .note {
     margin-left: 0;
   }
-  
-  .timeline {
-    padding-left: 1rem;
+
+  .timeline { padding-left: 4px; }
+  .timeline-item { padding-left: 26px; }
+
+  /* Ensure footer navigation visibility */
+  .data-deletion {
+    padding-bottom: calc(var(--footer-height, 65px) + env(safe-area-inset-bottom));
   }
-  
-  .timeline-item {
-    padding-left: 1.5rem;
+}
+
+/* 9. MOBILE HEADER (back button + title)
+   ---------------------------------------------------------- */
+.data-deletion .mobile-header {
+  display: none; /* Hidden by default on desktop */
+  align-items: center;
+  padding: 20px 0;
+  margin-bottom: 20px;
+  margin-top: -1rem !important;
+  gap: 16px;
+}
+
+.data-deletion .mobile-back-btn {
+  color: var(--dd-mobile-btn-text) !important;
+  background: var(--dd-mobile-btn-bg) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.data-deletion .mobile-header-title {
+  color: var(--dd-text-heading) !important;
+  font-weight: 600 !important;
+  font-size: 1.3rem !important;
+  margin: 0 !important;
+}
+
+.dark-mode .data-deletion .mobile-header-title {
+  color: var(--dd-text-subheading) !important;
+}
+
+/* 10. PRINT STYLES
+   ---------------------------------------------------------- */
+@media print {
+  .mobile-header { display: none !important; }
+
+  .data-deletion__header {
+    display: block !important;
+  }
+
+  .data-deletion__intro,
+  .data-deletion__content section {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
   }
 }

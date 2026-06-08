@@ -455,7 +455,7 @@ export default function AdminVerificationsScreen() {
     // === Header ===
     header: {
       paddingHorizontal: 16,
-      paddingTop: insets.top + 8,
+      paddingTop: Math.max(insets.top, 24) + 16,
       paddingBottom: 14,
       backgroundColor: bg,
       borderBottomWidth: StyleSheet.hairlineWidth,
@@ -463,7 +463,7 @@ export default function AdminVerificationsScreen() {
     },
     headerRow: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       gap: 12,
     },
     backCircle: {
@@ -476,10 +476,10 @@ export default function AdminVerificationsScreen() {
     },
     headerTitle: {
       fontSize: 22,
-      fontWeight: '800',
+      fontFamily: 'Poppins-Bold',
       letterSpacing: -0.4,
       color: text,
-      flex: 1,
+      paddingTop: 6,
     },
     headerSubtitle: {
       fontSize: 12,

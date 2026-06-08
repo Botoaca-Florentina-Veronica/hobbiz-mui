@@ -58,6 +58,7 @@ const LegalSection = () => {
           <li><a href="/termeni" onClick={(e) => handleLinkClick(e, '/termeni')}>{t('legal.terms')}</a></li>
           <li><a href="/confidentialitate" onClick={(e) => handleLinkClick(e, '/confidentialitate')}>{t('legal.privacyPolicy')}</a></li>
           <li><a href="/cookie" onClick={(e) => handleLinkClick(e, '/cookie')}>{t('legal.cookiePolicy')}</a></li>
+          <li><a href="/stergere-date" onClick={(e) => handleLinkClick(e, '/stergere-date')}>{t('legal.dataDeletion')}</a></li>
         </ul>
       </div>
       <div className="legal-section__column legal-section__socials">

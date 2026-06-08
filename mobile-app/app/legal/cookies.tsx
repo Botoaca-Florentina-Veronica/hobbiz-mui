@@ -257,7 +257,7 @@ export default function CookiesScreen() {
           <ThemedText style={[styles.h2, { color: tokens.colors.text }]}>{t.sec5Title}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>{t.sec5P1}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Cloudinary:</ThemedText> {t.sec5Cloudinary}</ThemedText>
-          <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Firebase (FCM):</ThemedText> Push notifications (push tokens) and related services used to deliver in-app notifications.</ThemedText>
+          <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Expo Push Notifications:</ThemedText> Push tokens used to deliver in-app notifications; messages to Android devices may be relayed via Firebase Cloud Messaging (FCM).</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Google Analytics/Umami</ThemedText> {t.sec5Analytics}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>• <ThemedText style={styles.strong}>Google Maps:</ThemedText> {t.sec5Maps}</ThemedText>
           <ThemedText style={[styles.paragraph, { color: tokens.colors.muted }]}>{t.sec5P2}</ThemedText>

@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { rankSearchSuggestions, type SearchIndexItem } from '../../src/utils/search';
+import { getCategoryDbName } from '../../src/constants/categories';
 import { getHomeTranslations } from '../../src/i18n/home';
 
 
@@ -37,10 +38,11 @@ const categories = [
   { description: 'Meditații', color: '#82E0AA', image: require('../../assets/images/carte.png') },
 ];
 
-const HERO_PHONE_SOURCE = require('../../assets/images/imp.png');
-const HERO_TABLET_SOURCE = require('../../assets/images/hobbiz-wide.png');
-const HERO_PHONE_ASPECT_RATIO = 1.72;
-const HERO_TABLET_ASPECT_RATIO = 1.5;
+const HERO_PHONE_SOURCE = require('../../assets/images/principala.jpg');
+const HERO_TABLET_SOURCE = require('../../assets/images/principala.jpg');
+// principala.jpg are 1036x1002px (raport ≈ 1.03, aproape pătrată)
+const HERO_PHONE_ASPECT_RATIO = 1.03;
+const HERO_TABLET_ASPECT_RATIO = 1.03;
 
 // Design colors
 const DESIGN_BLUE = '#034e84ff';
@@ -50,9 +52,9 @@ const TITLE_BLUE = '#1a3b7eff';
 // ==================== CONFIGURARE DIMENSIUNI IMAGINII HERO ====================
 // Editează aceste valori pentru a schimba rapid dimensiunea imaginii principale
 const HERO_IMAGE_CONFIG = {
-  // Aspect ratio (lățime / înălțime) al imaginii
-  aspectRatio: 1.5,
-  
+  // Aspect ratio (lățime / înălțime) al imaginii (principala.jpg ≈ 1.03, aproape pătrată)
+  aspectRatio: 1.03,
+
   // Înălțime minimă (px) - pentru telefoane mici
   minHeight: 260,
   
@@ -67,14 +69,18 @@ const HERO_IMAGE_CONFIG = {
   
   // Padding orizontal (spațiu la margini)
   horizontalPadding: 24,
+  // Factor de scalare aplicat la final dimensiunilor calculate (1 = fără modificare)
+  sizeScale: 1,
   // Suprascrieri specifice telefoanelor (opțional)
   phoneOverrides: {
-    // Menține un raport landscape pe telefoane pentru a evita spațiile goale sus/jos
-    aspectRatio: 1.5,
+    // Imaginea e aproape pătrată — păstrăm raportul real pentru a evita spațiile goale (letterboxing)
+    aspectRatio: 1.03,
     minHeight: 220,
     screenHeightPercent: 0.30,
     // Mai puțin padding pe mobile pentru a profita de lățimea ecranului
     horizontalPadding: 16,
+    // Micșorează puțin imaginea pe telefoane față de lățimea calculată
+    sizeScale: 0.93,
   },
 };
 // ============================================================================
@@ -305,6 +311,13 @@ export default function HomeScreen() {
           setSearchResults([]);
           router.push(`/announcement-details?id=${id}`);
         }}
+        onCategoryClick={(key) => {
+          const dbName = getCategoryDbName(key);
+          if (!dbName) return;
+          setSearchTerm('');
+          setSearchResults([]);
+          router.push(`/category-announcements?category=${encodeURIComponent(dbName)}`);
+        }}
         onNotificationClick={() => router.push('/notifications')}
       />
   <View style={[styles.mainContent, { backgroundColor: isDark ? 'transparent' : tokens.colors.surface, zIndex: 1 }]}> 
@@ -353,8 +366,10 @@ export default function HomeScreen() {
             let imageWidth = Math.min(availableWidth, Math.round(calculatedHeight * assetAspectRatio));
             const imageHeight = Math.round(imageWidth / assetAspectRatio);
 
-            const heroWidth = imageWidth;
-            const heroHeight = imageHeight;
+            // Aplicăm factorul de scalare final (ex: micșorăm puțin imaginea pe telefoane)
+            const sizeScale = cfg.sizeScale || 1;
+            const heroWidth = Math.round(imageWidth * sizeScale);
+            const heroHeight = Math.round(imageHeight * sizeScale);
             return (
               <View style={[styles.mainHeroWrap, { width: heroWidth, height: heroHeight, marginTop: 0, marginBottom: 8 }]}>
                 <Image

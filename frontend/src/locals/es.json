@@ -449,6 +449,7 @@
     "terms": "Términos y condiciones",
     "privacyPolicy": "Política de privacidad",
     "cookiePolicy": "Política de cookies",
+    "dataDeletion": "Eliminación de datos",
     "followUs": "Síguenos"
   },
   "about": {
@@ -760,7 +761,7 @@
       "title": "3. Uso de la plataforma y anuncios",
       "h1": "Publicar anuncios",
       "p1": "Los usuarios pueden publicar anuncios para la venta de productos nuevos o de segunda mano, prestación de servicios, alquiler de bienes u otras transacciones comerciales legales. Cada anuncio debe contener una descripción precisa y completa del producto o servicio, fotos reales y sin modificar y un precio correcto y transparente.",
-      "p2": "Está estrictamente prohibido publicar anuncios de: productos falsificados o pirateados, sustancias prohibidas por ley, armas y municiones, animales protegidos o obtenidos ilegalmente, servicios ilegales o inmorales, contenido adulto o materiales que violen derechos de autor. Monitoreamos activamente el contenido mediante algoritmos automatizados y moderación humana.",
+      "p2": "Está estrictamente prohibido publicar anuncios o cualquier otro contenido (incluido en mensajes, imágenes, reseñas o perfiles) que incluya: productos falsificados o pirateados, sustancias prohibidas por ley, armas y municiones, animales protegidos o obtenidos ilegalmente, servicios ilegales o inmorales, desnudez o contenido sexualmente explícito, representaciones de violencia explícita del mundo real (fuera de un contexto periodístico o educativo), discurso de odio, o materiales que violen derechos de autor. Monitoreamos activamente el contenido mediante algoritmos automatizados y moderación humana.",
       "h2": "Responsabilidades del usuario y moderación de contenido",
       "p3": "Los usuarios son plenamente responsables del contenido publicado. Hobbiz tiene tolerancia cero con contenido objetable o usuarios abusivos. Los usuarios pueden reportar contenido objetable o comportamiento abusivo directamente mediante la función de reporte en la app o contactando soporte. Nuestro equipo revisará los reportes y tomará acciones firmes (incluyendo eliminar contenido y suspender/bloquear al usuario) dentro de un máximo de 24 horas de recibir el reporte.",
       "p4": "La comunicación entre usuarios debe realizarse de manera respetuosa. El acoso, amenazas, lenguaje vulgar o discriminatorio, spam e intentos de fraude están estrictamente prohibidos y resultarán en suspensión inmediata de la cuenta."
@@ -829,6 +830,130 @@
       "p4": "Investigamos todas las quejas de forma imparcial y transparente, respetando los derechos de todas las partes. Los resultados se comunican por escrito y para casos complejos brindamos explicaciones detalladas de las medidas tomadas."
     },
     "footer": "Este documento fue actualizado por última vez el 13 de diciembre de 2025 y entra en vigor inmediatamente para todos los usuarios de la plataforma Hobbiz. Para versiones anteriores, contacta a team.hobbiz@gmail.com."
+  },
+  "dataDeletion": {
+    "title": "Eliminación de datos",
+    "subtitle": "Tu derecho a eliminar tus datos",
+    "intro": {
+      "title": "Control total sobre tus datos",
+      "text": "En Hobbiz respetamos tu derecho a la privacidad y a la eliminación de datos conforme al RGPD. Tienes control total sobre tus datos personales y puedes solicitar su eliminación en cualquier momento. Esta página explica cómo eliminar todos los datos asociados a tu cuenta, incluidos los datos recibidos a través de Facebook Login u otros servicios de autenticación de terceros."
+    },
+    "s1": {
+      "title": "1. ¿Qué datos se eliminarán?",
+      "intro": "Cuando solicitas la eliminación de tu cuenta, los siguientes datos se eliminarán permanentemente de nuestros sistemas:",
+      "list": [
+        "Información de la cuenta (nombre, correo electrónico, teléfono, foto de perfil, imagen de portada)",
+        "Todos los anuncios que has creado (títulos, descripciones, imágenes, datos de contacto)",
+        "Anuncios favoritos/guardados",
+        "Credenciales de acceso y tokens de autenticación (incluidos los datos de inicio de sesión de Facebook/Google)",
+        "Datos de uso de la aplicación y preferencias"
+      ],
+      "note": "Nota: Es posible que se conserven algunos datos analíticos anónimos para mejorar la plataforma, pero estos datos no se pueden vincular a tu identidad."
+    },
+    "s2": {
+      "title": "2. Cómo eliminar tus datos",
+      "intro": "Tienes tres opciones para eliminar tu cuenta de Hobbiz y todos los datos asociados:",
+      "optionA": {
+        "title": "Eliminar desde los ajustes de la aplicación (recomendado)",
+        "steps": [
+          "Abre la aplicación Hobbiz e inicia sesión en tu cuenta",
+          "Ve a Ajustes > Cuenta > Eliminar cuenta",
+          "Lee la advertencia y confirma la eliminación",
+          "Introduce tu contraseña para la confirmación final",
+          "Tu cuenta y tus datos se eliminan de inmediato y de forma definitiva — esta acción no se puede deshacer"
+        ]
+      },
+      "optionB": {
+        "title": "Eliminar mediante solicitud por correo electrónico",
+        "intro": "Envía un correo a team.hobbiz@gmail.com con el asunto \"Solicitud de eliminación de datos\" e incluye:",
+        "steps": [
+          "Tu nombre completo tal como aparece registrado en Hobbiz",
+          "La dirección de correo electrónico asociada a tu cuenta",
+          "Una declaración confirmando que deseas eliminar todos tus datos"
+        ],
+        "note": "Verificaremos tu identidad y procesaremos tu solicitud en un plazo máximo de 30 días desde su recepción, conforme a los plazos que establece la legislación de protección de datos (RGPD). Recibirás una respuesta por correo electrónico una vez finalizada tu solicitud."
+      },
+      "optionC": {
+        "title": "Revocar el acceso de Facebook",
+        "intro": "Si te registraste mediante Facebook Login, también puedes revocar el acceso de Hobbiz a tus datos de Facebook:",
+        "steps": [
+          "Ve a Configuración de Facebook > Aplicaciones y sitios web",
+          "Busca \"Hobbiz\" en la lista de aplicaciones activas",
+          "Haz clic en \"Eliminar\" para revocar todos los permisos",
+          "Opcionalmente, solicita la eliminación de tu actividad de la app Hobbiz en Facebook"
+        ],
+        "note": "Nota: Revocar el acceso de Facebook solo desconectará la aplicación de Facebook. Para eliminar por completo los datos de tu cuenta de Hobbiz, también debes usar la Opción A o B anteriores."
+      }
+    },
+    "s3": {
+      "title": "3. Qué ocurre cuando solicitas la eliminación",
+      "intro": "La forma en que gestionamos tu solicitud de eliminación depende de la opción que elijas:",
+      "day0": {
+        "title": "Eliminación desde la aplicación (Opción A)",
+        "text": "Tu cuenta, tus anuncios, tus datos de perfil, tus preferencias y tus credenciales de autenticación se eliminan de inmediato y de forma definitiva de nuestros sistemas activos, en el mismo momento de la confirmación. No existe ningún período de gracia."
+      },
+      "day7": {
+        "title": "Solicitud por correo electrónico (Opción B)",
+        "text": "Verificamos tu identidad y procesamos tu solicitud en un plazo máximo de 30 días desde su recepción, conforme a los plazos que establece la legislación de protección de datos (RGPD). Recibirás una respuesta por correo electrónico una vez finalizada tu solicitud."
+      },
+      "day30": {
+        "title": "Datos analíticos y obligaciones legales",
+        "text": "Los datos agregados y anonimizados, que ya no pueden identificarte, pueden conservarse para mejorar la plataforma. También podemos conservar cierta información durante el tiempo necesario para cumplir con obligaciones legales, como la prevención del fraude."
+      },
+      "recovery": "Importante: la eliminación de la cuenta realizada desde la aplicación es inmediata e irreversible. Te recomendamos descargar o guardar cualquier información que necesites antes de confirmar la eliminación."
+    },
+    "s4": {
+      "title": "4. Consideraciones importantes",
+      "retained": {
+        "title": "Datos que pueden conservarse",
+        "intro": "En determinadas circunstancias limitadas, algunos datos pueden conservarse incluso después de la eliminación:",
+        "list": [
+          "Obligaciones legales: Podemos conservar ciertos registros si así lo exige la ley o por motivos legales legítimos (p. ej., prevención del fraude, cumplimiento normativo)",
+          "Análisis anónimos: Datos de uso agregados y anonimizados que no se pueden vincular a ti personalmente",
+          "Mensajes y reseñas: Las conversaciones y reseñas intercambiadas con otros usuarios pueden permanecer en la plataforma para preservar la integridad de su historial — eliminarlas también afectaría a datos de esos otros usuarios",
+          "Copias de terceros: El contenido que compartiste públicamente puede haber sido copiado por otros usuarios antes de la eliminación. No podemos controlar ni eliminar dichas copias."
+        ]
+      },
+      "permanent": {
+        "title": "Esta acción es permanente",
+        "intro": "La eliminación de la cuenta realizada desde la aplicación es inmediata e irreversible desde el momento de la confirmación. Una vez que tus datos se eliminan permanentemente:",
+        "list": [
+          "No podrás recuperar tu cuenta, anuncios, mensajes o reseñas",
+          "Si deseas volver a usar Hobbiz, deberás crear una cuenta nueva desde cero",
+          "Tu nombre de usuario y correo electrónico podrían quedar disponibles para que otros se registren"
+        ]
+      }
+    },
+    "partialDeletion": {
+      "title": "5. Eliminación parcial de datos (sin eliminar tu cuenta)",
+      "intro": "Si quieres mantener tu cuenta activa pero eliminar tu contenido y actividad de la plataforma, puedes usar la función «Restablecer datos de la cuenta» directamente desde la aplicación o el sitio web:",
+      "steps": [
+        "Inicia sesión en tu cuenta de Hobbiz",
+        "Ve a Ajustes > Cuenta > Restablecer datos de la cuenta",
+        "Lee la advertencia y confirma la acción"
+      ],
+      "deletedTitle": "Qué se elimina:",
+      "deletedList": [
+        "Todos tus anuncios",
+        "Tus mensajes y conversaciones con otros usuarios",
+        "Las negociaciones en las que participaste",
+        "Tus notificaciones",
+        "Las reseñas que escribiste y las que otros escribieron sobre ti",
+        "Los reportes y solicitudes de contacto enviados o recibidos"
+      ],
+      "keptTitle": "Qué permanece sin cambios:",
+      "keptList": [
+        "Tu cuenta sigue activa y puedes continuar usándola con normalidad",
+        "Tus datos de perfil y credenciales de autenticación (nombre, correo electrónico, teléfono, contraseña, datos de inicio de sesión de Facebook/Google)"
+      ],
+      "note": "Nota: Esta acción es permanente e irreversible — los datos eliminados no se pueden recuperar."
+    },
+    "s5": {
+      "title": "6. ¿Necesitas ayuda?",
+      "p1": "Si tienes preguntas sobre la eliminación de datos o encuentras algún problema, ponte en contacto con nuestro equipo de soporte en",
+      "response": "Normalmente respondemos en un plazo de 48 horas.",
+      "p2": "Para más información sobre cómo gestionamos tus datos, consulta nuestra Política de Privacidad y los Términos y Condiciones."
+    }
   },
   "privacy": {
     "title": "Política de privacidad",
