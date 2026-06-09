@@ -571,8 +571,8 @@ export default function HomeScreen() {
             const horizontalPadding = 32; // padding from section container (16 + 16)
             const avail = Math.max(screenWidth || 360, 320) - horizontalPadding;
             const tentative = Math.floor((avail + gap) / (minCardWidth + gap));
-            const maxPossibleCols = Math.max(1, Math.min(tentative, 6));
-            const minCols = (screenWidth || 0) >= 400 ? 3 : 1;
+            const maxPossibleCols = Math.max(2, Math.min(tentative, 6));
+            const minCols = (screenWidth || 0) >= 700 ? 3 : 2;
 
             // Build candidate cols range between minCols and maxPossibleCols
             const candidates: number[] = [];

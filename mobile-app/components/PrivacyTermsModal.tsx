@@ -28,8 +28,11 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
   const { locale } = useLocale();
   const router = useRouter();
 
-  const WEB_PRIMARY = '#100e9aff';
-  const WEB_ACCENT = '#fcc22eff';
+  // Modal is always shown in light mode for consistent branding at first launch.
+  // Dark mode palette is preserved here for future use if needed.
+  const WEB_PRIMARY        = '#100e9aff';
+  const WEB_ACCENT         = '#fcc22eff';
+  const DARK_PRIMARY_LINK  = '#6b8cffff'; // lighter blue — readable on dark bg
 
   const handleTermsPress = () => {
     router.push('/legal/terms');
@@ -77,15 +80,15 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
     >
       <BlurView
         intensity={Platform.OS === 'ios' ? 40 : 80}
-        tint={isDark ? 'dark' : 'light'}
+        tint="light"
         style={styles.blurContainer}
       >
         <View style={styles.overlay}>
           <View style={[
             styles.modalContainer,
             {
-              backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
-              borderColor: isDark ? '#333333' : '#e2e8f0',
+              backgroundColor: '#ffffff',
+              borderColor: '#e2e8f0',
             }
           ]}>
             {/* Logo */}
@@ -96,18 +99,12 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
             />
 
             {/* Title */}
-            <Text style={[
-              styles.title,
-              { color: isDark ? '#ffffff' : '#1a202c' }
-            ]}>
+            <Text style={[styles.title, { color: '#1a202c' }]}>
               {t.title}
             </Text>
 
             {/* Description */}
-            <Text style={[
-              styles.description,
-              { color: isDark ? '#b0b0b0' : '#64748b' }
-            ]}>
+            <Text style={[styles.description, { color: '#64748b' }]}>
               {t.welcome}
             </Text>
 
@@ -120,10 +117,8 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
               <View style={[
                 styles.checkbox,
                 {
-                  borderColor: isDark ? '#444444' : '#cbd5e0',
-                  backgroundColor: isChecked
-                    ? WEB_PRIMARY
-                    : (isDark ? '#2a2a2a' : '#ffffff'),
+                  borderColor: '#cbd5e0',
+                  backgroundColor: isChecked ? WEB_PRIMARY : '#ffffff',
                 }
               ]}>
                 {isChecked && (
@@ -131,31 +126,19 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
                 )}
               </View>
               <View style={styles.checkboxTextContainer}>
-                <Text style={[
-                  styles.checkboxText,
-                  { color: isDark ? '#e0e0e0' : '#2d3748' }
-                ]}>
+                <Text style={[styles.checkboxText, { color: '#2d3748' }]}>
                   {t.agree}{' '}
                 </Text>
                 <TouchableOpacity onPress={handleTermsPress}>
-                  <Text style={[
-                    styles.link,
-                    { color: WEB_PRIMARY }
-                  ]}>
+                  <Text style={[styles.link, { color: WEB_PRIMARY }]}>
                     {t.termsOfUse}
                   </Text>
                 </TouchableOpacity>
-                <Text style={[
-                  styles.checkboxText,
-                  { color: isDark ? '#e0e0e0' : '#2d3748' }
-                ]}>
+                <Text style={[styles.checkboxText, { color: '#2d3748' }]}>
                   {' '}{t.and}{' '}
                 </Text>
                 <TouchableOpacity onPress={handlePrivacyPress}>
-                  <Text style={[
-                    styles.link,
-                    { color: WEB_PRIMARY }
-                  ]}>
+                  <Text style={[styles.link, { color: WEB_PRIMARY }]}>
                     {t.privacyPolicy}
                   </Text>
                 </TouchableOpacity>
@@ -167,7 +150,7 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
               style={[
                 styles.button,
                 {
-                  backgroundColor: isChecked ? WEB_PRIMARY : (isDark ? '#333333' : '#e2e8f0'),
+                  backgroundColor: isChecked ? WEB_PRIMARY : '#e2e8f0',
                   opacity: isChecked ? 1 : 0.5,
                 }
               ]}
@@ -177,9 +160,7 @@ export function PrivacyTermsModal({ visible, onAccept }: PrivacyTermsModalProps)
             >
               <Text style={[
                 styles.buttonText,
-                {
-                  color: isChecked ? '#ffffff' : (isDark ? '#666666' : '#94a3b8')
-                }
+                { color: isChecked ? '#ffffff' : '#94a3b8' }
               ]}>
                 {t.getStarted}
               </Text>

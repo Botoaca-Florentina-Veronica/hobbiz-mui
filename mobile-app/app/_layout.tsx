@@ -39,17 +39,13 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!navigationState?.key || loading) return;
 
-    // Don't navigate if we've already done initial navigation
-    if (hasNavigated) return;
-
     const inAuthGroup = segments[0] === '(tabs)';
     const inWelcome = segments[0] === 'welcome';
     const inAuthPages = segments[0] === 'login' || segments[0] === 'signup' || segments[0] === 'forgot-password';
     const inOAuth = segments[0] === 'oauth';
 
-    // Initial navigation on app launch
+    // Initial navigation on app launch (index/empty route)
     if (segments.length === 0 || (segments.length === 1 && segments[0] === 'index')) {
-      // Only redirect if we have a clear authentication state
       if (isAuthenticated && user) {
         router.replace('/(tabs)');
       } else if (isGuest) {
@@ -61,20 +57,22 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Redirect authenticated users away from welcome/auth pages
+    // Always redirect AUTHENTICATED users away from welcome/auth pages, regardless of hasNavigated.
+    // This prevents back-navigation to login/signup after a successful login.
     if (isAuthenticated && user && (inWelcome || (inAuthPages && !inOAuth))) {
       router.replace('/(tabs)');
-      setHasNavigated(true);
+      return;
     }
-    // Redirect guest users away from welcome/auth pages
-    else if (isGuest && !isAuthenticated && (inWelcome || (inAuthPages && !inOAuth))) {
+    // Guest users can freely navigate to login/signup after the initial redirect,
+    // so keep the hasNavigated guard here to avoid an infinite loop.
+    if (!hasNavigated && isGuest && !isAuthenticated && (inWelcome || (inAuthPages && !inOAuth))) {
       router.replace('/(tabs)');
       setHasNavigated(true);
+      return;
     }
-    // Redirect unauthenticated users trying to access tabs (but not guests)
-    else if (!isAuthenticated && !isGuest && inAuthGroup && !inWelcome && !inAuthPages) {
+    // Redirect unauthenticated/non-guest users out of tabs (only after initial nav happened)
+    if (!isAuthenticated && !isGuest && inAuthGroup && !inWelcome && !inAuthPages && hasNavigated) {
       router.replace('/welcome');
-      setHasNavigated(true);
     }
   }, [isAuthenticated, isGuest, loading, segments, navigationState?.key, hasNavigated, user]);
 
@@ -244,7 +242,7 @@ export default function RootLayout() {
                     }}
                   >
                   <JsStack.Screen name="welcome" options={{ headerShown: false }} />
-                  <JsStack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <JsStack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
                   <JsStack.Screen name="login" options={{ headerShown: false }} />
                   <JsStack.Screen name="signup" options={{ headerShown: false }} />
                   <JsStack.Screen name="forgot-password" options={{ headerShown: false }} />

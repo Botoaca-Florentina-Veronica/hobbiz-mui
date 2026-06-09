@@ -32,8 +32,11 @@ export async function registerWithCredentials(payload: {
     const res = await api.post('/api/users/register', payload);
     return res.data;
   } catch (e: any) {
-    const msg = e?.response?.data?.error || 'Eroare la înregistrare';
-    throw new Error(msg);
+    const data = e?.response?.data ?? {};
+    const err: any = new Error(data.error || 'Eroare la înregistrare');
+    if (data.code) err.code = data.code;
+    if (data.daysLeft !== undefined) err.daysLeft = data.daysLeft;
+    throw err;
   }
 }
 

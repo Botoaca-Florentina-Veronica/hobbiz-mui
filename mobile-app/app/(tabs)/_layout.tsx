@@ -1,5 +1,6 @@
-import { Tabs } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { Tabs, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import CustomTabBar from '@/components/navigation/CustomTabBar';
 import { TabBarProvider } from '@/src/context/TabBarContext';
@@ -19,6 +20,18 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { locale } = useLocale();
   const tabLocale = normalizeLocale(locale);
+
+  // Prevent Android hardware back from navigating to login/signup.
+  // Standard behavior: exit the app when back is pressed at the root tab.
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        BackHandler.exitApp();
+        return true;
+      });
+      return () => sub.remove();
+    }, [])
+  );
 
   return (
     <TabBarProvider>
