@@ -507,7 +507,7 @@ export default function HomeScreen() {
                           {/* star button removed per request */}
                         </View>
 
-                        <ThemedText numberOfLines={1} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}>
+                        <ThemedText numberOfLines={2} style={[styles.popularLabel, { color: isDark ? '#c81553ff' : TITLE_BLUE }]}>
                           {item.title || item.description || t.announcement}
                         </ThemedText>
 

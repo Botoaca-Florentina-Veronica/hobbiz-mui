@@ -38,12 +38,18 @@ export default function LegalMenu() {
       en: 'Privacy Policy',
       es: 'Politica de privacidad',
     },
+    dataDeletion: {
+      ro: 'Ștergerea datelor',
+      en: 'Data Deletion',
+      es: 'Eliminación de datos',
+    },
   };
 
   const items = [
     { key: 'terms', label: labels.terms[normalizedLocale], route: '/legal/terms', icon: 'document-text-outline' },
     { key: 'cookies', label: labels.cookies[normalizedLocale], route: '/legal/cookies', icon: 'logo-chrome' },
     { key: 'privacy', label: labels.privacy[normalizedLocale], route: '/legal/privacy', icon: 'shield-checkmark-outline' },
+    { key: 'dataDeletion', label: labels.dataDeletion[normalizedLocale], route: '/legal/data-deletion', icon: 'trash-outline' },
   ];
 
   return (

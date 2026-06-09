@@ -126,19 +126,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
           const profile = await fetchProfile();
           setIsGuest(false); // User is authenticated, not a guest
-          // After profile is available, register for push notifications
-          try {
-            const allowPush = profile?.notificationSettings?.push !== false;
-            if (allowPush) {
-              const tokenValue = await registerForPushNotificationsAsync();
-              if (tokenValue) {
-                try { await storage.setItemAsync('pushToken', tokenValue); } catch (_) {}
-                try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+          // Delay push permission request so the initial navigation settles first.
+          // Without this, the system dialog appears while two screens are still
+          // overlapping, giving a false "frozen" appearance.
+          setTimeout(async () => {
+            try {
+              const allowPush = profile?.notificationSettings?.push !== false;
+              if (allowPush) {
+                const tokenValue = await registerForPushNotificationsAsync();
+                if (tokenValue) {
+                  try { await storage.setItemAsync('pushToken', tokenValue); } catch (_) {}
+                  try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+                }
               }
-            }
-          } catch (e) {
-            // ignore push errors to not block auth
-          }
+            } catch (_) {}
+          }, 1500);
         } catch (profileErr) {
           // If profile fetch fails (e.g., expired token), clear token
           console.warn('[Auth] Failed to fetch profile, clearing token');
@@ -169,16 +171,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setToken(data.token);
         const profile = await fetchProfile();
 
-        try {
-          const allowPush = profile?.notificationSettings?.push !== false;
-          if (allowPush) {
-            const tokenValue = await registerForPushNotificationsAsync();
-            if (tokenValue) {
-              try { await storage.setItemAsync('pushToken', tokenValue); } catch (_) {}
-              try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+        // Delay so the post-login navigation transition finishes before the
+        // system notification permission dialog appears.
+        setTimeout(async () => {
+          try {
+            const allowPush = profile?.notificationSettings?.push !== false;
+            if (allowPush) {
+              const tokenValue = await registerForPushNotificationsAsync();
+              if (tokenValue) {
+                try { await storage.setItemAsync('pushToken', tokenValue); } catch (_) {}
+                try { await api.post('/api/users/push-token', { token: tokenValue }); } catch (_) {}
+              }
             }
-          }
-        } catch (e) {}
+          } catch (_) {}
+        }, 1000);
 
         setLoading(false);
         return true;

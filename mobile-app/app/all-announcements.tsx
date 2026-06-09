@@ -23,6 +23,7 @@ import { useAppTheme } from '../src/context/ThemeContext';
 import { useLocale } from '../src/context/LocaleContext';
 import { useAuth } from '../src/context/AuthContext';
 import api from '../src/services/api';
+import { useFavoritesCount } from '../src/context/FavoritesContext';
 import { translateCategory, getCategoryKeyByLabel, CATEGORY_DEFS } from '../src/constants/categories';
 import { getSearchTranslations } from '../src/i18n/search';
 import { addRecentSearch, getRecentSearches } from '../src/services/searchHistory';
@@ -260,6 +261,7 @@ export default function AllAnnouncements() {
   const { tokens, isDark } = useAppTheme();
   const { locale } = useLocale();
   const { isAuthenticated } = useAuth();
+  const { favoriteIds, addFavoriteId, removeFavoriteId, incrementFavoritesCount, decrementFavoritesCount } = useFavoritesCount();
   const t = getSearchTranslations(locale);
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -277,7 +279,6 @@ export default function AllAnnouncements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
   const params = useLocalSearchParams();
   const qParam = (params.q as string) || '';
@@ -322,23 +323,7 @@ export default function AllAnnouncements() {
     }
   }, []);
 
-  const fetchFavorites = useCallback(async () => {
-    if (!isAuthenticated) {
-      setFavoriteIds(new Set());
-      return;
-    }
-    try {
-      const res = await api.get('/api/favorites');
-      const list = res.data?.favorites || [];
-      const ids = new Set<string>(list.map((a: any) => a._id).filter(Boolean));
-      setFavoriteIds(ids);
-    } catch (e) {
-      // Silent — favorites are best-effort UX
-    }
-  }, [isAuthenticated]);
-
   useEffect(() => { fetchAnnouncements(); }, [fetchAnnouncements]);
-  useEffect(() => { fetchFavorites(); }, [fetchFavorites]);
 
   useEffect(() => {
     if (qParam !== undefined && qParam !== searchTerm) {
@@ -405,9 +390,9 @@ export default function AllAnnouncements() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([fetchAnnouncements(), fetchFavorites()]);
+    await fetchAnnouncements();
     setRefreshing(false);
-  }, [fetchAnnouncements, fetchFavorites]);
+  }, [fetchAnnouncements]);
 
   const handleCardPress = useCallback((id: string) => {
     router.push(`/announcement-details?id=${id}`);
@@ -428,13 +413,14 @@ export default function AllAnnouncements() {
 
     const wasFavorited = favoriteIds.has(id);
 
-    // Optimistic update
-    setFavoriteIds((prev) => {
-      const next = new Set(prev);
-      if (wasFavorited) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    // Optimistic update — mutate shared context so all screens stay in sync
+    if (wasFavorited) {
+      removeFavoriteId(id);
+      decrementFavoritesCount();
+    } else {
+      addFavoriteId(id);
+      incrementFavoritesCount();
+    }
 
     try {
       if (wasFavorited) {
@@ -444,14 +430,15 @@ export default function AllAnnouncements() {
       }
     } catch (e) {
       // Revert on error
-      setFavoriteIds((prev) => {
-        const next = new Set(prev);
-        if (wasFavorited) next.add(id);
-        else next.delete(id);
-        return next;
-      });
+      if (wasFavorited) {
+        addFavoriteId(id);
+        incrementFavoritesCount();
+      } else {
+        removeFavoriteId(id);
+        decrementFavoritesCount();
+      }
     }
-  }, [favoriteIds, isAuthenticated, locale, router]);
+  }, [favoriteIds, isAuthenticated, locale, router, addFavoriteId, removeFavoriteId, incrementFavoritesCount, decrementFavoritesCount]);
 
   const renderItem = useCallback(({ item }: { item: Announcement }) => (
     <ResultCard

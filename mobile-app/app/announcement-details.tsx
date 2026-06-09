@@ -41,7 +41,7 @@ export default function AnnouncementDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { tokens, isDark } = useAppTheme();
   const { isAuthenticated, user: currentUser } = useAuth();
-  const { incrementFavoritesCount, decrementFavoritesCount } = useFavoritesCount();
+  const { favoriteIds, addFavoriteId, removeFavoriteId, incrementFavoritesCount, decrementFavoritesCount } = useFavoritesCount();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
@@ -56,7 +56,8 @@ export default function AnnouncementDetailsScreen() {
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
   const [fallbackImage, setFallbackImage] = useState<string | null>(null);
-  const [favorited, setFavorited] = useState<boolean>(false);
+  // Derived from shared context — no local state needed, stays in sync across all screens
+  const favorited = favoriteIds.has(String(id ?? ''));
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showPhone, setShowPhone] = useState(false);
   const [ratingModalVisible, setRatingModalVisible] = useState(false);
@@ -108,18 +109,7 @@ export default function AnnouncementDetailsScreen() {
   // Use public announcement endpoint so details can be viewed for any announcement
   const res = await api.get(`/api/announcements/${id}`);
       setAnnouncement(res.data);
-      // after loading announcement, check if it's in user's favorites
-      if (isAuthenticated) {
-        try {
-          const favRes = await api.get('/api/favorites');
-          const favIds = favRes?.data?.favoriteIds || favRes?.data?.favorites || [];
-          if (Array.isArray(favIds)) {
-            setFavorited(favIds.some((f: any) => String(f) === String(id)));
-          }
-        } catch (favErr) {
-          console.warn('Could not fetch favorites:', favErr);
-        }
-      }
+      // Favorite status is derived from FavoritesContext (no extra API call needed)
     } catch (e: any) {
       console.error('Error loading announcement details:', e?.message || e);
       setFetchError(t.loadError);
@@ -420,37 +410,40 @@ export default function AnnouncementDetailsScreen() {
                 return;
               }
 
-              console.log('[Favorites] Current state:', { favorited, announcementId: id, isAuthenticated });
-
               const wasFavorited = favorited;
-              // Optimistic update for the tab-bar badge
-              if (wasFavorited) decrementFavoritesCount(); else incrementFavoritesCount();
+
+              // Optimistic update — context propagates to all screens instantly
+              if (wasFavorited) {
+                removeFavoriteId(String(id));
+                decrementFavoritesCount();
+              } else {
+                addFavoriteId(String(id));
+                incrementFavoritesCount();
+              }
 
               try {
                 if (!wasFavorited) {
-                  console.log('[Favorites] Adding to favorites...');
                   const r = await api.post(`/api/favorites/${id}`);
-                  console.log('[Favorites] POST response:', r.data);
-                  setFavorited(true);
                   if (r?.data?.favoritesCount !== undefined) {
                     setAnnouncement(prev => prev ? { ...prev, favoritesCount: r.data.favoritesCount } : prev);
                   }
                   showToast(t.favoriteAdded, 'success');
                 } else {
-                  console.log('[Favorites] Removing from favorites...');
                   const r = await api.delete(`/api/favorites/${id}`);
-                  console.log('[Favorites] DELETE response:', r.data);
-                  setFavorited(false);
                   if (r?.data?.favoritesCount !== undefined) {
                     setAnnouncement(prev => prev ? { ...prev, favoritesCount: r.data.favoritesCount } : prev);
                   }
                   showToast(t.favoriteRemoved, 'success');
                 }
               } catch (err: any) {
-                console.error('[Favorites] Toggle failed:', err);
-                console.error('[Favorites] Error response:', err?.response?.data);
-                // Revert optimistic badge update
-                if (wasFavorited) incrementFavoritesCount(); else decrementFavoritesCount();
+                // Revert optimistic context update
+                if (wasFavorited) {
+                  addFavoriteId(String(id));
+                  incrementFavoritesCount();
+                } else {
+                  removeFavoriteId(String(id));
+                  decrementFavoritesCount();
+                }
                 const errorMsg = err?.response?.data?.error || err?.response?.data?.message || t.favoriteFailed;
                 showToast(errorMsg, 'error');
               }

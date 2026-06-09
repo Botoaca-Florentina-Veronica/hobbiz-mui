@@ -51,7 +51,7 @@ export default function FavoritesScreen() {
   } as const;
   const colors = isDark ? darkPalette : tokens.colors;
   const { isAuthenticated } = useAuth();
-  const { incrementFavoritesCount, decrementFavoritesCount, setFavoritesCount } = useFavoritesCount();
+  const { incrementFavoritesCount, decrementFavoritesCount, setFavoritesCount, addFavoriteId, removeFavoriteId, setFavoriteIds } = useFavoritesCount();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -78,8 +78,9 @@ export default function FavoritesScreen() {
       // reset local optimistic state on fresh fetch
       setRemovedFavorites(new Set());
       setRemovingIds(new Set());
-      // Sync the global tab-bar badge to the authoritative server count
+      // Sync the global context (badge + ID set) to authoritative server data
       setFavoritesCount(list.length);
+      setFavoriteIds(new Set(list.map((f: any) => String(f._id)).filter(Boolean)));
     } catch (e) {
       console.error('Error fetching favorites:', e);
       setFavorites([]);
@@ -117,8 +118,14 @@ export default function FavoritesScreen() {
       return next;
     });
 
-    // Sync the global tab-bar badge optimistically
-    if (wasRemoved) incrementFavoritesCount(); else decrementFavoritesCount();
+    // Sync badge + ID set in context optimistically
+    if (wasRemoved) {
+      incrementFavoritesCount();
+      addFavoriteId(id);
+    } else {
+      decrementFavoritesCount();
+      removeFavoriteId(id);
+    }
 
     try {
       if (wasRemoved) {
@@ -134,7 +141,13 @@ export default function FavoritesScreen() {
         if (wasRemoved) next.add(id); else next.delete(id);
         return next;
       });
-      if (wasRemoved) decrementFavoritesCount(); else incrementFavoritesCount();
+      if (wasRemoved) {
+        decrementFavoritesCount();
+        removeFavoriteId(id);
+      } else {
+        incrementFavoritesCount();
+        addFavoriteId(id);
+      }
       try { Alert.alert('Error', 'Could not update favorite.'); } catch (_) {}
     } finally {
       setRemovingIds(prev => {

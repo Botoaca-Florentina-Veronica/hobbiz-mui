@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
 import { useTabBar } from '../../src/context/TabBarContext';
 import { useChatNotifications } from '../../src/context/ChatNotificationContext';
+import { useFavoritesCount } from '../../src/context/FavoritesContext';
 import storage from '../../src/services/storage';
 import { useLocale } from '../../src/context/LocaleContext';
 import { useRouter } from 'expo-router';
@@ -46,7 +47,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const { isAuthenticated, isGuest, loading, user } = useAuth();
   const { hidden } = useTabBar();
   const { unreadCount } = useChatNotifications();
-  const [favoriteCount, setFavoriteCount] = useState(0);
+  const { favoritesCount: favoriteCount } = useFavoritesCount();
   const insets = useSafeAreaInsets();
   const { locale } = useLocale();
   const tabLocale = normalizeLocale(locale);
@@ -131,30 +132,6 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, 
   const BAR_HEIGHT = 64;
   // Margin from bottom of screen (safe area + spacing)
   const bottomMargin = Math.max(insets.bottom, 20);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setFavoriteCount(0);
-      return;
-    }
-
-    let isMounted = true;
-    (async () => {
-      try {
-        const res = await api.get('/api/favorites');
-        if (isMounted) {
-          const count = Array.isArray(res.data?.favorites) ? res.data.favorites.length : 0;
-          setFavoriteCount(count);
-        }
-      } catch (e) {
-        // ignore errors; badge stays 0
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isAuthenticated, user?.id]);
 
   if (hidden) return null;
 

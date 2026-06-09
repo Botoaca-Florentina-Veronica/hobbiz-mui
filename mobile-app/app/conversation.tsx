@@ -1809,54 +1809,8 @@ export default function ConversationScreen() {
                         hasReactions && styles.messageRowWithReactions,
                       ]}
                     >
-                      <View style={[styles.messageGroup, { position: 'relative' }]}>
-                        {message.reactions && message.reactions.length > 0 && (() => {
-                          const counts: Record<string, number> = {};
-                          (message.reactions || []).forEach((r) => {
-                            counts[r.emoji] = (counts[r.emoji] || 0) + 1;
-                          });
-                          const entries = Object.keys(counts).map((emoji) => ({ emoji, count: counts[emoji] }));
-                          entries.sort((a, b) => b.count - a.count || a.emoji.localeCompare(b.emoji));
-                          const visible = entries.slice(0, 3);
-                          const more = Math.max(0, entries.length - visible.length);
-                          const absStyle: ViewStyle = isOwn
-                            ? { position: 'absolute', right: 18, bottom: -14 }
-                            : { position: 'absolute', left: 18, bottom: -14 };
-                          return (
-                            <View
-                              onLayout={(e) => {
-                                const { width, height } = e.nativeEvent.layout;
-                                setReactionDimsMap((prev) => ({ ...prev, [message._id]: { width, height } }));
-                              }}
-                              style={[styles.reactionsContainer, absStyle]}
-                            >
-                              {visible.map((e) => (
-                                <View
-                                  key={`r-${e.emoji}`}
-                                  style={[
-                                    styles.reactionBubble,
-                                    e.count > 1 ? styles.reactionBubbleWithCount : styles.reactionBubbleSingle,
-                                  ]}
-                                >
-                                  <ThemedText
-                                    style={[
-                                      styles.reactionEmoji,
-                                      e.count > 1 ? styles.reactionEmojiWithCount : styles.reactionEmojiSingle,
-                                    ]}
-                                  >
-                                    {e.emoji}
-                                  </ThemedText>
-                                  {e.count > 1 && <ThemedText style={styles.reactionCount}>{e.count}</ThemedText>}
-                                </View>
-                              ))}
-                              {more > 0 && (
-                                <View style={[styles.reactionBubble, styles.reactionBubbleMore]}>
-                                  <ThemedText style={styles.reactionCount}>+{more}</ThemedText>
-                                </View>
-                              )}
-                            </View>
-                          );
-                        })()}
+                      <View style={styles.messageGroup}>
+                        <View style={{ position: 'relative' }}>
                         <Pressable
                           ref={(r) => { bubbleRefs.current[message._id] = r; }}
                           onLayout={(e) => {
@@ -1893,22 +1847,22 @@ export default function ConversationScreen() {
                           ) : (
                             <>
                               {message.replyTo && message.replyTo.messageId && (
-                                <View style={[styles.replyInBubble, { 
-                                  backgroundColor: isOwn 
-                                    ? (isDark ? '#ffffff' : 'rgba(0,0,0,0.08)') 
+                                <View style={[styles.replyInBubble, {
+                                  backgroundColor: isOwn
+                                    ? (isDark ? '#ffffff' : 'rgba(0,0,0,0.08)')
                                     : 'rgba(0,0,0,0.05)',
-                                  borderLeftColor: isDark ? '#000000' : tokens.colors.primary 
-                                }]}> 
-                                  <ThemedText style={[styles.replyInBubbleName, { 
-                                    color: isOwn && isDark ? '#000000' : tokens.colors.primary 
+                                  borderLeftColor: isDark ? '#000000' : tokens.colors.primary
+                                }]}>
+                                  <ThemedText style={[styles.replyInBubbleName, {
+                                    color: isOwn && isDark ? '#000000' : tokens.colors.primary
                                   }]}>
                                     {message.replyTo.senderName}
                                   </ThemedText>
                                   {message.replyTo.text && (
-                                    <ThemedText 
-                                      style={[styles.replyInBubbleText, { 
-                                        color: isOwn && isDark ? '#000000' : tokens.colors.muted 
-                                      }]} 
+                                    <ThemedText
+                                      style={[styles.replyInBubbleText, {
+                                        color: isOwn && isDark ? '#000000' : tokens.colors.muted
+                                      }]}
                                       numberOfLines={1}
                                     >
                                       {message.replyTo.text}
@@ -1916,15 +1870,15 @@ export default function ConversationScreen() {
                                   )}
                                   {message.replyTo.image && (
                                     <View style={styles.replyInBubbleImageRow}>
-                                      <Ionicons 
-                                        name="image-outline" 
-                                        size={14} 
-                                        color={isOwn && isDark ? '#000000' : tokens.colors.muted} 
+                                      <Ionicons
+                                        name="image-outline"
+                                        size={14}
+                                        color={isOwn && isDark ? '#000000' : tokens.colors.muted}
                                       />
-                                      <ThemedText 
-                                        style={[styles.replyInBubbleText, { 
+                                      <ThemedText
+                                        style={[styles.replyInBubbleText, {
                                           color: isOwn && isDark ? '#000000' : tokens.colors.muted,
-                                          marginLeft: 4 
+                                          marginLeft: 4
                                         }]}
                                       >
                                         {t.photo}
@@ -1933,7 +1887,7 @@ export default function ConversationScreen() {
                                   )}
                                 </View>
                               )}
-                              
+
                                                       {isCollaborationRequestMessage(message) ? (
                                 renderCollaborationBody(message, isOwn)
                               ) : message.messageType === 'negotiation' ? (
@@ -1955,29 +1909,82 @@ export default function ConversationScreen() {
                                   )}
                                 </>
                               )}
-                              {isOwn && (
-                                <Ionicons
-                                  name="checkmark-done"
-                                  size={15}
-                                  color={message.isRead ? (isDark ? '#ffabb7' : '#34B7F1') : tokens.colors.muted}
-                                  style={styles.tickIconClean}
-                                />
+                              {showTime && (
+                                <View style={styles.messageMetaRow}>
+                                  <ThemedText style={[styles.messageMetaTime, {
+                                    color: isOwn && isDark ? 'rgba(255,255,255,0.65)' : tokens.colors.muted,
+                                  }]}>
+                                    {timeForMessage}
+                                  </ThemedText>
+                                  {isOwn && (
+                                    <Ionicons
+                                      name="checkmark-done"
+                                      size={13}
+                                      color={message.isRead
+                                        ? (isDark ? '#ffabb7' : '#34B7F1')
+                                        : (isDark ? 'rgba(255,255,255,0.45)' : tokens.colors.muted)}
+                                    />
+                                  )}
+                                </View>
                               )}
                             </>
                           )}
                         </Pressable>
-                        {showTime && (
-                          <View 
-                            style={[
-                              styles.messageTimestamp, 
-                              isOwn ? { alignSelf: 'flex-end', marginRight: 12 } : { alignSelf: 'flex-start', marginLeft: 12 }
-                            ]}
-                          >
-                            <ThemedText style={[styles.messageTimeClean, { color: tokens.colors.muted }] }>
-                              {timeForMessage}
-                            </ThemedText>
-                          </View>
-                        )}
+                        {message.reactions && message.reactions.length > 0 && (() => {
+                          const counts: Record<string, number> = {};
+                          (message.reactions || []).forEach((r) => {
+                            counts[r.emoji] = (counts[r.emoji] || 0) + 1;
+                          });
+                          const entries = Object.keys(counts).map((emoji) => ({ emoji, count: counts[emoji] }));
+                          entries.sort((a, b) => b.count - a.count || a.emoji.localeCompare(b.emoji));
+                          const visible = entries.slice(0, 3);
+                          const more = Math.max(0, entries.length - visible.length);
+                          const absStyle: ViewStyle = isOwn
+                            ? { position: 'absolute', right: 12, bottom: -16 }
+                            : { position: 'absolute', left: 12, bottom: -16 };
+                          const reactionBg = isDark ? tokens.colors.elev : '#ffffff';
+                          const reactionBorder = isDark ? tokens.colors.bg : '#e8e8e8';
+                          const reactionCountColor = isDark ? '#e0e0e0' : '#444444';
+                          return (
+                            <View
+                              onLayout={(e) => {
+                                const { width, height } = e.nativeEvent.layout;
+                                setReactionDimsMap((prev) => ({ ...prev, [message._id]: { width, height } }));
+                              }}
+                              style={[
+                                styles.reactionsContainer,
+                                absStyle,
+                                { backgroundColor: reactionBg, borderColor: reactionBorder },
+                              ]}
+                            >
+                              {visible.map((e) => (
+                                <View
+                                  key={`r-${e.emoji}`}
+                                  style={[
+                                    styles.reactionBubble,
+                                    e.count > 1 ? styles.reactionBubbleWithCount : styles.reactionBubbleSingle,
+                                  ]}
+                                >
+                                  <ThemedText
+                                    style={[
+                                      styles.reactionEmoji,
+                                      e.count > 1 ? styles.reactionEmojiWithCount : styles.reactionEmojiSingle,
+                                    ]}
+                                  >
+                                    {e.emoji}
+                                  </ThemedText>
+                                  {e.count > 1 && <ThemedText style={[styles.reactionCount, { color: reactionCountColor }]}>{e.count}</ThemedText>}
+                                </View>
+                              ))}
+                              {more > 0 && (
+                                <View style={[styles.reactionBubble, styles.reactionBubbleMore]}>
+                                  <ThemedText style={[styles.reactionCount, { color: reactionCountColor }]}>+{more}</ThemedText>
+                                </View>
+                              )}
+                            </View>
+                          );
+                        })()}
+                        </View>
                       </View>
                     </View>
                   </View>
@@ -2178,14 +2185,22 @@ export default function ConversationScreen() {
                         {selectedMessage.image && (
                           <Image source={{ uri: selectedMessage.image }} style={[styles.messageImage, { borderRadius: 12 }]} resizeMode="cover" />
                         )}
-                        {selectedMessage.senderId === userId && (
-                          <Ionicons
-                            name="checkmark-done"
-                            size={15}
-                            color={selectedMessage.isRead ? (isDark ? '#ffabb7' : '#34B7F1') : tokens.colors.muted}
-                            style={styles.tickIconClean}
-                          />
-                        )}
+                        <View style={styles.messageMetaRow}>
+                          <ThemedText style={[styles.messageMetaTime, {
+                            color: selectedMessage.senderId === userId && isDark ? 'rgba(255,255,255,0.65)' : tokens.colors.muted,
+                          }]}>
+                            {formatTime(selectedMessage.createdAt)}
+                          </ThemedText>
+                          {selectedMessage.senderId === userId && (
+                            <Ionicons
+                              name="checkmark-done"
+                              size={13}
+                              color={selectedMessage.isRead
+                                ? (isDark ? '#ffabb7' : '#34B7F1')
+                                : (isDark ? 'rgba(255,255,255,0.45)' : tokens.colors.muted)}
+                            />
+                          )}
+                        </View>
                       </>
                     )}
                   </View>
@@ -2617,7 +2632,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   messageRowWithReactions: {
-    marginBottom: 22,
+    marginBottom: 28,
   },
   messageRowOwn: {
     alignSelf: 'flex-end',
@@ -2673,8 +2688,8 @@ const styles = StyleSheet.create({
   },
   messageBubbleClean: {
     paddingHorizontal: 14,
-    paddingRight: 24,
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 8,
     borderRadius: 18,
     maxWidth: '75%',
     marginHorizontal: 12,
@@ -2683,6 +2698,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
+  },
+  messageMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+    marginTop: 4,
+  },
+  messageMetaTime: {
+    fontSize: 11,
+    lineHeight: 14,
   },
   messageTextClean: {
     fontSize: 15,
@@ -2723,50 +2749,48 @@ const styles = StyleSheet.create({
   reactionsContainer: {
     flexDirection: 'row',
     gap: 2,
-    marginBottom: 2,
-    paddingHorizontal: 2,
+    paddingHorizontal: 5,
+    paddingVertical: 3,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   reactionBubble: {
-    backgroundColor: 'transparent',
     borderRadius: 999,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.92)',
+    paddingHorizontal: 2,
+    paddingVertical: 1,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    gap: 1,
   },
   reactionBubbleSingle: {
-    minWidth: 22,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
+    paddingHorizontal: 1,
+    paddingVertical: 0,
   },
   reactionBubbleWithCount: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 2,
+    paddingVertical: 0,
   },
   reactionBubbleMore: {
-    minWidth: 26,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    minWidth: 16,
+    paddingHorizontal: 2,
+    paddingVertical: 0,
   },
   reactionEmoji: {
-    fontSize: 15,
-    lineHeight: 16,
-    marginRight: 0,
+    fontSize: 13,
+    lineHeight: 17,
   },
-  reactionEmojiSingle: {
-    transform: [{ translateY: -1 }],
-  },
-  reactionEmojiWithCount: {
-    marginRight: 1,
-  },
+  reactionEmojiSingle: {},
+  reactionEmojiWithCount: {},
   reactionCount: {
-    fontSize: 10,
-    lineHeight: 12,
-    color: '#ffffff',
-    fontWeight: '600',
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,
@@ -2774,33 +2798,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickReactionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
   },
   quickReactionEmoji: {
-    fontSize: 24,
+    fontSize: 28,
   },
   reactionPickerDropdown: {
     position: 'absolute',
     top: '100%',
     left: 0,
     right: 0,
-    marginTop: 6,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 18,
+    marginTop: 8,
+    borderRadius: 24,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 12,
-    gap: 8,
+    padding: 10,
+    gap: 6,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
   },
   reactionPickerButton: {
     width: 52,
@@ -2808,10 +2830,9 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
   },
   reactionPickerEmoji: {
-    fontSize: 28,
+    fontSize: 30,
   },
   contextMenu: {
     backgroundColor: '#ffffff',
@@ -2836,16 +2857,17 @@ const styles = StyleSheet.create({
   reactionBarAbsolute: {
     position: 'absolute',
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.97)',
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 28,
-    gap: 4,
+    gap: 2,
     shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    shadowOpacity: 0.22,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+    alignItems: 'center',
   },
   contextMenuAbsolute: {
     position: 'absolute',
