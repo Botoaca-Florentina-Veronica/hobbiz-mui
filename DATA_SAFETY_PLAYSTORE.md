@@ -1,15 +1,5 @@
 # Hobbiz — Data Safety Form (Play Store / App Store)
 
----
-
-## Pre-submission Checklist (Critical)
-Before submitting, please verify:
-1.  ~~**Unused Packages**: The project contains `expo-location` in `package.json` but does not appear to use it in the code. **Action**: Run `npm uninstall expo-location` in the `mobile-app` folder.~~ **Done** — `expo-location` has been removed from `package.json`, so Google will no longer detect the `ACCESS_FINE_LOCATION` permission.
-2.  **Privacy Policy URL**: You must host a Privacy Policy on a public URL (e.g., on your website or a generated page). This document can serve as the basis for that policy.
-3.  **Account Deletion**: The app **does** have an in-app deletion feature (Settings -> Delete Account). Make sure to answer "Yes" to "Do you provide a way for users to delete their account within the app?".
-
----
-
 ## 1) Developer & App
 - **Developer / Data Controller**: Individual based in Romania
 - **Contact email**: team.hobbiz@gmail.com
@@ -116,6 +106,6 @@ We do not sell personal data. We share data with third-party service providers w
 - **Is user data encrypted in transit?** Yes.
 - **Can users request deletion?** Yes.
 
-## 13) Recommended short summary for store listing
+## 13) Short summary for store listing
 Hobbiz is a free community platform. We collect data you provide (profile, listings, messages, reviews) and device identifiers to enable app functionality and improve performance. We use third-party services like Firebase (for notifications and analytics) and Cloudinary (for images). We do not sell your personal data. You can request account deletion at any time directly from the app settings.
 

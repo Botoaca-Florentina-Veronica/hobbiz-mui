@@ -26,11 +26,11 @@ import { ChatNotificationProvider } from '../src/context/ChatNotificationContext
 import { FavoritesProvider } from '../src/context/FavoritesContext';
 import { NotificationProvider } from '../src/context/NotificationContext';
 import { LocaleProvider } from '../src/context/LocaleContext';
-import { setupNotificationListeners } from '../src/services/notificationService';
+import { setupNotificationListeners, registerForPushNotificationsAsync } from '../src/services/notificationService';
 
 const PRIVACY_TERMS_ACCEPTED_KEY = '@hobbiz_privacy_terms_accepted';
 
-function NavigationWrapper({ children }: { children: React.ReactNode }) {
+function NavigationWrapper({ children, needsAcceptance }: { children: React.ReactNode; needsAcceptance: boolean }) {
   const { isAuthenticated, isGuest, loading, user } = useAuth();
   const segments = useSegments();
   const navigationState = useRootNavigationState();
@@ -38,6 +38,7 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!navigationState?.key || loading) return;
+    if (needsAcceptance) return;
 
     const inAuthGroup = segments[0] === '(tabs)';
     const inWelcome = segments[0] === 'welcome';
@@ -74,7 +75,7 @@ function NavigationWrapper({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated && !isGuest && inAuthGroup && !inWelcome && !inAuthPages && hasNavigated) {
       router.replace('/welcome');
     }
-  }, [isAuthenticated, isGuest, loading, segments, navigationState?.key, hasNavigated, user]);
+  }, [isAuthenticated, isGuest, loading, segments, navigationState?.key, hasNavigated, user, needsAcceptance]);
 
   return <>{children}</>;
 }
@@ -122,9 +123,17 @@ export default function RootLayout() {
     try {
       await AsyncStorage.setItem(PRIVACY_TERMS_ACCEPTED_KEY, 'true');
       setShowPrivacyModal(false);
+      // Request OS notification permission while navigation is still blocked
+      // (needsAcceptance = true), so the dialog appears after the T&C modal
+      // closes but before any screen transition happens.
+      try { await registerForPushNotificationsAsync(); } catch (_) {}
+      // Unblock navigation and land on the intro/welcome screen.
       setNeedsAcceptance(false);
+      router.replace('/welcome');
     } catch (error) {
       console.error('Error saving privacy acceptance:', error);
+      setShowPrivacyModal(false);
+      setNeedsAcceptance(false);
     }
   };
 
@@ -225,7 +234,7 @@ export default function RootLayout() {
                 {/* Global toast for network / error feedback */}
                 <GlobalToast />
                 <NavThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <NavigationWrapper>
+                <NavigationWrapper needsAcceptance={needsAcceptance}>
                   <JsStack
                     id="root"
                     initialRouteName="welcome"
