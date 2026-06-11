@@ -405,11 +405,17 @@ export default function ChatPage() {
   const handleDeleteConversation = async () => {
     if (!selectedConversation) return;
     setConfirmDeleteConvOpen(false);
+    const convId = selectedConversation.conversationId;
+    console.log('[Admin] DELETE conversation messages, conversationId:', convId);
     try {
-      await apiClient.delete(`/api/messages/conversation/${selectedConversation.conversationId}/all`);
+      const res = await apiClient.delete(`/api/messages/conversation/${convId}/all`);
+      console.log('[Admin] Delete response:', res.data);
       setMessages([]);
+      showNegotiationSnackbar('Toate mesajele au fost șterse.', 'success');
     } catch (err) {
       console.error('Eroare la ștergerea conversației:', err);
+      const msg = err?.response?.data?.error || `Eroare ${err?.response?.status || ''}: nu s-au putut șterge mesajele.`;
+      showNegotiationSnackbar(msg, 'error');
     }
   };
 

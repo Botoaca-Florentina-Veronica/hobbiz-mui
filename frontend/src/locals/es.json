@@ -1723,7 +1723,17 @@
     "commentOptional": "Comentario (opcional)",
     "submit": "Enviar",
     "userNotAvailable": "El usuario no está disponible para calificar.",
-    "reviewError": "Ocurrió un error al enviar la reseña. Inténtalo de nuevo."
+    "reviewError": "Ocurrió un error al enviar la reseña. Inténtalo de nuevo.",
+    "proposePrice": "Proponer un precio",
+    "proposePriceTitle": "Proponer un precio",
+    "yourOffer": "Tu oferta (RON)",
+    "messageOptional": "Mensaje (opcional)",
+    "proposePriceSuccess": "¡Oferta enviada con éxito!",
+    "proposePriceError": "Error al enviar la oferta.",
+    "enterValidPrice": "Por favor ingresa un precio válido.",
+    "loginToPropose": "Debes iniciar sesión para proponer un precio.",
+    "sending": "Enviando...",
+    "send": "Enviar oferta"
   },
   "categoryTags": {
     "label": "Etiquetas",

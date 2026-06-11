@@ -56,7 +56,8 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   Person as PersonIcon,
-  Visibility as VisibilityIcon
+  Visibility as VisibilityIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import StarIcon from '@mui/icons-material/Star';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -64,6 +65,7 @@ import apiClient from '../api/api';
 import { createAnnouncementReport } from '../api/api';
 import Toast from '../components/Toast';
 import './AnnouncementDetails.css';
+import './ChatPageCollaboration.css';
 import AnnouncementLocationMap from '../components/AnnouncementLocationMap.jsx';
 import translateCategory from '../utils/translateCategory';
 import { resolveMediaUrl } from '../utils/media';
@@ -143,6 +145,13 @@ export default function AnnouncementDetails() {
   // ========== Admin delete dialog ==========
   const [adminDeleteOpen, setAdminDeleteOpen] = useState(false);
   const [adminDeleting, setAdminDeleting] = useState(false);
+
+  // ========== Price proposal ==========
+  const [priceModalOpen, setPriceModalOpen] = useState(false);
+  const [proposedPrice, setProposedPrice] = useState('');
+  const [priceMessage, setPriceMessage] = useState('');
+  const [submittingPrice, setSubmittingPrice] = useState(false);
+  const [priceSnackbar, setPriceSnackbar] = useState(null); // { message, type }
 
   // ========== Report dialog ==========
   const [reportOpen, setReportOpen] = useState(false);
@@ -524,6 +533,34 @@ export default function AnnouncementDetails() {
   const token = localStorage.getItem('token');
   const isOwnAnnouncement = !!loggedUserId && String(announcement.user._id) === String(loggedUserId);
   const isAdminUser = !!user?.isAdmin;
+
+  const handleProposePrice = async () => {
+    const price = parseFloat(proposedPrice);
+    if (!proposedPrice || isNaN(price) || price <= 0) {
+      setPriceSnackbar({ message: t('announcementDetails.enterValidPrice'), type: 'error' });
+      setTimeout(() => setPriceSnackbar(null), 3500);
+      return;
+    }
+    setSubmittingPrice(true);
+    try {
+      await apiClient.post('/api/negotiations', {
+        announcementId: announcement._id,
+        proposedPrice: price,
+        message: priceMessage || undefined,
+      });
+      setPriceModalOpen(false);
+      setProposedPrice('');
+      setPriceMessage('');
+      setPriceSnackbar({ message: t('announcementDetails.proposePriceSuccess'), type: 'success' });
+      setTimeout(() => setPriceSnackbar(null), 3500);
+    } catch (err) {
+      const msg = err?.response?.data?.message || t('announcementDetails.proposePriceError');
+      setPriceSnackbar({ message: msg, type: 'error' });
+      setTimeout(() => setPriceSnackbar(null), 4000);
+    } finally {
+      setSubmittingPrice(false);
+    }
+  };
 
   const handleChatClick = () => {
     console.log('🔍 Chat button clicked:', { loggedUserId, isOwnAnnouncement, announcementUserId: announcement.user._id, showChat });
@@ -1085,6 +1122,30 @@ export default function AnnouncementDetails() {
                       {t('announcementDetails.sendMessage')}
                     </Button>
 
+                    {/* Propose Price Button */}
+                    <Button
+                      variant="outlined"
+                      startIcon={<span>💰</span>}
+                      onClick={() => {
+                        if (!loggedUserId) {
+                          setPriceSnackbar({ message: t('announcementDetails.loginToPropose'), type: 'error' });
+                          setTimeout(() => setPriceSnackbar(null), 3500);
+                          return;
+                        }
+                        setPriceModalOpen(true);
+                      }}
+                      fullWidth
+                      sx={{
+                        borderColor: getAccentCss(),
+                        color: getAccentCss(),
+                        borderRadius: 2,
+                        py: 1.5,
+                        '&:hover': { borderColor: getAccentHover(), bgcolor: 'transparent' }
+                      }}
+                    >
+                      {t('announcementDetails.proposePrice')}
+                    </Button>
+
                     {/* Phone Contact */}
                     <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: getIsDarkMode() ? '#121212' : '#ffffff', border: getIsDarkMode() ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(0,0,0,0.12)' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1495,6 +1556,355 @@ export default function AnnouncementDetails() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* ========== Price Proposal Dialog ========== */}
+      <Dialog
+        open={priceModalOpen}
+        onClose={() => { if (!submittingPrice) { setPriceModalOpen(false); setProposedPrice(''); setPriceMessage(''); } }}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{
+          backdrop: {
+            sx: {
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              backgroundColor: isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(15,23,42,0.45)',
+            }
+          }
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: '22px',
+            overflow: 'hidden',
+            bgcolor: isDarkMode ? '#0f172a' : '#ffffff',
+            border: isDarkMode ? '1px solid rgba(255,255,255,0.07)' : 'none',
+            boxShadow: isDarkMode
+              ? '0 40px 100px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.04)'
+              : '0 32px 80px rgba(0,0,0,0.16), 0 8px 24px rgba(0,0,0,0.06)',
+            m: 2,
+          }
+        }}
+      >
+        {/* ── Header gradient ── */}
+        <Box sx={{
+          background: isDarkMode
+            ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+            : 'linear-gradient(135deg, #2D4361 0%, #4A6FA5 100%)',
+          px: 3,
+          pt: 3,
+          pb: 2.5,
+          position: 'relative',
+        }}>
+          <IconButton
+            onClick={() => { if (!submittingPrice) { setPriceModalOpen(false); setProposedPrice(''); setPriceMessage(''); } }}
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              color: 'rgba(255,255,255,0.55)',
+              '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.12)' },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{
+              width: 50,
+              height: 50,
+              borderRadius: '14px',
+              background: 'rgba(255,255,255,0.14)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                <circle cx="7" cy="7" r="1.5" fill="white" stroke="none"/>
+              </svg>
+            </Box>
+            <Box sx={{ overflow: 'hidden' }}>
+              <Typography sx={{
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: '1.1rem',
+                fontFamily: "'Poppins', sans-serif",
+                lineHeight: 1.25,
+              }}>
+                {t('announcementDetails.proposePriceTitle')}
+              </Typography>
+              {announcement?.title && (
+                <Typography sx={{
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '0.76rem',
+                  mt: 0.25,
+                  fontFamily: "'Poppins', sans-serif",
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: 210,
+                }}>
+                  {announcement.title}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        </Box>
+
+        {/* ── Body ── */}
+        <Box sx={{ px: 3, pt: 2.5, pb: 0, bgcolor: isDarkMode ? '#0f172a' : '#ffffff' }}>
+          {/* Reference price pill */}
+          {announcement?.price > 0 && (
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 2.5,
+              px: 2,
+              py: 1.25,
+              borderRadius: '12px',
+              background: isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(45,67,97,0.05)',
+              border: isDarkMode ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(45,67,97,0.1)',
+            }}>
+              <Typography sx={{
+                fontSize: '0.8rem',
+                color: isDarkMode ? '#64748b' : '#9ca3af',
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 500,
+              }}>
+                Preț listat
+              </Typography>
+              <Typography sx={{
+                fontSize: '1rem',
+                fontWeight: 700,
+                color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                fontFamily: "'Poppins', sans-serif",
+              }}>
+                {announcement.price} RON
+              </Typography>
+            </Box>
+          )}
+
+          {/* Price input label */}
+          <Typography sx={{
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            color: isDarkMode ? '#64748b' : '#9ca3af',
+            mb: 0.75,
+            textTransform: 'uppercase',
+            letterSpacing: '0.7px',
+            fontFamily: "'Poppins', sans-serif",
+          }}>
+            {t('announcementDetails.yourOffer')}
+          </Typography>
+
+          {/* Custom price input with RON suffix */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'stretch',
+            borderRadius: '12px',
+            border: `1.5px solid ${isDarkMode ? '#1e293b' : '#e5e7eb'}`,
+            overflow: 'hidden',
+            mb: 2.5,
+            transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+            '&:focus-within': {
+              borderColor: isDarkMode ? '#38bdf8' : '#2D4361',
+              boxShadow: isDarkMode
+                ? '0 0 0 3px rgba(56,189,248,0.1)'
+                : '0 0 0 3px rgba(45,67,97,0.1)',
+            }
+          }}>
+            <Box
+              component="input"
+              type="number"
+              min="1"
+              step="0.01"
+              value={proposedPrice}
+              onChange={e => setProposedPrice(e.target.value)}
+              autoFocus
+              placeholder="0"
+              sx={{
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                px: 2,
+                py: 1.5,
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                background: isDarkMode ? '#0f172a' : '#ffffff',
+                color: isDarkMode ? '#f1f5f9' : '#111827',
+                fontFamily: "'Poppins', sans-serif",
+                width: '100%',
+                '&::placeholder': { color: isDarkMode ? '#1e293b' : '#e5e7eb', fontWeight: 700 },
+                '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                '&[type=number]': { MozAppearance: 'textfield' },
+              }}
+            />
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              px: 2,
+              background: isDarkMode ? '#0a1120' : '#f8fafc',
+              borderLeft: `1.5px solid ${isDarkMode ? '#1e293b' : '#e5e7eb'}`,
+              color: isDarkMode ? '#475569' : '#94a3b8',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+              fontFamily: "'Poppins', sans-serif",
+              userSelect: 'none',
+            }}>
+              RON
+            </Box>
+          </Box>
+
+          {/* Optional message label */}
+          <Typography sx={{
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            color: isDarkMode ? '#64748b' : '#9ca3af',
+            mb: 0.75,
+            textTransform: 'uppercase',
+            letterSpacing: '0.7px',
+            fontFamily: "'Poppins', sans-serif",
+          }}>
+            {t('announcementDetails.messageOptional')}
+          </Typography>
+
+          {/* Custom textarea */}
+          <Box
+            component="textarea"
+            rows={3}
+            maxLength={300}
+            value={priceMessage}
+            onChange={e => setPriceMessage(e.target.value)}
+            placeholder="Adaugă un mesaj pentru vânzător..."
+            sx={{
+              display: 'block',
+              width: '100%',
+              border: `1.5px solid ${isDarkMode ? '#1e293b' : '#e5e7eb'}`,
+              borderRadius: '12px',
+              px: 1.75,
+              py: 1.25,
+              fontSize: '0.88rem',
+              color: isDarkMode ? '#e2e8f0' : '#374151',
+              background: isDarkMode ? '#0a1120' : '#f8fafc',
+              outline: 'none',
+              resize: 'none',
+              fontFamily: "'Poppins', sans-serif",
+              lineHeight: 1.65,
+              boxSizing: 'border-box',
+              transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+              '&::placeholder': { color: isDarkMode ? '#1e293b' : '#cbd5e1' },
+              '&:focus': {
+                borderColor: isDarkMode ? '#38bdf8' : '#2D4361',
+                boxShadow: isDarkMode ? '0 0 0 3px rgba(56,189,248,0.1)' : '0 0 0 3px rgba(45,67,97,0.1)',
+              },
+            }}
+          />
+          <Typography sx={{
+            textAlign: 'right',
+            fontSize: '0.7rem',
+            color: isDarkMode ? '#334155' : '#cbd5e1',
+            mt: 0.5,
+            mb: 0,
+            fontFamily: "'Poppins', sans-serif",
+          }}>
+            {priceMessage.length}/300
+          </Typography>
+        </Box>
+
+        {/* ── Footer actions ── */}
+        <Box sx={{
+          px: 3,
+          pt: 2,
+          pb: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          bgcolor: isDarkMode ? '#0f172a' : '#ffffff',
+        }}>
+          <Button
+            variant="contained"
+            onClick={handleProposePrice}
+            disabled={submittingPrice || !proposedPrice || parseFloat(proposedPrice) <= 0}
+            fullWidth
+            disableElevation
+            sx={{
+              borderRadius: '12px',
+              py: 1.5,
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              textTransform: 'none',
+              letterSpacing: '0.01em',
+              background: isDarkMode
+                ? 'linear-gradient(135deg, #0369a1 0%, #0284c7 100%)'
+                : 'linear-gradient(135deg, #2D4361 0%, #4A6FA5 100%)',
+              color: '#fff',
+              transition: 'all 0.2s ease',
+              '&:hover:not(:disabled)': {
+                background: isDarkMode
+                  ? 'linear-gradient(135deg, #075985 0%, #0369a1 100%)'
+                  : 'linear-gradient(135deg, #1A314E 0%, #2D4361 100%)',
+                transform: 'translateY(-1px)',
+                boxShadow: isDarkMode
+                  ? '0 6px 20px rgba(3,105,161,0.45)'
+                  : '0 6px 20px rgba(45,67,97,0.35)',
+              },
+              '&:disabled': {
+                background: isDarkMode ? '#1e293b' : '#f1f5f9',
+                color: isDarkMode ? '#334155' : '#cbd5e1',
+              },
+            }}
+          >
+            {submittingPrice
+              ? <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box component="span" sx={{
+                    width: 16, height: 16,
+                    border: '2px solid rgba(255,255,255,0.25)',
+                    borderTopColor: '#fff',
+                    borderRadius: '50%',
+                    display: 'inline-block',
+                    animation: 'spin 0.75s linear infinite',
+                    '@keyframes spin': { to: { transform: 'rotate(360deg)' } },
+                  }} />
+                  {t('announcementDetails.sending')}
+                </Box>
+              : t('announcementDetails.send')
+            }
+          </Button>
+          <Button
+            onClick={() => { if (!submittingPrice) { setPriceModalOpen(false); setProposedPrice(''); setPriceMessage(''); } }}
+            disabled={submittingPrice}
+            fullWidth
+            sx={{
+              borderRadius: '12px',
+              py: 1,
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 500,
+              fontSize: '0.85rem',
+              textTransform: 'none',
+              color: isDarkMode ? '#475569' : '#9ca3af',
+              '&:hover:not(:disabled)': {
+                bgcolor: isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                color: isDarkMode ? '#64748b' : '#6b7280',
+              },
+            }}
+          >
+            {t('common.cancel') || 'Anulează'}
+          </Button>
+        </Box>
+      </Dialog>
+
+      {/* Price proposal snackbar */}
+      {priceSnackbar && (
+        <div className={`negotiation-snackbar ${priceSnackbar.type}`} style={{ zIndex: 13000 }}>
+          {priceSnackbar.message}
+        </div>
+      )}
 
       {/* ========== Image Zoom Modal ========== */}
       {zoomOpen && (

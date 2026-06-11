@@ -1728,7 +1728,17 @@
     "commentOptional": "Comment (optional)",
     "submit": "Submit",
     "userNotAvailable": "The user is not available for rating.",
-    "reviewError": "An error occurred while submitting the review. Try again."
+    "reviewError": "An error occurred while submitting the review. Try again.",
+    "proposePrice": "Propose a price",
+    "proposePriceTitle": "Propose a price",
+    "yourOffer": "Your offer (RON)",
+    "messageOptional": "Message (optional)",
+    "proposePriceSuccess": "Offer sent successfully!",
+    "proposePriceError": "Error sending offer.",
+    "enterValidPrice": "Please enter a valid price.",
+    "loginToPropose": "You must be logged in to propose a price.",
+    "sending": "Sending...",
+    "send": "Send offer"
   },
   "categoryTags": {
     "label": "Tags",

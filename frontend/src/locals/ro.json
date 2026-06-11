@@ -1728,7 +1728,17 @@
     "commentOptional": "Comentariu (opțional)",
     "submit": "Trimite",
     "userNotAvailable": "Utilizatorul nu este disponibil pentru evaluare.",
-    "reviewError": "A apărut o eroare la trimiterea recenziei. Încearcă din nou."
+    "reviewError": "A apărut o eroare la trimiterea recenziei. Încearcă din nou.",
+    "proposePrice": "Propune un preț",
+    "proposePriceTitle": "Propune un preț",
+    "yourOffer": "Oferta ta (RON)",
+    "messageOptional": "Mesaj (opțional)",
+    "proposePriceSuccess": "Oferta a fost trimisă cu succes!",
+    "proposePriceError": "Eroare la trimiterea ofertei.",
+    "enterValidPrice": "Te rog introdu un preț valid.",
+    "loginToPropose": "Trebuie să fii autentificat pentru a propune un preț.",
+    "sending": "Se trimite...",
+    "send": "Trimite oferta"
   },
   "categoryTags": {
     "label": "Taguri",
