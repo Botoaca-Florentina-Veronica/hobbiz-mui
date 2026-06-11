@@ -179,6 +179,7 @@ export default function ConversationScreen() {
   const [replyTo, setReplyTo] = useState<{ messageId: string; senderId: string; senderName: string; text?: string; image?: string } | null>(null);
   const [targetMessageId, setTargetMessageId] = useState<string | null>(null);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+  const [confirmDeleteConvVisible, setConfirmDeleteConvVisible] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
@@ -257,10 +258,17 @@ export default function ConversationScreen() {
       }
     };
 
+    const handleConversationCleared = (data: { conversationId: string }) => {
+      if (data.conversationId === selectedConversation.conversationId) {
+        setMessages([]);
+      }
+    };
+
     socket.on('newMessage', handleNewMessage);
     socket.on('userTyping', handleUserTyping);
     socket.on('userStatus', handleUserStatus);
     socket.on('collaborationUpdated', handleCollaborationUpdated);
+    socket.on('conversationCleared', handleConversationCleared);
 
     return () => {
         // Notify server that user left this conversation
@@ -271,6 +279,7 @@ export default function ConversationScreen() {
         socket.off('userTyping', handleUserTyping);
         socket.off('userStatus', handleUserStatus);
         socket.off('collaborationUpdated', handleCollaborationUpdated);
+        socket.off('conversationCleared', handleConversationCleared);
     };
   }, [socket, selectedConversation, userId, decrementUnreadCount]);
 
@@ -326,6 +335,17 @@ export default function ConversationScreen() {
 
     return { latest, accepted, pending };
   }, [messages, getCollaborationMessageStatus, isCollaborationRequestMessage]);
+
+  const handleDeleteConversation = async () => {
+    if (!selectedConversation) return;
+    setConfirmDeleteConvVisible(false);
+    try {
+      await api.delete(`/api/messages/conversation/${selectedConversation.conversationId}/all`);
+      setMessages([]);
+    } catch (err) {
+      console.error('Eroare la ștergerea conversației:', err);
+    }
+  };
 
   const handleSendCollaborationRequest = async () => {
     if (!userId || !selectedConversation || sendingCollab) return;
@@ -1589,8 +1609,8 @@ export default function ConversationScreen() {
 
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 {/* Finalize Deal Button - only for buyer when negotiation is confirmed */}
-                {activeNegotiation && 
-                 activeNegotiation.status === 'confirmed' && 
+                {activeNegotiation &&
+                 activeNegotiation.status === 'confirmed' &&
                  String(activeNegotiation.buyer._id) === String(userId) && (
                   <TouchableOpacity
                     onPress={handleFinalizeDeal}
@@ -1611,6 +1631,17 @@ export default function ConversationScreen() {
                 >
                   <Ionicons name="people-outline" size={22} color={tokens.colors.text} />
                 </TouchableOpacity>
+
+                {/* Admin: Delete All Messages Button */}
+                {user?.isAdmin && (
+                  <TouchableOpacity
+                    onPress={() => setConfirmDeleteConvVisible(true)}
+                    activeOpacity={0.85}
+                    style={[styles.headerActionBtn, { backgroundColor: isDark ? 'rgba(255,59,48,0.15)' : 'rgba(211,47,47,0.1)' }]}
+                  >
+                    <Ionicons name="trash-outline" size={22} color={isDark ? '#ff3b30' : '#d32f2f'} />
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
 
@@ -2385,6 +2416,17 @@ export default function ConversationScreen() {
           icon="people-outline"
           onConfirm={confirmSendCollaborationRequest}
           onCancel={() => setConfirmCollabVisible(false)}
+        />
+        <ConfirmDialog
+          visible={confirmDeleteConvVisible}
+          title="Șterge toate mesajele"
+          message="Ești sigur că vrei să ștergi toate mesajele din această conversație? Acțiunea este ireversibilă."
+          confirmText="Șterge tot"
+          cancelText={t.cancel}
+          confirmColor={isDark ? '#ff3b30' : '#d32f2f'}
+          icon="trash-outline"
+          onConfirm={handleDeleteConversation}
+          onCancel={() => setConfirmDeleteConvVisible(false)}
         />
         <ReportContentModal
           visible={reportModalVisible}

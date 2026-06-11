@@ -1113,6 +1113,48 @@ const handleCollaborationResponse = async (req, res) => {
   }
 };
 
+// Șterge toate mesajele dintr-o conversație (doar admin)
+const deleteConversationMessages = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    if (!conversationId) {
+      return res.status(400).json({ error: "conversationId este necesar" });
+    }
+
+    // Include legacy 2-part conversationId formats
+    const parts = String(conversationId).split("-");
+    const conversationIds = [conversationId];
+    if (parts.length === 3) {
+      const legacySorted = [parts[0], parts[1]].sort().join("-");
+      const legacyUnsorted = `${parts[0]}-${parts[1]}`;
+      if (!conversationIds.includes(legacySorted)) conversationIds.push(legacySorted);
+      if (!conversationIds.includes(legacyUnsorted)) conversationIds.push(legacyUnsorted);
+    }
+
+    const result = await Message.deleteMany({ conversationId: { $in: conversationIds } });
+
+    // Notify participants via socket
+    try {
+      const io = req.app.get("io");
+      const activeUsers = req.app.get("activeUsers");
+      if (io && activeUsers) {
+        const participantIds = parts.length >= 2 ? [parts[0], parts[1]] : [];
+        for (const uid of participantIds) {
+          const sid = activeUsers.get(uid);
+          if (sid) {
+            io.to(sid).emit("conversationCleared", { conversationId });
+          }
+        }
+      }
+    } catch (_) {}
+
+    res.json({ success: true, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error("Eroare la ștergerea conversației:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createMessage,
   deleteMessage,
@@ -1124,4 +1166,5 @@ module.exports = {
   reactToMessage,
   getUnreadCount,
   handleCollaborationResponse,
+  deleteConversationMessages,
 };

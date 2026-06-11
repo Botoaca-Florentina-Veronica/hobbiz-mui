@@ -11,8 +11,10 @@ const {
   reactToMessage,
   getUnreadCount,
   handleCollaborationResponse,
+  deleteConversationMessages,
 } = require("../controllers/MessageController");
 const auth = require("../middleware/auth");
+const adminAuth = require("../middleware/adminAuth");
 const upload = require("../config/cloudinaryMulter");
 
 // Creează un mesaj nou
@@ -20,6 +22,9 @@ router.post("/", auth, upload.single("image"), createMessage);
 
 // Șterge un mesaj după id
 router.delete("/:id", auth, deleteMessage);
+
+// Șterge toate mesajele dintr-o conversație (doar admin)
+router.delete("/conversation/:conversationId/all", auth, adminAuth, deleteConversationMessages);
 
 // Reacționează la un mesaj (toggle/update)
 router.post("/:id/react", auth, reactToMessage);

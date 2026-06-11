@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, Fragment } from 'r
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
+import { useAuth } from '../context/AuthContext.jsx';
 
 import TypingIndicator from '../components/TypingIndicator';
 import useSocket from '../hooks/useSocket';
@@ -11,6 +12,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
@@ -71,6 +73,14 @@ export default function ChatPage() {
   const [confirmCollabDialog, setConfirmCollabDialog] = useState(false);
   const [collabStatusDialog, setCollabStatusDialog] = useState({ open: false, message: '', type: 'info' });
 
+  // Negotiation state
+  const [activeNegotiation, setActiveNegotiation] = useState(null);
+  const [counterOfferOpen, setCounterOfferOpen] = useState(false);
+  const [counterOfferPrice, setCounterOfferPrice] = useState('');
+  const [loadingNegotiation, setLoadingNegotiation] = useState(false);
+  const [negotiationSnackbar, setNegotiationSnackbar] = useState(null); // { message, type }
+  const [confirmFinalizeOpen, setConfirmFinalizeOpen] = useState(false);
+
   const MOBILE_BREAKPOINT = 1024;
   const [isMobile, setIsMobile] = useState(() => getEffectiveViewportWidth() <= MOBILE_BREAKPOINT);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => getEffectiveViewportWidth() <= MOBILE_BREAKPOINT);
@@ -80,6 +90,9 @@ export default function ChatPage() {
 
   const { emitTyping, on, off } = useSocket(userId);
   const { openPopupChat } = useChatContext();
+  const { user: currentUser } = useAuth() || {};
+  const isAdmin = !!currentUser?.isAdmin;
+  const [confirmDeleteConvOpen, setConfirmDeleteConvOpen] = useState(false);
 
   const handlePopOut = () => {
     if (!selectedConversation) return;
@@ -300,12 +313,26 @@ export default function ChatPage() {
     fetchMsgs();
   }, [selectedConversation]);
 
+  // Load negotiation when conversation changes
+  useEffect(() => {
+    if (selectedConversation?.announcementId) {
+      loadActiveNegotiation(selectedConversation.announcementId);
+    } else {
+      setActiveNegotiation(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedConversation?.announcementId]);
+
   // Socket
   useEffect(() => {
     if (!userId) return;
     const handleNew = (msg) => {
       if (selectedConversation && msg.conversationId === selectedConversation.conversationId) {
         setMessages(prev => { if (prev.some(m => m._id === msg._id)) return prev; return [...prev, msg]; });
+        // Refresh negotiation when a negotiation system message arrives
+        if (msg.messageType === 'negotiation' && selectedConversation?.announcementId) {
+          loadActiveNegotiation(selectedConversation.announcementId);
+        }
         // Auto-mark as read since user is actively viewing this conversation
         if (String(msg.senderId) !== String(userId)) {
           apiClient.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`)
@@ -320,7 +347,18 @@ export default function ChatPage() {
       }
     };
     on('newMessage', handleNew);
-    return () => off('newMessage', handleNew);
+
+    const handleConversationCleared = (data) => {
+      if (selectedConversation && data.conversationId === selectedConversation.conversationId) {
+        setMessages([]);
+      }
+    };
+    on('conversationCleared', handleConversationCleared);
+
+    return () => {
+      off('newMessage', handleNew);
+      off('conversationCleared', handleConversationCleared);
+    };
   }, [userId, selectedConversation, on, off]);
 
   useEffect(() => {
@@ -362,6 +400,129 @@ export default function ChatPage() {
       return !s.isAccepted && !s.isDeclined;
     });
     return { latest, accepted, pending };
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!selectedConversation) return;
+    setConfirmDeleteConvOpen(false);
+    try {
+      await apiClient.delete(`/api/messages/conversation/${selectedConversation.conversationId}/all`);
+      setMessages([]);
+    } catch (err) {
+      console.error('Eroare la ștergerea conversației:', err);
+    }
+  };
+
+  // ── Negotiation helpers ──────────────────────────────────────
+
+  const showNegotiationSnackbar = (message, type = 'success') => {
+    setNegotiationSnackbar({ message, type });
+    setTimeout(() => setNegotiationSnackbar(null), 3500);
+  };
+
+  const loadActiveNegotiation = async (announcementId) => {
+    if (!announcementId) { setActiveNegotiation(null); return; }
+    try {
+      const res = await apiClient.get(`/api/negotiations/announcement/${announcementId}`);
+      const negotiations = res.data.negotiations || [];
+      const active = negotiations.find(neg =>
+        (neg.buyer._id === userId || neg.seller._id === userId) &&
+        ['pending', 'counter_offer', 'pending_confirmation', 'confirmed'].includes(neg.status)
+      );
+      setActiveNegotiation(active || null);
+    } catch (e) {
+      if (e?.response?.status !== 404) console.error('Negotiation load error:', e);
+      setActiveNegotiation(null);
+    }
+  };
+
+  const handleAcceptOffer = async () => {
+    if (!activeNegotiation || loadingNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      await apiClient.post(`/api/negotiations/${activeNegotiation._id}/accept`);
+      showNegotiationSnackbar(t('chat.offerAccepted'), 'success');
+      await loadActiveNegotiation(selectedConversation?.announcementId);
+    } catch (e) {
+      showNegotiationSnackbar(e?.response?.data?.message || t('chat.negotiationError'), 'error');
+    } finally { setLoadingNegotiation(false); }
+  };
+
+  const handleRejectOffer = async () => {
+    if (!activeNegotiation || loadingNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      await apiClient.post(`/api/negotiations/${activeNegotiation._id}/reject`);
+      showNegotiationSnackbar(t('chat.offerRejected'), 'info');
+      setActiveNegotiation(null);
+      await loadActiveNegotiation(selectedConversation?.announcementId);
+    } catch (e) {
+      showNegotiationSnackbar(e?.response?.data?.message || t('chat.negotiationError'), 'error');
+    } finally { setLoadingNegotiation(false); }
+  };
+
+  const handleSendCounterOffer = async () => {
+    if (!activeNegotiation || loadingNegotiation) return;
+    const price = parseFloat(counterOfferPrice);
+    if (isNaN(price) || price <= 0) return;
+    try {
+      setLoadingNegotiation(true);
+      setCounterOfferOpen(false);
+      const isSeller = String(userId) === String(activeNegotiation.seller._id);
+      let res;
+      if (isSeller) {
+        res = await apiClient.post(`/api/negotiations/${activeNegotiation._id}/counter-offer`, { counterPrice: price });
+      } else {
+        res = await apiClient.post(`/api/negotiations/${activeNegotiation._id}/buyer-counter`, { newPrice: price });
+      }
+      const displayPrice = res.data.negotiation?.currentPrice ?? price;
+      showNegotiationSnackbar(t('chat.counterOfferSent').replace('{price}', displayPrice), 'success');
+      setCounterOfferPrice('');
+      await loadActiveNegotiation(selectedConversation?.announcementId);
+    } catch (e) {
+      showNegotiationSnackbar(e?.response?.data?.message || t('chat.negotiationError'), 'error');
+    } finally { setLoadingNegotiation(false); }
+  };
+
+  const handleAcceptCounterOffer = async () => {
+    if (!activeNegotiation || loadingNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      await apiClient.post(`/api/negotiations/${activeNegotiation._id}/accept-counter`);
+      showNegotiationSnackbar(t('chat.offerAccepted'), 'success');
+      await loadActiveNegotiation(selectedConversation?.announcementId);
+    } catch (e) {
+      showNegotiationSnackbar(e?.response?.data?.message || t('chat.negotiationError'), 'error');
+    } finally { setLoadingNegotiation(false); }
+  };
+
+  const handleConfirmCollaboration = async () => {
+    if (!activeNegotiation || loadingNegotiation) return;
+    try {
+      setLoadingNegotiation(true);
+      const res = await apiClient.post(`/api/negotiations/${activeNegotiation._id}/confirm`);
+      if (res.data.collaborationEstablished) {
+        showNegotiationSnackbar(t('chat.collaborationConfirmedMsg'), 'success');
+      } else {
+        showNegotiationSnackbar(t('chat.waitingForConfirmation'), 'info');
+      }
+      await loadActiveNegotiation(selectedConversation?.announcementId);
+    } catch (e) {
+      showNegotiationSnackbar(e?.response?.data?.message || t('chat.negotiationError'), 'error');
+    } finally { setLoadingNegotiation(false); }
+  };
+
+  const handleFinalizeDeal = async () => {
+    if (!activeNegotiation || loadingNegotiation) return;
+    setConfirmFinalizeOpen(false);
+    try {
+      setLoadingNegotiation(true);
+      await apiClient.post(`/api/negotiations/${activeNegotiation._id}/finalize`);
+      showNegotiationSnackbar(`${t('chat.dealFinalized')} ${activeNegotiation.currentPrice} RON`, 'success');
+      await loadActiveNegotiation(selectedConversation?.announcementId);
+    } catch (e) {
+      showNegotiationSnackbar(e?.response?.data?.message || t('chat.negotiationError'), 'error');
+    } finally { setLoadingNegotiation(false); }
   };
 
   const handleSendCollaborationRequest = () => {
@@ -716,7 +877,114 @@ export default function ChatPage() {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
                 </IconButton>
+                {/* Finalize Deal Button (buyer only, when negotiation confirmed) */}
+                {activeNegotiation?.status === 'confirmed' && String(activeNegotiation?.buyer?._id) === String(userId) && (
+                  <IconButton
+                    onClick={() => setConfirmFinalizeOpen(true)}
+                    disabled={loadingNegotiation}
+                    sx={{
+                      color: '#16a34a',
+                      opacity: loadingNegotiation ? 0.5 : 1,
+                      '&:hover': { backgroundColor: 'rgba(22,163,74,0.1)' }
+                    }}
+                    title={t('chat.finalizeDeal')}
+                  >
+                    <CheckCircleOutlineIcon sx={{ fontSize: 24 }} />
+                  </IconButton>
+                )}
+                {/* Admin: Delete All Messages Button */}
+                {isAdmin && (
+                  <IconButton
+                    onClick={() => setConfirmDeleteConvOpen(true)}
+                    sx={{
+                      color: '#e53935',
+                      '&:hover': { backgroundColor: 'rgba(229,57,53,0.1)' }
+                    }}
+                    title="Șterge toate mesajele (admin)"
+                  >
+                    <DeleteSweepIcon sx={{ fontSize: 22 }} />
+                  </IconButton>
+                )}
               </div>
+
+              {/* Negotiation Bar */}
+              {activeNegotiation && activeNegotiation.status !== 'finalized' && (
+                <div className="negotiation-bar">
+                  <div className="negotiation-bar-top">
+                    <div className="negotiation-bar-icon">💰</div>
+                    <div className="negotiation-bar-info">
+                      <div className="negotiation-bar-label">{t('chat.negotiationOffer')}</div>
+                      <div className="negotiation-bar-status">
+                        {activeNegotiation.status === 'pending'
+                          ? (String(activeNegotiation.buyer._id) === String(userId)
+                              ? t('chat.awaitingReply')
+                              : t('chat.respondToOffer'))
+                          : activeNegotiation.status === 'counter_offer'
+                          ? (String(activeNegotiation.lastActionBy) === String(userId)
+                              ? t('chat.awaitingReply')
+                              : t('chat.respondToCounter'))
+                          : activeNegotiation.status === 'pending_confirmation'
+                          ? t('chat.pendingConfirmation')
+                          : activeNegotiation.status === 'confirmed'
+                          ? t('chat.collaborationConfirmed')
+                          : t('chat.negotiationOffer')}
+                      </div>
+                    </div>
+                    <div className="negotiation-bar-price">{activeNegotiation.currentPrice} RON</div>
+                    {['pending', 'counter_offer', 'pending_confirmation'].includes(activeNegotiation.status) && (
+                      <button
+                        className="negotiation-bar-reject"
+                        onClick={handleRejectOffer}
+                        disabled={loadingNegotiation}
+                      >
+                        {t('chat.rejectOffer')}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Seller sees Accept + Counter when pending or when buyer countered */}
+                  {String(activeNegotiation.seller._id) === String(userId) &&
+                   (activeNegotiation.status === 'pending' ||
+                    (activeNegotiation.status === 'counter_offer' && String(activeNegotiation.lastActionBy) === String(activeNegotiation.buyer._id))) && (
+                    <div className="negotiation-bar-actions">
+                      <button className="negotiation-bar-btn primary" disabled={loadingNegotiation} onClick={handleAcceptOffer}>
+                        {t('chat.acceptOffer')}
+                      </button>
+                      <button className="negotiation-bar-btn secondary" disabled={loadingNegotiation} onClick={() => setCounterOfferOpen(true)}>
+                        {t('chat.sendCounterOffer')}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Buyer sees Accept Counter + Counter when seller countered */}
+                  {String(activeNegotiation.buyer._id) === String(userId) &&
+                   activeNegotiation.status === 'counter_offer' &&
+                   String(activeNegotiation.lastActionBy) === String(activeNegotiation.seller._id) && (
+                    <div className="negotiation-bar-actions">
+                      <button className="negotiation-bar-btn primary" disabled={loadingNegotiation} onClick={handleAcceptCounterOffer}>
+                        {t('chat.acceptOffer')}
+                      </button>
+                      <button className="negotiation-bar-btn secondary" disabled={loadingNegotiation} onClick={() => setCounterOfferOpen(true)}>
+                        {t('chat.sendCounterOffer')}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Both see Confirm button when pending_confirmation */}
+                  {activeNegotiation.status === 'pending_confirmation' && (
+                    <div className="negotiation-bar-actions">
+                      <button className="negotiation-bar-btn primary" disabled={loadingNegotiation} onClick={handleConfirmCollaboration}>
+                        {t('chat.confirmCollaboration')}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Confirmed message */}
+                  {activeNegotiation.status === 'confirmed' && (
+                    <div className="negotiation-bar-confirmed-msg">{t('chat.collaborationConfirmedMsg')}</div>
+                  )}
+                </div>
+              )}
 
               <div className="chat-messages-container">
                 {loading && <CircularProgress sx={{ alignSelf: 'center', mt: 2 }} />}
@@ -828,6 +1096,19 @@ export default function ChatPage() {
                                     </>
                                   );
                                 })()}
+                              </div>
+                            ) : msg.messageType === 'negotiation' ? (
+                              <div className="negotiation-message">
+                                <div className="negotiation-message-header">
+                                  <span>💰</span>
+                                  <span>{t('chat.negotiationOffer')}</span>
+                                </div>
+                                {msg.negotiation?.price != null && (
+                                  <div className="negotiation-message-price">{msg.negotiation.price} RON</div>
+                                )}
+                                {msg.text && (
+                                  <div className="negotiation-message-text">{msg.text}</div>
+                                )}
                               </div>
                             ) : (
                               <>
@@ -983,12 +1264,112 @@ export default function ChatPage() {
               )}
             </div>
             <p className="collab-status-message">{collabStatusDialog.message}</p>
-            <button 
+            <button
               className="collab-dialog-btn confirm full-width"
               onClick={() => setCollabStatusDialog({ open: false, message: '' })}
             >
               OK
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Counter-offer dialog */}
+      {counterOfferOpen && (
+        <div className="negotiation-counter-overlay" onClick={() => { setCounterOfferOpen(false); setCounterOfferPrice(''); }}>
+          <div className="negotiation-counter-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>💰 {t('chat.sendCounterOffer')}</h3>
+            <p>
+              {t('chat.negotiationOffer')}: <strong>{activeNegotiation?.currentPrice} RON</strong>
+            </p>
+            <div className="negotiation-counter-input-wrap">
+              <input
+                className="negotiation-counter-input"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="0.00"
+                value={counterOfferPrice}
+                onChange={(e) => setCounterOfferPrice(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSendCounterOffer(); }}
+                autoFocus
+              />
+              <span className="negotiation-counter-currency">RON</span>
+            </div>
+            <div className="negotiation-counter-actions">
+              <button className="btn-cancel" onClick={() => { setCounterOfferOpen(false); setCounterOfferPrice(''); }}>
+                {t('chat.cancel')}
+              </button>
+              <button
+                className="btn-send"
+                disabled={!counterOfferPrice || parseFloat(counterOfferPrice) <= 0 || loadingNegotiation}
+                onClick={handleSendCounterOffer}
+              >
+                {t('chat.sendCounterOffer')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Finalize deal confirmation dialog */}
+      {confirmFinalizeOpen && (
+        <div className="collab-dialog-overlay" onClick={() => setConfirmFinalizeOpen(false)}>
+          <div className="collab-dialog delete-conv-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-conv-icon-wrap" style={{ background: 'linear-gradient(135deg,#dcfce7,#bbf7d0)', color: '#166534' }}>
+              <CheckCircleOutlineIcon style={{ fontSize: 36 }} />
+            </div>
+            <h3 className="delete-conv-title" style={{ color: 'var(--c-text-primary)' }}>{t('chat.finalizeDeal')}</h3>
+            <p className="delete-conv-message">{t('chat.finalizeDealConfirm')}</p>
+            <div className="delete-conv-actions">
+              <button className="collab-dialog-btn delete-cancel" onClick={() => setConfirmFinalizeOpen(false)}>
+                {t('chat.cancel')}
+              </button>
+              <button
+                className="collab-dialog-btn delete-confirm"
+                style={{ background: '#16a34a' }}
+                onClick={handleFinalizeDeal}
+              >
+                {t('chat.finalizeDeal')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Negotiation snackbar */}
+      {negotiationSnackbar && (
+        <div className={`negotiation-snackbar ${negotiationSnackbar.type}`}>
+          {negotiationSnackbar.message}
+        </div>
+      )}
+
+      {/* Admin: Confirm delete all messages dialog */}
+      {confirmDeleteConvOpen && (
+        <div className="collab-dialog-overlay" onClick={() => setConfirmDeleteConvOpen(false)}>
+          <div className="collab-dialog delete-conv-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-conv-icon-wrap">
+              <DeleteSweepIcon style={{ fontSize: 36 }} />
+            </div>
+            <h3 className="delete-conv-title">Șterge toate mesajele</h3>
+            <p className="delete-conv-message">
+              Ești sigur că vrei să ștergi <strong>toate mesajele</strong> din această conversație?<br />
+              Această acțiune este <strong>ireversibilă</strong>.
+            </p>
+            <div className="delete-conv-actions">
+              <button
+                className="collab-dialog-btn delete-cancel"
+                onClick={() => setConfirmDeleteConvOpen(false)}
+              >
+                Anulează
+              </button>
+              <button
+                className="collab-dialog-btn delete-confirm"
+                onClick={handleDeleteConversation}
+              >
+                Șterge tot
+              </button>
+            </div>
           </div>
         </div>
       )}
