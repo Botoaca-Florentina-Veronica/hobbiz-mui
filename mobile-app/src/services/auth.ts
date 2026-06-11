@@ -21,12 +21,18 @@ export async function loginWithCredentials(email: string, password: string) {
   }
 }
 
+export async function getRegisterChallenge(): Promise<string> {
+  const res = await api.get('/api/users/register/challenge');
+  return res.data.token;
+}
+
 export async function registerWithCredentials(payload: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   phone?: string;
+  _formToken?: string;
 }) {
   try {
     const res = await api.post('/api/users/register', payload);

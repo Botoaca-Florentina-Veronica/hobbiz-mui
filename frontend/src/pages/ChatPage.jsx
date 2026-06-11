@@ -247,6 +247,15 @@ export default function ChatPage() {
         const formatted = data.map(c => {
           const partAvatar = resolveAvatarUrl(c.otherParticipant?.avatar);
           const annImg = resolveAvatarUrl(c.announcementImage);
+          const msgType = c.lastMessage?.messageType;
+          const rawText = c.lastMessage?.text || '';
+          const lastMessageText =
+            msgType === 'collaboration_request' || rawText === 'COLLABORATION_REQUEST'
+              ? `🤝 ${t('chat.collaborationRequestText')}`
+              : msgType === 'negotiation'
+              ? `💰 ${t('chat.negotiationOffer')}`
+              : rawText || t('chat.image');
+
           return {
             ...c,
             id: c.otherParticipant.id,
@@ -254,7 +263,7 @@ export default function ChatPage() {
             participantName: `${c.otherParticipant.firstName} ${c.otherParticipant.lastName}`.trim(),
             participantAvatar: partAvatar,
             displayTitle: c.announcementTitle || c.name || '(Fără titlu)',
-            lastMessageText: c.lastMessage?.text || 'Imagine',
+            lastMessageText,
             timeFormatted: new Date(c.lastMessage?.createdAt).toLocaleString('ro-RO', {hour:'2-digit', minute:'2-digit'})
           };
         });
@@ -297,6 +306,17 @@ export default function ChatPage() {
     const handleNew = (msg) => {
       if (selectedConversation && msg.conversationId === selectedConversation.conversationId) {
         setMessages(prev => { if (prev.some(m => m._id === msg._id)) return prev; return [...prev, msg]; });
+        // Auto-mark as read since user is actively viewing this conversation
+        if (String(msg.senderId) !== String(userId)) {
+          apiClient.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`)
+            .then(() => {
+              setConversations(prev => prev.map(c =>
+                c.conversationId === selectedConversation.conversationId ? { ...c, unread: false } : c
+              ));
+              window.dispatchEvent(new Event('chat:counts-updated'));
+            })
+            .catch(() => {});
+        }
       }
     };
     on('newMessage', handleNew);

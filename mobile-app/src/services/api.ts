@@ -134,8 +134,8 @@ api.interceptors.response.use(
           return new Promise((resolve) => setTimeout(resolve, delay)).then(() => api(cfg));
         }
 
-        // If we're here it means we won't retry - show an error toast once
-        if (!shouldRetry) {
+        // Show toast only for actual connection failures, not for validation errors (4xx)
+        if (!shouldRetry && (isTimeout || isNetwork || isRetriableStatus)) {
           showToast('Request eșuat. Verifică conexiunea la internet și încearcă din nou.', 'error', 6000);
         }
     } catch (e) {

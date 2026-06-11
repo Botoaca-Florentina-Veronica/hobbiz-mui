@@ -307,6 +307,15 @@ export default function ChatScreen() {
           '(fără titlu)';
 
         const announcementOwnerName = conv.announcementOwnerName || participantName;
+        const lastMsgType = conv.lastMessage?.messageType;
+        const lastMsgRaw = conv.lastMessage?.text || '';
+        const lastMessageText =
+          lastMsgType === 'collaboration_request' || lastMsgRaw === 'COLLABORATION_REQUEST'
+            ? `🤝 ${t.collaborationRequest}`
+            : lastMsgType === 'negotiation'
+            ? `💰 ${t.negotiationOffer}`
+            : lastMsgRaw;
+
         return {
           id: conv.otherParticipant.id,
           conversationId: conv.conversationId,
@@ -316,7 +325,7 @@ export default function ChatScreen() {
           participantAvatar,
           announcementTitle: resolvedAnnouncementTitle,
           announcementOwnerName,
-          lastMessage: conv.lastMessage.text,
+          lastMessage: lastMessageText,
           time: new Date(conv.lastMessage.createdAt).toLocaleString('ro-RO', {
             hour: '2-digit',
             minute: '2-digit',

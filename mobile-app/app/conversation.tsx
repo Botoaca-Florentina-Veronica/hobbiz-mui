@@ -227,6 +227,11 @@ export default function ConversationScreen() {
                if (prev.some(m => m._id === newMsg._id)) return prev;
                return [...prev, newMsg];
            });
+           // Auto-mark as read since user is actively viewing this conversation
+           if (String(newMsg.senderId) !== String(userId)) {
+             api.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`).catch(() => {});
+             decrementUnreadCount(1);
+           }
       }
     };
 
@@ -240,22 +245,34 @@ export default function ConversationScreen() {
         if (selectedConversation.otherParticipant?.id === data.userId) {
             setIsOtherUserOnline(data.status === 'online');
         }
-    }
+    };
+
+    const handleCollaborationUpdated = (data: { messageId: string; conversationId: string; collaborationData: any }) => {
+      if (data.conversationId === selectedConversation.conversationId) {
+        setMessages((prev) => prev.map((m) =>
+          m._id === data.messageId
+            ? { ...m, collaborationData: data.collaborationData }
+            : m
+        ));
+      }
+    };
 
     socket.on('newMessage', handleNewMessage);
     socket.on('userTyping', handleUserTyping);
     socket.on('userStatus', handleUserStatus);
+    socket.on('collaborationUpdated', handleCollaborationUpdated);
 
     return () => {
         // Notify server that user left this conversation
         socket.emit('leaveConversation', { userId });
         console.log(`👋 Left conversation: ${selectedConversation.conversationId}`);
-        
+
         socket.off('newMessage', handleNewMessage);
         socket.off('userTyping', handleUserTyping);
         socket.off('userStatus', handleUserStatus);
+        socket.off('collaborationUpdated', handleCollaborationUpdated);
     };
-  }, [socket, selectedConversation, userId]);
+  }, [socket, selectedConversation, userId, decrementUnreadCount]);
 
   // Typing handler
   const handleTypingInput = (text: string) => {
@@ -961,14 +978,17 @@ export default function ConversationScreen() {
       });
       setMessages(normalized);
 
-      if (selectedConversation.unread && selectedConversation.unreadCount) {
-        try {
-          await api.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
-          decrementUnreadCount(selectedConversation.unreadCount);
-          setSelectedConversation(prev => prev ? ({ ...prev, unread: false, unreadCount: 0 }) : null);
-        } catch (e) {
-          console.error('Error marking as read:', e);
+      // Always mark as read regardless of local unread flag — the flag may be
+      // stale (e.g. navigating from a push notification that doesn't pass unread=true).
+      // Backend returns modifiedCount so we only decrement when something was actually marked.
+      try {
+        const markRes = await api.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
+        const marked = (markRes?.data?.modifiedCount as number) ?? 0;
+        if (marked > 0) {
+          decrementUnreadCount(marked);
         }
+      } catch (e) {
+        // non-fatal: unread count will self-correct on next periodic refresh
       }
     } catch (error) {
       console.error('Error loading messages:', error);

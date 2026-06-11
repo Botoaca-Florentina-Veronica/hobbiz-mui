@@ -9,6 +9,8 @@ export const chatTranslations = {
     loadingConversations: 'Se încarcă conversațiile...',
     noConversations: 'Nu ai conversații',
     startWriting: 'E momentul tău Eminescu, începe să scrii!',
+    collaborationRequest: 'Cerere de colaborare',
+    negotiationOffer: 'Propunere de preț',
   },
   en: {
     messages: 'Messages',
@@ -18,6 +20,8 @@ export const chatTranslations = {
     loadingConversations: 'Loading conversations...',
     noConversations: 'You have no conversations',
     startWriting: "It's your moment, start writing!",
+    collaborationRequest: 'Collaboration request',
+    negotiationOffer: 'Price proposal',
   },
   es: {
     messages: 'Mensajes',
@@ -27,6 +31,8 @@ export const chatTranslations = {
     loadingConversations: 'Cargando conversaciones...',
     noConversations: 'No tienes conversaciones',
     startWriting: 'Es tu momento, empieza a escribir!',
+    collaborationRequest: 'Solicitud de colaboración',
+    negotiationOffer: 'Propuesta de precio',
   },
 };
 

@@ -1422,7 +1422,8 @@
     "accept": "Acceptă",
     "decline": "Refuză",
     "cancel": "Anulează",
-    "sendMessageError": "Eroare la trimiterea mesajului"
+    "sendMessageError": "Eroare la trimiterea mesajului",
+    "negotiationOffer": "Propunere de preț"
   },
   "notifications": {
     "title": "Notificări",

@@ -1422,7 +1422,8 @@
     "accept": "Accept",
     "decline": "Decline",
     "cancel": "Cancel",
-    "sendMessageError": "Error sending message"
+    "sendMessageError": "Error sending message",
+    "negotiationOffer": "Price proposal"
   },
   "notifications": {
     "title": "Notifications",

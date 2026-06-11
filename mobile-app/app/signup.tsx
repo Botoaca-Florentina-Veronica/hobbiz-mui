@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -20,7 +20,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
 import { normalizeLocale } from '../src/i18n';
 import api from '../src/services/api';
-import { registerWithCredentials, saveToken } from '../src/services/auth';
+import { getRegisterChallenge, registerWithCredentials, saveToken } from '../src/services/auth';
 
 export const options = { headerShown: false };
 
@@ -201,6 +201,14 @@ export default function SignupScreen() {
   const [loading,   setLoading]     = useState(false);
   const [error,     setError]       = useState('');
 
+  const formTokenRef = useRef<{ token: string; fetchedAt: number } | null>(null);
+
+  useEffect(() => {
+    getRegisterChallenge()
+      .then(token => { formTokenRef.current = { token, fetchedAt: Date.now() }; })
+      .catch(() => {});
+  }, []);
+
   const isSmall  = width < 600;
   const isMedium = width >= 600 && width < 900;
 
@@ -232,12 +240,27 @@ export default function SignupScreen() {
     setError('');
     setLoading(true);
     try {
+      // Fetch or refresh the form challenge token (backend anti-bot requirement)
+      const TOKEN_MAX_AGE_MS = 14 * 60 * 1000;
+      let tokenData = formTokenRef.current;
+      if (!tokenData || Date.now() - tokenData.fetchedAt > TOKEN_MAX_AGE_MS) {
+        const token = await getRegisterChallenge();
+        tokenData = { token, fetchedAt: Date.now() };
+        formTokenRef.current = tokenData;
+      }
+      // Backend requires >= 2s between token issuance and use
+      const age = Date.now() - tokenData.fetchedAt;
+      if (age < 2100) {
+        await new Promise<void>(resolve => setTimeout(resolve, 2100 - age));
+      }
+
       const res = await registerWithCredentials({
         firstName: firstName.trim(),
         lastName:  lastName.trim(),
         email:     email.trim(),
         password,
         phone:     phone.trim() || undefined,
+        _formToken: tokenData.token,
       });
 
       const token = (res as any)?.token as string | undefined;

@@ -577,9 +577,10 @@ const getConversations = async (req, res) => {
                 lastSeen: otherUser.lastSeen,
               },
               lastMessage: {
-                text: decrypt(message.text),
+                text: message.text ? decrypt(message.text) : '',
                 senderId: message.senderId,
                 createdAt: message.createdAt,
+                messageType: message.messageType || 'text',
               },
               announcementId,
               announcementImage,
@@ -600,9 +601,10 @@ const getConversations = async (req, res) => {
           new Date(existingConversation.lastMessage.createdAt)
         ) {
           existingConversation.lastMessage = {
-            text: decrypt(message.text),
+            text: message.text ? decrypt(message.text) : '',
             senderId: message.senderId,
             createdAt: message.createdAt,
+            messageType: message.messageType || 'text',
           };
           existingConversation.conversationId = message.conversationId;
         }
@@ -784,9 +786,22 @@ const markMessagesAsReadByConversation = async (req, res) => {
         .status(403)
         .json({ error: "Nu poți marca drept citite o conversație a altora" });
     }
+
+    // Construiește lista de conversationId-uri de căutat:
+    // mesajele vechi pot fi stocate cu formatul legacy 2-parti (userA-userB),
+    // în timp ce cel curent are 3 parti (userA-userB-announcementId).
+    const conversationIds = [conversationId];
+    if (parts.length === 3) {
+      // Ambele ordini posibile ale celor doi participanți
+      const legacySorted = [parts[0], parts[1]].sort().join("-");
+      const legacyUnsorted = `${parts[0]}-${parts[1]}`;
+      if (!conversationIds.includes(legacySorted)) conversationIds.push(legacySorted);
+      if (!conversationIds.includes(legacyUnsorted)) conversationIds.push(legacyUnsorted);
+    }
+
     // Găsește mesajele necitite ce urmează a fi marcate ca citite pentru a extrage ID-urile și expeditorii
     const unreadMessages = await Message.find({
-      conversationId,
+      conversationId: { $in: conversationIds },
       senderId: { $ne: authenticatedUserId },
       isRead: false,
     }).select("_id senderId");
@@ -798,7 +813,7 @@ const markMessagesAsReadByConversation = async (req, res) => {
     const now = new Date();
     const result = await Message.updateMany(
       {
-        conversationId,
+        conversationId: { $in: conversationIds },
         senderId: { $ne: authenticatedUserId },
         isRead: false,
       },
@@ -1046,6 +1061,31 @@ const handleCollaborationResponse = async (req, res) => {
         );
       }
     }
+
+    // Emit real-time update to all participants so both UIs reflect the new status
+    try {
+      const io = req.app.get("io");
+      const activeUsers = req.app.get("activeUsers");
+      if (io && activeUsers) {
+        const participants = (message.collaborationData.participants || [])
+          .map(String)
+          .filter(Boolean);
+        for (const uid of participants) {
+          const sid = activeUsers.get(uid);
+          if (sid) {
+            io.to(sid).emit("collaborationUpdated", {
+              messageId: String(message._id),
+              conversationId: message.conversationId,
+              collaborationData: {
+                participants: message.collaborationData.participants,
+                acceptedBy: message.collaborationData.acceptedBy,
+                declinedBy: message.collaborationData.declinedBy,
+              },
+            });
+          }
+        }
+      }
+    } catch (_) {}
 
     // Attach sender info for consistency
     let senderInfo = null;

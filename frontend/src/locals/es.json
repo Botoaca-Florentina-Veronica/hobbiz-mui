@@ -1417,7 +1417,8 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "cancel": "Cancelar",
-    "sendMessageError": "Error al enviar el mensaje"
+    "sendMessageError": "Error al enviar el mensaje",
+    "negotiationOffer": "Propuesta de precio"
   },
   "notifications": {
     "title": "Notificaciones",
