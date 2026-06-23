@@ -42,8 +42,21 @@ const PrivacyPolicy = () => {
         </div>
       </div>
 
+      <nav className="privacy-policy__toc" aria-label={t('privacy.toc.aria')}>
+        <h2 className="privacy-policy__toc-title">{t('privacy.toc.title')}</h2>
+        <ul>
+          <li><a href="#scop-aplicare">{t('privacy.toc.s1')}</a></li>
+          <li><a href="#categorii-date">{t('privacy.toc.s2')}</a></li>
+          <li><a href="#scopuri-juridice">{t('privacy.toc.s3')}</a></li>
+          <li><a href="#securitate-confidentialitate">{t('privacy.toc.s4')}</a></li>
+          <li><a href="#securitate-informatii">{t('privacy.toc.s5')}</a></li>
+          <li><a href="#drepturi-utilizatori">{t('privacy.toc.s6')}</a></li>
+          <li><a href="#contact-info">{t('privacy.toc.s7')}</a></li>
+        </ul>
+      </nav>
+
       <div className="privacy-policy__content">
-        <section>
+        <section id="scop-aplicare">
           <h2>{t('privacy.s1.title')}</h2>
           <p>
             {t('privacy.s1.p1')}
@@ -55,7 +68,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="privacy-policy__content">
-        <section>
+        <section id="categorii-date">
           <h2>{t('privacy.s2.title')}</h2>
           
           <h3>{t('privacy.s2.h1')}</h3>
@@ -77,7 +90,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="privacy-policy__content">
-        <section>
+        <section id="scopuri-juridice">
           <h2>{t('privacy.s3.title')}</h2>
           <p>
             {t('privacy.s3.intro')}
@@ -106,7 +119,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="privacy-policy__content">
-        <section>
+        <section id="securitate-confidentialitate">
           <h2>{t('privacy.s4.title')}</h2>
           <p>
             {t('privacy.s4.intro')}
@@ -131,7 +144,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="privacy-policy__content">
-        <section>
+        <section id="securitate-informatii">
           <h2>{t('privacy.s5.title')}</h2>
           
           <p>
@@ -206,7 +219,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="privacy-policy__content">
-        <section>
+        <section id="drepturi-utilizatori">
           <h2>{t('privacy.s6.title')}</h2>
           <p>
             {t('privacy.s6.intro')}
@@ -239,7 +252,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="privacy-policy__content">
-        <section>
+        <section id="contact-info">
           <h2>{t('privacy.s7.title')}</h2>
           <p>
             {t('privacy.s7.intro')}

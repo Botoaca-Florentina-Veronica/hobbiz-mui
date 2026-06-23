@@ -102,10 +102,8 @@ const createReview = async (req, res) => {
         // Emit socket event for real-time delivery (if Socket.IO configured)
         try {
           const io = req.app && req.app.get ? req.app.get("io") : null;
-          const activeUsers = req.app && req.app.get ? req.app.get("activeUsers") : null;
-          if (io && activeUsers) {
-            const sid = activeUsers.get(String(reviewedUserId));
-            if (sid) io.to(sid).emit("newNotification", { userId: reviewedUserId });
+          if (io) {
+            io.to('user:' + String(reviewedUserId)).emit("newNotification", { userId: reviewedUserId });
           }
         } catch (_) {}
 

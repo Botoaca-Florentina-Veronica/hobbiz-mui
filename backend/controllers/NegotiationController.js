@@ -105,11 +105,9 @@ exports.createNegotiation = async (req, res) => {
           if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar };
         } catch (_) {}
 
-        if (io && activeUsers) {
-          const sellerSocket = activeUsers.get(String(sellerId));
-          const buyerSocket = activeUsers.get(String(buyerId));
-          if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...sysMsgResponse, senderInfo });
-          if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...sysMsgResponse, senderInfo });
+        if (io) {
+          io.to('user:' + String(sellerId)).emit('newMessage', { ...sysMsgResponse, senderInfo });
+          io.to('user:' + String(buyerId)).emit('newMessage', { ...sysMsgResponse, senderInfo });
         }
       } catch (_) {}
     } catch (e) {
@@ -139,10 +137,8 @@ exports.createNegotiation = async (req, res) => {
         // Try to emit socket event for real-time delivery (if Socket.IO configured)
         try {
           const io = req.app && req.app.get ? req.app.get('io') : null;
-          const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-          if (io && activeUsers) {
-            const sid = activeUsers.get(String(sellerId));
-            if (sid) io.to(sid).emit('newNotification', { userId: sellerId });
+          if (io) {
+            io.to('user:' + String(sellerId)).emit('newNotification', { userId: sellerId });
           }
         } catch (_) {}
 
@@ -350,14 +346,11 @@ exports.acceptOffer = async (req, res) => {
       msgResponse.text = decrypt(msgResponse.text);
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
-      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-      if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
-        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+      if (io) {
         let senderInfo = null;
         try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
-        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
-        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.buyer._id)).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.seller._id)).emit('newMessage', { ...msgResponse, senderInfo });
       }
     } catch (e) { console.warn('Nu s-a putut crea mesaj pentru acceptare:', e?.message || e); }
 
@@ -434,14 +427,11 @@ exports.rejectOffer = async (req, res) => {
       msgResponse.text = decrypt(msgResponse.text);
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
-      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-      if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
-        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+      if (io) {
         let senderInfo = null;
         try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
-        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
-        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.buyer._id)).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.seller._id)).emit('newMessage', { ...msgResponse, senderInfo });
       }
     } catch (e) { console.warn('Nu s-a putut crea mesaj pentru refuz:', e?.message || e); }
 
@@ -523,14 +513,11 @@ exports.counterOffer = async (req, res) => {
       msgResponse.text = decrypt(msgResponse.text);
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
-      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-      if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
-        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+      if (io) {
         let senderInfo = null;
         try { const sellerUser = await User.findById(userId).select('firstName lastName avatar'); if (sellerUser) senderInfo = { firstName: sellerUser.firstName, lastName: sellerUser.lastName, avatar: sellerUser.avatar }; } catch (_) {}
-        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
-        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.buyer._id)).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.seller._id)).emit('newMessage', { ...msgResponse, senderInfo });
       }
     } catch (e) { console.warn('Nu s-a putut crea mesaj pentru contraoferta:', e?.message || e); }
 
@@ -605,14 +592,11 @@ exports.acceptCounterOffer = async (req, res) => {
       msgResponse.text = decrypt(msgResponse.text);
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
-      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-      if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
-        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+      if (io) {
         let senderInfo = null;
         try { const buyerUser = await User.findById(userId).select('firstName lastName avatar'); if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar }; } catch (_) {}
-        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
-        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.buyer._id)).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.seller._id)).emit('newMessage', { ...msgResponse, senderInfo });
       }
     } catch (e) { console.warn('Nu s-a putut crea mesaj pentru accept counter:', e?.message || e); }
 
@@ -694,14 +678,11 @@ exports.buyerCounterOffer = async (req, res) => {
       msgResponse.text = decrypt(msgResponse.text);
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
-      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-      if (io && activeUsers) {
-        const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
-        const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+      if (io) {
         let senderInfo = null;
         try { const buyerUser = await User.findById(userId).select('firstName lastName avatar'); if (buyerUser) senderInfo = { firstName: buyerUser.firstName, lastName: buyerUser.lastName, avatar: buyerUser.avatar }; } catch (_) {}
-        if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
-        if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.buyer._id)).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + String(negotiation.seller._id)).emit('newMessage', { ...msgResponse, senderInfo });
       }
     } catch (e) { console.warn('Nu s-a putut crea mesaj pentru oferta noua:', e?.message || e); }
 
@@ -823,20 +804,15 @@ exports.cancelNegotiation = async (req, res) => {
       }).save();
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
-      const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-      if (io && activeUsers) {
+      if (io) {
         const destId = userId === String(negotiation.buyer._id) ? String(negotiation.seller._id) : String(negotiation.buyer._id);
-        const sourceSocket = activeUsers.get(String(userId));
-        const destSocket = activeUsers.get(destId);
-        
         let senderInfo = null;
-        try { 
-            const u = await User.findById(userId).select('firstName lastName avatar'); 
-            if (u) senderInfo = { firstName: u.firstName, lastName: u.lastName, avatar: u.avatar }; 
+        try {
+            const u = await User.findById(userId).select('firstName lastName avatar');
+            if (u) senderInfo = { firstName: u.firstName, lastName: u.lastName, avatar: u.avatar };
         } catch (_) {}
-
-        if (sourceSocket) io.to(sourceSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
-        if (destSocket) io.to(destSocket).emit('newMessage', { ...msg.toObject(), senderInfo });
+        io.to('user:' + String(userId)).emit('newMessage', { ...msg.toObject(), senderInfo });
+        io.to('user:' + destId).emit('newMessage', { ...msg.toObject(), senderInfo });
       }
     } catch (e) {
       console.warn('Nu s-a putut crea mesajul de anulare negociere:', e?.message || e);
@@ -966,21 +942,18 @@ exports.confirmCollaboration = async (req, res) => {
 
         // Send socket messages
         const io = req.app && req.app.get ? req.app.get('io') : null;
-        const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-        if (io && activeUsers) {
-          const buyerSocket = activeUsers.get(String(negotiation.buyer._id));
-          const sellerSocket = activeUsers.get(String(negotiation.seller._id));
+        if (io) {
           let senderInfo = null;
-          try { 
-            const senderUser = await User.findById(userId).select('firstName lastName avatar'); 
-            if (senderUser) senderInfo = { 
-              firstName: senderUser.firstName, 
-              lastName: senderUser.lastName, 
-              avatar: senderUser.avatar 
-            }; 
+          try {
+            const senderUser = await User.findById(userId).select('firstName lastName avatar');
+            if (senderUser) senderInfo = {
+              firstName: senderUser.firstName,
+              lastName: senderUser.lastName,
+              avatar: senderUser.avatar
+            };
           } catch (_) {}
-          if (buyerSocket) io.to(buyerSocket).emit('newMessage', { ...msgResponse, senderInfo });
-          if (sellerSocket) io.to(sellerSocket).emit('newMessage', { ...msgResponse, senderInfo });
+          io.to('user:' + String(negotiation.buyer._id)).emit('newMessage', { ...msgResponse, senderInfo });
+          io.to('user:' + String(negotiation.seller._id)).emit('newMessage', { ...msgResponse, senderInfo });
         }
       } catch (e) { 
         console.warn('Nu s-a putut crea mesaj pentru confirmarea colaborării:', e?.message || e); 
@@ -1034,16 +1007,12 @@ exports.confirmCollaboration = async (req, res) => {
 
         // Send socket notification (simplified)
         const io = req.app && req.app.get ? req.app.get('io') : null;
-        const activeUsers = req.app && req.app.get ? req.app.get('activeUsers') : null;
-        if (io && activeUsers) {
+        if (io) {
           const targetUserId = userId === negotiation.seller._id.toString() ? negotiation.buyer._id : negotiation.seller._id;
-          const targetSocket = activeUsers.get(String(targetUserId));
-          if (targetSocket) {
-            const msgResponse = msg.toObject();
-            const { decrypt } = require('../services/encryptionService');
-            msgResponse.text = decrypt(msgResponse.text);
-            io.to(targetSocket).emit('newMessage', msgResponse);
-          }
+          const msgResponse = msg.toObject();
+          const { decrypt } = require('../services/encryptionService');
+          msgResponse.text = decrypt(msgResponse.text);
+          io.to('user:' + String(targetUserId)).emit('newMessage', msgResponse);
         }
       } catch (e) { 
         console.warn('Nu s-a putut crea mesaj pentru confirmarea parțială:', e?.message || e); 

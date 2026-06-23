@@ -6,7 +6,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, Card, CardMedia, CardContent, Paper, Avatar } from '@mui/material';
+import { Box, IconButton, TextField, InputAdornment, Divider, Chip, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, Card, CardMedia, CardContent, Paper, Avatar, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -109,7 +109,8 @@ export default function AddAnnouncementPage() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // State-uri pentru toast
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -516,6 +517,7 @@ export default function AddAnnouncementPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append('title', title);
@@ -542,7 +544,7 @@ export default function AddAnnouncementPage() {
         navigate('/adauga-anunt');
       } else {
         const response = await apiClient.post('/api/users/my-announcements', formData, {
-          headers: { 
+          headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`
           }
@@ -561,6 +563,7 @@ export default function AddAnnouncementPage() {
       } else {
         setError(t('addAnnouncement.errors.submitError'));
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -1263,8 +1266,8 @@ export default function AddAnnouncementPage() {
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
-          <button type="button" className="add-announcement-preview" onClick={handlePreview}>{t('addAnnouncement.previewButton')}</button>
-          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>{isEdit ? t('addAnnouncement.submitButton.update') : t('addAnnouncement.submitButton.create')}</button>
+          <button type="button" className="add-announcement-preview" onClick={handlePreview} disabled={isSubmitting}>{t('addAnnouncement.previewButton')}</button>
+          <button type="button" className="add-announcement-submit" onClick={handleSubmit} disabled={isSubmitting}>{isEdit ? t('addAnnouncement.submitButton.update') : t('addAnnouncement.submitButton.create')}</button>
         </div>
       </div>
       <Toast
@@ -1292,6 +1295,29 @@ export default function AddAnnouncementPage() {
         onSubmit={handleSubmit}
         submitLabel={isEdit ? t('addAnnouncement.submitButton.update') : t('addAnnouncement.submitButton.create')}
       />
+
+      {isSubmitting && (
+        <Box
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(18,18,18,0.45)' : 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)'
+          }}
+        >
+          <CircularProgress size={48} />
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            {isEdit ? t('addAnnouncement.updatingOverlay') : t('addAnnouncement.publishingOverlay')}
+          </Typography>
+        </Box>
+      )}
     </div>
   );
 }

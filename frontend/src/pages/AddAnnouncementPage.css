@@ -504,6 +504,12 @@ body:not(.dark-mode) .add-announcement-contact-input[type="tel"]:focus {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
+.add-announcement-preview:disabled,
+.add-announcement-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Buton Preview */
 .add-announcement-preview {
   background: #f9faf8;

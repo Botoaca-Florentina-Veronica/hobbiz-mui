@@ -53,11 +53,7 @@ router.post('/:announcementId', auth, async (req, res) => {
     // Emit realtime update doar către utilizatorul curent
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(req.userId));
-        if (sid) io.to(sid).emit('favoritesUpdated', { favoriteIds: user.favorites });
-      }
+      if (io) io.to('user:' + String(req.userId)).emit('favoritesUpdated', { favoriteIds: user.favorites });
     } catch (_) {}
 
     // Notify announcement owner
@@ -93,13 +89,7 @@ router.post('/:announcementId', auth, async (req, res) => {
           // Emit Socket.IO event for real-time notification
           try {
             const io = req.app.get('io');
-            const activeUsers = req.app.get('activeUsers');
-            if (io && activeUsers) {
-              const sid = activeUsers.get(String(ann.user));
-              if (sid) {
-                io.to(sid).emit('newNotification', { userId: ann.user });
-              }
-            }
+            if (io) io.to('user:' + String(ann.user)).emit('newNotification', { userId: ann.user });
           } catch (_) {}
 
           const allowPush = settings.push !== false;
@@ -166,11 +156,7 @@ router.delete('/:announcementId', auth, async (req, res) => {
     // Emit realtime update doar către utilizatorul curent
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(req.userId));
-        if (sid) io.to(sid).emit('favoritesUpdated', { favoriteIds: user.favorites });
-      }
+      if (io) io.to('user:' + String(req.userId)).emit('favoritesUpdated', { favoriteIds: user.favorites });
     } catch (_) {}
 
     res.json({

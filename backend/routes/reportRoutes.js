@@ -33,13 +33,7 @@ const notifyAdminsForNewReport = async (req, reportDoc, announcementTitle) => {
 
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(admin._id));
-        if (sid) {
-          io.to(sid).emit('newNotification', { userId: String(admin._id) });
-        }
-      }
+      if (io) io.to('user:' + String(admin._id)).emit('newNotification', { userId: String(admin._id) });
     } catch (_) {}
   }
 };
@@ -58,13 +52,7 @@ const notifyAdminsForNewMessageReport = async (req, reportDoc, reportedUserName)
 
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(admin._id));
-        if (sid) {
-          io.to(sid).emit('newNotification', { userId: String(admin._id) });
-        }
-      }
+      if (io) io.to('user:' + String(admin._id)).emit('newNotification', { userId: String(admin._id) });
     } catch (_) {}
   }
 };

@@ -399,6 +399,8 @@
     "priceHelper": "Puedes agregar un precio para tu servicio/producto",
     "previewButton": "Vista previa del anuncio",
     "submitButton": { "create": "Publicar anuncio", "update": "Actualizar anuncio" },
+    "updatingOverlay": "Actualizando anuncio...",
+    "publishingOverlay": "Publicando anuncio...",
     "imagePrimaryBadge": "Principal",
     "imageRemoveTitle": "Eliminar imagen",
     "errors": {
@@ -961,6 +963,17 @@
     "intro": {
       "title": "Transparencia y protección de datos",
       "text": "En Hobbiz, consideramos la protección de datos personales una responsabilidad fundamental. Este documento describe en detalle nuestras prácticas de gestión de información, conforme al Reglamento General de Protección de Datos (GDPR) y la legislación rumana aplicable."
+    },
+    "toc": {
+      "aria": "Índice",
+      "title": "Tabla de contenidos",
+      "s1": "Propósito y alcance",
+      "s2": "Categorías de datos tratados",
+      "s3": "Fines y bases legales",
+      "s4": "Seguridad y confidencialidad de datos",
+      "s5": "Seguridad de tu información",
+      "s6": "Derechos del usuario",
+      "s7": "Contacto e información adicional"
     },
     "s1": {
       "title": "1. Propósito y alcance",

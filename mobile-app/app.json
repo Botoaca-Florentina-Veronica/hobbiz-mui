@@ -22,7 +22,7 @@
       "bundleIdentifier": "com.verabotoaca.hobbiz"
     },
     "android": {
-      "versionCode": 26,
+      "versionCode": 27,
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/puzzle_safe.png"

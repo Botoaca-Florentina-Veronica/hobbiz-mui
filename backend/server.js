@@ -30,6 +30,7 @@ const http = require('http');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const socketIo = require('socket.io');
+const { createAdapter } = require('@socket.io/cluster-adapter');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
@@ -110,8 +111,11 @@ const io = socketIo(server, {
   },
 });
 
-// Store active users and their typing status
-const activeUsers = new Map();
+// Enable cross-process event routing when running under PM2 cluster mode
+io.adapter(createAdapter());
+
+// Per-worker map used only to track which conversation each user is currently viewing
+// (drives push-notification suppression; acceptable if stale across workers)
 const typingUsers = new Map();
 const activeConversations = new Map();
 
@@ -120,7 +124,8 @@ io.on('connection', (socket) => {
   console.log('🔌 User connected:', socket.id);
 
   socket.on('join', (userId) => {
-    activeUsers.set(userId, socket.id);
+    // Join a room named after the user so controllers can emit via io.to('user:<id>')
+    socket.join('user:' + userId);
     socket.userId = userId;
     console.log(`👤 User ${userId} joined with socket ${socket.id}`);
     io.emit('userStatus', { userId, status: 'online' });
@@ -138,10 +143,15 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('checkStatus', (targetUserId, callback) => {
-    const isOnline = activeUsers.has(targetUserId);
-    if (typeof callback === 'function') {
-      callback({ status: isOnline ? 'online' : 'offline' });
+  // fetchSockets() queries all cluster workers, so online status is accurate cross-process
+  socket.on('checkStatus', async (targetUserId, callback) => {
+    try {
+      const sockets = await io.in('user:' + String(targetUserId)).fetchSockets();
+      if (typeof callback === 'function') {
+        callback({ status: sockets.length > 0 ? 'online' : 'offline' });
+      }
+    } catch (_) {
+      if (typeof callback === 'function') callback({ status: 'offline' });
     }
   });
 
@@ -159,21 +169,18 @@ io.on('connection', (socket) => {
     const participantIds = conversationId.split('-');
     participantIds.forEach(participantId => {
       if (participantId !== socket.userId) {
-        const participantSocketId = activeUsers.get(participantId);
-        if (participantSocketId) {
-          io.to(participantSocketId).emit('userTyping', {
-            conversationId,
-            userId: socket.userId,
-            isTyping,
-          });
-        }
+        // Emitting to a user room works across all cluster workers automatically
+        io.to('user:' + participantId).emit('userTyping', {
+          conversationId,
+          userId: socket.userId,
+          isTyping,
+        });
       }
     });
   });
 
   socket.on('disconnect', () => {
     if (socket.userId) {
-      activeUsers.delete(socket.userId);
       activeConversations.delete(socket.userId);
       io.emit('userStatus', { userId: socket.userId, status: 'offline' });
       typingUsers.forEach((typingSet, conversationId) => {
@@ -182,14 +189,11 @@ io.on('connection', (socket) => {
           const participantIds = conversationId.split('-');
           participantIds.forEach(participantId => {
             if (participantId !== socket.userId) {
-              const participantSocketId = activeUsers.get(participantId);
-              if (participantSocketId) {
-                io.to(participantSocketId).emit('userTyping', {
-                  conversationId,
-                  userId: socket.userId,
-                  isTyping: false,
-                });
-              }
+              io.to('user:' + participantId).emit('userTyping', {
+                conversationId,
+                userId: socket.userId,
+                isTyping: false,
+              });
             }
           });
         }
@@ -200,7 +204,6 @@ io.on('connection', (socket) => {
 });
 
 app.set('io', io);
-app.set('activeUsers', activeUsers);
 app.set('activeConversations', activeConversations);
 
 // CORS

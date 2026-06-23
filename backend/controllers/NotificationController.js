@@ -164,12 +164,8 @@ const createNotification = async (req, res) => {
     // Emit Socket.IO event for real-time notification
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(userId));
-        if (sid) {
-          io.to(sid).emit('newNotification', { userId });
-        }
+      if (io) {
+        io.to('user:' + String(userId)).emit('newNotification', { userId });
       }
     } catch (_) {}
     

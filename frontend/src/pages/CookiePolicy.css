@@ -203,6 +203,8 @@
 /* Typography in Content */
 .policy-section {
   margin-bottom: 50px;
+  /* Keeps the heading visible below the fixed header when jumping here via TOC anchor links */
+  scroll-margin-top: 96px;
 }
 .policy-section:last-child { margin-bottom: 0; }
 
@@ -495,10 +497,30 @@
 /* 6. MEDIA QUERIES (RESPONSIVE)
    ---------------------------------------------------------- */
 
+/* Tablet (769-1024): matches fixed .header height of 68px in Header.css */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .policy-section { scroll-margin-top: 92px; }
+}
+
+/* Small Desktop (1025-1200): matches fixed .header height of 70px in Header.css */
+@media (min-width: 1025px) and (max-width: 1200px) {
+  .policy-section { scroll-margin-top: 94px; }
+}
+
+/* 4K+ (2561+): matches fixed .header height of 80px in Header.css */
+@media (min-width: 2561px) {
+  .policy-section { scroll-margin-top: 104px; }
+}
+
 @media (max-width: 768px) {
   .cookie-policy-page {
     padding: 20px 0;
     padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
+  }
+
+  /* Mobile uses the fixed MobileHeader (60px + safe-area-inset-top) instead of .header */
+  .policy-section {
+    scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 84px);
   }
   
   .cookie-policy-container { padding: 0 16px; }

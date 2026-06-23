@@ -1,10 +1,10 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog, DialogContent, DialogActions, Button, Box, Grid,
   Card, CardMedia, CardContent, Paper, Avatar, Chip,
   Typography, IconButton, Divider
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -59,7 +59,34 @@ export default function AnnouncementPreviewDialog({
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const theme = useTheme();
+  const baseTheme = useTheme();
+
+  // Aplicația folosește o clasă `.dark-mode` pe <body> pentru modul întunecat,
+  // NU un ThemeProvider MUI. Astfel, `theme.palette.mode` ar fi mereu 'light' aici,
+  // iar toate stilurile de dark-mode din dialog nu s-ar aplica (apărea prea mult alb).
+  // Detectăm clasa de pe body și injectăm o temă MUI întunecată reală pentru dialog.
+  const [appDark, setAppDark] = useState(
+    () => typeof document !== 'undefined' && document.body.classList.contains('dark-mode')
+  );
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    const body = document.body;
+    const sync = () => setAppDark(body.classList.contains('dark-mode'));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  // Temă întunecată pentru dialog: păstrăm tema de bază pe light și forțăm mode:'dark'
+  // pe dark, ca verificările `theme.palette.mode === 'dark'` din sx să se activeze
+  // și ca fundalul implicit MUI (Paper/Card) să devină întunecat.
+  const dialogTheme = useMemo(
+    () => (appDark ? createTheme({ palette: { mode: 'dark', background: { paper: '#121212', default: '#121212' } } }) : baseTheme),
+    [appDark, baseTheme]
+  );
+  const theme = dialogTheme;
 
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [imgFade, setImgFade] = useState(true);
@@ -91,6 +118,7 @@ export default function AnnouncementPreviewDialog({
   };
 
   return (
+    <ThemeProvider theme={dialogTheme}>
     <Dialog
       open={open}
       onClose={onClose}
@@ -515,5 +543,6 @@ export default function AnnouncementPreviewDialog({
         )}
       </DialogActions>
     </Dialog>
+    </ThemeProvider>
   );
 }

@@ -399,6 +399,8 @@
     "priceHelper": "Poți adăuga un preț pentru serviciul/produsul tău",
     "previewButton": "Previzualizează anunțul",
     "submitButton": { "create": "Publică un anunț", "update": "Actualizează anunțul" },
+    "updatingOverlay": "Se actualizează anunțul...",
+    "publishingOverlay": "Se publică anunțul...",
     "imagePrimaryBadge": "Principală",
     "imageRemoveTitle": "Șterge imaginea",
     "errors": {
@@ -964,6 +966,17 @@
     "intro": {
       "title": "Transparență și protecție a datelor",
       "text": "La Hobbiz, considerăm protecția datelor personale o responsabilitate fundamentală. Acest document descrie în detaliu practicile noastre de gestionare a informațiilor, conform Regulamentului General privind Protecția Datelor (GDPR) și legislației românești aplicabile. Ne angajăm să protejăm confidențialitatea utilizatorilor noștri."
+    },
+    "toc": {
+      "aria": "Cuprins",
+      "title": "Cuprins",
+      "s1": "Scopul și domeniul de aplicare",
+      "s2": "Categorii de date prelucrate",
+      "s3": "Scopurile și bazele juridice",
+      "s4": "Securitatea și confidențialitatea datelor",
+      "s5": "Securitatea informațiilor tale",
+      "s6": "Drepturile utilizatorilor",
+      "s7": "Contact și informații suplimentare"
     },
     "s1": {
       "title": "1. Scopul și domeniul de aplicare",

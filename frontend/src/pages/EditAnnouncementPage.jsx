@@ -6,7 +6,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton, Button, TextField, InputAdornment, Divider, Chip } from '@mui/material';
+import { Box, IconButton, Button, TextField, InputAdornment, Divider, Chip, CircularProgress } from '@mui/material';
 import AnnouncementPreviewDialog from '../components/AnnouncementPreviewDialog';
 import { useTranslation } from 'react-i18next';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -59,7 +59,8 @@ export default function EditAnnouncementPage() {
   const [categoryAnchorEl, setCategoryAnchorEl] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // State for image validation errors
   const [imageError, setImageError] = useState("");
   
@@ -396,6 +397,7 @@ export default function EditAnnouncementPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append('title', title);
@@ -424,8 +426,14 @@ export default function EditAnnouncementPage() {
       });
       
   setSuccess(t('addAnnouncement.success.updated'));
-  // Redirecționează către pagina de detalii a anunțului cu flag updated=1
-  setTimeout(() => navigate(`/announcement/${announcementId}?updated=1`, { state: { updated: true } }), 800);
+  // Redirecționează către pagina de detalii a anunțului cu flag updated=1.
+  // Trecem mai întâi prin 'Anunțurile mele' (replace) ca să eliminăm formularul de editare
+  // din istoric, apoi adăugăm pagina de detalii peste - astfel butonul "înapoi" duce
+  // mereu la 'Anunțurile mele', nu la formularul cu datele deja salvate.
+  setTimeout(() => {
+    navigate('/anunturile-mele', { replace: true });
+    navigate(`/announcement/${announcementId}?updated=1`, { state: { updated: true } });
+  }, 800);
     } catch (e) {
       console.error('Error updating announcement:', e);
       if (e.response?.status === 401) {
@@ -435,6 +443,7 @@ export default function EditAnnouncementPage() {
       } else {
         setError(t('addAnnouncement.errors.submitError'));
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -936,8 +945,8 @@ export default function EditAnnouncementPage() {
       <div className="add-announcement-actions-section">
         <div className="add-announcement-actions-left"></div>
         <div className="add-announcement-actions-right">
-          <button type="button" className="add-announcement-preview" onClick={handlePreview}>{t('addAnnouncement.previewButton')}</button>
-          <button type="button" className="add-announcement-submit" onClick={handleSubmit}>{t('addAnnouncement.submitButton.update')}</button>
+          <button type="button" className="add-announcement-preview" onClick={handlePreview} disabled={isSubmitting}>{t('addAnnouncement.previewButton')}</button>
+          <button type="button" className="add-announcement-submit" onClick={handleSubmit} disabled={isSubmitting}>{t('addAnnouncement.submitButton.update')}</button>
         </div>
       </div>
       <Toast
@@ -965,6 +974,29 @@ export default function EditAnnouncementPage() {
         onSubmit={handleSubmit}
         submitLabel={t('addAnnouncement.submitButton.update')}
       />
+
+      {isSubmitting && (
+        <Box
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(18,18,18,0.45)' : 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)'
+          }}
+        >
+          <CircularProgress size={48} />
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            {t('addAnnouncement.updatingOverlay')}
+          </Typography>
+        </Box>
+      )}
 
     </div>
   );

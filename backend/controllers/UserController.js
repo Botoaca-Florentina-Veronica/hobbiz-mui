@@ -829,11 +829,7 @@ const addAnnouncement = async (req, res) => {
     // Emit realtime event doar utilizatorului (lista lui) – în viitor se poate extinde
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(userId));
-        if (sid) io.to(sid).emit('announcementCreated', { id: announcement._id });
-      }
+      if (io) io.to('user:' + String(userId)).emit('announcementCreated', { id: announcement._id });
     } catch (_) {}
 
     res.status(201).json({ message: 'Anunț adăugat cu succes!' });
@@ -898,11 +894,7 @@ const deleteAnnouncement = async (req, res) => {
     // Emit realtime
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(userId));
-        if (sid) io.to(sid).emit('announcementDeleted', { id: announcementId });
-      }
+      if (io) io.to('user:' + String(userId)).emit('announcementDeleted', { id: announcementId });
     } catch (_) {}
 
     res.json({ message: 'Anunț șters cu succes!' });
@@ -967,11 +959,7 @@ const updateAnnouncement = async (req, res) => {
     // Emit realtime update (could be treated similar to created for list refresh)
     try {
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(userId));
-        if (sid) io.to(sid).emit('announcementCreated', { id: announcement._id, updated: true });
-      }
+      if (io) io.to('user:' + String(userId)).emit('announcementCreated', { id: announcement._id, updated: true });
     } catch (_) {}
     res.json({ message: 'Anunț actualizat cu succes!' });
   } catch (error) {
@@ -1168,13 +1156,9 @@ const uploadVerificationDocument = async (req, res) => {
 
       // Emit Socket.IO event pentru admini
       const io = req.app.get('io');
-      const activeUsers = req.app.get('activeUsers');
-      if (io && activeUsers) {
+      if (io) {
         for (const admin of admins) {
-          const sid = activeUsers.get(String(admin._id));
-          if (sid) {
-            io.to(sid).emit('newNotification', { userId: String(admin._id) });
-          }
+          io.to('user:' + String(admin._id)).emit('newNotification', { userId: String(admin._id) });
         }
       }
     } catch (notifError) {
@@ -1392,13 +1376,7 @@ const verifyDocument = async (req, res) => {
 
         // Emit Socket.IO event
         const io = req.app.get('io');
-        const activeUsers = req.app.get('activeUsers');
-        if (io && activeUsers) {
-          const sid = activeUsers.get(String(user._id));
-          if (sid) {
-            io.to(sid).emit('newNotification', { userId: String(user._id) });
-          }
-        }
+        if (io) io.to('user:' + String(user._id)).emit('newNotification', { userId: String(user._id) });
       }
     } catch (notifError) {
       console.error('Eroare la trimiterea notificării de document:', notifError);
@@ -1492,13 +1470,7 @@ const toggleUserVerification = async (req, res) => {
 
         // Emit Socket.IO event for real-time notification
         const io = req.app.get('io');
-        const activeUsers = req.app.get('activeUsers');
-        if (io && activeUsers) {
-          const sid = activeUsers.get(String(user._id));
-          if (sid) {
-            io.to(sid).emit('newNotification', { userId: String(user._id) });
-          }
-        }
+        if (io) io.to('user:' + String(user._id)).emit('newNotification', { userId: String(user._id) });
       } catch (notifError) {
         console.error('Eroare la trimiterea notificării de verificare:', notifError);
       }

@@ -110,17 +110,13 @@ const deleteMessage = async (req, res) => {
     if (remainingCount === 0) {
       try {
         const io = req.app.get("io");
-        const activeUsers = req.app.get("activeUsers");
-        if (io && activeUsers) {
+        if (io) {
           const notifyUsers = [
             String(authenticatedUserId),
             String(otherParticipantId),
           ].filter(Boolean);
           for (const uid of notifyUsers) {
-            const sid = activeUsers.get(String(uid));
-            if (sid) {
-              io.to(sid).emit("conversationEmpty", { conversationId });
-            }
+            io.to('user:' + uid).emit("conversationEmpty", { conversationId });
           }
         }
       } catch (_) {}
@@ -279,58 +275,53 @@ const createMessage = async (req, res) => {
 
     // Real-time message delivery via Socket.IO
     const io = req.app.get("io");
-    const activeUsers = req.app.get("activeUsers");
     const activeConversations = req.app.get("activeConversations");
 
-    // Check if recipient is currently viewing this conversation
-    const isRecipientViewingConversation = activeConversations && 
+    // Check if recipient is currently viewing this conversation (per-worker; drives push suppression)
+    const isRecipientViewingConversation = activeConversations &&
       activeConversations.get(destinatarId) === conversationId;
 
     if (
       io &&
-      activeUsers &&
       isValidObjectId(destinatarId) &&
       String(destinatarId) !== String(senderId)
     ) {
-      const recipientSocketId = activeUsers.get(destinatarId);
-      if (recipientSocketId) {
-        // Get sender info for real-time message
-        let senderInfo = null;
-        try {
-          const sender = await User.findById(senderId).select(
-            "firstName lastName avatar"
-          );
-          if (sender) {
-            senderInfo = {
-              firstName: sender.firstName,
-              lastName: sender.lastName,
-              avatar: sender.avatar,
-            };
-          }
-        } catch (e) {
-          console.warn(
-            "Could not fetch sender info for real-time message:",
-            e.message
-          );
+      // Get sender info for real-time message
+      let senderInfo = null;
+      try {
+        const sender = await User.findById(senderId).select(
+          "firstName lastName avatar"
+        );
+        if (sender) {
+          senderInfo = {
+            firstName: sender.firstName,
+            lastName: sender.lastName,
+            avatar: sender.avatar,
+          };
         }
+      } catch (e) {
+        console.warn(
+          "Could not fetch sender info for real-time message:",
+          e.message
+        );
+      }
 
-        // Emit the new message to the recipient
-        io.to(recipientSocketId).emit("newMessage", {
-          ...messageResponse,
-          senderInfo,
-        });
-        console.log(`📨 Real-time message sent to user ${destinatarId}`);
+      // Emit the new message to the recipient (works across all cluster workers)
+      io.to('user:' + String(destinatarId)).emit("newMessage", {
+        ...messageResponse,
+        senderInfo,
+      });
+      console.log(`📨 Real-time message sent to user ${destinatarId}`);
 
-        // If recipient is viewing the conversation, mark message as read immediately
-        if (isRecipientViewingConversation) {
-          try {
-            message.isRead = true;
-            message.readAt = new Date();
-            await message.save();
-            console.log(`✓ Message auto-marked as read (recipient viewing conversation)`);
-          } catch (e) {
-            console.warn("Could not auto-mark message as read:", e.message);
-          }
+      // If recipient is viewing the conversation, mark message as read immediately
+      if (isRecipientViewingConversation) {
+        try {
+          message.isRead = true;
+          message.readAt = new Date();
+          await message.save();
+          console.log(`✓ Message auto-marked as read (recipient viewing conversation)`);
+        } catch (e) {
+          console.warn("Could not auto-mark message as read:", e.message);
         }
       }
     }
@@ -826,22 +817,18 @@ const markMessagesAsReadByConversation = async (req, res) => {
     // Emite eveniment realtime către ceilalți participanți din conversație (expeditorii mesajelor marcate)
     try {
       const io = req.app.get("io");
-      const activeUsers = req.app.get("activeUsers");
-      if (io && activeUsers) {
+      if (io) {
         const notifyUserIds = Array.from(
           new Set(unreadMessages.map((m) => String(m.senderId)))
         );
         const messageIds = unreadMessages.map((m) => String(m._id));
         for (const uid of notifyUserIds) {
-          const sid = activeUsers.get(uid);
-          if (sid) {
-            io.to(sid).emit("messagesRead", {
-              conversationId,
-              readerId: String(authenticatedUserId),
-              messageIds,
-              readAt: now.toISOString(),
-            });
-          }
+          io.to('user:' + uid).emit("messagesRead", {
+            conversationId,
+            readerId: String(authenticatedUserId),
+            messageIds,
+            readAt: now.toISOString(),
+          });
         }
       }
     } catch (_) {
@@ -900,17 +887,13 @@ const markMessagesAsRead = async (req, res) => {
     // Emitere realtime către celălalt participant (otherUserId)
     try {
       const io = req.app.get("io");
-      const activeUsers = req.app.get("activeUsers");
-      if (io && activeUsers) {
-        const sid = activeUsers.get(String(otherUserId));
-        if (sid) {
-          io.to(sid).emit("messagesRead", {
-            conversationId,
-            readerId: String(userId),
-            messageIds: unreadMessages.map((m) => String(m._id)),
-            readAt: now.toISOString(),
-          });
-        }
+      if (io) {
+        io.to('user:' + String(otherUserId)).emit("messagesRead", {
+          conversationId,
+          readerId: String(userId),
+          messageIds: unreadMessages.map((m) => String(m._id)),
+          readAt: now.toISOString(),
+        });
       }
     } catch (_) {
       /* noop */
@@ -1065,24 +1048,20 @@ const handleCollaborationResponse = async (req, res) => {
     // Emit real-time update to all participants so both UIs reflect the new status
     try {
       const io = req.app.get("io");
-      const activeUsers = req.app.get("activeUsers");
-      if (io && activeUsers) {
+      if (io) {
         const participants = (message.collaborationData.participants || [])
           .map(String)
           .filter(Boolean);
         for (const uid of participants) {
-          const sid = activeUsers.get(uid);
-          if (sid) {
-            io.to(sid).emit("collaborationUpdated", {
-              messageId: String(message._id),
-              conversationId: message.conversationId,
-              collaborationData: {
-                participants: message.collaborationData.participants,
-                acceptedBy: message.collaborationData.acceptedBy,
-                declinedBy: message.collaborationData.declinedBy,
-              },
-            });
-          }
+          io.to('user:' + uid).emit("collaborationUpdated", {
+            messageId: String(message._id),
+            conversationId: message.conversationId,
+            collaborationData: {
+              participants: message.collaborationData.participants,
+              acceptedBy: message.collaborationData.acceptedBy,
+              declinedBy: message.collaborationData.declinedBy,
+            },
+          });
         }
       }
     } catch (_) {}
@@ -1136,14 +1115,10 @@ const deleteConversationMessages = async (req, res) => {
     // Notify participants via socket
     try {
       const io = req.app.get("io");
-      const activeUsers = req.app.get("activeUsers");
-      if (io && activeUsers) {
+      if (io) {
         const participantIds = parts.length >= 2 ? [parts[0], parts[1]] : [];
         for (const uid of participantIds) {
-          const sid = activeUsers.get(uid);
-          if (sid) {
-            io.to(sid).emit("conversationCleared", { conversationId });
-          }
+          io.to('user:' + uid).emit("conversationCleared", { conversationId });
         }
       }
     } catch (_) {}

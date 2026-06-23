@@ -411,6 +411,8 @@ export default function ChatPage() {
       const res = await apiClient.delete(`/api/messages/conversation/${convId}/all`);
       console.log('[Admin] Delete response:', res.data);
       setMessages([]);
+      setConversations(prev => prev.filter(c => c.conversationId !== convId));
+      setSelectedConversation(null);
       showNegotiationSnackbar('Toate mesajele au fost șterse.', 'success');
     } catch (err) {
       console.error('Eroare la ștergerea conversației:', err);
