@@ -29,6 +29,7 @@ const cors = require('cors');
 const http = require('http');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cluster = require('cluster');
 const socketIo = require('socket.io');
 const { createAdapter } = require('@socket.io/cluster-adapter');
 const MongoStore = require('connect-mongo');
@@ -111,8 +112,13 @@ const io = socketIo(server, {
   },
 });
 
-// Enable cross-process event routing when running under PM2 cluster mode
-io.adapter(createAdapter());
+// Enable cross-process event routing only when running under Node's cluster
+// module (e.g. PM2 cluster mode via start:cluster). createAdapter() reads
+// cluster.worker.id internally, which is undefined in a single-process run
+// (e.g. plain `node server.js` on Render) and would crash on startup.
+if (cluster.isWorker) {
+  io.adapter(createAdapter());
+}
 
 // Per-worker map used only to track which conversation each user is currently viewing
 // (drives push-notification suppression; acceptable if stale across workers)
