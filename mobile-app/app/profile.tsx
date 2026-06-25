@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ThemedView } from '../components/themed-view';
 import { ThemedText } from '../components/themed-text';
 import { ThemedTextInput } from '../components/themed-text-input';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar, FlatList, Text, TextInput } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, StatusBar, Text, TextInput, Switch } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,6 +56,41 @@ interface ReviewStats {
   };
 }
 
+interface AvailabilityDay {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+}
+
+interface BookingSlot {
+  date: string;
+  startTime: string;
+  endTime: string;
+  available: boolean;
+}
+
+const SLOT_DURATION_OPTIONS = [15, 30, 45, 60, 90, 120];
+const AVAILABILITY_DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
+
+const toLocalDateStr = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const getMonthWeeks = (year: number, month: number): (number | null)[][] => {
+  const startWeekday = (new Date(year, month, 1).getDay() + 6) % 7; // Luni=0 ... Duminică=6
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+};
+
 export default function ProfileScreen() {
   const { tokens, isDark } = useAppTheme();
   // Page-level accent aligned with theme primary (dark: #f51866)
@@ -88,6 +124,23 @@ export default function ProfileScreen() {
   const [editLastName, setEditLastName] = React.useState('');
   const [editPhone, setEditPhone] = React.useState('');
   const [isSaving, setIsSaving] = React.useState(false);
+
+  // Availability schedule edit state (own profile)
+  const [availabilityEditMode, setAvailabilityEditMode] = React.useState(false);
+  const [availabilitySaving, setAvailabilitySaving] = React.useState(false);
+  const [editAvailabilityEnabled, setEditAvailabilityEnabled] = React.useState(false);
+  const [editSlotDuration, setEditSlotDuration] = React.useState(60);
+  const [editWeeklySchedule, setEditWeeklySchedule] = React.useState<AvailabilityDay[]>([]);
+  const [activeTimePicker, setActiveTimePicker] = React.useState<{ dayOfWeek: number; field: 'startTime' | 'endTime' } | null>(null);
+
+  // Booking widget state (public profile)
+  const [bookingSlotsByDate, setBookingSlotsByDate] = React.useState<Record<string, BookingSlot[]>>({});
+  const [bookingDates, setBookingDates] = React.useState<string[]>([]);
+  const [bookingSlotsLoading, setBookingSlotsLoading] = React.useState(false);
+  const [selectedBookingDate, setSelectedBookingDate] = React.useState<string | null>(null);
+  const [bookingDialogSlot, setBookingDialogSlot] = React.useState<BookingSlot | null>(null);
+  const [bookingMessage, setBookingMessage] = React.useState('');
+  const [bookingSubmitting, setBookingSubmitting] = React.useState(false);
 
   // Toast state for custom notifications
   const [toastVisible, setToastVisible] = React.useState(false);
@@ -154,6 +207,43 @@ export default function ProfileScreen() {
     };
     fetchPublic();
   }, [userId]);
+
+  // Fetch available booking slots when viewing another user's profile with availability enabled
+  React.useEffect(() => {
+    const fetchSlots = async () => {
+      if (!userId || !publicProfile?.availability?.enabled) {
+        setBookingSlotsByDate({});
+        setBookingDates([]);
+        setSelectedBookingDate(null);
+        return;
+      }
+      try {
+        setBookingSlotsLoading(true);
+        const from = toLocalDateStr(new Date());
+        const toDateObj = new Date();
+        toDateObj.setDate(toDateObj.getDate() + 13);
+        const to = toLocalDateStr(toDateObj);
+        const res = await api.get(`/api/bookings/availability/${encodeURIComponent(String(userId))}`, { params: { from, to } });
+        const slots: BookingSlot[] = res.data?.slots || [];
+        const byDate: Record<string, BookingSlot[]> = {};
+        slots.forEach((s) => {
+          if (!byDate[s.date]) byDate[s.date] = [];
+          byDate[s.date].push(s);
+        });
+        const dates = Object.keys(byDate).sort();
+        setBookingSlotsByDate(byDate);
+        setBookingDates(dates);
+        setSelectedBookingDate(dates.find((dt) => byDate[dt].some((s) => s.available)) || dates[0] || null);
+      } catch (e) {
+        console.error('Error loading booking availability:', e);
+        setBookingSlotsByDate({});
+        setBookingDates([]);
+      } finally {
+        setBookingSlotsLoading(false);
+      }
+    };
+    fetchSlots();
+  }, [userId, publicProfile?.availability?.enabled]);
 
   // Helper to get correct image URL (moved up so it can be used in useEffect)
   const getImageSrc = (img?: string) => {
@@ -427,6 +517,126 @@ export default function ProfileScreen() {
       showToast('Nu s-au putut actualiza informațiile. Încearcă din nou', 'error');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const getAvailabilityDayLabel = (dayOfWeek: number) => {
+    switch (dayOfWeek) {
+      case 1: return t.dayMonday;
+      case 2: return t.dayTuesday;
+      case 3: return t.dayWednesday;
+      case 4: return t.dayThursday;
+      case 5: return t.dayFriday;
+      case 6: return t.daySaturday;
+      default: return t.daySunday;
+    }
+  };
+
+  const handleStartEditAvailability = () => {
+    const avail = profileToShow?.availability;
+    setEditAvailabilityEnabled(!!avail?.enabled);
+    setEditSlotDuration(avail?.slotDurationMinutes || 60);
+    setEditWeeklySchedule(
+      Array.isArray(avail?.weeklySchedule)
+        ? avail.weeklySchedule.map((d: AvailabilityDay) => ({ dayOfWeek: d.dayOfWeek, startTime: d.startTime, endTime: d.endTime }))
+        : []
+    );
+    setAvailabilityEditMode(true);
+  };
+
+  const handleCancelEditAvailability = () => {
+    setAvailabilityEditMode(false);
+    setActiveTimePicker(null);
+  };
+
+  const handleToggleAvailabilityDay = (dayOfWeek: number) => {
+    setEditWeeklySchedule((prev) => {
+      const exists = prev.some((d) => d.dayOfWeek === dayOfWeek);
+      if (exists) return prev.filter((d) => d.dayOfWeek !== dayOfWeek);
+      return [...prev, { dayOfWeek, startTime: '09:00', endTime: '17:00' }];
+    });
+  };
+
+  const handleDayTimeChange = (dayOfWeek: number, field: 'startTime' | 'endTime', value: string) => {
+    setEditWeeklySchedule((prev) => prev.map((d) => (d.dayOfWeek === dayOfWeek ? { ...d, [field]: value } : d)));
+  };
+
+  const handleTimePickerChange = (event: any, selectedDate?: Date) => {
+    const picker = activeTimePicker;
+    if (Platform.OS === 'android') {
+      setActiveTimePicker(null);
+      if (event?.type === 'set' && selectedDate && picker) {
+        const hh = String(selectedDate.getHours()).padStart(2, '0');
+        const mm = String(selectedDate.getMinutes()).padStart(2, '0');
+        handleDayTimeChange(picker.dayOfWeek, picker.field, `${hh}:${mm}`);
+      }
+      return;
+    }
+    if (selectedDate && picker) {
+      const hh = String(selectedDate.getHours()).padStart(2, '0');
+      const mm = String(selectedDate.getMinutes()).padStart(2, '0');
+      handleDayTimeChange(picker.dayOfWeek, picker.field, `${hh}:${mm}`);
+    }
+  };
+
+  const handleSaveAvailability = async () => {
+    try {
+      setAvailabilitySaving(true);
+      await api.put('/api/users/availability', {
+        enabled: editAvailabilityEnabled,
+        slotDurationMinutes: editSlotDuration,
+        weeklySchedule: editWeeklySchedule,
+      });
+      try {
+        if (typeof restore === 'function') await restore();
+      } catch (e) {
+        console.warn('[Profile] restore failed after availability update', e);
+      }
+      showToast(t.saveSuccess, 'success');
+      setAvailabilityEditMode(false);
+    } catch (error) {
+      console.error('Error updating availability:', error);
+      showToast(t.saveFailed, 'error');
+    } finally {
+      setAvailabilitySaving(false);
+    }
+  };
+
+  const handleSubmitBooking = async () => {
+    if (!bookingDialogSlot || !userId) return;
+    try {
+      setBookingSubmitting(true);
+      await api.post('/api/bookings', {
+        providerId: String(userId),
+        date: bookingDialogSlot.date,
+        startTime: bookingDialogSlot.startTime,
+        endTime: bookingDialogSlot.endTime,
+        message: bookingMessage.trim() || undefined,
+      });
+      showToast(t.bookingRequestSent, 'success');
+      setBookingDialogSlot(null);
+      setBookingMessage('');
+      // refresh slots since the one just booked is no longer available
+      setBookingSlotsByDate((prev) => {
+        const next = { ...prev };
+        const dateSlots = next[bookingDialogSlot.date];
+        if (dateSlots) {
+          next[bookingDialogSlot.date] = dateSlots.map((s) =>
+            s.startTime === bookingDialogSlot.startTime ? { ...s, available: false } : s
+          );
+        }
+        return next;
+      });
+    } catch (error: any) {
+      console.error('Error creating booking:', error);
+      if (error?.response?.status === 409) {
+        showToast(t.bookingConflictError, 'error');
+        setBookingDialogSlot(null);
+      } else {
+        showToast(t.bookingRequestError, 'error');
+      }
+    } finally {
+      setBookingSubmitting(false);
     }
   };
 
@@ -880,6 +1090,340 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Availability Schedule Dashboard - own profile only */}
+        {isViewingOwnProfile && (
+          <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
+            <View style={styles.dashboardHeader}>
+              <Ionicons name="calendar-outline" size={18} color={tokens.colors.primary} style={{ marginRight: 8 }} />
+              <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>{t.availabilityTitle}</ThemedText>
+              {!availabilityEditMode && (
+                <TouchableOpacity
+                  onPress={handleStartEditAvailability}
+                  style={[styles.editButton, { backgroundColor: 'rgba(0,0,0,0)', borderColor: tokens.colors.primary, borderWidth: 1, marginLeft: 'auto' }]}
+                  activeOpacity={0.8}
+                >
+                  <ThemedText style={[styles.editButtonText, { color: tokens.colors.primary }]}>{t.edit}</ThemedText>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {availabilityEditMode ? (
+              <>
+                <View style={styles.availabilityEnableRow}>
+                  <ThemedText style={[styles.infoItemValue, { color: tokens.colors.text, flex: 1 }]}>{t.availabilityEnable}</ThemedText>
+                  <Switch
+                    trackColor={{ false: tokens.colors.border, true: tokens.colors.primary }}
+                    thumbColor={Platform.OS === 'ios' ? '#fff' : (editAvailabilityEnabled ? '#fff' : '#f4f3f4')}
+                    ios_backgroundColor={tokens.colors.border}
+                    onValueChange={setEditAvailabilityEnabled}
+                    value={editAvailabilityEnabled}
+                  />
+                </View>
+
+                <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted, marginTop: 14, marginBottom: 6 }]}>
+                  {t.availabilitySlotDuration}
+                </ThemedText>
+                <View style={styles.availabilityChipsRow}>
+                  {SLOT_DURATION_OPTIONS.map((minutes) => (
+                    <TouchableOpacity
+                      key={minutes}
+                      onPress={() => setEditSlotDuration(minutes)}
+                      activeOpacity={0.8}
+                      style={[
+                        styles.availabilityChip,
+                        { borderColor: tokens.colors.borderNeutral },
+                        editSlotDuration === minutes && { backgroundColor: tokens.colors.primary, borderColor: tokens.colors.primary },
+                      ]}
+                    >
+                      <ThemedText style={[styles.availabilityChipText, { color: editSlotDuration === minutes ? tokens.colors.primaryContrast : tokens.colors.text }]}>
+                        {minutes} {t.availabilityMinutesShort}
+                      </ThemedText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <View style={{ marginTop: 14, gap: 8 }}>
+                  {AVAILABILITY_DAY_ORDER.map((dayOfWeek) => {
+                    const daySchedule = editWeeklySchedule.find((d) => d.dayOfWeek === dayOfWeek);
+                    const isActive = !!daySchedule;
+                    return (
+                      <View
+                        key={dayOfWeek}
+                        style={[
+                          styles.availabilityDayRow,
+                          { borderColor: tokens.colors.borderNeutral },
+                          isActive ? { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg } : null,
+                        ]}
+                      >
+                        <Switch
+                          trackColor={{ false: tokens.colors.border, true: tokens.colors.primary }}
+                          thumbColor={Platform.OS === 'ios' ? '#fff' : (isActive ? '#fff' : '#f4f3f4')}
+                          ios_backgroundColor={tokens.colors.border}
+                          onValueChange={() => handleToggleAvailabilityDay(dayOfWeek)}
+                          value={isActive}
+                          style={{ transform: [{ scale: 0.85 }] }}
+                        />
+                        <ThemedText style={[styles.availabilityDayLabel, { color: tokens.colors.text }]}>
+                          {getAvailabilityDayLabel(dayOfWeek)}
+                        </ThemedText>
+                        {isActive && (
+                          <View style={styles.availabilityTimeRow}>
+                            <TouchableOpacity
+                              onPress={() => setActiveTimePicker({ dayOfWeek, field: 'startTime' })}
+                              style={[styles.availabilityTimeChip, { borderColor: tokens.colors.borderNeutral }]}
+                              activeOpacity={0.8}
+                            >
+                              <ThemedText style={[styles.availabilityTimeChipText, { color: tokens.colors.text }]}>
+                                {daySchedule?.startTime}
+                              </ThemedText>
+                            </TouchableOpacity>
+                            <ThemedText style={{ color: tokens.colors.muted }}>–</ThemedText>
+                            <TouchableOpacity
+                              onPress={() => setActiveTimePicker({ dayOfWeek, field: 'endTime' })}
+                              style={[styles.availabilityTimeChip, { borderColor: tokens.colors.borderNeutral }]}
+                              activeOpacity={0.8}
+                            >
+                              <ThemedText style={[styles.availabilityTimeChipText, { color: tokens.colors.text }]}>
+                                {daySchedule?.endTime}
+                              </ThemedText>
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+
+                {activeTimePicker && (
+                  <DateTimePicker
+                    value={(() => {
+                      const sched = editWeeklySchedule.find((d) => d.dayOfWeek === activeTimePicker.dayOfWeek);
+                      const hhmm = (sched ? sched[activeTimePicker.field] : null) || (activeTimePicker.field === 'startTime' ? '09:00' : '17:00');
+                      const [h, m] = hhmm.split(':').map(Number);
+                      const dt = new Date();
+                      dt.setHours(h, m, 0, 0);
+                      return dt;
+                    })()}
+                    mode="time"
+                    is24Hour
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleTimePickerChange}
+                  />
+                )}
+                {Platform.OS === 'ios' && activeTimePicker && (
+                  <TouchableOpacity
+                    onPress={() => setActiveTimePicker(null)}
+                    style={[styles.actionButton, styles.saveButton, { backgroundColor: tokens.colors.primary, marginTop: 8 }]}
+                    activeOpacity={0.8}
+                  >
+                    <ThemedText style={[styles.actionButtonText, { color: '#fff' }]}>{t.saveBtn}</ThemedText>
+                  </TouchableOpacity>
+                )}
+
+                <View style={styles.editActions}>
+                  <TouchableOpacity
+                    onPress={handleCancelEditAvailability}
+                    style={[styles.actionButton, styles.cancelButton, { borderColor: tokens.colors.borderNeutral }]}
+                    activeOpacity={0.8}
+                  >
+                    <ThemedText style={[styles.actionButtonText, { color: tokens.colors.text }]}>{t.cancelBtn}</ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleSaveAvailability}
+                    style={[styles.actionButton, styles.saveButton, { backgroundColor: tokens.colors.primary }]}
+                    activeOpacity={0.8}
+                    disabled={availabilitySaving}
+                  >
+                    {availabilitySaving ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <ThemedText style={[styles.actionButtonText, { color: '#fff' }]}>{t.saveBtn}</ThemedText>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : profileToShow?.availability?.enabled && Array.isArray(profileToShow?.availability?.weeklySchedule) && profileToShow.availability.weeklySchedule.length > 0 ? (
+              <View style={styles.availabilitySummaryWrap}>
+                {AVAILABILITY_DAY_ORDER.filter((d) => profileToShow.availability.weeklySchedule.some((s: AvailabilityDay) => s.dayOfWeek === d)).map((dayOfWeek) => {
+                  const s = profileToShow.availability.weeklySchedule.find((d2: AvailabilityDay) => d2.dayOfWeek === dayOfWeek);
+                  return (
+                    <View key={dayOfWeek} style={[styles.availabilitySummaryChip, { borderColor: tokens.colors.borderNeutral }]}>
+                      <ThemedText style={[styles.availabilitySummaryChipDay, { color: tokens.colors.text }]}>{getAvailabilityDayLabel(dayOfWeek)}</ThemedText>
+                      <ThemedText style={[styles.availabilitySummaryChipTime, { color: tokens.colors.muted }]}>{s?.startTime} - {s?.endTime}</ThemedText>
+                    </View>
+                  );
+                })}
+              </View>
+            ) : (
+              <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>
+                {profileToShow?.availability?.enabled ? t.availabilityNoDays : t.availabilityDisabled}
+              </ThemedText>
+            )}
+          </View>
+        )}
+
+        {/* Availability Calendar - own profile only, shows current month with availability highlighted */}
+        {isViewingOwnProfile && (() => {
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = today.getMonth();
+          const weeks = getMonthWeeks(year, month);
+          const localeTag = locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'ro-RO';
+          const monthLabel = today.toLocaleDateString(localeTag, { month: 'long', year: 'numeric' });
+          const monday = new Date(2024, 0, 1);
+          const weekdayLabels = Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            return d.toLocaleDateString(localeTag, { weekday: 'short' });
+          });
+          const scheduleEnabled = !!profileToShow?.availability?.enabled;
+          const weeklySchedule: AvailabilityDay[] = scheduleEnabled && Array.isArray(profileToShow?.availability?.weeklySchedule)
+            ? profileToShow.availability.weeklySchedule
+            : [];
+          const availableDaysOfWeek = new Set(weeklySchedule.map((s) => s.dayOfWeek));
+
+          return (
+            <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
+              <View style={styles.dashboardHeader}>
+                <Ionicons name="calendar-outline" size={18} color={tokens.colors.primary} style={{ marginRight: 8 }} />
+                <View>
+                  <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>{t.availabilityCalendarTitle}</ThemedText>
+                  <ThemedText style={[styles.availabilityCalendarSubtitle, { color: tokens.colors.muted }]}>{monthLabel}</ThemedText>
+                </View>
+              </View>
+
+              <View style={styles.availabilityCalendarWeekdays}>
+                {weekdayLabels.map((w, i) => (
+                  <ThemedText key={i} style={[styles.availabilityCalendarWeekdayText, { color: tokens.colors.muted }]}>{w}</ThemedText>
+                ))}
+              </View>
+
+              {weeks.map((week, wi) => (
+                <View key={wi} style={styles.availabilityCalendarRow}>
+                  {week.map((day, di) => {
+                    if (day == null) {
+                      return <View key={di} style={styles.availabilityCalendarCell} />;
+                    }
+                    const dayOfWeek = new Date(year, month, day).getDay();
+                    const isToday = day === today.getDate();
+                    const isAvailable = availableDaysOfWeek.has(dayOfWeek);
+                    return (
+                      <View
+                        key={di}
+                        style={[
+                          styles.availabilityCalendarCell,
+                          isAvailable ? { backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg } : null,
+                        ]}
+                      >
+                        <View style={[styles.availabilityCalendarDayNum, isToday ? { backgroundColor: tokens.colors.primary } : null]}>
+                          <ThemedText style={[styles.availabilityCalendarDayNumText, { color: isToday ? '#fff' : tokens.colors.text }]}>
+                            {day}
+                          </ThemedText>
+                        </View>
+                        {isAvailable && <View style={[styles.availabilityCalendarDot, { backgroundColor: tokens.colors.primary }]} />}
+                      </View>
+                    );
+                  })}
+                </View>
+              ))}
+
+              {scheduleEnabled && availableDaysOfWeek.size > 0 && (
+                <View style={styles.availabilityCalendarLegend}>
+                  <View style={[styles.availabilityCalendarDot, { backgroundColor: tokens.colors.primary }]} />
+                  <ThemedText style={[styles.availabilityCalendarLegendText, { color: tokens.colors.muted }]}>
+                    {t.availabilityCalendarLegend}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          );
+        })()}
+
+        {/* Booking Widget - viewing someone else's profile with availability enabled */}
+        {!isViewingOwnProfile && publicProfile?.availability?.enabled && (
+          <View style={[styles.dashboardCard, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
+            <View style={styles.dashboardHeader}>
+              <Ionicons name="calendar-outline" size={18} color={tokens.colors.primary} style={{ marginRight: 8 }} />
+              <ThemedText style={[styles.dashboardTitle, { color: tokens.colors.text }]}>{t.bookingTitle}</ThemedText>
+            </View>
+            <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted, marginBottom: 12 }]}>{t.bookingSubtitle}</ThemedText>
+
+            {bookingSlotsLoading ? (
+              <ActivityIndicator size="small" color={tokens.colors.primary} />
+            ) : bookingDates.length === 0 ? (
+              <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted }]}>{t.bookingNoSlots}</ThemedText>
+            ) : (
+              <>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+                  {bookingDates.map((dateStr) => {
+                    const d = new Date(`${dateStr}T00:00:00`);
+                    const isToday = dateStr === toLocalDateStr(new Date());
+                    const localeTag = locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'ro-RO';
+                    const weekday = d.toLocaleDateString(localeTag, { weekday: 'short' });
+                    const dayMonth = `${d.getDate()} ${d.toLocaleDateString(localeTag, { month: 'short' })}`;
+                    const selected = selectedBookingDate === dateStr;
+                    const hasAvailable = (bookingSlotsByDate[dateStr] || []).some((s) => s.available);
+                    return (
+                      <TouchableOpacity
+                        key={dateStr}
+                        onPress={() => setSelectedBookingDate(dateStr)}
+                        disabled={!hasAvailable}
+                        activeOpacity={0.8}
+                        style={[
+                          styles.bookingDayChip,
+                          { borderColor: tokens.colors.borderNeutral },
+                          selected ? { backgroundColor: tokens.colors.primary, borderColor: tokens.colors.primary } : null,
+                          !hasAvailable ? { opacity: 0.35 } : null,
+                        ]}
+                      >
+                        <ThemedText style={[styles.bookingDayChipWeekday, { color: selected ? tokens.colors.primaryContrast : tokens.colors.muted }]}>
+                          {isToday ? t.bookingToday : weekday}
+                        </ThemedText>
+                        <ThemedText style={[styles.bookingDayChipDate, { color: selected ? tokens.colors.primaryContrast : tokens.colors.text }]}>
+                          {dayMonth}
+                        </ThemedText>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+
+                <View style={styles.bookingSlotsGrid}>
+                  {(bookingSlotsByDate[selectedBookingDate || ''] || []).map((slot) => (
+                    <TouchableOpacity
+                      key={`${slot.date}-${slot.startTime}`}
+                      disabled={!slot.available}
+                      onPress={() => {
+                        if (!user) {
+                          router.push('/login' as any);
+                          return;
+                        }
+                        setBookingDialogSlot(slot);
+                        setBookingMessage('');
+                      }}
+                      activeOpacity={0.8}
+                      style={[
+                        styles.bookingSlotChip,
+                        { borderColor: tokens.colors.borderNeutral },
+                        !slot.available ? styles.bookingSlotChipUnavailable : null,
+                      ]}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.bookingSlotChipText,
+                          { color: slot.available ? tokens.colors.text : tokens.colors.muted },
+                          !slot.available ? { textDecorationLine: 'line-through' } : null,
+                        ]}
+                      >
+                        {slot.startTime}
+                      </ThemedText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
+          </View>
+        )}
+
         {/* Verification Documents Section moved to account tab */}
 
         {/* Admin Controls - Show when viewing another user's profile */}
@@ -1232,18 +1776,17 @@ export default function ProfileScreen() {
               </ThemedText>
             </View>
           ) : (
-            <FlatList
-              data={userAnnouncements}
+            <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item._id}
+              style={{ width: '100%' }}
               contentContainerStyle={styles.announcementsList}
-              scrollEnabled={true}
-              nestedScrollEnabled={true}
-              renderItem={({ item }) => {
+            >
+              {userAnnouncements.map((item) => {
                 const imageUri = item.images?.[0] ? getImageSrc(item.images[0]) : null;
                 return (
                   <TouchableOpacity
+                    key={item._id}
                     style={[styles.announcementCard, { backgroundColor: tokens.colors.bg, borderColor: tokens.colors.borderNeutral }]}
                     onPress={() => router.push(`/announcement-details?id=${item._id}`)}
                     activeOpacity={0.7}
@@ -1255,14 +1798,14 @@ export default function ProfileScreen() {
                       style={[styles.announcementImage, { backgroundColor: tokens.colors.placeholderBg }]}
                     />
                     <View style={styles.announcementInfo}>
-                      <ThemedText 
-                        numberOfLines={2} 
+                      <ThemedText
+                        numberOfLines={2}
                         style={[styles.announcementTitle, { color: tokens.colors.text }]}
                       >
                         {item.title}
                       </ThemedText>
-                      <ThemedText 
-                        numberOfLines={1} 
+                      <ThemedText
+                        numberOfLines={1}
                         style={[styles.announcementLocation, { color: tokens.colors.muted }]}
                       >
                         <Ionicons name="location-outline" size={12} color={tokens.colors.muted} />
@@ -1271,8 +1814,8 @@ export default function ProfileScreen() {
                     </View>
                   </TouchableOpacity>
                 );
-              }}
-            />
+              })}
+            </ScrollView>
           )}
         </View>
       </ScrollView>
@@ -1339,6 +1882,61 @@ export default function ProfileScreen() {
               ))
             )}
           </ScrollView>
+        </View>
+      </View>
+    )}
+
+    {bookingDialogSlot && (
+      <View style={[styles.categoryOverlay, { backgroundColor: isDark ? tokens.colors.overlayDark : tokens.colors.overlayLight }]}>
+        <View style={[styles.categorySheet, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}>
+          <View style={[styles.categoryHeader, { borderColor: tokens.colors.borderNeutral }]}>
+            <ThemedText style={[styles.categoryHeaderTitle, { color: tokens.colors.text }]}>{t.bookingConfirmTitle}</ThemedText>
+            <TouchableOpacity onPress={() => setBookingDialogSlot(null)} style={styles.closeBtn}>
+              <Ionicons name="close" size={22} color={tokens.colors.text} />
+            </TouchableOpacity>
+          </View>
+          <View style={{ padding: 16, gap: 14 }}>
+            <View style={[styles.bookingSlotSummary, { borderColor: tokens.colors.borderNeutral, backgroundColor: isDark ? tokens.colors.elev : tokens.colors.bg }]}>
+              <Ionicons name="time-outline" size={18} color={tokens.colors.primary} />
+              <ThemedText style={[styles.bookingSlotSummaryText, { color: tokens.colors.text }]}>
+                {new Date(`${bookingDialogSlot.date}T00:00:00`).toLocaleDateString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })}
+                {' · '}{bookingDialogSlot.startTime} - {bookingDialogSlot.endTime}
+              </ThemedText>
+            </View>
+            <View>
+              <ThemedText style={[styles.infoItemLabel, { color: tokens.colors.muted, marginBottom: 6 }]}>{t.bookingMessageLabel}</ThemedText>
+              <ThemedTextInput
+                value={bookingMessage}
+                onChangeText={setBookingMessage}
+                placeholder={t.bookingMessagePlaceholder}
+                placeholderTextColor={tokens.colors.placeholder}
+                style={[styles.bookingMessageInput, { color: tokens.colors.text, borderColor: tokens.colors.borderNeutral }]}
+                multiline
+                numberOfLines={3}
+              />
+            </View>
+            <View style={styles.editActions}>
+              <TouchableOpacity
+                onPress={() => setBookingDialogSlot(null)}
+                style={[styles.actionButton, styles.cancelButton, { borderColor: tokens.colors.borderNeutral }]}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.actionButtonText, { color: tokens.colors.text }]}>{t.cancelBtn}</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSubmitBooking}
+                style={[styles.actionButton, styles.saveButton, { backgroundColor: tokens.colors.primary }]}
+                activeOpacity={0.8}
+                disabled={bookingSubmitting}
+              >
+                {bookingSubmitting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <ThemedText style={[styles.actionButtonText, { color: '#fff' }]}>{t.bookingSendRequest}</ThemedText>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
     )}
@@ -1594,6 +2192,197 @@ const styles = StyleSheet.create({
   infoItemValue: {
     fontSize: 13,
     fontWeight: '600',
+  },
+
+  // Availability schedule card
+  availabilityEnableRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  availabilityChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  availabilityChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  availabilityChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  availabilityDayRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  availabilityDayLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    flex: 1,
+  },
+  availabilityTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  availabilityTimeChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  availabilityTimeChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  availabilitySummaryWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  availabilitySummaryChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    minWidth: '47%',
+  },
+  availabilitySummaryChipDay: {
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  availabilitySummaryChipTime: {
+    fontSize: 12,
+  },
+
+  // Availability calendar (current month)
+  availabilityCalendarSubtitle: {
+    fontSize: 12,
+    marginTop: 1,
+    textTransform: 'capitalize',
+  },
+  availabilityCalendarWeekdays: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  availabilityCalendarWeekdayText: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'capitalize',
+  },
+  availabilityCalendarRow: {
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 4,
+  },
+  availabilityCalendarCell: {
+    flex: 1,
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    gap: 2,
+  },
+  availabilityCalendarDayNum: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  availabilityCalendarDayNumText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  availabilityCalendarDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  availabilityCalendarLegend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 12,
+  },
+  availabilityCalendarLegendText: {
+    fontSize: 12,
+  },
+
+  // Booking widget
+  bookingDayChip: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginRight: 8,
+    minWidth: 64,
+  },
+  bookingDayChipWeekday: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'capitalize',
+    marginBottom: 2,
+  },
+  bookingDayChipDate: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  bookingSlotsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  bookingSlotChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  bookingSlotChipUnavailable: {
+    opacity: 0.4,
+  },
+  bookingSlotChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  bookingSlotSummary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  bookingSlotSummaryText: {
+    fontSize: 13,
+    fontWeight: '600',
+    flex: 1,
+    textTransform: 'capitalize',
+  },
+  bookingMessageInput: {
+    fontSize: 13,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    minHeight: 80,
+    textAlignVertical: 'top',
   },
 
   // Edit Mode Styles

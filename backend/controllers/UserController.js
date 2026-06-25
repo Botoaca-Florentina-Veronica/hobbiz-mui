@@ -994,6 +994,64 @@ const updateProfile = async (req, res) => {
   }
 };
 
+// Actualizează programul săptămânal de disponibilitate (pentru rezervări de slot)
+const updateAvailability = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { enabled, slotDurationMinutes, weeklySchedule } = req.body;
+
+    if (slotDurationMinutes !== undefined) {
+      const duration = Number(slotDurationMinutes);
+      if (!Number.isFinite(duration) || duration < 15 || duration > 240) {
+        return res.status(400).json({ error: 'Durata unui slot trebuie să fie între 15 și 240 de minute' });
+      }
+    }
+
+    const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    let normalizedSchedule = [];
+    if (weeklySchedule !== undefined) {
+      if (!Array.isArray(weeklySchedule)) {
+        return res.status(400).json({ error: 'weeklySchedule trebuie să fie un array' });
+      }
+      const seenDays = new Set();
+      for (const entry of weeklySchedule) {
+        const dayOfWeek = Number(entry?.dayOfWeek);
+        if (!Number.isInteger(dayOfWeek) || dayOfWeek < 0 || dayOfWeek > 6) {
+          return res.status(400).json({ error: 'dayOfWeek trebuie să fie un număr între 0 și 6' });
+        }
+        if (seenDays.has(dayOfWeek)) {
+          return res.status(400).json({ error: 'Poate exista cel mult un interval orar per zi din săptămână' });
+        }
+        if (!timePattern.test(entry?.startTime) || !timePattern.test(entry?.endTime)) {
+          return res.status(400).json({ error: 'startTime/endTime trebuie să fie în format HH:mm' });
+        }
+        if (entry.startTime >= entry.endTime) {
+          return res.status(400).json({ error: 'startTime trebuie să fie înainte de endTime' });
+        }
+        seenDays.add(dayOfWeek);
+        normalizedSchedule.push({ dayOfWeek, startTime: entry.startTime, endTime: entry.endTime });
+      }
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilizator negăsit' });
+    }
+
+    user.availability = {
+      enabled: enabled !== undefined ? !!enabled : (user.availability?.enabled || false),
+      slotDurationMinutes: slotDurationMinutes !== undefined ? Number(slotDurationMinutes) : (user.availability?.slotDurationMinutes || 60),
+      weeklySchedule: weeklySchedule !== undefined ? normalizedSchedule : (user.availability?.weeklySchedule || []),
+    };
+    await user.save();
+
+    res.json({ message: 'Disponibilitate actualizată cu succes!', availability: user.availability });
+  } catch (error) {
+    console.error('Eroare la actualizarea disponibilității:', error);
+    res.status(500).json({ error: 'Eroare server la actualizarea disponibilității' });
+  }
+};
+
 // Arhivează un anunț (setează archived = true)
 const archiveAnnouncement = async (req, res) => {
   try {
@@ -1508,6 +1566,7 @@ module.exports = {
   deleteAnnouncement,
   updateAnnouncement,
   updateProfile,
+  updateAvailability,
   uploadAvatar,
   uploadCover,
   deleteAvatar,

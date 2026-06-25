@@ -41,6 +41,7 @@ import './PublicProfile.css';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import Toast from '../components/Toast';
+import AvailabilityBooking from '../components/AvailabilityBooking';
 import { resolveMediaUrl } from '../utils/media';
 
 export default function PublicProfile() {
@@ -332,6 +333,25 @@ export default function PublicProfile() {
           </div>
         </div>
       </div>
+
+      {/* ─── Disponibilitate / rezervare slot ─── */}
+      {profile?.availability?.enabled && (!user || currentUserId !== userId) && (
+        <AvailabilityBooking
+          providerId={userId}
+          isAuthenticated={!!user}
+          onRequireLogin={() => navigate('/login', { state: { from: `/profil/${userId}` } })}
+          onSuccess={() => {
+            setToastMessage(t('publicProfile.availability.requestSent'));
+            setToastType('success');
+            setToastVisible(true);
+          }}
+          onError={(msg) => {
+            setToastMessage(msg);
+            setToastType('error');
+            setToastVisible(true);
+          }}
+        />
+      )}
 
       {/* ─── Content ─── */}
       <div className="pp-grid">

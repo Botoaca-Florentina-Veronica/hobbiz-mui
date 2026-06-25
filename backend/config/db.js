@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+// Never log credentials: mask the user:password segment before printing the URI.
+const redactUri = (uri) => uri.replace(/\/\/([^:/?#]+):([^@/?#]+)@/, '//$1:***@');
+
 const connectDB = async () => {
   try {
     const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/hobbiz';
@@ -8,7 +11,7 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
   const conn = mongoose.connection;
-  console.log('✅ Conectat la MongoDB:', uri);
+  console.log('✅ Conectat la MongoDB:', redactUri(uri));
   console.log('   • DB name:', conn.name, '| readyState:', conn.readyState);
   } catch (err) {
     console.error('❌ Eroare de conexiune MongoDB:', err.message);

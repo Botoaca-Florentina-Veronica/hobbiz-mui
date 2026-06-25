@@ -96,13 +96,21 @@ interface Message {
   replyTo?: { messageId: string; senderId: string; senderName: string; text?: string; image?: string };
   reactions?: Array<{ userId: string; emoji: string }>;
   deleted?: boolean;
-  messageType?: 'text' | 'collaboration_request' | 'negotiation';
+  messageType?: 'text' | 'collaboration_request' | 'negotiation' | 'booking_request';
   negotiation?: { negotiationId?: string; price?: number; action?: string };
   lastActionBy?: string;
   collaborationData?: {
     participants?: string[];
     acceptedBy?: string[];
     declinedBy?: string[];
+  };
+  bookingData?: {
+    bookingId?: string;
+    providerId?: string;
+    date?: string;
+    startTime?: string;
+    endTime?: string;
+    status?: 'pending' | 'accepted' | 'rejected' | 'cancelled';
   };
 }
 
@@ -258,6 +266,16 @@ export default function ConversationScreen() {
       }
     };
 
+    const handleBookingUpdated = (data: { messageId: string; conversationId: string; bookingData: any }) => {
+      if (data.conversationId === selectedConversation.conversationId) {
+        setMessages((prev) => prev.map((m) =>
+          m._id === data.messageId
+            ? { ...m, bookingData: { ...m.bookingData, ...data.bookingData } }
+            : m
+        ));
+      }
+    };
+
     const handleConversationCleared = (data: { conversationId: string }) => {
       if (data.conversationId === selectedConversation.conversationId) {
         setMessages([]);
@@ -268,6 +286,7 @@ export default function ConversationScreen() {
     socket.on('userTyping', handleUserTyping);
     socket.on('userStatus', handleUserStatus);
     socket.on('collaborationUpdated', handleCollaborationUpdated);
+    socket.on('bookingUpdated', handleBookingUpdated);
     socket.on('conversationCleared', handleConversationCleared);
 
     return () => {
@@ -279,6 +298,7 @@ export default function ConversationScreen() {
         socket.off('userTyping', handleUserTyping);
         socket.off('userStatus', handleUserStatus);
         socket.off('collaborationUpdated', handleCollaborationUpdated);
+        socket.off('bookingUpdated', handleBookingUpdated);
         socket.off('conversationCleared', handleConversationCleared);
     };
   }, [socket, selectedConversation, userId, decrementUnreadCount]);
@@ -316,6 +336,10 @@ export default function ConversationScreen() {
       message.messageType === 'collaboration_request' ||
       String(message.text || '').trim() === 'COLLABORATION_REQUEST'
     );
+  }, []);
+
+  const isBookingRequestMessage = useCallback((message: Message) => {
+    return !!message && message.messageType === 'booking_request';
   }, []);
 
   const findExistingCollaborationRequest = useCallback(() => {
@@ -435,6 +459,34 @@ export default function ConversationScreen() {
       }
     } catch (err) {
       console.error('Collaboration response error:', err);
+      Alert.alert(t.error, t.sendMessageError);
+    }
+  };
+
+  const handleBookingResponse = async (bookingId: string, accept: boolean) => {
+    if (!bookingId) return;
+    try {
+      const res = await api.post(`/api/bookings/${encodeURIComponent(String(bookingId))}/respond`, { accept });
+      const updated = res.data?.message;
+      if (updated && updated._id) {
+        setMessages((prev) => prev.map((m) => (m._id === updated._id ? { ...m, ...updated } : m)));
+      }
+    } catch (err) {
+      console.error('Booking response error:', err);
+      Alert.alert(t.error, t.sendMessageError);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!bookingId) return;
+    try {
+      const res = await api.post(`/api/bookings/${encodeURIComponent(String(bookingId))}/cancel`);
+      const updated = res.data?.message;
+      if (updated && updated._id) {
+        setMessages((prev) => prev.map((m) => (m._id === updated._id ? { ...m, ...updated } : m)));
+      }
+    } catch (err) {
+      console.error('Booking cancel error:', err);
       Alert.alert(t.error, t.sendMessageError);
     }
   };
@@ -807,6 +859,95 @@ export default function ConversationScreen() {
         >
           <ThemedText style={{ color: tokens.colors.text }}>{t.priceOffered}</ThemedText>
         </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const BOOKING_STATUS_COLORS: Record<string, string> = {
+    pending: '#b45309',
+    accepted: '#15803d',
+    rejected: '#b91c1c',
+    cancelled: '#b91c1c',
+  };
+
+  const renderBookingBody = (message: Message, isOwn: boolean) => {
+    const status = message.bookingData?.status || 'pending';
+    const statusColor = BOOKING_STATUS_COLORS[status] || BOOKING_STATUS_COLORS.pending;
+    const statusLabel =
+      status === 'accepted' ? t.bookingAccepted
+        : status === 'rejected' ? t.bookingRejected
+        : status === 'cancelled' ? t.bookingCancelled
+        : t.bookingPending;
+    const statusIcon = status === 'accepted' ? 'checkmark-done' : (status === 'rejected' || status === 'cancelled') ? 'close-circle' : 'time-outline';
+
+    const dateLabel = message.bookingData?.date
+      ? new Date(`${message.bookingData.date}T00:00:00`).toLocaleDateString(
+          locale === 'en' ? 'en-US' : locale === 'es' ? 'es-ES' : 'ro-RO',
+          { weekday: 'short', day: 'numeric', month: 'short' }
+        )
+      : '';
+
+    const canRespond = status === 'pending' && String(message.bookingData?.providerId) === String(userId);
+    const canCancel = status === 'pending' || status === 'accepted';
+
+    return (
+      <View style={styles.collabContainer}>
+        <ThemedText
+          style={[styles.collabTitle, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }]}
+        >
+          {t.bookingRequestText}
+        </ThemedText>
+        <ThemedText
+          style={[styles.collabStatus, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.muted }]}
+        >
+          {dateLabel}{dateLabel ? ' · ' : ''}{message.bookingData?.startTime} - {message.bookingData?.endTime}
+        </ThemedText>
+        {message.text ? (
+          <ThemedText style={[styles.collabHint, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.muted }]}>
+            {message.text}
+          </ThemedText>
+        ) : null}
+        <View style={[styles.bookingStatusBadge, { backgroundColor: hexToRgba(statusColor, 0.15) }]}>
+          <Ionicons name={statusIcon as any} size={13} color={statusColor} />
+          <ThemedText style={[styles.bookingStatusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
+        </View>
+        {canRespond && (
+          <View style={styles.collabButtonsRow}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => handleBookingResponse(message.bookingData?.bookingId || '', true)}
+              style={[styles.collabBtn, { backgroundColor: tokens.colors.primary, borderColor: tokens.colors.primary }]}
+            >
+              <ThemedText style={[styles.collabBtnText, { color: tokens.colors.primaryContrast }]}>{t.accept}</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => handleBookingResponse(message.bookingData?.bookingId || '', false)}
+              style={[styles.collabBtn, { backgroundColor: 'transparent', borderColor: tokens.colors.border }]}
+            >
+              <ThemedText
+                style={[styles.collabBtnText, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }]}
+              >
+                {t.decline}
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        )}
+        {canCancel && (
+          <View style={[styles.collabButtonsRow, { marginTop: canRespond ? 6 : 4 }]}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => handleCancelBooking(message.bookingData?.bookingId || '')}
+              style={[styles.collabBtn, { backgroundColor: 'transparent', borderColor: tokens.colors.border }]}
+            >
+              <ThemedText
+                style={[styles.collabBtnText, { color: isOwn && isDark ? tokens.colors.primaryContrast : tokens.colors.text }]}
+              >
+                {t.bookingCancelAction}
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   };
@@ -1941,6 +2082,8 @@ export default function ConversationScreen() {
 
                                                       {isCollaborationRequestMessage(message) ? (
                                 renderCollaborationBody(message, isOwn)
+                              ) : isBookingRequestMessage(message) ? (
+                                renderBookingBody(message, isOwn)
                               ) : message.messageType === 'negotiation' ? (
                                 renderNegotiationBody(message, isOwn)
                               ) : (
@@ -2621,6 +2764,19 @@ const styles = StyleSheet.create({
   },
   collabHint: {
     fontSize: 12,
+  },
+  bookingStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  bookingStatusBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   collabButtonsRow: {
     flexDirection: 'row',

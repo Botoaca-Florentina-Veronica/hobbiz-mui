@@ -160,6 +160,87 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   BOOKING REQUEST MESSAGE BUBBLE
+   ═══════════════════════════════════════════════════════════════ */
+
+.booking-message {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border: 1px solid #ddd6fe;
+  max-width: 100%;
+}
+
+.dark-mode .booking-message {
+  background: linear-gradient(135deg, #2e1f4d 0%, #3b2a63 100%);
+  border-color: #5b4499;
+}
+
+.booking-message-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: #6d28d9;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.dark-mode .booking-message-header {
+  color: #c4b5fd;
+}
+
+.booking-message-details {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4c1d95;
+  margin-bottom: 4px;
+}
+
+.dark-mode .booking-message-details {
+  color: #ddd6fe;
+}
+
+.booking-message-text {
+  font-size: 13px;
+  color: #5b21b6;
+  font-style: italic;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.dark-mode .booking-message-text {
+  color: #c4b5fd;
+}
+
+.booking-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.booking-status--pending { color: #b45309; background: rgba(180, 83, 9, 0.12); }
+.booking-status--accepted { color: #15803d; background: rgba(21, 128, 61, 0.12); }
+.booking-status--rejected,
+.booking-status--cancelled { color: #b91c1c; background: rgba(185, 28, 28, 0.12); }
+
+.dark-mode .booking-status--pending { color: #fcd34d; background: rgba(252, 211, 77, 0.15); }
+.dark-mode .booking-status--accepted { color: #4ade80; background: rgba(74, 222, 128, 0.15); }
+.dark-mode .booking-status--rejected,
+.dark-mode .booking-status--cancelled { color: #f87171; background: rgba(248, 113, 113, 0.15); }
+
+.booking-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    NEGOTIATION BAR (below chat header)
    ═══════════════════════════════════════════════════════════════ */
 

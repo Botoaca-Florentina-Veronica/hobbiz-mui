@@ -1,0 +1,104 @@
+.profile-availability-calendar-card {
+  border-radius: var(--pf-card-radius);
+  box-shadow: var(--pf-card-shadow);
+  background: var(--pf-card-bg);
+  border: 1px solid var(--pf-divider);
+  margin-bottom: 1rem;
+  padding: 20px;
+}
+
+.availability-calendar-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--pf-text-muted);
+  text-transform: capitalize;
+}
+
+.availability-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--pf-text-muted);
+  text-transform: capitalize;
+  margin-bottom: 6px;
+}
+
+.availability-calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.availability-calendar-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.availability-calendar-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--pf-text);
+}
+
+.availability-calendar-cell.empty {
+  visibility: hidden;
+}
+
+.availability-calendar-cell.available {
+  background: color-mix(in srgb, var(--pf-primary) 8%, transparent);
+}
+
+.availability-calendar-day-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.availability-calendar-day-num.today {
+  background: var(--pf-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.availability-calendar-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pf-primary);
+  flex: 0 0 auto;
+}
+
+.availability-calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: var(--pf-text-muted);
+}
+
+@media (max-width: 700px) {
+  .profile-availability-calendar-card {
+    padding: 16px;
+  }
+  .availability-calendar-cell {
+    font-size: 0.8rem;
+  }
+  .availability-calendar-day-num {
+    width: 24px;
+    height: 24px;
+  }
+}

@@ -466,19 +466,26 @@ export default function MainStage() {
 
   const categoryMenuItems = useMemo(
     () =>
-      categoriesList.map((category) => ({
-        label: t(`categories.${category}`),
-        icon: categoryIcons[category] || null,
-        ariaLabel: t('mainStage.categoryAriaLabel', {
-          defaultValue: `Deschide categoria ${t(`categories.${category}`)}`,
-          category: t(`categories.${category}`),
-        }),
-        link: `/anunturi-categorie/${encodeURIComponent(category)}`,
-        onClick: (event) => {
-          event.preventDefault();
-          navigate(`/anunturi-categorie/${encodeURIComponent(category)}`);
-        },
-      })),
+      categoriesList.map((category) => {
+        // Anunțurile sunt salvate cu valorile scurte din `categoryTagsMap` (ex. "Curățenie"),
+        // nu cu denumirea lungă afișată în meniu (ex. "Curatenie, Întreținere casă"). Fără
+        // această mapare, pagina de categorie filtrează după un text care nu există în DB
+        // și nu găsește niciun anunț.
+        const dbCategory = categoryMenuToTagsKey[category] || category;
+        return {
+          label: t(`categories.${category}`),
+          icon: categoryIcons[category] || null,
+          ariaLabel: t('mainStage.categoryAriaLabel', {
+            defaultValue: `Deschide categoria ${t(`categories.${category}`)}`,
+            category: t(`categories.${category}`),
+          }),
+          link: `/anunturi-categorie/${encodeURIComponent(dbCategory)}`,
+          onClick: (event) => {
+            event.preventDefault();
+            navigate(`/anunturi-categorie/${encodeURIComponent(dbCategory)}`);
+          },
+        };
+      }),
     [navigate, t]
   );
 

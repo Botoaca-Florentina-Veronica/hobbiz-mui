@@ -8,7 +8,7 @@ const NotificationSchema = new mongoose.Schema({
   read: { type: Boolean, default: false },
   
   // Pentru notificări mai complexe (verificări, documente, etc.)
-  type: { type: String, enum: ['message', 'verification', 'document', 'review', 'general'], default: 'general' },
+  type: { type: String, enum: ['message', 'verification', 'document', 'review', 'general', 'booking'], default: 'general' },
   fromUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // ID-ul utilizatorului care a declanșat notificarea
   actionDescription: { type: String }, // Descrierea acțiunii (ex: "a încărcat un document de verificare", "a verificat documentul tău")
   relatedDocumentId: { type: String }, // ID-ul documentului relevant

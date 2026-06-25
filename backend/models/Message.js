@@ -15,7 +15,7 @@ const MessageSchema = new mongoose.Schema({
   // Tip de mesaj pentru mesaje speciale
   messageType: {
     type: String,
-    enum: ["text", "collaboration_request", "negotiation"],
+    enum: ["text", "collaboration_request", "negotiation", "booking_request"],
     default: "text",
   },
   // Date pentru negociere (mesaje care reflectă o propunere/contraofertă/decizie)
@@ -29,6 +29,15 @@ const MessageSchema = new mongoose.Schema({
     participants: [{ type: String }],
     acceptedBy: [{ type: String }],
     declinedBy: [{ type: String }],
+  },
+  // Date pentru cerere de rezervare slot (booking_request)
+  bookingData: {
+    bookingId: { type: String },
+    providerId: { type: String },
+    date: { type: String }, // "YYYY-MM-DD"
+    startTime: { type: String }, // "HH:mm"
+    endTime: { type: String },
+    status: { type: String, enum: ["pending", "accepted", "rejected", "cancelled"] },
   },
   // Informații opționale pentru răspuns (reply)
   announcementId: { type: String, required: false }, // Referință la anunțul asociat conversației (opțional)

@@ -68,7 +68,8 @@
       ],
       "expo-web-browser",
       "expo-font",
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

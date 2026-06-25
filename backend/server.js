@@ -1,5 +1,7 @@
 // backend/server.js
-require('dotenv').config();
+// override: true forces values from .env to win even if PM2 (cluster mode)
+// already injected a stale cached environment snapshot from an earlier start.
+require('dotenv').config({ override: true });
 
 // Validate required secrets at startup — fail fast rather than run insecurely
 if (!process.env.JWT_SECRET) {
@@ -45,6 +47,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const negotiationRoutes = require('./routes/negotiationRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const shareRoutes = require('./routes/shareRoutes');
@@ -293,6 +296,7 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/negotiations', negotiationRoutes);
+app.use('/api/bookings', bookingRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/reports', reportRoutes);
 

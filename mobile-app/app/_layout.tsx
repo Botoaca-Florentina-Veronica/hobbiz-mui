@@ -262,7 +262,7 @@ export default function RootLayout() {
                   <JsStack.Screen name="legal" options={{ headerShown: false }} />
                   <JsStack.Screen name="notifications" options={{ headerShown: false }} />
                   <JsStack.Screen name="conversation" options={{ headerShown: false }} />
-                  <JsStack.Screen name="profile" options={{ headerShown: false }} />
+                  <JsStack.Screen name="profile" options={{ headerShown: false, gestureEnabled: false }} />
                   <JsStack.Screen name="my-announcements" options={{ headerShown: false }} />
                   <JsStack.Screen name="edit-announcement" options={{ headerShown: false }} />
                   <JsStack.Screen name="post-success" options={{ headerShown: false }} />

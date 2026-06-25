@@ -30,6 +30,7 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   CalendarMonth as CalendarMonthIcon,
+  EventBusy as EventBusyIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon,
   ThumbUp as ThumbUpIcon,
@@ -41,6 +42,7 @@ import apiClient from '../api/api';
 import ImageCropModal from '../components/ImageCropModal';
 import ImageZoomModal from '../components/ImageZoomModal';
 import LocationSelector from '../components/LocationSelector';
+import AvailabilityCalendar from '../components/AvailabilityCalendar';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -67,6 +69,11 @@ export default function ProfilePage() {
     social: '',
     bio: ''
   });
+
+  // Disponibilitate (program săptămânal pentru rezervări de slot) - editMode separat de cel general
+  const [availability, setAvailability] = useState({ enabled: false, slotDurationMinutes: 60, weeklySchedule: [] });
+  const [availabilityEditMode, setAvailabilityEditMode] = useState(false);
+  const [availabilitySaving, setAvailabilitySaving] = useState(false);
 
   // Loading & UI states
   const [loading, setLoading] = useState(true);
@@ -135,6 +142,7 @@ export default function ProfilePage() {
           social: res.data.social || '',
           bio: res.data.bio || ''
         });
+        setAvailability(res.data.availability || { enabled: false, slotDurationMinutes: 60, weeklySchedule: [] });
       } catch (e) {
         setError('profile.messages.errorLoadingProfile');
         setProfile({});
@@ -237,6 +245,67 @@ export default function ProfilePage() {
       setError('profile.messages.errorSavingProfile');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // ============================================
+  // EVENT HANDLERS - Disponibilitate
+  // ============================================
+
+  const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const DAY_DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // săptămâna începe Luni în UI
+
+  const getDaySchedule = (dayOfWeek) =>
+    availability.weeklySchedule.find((d) => d.dayOfWeek === dayOfWeek);
+
+  const handleAvailabilityToggle = (e) => {
+    setAvailability((prev) => ({ ...prev, enabled: e.target.checked }));
+  };
+
+  const handleSlotDurationChange = (e) => {
+    setAvailability((prev) => ({ ...prev, slotDurationMinutes: Number(e.target.value) }));
+  };
+
+  const handleToggleDay = (dayOfWeek, checked) => {
+    setAvailability((prev) => {
+      const rest = prev.weeklySchedule.filter((d) => d.dayOfWeek !== dayOfWeek);
+      if (!checked) return { ...prev, weeklySchedule: rest };
+      return {
+        ...prev,
+        weeklySchedule: [...rest, { dayOfWeek, startTime: '09:00', endTime: '17:00' }].sort(
+          (a, b) => a.dayOfWeek - b.dayOfWeek
+        )
+      };
+    });
+  };
+
+  const handleDayTimeChange = (dayOfWeek, field, value) => {
+    setAvailability((prev) => ({
+      ...prev,
+      weeklySchedule: prev.weeklySchedule.map((d) =>
+        d.dayOfWeek === dayOfWeek ? { ...d, [field]: value } : d
+      )
+    }));
+  };
+
+  const handleCancelAvailability = () => {
+    setAvailability(profile?.availability || { enabled: false, slotDurationMinutes: 60, weeklySchedule: [] });
+    setAvailabilityEditMode(false);
+  };
+
+  const handleSaveAvailability = async () => {
+    try {
+      setAvailabilitySaving(true);
+      setError('');
+      await apiClient.put('/api/users/availability', availability);
+      setProfile((prev) => ({ ...prev, availability }));
+      setAvailabilityEditMode(false);
+      setSuccess('profile.messages.availabilityUpdated');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (e) {
+      setError('profile.messages.errorSavingAvailability');
+    } finally {
+      setAvailabilitySaving(false);
     }
   };
 
@@ -549,6 +618,198 @@ export default function ProfilePage() {
           />
         </div>
       </div>
+    </div>
+  );
+
+  const renderSwitch = (checked, onChange, extraClass = '') => (
+    <label className={`pf-switch ${extraClass}`}>
+      <input type="checkbox" checked={checked} onChange={onChange} />
+      <span className="pf-switch-track" />
+      <span className="pf-switch-thumb" />
+    </label>
+  );
+
+  const renderAvailabilityDayRow = (dayOfWeek) => {
+    const daySchedule = getDaySchedule(dayOfWeek);
+    const isActive = !!daySchedule;
+    return (
+      <div className={`availability-day-row ${isActive ? 'active' : ''}`} key={dayOfWeek}>
+        <div className="availability-day-toggle">
+          {renderSwitch(isActive, (e) => handleToggleDay(dayOfWeek, e.target.checked), 'pf-switch--sm')}
+          <span className="availability-day-label">{t(`profile.days.${DAY_KEYS[dayOfWeek]}`)}</span>
+        </div>
+        {isActive && (
+          <div className="availability-day-times">
+            <input
+              type="time"
+              className="availability-time-input"
+              value={daySchedule.startTime}
+              onChange={(e) => handleDayTimeChange(dayOfWeek, 'startTime', e.target.value)}
+            />
+            <span className="availability-time-sep">–</span>
+            <input
+              type="time"
+              className="availability-time-input"
+              value={daySchedule.endTime}
+              onChange={(e) => handleDayTimeChange(dayOfWeek, 'endTime', e.target.value)}
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAvailabilityBody = () => (
+    <>
+      <div className="availability-toggle-row">
+        <div className="availability-enabled-toggle">
+          {renderSwitch(!!availability.enabled, handleAvailabilityToggle)}
+          <span>{t('profile.availability.enable')}</span>
+        </div>
+        {availability.enabled && (
+          <div className="availability-slot-duration">
+            <label>{t('profile.availability.slotDuration')}</label>
+            <select value={availability.slotDurationMinutes} onChange={handleSlotDurationChange}>
+              {[15, 30, 45, 60, 90, 120].map((min) => (
+                <option key={min} value={min}>
+                  {min} {t('profile.availability.minutes')}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+      {availability.enabled && (
+        <div className="availability-days-list">
+          {DAY_DISPLAY_ORDER.map(renderAvailabilityDayRow)}
+        </div>
+      )}
+    </>
+  );
+
+  const renderAvailabilityEmptyState = (variant) => (
+    <div className="availability-empty-state">
+      <div className={`availability-empty-icon ${variant === 'disabled' ? 'muted' : ''}`}>
+        {variant === 'disabled' ? <EventBusyIcon /> : <CalendarMonthIcon />}
+      </div>
+      <p className="availability-empty-text">
+        {variant === 'disabled' ? t('profile.availability.disabled') : t('profile.availability.noDays')}
+      </p>
+      <button className="availability-empty-cta" onClick={() => setAvailabilityEditMode(true)}>
+        <EditIcon className="profile-icon" />
+        {t('profile.actions.edit')}
+      </button>
+    </div>
+  );
+
+  const renderAvailabilitySummary = () => (
+    <div className="availability-summary">
+      {availability.enabled ? (
+        availability.weeklySchedule.length > 0 ? (
+          <div className="availability-summary-chips">
+            {DAY_DISPLAY_ORDER.filter((d) => getDaySchedule(d)).map((d) => {
+              const s = getDaySchedule(d);
+              return (
+                <span className="availability-summary-chip" key={d}>
+                  <span className="availability-summary-chip-day">{t(`profile.days.${DAY_KEYS[d]}`)}</span>
+                  <span className="availability-summary-chip-time">{s.startTime} – {s.endTime}</span>
+                </span>
+              );
+            })}
+          </div>
+        ) : (
+          renderAvailabilityEmptyState('noDays')
+        )
+      ) : (
+        renderAvailabilityEmptyState('disabled')
+      )}
+    </div>
+  );
+
+  const renderAvailabilityCard = () => (
+    <div className="profile-availability-card">
+      <div className="profile-info-header-section">
+        <div className="profile-availability-title-group">
+          <div className="profile-availability-icon"><CalendarMonthIcon /></div>
+          <h2 className="profile-info-main-title">{t('profile.availability.title')}</h2>
+        </div>
+        {!availabilityEditMode && (
+          <button className="profile-edit-button" onClick={() => setAvailabilityEditMode(true)}>
+            <EditIcon className="profile-icon" />
+            {t('profile.actions.edit')}
+          </button>
+        )}
+      </div>
+      <hr className="profile-divider" />
+      {availabilityEditMode ? (
+        <>
+          {renderAvailabilityBody()}
+          <hr className="profile-actions-divider" />
+          <div className="profile-actions-container">
+            <button className="profile-action-button cancel" onClick={handleCancelAvailability} disabled={availabilitySaving}>
+              <CancelIcon className="profile-icon" />
+              {t('profile.actions.cancel')}
+            </button>
+            <button className="profile-action-button save" onClick={handleSaveAvailability} disabled={availabilitySaving}>
+              {availabilitySaving ? (
+                <>
+                  <CircularProgress className="profile-loading-spinner-small" style={{ color: 'white' }} />
+                  <span className="profile-loading-text">{t('profile.actions.saving')}</span>
+                </>
+              ) : (
+                <>
+                  <SaveIcon className="profile-icon" />
+                  {t('profile.actions.save')}
+                </>
+              )}
+            </button>
+          </div>
+        </>
+      ) : (
+        renderAvailabilitySummary()
+      )}
+    </div>
+  );
+
+  const renderMobileAvailabilityCard = () => (
+    <div className="mobile-availability-card">
+      <div className="mobile-card-header">
+        <div className="profile-availability-title-group">
+          <div className="profile-availability-icon"><CalendarMonthIcon /></div>
+          <h2 className="mobile-card-title">{t('profile.availability.title')}</h2>
+        </div>
+        {!availabilityEditMode && (
+          <button className="mobile-edit-button" onClick={() => setAvailabilityEditMode(true)}>
+            {t('profile.actions.edit')}
+          </button>
+        )}
+      </div>
+      {availabilityEditMode ? (
+        <>
+          {renderAvailabilityBody()}
+          <div className="mobile-edit-actions">
+            <button className="mobile-action-button mobile-cancel-button" onClick={handleCancelAvailability} disabled={availabilitySaving}>
+              <CancelIcon className="profile-icon" />
+              {t('profile.actions.cancel')}
+            </button>
+            <button className="mobile-action-button mobile-save-button" onClick={handleSaveAvailability} disabled={availabilitySaving}>
+              {availabilitySaving ? (
+                <>
+                  <CircularProgress size={16} style={{ color: 'white' }} />
+                  <span>{t('profile.actions.saving')}</span>
+                </>
+              ) : (
+                <>
+                  <SaveIcon className="profile-icon" />
+                  {t('profile.actions.save')}
+                </>
+              )}
+            </button>
+          </div>
+        </>
+      ) : (
+        renderAvailabilitySummary()
+      )}
     </div>
   );
 
@@ -1173,6 +1434,8 @@ export default function ProfilePage() {
                 {renderAboutMe()}
               </div>
               {renderLocationCard()}
+              {renderAvailabilityCard()}
+              <AvailabilityCalendar weeklySchedule={availability.weeklySchedule} enabled={availability.enabled} />
             </div>
           </div>
 
@@ -1189,6 +1452,8 @@ export default function ProfilePage() {
         {renderMobileProfileHeader()}
         {renderMobileLocationSection()}
         {renderMobileContactCard()}
+        {renderMobileAvailabilityCard()}
+        <AvailabilityCalendar weeklySchedule={availability.weeklySchedule} enabled={availability.enabled} />
         {renderMobileReviewsCard()}
         {renderMobileAnnouncementsCard()}
       </div>

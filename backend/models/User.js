@@ -71,6 +71,19 @@ const userSchema = new mongoose.Schema({
   // Login protection against repeated invalid credentials
   failedLoginAttempts: { type: Number, default: 0 },
   loginBlockedUntil: { type: Date, default: null },
+
+  // Weekly recurring availability schedule, used for booking requests on the public profile
+  availability: {
+    enabled: { type: Boolean, default: false },
+    slotDurationMinutes: { type: Number, default: 60 },
+    weeklySchedule: [
+      {
+        dayOfWeek: { type: Number, min: 0, max: 6, required: true }, // 0=Duminică, ca Date.getDay()
+        startTime: { type: String, required: true }, // "HH:mm"
+        endTime: { type: String, required: true },
+      },
+    ],
+  },
 });
 
 // Hash-uim parola înainte de salvare (only if password is provided)

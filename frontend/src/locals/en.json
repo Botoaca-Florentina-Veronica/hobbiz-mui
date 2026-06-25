@@ -678,6 +678,25 @@
     "emptyAnnouncements": "You don't have any announcements yet.",
     "noImage": "No image",
     "noBio": "No bio added yet.",
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    },
+    "availability": {
+      "title": "My availability",
+      "enable": "Enable availability schedule",
+      "slotDuration": "Slot duration",
+      "minutes": "min",
+      "disabled": "You haven't enabled an availability schedule.",
+      "noDays": "You haven't set any available days yet.",
+      "calendarTitle": "Availability calendar",
+      "calendarLegend": "Days available according to your schedule"
+    },
     "messages": {
       "errorLoadingProfile": "Error loading profile",
       "locationUpdated": "Location updated successfully!",
@@ -689,7 +708,9 @@
       "coverUpdated": "Cover updated successfully!",
       "errorUploadingCover": "Error uploading cover image",
       "coverDeleted": "Cover deleted.",
-      "errorDeletingCover": "Error deleting cover"
+      "errorDeletingCover": "Error deleting cover",
+      "availabilityUpdated": "Availability updated successfully!",
+      "errorSavingAvailability": "Error saving availability"
     }
   },
   "publicProfile": {
@@ -738,7 +759,19 @@
     "lastSeenHours": "Active {{count}}h ago",
     "lastSeenYesterday": "Active yesterday",
     "lastSeenDays": "Active {{count}} days ago",
-    "retry": "Try again"
+    "retry": "Try again",
+    "availability": {
+      "title": "Availability",
+      "subtitle": "Pick a free day and time to send a direct booking request.",
+      "today": "Today",
+      "confirmTitle": "Confirm booking request",
+      "messageLabel": "Message (optional)",
+      "messagePlaceholder": "Tell the provider what you need...",
+      "sendRequest": "Send request",
+      "requestSent": "Your booking request has been sent!",
+      "conflictError": "This slot was just booked by someone else, please choose another one.",
+      "requestError": "There was an error sending the request. Please try again."
+    }
   },
   "terms": {
     "title": "Terms and Conditions",
@@ -1436,6 +1469,14 @@
     "decline": "Decline",
     "cancel": "Cancel",
     "sendMessageError": "Error sending message",
+    "bookingRequestText": "Booking request",
+    "bookingCancel": "Cancel booking",
+    "bookingStatus": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
     "negotiationOffer": "Price proposal",
     "negotiationPriceOffered": "Proposed price",
     "acceptOffer": "Accept offer",

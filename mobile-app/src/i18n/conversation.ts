@@ -87,6 +87,13 @@ export const conversationTranslations = {
     accept: 'Acceptă',
     decline: 'Refuză',
 
+    bookingRequestText: 'Cerere de rezervare',
+    bookingPending: 'În așteptare',
+    bookingAccepted: 'Acceptată',
+    bookingRejected: 'Respinsă',
+    bookingCancelled: 'Anulată',
+    bookingCancelAction: 'Anulează rezervarea',
+
     finalizeDeal: 'Finalizează',
     negotiationOffer: 'Ofertă de preț',
     counterOffer: 'Contraofertă',
@@ -202,6 +209,13 @@ export const conversationTranslations = {
     accept: 'Accept',
     decline: 'Decline',
 
+    bookingRequestText: 'Booking request',
+    bookingPending: 'Pending',
+    bookingAccepted: 'Accepted',
+    bookingRejected: 'Rejected',
+    bookingCancelled: 'Cancelled',
+    bookingCancelAction: 'Cancel booking',
+
     finalizeDeal: 'Finalize',
     negotiationOffer: 'Price offer',
     counterOffer: 'Counter offer',
@@ -316,6 +330,13 @@ export const conversationTranslations = {
     collaborationAlreadyAccepted: 'La colaboracion ya esta confirmada.',
     accept: 'Aceptar',
     decline: 'Rechazar',
+
+    bookingRequestText: 'Solicitud de reserva',
+    bookingPending: 'Pendiente',
+    bookingAccepted: 'Aceptada',
+    bookingRejected: 'Rechazada',
+    bookingCancelled: 'Cancelada',
+    bookingCancelAction: 'Cancelar reserva',
 
     finalizeDeal: 'Finalizar',
     negotiationOffer: 'Oferta de precio',

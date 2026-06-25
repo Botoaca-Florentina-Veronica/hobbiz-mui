@@ -19,6 +19,8 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import gumballChat from '../assets/images/gumballChat.jpg';
 
 import './ChatPage.css';
@@ -267,6 +269,8 @@ export default function ChatPage() {
               ? `🤝 ${t('chat.collaborationRequestText')}`
               : msgType === 'negotiation'
               ? `💰 ${t('chat.negotiationOffer')}`
+              : msgType === 'booking_request'
+              ? `📅 ${t('chat.bookingRequestText')}`
               : rawText || t('chat.image');
 
           return {
@@ -355,9 +359,20 @@ export default function ChatPage() {
     };
     on('conversationCleared', handleConversationCleared);
 
+    // Cererile de rezervare se actualizează in-place pe mesajul existent (ca la collaboration_request),
+    // dar diferit de collaborationUpdated, acesta E ascultat - altfel partea care nu a făcut acțiunea
+    // (accept/respinge/anulează) nu ar vedea schimbarea de status fără refresh.
+    const handleBookingUpdated = (data) => {
+      if (selectedConversation && data.conversationId === selectedConversation.conversationId && data.messageId) {
+        setMessages(prev => prev.map(m => m._id === data.messageId ? { ...m, bookingData: { ...m.bookingData, ...data.bookingData } } : m));
+      }
+    };
+    on('bookingUpdated', handleBookingUpdated);
+
     return () => {
       off('newMessage', handleNew);
       off('conversationCleared', handleConversationCleared);
+      off('bookingUpdated', handleBookingUpdated);
     };
   }, [userId, selectedConversation, on, off]);
 
@@ -613,6 +628,36 @@ export default function ChatPage() {
       }
     } catch (err) {
       console.error('Collaboration response error:', err);
+      alert(t('chat.sendMessageError'));
+    }
+  };
+
+  // --- Booking request helpers ---
+
+  const handleBookingResponse = async (bookingId, accept) => {
+    if (!bookingId) return;
+    try {
+      const res = await apiClient.post(`/api/bookings/${encodeURIComponent(String(bookingId))}/respond`, { accept });
+      const updated = res.data?.message;
+      if (updated && updated._id) {
+        setMessages(prev => prev.map(m => m._id === updated._id ? { ...m, ...updated } : m));
+      }
+    } catch (err) {
+      console.error('Booking response error:', err);
+      alert(t('chat.sendMessageError'));
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!bookingId) return;
+    try {
+      const res = await apiClient.post(`/api/bookings/${encodeURIComponent(String(bookingId))}/cancel`);
+      const updated = res.data?.message;
+      if (updated && updated._id) {
+        setMessages(prev => prev.map(m => m._id === updated._id ? { ...m, ...updated } : m));
+      }
+    } catch (err) {
+      console.error('Booking cancel error:', err);
       alert(t('chat.sendMessageError'));
     }
   };
@@ -1104,6 +1149,41 @@ export default function ChatPage() {
                                     </>
                                   );
                                 })()}
+                              </div>
+                            ) : msg.messageType === 'booking_request' ? (
+                              <div className="booking-message">
+                                <div className="booking-message-header">
+                                  <CalendarMonthIcon fontSize="small" />
+                                  <strong>{t('chat.bookingRequestText')}</strong>
+                                </div>
+                                <div className="booking-message-details">
+                                  {msg.bookingData?.date && new Date(`${msg.bookingData.date}T00:00:00`).toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                  {' · '}{msg.bookingData?.startTime} - {msg.bookingData?.endTime}
+                                </div>
+                                {msg.text && <div className="booking-message-text">{msg.text}</div>}
+                                <div className={`booking-status booking-status--${msg.bookingData?.status || 'pending'}`}>
+                                  {msg.bookingData?.status === 'accepted' ? <CheckCircleOutlineIcon fontSize="inherit" />
+                                    : (msg.bookingData?.status === 'rejected' || msg.bookingData?.status === 'cancelled') ? <EventBusyIcon fontSize="inherit" />
+                                    : <AccessTimeIcon fontSize="inherit" />}
+                                  {t(`chat.bookingStatus.${msg.bookingData?.status || 'pending'}`)}
+                                </div>
+                                {msg.bookingData?.status === 'pending' && String(msg.bookingData?.providerId) === String(userId) && (
+                                  <div className="booking-buttons">
+                                    <button className="collab-btn accept" onClick={() => handleBookingResponse(msg.bookingData.bookingId, true)}>
+                                      {t('chat.accept')}
+                                    </button>
+                                    <button className="collab-btn decline" onClick={() => handleBookingResponse(msg.bookingData.bookingId, false)}>
+                                      {t('chat.decline')}
+                                    </button>
+                                  </div>
+                                )}
+                                {['pending', 'accepted'].includes(msg.bookingData?.status) && (
+                                  <div className="booking-buttons">
+                                    <button className="collab-btn decline" onClick={() => handleCancelBooking(msg.bookingData.bookingId)}>
+                                      {t('chat.bookingCancel')}
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             ) : msg.messageType === 'negotiation' ? (
                               <div className="negotiation-message">

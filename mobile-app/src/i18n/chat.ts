@@ -11,6 +11,7 @@ export const chatTranslations = {
     startWriting: 'E momentul tău Eminescu, începe să scrii!',
     collaborationRequest: 'Cerere de colaborare',
     negotiationOffer: 'Propunere de preț',
+    bookingRequest: 'Cerere de rezervare',
   },
   en: {
     messages: 'Messages',
@@ -22,6 +23,7 @@ export const chatTranslations = {
     startWriting: "It's your moment, start writing!",
     collaborationRequest: 'Collaboration request',
     negotiationOffer: 'Price proposal',
+    bookingRequest: 'Booking request',
   },
   es: {
     messages: 'Mensajes',
@@ -33,6 +35,7 @@ export const chatTranslations = {
     startWriting: 'Es tu momento, empieza a escribir!',
     collaborationRequest: 'Solicitud de colaboración',
     negotiationOffer: 'Propuesta de precio',
+    bookingRequest: 'Solicitud de reserva',
   },
 };
 

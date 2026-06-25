@@ -314,6 +314,8 @@ export default function ChatScreen() {
             ? `🤝 ${t.collaborationRequest}`
             : lastMsgType === 'negotiation'
             ? `💰 ${t.negotiationOffer}`
+            : lastMsgType === 'booking_request'
+            ? `📅 ${t.bookingRequest}`
             : lastMsgRaw;
 
         return {

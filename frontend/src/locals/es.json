@@ -676,6 +676,25 @@
     "emptyAnnouncements": "Aún no tienes anuncios.",
     "noImage": "Sin imagen",
     "noBio": "Aún no hay biografía.",
+    "days": {
+      "sunday": "Domingo",
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado"
+    },
+    "availability": {
+      "title": "Mi disponibilidad",
+      "enable": "Activar horario de disponibilidad",
+      "slotDuration": "Duración del turno",
+      "minutes": "min",
+      "disabled": "No has activado un horario de disponibilidad.",
+      "noDays": "Aún no has configurado ningún día disponible.",
+      "calendarTitle": "Calendario de disponibilidad",
+      "calendarLegend": "Días disponibles según tu horario"
+    },
     "messages": {
       "errorLoadingProfile": "Error al cargar el perfil",
       "locationUpdated": "Ubicación actualizada correctamente!",
@@ -687,7 +706,9 @@
       "coverUpdated": "Portada actualizada correctamente!",
       "errorUploadingCover": "Error al subir la portada",
       "coverDeleted": "Portada eliminada.",
-      "errorDeletingCover": "Error al eliminar la portada"
+      "errorDeletingCover": "Error al eliminar la portada",
+      "availabilityUpdated": "Disponibilidad actualizada correctamente!",
+      "errorSavingAvailability": "Error al guardar la disponibilidad"
     }
   },
   "publicProfile": {
@@ -736,7 +757,19 @@
     "lastSeenHours": "Activo hace {{count}} h",
     "lastSeenYesterday": "Activo ayer",
     "lastSeenDays": "Activo hace {{count}} días",
-    "retry": "Intentar de nuevo"
+    "retry": "Intentar de nuevo",
+    "availability": {
+      "title": "Disponibilidad",
+      "subtitle": "Elige un día y una hora libres para enviar una solicitud de reserva directa.",
+      "today": "Hoy",
+      "confirmTitle": "Confirmar solicitud de reserva",
+      "messageLabel": "Mensaje (opcional)",
+      "messagePlaceholder": "Dile al proveedor qué necesitas...",
+      "sendRequest": "Enviar solicitud",
+      "requestSent": "¡Tu solicitud de reserva ha sido enviada!",
+      "conflictError": "Este horario ya ha sido reservado por otra persona, elige otro.",
+      "requestError": "Hubo un error al enviar la solicitud. Inténtalo de nuevo."
+    }
   },
   "terms": {
     "title": "Términos y condiciones",
@@ -1431,6 +1464,14 @@
     "decline": "Rechazar",
     "cancel": "Cancelar",
     "sendMessageError": "Error al enviar el mensaje",
+    "bookingRequestText": "Solicitud de reserva",
+    "bookingCancel": "Cancelar reserva",
+    "bookingStatus": {
+      "pending": "Pendiente",
+      "accepted": "Aceptada",
+      "rejected": "Rechazada",
+      "cancelled": "Cancelada"
+    },
     "negotiationOffer": "Propuesta de precio",
     "negotiationPriceOffered": "Precio propuesto",
     "acceptOffer": "Aceptar oferta",

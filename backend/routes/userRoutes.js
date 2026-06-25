@@ -5,7 +5,7 @@ const adminAuth = require('../middleware/adminAuth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
 const uploadDocuments = require('../config/cloudinaryDocuments');
-const { register, registerChallenge, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, deleteAccount, resetUserData, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
+const { register, registerChallenge, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, updateAvailability, deleteAccount, resetUserData, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
 router.delete('/avatar', auth, deleteAvatar);
@@ -42,6 +42,7 @@ router.get('/my-announcements/:id', auth, getMyAnnouncementById);
 router.delete('/my-announcements/:id', auth, deleteAnnouncement);
 router.put('/my-announcements/:id', auth, upload.array('images', 10), updateAnnouncement);
 router.put('/profile', auth, updateProfile); // Rută pentru actualizarea profilului (nume, prenume, localitate, telefon)
+router.put('/availability', auth, updateAvailability); // Programul săptămânal de disponibilitate (pentru rezervări de slot)
 
 // Verifică autentificarea utilizatorului
 router.get('/auth/check', auth, async (req, res) => {

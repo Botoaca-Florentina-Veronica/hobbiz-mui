@@ -679,6 +679,25 @@
     "emptyAnnouncements": "Nu ai încă anunțuri.",
     "noImage": "Fără imagine",
     "noBio": "Nu a fost adăugată nicio descriere.",
+    "days": {
+      "sunday": "Duminică",
+      "monday": "Luni",
+      "tuesday": "Marți",
+      "wednesday": "Miercuri",
+      "thursday": "Joi",
+      "friday": "Vineri",
+      "saturday": "Sâmbătă"
+    },
+    "availability": {
+      "title": "Disponibilitatea mea",
+      "enable": "Activează programul de disponibilitate",
+      "slotDuration": "Durata unui slot",
+      "minutes": "min",
+      "disabled": "Nu ai activat un program de disponibilitate.",
+      "noDays": "Nu ai setat încă nicio zi disponibilă.",
+      "calendarTitle": "Calendarul disponibilității",
+      "calendarLegend": "Zile disponibile conform programului tău"
+    },
     "messages": {
       "errorLoadingProfile": "Eroare la încărcarea profilului",
       "locationUpdated": "Locația a fost actualizată cu succes!",
@@ -690,7 +709,9 @@
       "coverUpdated": "Coperta a fost actualizată cu succes!",
       "errorUploadingCover": "Eroare la încărcarea imaginii de copertă",
       "coverDeleted": "Coperta a fost ștearsă.",
-      "errorDeletingCover": "Eroare la ștergerea copertei"
+      "errorDeletingCover": "Eroare la ștergerea copertei",
+      "availabilityUpdated": "Disponibilitatea a fost actualizată cu succes!",
+      "errorSavingAvailability": "Eroare la salvarea disponibilității"
     }
   },
   "publicProfile": {
@@ -739,7 +760,19 @@
     "lastSeenHours": "Activ acum {{count}}h",
     "lastSeenYesterday": "Activ ieri",
     "lastSeenDays": "Activ acum {{count}} zile",
-    "retry": "Încearcă din nou"
+    "retry": "Încearcă din nou",
+    "availability": {
+      "title": "Disponibilitate",
+      "subtitle": "Alege o zi și o oră libere pentru a trimite o cerere de rezervare directă.",
+      "today": "Azi",
+      "confirmTitle": "Confirmă cererea de rezervare",
+      "messageLabel": "Mesaj (opțional)",
+      "messagePlaceholder": "Spune-i prestatorului ce ai nevoie...",
+      "sendRequest": "Trimite cererea",
+      "requestSent": "Cererea de rezervare a fost trimisă!",
+      "conflictError": "Acest interval a fost rezervat de altcineva, alege un alt slot.",
+      "requestError": "A apărut o eroare la trimiterea cererii. Încearcă din nou."
+    }
   },
   "terms": {
     "title": "Termeni și condiții",
@@ -1436,6 +1469,14 @@
     "decline": "Refuză",
     "cancel": "Anulează",
     "sendMessageError": "Eroare la trimiterea mesajului",
+    "bookingRequestText": "Cerere de rezervare",
+    "bookingCancel": "Anulează rezervarea",
+    "bookingStatus": {
+      "pending": "În așteptare",
+      "accepted": "Acceptată",
+      "rejected": "Respinsă",
+      "cancelled": "Anulată"
+    },
     "negotiationOffer": "Propunere de preț",
     "negotiationPriceOffered": "Preț propus",
     "acceptOffer": "Acceptă oferta",
