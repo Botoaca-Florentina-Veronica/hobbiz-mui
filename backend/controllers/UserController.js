@@ -1383,7 +1383,6 @@ const verifyDocument = async (req, res) => {
       return res.status(400).json({ error: 'Status invalid. Folosește "verified" sau "rejected".' });
     }
 
-    const admin = await User.findById(adminId).select('firstName lastName');
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
@@ -1395,7 +1394,6 @@ const verifyDocument = async (req, res) => {
     }
 
     const documentTypeName = document.type.charAt(0).toUpperCase() + document.type.slice(1);
-    const adminName = `${admin?.firstName || 'Admin'} ${admin?.lastName || ''}`.trim();
 
     document.status = status;
     document.verifiedAt = new Date();
@@ -1412,12 +1410,14 @@ const verifyDocument = async (req, res) => {
       let notificationMessage = '';
       let actionDescription = '';
 
+      // `{name}` e rezolvat dinamic la citire (GET /api/notifications) cu numele curent al
+      // administratorului, nu cel valabil la momentul acțiunii.
       if (status === 'verified') {
-        notificationMessage = `Documentul tău "${document.name}" (${documentTypeName}) a fost verificat cu succes de ${adminName}.`;
+        notificationMessage = `Documentul tău "${document.name}" (${documentTypeName}) a fost verificat cu succes de {name}.`;
         actionDescription = `a verificat documentul tău "${document.name}"`;
       } else if (status === 'rejected') {
         const reasonText = rejectionReason ? ` Motiv: ${rejectionReason}` : '.';
-        notificationMessage = `Documentul tău "${document.name}" (${documentTypeName}) a fost respins de ${adminName}.${reasonText}`;
+        notificationMessage = `Documentul tău "${document.name}" (${documentTypeName}) a fost respins de {name}.${reasonText}`;
         actionDescription = `a respins documentul tău "${document.name}"`;
       }
 
@@ -1461,13 +1461,10 @@ const toggleUserVerification = async (req, res) => {
       return res.status(400).json({ error: 'isVerified trebuie să fie boolean.' });
     }
 
-    const admin = await User.findById(adminId).select('firstName lastName');
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
     }
-
-    const adminName = `${admin?.firstName || 'Admin'} ${admin?.lastName || ''}`.trim();
 
     user.isVerified = isVerified;
     
@@ -1514,7 +1511,8 @@ const toggleUserVerification = async (req, res) => {
     // Trimite notificare utilizatorului
     if (isVerified) {
       try {
-        const notificationMessage = `Felicitări! Contul tău a fost verificat de ${adminName} și ai primit badge-ul de utilizator de încredere.`;
+        // `{name}` e rezolvat dinamic la citire cu numele curent al administratorului.
+        const notificationMessage = `Felicitări! Contul tău a fost verificat de {name} și ai primit badge-ul de utilizator de încredere.`;
         const link = '/profile';
         
         await Notification.create({

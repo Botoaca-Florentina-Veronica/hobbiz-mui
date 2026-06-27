@@ -70,7 +70,6 @@ export default function ChatPage() {
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [sidebarWidth, setSidebarWidth] = useState(380);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
-  const [userLastSeen, setUserLastSeen] = useState({});
   const [sendingCollab, setSendingCollab] = useState(false);
   const [confirmCollabDialog, setConfirmCollabDialog] = useState(false);
   const [collabStatusDialog, setCollabStatusDialog] = useState({ open: false, message: '', type: 'info' });
@@ -90,7 +89,7 @@ export default function ChatPage() {
   const isChattingOnMobile = isMobile && !!selectedConversation;
   const isDesktop = !isMobile;
 
-  const { emitTyping, on, off } = useSocket(userId);
+  const { socket, emitTyping, on, off } = useSocket(userId);
   const { openPopupChat } = useChatContext();
   const { user: currentUser } = useAuth() || {};
   const isAdmin = !!currentUser?.isAdmin;
@@ -145,19 +144,17 @@ export default function ChatPage() {
   useEffect(() => {
     if (!userId) return;
 
-    const handleUserOnline = (data) => {
-      setOnlineUsers(prev => new Set(prev).add(data.userId));
-    };
-
-    const handleUserOffline = (data) => {
+    const handleUserStatus = (data) => {
+      if (!data?.userId) return;
       setOnlineUsers(prev => {
         const updated = new Set(prev);
-        updated.delete(data.userId);
+        if (data.status === 'online') {
+          updated.add(data.userId);
+        } else {
+          updated.delete(data.userId);
+        }
         return updated;
       });
-      if (data.userId && data.lastSeen) {
-        setUserLastSeen(prev => ({ ...prev, [data.userId]: data.lastSeen }));
-      }
     };
 
     const handleTypingStatus = (data) => {
@@ -173,24 +170,34 @@ export default function ChatPage() {
       });
     };
 
-    const handleOnlineUsersList = (data) => {
-      if (data.userIds) {
-        setOnlineUsers(new Set(data.userIds));
-      }
-    };
-
-    on('user:online', handleUserOnline);
-    on('user:offline', handleUserOffline);
+    on('userStatus', handleUserStatus);
     on('userTyping', handleTypingStatus);
-    on('online:users', handleOnlineUsersList);
 
     return () => {
-      off('user:online', handleUserOnline);
-      off('user:offline', handleUserOffline);
+      off('userStatus', handleUserStatus);
       off('userTyping', handleTypingStatus);
-      off('online:users', handleOnlineUsersList);
     };
   }, [userId, on, off]);
+
+  // Cere starea curentă (online/offline) a interlocutorului la deschiderea unei conversații —
+  // evenimentul 'userStatus' de mai sus prinde doar tranzițiile viitoare de connect/disconnect,
+  // nu starea curentă a unui utilizator deja conectat înainte ca acest listener să fi pornit.
+  useEffect(() => {
+    const otherId = selectedConversation?.otherParticipant?.id;
+    if (!socket || !otherId) return;
+
+    socket.emit('checkStatus', otherId, (response) => {
+      setOnlineUsers(prev => {
+        const updated = new Set(prev);
+        if (response?.status === 'online') {
+          updated.add(otherId);
+        } else {
+          updated.delete(otherId);
+        }
+        return updated;
+      });
+    });
+  }, [socket, selectedConversation?.otherParticipant?.id]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(getEffectiveViewportWidth() <= MOBILE_BREAKPOINT);
@@ -896,7 +903,7 @@ export default function ChatPage() {
                     ) : onlineUsers.has(selectedConversation.otherParticipant?.id) ? (
                       <span className="online-status">{t('chat.online')}</span>
                     ) : (
-                      <span className="offline-status">{formatLastSeen(userLastSeen[selectedConversation.otherParticipant?.id])}</span>
+                      <span className="offline-status">{formatLastSeen()}</span>
                     )}
                   </p>
                 </div>

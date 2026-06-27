@@ -641,6 +641,7 @@
     "profileViews": "Vistas del perfil",
     "myAnnouncements": "Mis anuncios",
     "viewAll": "→",
+    "viewAllListings": "Ver todos los anuncios",
     "reviewsTitle": "Resultado de la evaluación",
     "createNewListing": "Crear nuevo anuncio",
     "aboutMe": "Sobre mí",
@@ -675,6 +676,7 @@
     "loading": "Cargando...",
     "emptyAnnouncements": "Aún no tienes anuncios.",
     "noImage": "Sin imagen",
+    "views": "visitas",
     "noBio": "Aún no hay biografía.",
     "days": {
       "sunday": "Domingo",
@@ -693,7 +695,8 @@
       "disabled": "No has activado un horario de disponibilidad.",
       "noDays": "Aún no has configurado ningún día disponible.",
       "calendarTitle": "Calendario de disponibilidad",
-      "calendarLegend": "Días disponibles según tu horario"
+      "calendarLegend": "Días disponibles según tu horario",
+      "available": "Disponible"
     },
     "messages": {
       "errorLoadingProfile": "Error al cargar el perfil",

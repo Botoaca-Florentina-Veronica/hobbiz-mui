@@ -644,6 +644,7 @@
     "profileViews": "Vizualizări Profil",
     "myAnnouncements": "Anunțurile Mele",
     "viewAll": "→",
+    "viewAllListings": "Vezi toate anunțurile",
     "reviewsTitle": "Rezultatul evaluării",
     "createNewListing": "Creează Anunț Nou",
     "aboutMe": "Despre Mine",
@@ -678,6 +679,7 @@
     "loading": "Se încarcă...",
     "emptyAnnouncements": "Nu ai încă anunțuri.",
     "noImage": "Fără imagine",
+    "views": "vizualizări",
     "noBio": "Nu a fost adăugată nicio descriere.",
     "days": {
       "sunday": "Duminică",
@@ -696,7 +698,8 @@
       "disabled": "Nu ai activat un program de disponibilitate.",
       "noDays": "Nu ai setat încă nicio zi disponibilă.",
       "calendarTitle": "Calendarul disponibilității",
-      "calendarLegend": "Zile disponibile conform programului tău"
+      "calendarLegend": "Zile disponibile conform programului tău",
+      "available": "Disponibil"
     },
     "messages": {
       "errorLoadingProfile": "Eroare la încărcarea profilului",

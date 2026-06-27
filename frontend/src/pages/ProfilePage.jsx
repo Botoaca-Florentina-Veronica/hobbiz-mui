@@ -34,7 +34,9 @@ import {
   Star as StarIcon,
   StarBorder as StarBorderIcon,
   ThumbUp as ThumbUpIcon,
-  ThumbDown as ThumbDownIcon
+  ThumbDown as ThumbDownIcon,
+  Visibility as VisibilityIcon,
+  ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Avatar } from '@mui/material';
@@ -562,18 +564,20 @@ export default function ProfilePage() {
       <div className="profile-name-section">
         <div className="profile-name-header">
           <div className="profile-name-info">
-            <h1 className="profile-name-title-unified">{fullName}</h1>
-            {profile?.isAdmin && (
-              <div className="profile-admin-badge">
-                <span className="profile-admin-badge-text">Admin</span>
-              </div>
-            )}
-            {profile?.isVerified && (
-              <div className="profile-verified-badge">
-                <span className="profile-verified-icon">✓</span>
-                <span className="profile-verified-text">{t('profile.verifiedMember')}</span>
-              </div>
-            )}
+            <div className="profile-name-row">
+              <h1 className="profile-name-title-unified">{fullName}</h1>
+              {profile?.isAdmin && (
+                <div className="profile-admin-badge">
+                  <span className="profile-admin-badge-text">Admin</span>
+                </div>
+              )}
+              {profile?.isVerified && (
+                <div className="profile-verified-badge">
+                  <span className="profile-verified-icon">✓</span>
+                  <span className="profile-verified-text">{t('profile.verifiedMember')}</span>
+                </div>
+              )}
+            </div>
             <div className="profile-member-since">
               {t('profile.memberSince')} {profile?.createdAt
                 ? new Date(profile.createdAt).getFullYear()
@@ -706,14 +710,18 @@ export default function ProfilePage() {
     <div className="availability-summary">
       {availability.enabled ? (
         availability.weeklySchedule.length > 0 ? (
-          <div className="availability-summary-chips">
+          <div className="availability-summary-list">
             {DAY_DISPLAY_ORDER.filter((d) => getDaySchedule(d)).map((d) => {
               const s = getDaySchedule(d);
               return (
-                <span className="availability-summary-chip" key={d}>
-                  <span className="availability-summary-chip-day">{t(`profile.days.${DAY_KEYS[d]}`)}</span>
-                  <span className="availability-summary-chip-time">{s.startTime} – {s.endTime}</span>
-                </span>
+                <div className="availability-summary-row" key={d}>
+                  <span className="availability-summary-daypill">{t(`profile.days.${DAY_KEYS[d]}`)}</span>
+                  <span className="availability-summary-time">{s.startTime} – {s.endTime}</span>
+                  <span className="availability-summary-status">
+                    <span className="availability-summary-status-dot" />
+                    {t('profile.availability.available')}
+                  </span>
+                </div>
               );
             })}
           </div>
@@ -1170,24 +1178,29 @@ export default function ProfilePage() {
       onClick={() => handleAnnouncementClick(announcement._id)}
       className="announcement-card-vertical"
     >
-      {announcement.images && announcement.images.length > 0 ? (
-        <img
-          src={announcement.images[0]}
-          alt={announcement.title}
-          className="announcement-image"
-        />
-      ) : (
-        <div className="announcement-image-placeholder">{t('profile.noImage')}</div>
-      )}
+      <div className="announcement-image-wrapper">
+        {announcement.images && announcement.images.length > 0 ? (
+          <img
+            src={announcement.images[0]}
+            alt={announcement.title}
+            className="announcement-image"
+          />
+        ) : (
+          <div className="announcement-image-placeholder">{t('profile.noImage')}</div>
+        )}
+
+        {announcement.price && (
+          <span className="announcement-price-badge">{announcement.price} lei</span>
+        )}
+      </div>
 
       <div className="announcement-card-body">
         <h4 className="announcement-title">{announcement.title}</h4>
 
-        {announcement.price && (
-          <p className="announcement-price">{announcement.price} lei</p>
-        )}
-
-        <p className="announcement-location">{announcement.localitate}</p>
+        <p className="announcement-views">
+          <VisibilityIcon className="announcement-views-icon" />
+          {announcement.views || 0} {t('profile.views')}
+        </p>
       </div>
     </div>
   );
@@ -1374,38 +1387,43 @@ export default function ProfilePage() {
   );
 
   const renderAnnouncementsSidebar = () => (
-    <div className="profile-right-column">
-      <div className="profile-announcements-sidebar">
-        <div className="profile-announcements-header">
-          <h3 className="profile-section-title">{t('profile.myAnnouncements')} ({userAnnouncements.length})</h3>
-          <button className="profile-view-all-button" onClick={() => navigate('/toate-anunturile')}>{t('profile.viewAll')}</button>
-        </div>
-
-        {announcementsLoading ? (
-          <Box className="profile-announcements-loading">
-            <CircularProgress size={20} />
-            <span className="profile-loading-inline-text">{t('profile.loading')}</span>
-          </Box>
-        ) : userAnnouncements.length === 0 ? (
-          <Box className="profile-empty-state">{t('profile.emptyAnnouncements')}</Box>
-        ) : (
-          <div className="profile-announcements-vertical">
-            {userAnnouncements
-              .slice()
-              .sort((a, b) => (b.favoritesCount || 0) - (a.favoritesCount || 0))
-              .slice(0, 3)
-              .map(renderAnnouncementCard)
-            }
-          </div>
-        )}
-        {!announcementsLoading && (
-          <div className="profile-announcements-footer">
-            <button className="profile-create-listing-button" onClick={() => navigate('/add-announcement')}>
-              {t('profile.createNewListing')}
-            </button>
-          </div>
-        )}
+    <div className="profile-announcements-sidebar">
+      <div className="profile-announcements-header">
+        <h3 className="profile-section-title">{t('profile.myAnnouncements')} ({userAnnouncements.length})</h3>
+        <button
+          className="profile-view-all-button"
+          onClick={() => navigate('/toate-anunturile')}
+          aria-label={t('profile.viewAllListings')}
+          title={t('profile.viewAllListings')}
+        >
+          <ArrowForwardIcon />
+        </button>
       </div>
+
+      {announcementsLoading ? (
+        <Box className="profile-announcements-loading">
+          <CircularProgress size={20} />
+          <span className="profile-loading-inline-text">{t('profile.loading')}</span>
+        </Box>
+      ) : userAnnouncements.length === 0 ? (
+        <Box className="profile-empty-state">{t('profile.emptyAnnouncements')}</Box>
+      ) : (
+        <div className="profile-announcements-vertical">
+          {userAnnouncements
+            .slice()
+            .sort((a, b) => (b.favoritesCount || 0) - (a.favoritesCount || 0))
+            .slice(0, 2)
+            .map(renderAnnouncementCard)
+          }
+        </div>
+      )}
+      {!announcementsLoading && (
+        <div className="profile-announcements-footer">
+          <button className="profile-create-listing-button" onClick={() => navigate('/toate-anunturile')}>
+            {t('profile.viewAllListings')}
+          </button>
+        </div>
+      )}
     </div>
   );
 

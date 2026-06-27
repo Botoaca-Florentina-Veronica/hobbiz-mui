@@ -67,18 +67,11 @@ router.post('/:announcementId', auth, async (req, res) => {
 
         // Only create notification and send push if user has favorites notifications enabled
         if (allowFavoriteNotifications) {
-          // Look up the user who added the favorite
-          let adderName = 'Cineva';
-          try {
-            const adder = await User.findById(req.userId).select('firstName lastName');
-            if (adder) {
-              adderName = `${adder.firstName || ''} ${adder.lastName || ''}`.trim() || 'Cineva';
-            }
-          } catch (_) {}
-
+          // Numele celui care a adăugat la favorite este rezolvat dinamic la citire
+          // (GET /api/notifications), prin `fromUserId` + placeholder-ul `{name}`.
           await Notification.create({
             userId: ann.user,
-            message: `${adderName} a adăugat anunțul tău „${ann.title}" la favorite.`,
+            message: `{name} a adăugat anunțul tău „${ann.title}" la favorite.`,
             link: `/announcement/${ann._id}`,
             type: 'general',
             fromUserId: req.userId,

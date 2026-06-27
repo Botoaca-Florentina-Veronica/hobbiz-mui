@@ -110,11 +110,11 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       }
 
       if (user) {
-        // Actualizează date profil
+        // Actualizează date profil (nu suprascrie numele dacă utilizatorul l-a personalizat deja pe platformă)
         user.googleId = user.googleId || profile.id;
         user.avatar = (profile.photos && profile.photos[0]) ? profile.photos[0].value : user.avatar;
-        user.firstName = profile.name?.givenName || user.firstName;
-        user.lastName = profile.name?.familyName || user.lastName;
+        if (!user.firstName) user.firstName = profile.name?.givenName || '';
+        if (!user.lastName) user.lastName = profile.name?.familyName || '';
         if (primaryEmail) user.email = primaryEmail; // normalize
         await user.save();
       } else {

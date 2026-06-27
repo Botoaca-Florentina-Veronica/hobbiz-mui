@@ -379,6 +379,67 @@ body:not(.dark-mode) .MuiCard-root {
   .announcement-details-page { min-height: auto; padding-bottom: calc(var(--footer-height,65px) + env(safe-area-inset-bottom)); }
 }
 
+/* =============================================================
+   ACTION TOOLTIPS (favorite / share buttons)
+   Tooltip pur CSS, fără Popper.js — randat direct în arborele DOM,
+   nu prin portal, deci nu are nevoie de calcule de poziție bazate pe
+   getBoundingClientRect. Asta îl face imun la bug-ul de poziționare
+   cauzat de `html { zoom: 90% }` (vezi index.css), care afecta
+   MUI Tooltip/Popper.
+   ============================================================= */
+.action-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.action-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background-color: #324866;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(50, 72, 102, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  z-index: 20;
+}
+
+.action-tooltip-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #324866;
+}
+
+.action-tooltip:hover .action-tooltip-bubble,
+.action-tooltip:focus-within .action-tooltip-bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0.25s;
+}
+
+.dark-mode .action-tooltip-bubble {
+  background-color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .action-tooltip-bubble::after {
+  border-top-color: #1a1a1a;
+}
+
 /* Page-scoped override: keep global app backgrounds white while this page is mounted */
 .page-announcement-details {
   --bg-primary: #ffffff;

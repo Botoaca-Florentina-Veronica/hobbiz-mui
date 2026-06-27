@@ -87,7 +87,11 @@ const createReview = async (req, res) => {
         } catch (_) {}
 
         const commentSnippet = comment ? ` — "${String(comment).slice(0, 80)}${String(comment).length > 80 ? '...' : ''}"` : '';
-        const notifMessage = `${authorName} ți-a lăsat o recenzie de ${parsedScore}/5${commentSnippet}`;
+        // Notificarea în-app stochează `{name}`, rezolvat dinamic la citire cu numele curent
+        // al autorului; push notification-ul (livrat instant, neactualizabil retroactiv)
+        // folosește numele real, valabil la momentul recenziei.
+        const notifMessage = `{name} ți-a lăsat o recenzie de ${parsedScore}/5${commentSnippet}`;
+        const pushMessage = `${authorName} ți-a lăsat o recenzie de ${parsedScore}/5${commentSnippet}`;
         const link = `/profil/${reviewedUserId}`;
 
         await Notification.create({
@@ -128,7 +132,7 @@ const createReview = async (req, res) => {
             body: JSON.stringify({
               to: tokens,
               title: "Recenzie nouă",
-              body: notifMessage.slice(0, 120),
+              body: pushMessage.slice(0, 120),
               data: { link },
               priority: "high",
               sound: "default",

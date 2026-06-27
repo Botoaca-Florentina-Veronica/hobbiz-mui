@@ -643,6 +643,7 @@
     "profileViews": "Profile Views",
     "myAnnouncements": "My Announcements",
     "viewAll": "→",
+    "viewAllListings": "View all listings",
     "reviewsTitle": "Rating results",
     "createNewListing": "Create New Listing",
     "aboutMe": "About Me",
@@ -677,6 +678,7 @@
     "loading": "Loading...",
     "emptyAnnouncements": "You don't have any announcements yet.",
     "noImage": "No image",
+    "views": "views",
     "noBio": "No bio added yet.",
     "days": {
       "sunday": "Sunday",
@@ -695,7 +697,8 @@
       "disabled": "You haven't enabled an availability schedule.",
       "noDays": "You haven't set any available days yet.",
       "calendarTitle": "Availability calendar",
-      "calendarLegend": "Days available according to your schedule"
+      "calendarLegend": "Days available according to your schedule",
+      "available": "Available"
     },
     "messages": {
       "errorLoadingProfile": "Error loading profile",

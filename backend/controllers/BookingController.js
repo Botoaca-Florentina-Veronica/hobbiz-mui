@@ -207,7 +207,11 @@ exports.createBooking = async (req, res) => {
       try {
         const clientUser = await User.findById(clientId).select('firstName lastName');
         const clientName = clientUser ? (`${clientUser.firstName || ''} ${clientUser.lastName || ''}`).trim() || 'Utilizator' : 'Utilizator';
-        const notifMessage = `${clientName} a cerut o rezervare pe ${date} la ${startTime}`;
+        // Notificarea în-app stochează `{name}`, rezolvat dinamic la citire cu numele curent
+        // al clientului; push notification-ul (livrat instant, neactualizabil retroactiv)
+        // folosește numele real, valabil la momentul cererii.
+        const notifMessage = `{name} a cerut o rezervare pe ${date} la ${startTime}`;
+        const pushMessage = `${clientName} a cerut o rezervare pe ${date} la ${startTime}`;
 
         await Notification.create({
           userId: providerId,
@@ -233,7 +237,7 @@ exports.createBooking = async (req, res) => {
             body: JSON.stringify({
               to: tokens,
               title: 'Cerere de rezervare',
-              body: notifMessage.slice(0, 120),
+              body: pushMessage.slice(0, 120),
               priority: 'high',
               sound: 'default',
             }),

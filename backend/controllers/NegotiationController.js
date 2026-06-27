@@ -121,7 +121,12 @@ exports.createNegotiation = async (req, res) => {
         const seller = await User.findById(sellerId).select('pushToken firstName lastName notificationSettings');
         const buyerUser = await User.findById(buyerId).select('firstName lastName');
         const buyerName = buyerUser ? (`${buyerUser.firstName || ''} ${buyerUser.lastName || ''}`).trim() || 'Utilizator' : 'Utilizator';
-        const notifMessage = `${buyerName} ți-a propus un preț de ${proposedPrice} lei pentru anunțul „${announcement.title || ''}"`;
+        // Notificarea în-app stochează placeholder-ul `{name}`, rezolvat dinamic la citire
+        // (GET /api/notifications) cu numele curent al cumpărătorului. Push notification-ul
+        // este însă o notificare nativă, livrată instant și imposibil de actualizat retroactiv
+        // — pentru acesta folosim numele real, valabil la momentul trimiterii.
+        const notifMessage = `{name} ți-a propus un preț de ${proposedPrice} lei pentru anunțul „${announcement.title || ''}"`;
+        const pushMessage = `${buyerName} ți-a propus un preț de ${proposedPrice} lei pentru anunțul „${announcement.title || ''}"`;
 
         await Notification.create({
           userId: sellerId,
@@ -160,7 +165,7 @@ exports.createNegotiation = async (req, res) => {
             body: JSON.stringify({
               to: tokens,
               title: 'Propunere de preț',
-              body: notifMessage.slice(0, 120),
+              body: pushMessage.slice(0, 120),
               data: { link: `/negotiations/${negotiation._id}` },
               priority: 'high',
               sound: 'default'

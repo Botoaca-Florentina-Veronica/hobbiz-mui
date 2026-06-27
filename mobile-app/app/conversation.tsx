@@ -1109,6 +1109,39 @@ export default function ConversationScreen() {
     }
   }, [JSON.stringify(routeParams), userId]);
 
+  // Numele celuilalt participant vine inițial din parametrii de navigare (capturați în
+  // momentul în care utilizatorul a deschis conversația din listă) și poate rămâne învechit
+  // dacă acela și-a schimbat numele cât timp ecranul a stat montat. Îl reîmprospătăm cu o
+  // interogare live de profil de fiecare dată când se schimbă conversația selectată.
+  useEffect(() => {
+    const otherUserId = selectedConversation?.otherParticipant?.id;
+    if (!otherUserId) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await api.get(`/api/users/profile/${otherUserId}`);
+        const fresh = response.data;
+        if (cancelled || !fresh) return;
+        const freshName = `${fresh.firstName || ''} ${fresh.lastName || ''}`.trim() || 'Utilizator';
+        setSelectedConversation(prev => {
+          if (!prev || prev.otherParticipant?.id !== otherUserId) return prev;
+          if (prev.participantName === freshName) return prev;
+          return {
+            ...prev,
+            participantName: freshName,
+            announcementOwnerName: prev.announcementOwnerName === prev.participantName ? freshName : prev.announcementOwnerName,
+            otherParticipant: { ...prev.otherParticipant, firstName: fresh.firstName || '', lastName: fresh.lastName || '' },
+          };
+        });
+      } catch (e) {
+        // Nefatal — păstrăm numele din parametrii de navigare dacă lookup-ul live eșuează
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [selectedConversation?.otherParticipant?.id]);
+
   // Scroll to target message
   useEffect(() => {
     const idToScroll = targetMessageId || (routeParams as any)?.messageId;

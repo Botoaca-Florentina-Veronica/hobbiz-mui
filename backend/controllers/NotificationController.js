@@ -134,6 +134,14 @@ const getNotifications = async (req, res) => {
           } catch (_) {}
         }
 
+        // Mesajele care conțin placeholder-ul `{name}` (vezi creatorii de notificări) sunt
+        // înlocuite la citire cu numele curent al expeditorului, nu cel valabil la momentul
+        // creării — astfel, dacă expeditorul își schimbă numele ulterior, notificările deja
+        // trimise reflectă tot numele actual, nu unul înghețat în baza de date.
+        if (obj.message && obj.message.includes('{name}')) {
+          obj.message = obj.message.replace(/\{name\}/g, obj.senderName || 'Cineva');
+        }
+
         // Ensure we always have a preview - fallback to the message field from the notification
         if (!obj.preview && obj.message) {
           obj.preview = obj.message;

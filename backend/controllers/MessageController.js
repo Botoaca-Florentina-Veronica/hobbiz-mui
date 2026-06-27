@@ -353,18 +353,11 @@ const createMessage = async (req, res) => {
           : null;
 
         if (allowMessageNotifications && !existingNotification) {
-          // Obține numele expeditorului și titlul anunțului pentru un mesaj mai clar
-          let senderName = 'Cineva';
+          // Obține titlul anunțului pentru un mesaj mai clar. Numele expeditorului nu mai
+          // este interpolat aici — placeholder-ul `{name}` este rezolvat dinamic la citire
+          // (GET /api/notifications), folosind numele curent al expeditorului, nu cel valabil
+          // la momentul trimiterii mesajului.
           let announcementTitle = '';
-          
-          try {
-            const senderUser = await User.findById(senderId).select('firstName lastName');
-            if (senderUser) {
-              senderName = `${senderUser.firstName || ''} ${senderUser.lastName || ''}`.trim() || 'Cineva';
-            }
-          } catch (e) {
-            console.warn('Nu s-a putut obține numele expeditorului:', e.message);
-          }
 
           if (announcementId) {
             try {
@@ -379,7 +372,7 @@ const createMessage = async (req, res) => {
           }
 
           // Creează un mesaj mai explicit
-          let notificationMessage = `${senderName} ți-a trimis un mesaj`;
+          let notificationMessage = `{name} ți-a trimis un mesaj`;
           if (announcementTitle) {
             notificationMessage += ` despre anunțul "${announcementTitle}"`;
           } else if (announcementId) {
@@ -390,6 +383,7 @@ const createMessage = async (req, res) => {
             userId: destinatarId,
             message: notificationMessage,
             link,
+            fromUserId: senderId,
           });
         }
 

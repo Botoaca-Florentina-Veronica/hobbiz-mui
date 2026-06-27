@@ -31,7 +31,6 @@ import {
   Grid,
   Paper,
   Divider,
-  Tooltip,
   Fade,
   Skeleton,
   Dialog,
@@ -273,24 +272,6 @@ export default function AnnouncementDetails() {
 
   // i18n
   const { t } = useTranslation();
-
-  // Tooltip simplu și centrat pentru butoanele de acțiune
-  const getTooltipStyles = () => ({
-    tooltip: {
-      backgroundColor: getIsDarkMode() ? '#1a1a1a' : '#324866',
-      color: '#ffffff',
-      fontSize: '0.75rem',
-      fontWeight: 500,
-      padding: '8px 12px',
-      borderRadius: '8px',
-      boxShadow: getIsDarkMode() 
-        ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
-        : '0 4px 12px rgba(50, 72, 102, 0.3)'
-    },
-    arrow: {
-      color: getIsDarkMode() ? '#1a1a1a' : '#324866'
-    }
-  });
 
   // ========== Effects: preîncărcare imagini și detecție aspect ratio ==========
   useEffect(() => {
@@ -789,7 +770,7 @@ export default function AnnouncementDetails() {
 
             {/* Details card */}
 
-            <Card className="seller-card" elevation={2}>
+            <Card className="seller-card" elevation={2} sx={{ overflow: 'visible' }}>
               <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
                 {/* Header with actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
@@ -840,24 +821,14 @@ export default function AnnouncementDetails() {
                   </Box>
                   
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Tooltip 
-                      title={isFavorite ? t('announcementDetails.removeFromFavorites') : t('announcementDetails.addToFavorites')}
-                      placement="right"
-                      arrow
-                      enterDelay={300}
-                      leaveDelay={200}
-                      PopperProps={{ strategy: 'fixed' }}
-                      componentsProps={{
-                        tooltip: { sx: getTooltipStyles().tooltip },
-                        arrow: { sx: getTooltipStyles().arrow }
-                      }}
-                    >
+                    <span className="action-tooltip">
                       <IconButton
                         onClick={handleToggleFavorite}
+                        aria-label={isFavorite ? t('announcementDetails.removeFromFavorites') : t('announcementDetails.addToFavorites')}
                         sx={{
                           color: isFavorite ? (getIsDarkMode() ? '#f51866' : '#e53e3e') : getAccentCss(),
                           '&:hover': {
-                            bgcolor: isFavorite 
+                            bgcolor: isFavorite
                               ? (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(229, 62, 62, 0.08)')
                               : (getIsDarkMode() ? 'rgba(245, 24, 102, 0.08)' : 'rgba(45, 67, 97, 0.08)'),
                             transform: 'scale(1.1)'
@@ -867,21 +838,14 @@ export default function AnnouncementDetails() {
                       >
                         {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                       </IconButton>
-                    </Tooltip>
-                    <Tooltip 
-                      title={t('announcementDetails.share')}
-                      placement="right"
-                      arrow
-                      enterDelay={300}
-                      leaveDelay={200}
-                      PopperProps={{ strategy: 'fixed' }}
-                      componentsProps={{
-                        tooltip: { sx: getTooltipStyles().tooltip },
-                        arrow: { sx: getTooltipStyles().arrow }
-                      }}
-                    >
+                      <span className="action-tooltip-bubble" role="tooltip">
+                        {isFavorite ? t('announcementDetails.removeFromFavorites') : t('announcementDetails.addToFavorites')}
+                      </span>
+                    </span>
+                    <span className="action-tooltip">
                       <IconButton
                         onClick={handleShare}
+                        aria-label={t('announcementDetails.share')}
                         sx={{
                           color: getAccentCss(),
                           '&:hover': {
@@ -893,7 +857,10 @@ export default function AnnouncementDetails() {
                       >
                         <ShareIcon />
                       </IconButton>
-                    </Tooltip>
+                      <span className="action-tooltip-bubble" role="tooltip">
+                        {t('announcementDetails.share')}
+                      </span>
+                    </span>
                   </Box>
                 </Box>
 
