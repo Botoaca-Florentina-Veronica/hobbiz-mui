@@ -29,7 +29,13 @@ const LegalSection = () => {
           <a href="#" className="app-store-button" aria-label={t('legal.downloadAppStore')}>
             <img src={appStoreImg} alt={t('legal.downloadAppStore')} />
           </a>
-          <a href="#" className="app-store-button" aria-label={t('legal.getOnGooglePlay')}>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.verabotoaca.hobbiz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="app-store-button"
+            aria-label={t('legal.getOnGooglePlay')}
+          >
             <img src={googlePlayImg} alt={t('legal.getOnGooglePlay')} />
           </a>
         </div>

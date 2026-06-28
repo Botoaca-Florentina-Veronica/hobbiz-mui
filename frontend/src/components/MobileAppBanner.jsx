@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import appLogo from '../assets/images/puzzle_safe.png';
 import './MobileAppBanner.css';
 
-const APK_URL = 'https://drive.google.com/file/d/1JGuHSou3ROWWC7PRLuOggvdfSCENna-A/view?usp=sharing';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.verabotoaca.hobbiz';
 const SESSION_KEY = 'hobbiz_app_banner_shown';
 
 // Routes where we never show the banner
@@ -83,7 +83,7 @@ export default function MobileAppBanner() {
         <div className="mab-actions">
           <a
             className="mab-btn-download"
-            href={APK_URL}
+            href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
             onClick={dismiss}

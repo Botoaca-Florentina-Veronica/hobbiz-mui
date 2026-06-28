@@ -482,7 +482,7 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
           <img className="chat-popup-announcement-img" src={announcement?.images?.[0] || ''} alt="anunt" />
           <div className="chat-popup-announcement-info">
             <div className="chat-popup-announcement-title">{announcement?.title}</div>
-            <div className="chat-popup-announcement-price">{announcement?.price ? `${announcement.price} €` : ''}</div>
+            <div className="chat-popup-announcement-price">{announcement?.price ? `${announcement.price} RON` : ''}</div>
             <div className="chat-popup-announcement-id">ID: {announcement?.id}</div>
           </div>
         </div>

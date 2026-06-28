@@ -115,8 +115,9 @@ function MobileAppCard({ announcement: a, favorited, onToggle, onNavigate, t }) 
 
 function DesktopCard({ announcement: a, favorited, onToggle, onNavigate, t }) {
   const imageSrc = getImageSrc(a.images);
+  const translatedCategory = translateCategory(a.category, t);
   const formattedDate = a.createdAt
-    ? `${t('favorites.posted')} ${new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' })}`
+    ? new Date(a.createdAt).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' })
     : '';
 
   return (
@@ -127,27 +128,29 @@ function DesktopCard({ announcement: a, favorited, onToggle, onNavigate, t }) {
         onNavigate(a._id);
       }}
     >
-      <div className="favorite-announcement-image">
+      <div className="favorite-announcement-image-wrapper">
         {imageSrc ? (
           <img src={imageSrc} alt="imagine principala" className="favorite-announcement-img" />
         ) : (
           <div className="favorite-announcement-img placeholder" />
         )}
+        {a.category && (
+          <span className="favorite-img-category-badge">{translatedCategory}</span>
+        )}
+        <div
+          className={`favorite-heart ${favorited ? 'filled' : ''}`}
+          onClick={(ev) => { ev.stopPropagation(); onToggle(a._id); }}
+        >
+          {favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+        </div>
       </div>
       <div className="favorite-announcement-info">
-        <div className="favorite-info-top">
-          <span className="favorite-date">{formattedDate}</span>
-          <div
-            className={`favorite-heart ${favorited ? 'filled' : ''}`}
-            onClick={(ev) => { ev.stopPropagation(); onToggle(a._id); }}
-          >
-            {favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-          </div>
+        <div className="favorite-card-meta-row">
+          <span className="favorite-card-date">{formattedDate}</span>
+          {a.location && <span className="favorite-card-location">{a.location}</span>}
         </div>
         <h2 className="favorite-announcement-title">{a.title}</h2>
-        <div className="favorite-announcement-category">{a.category}</div>
-        <div className="favorite-announcement-location">{a.location}</div>
-        {a.price && <div className="favorite-price">{a.price} €</div>}
+        {a.price != null && a.price !== '' && <div className="favorite-price">{a.price} RON</div>}
       </div>
     </div>
   );

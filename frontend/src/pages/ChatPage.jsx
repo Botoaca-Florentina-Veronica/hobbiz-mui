@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, Fragment } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
@@ -18,9 +18,11 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import gumballChat from '../assets/images/gumballChat.jpg';
 
 import './ChatPage.css';
@@ -53,6 +55,9 @@ export default function ChatPage() {
 
   const [activeTab, setActiveTab] = useState('buying');
   const [conversations, setConversations] = useState([]);
+  // Numărul de conversații necitite per categorie, calculat din lista completă
+  // (nefiltrată pe tab), ca să poată fi arătat un indice și pe tab-ul inactiv.
+  const [unreadByTab, setUnreadByTab] = useState({ buying: 0, selling: 0 });
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -259,47 +264,57 @@ export default function ChatPage() {
     });
   }, [userId]);
 
-  useEffect(() => {
+  const fetchConv = useCallback(async () => {
     if (!userId) return;
-    const fetchConv = async () => {
-      setLoading(true);
-      try {
-        const res = await apiClient.get(`/api/messages/conversations/${userId}`);
-        const data = res.data || [];
-        const formatted = data.map(c => {
-          const partAvatar = resolveAvatarUrl(c.otherParticipant?.avatar);
-          const annImg = resolveAvatarUrl(c.announcementImage);
-          const msgType = c.lastMessage?.messageType;
-          const rawText = c.lastMessage?.text || '';
-          const lastMessageText =
-            msgType === 'collaboration_request' || rawText === 'COLLABORATION_REQUEST'
-              ? `🤝 ${t('chat.collaborationRequestText')}`
-              : msgType === 'negotiation'
-              ? `💰 ${t('chat.negotiationOffer')}`
-              : msgType === 'booking_request'
-              ? `📅 ${t('chat.bookingRequestText')}`
-              : rawText || t('chat.image');
+    setLoading(true);
+    try {
+      const res = await apiClient.get(`/api/messages/conversations/${userId}`);
+      const data = res.data || [];
+      const formatted = data.map(c => {
+        const partAvatar = resolveAvatarUrl(c.otherParticipant?.avatar);
+        const annImg = resolveAvatarUrl(c.announcementImage);
+        const msgType = c.lastMessage?.messageType;
+        const rawText = c.lastMessage?.text || '';
+        const lastMessageText =
+          msgType === 'collaboration_request' || rawText === 'COLLABORATION_REQUEST'
+            ? `🤝 ${t('chat.collaborationRequestText')}`
+            : msgType === 'negotiation'
+            ? `💰 ${t('chat.negotiationOffer')}`
+            : msgType === 'booking_request'
+            ? `📅 ${t('chat.bookingRequestText')}`
+            : rawText || t('chat.image');
 
-          return {
-            ...c,
-            id: c.otherParticipant.id,
-            avatar: (annImg || partAvatar) || partAvatar,
-            participantName: `${c.otherParticipant.firstName} ${c.otherParticipant.lastName}`.trim(),
-            participantAvatar: partAvatar,
-            displayTitle: c.announcementTitle || c.name || '(Fără titlu)',
-            lastMessageText,
-            timeFormatted: new Date(c.lastMessage?.createdAt).toLocaleString('ro-RO', {hour:'2-digit', minute:'2-digit'})
-          };
-        });
-        if (activeTab === 'selling') {
-          setConversations(formatted.filter(c => c.announcementOwnerId === userId));
-        } else {
-          setConversations(formatted.filter(c => c.announcementOwnerId !== userId));
-        }
-      } catch (err) { console.error(err); } finally { setLoading(false); }
-    };
+        return {
+          ...c,
+          id: c.otherParticipant.id,
+          avatar: (annImg || partAvatar) || partAvatar,
+          participantName: `${c.otherParticipant.firstName} ${c.otherParticipant.lastName}`.trim(),
+          participantAvatar: partAvatar,
+          displayTitle: c.announcementTitle || c.name || '(Fără titlu)',
+          lastMessageText,
+          timeFormatted: new Date(c.lastMessage?.createdAt).toLocaleString('ro-RO', {hour:'2-digit', minute:'2-digit'})
+        };
+      });
+
+      // Contoarele de necitite se calculează din lista completă (ambele categorii),
+      // independent de tab-ul activ în acel moment, ca indicele să poată fi afișat
+      // și pe butonul categoriei pe care utilizatorul NU se află în prezent.
+      setUnreadByTab({
+        buying: formatted.filter(c => c.announcementOwnerId !== userId && c.unread).length,
+        selling: formatted.filter(c => c.announcementOwnerId === userId && c.unread).length,
+      });
+
+      if (activeTab === 'selling') {
+        setConversations(formatted.filter(c => c.announcementOwnerId === userId));
+      } else {
+        setConversations(formatted.filter(c => c.announcementOwnerId !== userId));
+      }
+    } catch (err) { console.error(err); } finally { setLoading(false); }
+  }, [userId, activeTab, t]);
+
+  useEffect(() => {
     fetchConv();
-  }, [userId, activeTab]);
+  }, [fetchConv]);
 
   useEffect(() => {
     const targetId = location.state?.conversationId;
@@ -355,6 +370,11 @@ export default function ChatPage() {
             })
             .catch(() => {});
         }
+      } else if (String(msg.destinatarId) === String(userId)) {
+        // Mesaj nou într-o conversație din afara celei deschise în prezent — resincronizează
+        // contoarele de necitite per categorie, ca indicele să apară imediat și pe tab-ul
+        // (cumpărat/vândut) pe care utilizatorul nu se află în acest moment.
+        fetchConv();
       }
     };
     on('newMessage', handleNew);
@@ -381,7 +401,7 @@ export default function ChatPage() {
       off('conversationCleared', handleConversationCleared);
       off('bookingUpdated', handleBookingUpdated);
     };
-  }, [userId, selectedConversation, on, off]);
+  }, [userId, selectedConversation, on, off, fetchConv]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -446,8 +466,11 @@ export default function ChatPage() {
   // ── Negotiation helpers ──────────────────────────────────────
 
   const showNegotiationSnackbar = (message, type = 'success') => {
-    setNegotiationSnackbar({ message, type });
-    setTimeout(() => setNegotiationSnackbar(null), 3500);
+    setNegotiationSnackbar({ message, type, exiting: false });
+    setTimeout(() => {
+      setNegotiationSnackbar(prev => (prev ? { ...prev, exiting: true } : null));
+      setTimeout(() => setNegotiationSnackbar(null), 250);
+    }, 3000);
   };
 
   const loadActiveNegotiation = async (announcementId) => {
@@ -845,16 +868,24 @@ export default function ChatPage() {
               <div className="chat-mobile-filter-segment">
                 <button className={`chat-mobile-filter-btn ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>
                   <span className="chat-mobile-filter-text">{t('chat.buying')}</span>
+                  {unreadByTab.buying > 0 && <span className="chat-tab-badge">{unreadByTab.buying}</span>}
                 </button>
                 <button className={`chat-mobile-filter-btn ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>
                   <span className="chat-mobile-filter-text">{t('chat.selling')}</span>
+                  {unreadByTab.selling > 0 && <span className="chat-tab-badge">{unreadByTab.selling}</span>}
                 </button>
               </div>
             </div>
           ) : (
             <div className="chat-tabs">
-              <button className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>{t('chat.buying')}</button>
-              <button className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>{t('chat.selling')}</button>
+              <button className={`chat-tab ${activeTab === 'buying' ? 'active' : ''}`} onClick={() => setActiveTab('buying')}>
+                {t('chat.buying')}
+                {unreadByTab.buying > 0 && <span className="chat-tab-badge">{unreadByTab.buying}</span>}
+              </button>
+              <button className={`chat-tab ${activeTab === 'selling' ? 'active' : ''}`} onClick={() => setActiveTab('selling')}>
+                {t('chat.selling')}
+                {unreadByTab.selling > 0 && <span className="chat-tab-badge">{unreadByTab.selling}</span>}
+              </button>
             </div>
           )}
 
@@ -1195,7 +1226,7 @@ export default function ChatPage() {
                             ) : msg.messageType === 'negotiation' ? (
                               <div className="negotiation-message">
                                 <div className="negotiation-message-header">
-                                  <span>💰</span>
+                                  <LocalOfferOutlinedIcon sx={{ fontSize: 16 }} />
                                   <span>{t('chat.negotiationOffer')}</span>
                                 </div>
                                 {msg.negotiation?.price != null && (
@@ -1434,8 +1465,13 @@ export default function ChatPage() {
 
       {/* Negotiation snackbar */}
       {negotiationSnackbar && (
-        <div className={`negotiation-snackbar ${negotiationSnackbar.type}`}>
-          {negotiationSnackbar.message}
+        <div className={`negotiation-snackbar ${negotiationSnackbar.type} ${negotiationSnackbar.exiting ? 'exiting' : ''}`}>
+          <span className="negotiation-snackbar-icon">
+            {negotiationSnackbar.type === 'success' && <CheckCircleOutlineIcon sx={{ fontSize: 20 }} />}
+            {negotiationSnackbar.type === 'info' && <InfoOutlinedIcon sx={{ fontSize: 20 }} />}
+            {negotiationSnackbar.type === 'error' && <ErrorOutlineIcon sx={{ fontSize: 20 }} />}
+          </span>
+          <span className="negotiation-snackbar-text">{negotiationSnackbar.message}</span>
         </div>
       )}
 
