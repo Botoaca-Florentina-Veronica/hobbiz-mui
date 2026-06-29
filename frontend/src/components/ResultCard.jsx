@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import {
   FavoriteBorder,
+  Favorite,
   LocationOn,
   AccessTime,
 } from '@mui/icons-material';
@@ -31,6 +32,8 @@ export default function ResultCard({
   t,
   navigate,
   priceLabel = '',
+  isFavorite,
+  onToggleFavorite,
 }) {
   let createdAtLabel = null;
   try {
@@ -145,7 +148,33 @@ export default function ResultCard({
           </Box>
         )}
 
-        {a.favoritesCount > 0 && (
+        {onToggleFavorite ? (
+          <Box
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite(a?._id, e); }}
+            sx={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 6px 16px rgba(0,0,0,0.18)',
+              transition: 'transform 0.18s ease',
+              '&:hover': { transform: 'scale(1.06)' },
+            }}
+          >
+            {isFavorite ? (
+              <Favorite sx={{ fontSize: 19, color: '#f51866' }} />
+            ) : (
+              <FavoriteBorder sx={{ fontSize: 19, color: '#666' }} />
+            )}
+          </Box>
+        ) : a.favoritesCount > 0 && (
           <Chip
             icon={<FavoriteBorder sx={{ fontSize: 16, color: 'white !important' }} />}
             label={a.favoritesCount}

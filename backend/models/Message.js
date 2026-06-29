@@ -23,6 +23,7 @@ const MessageSchema = new mongoose.Schema({
     negotiationId: { type: String, required: false },
     price: { type: Number, required: false },
     action: { type: String, enum: ["offer", "counter_offer", "accept", "reject"], required: false },
+    message: { type: String, required: false },
   },
   // Date pentru colaborare
   collaborationData: {

@@ -464,6 +464,9 @@ body.dark-mode .favorite-announcement-card:hover {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* Rezervă mereu spațiul pentru 2 linii, indiferent dacă titlul are 1 sau 2 linii —
+     altfel cardurile cu titlu scurt sunt mai joase decât cele cu titlu lung pe același rând. */
+  min-height: 2.7em;
 }
 
 .favorite-price {

@@ -1,5 +1,9 @@
 .pp-availability {
-  margin: 0 24px 20px;
+  /* Aceeași lățime/centrare ca .pp-stats (vecinul direct de mai sus) și .pp-grid — fără
+     max-width + auto, cardul se întindea pe toată lățimea viewport-ului, mai larg decât
+     containerele din jur. */
+  max-width: 1200px;
+  margin: 24px auto 0;
 }
 
 .pp-availability-head {
@@ -96,19 +100,21 @@
   border: 1px solid var(--pp-border);
   background: var(--pp-card);
   color: var(--pp-text);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px 8px;
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease, box-shadow .15s ease;
 }
 
 .pp-availability-slot-chip:hover:not(:disabled) {
   border-color: var(--pp-accent);
   color: var(--pp-accent);
+  background: color-mix(in srgb, var(--pp-accent) 8%, transparent);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--pp-accent) 18%, transparent);
 }
 
 .pp-availability-slot-chip:active:not(:disabled) {
@@ -186,9 +192,17 @@
   margin-top: 2px;
 }
 
-@media (max-width: 900px) {
+/* Aceleași praguri ca .pp-stats, ca cele două să rămână alineate la orice lățime */
+@media (max-width: 1024px) {
   .pp-availability {
-    margin: 0 16px 16px;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pp-availability {
+    margin: 16px 16px 0;
   }
 }
 

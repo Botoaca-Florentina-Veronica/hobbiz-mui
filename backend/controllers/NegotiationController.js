@@ -73,7 +73,10 @@ exports.createNegotiation = async (req, res) => {
       // Build deterministic conversationId scoped by announcement
       let conversationId;
       try {
-        const ownerId = String(announcement.user);
+        // `announcement.user` e populat mai sus (.populate('user')), deci e un document
+        // Mongoose complet, nu doar un ObjectId — String() pe el dă un dump al obiectului
+        // întreg, nu ID-ul. Extragem explicit ._id pentru ambele cazuri (populat sau nu).
+        const ownerId = String(announcement.user._id || announcement.user);
         const otherId = String(buyerId);
         conversationId = [ownerId, otherId, announcementId].join('-');
       } catch (e) {
@@ -87,7 +90,7 @@ exports.createNegotiation = async (req, res) => {
         destinatarId: sellerId,
         text: encrypt(`Propunere: ${proposedPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
-        negotiation: { negotiationId: String(negotiation._id), price: proposedPrice, action: 'offer' },
+        negotiation: { negotiationId: String(negotiation._id), price: proposedPrice, action: 'offer', message: message || undefined },
         announcementId: announcementId
       };
 
@@ -425,7 +428,7 @@ exports.rejectOffer = async (req, res) => {
         destinatarId: String(negotiation.buyer._id),
         text: encrypt(`Oferta refuzată: ${negotiation.currentPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
-        negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
+        negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject', message: message || undefined },
         announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
@@ -511,7 +514,7 @@ exports.counterOffer = async (req, res) => {
         destinatarId: String(negotiation.buyer._id),
         text: encrypt(`Contraofertă: ${counterPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
-        negotiation: { negotiationId: String(negotiation._id), price: counterPrice, action: 'counter_offer' },
+        negotiation: { negotiationId: String(negotiation._id), price: counterPrice, action: 'counter_offer', message: message || undefined },
         announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();
@@ -676,7 +679,7 @@ exports.buyerCounterOffer = async (req, res) => {
         destinatarId: String(negotiation.seller._id),
         text: encrypt(`Contraofertă (buyer): ${newPrice} RON${message ? '\n' + String(message) : ''}`),
         messageType: 'negotiation',
-        negotiation: { negotiationId: String(negotiation._id), price: newPrice, action: 'counter_offer' },
+        negotiation: { negotiationId: String(negotiation._id), price: newPrice, action: 'counter_offer', message: message || undefined },
         announcementId: String(negotiation.announcement._id)
       }).save();
       const msgResponse = msg.toObject();

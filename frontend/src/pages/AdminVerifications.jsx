@@ -26,9 +26,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AdminContactFallbacks from './AdminContactFallbacks';
 import AdminReportsSection from './AdminReportsSection';
-import { 
-  getPendingVerifications, 
-  verifyDocument, 
+import SearchIcon from '@mui/icons-material/Search';
+import {
+  getPendingVerifications,
+  searchVerificationUsers,
+  verifyDocument,
   getUserDocumentsAdmin,
   toggleUserVerification,
   getAnnouncementReports,
@@ -53,7 +55,15 @@ export default function AdminVerifications() {
   const [processingDocId, setProcessingDocId] = useState(null);
   const [badgeProcessing, setBadgeProcessing] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
+  // Căutare — permite regăsirea unui utilizator ale cărui documente au fost deja
+  // tratate (verificate/respinse) și care, prin urmare, nu mai apare în lista de
+  // "verificări în așteptare", dar pentru care un admin ar putea decide ulterior
+  // să acorde sau să retragă insigna "Verificat".
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null); // null = nu se caută, se arată lista de pending
+  const [searching, setSearching] = useState(false);
+
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [targetDoc, setTargetDoc] = useState(null);
@@ -92,11 +102,35 @@ export default function AdminVerifications() {
     }
   }, [t]);
 
-  useEffect(() => { 
-    fetchPending(); 
+  useEffect(() => {
+    fetchPending();
     fetchReportsCount();
     fetchContactsCount();
   }, [fetchPending, fetchReportsCount, fetchContactsCount]);
+
+  // Caută printre TOȚI utilizatorii cu cel puțin un document încărcat (nu doar cei cu
+  // documente în așteptare), ca un admin să poată regăsi pe cineva ale cărui documente
+  // au fost deja tratate, pentru a-i revizui dosarul și a decide ulterior acordarea insignei.
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchResults(null);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    const timeout = setTimeout(async () => {
+      try {
+        const response = await searchVerificationUsers(query);
+        setSearchResults(response.data.users || []);
+      } catch (error) {
+        console.error('Error searching verification users:', error);
+      } finally {
+        setSearching(false);
+      }
+    }, 350);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   const handleOpenUserDocs = async (user) => {
     try {
@@ -145,10 +179,10 @@ export default function AdminVerifications() {
       setBadgeProcessing(true);
       await toggleUserVerification(userId, { isVerified: !currentStatus });
       if (window.showToast) window.showToast(t('verification.admin.badgeSuccess'), 'success');
-      setSelectedUser((prev) => {
-        if (!prev || prev._id !== userId) return prev;
-        return { ...prev, isVerified: !currentStatus };
-      });
+      if (selectedUser?._id === userId) {
+        const response = await getUserDocumentsAdmin(userId);
+        setSelectedUser(response.data.user);
+      }
       await fetchPending();
     } catch (error) {
       console.error('Error toggling badge:', error);
@@ -210,22 +244,38 @@ export default function AdminVerifications() {
 
         {activeSection === 'verifications' ? (
           <>
-            <Typography sx={{ mb: 2, color: 'text.secondary' }}>
+            <Typography className="av-list-heading">
               {t('verification.admin.pendingTitle')}
             </Typography>
 
-            {loading ? (
+            <TextField
+              fullWidth
+              size="small"
+              placeholder={t('verification.admin.searchPlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon fontSize="small" style={{ marginRight: 8 }} />,
+                endAdornment: searching ? <CircularProgress size={16} /> : null,
+              }}
+              className="av-search-field"
+              sx={{ mb: 2.5 }}
+            />
+
+            {(loading && searchResults === null) ? (
               <div className="av-loader">
                 <CircularProgress size={40} thickness={4} className="av-spinner" />
               </div>
-            ) : users.length === 0 ? (
+            ) : (searchResults !== null ? searchResults : users).length === 0 ? (
               <div className="av-empty">
                 <VerifiedIcon className="av-empty-icon" />
-                <Typography className="av-empty-text">{t('verification.admin.noPending')}</Typography>
+                <Typography className="av-empty-text">
+                  {searchResults !== null ? t('verification.admin.noResults') : t('verification.admin.noPending')}
+                </Typography>
               </div>
             ) : (
               <div className="av-grid">
-                {users.map((user) => (
+                {(searchResults !== null ? searchResults : users).map((user) => (
                   <div key={user._id} className="av-card" onClick={() => navigate(`/profil/${user._id}`)}>
                     <div className="av-card-left">
                       <Avatar
@@ -244,10 +294,15 @@ export default function AdminVerifications() {
                               {t('verification.admin.colVerified')}
                             </span>
                           )}
-                          {(user.pendingDocuments?.length > 0) && (
+                          {(user.pendingDocuments?.length > 0) ? (
                             <span className="av-badge av-badge--pending">
                               <HourglassEmptyIcon style={{ fontSize: 12 }} />
                               {user.pendingDocuments.length} {t('verification.admin.colDocuments').toLowerCase()}
+                            </span>
+                          ) : (user.totalDocuments > 0) && (
+                            <span className="av-badge av-badge--neutral">
+                              <DescriptionOutlinedIcon style={{ fontSize: 12 }} />
+                              {user.totalDocuments} {t('verification.admin.colDocuments').toLowerCase()}
                             </span>
                           )}
                         </div>
@@ -303,6 +358,12 @@ export default function AdminVerifications() {
                 {selectedUser?.firstName} {selectedUser?.lastName}
               </Typography>
               <Typography className="av-dialog-email">{selectedUser?.email}</Typography>
+              {selectedUser?.isVerified && selectedUser?.verifiedBy && (
+                <Typography className="av-badge-granted-by">
+                  {t('verification.admin.grantedBy', { name: `${selectedUser.verifiedBy.firstName} ${selectedUser.verifiedBy.lastName}` })}
+                  {selectedUser?.verifiedAt && ` · ${new Date(selectedUser.verifiedAt).toLocaleDateString()}`}
+                </Typography>
+              )}
             </div>
           </div>
 
@@ -370,6 +431,12 @@ export default function AdminVerifications() {
                         <span className={`av-doc-status av-doc-status--${doc.status}`}>
                           {doc.status === 'verified' ? <CheckIcon style={{ fontSize: 13 }} /> : <CloseIcon style={{ fontSize: 13 }} />}
                           {t(`verification.status.${doc.status}`)}
+                        </span>
+                      )}
+                      {doc.status !== 'pending' && doc.verifiedBy && (
+                        <span className="av-doc-reviewed-by">
+                          {t('verification.admin.byAdmin', { name: `${doc.verifiedBy.firstName} ${doc.verifiedBy.lastName}` })}
+                          {doc.verifiedAt && ` · ${new Date(doc.verifiedAt).toLocaleDateString()}`}
                         </span>
                       )}
                     </div>

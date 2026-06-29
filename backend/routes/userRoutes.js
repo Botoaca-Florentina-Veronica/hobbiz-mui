@@ -5,7 +5,7 @@ const adminAuth = require('../middleware/adminAuth');
 const optionalAuth = require('../middleware/optionalAuth');
 const upload = require('../config/cloudinaryMulter');
 const uploadDocuments = require('../config/cloudinaryDocuments');
-const { register, registerChallenge, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, updateAvailability, deleteAccount, resetUserData, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
+const { register, registerChallenge, login, getProfile, updateEmail, updatePassword, requestPasswordReset, confirmPasswordReset, addAnnouncement, getMyAnnouncements, getMyAnnouncementById, getUserAnnouncementsPublic, deleteAnnouncement, updateAnnouncement, updateProfile, updateAvailability, deleteAccount, resetUserData, uploadAvatar, uploadCover, deleteAvatar, deleteCover, archiveAnnouncement, getArchivedAnnouncements, unarchiveAnnouncement, setPushToken, deletePushToken, uploadVerificationDocument, getUserDocuments, deleteUserDocument, getPendingVerifications, searchVerificationUsers, getUserDocumentsAdmin, verifyDocument, toggleUserVerification } = require('../controllers/UserController');
 // Upload avatar utilizator
 router.post('/avatar', auth, upload.single('avatar'), uploadAvatar);
 router.delete('/avatar', auth, deleteAvatar);
@@ -72,6 +72,7 @@ router.delete('/documents/:documentId', auth, deleteUserDocument);
 
 // Admin routes - view and verify documents
 router.get('/admin/verifications/pending', auth, adminAuth, getPendingVerifications);
+router.get('/admin/verifications/search', auth, adminAuth, searchVerificationUsers);
 router.get('/admin/users/:userId/documents', auth, adminAuth, getUserDocumentsAdmin);
 router.put('/admin/users/:userId/documents/:documentId/verify', auth, adminAuth, verifyDocument);
 router.put('/admin/users/:userId/verification-badge', auth, adminAuth, toggleUserVerification);

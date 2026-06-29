@@ -1606,6 +1606,8 @@
         "reports": "Reports"
       },
       "noPending": "No pending verifications.",
+      "searchPlaceholder": "Search any user with uploaded documents (name or email)...",
+      "noResults": "No user found.",
       "colUser": "User",
       "colDocuments": "Documents",
       "colVerified": "Verified",
@@ -1615,6 +1617,8 @@
       "badgeActive": "Verified (Badge Active)",
       "grantBadge": "Grant Badge",
       "removeBadge": "Remove Badge",
+      "grantedBy": "Granted by {{name}}",
+      "byAdmin": "by {{name}}",
       "noDocuments": "No documents uploaded.",
       "viewDocument": "View Document",
       "downloadDocument": "Download",

@@ -118,7 +118,10 @@ export default function ChatPage() {
         avatar: selectedConversation.participantAvatar,
       },
       userId,
-      userRole: 'cumparator',
+      // 'vanzator' când utilizatorul curent este chiar proprietarul anunțului (tab-ul "De
+      // vândut") — altfel popup-ul reconstruiește conversationId în ordine inversă față de
+      // restul aplicației (sellerId-buyerId-announcementId), nu găsește istoricul existent.
+      userRole: selectedConversation.announcementOwnerId === userId ? 'vanzator' : 'cumparator',
     });
     navigate('/');
   };
@@ -334,9 +337,13 @@ export default function ChatPage() {
         await apiClient.put(`/api/messages/conversation/${selectedConversation.conversationId}/mark-read`);
         setConversations(prev => prev.map(c => c.conversationId === selectedConversation.conversationId ? { ...c, unread: false } : c));
         window.dispatchEvent(new Event('chat:counts-updated'));
+        // Resincronizează și indicele de necitite per categorie — altfel rămâne
+        // cu valoarea veche, chiar dacă conversația a fost marcată ca citită.
+        fetchConv();
       } catch (err) { console.error(err); } finally { setLoading(false); }
     };
     fetchMsgs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation]);
 
   // Load negotiation when conversation changes
@@ -1226,14 +1233,21 @@ export default function ChatPage() {
                             ) : msg.messageType === 'negotiation' ? (
                               <div className="negotiation-message">
                                 <div className="negotiation-message-header">
-                                  <LocalOfferOutlinedIcon sx={{ fontSize: 16 }} />
-                                  <span>{t('chat.negotiationOffer')}</span>
+                                  {msg.negotiation?.action === 'accept' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                    : msg.negotiation?.action === 'reject' ? <EventBusyIcon sx={{ fontSize: 16 }} />
+                                    : <LocalOfferOutlinedIcon sx={{ fontSize: 16 }} />}
+                                  <span>
+                                    {msg.negotiation?.action === 'accept' ? t('chat.offerAccepted')
+                                      : msg.negotiation?.action === 'reject' ? t('chat.offerRejected')
+                                      : msg.negotiation?.action === 'counter_offer' ? t('chat.counterOffer')
+                                      : t('chat.negotiationOffer')}
+                                  </span>
                                 </div>
                                 {msg.negotiation?.price != null && (
                                   <div className="negotiation-message-price">{msg.negotiation.price} RON</div>
                                 )}
-                                {msg.text && (
-                                  <div className="negotiation-message-text">{msg.text}</div>
+                                {msg.negotiation?.message && (
+                                  <div className="negotiation-message-text">{msg.negotiation.message}</div>
                                 )}
                               </div>
                             ) : (

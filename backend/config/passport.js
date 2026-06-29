@@ -68,13 +68,20 @@ async function mergeDupesByEmail(baseEmail, preferredUserId) {
     const favSet = new Set();
     users.forEach(u => (u.favorites||[]).forEach(f => favSet.add(f.toString())));
     primary.favorites = Array.from(favSet);
-    // Completează câmpuri lipsă
+    // Preluăm firstName/lastName/avatar/phone/localitate de la contul duplicat cu editarea
+    // CEA MAI RECENTĂ (profileUpdatedAt), nu de la "primary" (ales după preferință/Google/vechime) —
+    // altfel o editare de profil făcută pe celălalt cont duplicat se pierde silențios la următorul merge.
+    let freshest = users[0];
     for (const u of users) {
-      if (!primary.firstName && u.firstName) primary.firstName = u.firstName;
-      if (!primary.lastName && u.lastName) primary.lastName = u.lastName;
-      if (!primary.avatar && u.avatar) primary.avatar = u.avatar;
-      if (!primary.phone && u.phone) primary.phone = u.phone;
-      if (!primary.localitate && u.localitate) primary.localitate = u.localitate;
+      if ((u.profileUpdatedAt || u.createdAt) > (freshest.profileUpdatedAt || freshest.createdAt)) freshest = u;
+    }
+    if (freshest.firstName !== undefined) primary.firstName = freshest.firstName;
+    if (freshest.lastName !== undefined) primary.lastName = freshest.lastName;
+    if (freshest.avatar !== undefined) primary.avatar = freshest.avatar;
+    if (freshest.phone !== undefined) primary.phone = freshest.phone;
+    if (freshest.localitate !== undefined) primary.localitate = freshest.localitate;
+    if (String(freshest._id) !== String(primary._id)) {
+      primary.profileUpdatedAt = freshest.profileUpdatedAt || primary.profileUpdatedAt;
     }
     primary.email = normalizeEmail(primary.email);
     // Ensure the merged account keeps a Google link if any duplicate had one.

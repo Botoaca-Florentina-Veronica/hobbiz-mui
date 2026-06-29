@@ -38,6 +38,7 @@ const uploadAvatar = async (req, res) => {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
     }
     user.avatar = req.file.path;
+    user.profileUpdatedAt = new Date();
     await user.save();
     res.json({ message: 'Avatar actualizat cu succes!', avatar: user.avatar });
   } catch (error) {
@@ -155,18 +156,27 @@ async function mergeDuplicateUsersByEmail(normalizedEmail) {
       if (score(u) > score(primary)) primary = u;
     }
 
-    // Construim set de favorite și păstrăm câmpuri lipsă (firstName/lastName/avatar) dacă primary nu le are
+    // Construim set de favorite din toate duplicatele
     const favSet = new Set();
     users.forEach(u => (u.favorites || []).forEach(f => favSet.add(f.toString())));
     primary.favorites = Array.from(favSet);
 
-    // Completează date lipsă
+    // Preluăm datele de profil (firstName/lastName/avatar/phone/localitate) de la contul
+    // duplicat cu editarea CEA MAI RECENTĂ (profileUpdatedAt), nu neapărat de la "primary"
+    // (care e ales după prioritatea metodei de login: parolă > Google > vechime). Altfel,
+    // dacă utilizatorul editează profilul pe contul cu prioritate mai mică și apoi se
+    // loghează prin metoda cu prioritate mai mare, editarea se pierde silențios.
+    let freshest = users[0];
     for (const u of users) {
-      if (!primary.firstName && u.firstName) primary.firstName = u.firstName;
-      if (!primary.lastName && u.lastName) primary.lastName = u.lastName;
-      if (!primary.avatar && u.avatar) primary.avatar = u.avatar;
-      if (!primary.phone && u.phone) primary.phone = u.phone;
-      if (!primary.localitate && u.localitate) primary.localitate = u.localitate;
+      if ((u.profileUpdatedAt || u.createdAt) > (freshest.profileUpdatedAt || freshest.createdAt)) freshest = u;
+    }
+    if (freshest.firstName !== undefined) primary.firstName = freshest.firstName;
+    if (freshest.lastName !== undefined) primary.lastName = freshest.lastName;
+    if (freshest.avatar !== undefined) primary.avatar = freshest.avatar;
+    if (freshest.phone !== undefined) primary.phone = freshest.phone;
+    if (freshest.localitate !== undefined) primary.localitate = freshest.localitate;
+    if (String(freshest._id) !== String(primary._id)) {
+      primary.profileUpdatedAt = freshest.profileUpdatedAt || primary.profileUpdatedAt;
     }
 
     // Normalizează email-ul principal la lowercase
@@ -985,6 +995,9 @@ const updateProfile = async (req, res) => {
       console.log('📢 Updating notification settings:', notificationSettings);
       user.notificationSettings = notificationSettings;
     }
+    if (firstName !== undefined || lastName !== undefined || localitate !== undefined || phone !== undefined) {
+      user.profileUpdatedAt = new Date();
+    }
     await user.save();
     console.log('✓ Profile updated for user:', userId);
     res.json({ message: 'Profil actualizat cu succes!' });
@@ -1343,18 +1356,58 @@ const getPendingVerifications = async (req, res) => {
   }
 };
 
+// Search all users who have uploaded at least one verification document, regardless of
+// status (admin only). Folosit pentru a putea regăsi un utilizator după ce documentele
+// lui au fost deja tratate (verificate/respinse) — altfel ar deveni invizibil în lista de
+// "verificări în așteptare" și insigna i-ar putea fi acordată doar din eroare/întâmplător.
+const searchVerificationUsers = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const filter = { 'documents.0': { $exists: true } };
+
+    if (q && q.trim()) {
+      const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escaped, 'i');
+      filter.$or = [{ firstName: regex }, { lastName: regex }, { email: regex }];
+    }
+
+    const users = await User.find(filter)
+      .select('firstName lastName email avatar documents isVerified')
+      .limit(30);
+
+    const result = users.map(user => ({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      avatar: user.avatar,
+      isVerified: user.isVerified,
+      pendingDocuments: user.documents.filter(doc => doc.status === 'pending'),
+      totalDocuments: user.documents.length,
+    }));
+
+    res.json({ users: result });
+  } catch (error) {
+    console.error('Eroare la căutarea utilizatorilor pentru verificare:', error);
+    res.status(500).json({ error: 'Eroare server.' });
+  }
+};
+
 // Get all documents for a specific user (admin only)
 const getUserDocumentsAdmin = async (req, res) => {
   try {
     const { userId } = req.params;
-    
-    const user = await User.findById(userId).select('firstName lastName email avatar documents isVerified verifiedAt verifiedBy');
-    
+
+    const user = await User.findById(userId)
+      .select('firstName lastName email avatar documents isVerified verifiedAt verifiedBy')
+      .populate('verifiedBy', 'firstName lastName')
+      .populate('documents.verifiedBy', 'firstName lastName');
+
     if (!user) {
       return res.status(404).json({ error: 'Utilizator negăsit.' });
     }
 
-    res.json({ 
+    res.json({
       user: {
         _id: user._id,
         firstName: user.firstName,
@@ -1363,7 +1416,16 @@ const getUserDocumentsAdmin = async (req, res) => {
         avatar: user.avatar,
         isVerified: user.isVerified,
         verifiedAt: user.verifiedAt,
-        documents: user.documents
+        verifiedBy: user.verifiedBy
+          ? { _id: user.verifiedBy._id, firstName: user.verifiedBy.firstName, lastName: user.verifiedBy.lastName }
+          : null,
+        documents: user.documents.map(doc => {
+          const d = doc.toObject();
+          d.verifiedBy = doc.verifiedBy
+            ? { _id: doc.verifiedBy._id, firstName: doc.verifiedBy.firstName, lastName: doc.verifiedBy.lastName }
+            : null;
+          return d;
+        })
       }
     });
   } catch (error) {
@@ -1579,6 +1641,7 @@ module.exports = {
   getUserDocuments,
   deleteUserDocument,
   getPendingVerifications,
+  searchVerificationUsers,
   getUserDocumentsAdmin,
   verifyDocument,
   toggleUserVerification

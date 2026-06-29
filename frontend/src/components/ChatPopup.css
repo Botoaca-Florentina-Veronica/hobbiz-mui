@@ -43,7 +43,11 @@
 .dark-mode {
   --cp-bg-overlay: rgba(18, 18, 18, 0.8);
   --cp-bg-box: #232323;
-  --cp-bg-header: #2a2a2a;
+  /* Identic cu --cp-bg-box: containerul are overflow:visible (necesar pentru mânerele de
+     resize, care ies cu câțiva pixeli peste marginea cutiei), deci header-ul nu e clipat la
+     colțurile rotunjite ale părintelui. O culoare diferită aici lăsa vizibil un colț neclipat
+     (vizibil doar în dark mode, unde cele două culori diferă; în light mode ambele erau #fff). */
+  --cp-bg-header: #232323;
   --cp-bg-messages: #1e1e1e;
   --cp-bg-input: #232323;
   --cp-bg-input-field: #2a2a2a;
@@ -83,6 +87,10 @@
   bottom: 32px;
   z-index: 9999;
   background: var(--cp-bg-overlay);
+  /* Se mulează strict pe conținut (cutia popup) — fără border-radius aici, colțul
+     drept al acestui wrapper rămâne vizibil ca un pătrat fin în spatele colțului
+     rotunjit al .chat-popup-box, sesizabil pe fundaluri de pagină luminoase. */
+  border-radius: 16px;
 }
 
 .chat-popup-box {
@@ -118,6 +126,10 @@
 .chat-resize-handle.corner.br { bottom: -4px; right: -4px; cursor: nwse-resize; }
 
 body.chat-resizing { cursor: nwse-resize; user-select: none; }
+body.chat-dragging { cursor: grabbing; user-select: none; }
+/* Pregătește compozitorul pentru transform pe durata drag-ului, ca prima mișcare să nu
+   sufere de promovarea pe layer abia atunci. */
+body.chat-dragging .chat-popup-overlay { will-change: transform; }
 
 
 /* ─────────────────────────────────────────────────────────────
@@ -132,6 +144,16 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
   background: var(--cp-bg-header);
   border-bottom: 1px solid var(--cp-border);
   color: var(--cp-text-primary);
+}
+
+/* Header devine mâner de drag pe desktop (mutare liberă a popup-ului pe ecran) */
+.chat-popup-header.draggable {
+  cursor: grab;
+  touch-action: none;
+}
+
+.chat-popup-header.draggable:active {
+  cursor: grabbing;
 }
 
 .chat-popup-user {
@@ -178,13 +200,18 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
   color: var(--cp-text-primary);
 }
 
+.chat-popup-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .chat-popup-close {
   background: none;
   border: none;
   font-size: 28px;
   color: var(--cp-text-secondary);
   cursor: pointer;
-  margin-left: 12px;
   transition: color 0.2s;
 }
 
@@ -197,7 +224,6 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
   line-height: 1;
   color: var(--cp-text-secondary);
   cursor: pointer;
-  margin-left: 12px;
   transition: color 0.2s;
   padding-bottom: 4px;
 }
@@ -308,6 +334,42 @@ body.chat-resizing { cursor: nwse-resize; user-select: none; }
 }
 
 .chat-popup-message-text { margin-bottom: 4px; }
+
+/* Mesaj de negociere/contraofertă — aliniat vizual cu .negotiation-message din ChatPage */
+.cp-negotiation-message {
+  padding: 14px 16px 14px 13px;
+  border-radius: 12px;
+  background: var(--cp-bubble-other-bg);
+  border: 1px solid var(--cp-border);
+  border-left: 3px solid var(--cp-text-placeholder);
+  max-width: 100%;
+}
+
+.cp-negotiation-message-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--cp-text-placeholder);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.cp-negotiation-message-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cp-text-primary);
+  margin-bottom: 4px;
+}
+
+.cp-negotiation-message-text {
+  font-size: 13px;
+  color: var(--cp-text-secondary);
+  font-style: italic;
+  margin-top: 6px;
+}
 
 /* Imagini */
 .chat-popup-image-wrapper {

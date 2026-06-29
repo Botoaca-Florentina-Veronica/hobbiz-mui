@@ -1606,6 +1606,8 @@
         "reports": "Raportări"
       },
       "noPending": "Nu există verificări în așteptare.",
+      "searchPlaceholder": "Caută orice utilizator cu documente încărcate (nume sau email)...",
+      "noResults": "Niciun utilizator găsit.",
       "colUser": "Utilizator",
       "colDocuments": "Documente",
       "colVerified": "Verificat",
@@ -1615,6 +1617,8 @@
       "badgeActive": "Verificat (Badge Activ)",
       "grantBadge": "Acordă Badge",
       "removeBadge": "Șterge Badge",
+      "grantedBy": "Acordat de {{name}}",
+      "byAdmin": "de {{name}}",
       "noDocuments": "Niciun document încărcat.",
       "viewDocument": "Vezi Document",
       "downloadDocument": "Descarcă",

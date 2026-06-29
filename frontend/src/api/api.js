@@ -103,6 +103,7 @@ export const deleteUserDocument = (documentId) => apiClient.delete(`/api/users/d
 
 // Admin functions
 export const getPendingVerifications = () => apiClient.get('/api/users/admin/verifications/pending');
+export const searchVerificationUsers = (q) => apiClient.get('/api/users/admin/verifications/search', { params: { q } });
 export const getUserDocumentsAdmin = (userId) => apiClient.get(`/api/users/admin/users/${userId}/documents`);
 export const verifyDocument = (userId, documentId, data) => 
   apiClient.put(`/api/users/admin/users/${userId}/documents/${documentId}/verify`, data);

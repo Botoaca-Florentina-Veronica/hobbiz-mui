@@ -25,17 +25,18 @@ import {
   FilterList as FilterIcon,
   GridView as GridViewIcon,
   ViewList as ListViewIcon,
-  ArrowBack as ArrowBackIcon,
-  LocationOn as LocationOnIcon
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import apiClient from '../api/api';
 import { useAuth } from '../context/AuthContext.jsx';
 import Toast from '../components/Toast';
+import ResultCard from '../components/ResultCard';
 import './AllAnnouncements.css';
 import './FavoriteAnnouncements.css';
 
 export default function AllAnnouncements() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = (i18n?.language || 'ro').slice(0, 2);
   // ============================================
   // ROUTING & CONTEXT
   // ============================================
@@ -303,25 +304,33 @@ export default function AllAnnouncements() {
   };
 
   // ============================================
-  // HELPERS: DARK MODE DETECTION
+  // HELPERS: DARK MODE DETECTION & CARD FORMATTING (identice cu SearchResultsPage,
+  // pentru ca cardurile ResultCard să aibă exact același aspect)
   // ============================================
   const isDarkMode = document.body.classList.contains('dark-mode');
+  const accent = isDarkMode ? '#f51866' : '#1A314E';
 
-  // Helper: human-readable relative time (e.g., '2h ago', '3d ago')
-  const timeAgo = (dateStr) => {
-    if (!dateStr) return '';
-    const now = Date.now();
-    const then = new Date(dateStr).getTime();
-    const diff = Math.max(0, now - then);
-    const minutes = Math.floor(diff / (1000 * 60));
-    if (minutes < 1) return 'just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d ago`;
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' });
+  const formatRoDate = (date) => {
+    try {
+      const dateLocale = locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-ES' : 'ro-RO';
+      return date.toLocaleDateString(dateLocale, { day: '2-digit', month: 'long', year: 'numeric' });
+    } catch {
+      return '';
+    }
+  };
+
+  const formatPrice = (price) => {
+    const n = parseFloat(price);
+    if (Number.isNaN(n) || price === undefined || price === null || price === '') return '';
+    if (n === 0) {
+      return locale === 'en' ? 'Free' : locale === 'es' ? 'Gratis' : 'Gratuit';
+    }
+    const numFormatter = locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-ES' : 'ro-RO';
+    try {
+      return `${n.toLocaleString(numFormatter)} RON`;
+    } catch {
+      return `${n} RON`;
+    }
   };
 
   const resolveImageSrc = (image) => {
@@ -556,43 +565,36 @@ export default function AllAnnouncements() {
         ) : (
           // Announcements Cards & Pagination
           <>
-            <div className={`favorite-announcements-list ${viewMode === 'list' ? 'list-view' : 'grid-view'}`}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  lg: 'repeat(4, 1fr)',
+                },
+                gap: { xs: 2, md: 3 },
+                maxWidth: 1400,
+                margin: '32px auto 0',
+              }}
+            >
               {currentItems.map((announcement) => (
-                <div
+                <ResultCard
                   key={announcement._id}
-                  className="favorite-announcement-card"
-                  onClick={e => {
-                    if (e.target.closest('.favorite-heart')) return;
-                    navigate(`/announcement/${announcement._id}`);
-                  }}
-                >
-                  <div className="favorite-announcement-image">
-                    {announcement.images && announcement.images[0] ? (
-                      <img
-                        src={announcement.images[0].startsWith('http') || announcement.images[0].startsWith('/uploads')
-                          ? announcement.images[0]
-                          : `/uploads/${announcement.images[0].replace(/^.*[\\\\/]/, '')}`}
-                        alt="imagine principala"
-                        className="favorite-announcement-img"
-                      />
-                    ) : (
-                      <div className="favorite-announcement-img placeholder" />
-                    )}
-                  </div>
-                  <div className={`favorite-heart ${favoriteIds.includes(announcement._id) ? 'filled' : ''}`} onClick={ev => { ev.stopPropagation(); handleToggleFavorite(announcement._id, ev); }}>
-                    {favoriteIds.includes(announcement._id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                  </div>
-                  <div className="favorite-announcement-info">
-                    <h2 className="favorite-announcement-title">{announcement.title}</h2>
-                    <div className="favorite-announcement-category">{translateCategory(announcement.category, t)}</div>
-                    <div className="favorite-meta">
-                      <div className="favorite-announcement-location"><LocationOnIcon className="meta-location-icon" />{announcement.location}</div>
-                      <span className="favorite-date">{timeAgo(announcement.createdAt)}</span>
-                    </div>
-                  </div>
-                </div>
+                  a={announcement}
+                  layout="grid"
+                  isDarkMode={isDarkMode}
+                  accent={accent}
+                  formatRoDate={formatRoDate}
+                  t={t}
+                  navigate={navigate}
+                  priceLabel={formatPrice(announcement.price)}
+                  isFavorite={favoriteIds.includes(announcement._id)}
+                  onToggleFavorite={(id, ev) => handleToggleFavorite(id, ev)}
+                />
               ))}
-            </div>
+            </Box>
 
             {/* PAGINATION CONTROLS */}
             {totalPages > 1 && (

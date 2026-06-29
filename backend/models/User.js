@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
   // Expo/FCM push token for mobile notifications - changed to array to support multiple devices
   pushToken: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
+  // Marcat explicit la fiecare editare de profil (firstName/lastName/etc.) — folosit la
+  // merge-ul conturilor duplicate (vezi mergeDuplicateUsersByEmail/mergeDupesByEmail) pentru
+  // a determina care dintre conturile duplicate are datele cele mai recent editate de
+  // utilizator, indiferent prin care metodă de login s-a conectat ultima oară.
+  profileUpdatedAt: { type: Date, default: Date.now },
   localitate: { type: String }, // Adăugat câmpul localitate
   lastSeen: { type: Date, default: Date.now }, // Adăugat câmpul pentru ultima activitate
   // Token version for invalidating all sessions when user logs out from all devices

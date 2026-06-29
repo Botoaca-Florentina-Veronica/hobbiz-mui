@@ -87,6 +87,11 @@ export const adminVerificationsTranslations = {
     reportNoDetails: 'Fara detalii suplimentare.',
     emptyPending: 'Nu exista verificari in asteptare.',
     pendingDocumentsCount: '{count} documente in asteptare',
+    searchPlaceholder: 'Cauta orice utilizator cu documente (nume sau email)...',
+    noSearchResults: 'Niciun utilizator gasit.',
+    documentsCount: '{count} documente',
+    grantedByLabel: 'Acordat de {name}',
+    reviewedByLabel: 'de {name}',
   },
   en: {
     pendingHeader: 'Admin Settings',
@@ -174,6 +179,11 @@ export const adminVerificationsTranslations = {
     reportNoDetails: 'No additional details.',
     emptyPending: 'No pending verifications.',
     pendingDocumentsCount: '{count} pending documents',
+    searchPlaceholder: 'Search any user with documents (name or email)...',
+    noSearchResults: 'No user found.',
+    documentsCount: '{count} documents',
+    grantedByLabel: 'Granted by {name}',
+    reviewedByLabel: 'by {name}',
   },
   es: {
     pendingHeader: 'Configuracion de administrador',
@@ -261,6 +271,11 @@ export const adminVerificationsTranslations = {
     reportNoDetails: 'Sin detalles adicionales.',
     emptyPending: 'No hay verificaciones pendientes.',
     pendingDocumentsCount: '{count} documentos pendientes',
+    searchPlaceholder: 'Busca cualquier usuario con documentos (nombre o email)...',
+    noSearchResults: 'No se encontro ningun usuario.',
+    documentsCount: '{count} documentos',
+    grantedByLabel: 'Otorgado por {name}',
+    reviewedByLabel: 'por {name}',
   },
 };
 

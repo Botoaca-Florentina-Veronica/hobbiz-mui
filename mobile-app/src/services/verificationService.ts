@@ -1,6 +1,12 @@
 import api from './api';
 import * as DocumentPicker from 'expo-document-picker';
 
+export interface VerificationAdminRef {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface VerificationDocument {
   _id: string;
   url: string;
@@ -10,7 +16,7 @@ export interface VerificationDocument {
   status: 'pending' | 'verified' | 'rejected';
   uploadedAt: string;
   verifiedAt?: string;
-  verifiedBy?: string;
+  verifiedBy?: VerificationAdminRef | null;
   rejectionReason?: string;
 }
 
@@ -23,7 +29,9 @@ export interface UserWithDocuments {
   isVerified: boolean;
   documents?: VerificationDocument[];
   pendingDocuments?: VerificationDocument[];
+  totalDocuments?: number;
   verifiedAt?: string;
+  verifiedBy?: VerificationAdminRef | null;
 }
 
 // User functions - manage their own documents
@@ -102,6 +110,21 @@ export const getPendingVerifications = async (): Promise<{ users: UserWithDocume
     return response.data;
   } catch (error: any) {
     // If 404, no pending verifications - return empty array
+    if (error?.response?.status === 404) {
+      return { users: [] };
+    }
+    throw error;
+  }
+};
+
+// Caută TOȚI utilizatorii cu cel puțin un document încărcat, indiferent de status —
+// permite regăsirea unui utilizator ale cărui documente au fost deja tratate
+// (verificate/respinse) și care, prin urmare, nu mai apare în lista de pending.
+export const searchVerificationUsers = async (q: string): Promise<{ users: UserWithDocuments[] }> => {
+  try {
+    const response = await api.get('/api/users/admin/verifications/search', { params: { q } });
+    return response.data;
+  } catch (error: any) {
     if (error?.response?.status === 404) {
       return { users: [] };
     }

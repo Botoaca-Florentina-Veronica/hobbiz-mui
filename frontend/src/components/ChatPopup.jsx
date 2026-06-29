@@ -6,6 +6,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ReplyIcon from '@mui/icons-material/Reply';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Popover } from '@mui/material';
 import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessage } from '../api/api';
 import useSocket from '../hooks/useSocket';
@@ -37,7 +40,15 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
   const resizingRef = useRef(false);
   const resizeDirRef = useRef(null);
   const startSizeRef = useRef({ w: 440, h: 450, x: 0, y: 0 });
-  
+
+  // Drag (desktop) — permite mutarea popup-ului oriunde pe ecran. `null` = poziție
+  // implicită (ancorată jos-dreapta prin CSS); după prima mutare, devine {left, top}.
+  const [dragPos, setDragPos] = useState(null);
+  const overlayRef = useRef(null);
+  const draggingRef = useRef(false);
+  const dragStartRef = useRef({ left: 0, top: 0, w: 440, h: 450, clientX: 0, clientY: 0 });
+  const dragLatestRef = useRef({ left: 0, top: 0 });
+
   const emojiList = ['😀','😂','🤣','😍','😘','🥰','😎','😝','😢', '😉','👍','👎','🤞','🤝','👏','🖕','🙏','🤟','🤙','🎉','🔥','❤️','👀','😅','🤔','😇','😡','🥳'];
   const reactionEmojis = ['❤️','😂','😮','😢','😡','👍','👎','🎉','🔥','💯'];
   const messagesEndRef = useRef(null);
@@ -63,15 +74,25 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
     }
   }, [effectiveUserId]);
   
-  // Creează conversationId unic pentru fiecare anunț
+  // Rolul utilizatorului curent în această conversație — implicit cumpărător (cazul uzual:
+  // popup-ul deschis din pagina unui anunț/profil de vânzător), dar poate fi 'vanzator'
+  // când popup-ul e scos dintr-o conversație din pagina de chat unde utilizatorul curent
+  // este chiar proprietarul anunțului.
+  const isCurrentUserSeller = userRole === 'vanzator';
+
+  // Creează conversationId unic pentru fiecare anunț. Formatul canonic, folosit identic
+  // de restul aplicației (negocieri, listarea conversațiilor etc.), este mereu
+  // `${sellerId}-${buyerId}-${announcementId}` — indiferent care dintre cei doi participanți
+  // este utilizatorul curent. Prop-ul `seller` reprezintă mereu "celălalt participant".
   const conversationId = React.useMemo(() => {
     if (!seller || !effectiveUserId || !announcement) return null;
-    const sellerId = seller._id || seller.id;
+    const otherId = seller._id || seller.id;
     const announcementId = announcement.id || announcement._id;
-    if (!sellerId || !announcementId) return null;
-    // Nu sortăm, ordinea e: sellerId, userId, announcementId
-    return [sellerId, effectiveUserId, announcementId].join('-');
-  }, [seller, effectiveUserId, announcement]);
+    if (!otherId || !announcementId) return null;
+    const sellerId = isCurrentUserSeller ? effectiveUserId : otherId;
+    const buyerId = isCurrentUserSeller ? otherId : effectiveUserId;
+    return [sellerId, buyerId, announcementId].join('-');
+  }, [seller, effectiveUserId, announcement, isCurrentUserSeller]);
 
   // Socket — typing support
   const { emitTyping, on, off } = useSocket(effectiveUserId);
@@ -183,6 +204,16 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
         setBoxHeight(h => Math.min(h, maxH));
         const maxW = Math.min(720, window.innerWidth - 64); // leave margins
         setBoxWidth(w => Math.min(w, maxW));
+        // Reclamp poziția liberă (drag) ca să nu rămână în afara ferestrei după redimensionare
+        const rect = overlayRef.current?.getBoundingClientRect();
+        if (rect) {
+          setDragPos(pos => {
+            if (!pos) return pos;
+            const left = Math.max(0, Math.min(pos.left, window.innerWidth - rect.width));
+            const top = Math.max(0, Math.min(pos.top, window.innerHeight - rect.height));
+            return (left === pos.left && top === pos.top) ? pos : { left, top };
+          });
+        }
       }
     };
     check();
@@ -245,6 +276,84 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
     };
   }, [doResize, stopResize]);
 
+  // Drag — mutare liberă a popup-ului, activă doar pe desktop (același prag ca resize-ul).
+  // Pornește din header, dar ignoră click-urile pe avatar/nume (navighează profilul) și pe
+  // butoanele de minimizare/închidere.
+  const startDrag = useCallback((e) => {
+    if (!isResizable) return;
+    if (e.target.closest('.chat-popup-user, .chat-popup-header-actions')) return;
+    const rect = overlayRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    e.preventDefault();
+    draggingRef.current = true;
+    // Capturăm poziția, dimensiunea și punctul de pornire o singură dată. Nu apelăm
+    // setState aici — un re-render al întregii componente (cu toată lista de mesaje)
+    // chiar la pornire ar adăuga lag.
+    dragStartRef.current = {
+      left: rect.left, top: rect.top,
+      w: rect.width, h: rect.height,
+      clientX: e.clientX, clientY: e.clientY,
+    };
+    dragLatestRef.current = { left: rect.left, top: rect.top };
+    document.body.classList.add('chat-dragging');
+  }, [isResizable]);
+
+  const doDrag = useCallback((e) => {
+    if (!draggingRef.current) return;
+    const el = overlayRef.current;
+    if (!el) return;
+    const s = dragStartRef.current;
+    // Deltă față de punctul de pornire, limitată ca popup-ul să rămână complet în fereastră.
+    let dx = e.clientX - s.clientX;
+    let dy = e.clientY - s.clientY;
+    dx = Math.max(-s.left, Math.min(dx, window.innerWidth - s.w - s.left));
+    dy = Math.max(-s.top, Math.min(dy, window.innerHeight - s.h - s.top));
+    dragLatestRef.current = { left: s.left + dx, top: s.top + dy };
+    // Mutare prin transform (compus pe GPU, fără layout/reflow și fără re-ancorare
+    // right→left). La dx=dy=0 nu există absolut nicio mișcare, deci niciun salt la prima
+    // mișcare — popup-ul urmărește cursorul exact de la primul pixel.
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
+  }, []);
+
+  const stopDrag = useCallback(() => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    document.body.classList.remove('chat-dragging');
+    const el = overlayRef.current;
+    if (el) {
+      // Citim poziția vizuală REALĂ (getBoundingClientRect include transform-ul curent),
+      // nu cea calculată din s.left + dx — astfel evităm orice diferență sub-pixel între
+      // ancorarea right/bottom și left/top, care altfel ar muta popup-ul puțin la fixare.
+      const rect = el.getBoundingClientRect();
+      const pos = { left: rect.left, top: rect.top };
+      // Fixăm left/top exact pe poziția măsurată și anulăm transform-ul în același cadru —
+      // fără salt, fără reancorare vizibilă.
+      el.style.left = pos.left + 'px';
+      el.style.top = pos.top + 'px';
+      el.style.right = 'auto';
+      el.style.bottom = 'auto';
+      el.style.transform = '';
+      dragLatestRef.current = pos;
+      setDragPos(pos);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('pointermove', doDrag);
+    window.addEventListener('pointerup', stopDrag);
+    window.addEventListener('pointercancel', stopDrag);
+    return () => {
+      window.removeEventListener('pointermove', doDrag);
+      window.removeEventListener('pointerup', stopDrag);
+      window.removeEventListener('pointercancel', stopDrag);
+    };
+  }, [doDrag, stopDrag]);
+
+  // Resetează poziția liberă când popup-ul trece pe mobil (unde e fullscreen, ancorat prin CSS).
+  useEffect(() => {
+    if (!isResizable) setDragPos(null);
+  }, [isResizable]);
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (sending || !conversationId) return;
@@ -272,7 +381,7 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
       _id: tempId,
       conversationId,
       senderId: effectiveUserId,
-      senderRole: 'cumparator',
+      senderRole: isCurrentUserSeller ? 'vanzator' : 'cumparator',
       destinatarId: recipientId,
       text: hasText ? textToSend : undefined,
       image: hasFile ? URL.createObjectURL(selectedFile) : undefined,
@@ -294,7 +403,7 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
         const formData = new FormData();
         formData.append('conversationId', conversationId);
         formData.append('senderId', effectiveUserId);
-        formData.append('senderRole', 'cumparator');
+        formData.append('senderRole', isCurrentUserSeller ? 'vanzator' : 'cumparator');
         formData.append('destinatarId', recipientId);
         formData.append('announcementId', announcement.id || announcement._id);
         if (hasText) formData.append('text', textToSend);
@@ -306,7 +415,7 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
         const payload = {
           conversationId,
           senderId: effectiveUserId,
-          senderRole: 'cumparator',
+          senderRole: isCurrentUserSeller ? 'vanzator' : 'cumparator',
           destinatarId: recipientId,
           announcementId: announcement.id || announcement._id,
           text: textToSend,
@@ -437,7 +546,11 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
   if (!open || !conversationId) return null;
 
   return (
-    <div className="chat-popup-overlay">
+    <div
+      className="chat-popup-overlay"
+      ref={overlayRef}
+      style={dragPos ? { left: dragPos.left + 'px', top: dragPos.top + 'px', right: 'auto', bottom: 'auto' } : undefined}
+    >
       <div
         className={"chat-popup-box" + (isResizable ? " resizable" : "") + (minimized ? " minimized" : "")}
         style={isResizable && !minimized ? { width: boxWidth + 'px', height: boxHeight + 'px' } : undefined}
@@ -456,7 +569,10 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
             <div className="chat-resize-handle edge left" onPointerDown={(e)=>startResize(e,'left')} />
           </>
         )}
-        <div className="chat-popup-header">
+        <div
+          className={"chat-popup-header" + (isResizable ? " draggable" : "")}
+          onPointerDown={startDrag}
+        >
           <div className="chat-popup-user" onClick={handleNavigateToProfile} style={{ cursor: 'pointer' }}>
             <div className="chat-popup-avatar">
               {seller?.avatar ? (
@@ -467,12 +583,14 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
             </div>
             <span className="chat-popup-username">{seller?.firstName || t('common.user')}</span>
           </div>
-          {onMinimize && (
-            <button className="chat-popup-minimize" onClick={onMinimize} title="Minimizează">
-              &#8722;
-            </button>
-          )}
-          <button className="chat-popup-close" onClick={onClose}>&#10005;</button>
+          <div className="chat-popup-header-actions">
+            {onMinimize && (
+              <button className="chat-popup-minimize" onClick={onMinimize} title="Minimizează">
+                &#8722;
+              </button>
+            )}
+            <button className="chat-popup-close" onClick={onClose}>&#10005;</button>
+          </div>
         </div>
         <div
           className="chat-popup-announcement"
@@ -576,17 +694,41 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
                         </div>
                       )}
                       <div className="chat-popup-message-text">
-                        {msg.image && (
-                          <div className="chat-popup-image-wrapper">
-                            <img
-                              src={msg.image}
-                              alt={msg.imageFile || 'image'}
-                              className="chat-popup-image"
-                              onLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                            />
+                        {msg.messageType === 'negotiation' ? (
+                          <div className="cp-negotiation-message">
+                            <div className="cp-negotiation-message-header">
+                              {msg.negotiation?.action === 'accept' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                : msg.negotiation?.action === 'reject' ? <EventBusyIcon sx={{ fontSize: 16 }} />
+                                : <LocalOfferOutlinedIcon sx={{ fontSize: 16 }} />}
+                              <span>
+                                {msg.negotiation?.action === 'accept' ? t('chat.offerAccepted')
+                                  : msg.negotiation?.action === 'reject' ? t('chat.offerRejected')
+                                  : msg.negotiation?.action === 'counter_offer' ? t('chat.counterOffer')
+                                  : t('chat.negotiationOffer')}
+                              </span>
+                            </div>
+                            {msg.negotiation?.price != null && (
+                              <div className="cp-negotiation-message-price">{msg.negotiation.price} RON</div>
+                            )}
+                            {msg.negotiation?.message && (
+                              <div className="cp-negotiation-message-text">{msg.negotiation.message}</div>
+                            )}
                           </div>
+                        ) : (
+                          <>
+                            {msg.image && (
+                              <div className="chat-popup-image-wrapper">
+                                <img
+                                  src={msg.image}
+                                  alt={msg.imageFile || 'image'}
+                                  className="chat-popup-image"
+                                  onLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                                />
+                              </div>
+                            )}
+                            {msg.text && <div>{msg.text}</div>}
+                          </>
                         )}
-                        {msg.text && <div>{msg.text}</div>}
                       </div>
                       {msg.createdAt && (
                         <div className="chat-popup-message-time">

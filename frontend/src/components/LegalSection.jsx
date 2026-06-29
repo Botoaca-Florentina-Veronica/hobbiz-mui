@@ -26,7 +26,7 @@ const LegalSection = () => {
         </div>
         <p className="legal-section__desc">{t('legal.description')}</p>
         <div className="app-store-buttons">
-          <a href="#" className="app-store-button" aria-label={t('legal.downloadAppStore')}>
+          <a href="#" className="app-store-button app-store-button--soon" aria-label={t('legal.downloadAppStore')}>
             <img src={appStoreImg} alt={t('legal.downloadAppStore')} />
           </a>
           <a
@@ -37,16 +37,6 @@ const LegalSection = () => {
             aria-label={t('legal.getOnGooglePlay')}
           >
             <img src={googlePlayImg} alt={t('legal.getOnGooglePlay')} />
-          </a>
-        </div>
-        <div className="legal-download">
-          <a
-            className="legal-download__button"
-            href="https://drive.google.com/file/d/1JGuHSou3ROWWC7PRLuOggvdfSCENna-A/view?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('legal.downloadPresentation')}
           </a>
         </div>
       </div>

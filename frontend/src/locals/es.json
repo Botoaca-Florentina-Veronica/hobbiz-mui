@@ -1601,6 +1601,8 @@
         "reports": "Reportes"
       },
       "noPending": "No hay verificaciones pendientes.",
+      "searchPlaceholder": "Busca cualquier usuario con documentos subidos (nombre o email)...",
+      "noResults": "No se encontró ningún usuario.",
       "colUser": "Usuario",
       "colDocuments": "Documentos",
       "colVerified": "Verificado",
@@ -1610,6 +1612,8 @@
       "badgeActive": "Verificado (Badge activo)",
       "grantBadge": "Otorgar badge",
       "removeBadge": "Quitar badge",
+      "grantedBy": "Otorgado por {{name}}",
+      "byAdmin": "por {{name}}",
       "noDocuments": "No hay documentos subidos.",
       "viewDocument": "Ver documento",
       "downloadDocument": "Descargar",

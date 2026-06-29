@@ -90,6 +90,7 @@
   background: linear-gradient(135deg, #324866 0%, #1A314E 100%);
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   border-radius: 0;
 }
 .pp-hero-cover.has-cover {
@@ -569,6 +570,11 @@ body.dark-mode .pp-rev-badge { background: #422006; color: #fbbf24; }
 
 /* â”€â”€ Dark mode â”€â”€ */
 body.dark-mode .pp-page {
+  /* --pp-accent cădea altfel pe fallback-ul de light mode (#1A314E, navy) — nesuprascris
+     aici, accentul rămâne stins pe fundal întunecat oriunde e folosit pe pagină (chip-uri
+     de disponibilitate, badge verificat, iconițe de contact, butonul de like). */
+  --pp-accent: #f51866;
+  --pp-accent-hover: #fe6585;
   --pp-bg: #121212;
   --pp-card: #2d2d2d;
   --pp-text: #ffffff;
@@ -949,15 +955,18 @@ body.dark-mode .pp-delete-review-dialog .MuiButton-contained:hover {
   }
   .pp-hero-cover {
     height: 140px;
+    border-radius: 0 0 24px 24px;
+    position: relative;
+  }
+  /* Gradientul decorativ se aplică doar când NU există poză de copertă reală — pe
+     .has-cover, shorthand-ul `background` ar reseta background-size/repeat la valorile
+     default, făcând poza utilizatorului (setată inline, prin background-image) să se
+     randeze la mărimea naturală și să se repete (tiles) pe lățime. */
+  .pp-hero-cover:not(.has-cover) {
     background:
       radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.18) 0%, transparent 55%),
       radial-gradient(140% 100% at 100% 100%, rgba(0,0,0,0.20) 0%, transparent 60%),
       linear-gradient(135deg, var(--pp-accent) 0%, color-mix(in srgb, var(--pp-accent) 70%, #000) 100%);
-    border-radius: 0 0 24px 24px;
-    position: relative;
-  }
-  .pp-hero-cover.has-cover {
-    background-blend-mode: overlay;
   }
   .pp-hero-body {
     margin-top: -52px;
@@ -1310,7 +1319,9 @@ body.dark-mode .pp-delete-review-dialog .MuiButton-contained:hover {
 }
 
 /* ── Dark-mode tweaks for new mobile elements ─────────────── */
-body.dark-mode .pp-hero-cover {
+/* Neacoperit de nicio media query — se aplica la ORICE lățime de ecran. La fel ca mai sus,
+   scopat la :not(.has-cover) ca să nu reseteze background-size/repeat pe poza reală. */
+body.dark-mode .pp-hero-cover:not(.has-cover) {
   background:
     radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.08) 0%, transparent 55%),
     radial-gradient(140% 100% at 100% 100%, rgba(0,0,0,0.35) 0%, transparent 60%),

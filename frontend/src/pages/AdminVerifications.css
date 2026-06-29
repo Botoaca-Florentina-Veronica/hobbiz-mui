@@ -108,6 +108,67 @@
   background: rgba(255,255,255,0.22);
 }
 
+.av-list-heading {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: var(--as-text-title, #183642) !important;
+  letter-spacing: 0.1px;
+  margin-bottom: 12px !important;
+}
+
+/* ── Search field (find any user with uploaded documents) ── */
+.av-search-field .MuiOutlinedInput-root {
+  background: var(--as-bg-item, #f3f5f6);
+  border-radius: 999px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.av-search-field .MuiOutlinedInput-notchedOutline {
+  border-color: transparent;
+}
+
+.av-search-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--as-border-input, #ccc);
+}
+
+.av-search-field .MuiOutlinedInput-root.Mui-focused {
+  background: var(--as-bg-menu, #fff);
+  box-shadow: 0 0 0 3px rgba(11, 45, 90, 0.12);
+}
+
+.av-search-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--as-border-input-focus, #0B2D5A);
+  border-width: 1.5px;
+}
+
+.av-search-field input {
+  padding: 12px 4px !important;
+  font-size: 0.92rem;
+  color: var(--as-text-primary, #183642);
+}
+
+.av-search-field input::placeholder {
+  color: var(--as-text-primary, #183642);
+  opacity: 0.42;
+}
+
+.av-search-field .MuiSvgIcon-root {
+  color: var(--as-text-primary, #183642);
+  opacity: 0.4;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.av-search-field .MuiOutlinedInput-root.Mui-focused .MuiSvgIcon-root {
+  color: var(--as-border-input-focus, #0B2D5A);
+  opacity: 0.9;
+}
+
+.dark-mode .av-search-field .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 3px rgba(245, 24, 102, 0.16);
+}
+
 /* Dark mode: boost contrast for tab pills and counters */
 .dark-mode .av-section-btn {
   background: #161616;
@@ -258,6 +319,11 @@
 .av-badge--pending {
   background: rgba(237, 108, 2, 0.12);
   color: #e65100;
+}
+.av-badge--neutral {
+  background: rgba(11, 45, 90, 0.08);
+  color: var(--as-text-primary, #0B2D5A);
+  opacity: 0.75;
 }
 
 .av-view-btn {
@@ -474,6 +540,27 @@
 .av-doc-status--verified { background: rgba(46,125,50,0.12);  color: #2e7d32; }
 .av-doc-status--rejected { background: rgba(198,40,40,0.1);   color: #c62828; }
 
+.av-doc-status-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.av-doc-reviewed-by {
+  font-size: 0.68rem;
+  color: var(--as-text-primary, #183642);
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+.av-badge-granted-by {
+  font-size: 0.72rem !important;
+  color: var(--as-text-primary, #183642) !important;
+  opacity: 0.6 !important;
+  margin-top: 2px !important;
+}
+
 /* Card actions row */
 .av-doc-card-actions {
   display: flex;
@@ -645,6 +732,11 @@
 .dark-mode .av-badge--pending {
   background: rgba(255,152,0,0.15);
   color: #ffb74d;
+}
+.dark-mode .av-badge--neutral {
+  background: rgba(255,255,255,0.08);
+  color: var(--as-text-primary, #e4e4e7);
+  opacity: 0.8;
 }
 .dark-mode .av-doc-status--verified { background: rgba(76,175,80,0.15);  color: #81c784; }
 .dark-mode .av-doc-status--rejected { background: rgba(244,67,54,0.15);  color: #ef9a9a; }

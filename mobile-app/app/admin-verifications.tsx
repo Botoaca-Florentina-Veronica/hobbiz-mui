@@ -11,6 +11,7 @@ import {
   Image,
   Linking,
   Pressable,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -26,6 +27,7 @@ import { getAdminVerificationsTranslations } from '../src/i18n/admin-verificatio
 import api from '../src/services/api';
 import {
   getPendingVerifications,
+  searchVerificationUsers,
   verifyDocument,
   toggleUserVerification,
   getUserDocumentsAdmin,
@@ -90,6 +92,13 @@ export default function AdminVerificationsScreen() {
   const [loadingVerifications, setLoadingVerifications] = useState(true);
   const [processingVerification, setProcessingVerification] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithDocuments | null>(null);
+
+  // Căutare — regăsește un utilizator ale cărui documente au fost deja tratate
+  // (verificate/respinse) și care nu mai apare în lista de "verificări în așteptare".
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<UserWithDocuments[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   // Contacts
   const [contactFilter, setContactFilter] = useState<AdminListStatus>('open');
@@ -161,6 +170,27 @@ export default function AdminVerificationsScreen() {
       fetchReports(reportFilter);
     }
   }, [activeSection, reportFilter]);
+
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchResults(null);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    const timeout = setTimeout(async () => {
+      try {
+        const response = await searchVerificationUsers(query);
+        setSearchResults(response.users || []);
+      } catch (error) {
+        console.error('Error searching verification users:', error);
+      } finally {
+        setSearching(false);
+      }
+    }, 350);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   const fetchPendingVerifications = async () => {
     try {
@@ -274,7 +304,8 @@ export default function AdminVerificationsScreen() {
         );
 
         if (selectedUser?._id === userId) {
-          setSelectedUser({ ...selectedUser, isVerified: !currentStatus });
+          const response = await getUserDocumentsAdmin(userId);
+          setSelectedUser(response.user);
         }
 
         await fetchPendingVerifications();
@@ -651,6 +682,54 @@ export default function AdminVerificationsScreen() {
       fontSize: 11,
       color: WARNING,
       fontWeight: '700',
+    },
+    neutralChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: hexWithAlpha(accent, '14'),
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 6,
+      alignSelf: 'flex-start',
+      marginTop: 6,
+      gap: 4,
+    },
+    neutralChipText: {
+      fontSize: 11,
+      color: accent,
+      fontWeight: '700',
+    },
+
+    // === Search field ===
+    searchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: subtleSurface,
+      marginHorizontal: 16,
+      marginTop: 14,
+      paddingHorizontal: 14,
+      paddingVertical: 11,
+      borderRadius: 999,
+      gap: 8,
+      borderWidth: 1,
+      borderColor: 'transparent',
+    },
+    searchBarFocused: {
+      backgroundColor: surface,
+      borderColor: accent,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 13.5,
+      color: text,
+      padding: 0,
+    },
+
+    // === Granted/reviewed-by meta caption ===
+    byAdminText: {
+      fontSize: 11,
+      color: muted,
+      marginTop: 3,
     },
 
     // === Generic data card (contacts / reports) ===
@@ -1186,15 +1265,46 @@ export default function AdminVerificationsScreen() {
   // ============================================================================
   // Section: Verifications
   // ============================================================================
-  const renderVerificationsList = () => {
-    if (loadingVerifications) return renderSkeleton(3);
+  const renderSearchBar = () => (
+    <View style={[styles.searchBar, searchFocused && styles.searchBarFocused]}>
+      <Ionicons name="search-outline" size={16} color={searchFocused ? accent : muted} />
+      <TextInput
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={() => setSearchFocused(false)}
+        placeholder={t.searchPlaceholder}
+        placeholderTextColor={muted}
+        style={styles.searchInput}
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      {searching ? (
+        <ActivityIndicator size="small" color={accent} />
+      ) : searchQuery ? (
+        <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={8}>
+          <Ionicons name="close-circle" size={16} color={muted} />
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
 
-    if (users.length === 0) {
-      return renderEmpty('checkmark-done-circle-outline', t.emptyPending);
+  const renderVerificationsList = () => {
+    const isSearchMode = searchResults !== null;
+    const displayedUsers = isSearchMode ? searchResults : users;
+
+    if (loadingVerifications && !isSearchMode) return renderSkeleton(3);
+
+    if (displayedUsers.length === 0) {
+      return renderEmpty(
+        isSearchMode ? 'search-outline' : 'checkmark-done-circle-outline',
+        isSearchMode ? t.noSearchResults : t.emptyPending
+      );
     }
 
-    return users.map((user) => {
+    return displayedUsers.map((user) => {
       const pendingCount = user.pendingDocuments?.length || 0;
+      const totalCount = user.totalDocuments ?? user.documents?.length ?? 0;
       const ringStyle = user.isVerified
         ? styles.avatarRingVerified
         : pendingCount > 0
@@ -1236,11 +1346,18 @@ export default function AdminVerificationsScreen() {
               {user.firstName} {user.lastName}
             </Text>
             <Text style={styles.userEmail} numberOfLines={1}>{user.email}</Text>
-            {pendingCount > 0 && (
+            {pendingCount > 0 ? (
               <View style={styles.pendingChip}>
                 <Ionicons name="time-outline" size={11} color={WARNING} />
                 <Text style={styles.pendingChipText}>
                   {t.pendingDocumentsCount.replace('{count}', String(pendingCount))}
+                </Text>
+              </View>
+            ) : totalCount > 0 && (
+              <View style={styles.neutralChip}>
+                <Ionicons name="document-text-outline" size={11} color={accent} />
+                <Text style={styles.neutralChipText}>
+                  {t.documentsCount.replace('{count}', String(totalCount))}
                 </Text>
               </View>
             )}
@@ -1689,6 +1806,15 @@ export default function AdminVerificationsScreen() {
                 {selectedUser.isVerified ? t.statusVerified : t.statusPending}
               </Text>
             </View>
+            {selectedUser.isVerified && selectedUser.verifiedBy && (
+              <Text style={styles.byAdminText}>
+                {t.grantedByLabel.replace(
+                  '{name}',
+                  `${selectedUser.verifiedBy.firstName} ${selectedUser.verifiedBy.lastName}`
+                )}
+                {selectedUser.verifiedAt ? ` · ${new Date(selectedUser.verifiedAt).toLocaleDateString(dateLocale)}` : ''}
+              </Text>
+            )}
           </View>
 
           {/* Badge control */}
@@ -1741,6 +1867,12 @@ export default function AdminVerificationsScreen() {
                     <Text style={styles.docDate}>
                       {t.uploadedLabel}: {new Date(doc.uploadedAt).toLocaleDateString(dateLocale)}
                     </Text>
+                    {doc.status !== 'pending' && doc.verifiedBy && (
+                      <Text style={styles.byAdminText}>
+                        {t.reviewedByLabel.replace('{name}', `${doc.verifiedBy.firstName} ${doc.verifiedBy.lastName}`)}
+                        {doc.verifiedAt ? ` · ${new Date(doc.verifiedAt).toLocaleDateString(dateLocale)}` : ''}
+                      </Text>
+                    )}
                   </View>
                   <View style={[styles.statusPill, { backgroundColor: statusColor }]}>
                     <View style={styles.statusDot} />
@@ -1830,6 +1962,7 @@ export default function AdminVerificationsScreen() {
       >
         {renderSectionTabs()}
 
+        {activeSection === 'verifications' ? renderSearchBar() : null}
         {activeSection === 'verifications' ? renderVerificationsList() : null}
         {activeSection === 'contacts' ? renderContactsSection() : null}
         {activeSection === 'reports' ? renderReportsSection() : null}
