@@ -206,8 +206,11 @@ export default function NotificationsPage() {
                             </div>
                           )}
 
-                          {/* Action button — shown for all notifications with a link */}
-                          {n.link && (
+                          {/* Action button — shown for all notifications with a link, cu excepția
+                              notificării de acordare a badge-ului de utilizator de încredere
+                              (type 'verification' + link '/profile'), unde "Verifică documentele"
+                              nu e relevant — nu mai există niciun document de verificat în acel context. */}
+                          {n.link && !(getNotifType(n) === 'verification' && n.link === '/profile') && (
                             <button
                               className="notification-action-btn"
                               onClick={() => handleAction(n)}

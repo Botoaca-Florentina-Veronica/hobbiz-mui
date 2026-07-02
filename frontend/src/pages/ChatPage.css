@@ -839,6 +839,60 @@ body.dark-mode.chat-page .chat-emoji-picker button { color: var(--c-bubble-other
   border-top: 8px solid var(--c-main-header-bg);
 }
 
+/* Editare mesaj propriu — textarea inline + Salvează/Anulează */
+.message-edit-box { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+
+.message-edit-textarea {
+  width: 100%;
+  min-height: 40px;
+  max-height: 160px;
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: inherit;
+  padding: 8px 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  line-height: 1.35;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.chat-message.own .message-edit-textarea {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.message-edit-textarea:focus {
+  border-color: var(--c-indicator);
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.25);
+}
+
+.message-edit-actions { display: flex; justify-content: flex-end; gap: 6px; }
+
+.message-edit-save, .message-edit-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: background .15s ease, opacity .15s ease, filter .15s ease;
+}
+
+.message-edit-cancel { background: rgba(0, 0, 0, 0.08); color: inherit; }
+.message-edit-cancel:hover { background: rgba(0, 0, 0, 0.16); }
+
+.message-edit-save { background: var(--c-indicator); color: #fff; }
+.message-edit-save:hover:not(:disabled) { filter: brightness(1.08); }
+
+.message-edit-save:disabled, .message-edit-cancel:disabled { opacity: 0.5; cursor: default; }
+
+.chat-message-edited { font-size: 11px; opacity: 0.65; font-style: italic; margin-left: 2px; }
+
 
 /* ─────────────────────────────────────────────────────────────
    9. STARE GOALĂ (nicio conversație selectată)
@@ -899,7 +953,13 @@ body.dark-mode.chat-page .chat-emoji-picker button { color: var(--c-bubble-other
   .chat-separator { display: none; }
   .chat-sidebar { width: 100%; border: none; }
 
-  .chat-main-header { padding-top: calc(env(safe-area-inset-top) + 12px); }
+  .chat-main-header {
+    padding-top: calc(env(safe-area-inset-top) + 12px);
+    padding-left: 10px;
+    padding-right: 12px;
+    gap: 8px;
+  }
+  .chat-main-avatar { width: 36px; height: 36px; }
   .chat-messages-container { padding: 12px; padding-bottom: 160px; }
   .chat-message { max-width: 85%; }
 

@@ -148,6 +148,13 @@ export default function SellScreen() {
         return;
       }
 
+      const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+      const sizedAssets = jpgAssets.filter((a: any) => !a.fileSize || a.fileSize <= MAX_IMAGE_SIZE_BYTES);
+      if (sizedAssets.length < jpgAssets.length) {
+        showToast(t.imageSizeMessage, 'error');
+      }
+      if (sizedAssets.length === 0) return;
+
       let duplicatesFound = false;
       const timestampBase = Date.now();
 
@@ -164,7 +171,7 @@ export default function SellScreen() {
       const batchSignatures = new Set<string>();
       const additions: ImageItem[] = [];
 
-      jpgAssets.forEach((asset: any, idx: number) => {
+      sizedAssets.forEach((asset: any, idx: number) => {
         const uri = asset.uri;
         if (!uri) return;
         

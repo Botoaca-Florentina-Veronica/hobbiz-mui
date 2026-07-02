@@ -6,6 +6,19 @@ const Message = require('../models/Message');
 const mongoose = require('mongoose');
 const { encrypt, decrypt } = require('../services/encryptionService');
 
+// Verifică dacă destinatarul are EXACT această conversație deschisă în acest moment
+// (vezi 'joinConversation'/'leaveConversation' din server.js) — dacă da, mesajul de
+// sistem al negocierii (ofertă/acceptare/respingere/confirmare) este creat direct ca
+// citit, fără să mai depindă de un apel ulterior, fragil la curse, de pe client.
+function isRecipientViewingConversation(req, recipientId, conversationId) {
+  try {
+    const activeConversations = req.app && req.app.get ? req.app.get('activeConversations') : null;
+    return !!(activeConversations && activeConversations.get(String(recipientId)) === conversationId);
+  } catch (_) {
+    return false;
+  }
+}
+
 // Create a new negotiation (buyer proposes a price)
 exports.createNegotiation = async (req, res) => {
   try {
@@ -93,6 +106,10 @@ exports.createNegotiation = async (req, res) => {
         negotiation: { negotiationId: String(negotiation._id), price: proposedPrice, action: 'offer', message: message || undefined },
         announcementId: announcementId
       };
+      if (isRecipientViewingConversation(req, sellerId, conversationId)) {
+        messageData.isRead = true;
+        messageData.readAt = new Date();
+      }
 
       const sysMsg = await new Message(messageData).save();
       const sysMsgResponse = sysMsg.toObject();
@@ -340,7 +357,7 @@ exports.acceptOffer = async (req, res) => {
       } catch (e) {
         conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
-      const msg = await new Message({
+      const acceptMsgData = {
         conversationId,
         senderId: String(negotiation.seller._id),
         senderRole: 'vanzator',
@@ -349,7 +366,12 @@ exports.acceptOffer = async (req, res) => {
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
         announcementId: String(negotiation.announcement._id)
-      }).save();
+      };
+      if (isRecipientViewingConversation(req, negotiation.buyer._id, conversationId)) {
+        acceptMsgData.isRead = true;
+        acceptMsgData.readAt = new Date();
+      }
+      const msg = await new Message(acceptMsgData).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
 
@@ -421,7 +443,7 @@ exports.rejectOffer = async (req, res) => {
       } catch (e) {
         conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
-      const msg = await new Message({
+      const rejectMsgData = {
         conversationId,
         senderId: String(negotiation.seller._id),
         senderRole: 'vanzator',
@@ -430,7 +452,12 @@ exports.rejectOffer = async (req, res) => {
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject', message: message || undefined },
         announcementId: String(negotiation.announcement._id)
-      }).save();
+      };
+      if (isRecipientViewingConversation(req, negotiation.buyer._id, conversationId)) {
+        rejectMsgData.isRead = true;
+        rejectMsgData.readAt = new Date();
+      }
+      const msg = await new Message(rejectMsgData).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
 
@@ -507,7 +534,7 @@ exports.counterOffer = async (req, res) => {
       } catch (e) {
         conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
-      const msg = await new Message({
+      const counterMsgData = {
         conversationId,
         senderId: String(negotiation.seller._id),
         senderRole: 'vanzator',
@@ -516,7 +543,12 @@ exports.counterOffer = async (req, res) => {
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: counterPrice, action: 'counter_offer', message: message || undefined },
         announcementId: String(negotiation.announcement._id)
-      }).save();
+      };
+      if (isRecipientViewingConversation(req, negotiation.buyer._id, conversationId)) {
+        counterMsgData.isRead = true;
+        counterMsgData.readAt = new Date();
+      }
+      const msg = await new Message(counterMsgData).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
 
@@ -586,7 +618,7 @@ exports.acceptCounterOffer = async (req, res) => {
       } catch (e) {
         conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
-      const msg = await new Message({
+      const acceptCounterMsgData = {
         conversationId,
         senderId: String(negotiation.buyer._id),
         senderRole: 'cumparator',
@@ -595,7 +627,12 @@ exports.acceptCounterOffer = async (req, res) => {
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'accept' },
         announcementId: String(negotiation.announcement._id)
-      }).save();
+      };
+      if (isRecipientViewingConversation(req, negotiation.seller._id, conversationId)) {
+        acceptCounterMsgData.isRead = true;
+        acceptCounterMsgData.readAt = new Date();
+      }
+      const msg = await new Message(acceptCounterMsgData).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
 
@@ -672,7 +709,7 @@ exports.buyerCounterOffer = async (req, res) => {
       } catch (e) {
         conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
-      const msg = await new Message({
+      const buyerCounterMsgData = {
         conversationId,
         senderId: String(negotiation.buyer._id),
         senderRole: 'cumparator',
@@ -681,7 +718,12 @@ exports.buyerCounterOffer = async (req, res) => {
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: newPrice, action: 'counter_offer', message: message || undefined },
         announcementId: String(negotiation.announcement._id)
-      }).save();
+      };
+      if (isRecipientViewingConversation(req, negotiation.seller._id, conversationId)) {
+        buyerCounterMsgData.isRead = true;
+        buyerCounterMsgData.readAt = new Date();
+      }
+      const msg = await new Message(buyerCounterMsgData).save();
       const msgResponse = msg.toObject();
       msgResponse.text = decrypt(msgResponse.text);
 
@@ -800,27 +842,34 @@ exports.cancelNegotiation = async (req, res) => {
         conversationId = [String(negotiation.buyer._id), String(negotiation.seller._id)].sort().join('-');
       }
 
-      const msg = await new Message({
+      const destId = userId === String(negotiation.buyer._id) ? String(negotiation.seller._id) : String(negotiation.buyer._id);
+      const cancelMsgData = {
         conversationId,
         senderId: userId,
         senderRole: userId === String(negotiation.buyer._id) ? 'cumparator' : 'vanzator',
-        destinatarId: userId === String(negotiation.buyer._id) ? String(negotiation.seller._id) : String(negotiation.buyer._id),
-        text: `Negociere anulată.`,
+        destinatarId: destId,
+        text: encrypt(`Negociere anulată.`),
         messageType: 'negotiation',
         negotiation: { negotiationId: String(negotiation._id), price: negotiation.currentPrice, action: 'reject' },
         announcementId: String(negotiation.announcement._id)
-      }).save();
+      };
+      if (isRecipientViewingConversation(req, destId, conversationId)) {
+        cancelMsgData.isRead = true;
+        cancelMsgData.readAt = new Date();
+      }
+      const msg = await new Message(cancelMsgData).save();
+      const msgResponse = msg.toObject();
+      msgResponse.text = decrypt(msgResponse.text);
 
       const io = req.app && req.app.get ? req.app.get('io') : null;
       if (io) {
-        const destId = userId === String(negotiation.buyer._id) ? String(negotiation.seller._id) : String(negotiation.buyer._id);
         let senderInfo = null;
         try {
             const u = await User.findById(userId).select('firstName lastName avatar');
             if (u) senderInfo = { firstName: u.firstName, lastName: u.lastName, avatar: u.avatar };
         } catch (_) {}
-        io.to('user:' + String(userId)).emit('newMessage', { ...msg.toObject(), senderInfo });
-        io.to('user:' + destId).emit('newMessage', { ...msg.toObject(), senderInfo });
+        io.to('user:' + String(userId)).emit('newMessage', { ...msgResponse, senderInfo });
+        io.to('user:' + destId).emit('newMessage', { ...msgResponse, senderInfo });
       }
     } catch (e) {
       console.warn('Nu s-a putut crea mesajul de anulare negociere:', e?.message || e);
@@ -930,20 +979,26 @@ exports.confirmCollaboration = async (req, res) => {
         const Message = require('../models/Message');
         const { encrypt, decrypt } = require('../services/encryptionService');
 
-        const msg = await new Message({
+        const confirmDestId = userId === negotiation.seller._id.toString() ? String(negotiation.buyer._id) : String(negotiation.seller._id);
+        const confirmMsgData = {
           conversationId,
           senderId: userId,
           senderRole: userId === negotiation.seller._id.toString() ? 'vanzator' : 'cumparator',
-          destinatarId: userId === negotiation.seller._id.toString() ? negotiation.buyer._id : negotiation.seller._id,
+          destinatarId: confirmDestId,
           text: encrypt(`Colaborare confirmată! Preț finalizat: ${negotiation.currentPrice} RON. Acum puteți lăsa recenzii unul altuia.`),
           messageType: 'negotiation',
-          negotiation: { 
-            negotiationId: String(negotiation._id), 
-            price: negotiation.currentPrice, 
-            action: 'collaboration_confirmed' 
+          negotiation: {
+            negotiationId: String(negotiation._id),
+            price: negotiation.currentPrice,
+            action: 'collaboration_confirmed'
           },
           announcementId: String(negotiation.announcement._id)
-        }).save();
+        };
+        if (isRecipientViewingConversation(req, confirmDestId, conversationId)) {
+          confirmMsgData.isRead = true;
+          confirmMsgData.readAt = new Date();
+        }
+        const msg = await new Message(confirmMsgData).save();
 
         const msgResponse = msg.toObject();
         msgResponse.text = decrypt(msgResponse.text);
@@ -998,20 +1053,26 @@ exports.confirmCollaboration = async (req, res) => {
           `${negotiation.buyer.firstName || ''} ${negotiation.buyer.lastName || ''}`.trim() : 
           `${negotiation.seller.firstName || ''} ${negotiation.seller.lastName || ''}`.trim();
 
-        const msg = await new Message({
+        const partialConfirmDestId = userId === negotiation.seller._id.toString() ? String(negotiation.buyer._id) : String(negotiation.seller._id);
+        const partialConfirmMsgData = {
           conversationId,
           senderId: userId,
           senderRole: userId === negotiation.seller._id.toString() ? 'vanzator' : 'cumparator',
-          destinatarId: userId === negotiation.seller._id.toString() ? negotiation.buyer._id : negotiation.seller._id,
+          destinatarId: partialConfirmDestId,
           text: encrypt(`${confirmerName} a confirmat colaborarea. Așteptăm confirmarea celuilalt utilizator.`),
           messageType: 'negotiation',
-          negotiation: { 
-            negotiationId: String(negotiation._id), 
-            price: negotiation.currentPrice, 
-            action: 'partial_confirm' 
+          negotiation: {
+            negotiationId: String(negotiation._id),
+            price: negotiation.currentPrice,
+            action: 'partial_confirm'
           },
           announcementId: String(negotiation.announcement._id)
-        }).save();
+        };
+        if (isRecipientViewingConversation(req, partialConfirmDestId, conversationId)) {
+          partialConfirmMsgData.isRead = true;
+          partialConfirmMsgData.readAt = new Date();
+        }
+        const msg = await new Message(partialConfirmMsgData).save();
 
         // Send socket notification (simplified)
         const io = req.app && req.app.get ? req.app.get('io') : null;

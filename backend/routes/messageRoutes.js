@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createMessage,
   deleteMessage,
+  updateMessage,
   getConversations,
   getMessagesBetweenUsers,
   getMessages,
@@ -22,6 +23,9 @@ router.post("/", auth, upload.single("image"), createMessage);
 
 // Șterge un mesaj după id
 router.delete("/:id", auth, deleteMessage);
+
+// Editează textul unui mesaj propriu (doar mesaje de tip text)
+router.put("/:id", auth, updateMessage);
 
 // Șterge toate mesajele dintr-o conversație (doar admin)
 router.delete("/conversation/:conversationId/all", auth, adminAuth, deleteConversationMessages);

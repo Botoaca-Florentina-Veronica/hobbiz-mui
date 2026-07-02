@@ -129,6 +129,66 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+// Editează textul unui mesaj existent (doar propriul mesaj, doar mesaje de tip text)
+const updateMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const authenticatedUserId = req.userId;
+    const rawText = req.body.text;
+
+    const message = await Message.findById(id);
+    if (!message) {
+      return res.status(404).json({ error: "Mesajul nu a fost găsit." });
+    }
+
+    if (String(message.senderId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Nu poți edita mesajele altui utilizator." });
+    }
+
+    if (message.messageType && message.messageType !== "text") {
+      return res.status(400).json({ error: "Acest tip de mesaj nu poate fi editat." });
+    }
+
+    const text = sanitizeText(String(rawText || "").trim());
+    if (!text) {
+      return res.status(400).json({ error: "Textul mesajului nu poate fi gol." });
+    }
+
+    message.text = encrypt(text);
+    message.editedAt = new Date();
+    await message.save();
+
+    const otherParticipantId =
+      String(message.senderId) === String(authenticatedUserId)
+        ? message.destinatarId
+        : message.senderId;
+
+    try {
+      const io = req.app.get("io");
+      if (io && otherParticipantId) {
+        io.to("user:" + String(otherParticipantId)).emit("messageEdited", {
+          conversationId: message.conversationId,
+          messageId: String(message._id),
+          text,
+          editedAt: message.editedAt,
+        });
+      }
+    } catch (_) {}
+
+    return res.json({
+      success: true,
+      message: {
+        _id: message._id,
+        text,
+        editedAt: message.editedAt,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Eroare la editarea mesajului:", err);
+    res.status(500).json({ error: "Eroare la editarea mesajului." });
+  }
+};
+
 // Creează un mesaj nou și (opțional) o notificare pentru destinatar
 const createMessage = async (req, res) => {
   try {
@@ -1106,6 +1166,25 @@ const deleteConversationMessages = async (req, res) => {
 
     const result = await Message.deleteMany({ conversationId: { $in: conversationIds } });
 
+    // Negocierile (Negotiation) sunt o colecție separată de mesajele de chat — un mesaj
+    // de tip 'negotiation' este doar reflectarea ei vizuală în conversație. Ștergerea
+    // mesajelor, fără a șterge și negocierea propriu-zisă, lasă starea ei (preț, status
+    // 'confirmed' etc.) intactă în DB, iar widget-ul de negociere active o reîncarcă și o
+    // arată din nou, ca și cum conversația n-ar fi fost ștearsă deloc.
+    let deletedNegotiations = 0;
+    if (parts.length === 3) {
+      const [participantA, participantB, announcementId] = parts;
+      if (Types.ObjectId.isValid(announcementId)) {
+        const Negotiation = require("../models/Negotiation");
+        const negResult = await Negotiation.deleteMany({
+          announcement: announcementId,
+          buyer: { $in: [participantA, participantB] },
+          seller: { $in: [participantA, participantB] },
+        });
+        deletedNegotiations = negResult.deletedCount;
+      }
+    }
+
     // Notify participants via socket
     try {
       const io = req.app.get("io");
@@ -1117,7 +1196,7 @@ const deleteConversationMessages = async (req, res) => {
       }
     } catch (_) {}
 
-    res.json({ success: true, deletedCount: result.deletedCount });
+    res.json({ success: true, deletedCount: result.deletedCount, deletedNegotiations });
   } catch (err) {
     console.error("Eroare la ștergerea conversației:", err);
     res.status(500).json({ error: err.message });
@@ -1127,6 +1206,7 @@ const deleteConversationMessages = async (req, res) => {
 module.exports = {
   createMessage,
   deleteMessage,
+  updateMessage,
   getConversations,
   getMessagesBetweenUsers,
   getMessages,

@@ -14,8 +14,9 @@ import { updateEmail, updatePassword, deleteAccount, resetUserData } from '../sr
 import { useAuth } from '../src/context/AuthContext';
 import { useLocale } from '../src/context/LocaleContext';
 import { ProtectedRoute } from '../src/components/ProtectedRoute';
-import * as FileSystem from 'expo-file-system';
+import { File as FSFile, Paths } from 'expo-file-system/next';
 import * as Sharing from 'expo-sharing';
+import api from '../src/services/api';
 import { getSettingsTranslations } from '../src/i18n/settings';
 
 type SettingRow = { key: string; label: string; icon?: string; expandable?: boolean };
@@ -201,20 +202,8 @@ export default function SettingsScreen() {
   const handleDownloadData = async () => {
     setIsLoading(true);
     try {
-      const token = await storage.getItemAsync('userToken');
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000'}/api/users/profile`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      const userData = await response.json();
+      const response = await api.get('/api/users/profile');
+      const userData = response.data;
 
       // Create the JSON object with required fields
       const exportData = {
@@ -236,15 +225,13 @@ export default function SettingsScreen() {
 
       const jsonString = JSON.stringify(exportData, null, 2);
       const fileName = `datele_mele_${new Date().toISOString().split('T')[0]}.json`;
-      
-      // Use the new expo-file-system API
-      const file = new FileSystem.File(FileSystem.Paths.cache, fileName);
-      file.create();
-      await file.write(jsonString);
 
-      // Check if sharing is available
+      const file = new FSFile(Paths.cache, fileName);
+      file.create({ overwrite: true });
+      file.write(jsonString);
+
       const isSharingAvailable = await Sharing.isAvailableAsync();
-      
+
       if (isSharingAvailable) {
         await Sharing.shareAsync(file.uri, {
           mimeType: 'application/json',

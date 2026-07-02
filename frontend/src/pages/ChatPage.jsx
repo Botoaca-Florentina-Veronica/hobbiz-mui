@@ -6,11 +6,14 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 import TypingIndicator from '../components/TypingIndicator';
 import useSocket from '../hooks/useSocket';
-import apiClient from '../api/api';
+import apiClient, { editMessage } from '../api/api';
 
 import ReplyIcon from '@mui/icons-material/Reply';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import ArrowBack from '@mui/icons-material/ArrowBack';
@@ -71,6 +74,9 @@ export default function ChatPage() {
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const [selectedReply, setSelectedReply] = useState(null);
   const [reactionTargetId, setReactionTargetId] = useState(null);
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [sidebarWidth, setSidebarWidth] = useState(380);
@@ -94,7 +100,7 @@ export default function ChatPage() {
   const isChattingOnMobile = isMobile && !!selectedConversation;
   const isDesktop = !isMobile;
 
-  const { socket, emitTyping, on, off } = useSocket(userId);
+  const { socket, emitTyping, joinConversation, leaveConversation, on, off } = useSocket(userId);
   const { openPopupChat } = useChatContext();
   const { user: currentUser } = useAuth() || {};
   const isAdmin = !!currentUser?.isAdmin;
@@ -301,10 +307,11 @@ export default function ChatPage() {
 
       // Contoarele de necitite se calculează din lista completă (ambele categorii),
       // independent de tab-ul activ în acel moment, ca indicele să poată fi afișat
-      // și pe butonul categoriei pe care utilizatorul NU se află în prezent.
+      // și pe butonul categoriei pe care utilizatorul NU se află în prezent. Conversația
+      // deschisă în acest moment nu contribuie niciodată la contor — e deja vizibilă pe ecran.
       setUnreadByTab({
-        buying: formatted.filter(c => c.announcementOwnerId !== userId && c.unread).length,
-        selling: formatted.filter(c => c.announcementOwnerId === userId && c.unread).length,
+        buying: formatted.filter(c => c.announcementOwnerId !== userId && c.unread && c.conversationId !== selectedConversation?.conversationId).length,
+        selling: formatted.filter(c => c.announcementOwnerId === userId && c.unread && c.conversationId !== selectedConversation?.conversationId).length,
       });
 
       if (activeTab === 'selling') {
@@ -313,7 +320,7 @@ export default function ChatPage() {
         setConversations(formatted.filter(c => c.announcementOwnerId !== userId));
       }
     } catch (err) { console.error(err); } finally { setLoading(false); }
-  }, [userId, activeTab, t]);
+  }, [userId, activeTab, t, selectedConversation?.conversationId]);
 
   useEffect(() => {
     fetchConv();
@@ -326,6 +333,16 @@ export default function ChatPage() {
       if (found) setSelectedConversation(found);
     }
   }, [location.state, conversations, selectedConversation]);
+
+  // Anunță serverul ce conversație vizualizăm activ — folosit pentru a marca mesajele de
+  // sistem ale negocierii (ofertă/acceptare/confirmare) ca citite chiar la creare, dacă
+  // suntem deja aici, în loc să depindă exclusiv de apelul ulterior, fragil, de mark-read.
+  useEffect(() => {
+    if (!selectedConversation) return;
+    joinConversation(selectedConversation.conversationId);
+    return () => leaveConversation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedConversation?.conversationId]);
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -403,10 +420,19 @@ export default function ChatPage() {
     };
     on('bookingUpdated', handleBookingUpdated);
 
+    // Editare mesaj de către cealaltă parte — actualizăm textul in-place, în timp real.
+    const handleMessageEdited = (data) => {
+      if (selectedConversation && data.conversationId === selectedConversation.conversationId && data.messageId) {
+        setMessages(prev => prev.map(m => m._id === data.messageId ? { ...m, text: data.text, editedAt: data.editedAt } : m));
+      }
+    };
+    on('messageEdited', handleMessageEdited);
+
     return () => {
       off('newMessage', handleNew);
       off('conversationCleared', handleConversationCleared);
       off('bookingUpdated', handleBookingUpdated);
+      off('messageEdited', handleMessageEdited);
     };
   }, [userId, selectedConversation, on, off, fetchConv]);
 
@@ -460,8 +486,12 @@ export default function ChatPage() {
       const res = await apiClient.delete(`/api/messages/conversation/${convId}/all`);
       console.log('[Admin] Delete response:', res.data);
       setMessages([]);
-      setConversations(prev => prev.filter(c => c.conversationId !== convId));
       setSelectedConversation(null);
+      // Resincronizează lista de conversații ȘI contoarele "De cumpărat"/"De vândut" —
+      // altfel, dacă conversația ștearsă contribuia la vreun contor de necitite, acesta
+      // rămâne "înțepenit" la valoarea veche (nimic altceva nu îl recalculează).
+      await fetchConv();
+      window.dispatchEvent(new Event('chat:counts-updated'));
       showNegotiationSnackbar('Toate mesajele au fost șterse.', 'success');
     } catch (err) {
       console.error('Eroare la ștergerea conversației:', err);
@@ -700,6 +730,33 @@ export default function ChatPage() {
   };
 
   // --- Handlers ---
+  const handleStartEdit = (msg) => {
+    setEditingMessageId(msg._id);
+    setEditText(msg.text || '');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditText('');
+  };
+
+  const handleSaveEdit = async (msgId) => {
+    const trimmed = editText.trim();
+    if (!trimmed || savingEdit) return;
+    setSavingEdit(true);
+    try {
+      const res = await editMessage(msgId, trimmed);
+      const updated = res.data?.message;
+      setMessages(prev => prev.map(m => m._id === msgId ? { ...m, text: updated?.text ?? trimmed, editedAt: updated?.editedAt ?? new Date().toISOString() } : m));
+      setEditingMessageId(null);
+      setEditText('');
+    } catch (err) {
+      console.error('Edit message error:', err);
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -836,8 +893,12 @@ export default function ChatPage() {
     '🏆', '🎵', '🍀', '🌈', '☀️', '🌙', '❄️', '💎', '🦋', '🐱', '🐶', '🍕',
     '☕', '🍺', '🚀', '✅',
   ];
-  const unreadConvs = conversations.filter(c => c.unread);
-  const readConvs = conversations.filter(c => !c.unread);
+  // Conversația deschisă în acest moment nu trebuie arătată NICIODATĂ ca necitită — chiar
+  // dacă un mesaj nou ar ajunge printr-o curse cu un refresh al listei, utilizatorul o
+  // vede deja pe ecran, deci e, prin definiție, citită.
+  const isOpenConversation = (c) => selectedConversation && c.conversationId === selectedConversation.conversationId;
+  const unreadConvs = conversations.filter(c => c.unread && !isOpenConversation(c));
+  const readConvs = conversations.filter(c => !c.unread || isOpenConversation(c));
 
   return (
     <>
@@ -931,7 +992,7 @@ export default function ChatPage() {
           {selectedConversation ? (
             <>
               <div className="chat-main-header">
-                {isMobile && <IconButton onClick={() => setSelectedConversation(null)} sx={{color: 'var(--c-text-primary)'}}><ArrowBack /></IconButton>}
+                {isMobile && <IconButton onClick={() => setSelectedConversation(null)} sx={{color: 'var(--c-text-primary)', padding: '4px', marginLeft: '-4px'}}><ArrowBack /></IconButton>}
                 <img className="chat-main-avatar" src={selectedConversation.participantAvatar} alt="av" onClick={() => navigate(`/profil/${selectedConversation.id}`)}/>
                 <div className="chat-main-user-info">
                   <h3>{selectedConversation.participantName}</h3>
@@ -1233,11 +1294,15 @@ export default function ChatPage() {
                             ) : msg.messageType === 'negotiation' ? (
                               <div className="negotiation-message">
                                 <div className="negotiation-message-header">
-                                  {msg.negotiation?.action === 'accept' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                  {msg.negotiation?.action === 'collaboration_confirmed' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                    : msg.negotiation?.action === 'partial_confirm' ? <AccessTimeIcon sx={{ fontSize: 16 }} />
+                                    : msg.negotiation?.action === 'accept' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
                                     : msg.negotiation?.action === 'reject' ? <EventBusyIcon sx={{ fontSize: 16 }} />
                                     : <LocalOfferOutlinedIcon sx={{ fontSize: 16 }} />}
                                   <span>
-                                    {msg.negotiation?.action === 'accept' ? t('chat.offerAccepted')
+                                    {msg.negotiation?.action === 'collaboration_confirmed' ? t('chat.collaborationConfirmed')
+                                      : msg.negotiation?.action === 'partial_confirm' ? t('chat.partialConfirm')
+                                      : msg.negotiation?.action === 'accept' ? t('chat.offerAccepted')
                                       : msg.negotiation?.action === 'reject' ? t('chat.offerRejected')
                                       : msg.negotiation?.action === 'counter_offer' ? t('chat.counterOffer')
                                       : t('chat.negotiationOffer')}
@@ -1253,12 +1318,41 @@ export default function ChatPage() {
                             ) : (
                               <>
                                 {msg.image && <div className="chat-message-image"><img src={msg.image} alt="att" /></div>}
-                                {msg.text && <p className="chat-message-text">{msg.text}</p>}
+                                {editingMessageId === msg._id ? (
+                                  <div className="message-edit-box">
+                                    <textarea
+                                      className="message-edit-textarea"
+                                      value={editText}
+                                      maxLength={2000}
+                                      autoFocus
+                                      onChange={(e) => setEditText(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSaveEdit(msg._id); }
+                                        else if (e.key === 'Escape') { e.preventDefault(); handleCancelEdit(); }
+                                      }}
+                                    />
+                                    <div className="message-edit-actions">
+                                      <button type="button" className="message-edit-cancel" onClick={handleCancelEdit} disabled={savingEdit} title={t('common.cancel')}>
+                                        <CloseIcon fontSize="small"/>
+                                      </button>
+                                      <button type="button" className="message-edit-save" onClick={() => handleSaveEdit(msg._id)} disabled={savingEdit || !editText.trim()} title={t('common.save')}>
+                                        <CheckIcon fontSize="small"/>
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  msg.text && (
+                                    <p className="chat-message-text">
+                                      {msg.text}
+                                      {msg.editedAt && <span className="chat-message-edited">{t('chat.edited')}</span>}
+                                    </p>
+                                  )
+                                )}
                               </>
                             )}
-                            
+
                             {/* ACTIONS (hover or long-press on mobile) */}
-                            {hoveredMessageId === msg._id && reactionTargetId !== msg._id && (
+                            {hoveredMessageId === msg._id && reactionTargetId !== msg._id && editingMessageId !== msg._id && (
                               <div className="message-actions-bar" style={longPressBarStyle || undefined}>
                                 <button className="message-action-btn" onClick={() => setSelectedReply({ messageId: msg._id, senderId: msg.senderId, senderName: isOwn ? t('common.you') : t('common.user'), text: msg.text, image: msg.image })}><ReplyIcon fontSize="small"/></button>
                                 <button className="message-action-btn" onClick={() => setReactionTargetId(msg._id)}><SentimentSatisfiedAltIcon fontSize="small"/></button>
@@ -1268,6 +1362,9 @@ export default function ChatPage() {
                                     <div className="message-copied" role="status" aria-live="polite">{t('chat.copied')}</div>
                                   )}
                                 </button>
+                                {isOwn && (!msg.messageType || msg.messageType === 'text') && (
+                                  <button className="message-action-btn" onClick={() => handleStartEdit(msg)}><EditIcon fontSize="small"/></button>
+                                )}
                                 {isOwn && <button className="message-action-btn" onClick={() => { apiClient.delete(`/api/messages/${msg._id}`).then(() => setMessages(p => p.filter(m => m._id !== msg._id))); }}><DeleteIcon fontSize="small"/></button>}
                               </div>
                             )}

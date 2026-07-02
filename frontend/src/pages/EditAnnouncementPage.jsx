@@ -163,8 +163,8 @@ export default function EditAnnouncementPage() {
       return;
     }
 
-    // Verifică dimensiunea fiecărui fișier (max 5MB)
-    const oversizedFiles = validFiles.filter(file => file.size > 5 * 1024 * 1024);
+    // Verifică dimensiunea fiecărui fișier (max 10MB)
+    const oversizedFiles = validFiles.filter(file => file.size > 10 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
       setImageError(t('addAnnouncement.errors.imageSize'));
       return;

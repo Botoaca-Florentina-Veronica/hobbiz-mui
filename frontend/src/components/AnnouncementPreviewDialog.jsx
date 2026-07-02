@@ -90,6 +90,17 @@ export default function AnnouncementPreviewDialog({
 
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [imgFade, setImgFade] = useState(true);
+  // Reține, per URL de imagine, dacă e orizontală (landscape) sau verticală (portrait),
+  // determinat din dimensiunile reale după încărcare — ca să afișăm imaginile orizontale
+  // „full screen" (object-fit: cover, fără bare albe laterale), dar să păstrăm comportamentul
+  // existent (object-fit: contain) pentru cele verticale.
+  const [imgOrientations, setImgOrientations] = useState({});
+  const handleImageLoad = (src) => (e) => {
+    const { naturalWidth, naturalHeight } = e.target;
+    if (!naturalWidth || !naturalHeight) return;
+    const orientation = naturalWidth >= naturalHeight ? 'landscape' : 'portrait';
+    setImgOrientations(prev => (prev[src] === orientation ? prev : { ...prev, [src]: orientation }));
+  };
 
   // Resetează la fiecare deschidere
   useEffect(() => {
@@ -197,8 +208,10 @@ export default function AnnouncementPreviewDialog({
                       component="img"
                       image={imagePreviews[selectedIdx] || imagePreviews[0]}
                       alt={t('addAnnouncement.preview.imageAlt')}
+                      onLoad={handleImageLoad(imagePreviews[selectedIdx] || imagePreviews[0])}
                       sx={{
-                        width: '100%', height: '100%', objectFit: 'contain',
+                        width: '100%', height: '100%',
+                        objectFit: imgOrientations[imagePreviews[selectedIdx] || imagePreviews[0]] === 'landscape' ? 'cover' : 'contain',
                         bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
                         opacity: imgFade ? 1 : 0,
                         transition: 'opacity 0.4s cubic-bezier(.4,0,.2,1)',
@@ -237,8 +250,10 @@ export default function AnnouncementPreviewDialog({
                     component="img"
                     image={mainImagePreview}
                     alt={t('addAnnouncement.preview.imageAlt')}
+                    onLoad={handleImageLoad(mainImagePreview)}
                     sx={{
-                      width: '100%', height: '100%', objectFit: 'contain',
+                      width: '100%', height: '100%',
+                      objectFit: imgOrientations[mainImagePreview] === 'landscape' ? 'cover' : 'contain',
                       bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
                     }}
                   />

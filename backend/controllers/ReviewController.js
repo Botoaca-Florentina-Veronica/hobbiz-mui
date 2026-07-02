@@ -50,6 +50,14 @@ const createReview = async (req, res) => {
       });
     }
 
+    // Prevent duplicate reviews: a user can leave at most one review per collaborator
+    const existingReview = await Review.findOne({ user: reviewedUserId, author: authorId });
+    if (existingReview) {
+      return res.status(409).json({
+        error: "Ai lăsat deja o recenzie pentru acest utilizator.",
+      });
+    }
+
     const review = new Review({
       user: reviewedUserId,
       author: authorId,

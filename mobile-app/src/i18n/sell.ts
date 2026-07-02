@@ -47,6 +47,8 @@ export const sellTranslations = {
     phoneFormatError: 'Numărul de telefon nu este valid (ex: 07xxxxxxxx).',
     imageFormatError: 'Format imagine invalid',
     imageFormatMessage: 'Doar fișiere JPG sau JPEG.',
+    imageSizeError: 'Imagine prea mare',
+    imageSizeMessage: 'Fiecare imagine trebuie să fie mai mică de 10MB.',
     postError: 'Eroare la postare',
     postErrorMessage: 'A intervenit o eroare. Te rugăm să încerci din nou.',
     categoryLabels: {
@@ -110,6 +112,8 @@ export const sellTranslations = {
     phoneFormatError: 'The phone number is invalid (e.g. 07xxxxxxxx).',
     imageFormatError: 'Invalid image format',
     imageFormatMessage: 'Only JPG or JPEG files.',
+    imageSizeError: 'Image too large',
+    imageSizeMessage: 'Each image must be smaller than 10MB.',
     postError: 'Post error',
     postErrorMessage: 'An error occurred. Please try again.',
     categoryLabels: {
@@ -173,6 +177,8 @@ export const sellTranslations = {
     phoneFormatError: 'El numero de telefono no es valido (ej. 07xxxxxxxx).',
     imageFormatError: 'Formato de imagen invalido',
     imageFormatMessage: 'Solo archivos JPG o JPEG.',
+    imageSizeError: 'Imagen demasiado grande',
+    imageSizeMessage: 'Cada imagen debe ser menor de 10MB.',
     postError: 'Error al publicar',
     postErrorMessage: 'Ocurrio un error. Intentalo de nuevo.',
     categoryLabels: {

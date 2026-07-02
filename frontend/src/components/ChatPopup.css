@@ -827,6 +827,60 @@ body.chat-dragging .chat-popup-overlay { will-change: transform; }
   z-index: 30;
 }
 
+/* Editare mesaj propriu — textarea inline + Salvează/Anulează */
+.cp-message-edit-box { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+
+.cp-message-edit-textarea {
+  width: 100%;
+  min-height: 36px;
+  max-height: 140px;
+  resize: vertical;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: inherit;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.35;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.chat-popup-message-own .cp-message-edit-textarea {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.cp-message-edit-textarea:focus {
+  border-color: var(--cp-accent, #f51866);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cp-accent, #f51866) 25%, transparent);
+}
+
+.cp-message-edit-actions { display: flex; justify-content: flex-end; gap: 5px; }
+
+.cp-message-edit-save, .cp-message-edit-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: background .15s ease, opacity .15s ease, filter .15s ease;
+}
+
+.cp-message-edit-cancel { background: rgba(0, 0, 0, 0.08); color: inherit; }
+.cp-message-edit-cancel:hover { background: rgba(0, 0, 0, 0.16); }
+
+.cp-message-edit-save { background: var(--cp-accent, #f51866); color: #fff; }
+.cp-message-edit-save:hover:not(:disabled) { filter: brightness(1.08); }
+
+.cp-message-edit-save:disabled, .cp-message-edit-cancel:disabled { opacity: 0.5; cursor: default; }
+
+.cp-message-edited { font-size: 10px; opacity: 0.65; font-style: italic; margin-left: 3px; }
+
 /* Reaction picker — rând de emoji deasupra bulei */
 .cp-reaction-picker {
   position: absolute;

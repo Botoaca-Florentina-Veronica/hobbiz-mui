@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getEffectiveViewportWidth } from '../utils/devicePatch';
 
-// Returnează lățimea "efectivă" a ferestrei. Pe touch-uri (telefon/tabletă) e identică cu
-// `window.innerWidth`. Pe desktop/laptop returnează minim 1280 ca să nu trigereze
-// vreun threshold de layout mobil (vezi `src/utils/devicePatch.js`).
+// Returnează lățimea reală a ferestrei (`window.innerWidth`), pe orice dispozitiv.
+// Layout-ul comută pe baza lățimii, la fel ca regulile CSS responsive
+// (vezi `src/utils/devicePatch.js`).
 export const useWindowWidth = () => {
     const [width, setWidth] = useState(() => getEffectiveViewportWidth());
 

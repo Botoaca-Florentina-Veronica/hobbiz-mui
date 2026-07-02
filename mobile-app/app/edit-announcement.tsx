@@ -150,7 +150,14 @@ export default function EditAnnouncementScreen() {
         return;
       }
 
-      const newImages = jpgAssets.map((a: any, idx: number) => ({ 
+      const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+      const sizedAssets = jpgAssets.filter((a: any) => !a.fileSize || a.fileSize <= MAX_IMAGE_SIZE_BYTES);
+      if (sizedAssets.length < jpgAssets.length) {
+        Alert.alert(t.sizeError, t.sizeMessage);
+      }
+      if (sizedAssets.length === 0) return;
+
+      const newImages = sizedAssets.map((a: any, idx: number) => ({
         id: Date.now().toString() + '_' + idx, 
         uri: a.uri 
       }));

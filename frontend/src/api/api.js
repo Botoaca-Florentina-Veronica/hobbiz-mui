@@ -5,6 +5,7 @@ export const sendMessageMultipart = (formData) =>
 // Align with backend: GET /api/messages/conversation/:conversationId
 export const getMessages = (conversationId) => apiClient.get(`/api/messages/conversation/${conversationId}`);
 export const deleteMessage = (id) => apiClient.delete(`/api/messages/${id}`);
+export const editMessage = (id, text) => apiClient.put(`/api/messages/${id}`, { text });
 // Fetch messages between two users
 export const getMessagesBetween = (userId1, userId2) => apiClient.get(`/api/messages/between/${userId1}/${userId2}`);
 // Șterge contul utilizatorului și toate anunțurile sale

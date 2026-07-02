@@ -63,6 +63,27 @@ const useSocket = (userId) => {
     }
   };
 
+  // Anunță serverul ce conversație este activ vizualizată de acest utilizator — folosit
+  // pentru a marca mesajele de sistem (negociere etc.) ca citite chiar la creare, fără
+  // să se mai bazeze exclusiv pe un apel ulterior de pe client, fragil la curse.
+  const joinConversation = (conversationId) => {
+    const payload = { userId, conversationId };
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit('joinConversation', payload);
+    } else {
+      pendingEmitsRef.current.push({ event: 'joinConversation', payload });
+    }
+  };
+
+  const leaveConversation = () => {
+    const payload = { userId };
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit('leaveConversation', payload);
+    } else {
+      pendingEmitsRef.current.push({ event: 'leaveConversation', payload });
+    }
+  };
+
   // Listen for events
   const on = (event, callback) => {
     if (socketRef.current) {
@@ -87,6 +108,8 @@ const useSocket = (userId) => {
   return {
     socket: socketRef.current,
     emitTyping,
+    joinConversation,
+    leaveConversation,
     on,
     off
   };

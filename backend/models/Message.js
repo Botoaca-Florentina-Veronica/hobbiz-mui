@@ -22,7 +22,7 @@ const MessageSchema = new mongoose.Schema({
   negotiation: {
     negotiationId: { type: String, required: false },
     price: { type: Number, required: false },
-    action: { type: String, enum: ["offer", "counter_offer", "accept", "reject"], required: false },
+    action: { type: String, enum: ["offer", "counter_offer", "accept", "reject", "partial_confirm", "collaboration_confirmed"], required: false },
     message: { type: String, required: false },
   },
   // Date pentru colaborare
@@ -59,6 +59,7 @@ const MessageSchema = new mongoose.Schema({
   isRead: { type: Boolean, default: false }, // Statusul de citit al mesajului
   readAt: { type: Date, default: null }, // Când a fost citit mesajul
   createdAt: { type: Date, default: Date.now },
+  editedAt: { type: Date, default: null }, // Setat când expeditorul își editează mesajul de tip text
 });
 
 module.exports = mongoose.model("Message", MessageSchema);

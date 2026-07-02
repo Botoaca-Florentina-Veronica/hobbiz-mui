@@ -117,8 +117,9 @@ export default function AnnouncementDetails() {
   
   // ========== Carousel ==========
   const [imgIndex, setImgIndex] = useState(0);
-  const [fade, setFade] = useState(true);
-  const timeoutRef = useRef();
+  // Direcția ultimei navigări ('next'/'prev'), folosită doar pentru a alege keyframe-ul
+  // CSS de slide-in al noii imagini (vezi .ad-carousel-img.slide-next/.slide-prev).
+  const [slideDirection, setSlideDirection] = useState('next');
 
   // ========== Modal Zoom ==========
   const [zoomOpen, setZoomOpen] = useState(false);
@@ -488,22 +489,14 @@ export default function AnnouncementDetails() {
 
   const handlePrev = (e) => {
     e.stopPropagation();
-    setFade(false);
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setImgIndex(idx => idx > 0 ? idx - 1 : images.length - 1);
-      setFade(true);
-    }, 200);
+    setSlideDirection('prev');
+    setImgIndex(idx => idx > 0 ? idx - 1 : images.length - 1);
   };
 
   const handleNext = (e) => {
     e.stopPropagation();
-    setFade(false);
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setImgIndex(idx => idx < images.length - 1 ? idx + 1 : 0);
-      setFade(true);
-    }, 200);
+    setSlideDirection('next');
+    setImgIndex(idx => idx < images.length - 1 ? idx + 1 : 0);
   };
 
   const preventImageContextMenu = (e) => {
@@ -686,23 +679,23 @@ export default function AnnouncementDetails() {
           <Grid item xs={12} md={8} order={{ xs: 1, md: 1 }}>
             {/* Image Carousel */}
             <Card className="seller-card" elevation={3} sx={{ mb: 3, overflow: 'hidden', mt: { xs: 0, md: 4 } }}>
-              <Box sx={{ position: 'relative', height: { xs: '58vw', sm: '60vw', md: 500 } }}>
+              <Box className="ad-carousel-box" sx={{ position: 'relative', height: { xs: '58vw', sm: '60vw', md: 500 }, overflow: 'hidden' }}>
                 {images.length > 0 ? (
                   <>
                     <CardMedia
+                      key={imgIndex}
                       component="img"
                       height={undefined}
                       image={getImageSrc(images[imgIndex])}
                       alt={`Imagine ${imgIndex + 1}`}
                       onContextMenu={preventImageContextMenu}
                       draggable={false}
+                      className={`ad-carousel-img slide-${slideDirection}`}
                       sx={{
                         width: '100%',
                         height: '100%',
                         objectFit: imageFits[imgIndex] ?? 'contain',
                         bgcolor: getIsDarkMode() ? '#121212' : '#ffffff',
-                        opacity: fade ? 1 : 0,
-                        transition: 'opacity 0.4s cubic-bezier(.4,0,.2,1)',
                         cursor: 'pointer'
                       }}
                       onClick={() => handleOpenZoom(imgIndex)}
@@ -710,29 +703,23 @@ export default function AnnouncementDetails() {
                     {showArrows && (
                       <>
                         <IconButton
+                          className="ad-carousel-arrow ad-carousel-arrow--left"
                           onClick={handlePrev}
+                          aria-label={t('common.previousImage')}
                           sx={{
-                            position: 'absolute',
-                            left: 16,
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            bgcolor: getIsDarkMode() ? '#282828' : 'rgba(255,255,255,0.9)',
-                            '&:hover': { bgcolor: getIsDarkMode() ? '#3f3f3f' : 'rgba(255,255,255,1)' },
-                            boxShadow: 2
+                            '--ad-arrow-accent': getAccentCss(),
+                            '--ad-arrow-accent-hover': getAccentHover(),
                           }}
                         >
                           <ChevronLeftIcon />
                         </IconButton>
                         <IconButton
+                          className="ad-carousel-arrow ad-carousel-arrow--right"
                           onClick={handleNext}
+                          aria-label={t('common.nextImage')}
                           sx={{
-                            position: 'absolute',
-                            right: 16,
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            bgcolor: getIsDarkMode() ? '#282828' : 'rgba(255,255,255,0.9)',
-                            '&:hover': { bgcolor: getIsDarkMode() ? '#3f3f3f' : 'rgba(255,255,255,1)' },
-                            boxShadow: 2
+                            '--ad-arrow-accent': getAccentCss(),
+                            '--ad-arrow-accent-hover': getAccentHover(),
                           }}
                         >
                           <ChevronRightIcon />

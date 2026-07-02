@@ -4,6 +4,16 @@ const Message = require('../models/Message');
 const User = require('../models/User');
 const { decrypt } = require('../services/encryptionService');
 
+// Mesajele de tip 'collaboration_request' au text-ul setat la marker-ul intern
+// "COLLABORATION_REQUEST" (folosit pentru detecție server-side), nu la un text
+// destinat afișării — îl înlocuim cu un preview prietenos pentru notificări.
+function getMessagePreview(msg) {
+  if (msg.messageType === 'collaboration_request') return 'Cerere de colaborare';
+  if (msg.text) return decrypt(msg.text);
+  if (msg.image) return 'Imagine nouă';
+  return null;
+}
+
 // Obține toate notificările pentru un user
 // Îmbogățim cu detalii de expeditor pentru notificările de tip chat (/chat/:conversationId)
 const getNotifications = async (req, res) => {
@@ -31,7 +41,7 @@ const getNotifications = async (req, res) => {
             try {
               if (messageId) {
                 // If a specific message id is provided, try to load that message for exact preview
-                const msg = await Message.findById(messageId).select('senderId text image createdAt conversationId');
+                const msg = await Message.findById(messageId).select('senderId text image messageType createdAt conversationId');
                 if (msg && msg.senderId) {
                   const sender = await User.findById(msg.senderId).select('firstName lastName avatar');
                   if (sender) {
@@ -39,7 +49,7 @@ const getNotifications = async (req, res) => {
                     obj.senderAvatar = sender.avatar || null;
                     obj.senderId = String(sender._id);
                   }
-                  obj.preview = msg.text ? decrypt(msg.text) : (msg.image ? 'Imagine nouă' : obj.message);
+                  obj.preview = getMessagePreview(msg) || obj.message;
                 }
                 // Regardless, if conversationId looks like it encodes an announcement (owner-other-annId), expose metadata
                 if (conversationId) {
@@ -72,7 +82,7 @@ const getNotifications = async (req, res) => {
                     destinatarId: userId,
                   })
                   .sort({ createdAt: -1 })
-                  .select('senderId text image createdAt');
+                  .select('senderId text image messageType createdAt');
 
                 if (lastIncoming && lastIncoming.senderId) {
                   const sender = await User.findById(lastIncoming.senderId).select('firstName lastName avatar');
@@ -81,9 +91,7 @@ const getNotifications = async (req, res) => {
                     obj.senderAvatar = sender.avatar || null;
                     obj.senderId = String(sender._id);
                   }
-                  obj.preview = lastIncoming.text
-                    ? decrypt(lastIncoming.text)
-                    : (lastIncoming.image ? 'Imagine nouă' : obj.message);
+                  obj.preview = getMessagePreview(lastIncoming) || obj.message;
                 } else {
                   // fallback: deduce other participant from conversationId
                   const parts = String(conversationId).split('-');

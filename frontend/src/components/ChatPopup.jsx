@@ -6,11 +6,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ReplyIcon from '@mui/icons-material/Reply';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Popover } from '@mui/material';
-import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessage } from '../api/api';
+import apiClient, { sendMessage, sendMessageMultipart, getMessages, deleteMessage, editMessage } from '../api/api';
 import useSocket from '../hooks/useSocket';
 import TypingIndicator from './TypingIndicator';
 import './ChatPopup.css';
@@ -23,6 +27,9 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
   const [reactionTargetId, setReactionTargetId] = useState(null);
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const [selectedReply, setSelectedReply] = useState(null);
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   const [attachHover, setAttachHover] = useState(false);
   const [emojiHover, setEmojiHover] = useState(false);
   const [emojiAnchor, setEmojiAnchor] = useState(null);
@@ -95,7 +102,7 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
   }, [seller, effectiveUserId, announcement, isCurrentUserSeller]);
 
   // Socket — typing support
-  const { emitTyping, on, off } = useSocket(effectiveUserId);
+  const { emitTyping, joinConversation, leaveConversation, on, off } = useSocket(effectiveUserId);
 
   useEffect(() => {
     if (!conversationId || !effectiveUserId) return;
@@ -134,6 +141,15 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
       }
     } catch (_) {}
   }, [conversationId, announcement]);
+
+  // Anunță serverul ce conversație vizualizăm activ — folosit pentru a marca mesajele de
+  // sistem ale negocierii ca citite chiar la creare, dacă popup-ul e deja deschis aici.
+  useEffect(() => {
+    if (!open || !conversationId) return;
+    joinConversation(conversationId);
+    return () => leaveConversation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, conversationId]);
 
   // Încarcă mesajele când se deschide popup-ul
   useEffect(() => {
@@ -231,31 +247,47 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
       w: boxWidth,
       h: boxHeight,
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
+      // Capturăm poziția floating la momentul startului — necesară pentru a
+      // compensa deplasarea muchiilor top/left când popup-ul e în mod drag liber.
+      floatLeft: dragPos?.left ?? null,
+      floatTop:  dragPos?.top  ?? null,
     };
     document.body.classList.add('chat-resizing');
-  }, [isResizable, boxWidth, boxHeight]);
+  }, [isResizable, boxWidth, boxHeight, dragPos]);
 
   const doResize = useCallback((e) => {
     if (!resizingRef.current) return;
-    const { w, h, x, y } = startSizeRef.current;
+    const { w, h, x, y, floatLeft, floatTop } = startSizeRef.current;
     const dx = e.clientX - x;
     const dy = e.clientY - y;
     let newW = w;
     let newH = h;
     const dir = resizeDirRef.current;
-    // Anchored to bottom-right (overlay right/bottom). Adjust width/height only.
-    if (dir.includes('right')) newW = w + dx;
-    if (dir.includes('left')) newW = w - dx; // dragging left edge (dx negative when moving left => grow)
+    if (dir.includes('right'))  newW = w + dx;
+    if (dir.includes('left'))   newW = w - dx;
     if (dir.includes('bottom')) newH = h + dy;
-    if (dir.includes('top')) newH = h - dy;
-    // Constraints
+    if (dir.includes('top'))    newH = h - dy;
     const maxW = Math.min(900, window.innerWidth - 64);
     const maxH = Math.min(window.innerHeight - 80, 900);
     newW = Math.max(320, Math.min(newW, maxW));
     newH = Math.max(360, Math.min(newH, maxH));
     setBoxWidth(newW);
     setBoxHeight(newH);
+    // Când popup-ul e în mod floating (left/top explicit după un drag), muchia de sus
+    // și cea stângă nu sunt ancorate la nimic — fără corecție, redimensionarea din
+    // aceste direcții deplasează muchia greșită (bottom/right crește în loc de top/left).
+    // Soluție: mutăm left/top astfel încât muchia OPUSĂ (bottom/right) să rămână fixă.
+    // Formula: new_top = startTop + startH - newH (muchia de jos rămâne la startTop+startH).
+    if (floatLeft !== null || floatTop !== null) {
+      setDragPos(prev => {
+        if (!prev) return prev;
+        const next = { ...prev };
+        if (dir.includes('top')  && floatTop  !== null) next.top  = Math.max(0, floatTop  + h - newH);
+        if (dir.includes('left') && floatLeft !== null) next.left = Math.max(0, floatLeft + w - newW);
+        return (next.top === prev.top && next.left === prev.left) ? prev : next;
+      });
+    }
   }, []);
 
   const stopResize = useCallback(() => {
@@ -461,6 +493,33 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
     }
   };
 
+  const handleStartEdit = (msg) => {
+    setEditingMessageId(msg._id);
+    setEditText(msg.text || '');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditText('');
+  };
+
+  const handleSaveEdit = async (msgId) => {
+    const trimmed = editText.trim();
+    if (!trimmed || savingEdit) return;
+    setSavingEdit(true);
+    try {
+      const res = await editMessage(msgId, trimmed);
+      const updated = res.data?.message;
+      setMessages(prev => prev.map(m => m._id === msgId ? { ...m, text: updated?.text ?? trimmed, editedAt: updated?.editedAt ?? new Date().toISOString() } : m));
+      setEditingMessageId(null);
+      setEditText('');
+    } catch (error) {
+      console.error('❌ Eroare la editarea mesajului:', error);
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   // Reacție pe mesaj
   const handleReactToMessage = async (msgId, emoji) => {
     setReactionTargetId(null);
@@ -635,7 +694,7 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
                     onMouseLeave={() => { if (reactionTargetId !== msg._id) setHoveredMsgId(null); }}
                   >
                     {/* Bara de acțiuni (hover) */}
-                    {hoveredMsgId === msg._id && reactionTargetId !== msg._id && (
+                    {hoveredMsgId === msg._id && reactionTargetId !== msg._id && editingMessageId !== msg._id && (
                       <div className={`cp-message-actions-bar ${isOwn ? 'own' : ''}`}>
                         <button
                           className="cp-message-action-btn"
@@ -663,6 +722,15 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
                           <ContentCopyIcon sx={{ fontSize: 15 }} />
                           {copiedMessageId === msg._id && <span className="cp-copied-label">Copiat</span>}
                         </button>
+                        {isOwn && (!msg.messageType || msg.messageType === 'text') && (
+                          <button
+                            className="cp-message-action-btn"
+                            title="Editează"
+                            onClick={() => handleStartEdit(msg)}
+                          >
+                            <EditIcon sx={{ fontSize: 15 }} />
+                          </button>
+                        )}
                         {isOwn && (
                           <button
                             className="cp-message-action-btn delete"
@@ -697,11 +765,15 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
                         {msg.messageType === 'negotiation' ? (
                           <div className="cp-negotiation-message">
                             <div className="cp-negotiation-message-header">
-                              {msg.negotiation?.action === 'accept' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                              {msg.negotiation?.action === 'collaboration_confirmed' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                : msg.negotiation?.action === 'partial_confirm' ? <AccessTimeIcon sx={{ fontSize: 16 }} />
+                                : msg.negotiation?.action === 'accept' ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
                                 : msg.negotiation?.action === 'reject' ? <EventBusyIcon sx={{ fontSize: 16 }} />
                                 : <LocalOfferOutlinedIcon sx={{ fontSize: 16 }} />}
                               <span>
-                                {msg.negotiation?.action === 'accept' ? t('chat.offerAccepted')
+                                {msg.negotiation?.action === 'collaboration_confirmed' ? t('chat.collaborationConfirmed')
+                                  : msg.negotiation?.action === 'partial_confirm' ? t('chat.partialConfirm')
+                                  : msg.negotiation?.action === 'accept' ? t('chat.offerAccepted')
                                   : msg.negotiation?.action === 'reject' ? t('chat.offerRejected')
                                   : msg.negotiation?.action === 'counter_offer' ? t('chat.counterOffer')
                                   : t('chat.negotiationOffer')}
@@ -726,7 +798,31 @@ export default function ChatPopup({ open, onClose, onMinimize, minimized, announ
                                 />
                               </div>
                             )}
-                            {msg.text && <div>{msg.text}</div>}
+                            {editingMessageId === msg._id ? (
+                              <div className="cp-message-edit-box">
+                                <textarea
+                                  className="cp-message-edit-textarea"
+                                  value={editText}
+                                  maxLength={2000}
+                                  autoFocus
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSaveEdit(msg._id); }
+                                    else if (e.key === 'Escape') { e.preventDefault(); handleCancelEdit(); }
+                                  }}
+                                />
+                                <div className="cp-message-edit-actions">
+                                  <button type="button" className="cp-message-edit-cancel" onClick={handleCancelEdit} disabled={savingEdit}>
+                                    <CloseIcon sx={{ fontSize: 14 }} />
+                                  </button>
+                                  <button type="button" className="cp-message-edit-save" onClick={() => handleSaveEdit(msg._id)} disabled={savingEdit || !editText.trim()}>
+                                    <CheckIcon sx={{ fontSize: 14 }} />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              msg.text && <div>{msg.text}{msg.editedAt && <span className="cp-message-edited">(editat)</span>}</div>
+                            )}
                           </>
                         )}
                       </div>

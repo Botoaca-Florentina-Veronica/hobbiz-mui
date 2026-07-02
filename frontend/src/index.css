@@ -4,9 +4,11 @@
 /* Import sistem centralizat de teme */
 @import './styles/theme.css';
 
-/* Ajustări fluide pentru browser-e desktop cu ferestre înguste (~900-1280px).
+/* Ajustări fluide pentru browser-e desktop cu ferestre înguste (tier 1025-1280px).
+   Confinat la `min-width: 1025px` ca sub acest prag layout-ul să fie pur responsive
+   (mobil, bazat pe lățime) pe orice dispozitiv, inclusiv ferestrele înguste din browser.
    Trebuie importat după theme.css și înainte de orice variabile legacy. */
-@import './styles/desktopCompact.css';
+@import './styles/desktopCompact.css' (min-width: 1025px);
 
 /* ============================================
    VARIABILE LEGACY (pentru compatibilitate)
