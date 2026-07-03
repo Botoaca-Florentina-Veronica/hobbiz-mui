@@ -5,6 +5,8 @@
 # Hobbiz
 www.hobbiz.ro
 Gestionare hobby‑uri, skill‑uri și servicii locale. Web (React + MUI) + API Node/Express + aplicație mobilă Expo/React Native
+
+<a href="https://play.google.com/store/apps/details?id=com.verabotoaca.hobbiz" target="_blank"><img src="https://img.shields.io/badge/Google_Play-Descarcă_aplicația-3DDC84?style=for-the-badge&logo=googleplay&logoColor=white" alt="Disponibil pe Google Play" /></a>
 </div>
 
 ---
@@ -25,7 +27,7 @@ Nu ai hobby-uri? Nu e problemă, aici îți poți găsi pasiunile! Te poți cone
   <a href="https://react.dev" target="_blank"><img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" /></a>
   <a href="https://vitejs.dev" target="_blank"><img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" /></a>
   <a href="https://mui.com" target="_blank"><img src="https://img.shields.io/badge/Material_UI-5-007FFF?style=for-the-badge&logo=mui&logoColor=white" alt="Material UI" /></a>
-  <a href="https://nodejs.org" target="_blank"><img src="https://img.shields.io/badge/Node.js-18-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" /></a>
+  <a href="https://nodejs.org" target="_blank"><img src="https://img.shields.io/badge/Node.js-22-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" /></a>
   <a href="https://expressjs.com" target="_blank"><img src="https://img.shields.io/badge/Express-4-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" /></a>
   <a href="https://www.mongodb.com" target="_blank"><img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" /></a>
   <a href="https://expo.dev" target="_blank"><img src="https://img.shields.io/badge/Expo-54-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" /></a>
@@ -37,15 +39,19 @@ Nu ai hobby-uri? Nu e problemă, aici îți poți găsi pasiunile! Te poți cone
 
 ---
 
-## 📱 Aplicația Mobilă (în lucru)
+## 📱 Aplicația Mobilă
+
+**📲 Publicată oficial pe [Google Play](https://play.google.com/store/apps/details?id=com.verabotoaca.hobbiz)** (`com.verabotoaca.hobbiz`), după parcurgerea procesului de review Google.
 
 Hobbiz oferă o experiență mobilă nativă completă dezvoltată cu **Expo** și **React Native**, optimizată pentru iOS și Android. Aplicația permite utilizatorilor să:
 
 - **Exploreze anunțuri** – Navighează prin categorii și descoperă hobby-uri și servicii locale pe care ai vrea să le soliciți
 - **Gestioneze favorite** – Salvează și accesezi rapid anunțurile preferate
 - **Publice anunțuri** – Creează și editezi anunțuri direct de pe dispozitiv cu upload de imagini
-- **Comunice în timp real** – Chat privat cu notificări și typing indicators
-- **Gestioneze contul** – Profil personalizat cu avatar, setări și autentificare Google OAuth(în viitor +Facebook, Apple)
+- **Comunice în timp real** – Chat privat cu notificări push, typing indicators, editare mesaje și reacții
+- **Negocieze prețul** – Oferte și contra-oferte direct în conversație, cu confirmare bilaterală
+- **Rezerve sloturi orare** – Programul de disponibilitate al prestatorului, cu rezervare din chat
+- **Gestioneze contul** – Profil personalizat cu avatar, dark mode, 3 limbi (RO/EN/ES) și autentificare Google OAuth (în viitor +Facebook, Apple)
 
 ### Capturi de Ecran
 
@@ -162,22 +168,25 @@ hobbiz-mui/
 ---
 
 ## 🧪 Modele (Mongoose)
-User, Announcement, Message, Notification, Review, Alert.
+User, Announcement, Message, Notification, Review, Negotiation, Booking, Report, DeletedAccount, ContactFallbackMessage.
 
 Elemente notabile:
-- User: avatar (upload Cloudinary), favorites (referințe Announcement), googleId.
+- User: avatar (Cloudinary), favorites, googleId, tokenVersion (invalidare globală sesiuni), availability (program săptămânal), documente de verificare identitate.
 - Announcement: imagini multiple, views, favoritesCount.
-- Message: suport reacții + imagine (upload) + conversation scoping.
-- Review: like-uri + author vs. targetUser + optional auth la creare.
-- Notification: tip (ex: message, review, favorite), read/unread.
+- Message: text criptat AES-256-CBC, reacții, imagine, editare (editedAt), tipuri speciale (negotiation, booking_request, collaboration_request).
+- Negotiation: mașină de stare în 7 stări (pending → counter_offer → accepted → pending_confirmation → confirmed → finalized / rejected).
+- Booking: rezervare slot orar din programul de disponibilitate, integrată în chat.
+- Review: permis doar după colaborare confirmată, un singur review per pereche autor-utilizator.
+- DeletedAccount: hash-uri SHA-256 (email/telefon) cu TTL 30 zile — cooldown anti-reînregistrare.
 
 ---
 
 ## 💬 Realtime & Chat
-Socket.IO pentru:
-- Mapare userId -> socketId (activeUsers) pentru mesaje țintite (favoritesUpdated etc.)
-- Indicator typing per conversație (`conversationId` compus userId1-userId2)
-- Notificări actualizare favorite / mesaje / notificări.
+Socket.IO cu arhitectură room-based:
+- Fiecare utilizator intră în camera proprie (`socket.join('user:' + userId)`) — mesajele țintite se emit către `io.to('user:' + id)`
+- `activeConversations` (Map) urmărește conversația deschisă de fiecare utilizator, pentru marcarea automată ca citit
+- Indicator typing per conversație (`conversationId` compus ownerId-otherId-announcementId)
+- Evenimente: mesaje noi, editare mesaje, reacții, negocieri, rezervări, notificări, prezență online
 
 ---
 
@@ -210,9 +219,19 @@ Procesul sigur de schimbare a parolei:
    - Parolă criptată cu bcryptjs (salt rounds 10)
 
 **Limitări:**
-- Max 3 încercări /IP/oră (rate limiting)
+- Rate limiting pe rutele de autentificare (20 cereri / IP / 15 min)
 - Token valabil 15 minute
-- Email verificat conform RFC 5322
+- Codul e stocat doar ca hash SHA-256; la reset, tokenVersion invalidează toate sesiunile active
+
+### Pipeline anti-abuz la înregistrare
+POST /api/users/register trece prin 7 porți secvențiale:
+1. Rate limit strict (max 3 conturi noi / IP / oră)
+2. Honeypot (câmp ascuns `_trap`)
+3. Challenge token JWT (minim 2s de la afișarea formularului)
+4. Câmpuri obligatorii + format email
+5. Blocare domenii de email temporare (~300 domenii)
+6. Cooldown 30 zile după ștergerea contului (hash-uri SHA-256 în DeletedAccount, TTL)
+7. Unicitate email + telefon
 
 ---
 
@@ -263,10 +282,27 @@ Notifications (/api/notifications)
 
 Reviews (/api/reviews)
 - GET /:userId – listă recenzii pentru utilizator
-- POST / (auth opțional) – creare
+- POST / – creare (doar după colaborare confirmată, o recenzie per utilizator)
 - POST /:id/like – like/unlike
 - PUT  /:id – update (autor)
 - DELETE /:id – ștergere (autor)
+
+Negotiations (/api/negotiations)
+- POST / – inițiere negociere (ofertă de preț)
+- POST /:id/accept | /reject | /counter-offer | /accept-counter | /buyer-counter
+- POST /:id/confirm – confirmare bilaterală colaborare
+- POST /:id/finalize | /cancel
+
+Bookings & Availability (/api/bookings, /api/users/availability)
+- PUT  /api/users/availability – program săptămânal de disponibilitate
+- GET  /api/bookings/availability/:providerId – sloturi libere pe interval
+- POST /api/bookings – cerere de rezervare (apare ca mesaj în chat)
+- POST /api/bookings/:id/respond | /cancel
+
+Admin (protejate prin middleware adminAuth)
+- GET/PUT /api/users/admin/verifications/* – moderare documente identitate
+- GET/PATCH/DELETE /api/reports/* – raportări de conținut
+- DELETE /api/messages/conversation/:id/all – ștergere conversație (inclusiv negocierile asociate)
 
 Health & Utilitare
 - GET /api/health – stare server
@@ -280,32 +316,37 @@ Health & Utilitare
 - React 19 + Vite 6
 - React Router DOM 7
 - Material UI 5 + Emotion
+- i18next + react-i18next (RO/EN/ES)
 - Axios, jwt-decode
 - Socket.IO client (chat & notificări)
 
 **Backend (API):**
-- Node.js 18+, Express 4
+- Node.js 22, Express 4
 - MongoDB Atlas + Mongoose 8
-- JWT (jsonwebtoken) + bcryptjs
+- JWT (jsonwebtoken) + bcryptjs + tokenVersion (invalidare globală sesiuni)
 - Passport + passport-google-oauth20 + express-session
+- helmet + express-rate-limit + CORS whitelist
 - Multer + Cloudinary (multer-storage-cloudinary)
 - Socket.IO 4
-- **MailerSend** (email service: password reset, notifications)
+- **MailerSend** (email tranzacțional: resetare parolă, notificări)
 - **crypto** (Node.js built-in: AES-256-CBC encryption)
 
 **Mobile (Expo):**
-- Expo SDK 54, React Native 0.81
+- Expo SDK 54, React Native 0.81 (TypeScript)
 - expo-router (file-based declarative routing)
-- axios pentru API calls
+- expo-notifications + Expo Push API (notificări push)
 - expo-secure-store pentru token storage
+- EAS Build (build-uri native semnate, publicare Google Play)
 - Linear Gradient, Safe Area context
 
 **DevOps & Hosting:**
-- **Frontend**: Netlify (auto-deploy from git)
-- **Backend**: Render.com (Node.js server)
+- **Frontend**: Netlify (auto-deploy la fiecare push)
+- **Backend**: Render.com (plan Starter, instanță always-on)
+- **Mobile**: EAS Build → Google Play Console
 - **Database**: MongoDB Atlas (cloud)
 - **Media**: Cloudinary (CDN)
-- **Email**: MailerSend (transactional email, 500 free/month)
+- **Email**: MailerSend (email tranzacțional)
+- **Staging & security**: pipeline Jenkins pe droplet DigitalOcean (Docker), cu scanare MDSSC a codului sursă și a artefactelor de build
 
 **Dev Tools:**
 - TypeScript (type safety)
@@ -320,23 +361,31 @@ Health & Utilitare
 **✅ Completed:**
 - Reset parolă via email (MailerSend) + verificare cod
 - OAuth Google (Passport)
-- Chat real-time (Socket.IO)
-- Notificări (in-app + Socket.IO)
+- Chat real-time (Socket.IO) cu editare mesaje, reacții și imagini
+- Sistem de negociere a prețului (mașină de stare, confirmare bilaterală)
+- Disponibilitate prestator + rezervare sloturi orare din chat
+- Notificări (in-app + push prin Expo Push API)
 - Image upload (Cloudinary)
-- Mobile app (Expo)
-- Reviews & ratings
+- Mobile app (Expo) — **publicată pe Google Play**
+- Reviews & ratings (doar după colaborare confirmată)
 - **Criptare mesaje AES-256-CBC** (encryption at rest)
+- Rate limiting (express-rate-limit) & helmet (security)
+- Pipeline anti-abuz la înregistrare (honeypot, challenge token, cooldown ștergere)
+- Admin dashboard (verificare identitate, raportări, mesaje contact)
+- Dark mode + internaționalizare (RO/EN/ES) pe web și mobil
+- Pipeline Jenkins de securitate (DigitalOcean + scanare MDSSC)
 
 **🔄 In Progress:**
-- Rate limiting (express-rate-limit) & helmet (security)
 - Validare request bodies (Zod/Joi)
-- Push Notifications (Expo Notifications)
+- Teste automate (Jest + Playwright)
 
 **📋 Future:**
+- Payment processing (Stripe Connect pentru rezervări)
+- Calendar de disponibilitate pe tot anul
+- Publicare App Store + Sign in with Apple / Facebook Login
+- Migrare backend la TypeScript
 - Căutare full-text (MongoDB Atlas Search)
-- Admin dashboard (moderare recenzii/anunțuri)
 - Two-factor authentication (2FA)
-- Payment processing (Stripe integration)
 - Advanced analytics & statistics
 
 ---

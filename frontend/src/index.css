@@ -152,3 +152,16 @@ body.login-page .app {
 body.login-page .app.dark-mode {
   background: #121212 !important;
 }
+
+/* =====================================================================
+   Laptopuri de 13-14" (MacBook: viewport logic 1280x832 / 1440x900).
+   Design-ul e calibrat pentru ~1920px; pe aceste ecrane clamp-urile
+   fluide ating minimul și întreaga pagină pare prea mică. Scalăm uniform
+   cu `zoom` (echivalentul zoom-ului de browser), doar pe desktop —
+   ecranele touch și ferestrele înguste rămân pe layout-ul responsive.
+   ===================================================================== */
+@media (hover: hover) and (pointer: fine) and (min-width: 1150px) and (max-width: 1500px) {
+  body {
+    zoom: 1.2;
+  }
+}
