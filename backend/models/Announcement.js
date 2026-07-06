@@ -17,6 +17,8 @@ const announcementSchema = new mongoose.Schema({
   views: { type: Number, default: 0 },
   // Track if announcement is archived (hidden from main listings)
   archived: { type: Boolean, default: false },
+  // Arhivat de un administrator — doar un admin îl poate dezarhiva
+  archivedByAdmin: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

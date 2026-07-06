@@ -223,7 +223,7 @@ export default function ArchivedAnnouncementsPage() {
       window.showToast?.(t('myAnnouncements.unarchiveSuccess'), 'success');
     } catch (err) {
       console.error('Unarchive error', err);
-      window.showToast?.(t('myAnnouncements.unarchiveError'), 'error');
+      window.showToast?.(err?.response?.data?.error || t('myAnnouncements.unarchiveError'), 'error');
     }
   };
 
@@ -426,7 +426,9 @@ export default function ArchivedAnnouncementsPage() {
                             : <div className="arch-card-img" />
                           }
                           <div className="arch-card-image-overlay" />
-                          <span className="arch-badge-archived">Arhivat</span>
+                          <span className={`arch-badge-archived${announcement.archivedByAdmin ? ' arch-badge-archived--admin' : ''}`}>
+                            {announcement.archivedByAdmin ? 'Arhivat de admin' : 'Arhivat'}
+                          </span>
                           {announcement.category && (
                             <span className="arch-badge-category">
                               {translateCategory(announcement.category, t)}
@@ -459,12 +461,18 @@ export default function ArchivedAnnouncementsPage() {
                               {announcement.price ? `${announcement.price} RON` : 'Preț negociabil'}
                             </span>
                             <div className="arch-actions">
+                              {announcement.archivedByAdmin ? (
+                                <span className="arch-admin-lock" title="Acest anunț a fost arhivat de un administrator și poate fi dezarhivat doar de un administrator.">
+                                  🔒 Doar adminul poate dezarhiva
+                                </span>
+                              ) : (
                               <button
                                 className="arch-btn-unarchive"
                                 onClick={ev => { ev.stopPropagation(); handleUnarchive(announcement._id); }}
                               >
                                 {t('myAnnouncements.unarchive')}
                               </button>
+                              )}
                               <button
                                 className="arch-btn-delete"
                                 title={t('myAnnouncements.deleteBtn') || 'Șterge'}
@@ -502,7 +510,9 @@ export default function ArchivedAnnouncementsPage() {
                             ? <img src={imgSrc} alt={announcement.title} className="arch-list-img" />
                             : <div className="arch-list-img" />
                           }
-                          <span className="arch-badge-archived">Arhivat</span>
+                          <span className={`arch-badge-archived${announcement.archivedByAdmin ? ' arch-badge-archived--admin' : ''}`}>
+                            {announcement.archivedByAdmin ? 'Arhivat de admin' : 'Arhivat'}
+                          </span>
                         </div>
 
                         {/* Body */}
@@ -538,12 +548,18 @@ export default function ArchivedAnnouncementsPage() {
                               {announcement.price ? `${announcement.price} RON` : 'Preț negociabil'}
                             </span>
                             <div className="arch-actions">
+                              {announcement.archivedByAdmin ? (
+                                <span className="arch-admin-lock" title="Acest anunț a fost arhivat de un administrator și poate fi dezarhivat doar de un administrator.">
+                                  🔒 Doar adminul poate dezarhiva
+                                </span>
+                              ) : (
                               <button
                                 className="arch-btn-unarchive"
                                 onClick={e => { e.stopPropagation(); handleUnarchive(announcement._id); }}
                               >
                                 {t('myAnnouncements.unarchive')}
                               </button>
+                              )}
                               <button
                                 className="arch-btn-delete"
                                 title={t('myAnnouncements.deleteBtn') || 'Șterge'}

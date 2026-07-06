@@ -33,6 +33,7 @@ interface Announcement {
   price?: number;
   images?: string[];
   createdAt: string;
+  archivedByAdmin?: boolean;
 }
 
 export default function ArchivedAnnouncementsScreen() {
@@ -183,11 +184,11 @@ export default function ArchivedAnnouncementsScreen() {
       setUnarchiveDialogVisible(false);
       setAnnouncementToUnarchive(null);
       showToast(t.unarchiveSuccess, 'success');
-    } catch (e) {
+    } catch (e: any) {
       console.error('Unarchive error:', e);
       setUnarchiveDialogVisible(false);
       setAnnouncementToUnarchive(null);
-      showToast(t.unarchiveError, 'error');
+      showToast(e?.response?.data?.error || t.unarchiveError, 'error');
     }
   };
 
@@ -427,6 +428,12 @@ export default function ArchivedAnnouncementsScreen() {
 
                 {/* Action buttons - Stacked vertically */}
                 <View style={styles.actionsContainer}>
+                  {announcement.archivedByAdmin ? (
+                    <View style={[styles.actionButton, styles.fullWidthButton, styles.adminLockBadge]}>
+                      <Ionicons name="lock-closed-outline" size={13} color="#b45309" style={{ marginRight: 5 }} />
+                      <ThemedText numberOfLines={1} style={styles.adminLockText}>{t.archivedByAdmin}</ThemedText>
+                    </View>
+                  ) : (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.fullWidthButton, styles.primaryButton, isDark ? { backgroundColor: '#121212' } : {}]}
                     onPress={(e) => {
@@ -436,6 +443,7 @@ export default function ArchivedAnnouncementsScreen() {
                   >
                     <ThemedText numberOfLines={1} style={styles.primaryButtonText}>{t.unarchive}</ThemedText>
                   </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     style={[styles.actionButton, styles.fullWidthButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                     onPress={(e) => {
@@ -1026,6 +1034,20 @@ const createStyles = (tokens: any) => StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: tokens.colors.primary,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  adminLockBadge: {
+    borderColor: '#b45309',
+    backgroundColor: 'rgba(180, 83, 9, 0.08)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adminLockText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#b45309',
     textAlign: 'center',
     includeFontPadding: false,
   },

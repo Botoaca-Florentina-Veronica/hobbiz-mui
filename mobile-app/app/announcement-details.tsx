@@ -33,6 +33,8 @@ interface Announcement {
   views?: number;
   favoritesCount?: number;
   createdAt: string;
+  archived?: boolean;
+  archivedByAdmin?: boolean;
   user?: { _id: string; firstName?: string; lastName?: string; avatar?: string };
 }
 
@@ -239,6 +241,52 @@ export default function AnnouncementDetailsScreen() {
       showToast(msg, 'error');
     } finally {
       setSubmittingPrice(false);
+    }
+  };
+
+  // Admin: arhivează orice anunț (indiferent de proprietar)
+  const [adminArchiving, setAdminArchiving] = useState(false);
+  const handleAdminArchive = () => {
+    if (!announcement || adminArchiving) return;
+    Alert.alert(
+      t.adminArchiveTitle,
+      t.adminArchiveConfirm,
+      [
+        { text: t.cancel, style: 'cancel' },
+        {
+          text: t.adminArchiveAction,
+          style: 'destructive',
+          onPress: async () => {
+            setAdminArchiving(true);
+            try {
+              await api.put(`/api/announcements/${announcement._id}/archive`);
+              showToast(t.adminArchiveSuccess, 'success');
+              setTimeout(() => router.back(), 800);
+            } catch (error: any) {
+              const msg = error?.response?.data?.error || t.adminArchiveError;
+              showToast(msg, 'error');
+            } finally {
+              setAdminArchiving(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Admin: dezarhivează un anunț (singura cale pentru cele arhivate de admin)
+  const handleAdminUnarchive = async () => {
+    if (!announcement || adminArchiving) return;
+    setAdminArchiving(true);
+    try {
+      const res = await api.put(`/api/announcements/${announcement._id}/unarchive`);
+      setAnnouncement((prev) => (prev ? { ...prev, ...res.data.announcement } : prev));
+      showToast(t.adminUnarchiveSuccess, 'success');
+    } catch (error: any) {
+      const msg = error?.response?.data?.error || t.adminUnarchiveError;
+      showToast(msg, 'error');
+    } finally {
+      setAdminArchiving(false);
     }
   };
 
@@ -627,6 +675,36 @@ export default function AnnouncementDetailsScreen() {
         >
           <ThemedText style={[styles.outlineBtnText, { color: tokens.colors.text }]}>{t.viewProfile}</ThemedText>
         </TouchableOpacity>
+
+        {/* Admin: Archive any announcement */}
+        {currentUser?.isAdmin && !announcement.archived && (
+          <TouchableOpacity
+            onPress={handleAdminArchive}
+            disabled={adminArchiving}
+            style={[styles.outlineBtn, { borderColor: '#b45309', marginTop: 12, opacity: adminArchiving ? 0.5 : 1 }]}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="archive-outline" size={16} color="#b45309" style={{ marginRight: 8 }} />
+            <ThemedText style={[styles.outlineBtnText, { color: '#b45309' }]}>
+              {adminArchiving ? t.adminArchiving : t.adminArchiveButton}
+            </ThemedText>
+          </TouchableOpacity>
+        )}
+
+        {/* Admin: Unarchive (singura cale pentru anunțurile arhivate de admin) */}
+        {currentUser?.isAdmin && announcement.archived && (
+          <TouchableOpacity
+            onPress={handleAdminUnarchive}
+            disabled={adminArchiving}
+            style={[styles.outlineBtn, { borderColor: '#15803d', marginTop: 12, opacity: adminArchiving ? 0.5 : 1 }]}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="archive-outline" size={16} color="#15803d" style={{ marginRight: 8 }} />
+            <ThemedText style={[styles.outlineBtnText, { color: '#15803d' }]}>
+              {adminArchiving ? t.adminUnarchiving : t.adminUnarchiveButton}
+            </ThemedText>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Rating Modal removed - moved to absolute overlay */}

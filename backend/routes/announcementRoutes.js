@@ -219,6 +219,47 @@ router.delete('/:id/favorite', async (req, res) => {
   }
 });
 
+// PUT /api/announcements/:id/archive — admin only, poate arhiva orice anunț
+router.put('/:id/archive', auth, adminAuth, async (req, res) => {
+  try {
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit.' });
+    }
+    if (announcement.archived) {
+      return res.status(400).json({ error: 'Anunțul este deja arhivat.' });
+    }
+    announcement.archived = true;
+    announcement.archivedByAdmin = true;
+    await announcement.save();
+    res.json({ message: 'Anunț arhivat de administrator.', announcement });
+  } catch (error) {
+    console.error('Eroare la arhivarea admin a anunțului:', error);
+    res.status(500).json({ error: 'Eroare server la arhivarea anunțului.' });
+  }
+});
+
+// PUT /api/announcements/:id/unarchive — admin only; singura cale de dezarhivare
+// pentru anunțurile arhivate de un administrator
+router.put('/:id/unarchive', auth, adminAuth, async (req, res) => {
+  try {
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) {
+      return res.status(404).json({ error: 'Anunțul nu a fost găsit.' });
+    }
+    if (!announcement.archived) {
+      return res.status(400).json({ error: 'Anunțul nu este arhivat.' });
+    }
+    announcement.archived = false;
+    announcement.archivedByAdmin = false;
+    await announcement.save();
+    res.json({ message: 'Anunț dezarhivat de administrator.', announcement });
+  } catch (error) {
+    console.error('Eroare la dezarhivarea admin a anunțului:', error);
+    res.status(500).json({ error: 'Eroare server la dezarhivarea anunțului.' });
+  }
+});
+
 // DELETE /api/announcements/:id — admin only, poate șterge orice anunț
 router.delete('/:id', auth, adminAuth, async (req, res) => {
   try {

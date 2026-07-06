@@ -133,6 +133,34 @@
     pointer-events: none;
   }
 
+  /* Badge distinct pentru anunțurile arhivate de un administrator */
+  .archived-announcements-page .arch-badge-archived--admin {
+    background: rgba(180, 83, 9, 0.85);
+    color: #fff7ed;
+  }
+
+  /* Indicator "doar adminul poate dezarhiva" (în locul butonului de dezarhivare) */
+  .archived-announcements-page .arch-admin-lock {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #b45309;
+    background: rgba(180, 83, 9, 0.10);
+    border: 1px solid rgba(180, 83, 9, 0.35);
+    border-radius: 999px;
+    padding: 4px 10px;
+    cursor: help;
+    white-space: nowrap;
+  }
+
+  .dark-mode .archived-announcements-page .arch-admin-lock {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.10);
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+
   /* Category badge — bottom-left over image */
   .archived-announcements-page .arch-badge-category {
     position: absolute;

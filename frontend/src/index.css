@@ -152,3 +152,261 @@ body.login-page .app {
 body.login-page .app.dark-mode {
   background: #121212 !important;
 }
+
+/* =====================================================================
+   PAGINA PRINCIPALĂ, ECRANE LATE (≥1500px): secțiunile de sub hero se
+   scalează continuu cu zoom = lățime/1264 (referința de laptop), în
+   oglindă cu scalarea vw a hero-ului din MainStage.css, ca proporțiile
+   dintre secțiuni să rămână constante la orice lățime. Layout-ul intern
+   al fiecărei secțiuni rămâne constant (~1404px), deci nu apar
+   re-așezări. PromoSection e exclusă deliberat — e o animație sticky
+   legată de scroll și vh, pe care zoom-ul ar deregla-o.
+   ===================================================================== */
+@media (min-width: 1500px) {
+  .homepage {
+    --home-zoom: min(calc(100vw / 1264px), 2);
+  }
+  .homepage .content,
+  .homepage .choose-us-section,
+  .homepage .categories-container,
+  .homepage .footer {
+    zoom: var(--home-zoom);
+    /* Sub zoom imbricat (html 0.9 × secțiune), lățimea auto lasă o bandă
+       goală de ~10% pe dreapta. Fixăm lățimea internă la referința de
+       1404px — verificat empiric: right edge = exact lățimea vizuală a
+       viewportului (gBCR 2005.4 la viewport 2006). border-box ca
+       padding-urile orizontale proprii (ex. Categories) să nu o extindă. */
+    width: 1404px;
+    box-sizing: border-box;
+  }
+  /* min-height în vh ar fi multiplicat de zoom — compensăm împărțind */
+  .homepage .content {
+    min-height: calc(85vh / var(--home-zoom));
+  }
+
+  /* Pagina de detalii a anunțului — aceeași scalare ca secțiunile de pe
+     homepage. Container-ul MUI (maxWidth lg) rămâne la layout-ul de
+     referință de 1200px, deci fracția vizuală față de ecran e identică
+     cu cea de pe laptop; !important pentru a bate stilurile emotion/sx
+     injectate la runtime. minHeight 100vh din sx ar fi multiplicat de
+     zoom — îl compensăm împărțind. */
+  body.page-announcement-details {
+    --dz: min(calc(100vw / 1264px), 2);
+  }
+  .announcement-details-page {
+    zoom: var(--dz);
+    width: 1200px !important;
+    max-width: none !important;
+    min-height: calc(100vh / var(--dz)) !important;
+    box-sizing: border-box;
+  }
+  body.page-announcement-details .footer {
+    zoom: var(--dz);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Pagina de login/signup — scalăm doar cardul central (.login-page-main,
+     partajat de ambele pagini); wrapper-ul rămâne nescalat și doar îl
+     centrează, deci nu e nevoie de compensări vh. */
+  .login-page-main {
+    zoom: min(calc(100vw / 1264px), 2);
+  }
+  /* Cardul de signup e proiectat mai îngust decât cel de login; factor
+     suplimentar ca fracția lui vizuală să se alinieze cu a login-ului. */
+  .login-page-main.signup-page-main {
+    zoom: min(calc(100vw / 1128px), 2.25);
+  }
+
+  /* Publică/Editează un anunț — aceeași rețetă ca secțiunile homepage;
+     clasa e partajată de ambele pagini, iar footer-ul (frate în DOM,
+     doar pe aceste rute) e prins prin combinatorul de frați. */
+  .add-announcement-container,
+  .add-announcement-container ~ .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+  /* min-height în vh ar fi multiplicat de zoom — compensăm împărțind */
+  .add-announcement-container {
+    min-height: calc(120vh / min(calc(100vw / 1264px), 2));
+  }
+
+  /* Pagina de chat — card centrat cu înălțime legată de viewport;
+     compensăm înălțimea și offset-ul header-ului (ambele ar fi
+     multiplicate de zoom), lățimea internă rămâne la referință
+     (max-width 1300px + margin auto → centrare naturală). */
+  .chat-page-container {
+    --cz: min(calc(100vw / 1264px), 2);
+    zoom: var(--cz);
+    /* Redarea în flux primește zoom-ul html (0.9) încă o dată peste cel
+       al elementului — împărțim suplimentar la 0.9, iar header-ul fix
+       (nescalat) se măsoară vizual la 0.9 din valoarea declarată. */
+    height: calc((100vh - var(--chat-header-height) * 0.9 - 4px) / var(--cz) / 0.9);
+    margin-top: calc(var(--chat-header-height) / var(--cz));
+  }
+  .chat-page-container ~ .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Pagina de favorite — containerul e partajat cu alte pagini de listare,
+     deci scopăm prin clasa pusă pe body de pagina de favorite. */
+  body.page-favorites .my-announcements-container,
+  body.page-favorites .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+  body.page-favorites .my-announcements-container {
+    min-height: calc(100vh / min(calc(100vw / 1264px), 2));
+  }
+
+  /* Dialogurile MUI (popup-urile "Vezi mai multe" din De ce să ne alegi,
+     propunerile de preț, confirmările etc.) sunt portale la body, în
+     afara subarborilor zoomați — le scalăm o singură dată, global.
+     Containerul flex al MUI le re-centrează automat. */
+  .MuiDialog-paper {
+    zoom: min(calc(100vw / 1264px), 2);
+  }
+
+  /* Pagina "Toate anunțurile" — scalăm wrapper-ul de conținut (clasă
+     unică paginii); fundalul exterior (.my-announcements-page, partajat
+     cu alte pagini) rămâne full-bleed, nescalat. Footer-ul rutei e
+     scopat prin :has(). */
+  .all-announcements-wrapper {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1400px;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  body:has(.all-announcements-wrapper) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Pagina "Cum funcționează?" — scalăm containerul de conținut (unic
+     paginii; 1180px + 2×32px padding = 1244px, exact ca la referință);
+     fundalul .hiw-page rămâne full-bleed, nescalat. */
+  .hiw-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1244px;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  body:has(.hiw-page) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Paginile deschise din linkurile footer-ului (Despre noi, Termeni,
+     Confidențialitate, Cookie, Ștergere date) — același tipar: fundal
+     full-bleed nescalat + container de conținut centrat, scalat la
+     lățimea lui de referință (max-width + 2×20px padding, border-box).
+     Contact e un Dialog MUI, acoperit deja de regula globală. */
+  .about-container,
+  .cookie-policy-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1240px;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  .terms-conditions__container,
+  .privacy-policy__container,
+  .data-deletion__container,
+  .notifications-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1040px;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  body:has(.about-page) .footer,
+  body:has(.terms-conditions) .footer,
+  body:has(.privacy-policy) .footer,
+  body:has(.cookie-policy-page) .footer,
+  body:has(.data-deletion) .footer,
+  body:has(.notifications-page) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Setări cont / Setări notificări / Documente verificare — trei pagini
+     din zona de cont care partajează același Container MUI (maxWidth lg);
+     aceeași calibrare ca pagina de detalii anunț (layout 1200px de
+     referință), !important contra stilurilor emotion injectate la runtime. */
+  .notification-settings-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1200px !important;
+    max-width: none !important;
+    box-sizing: border-box;
+  }
+  body:has(.notification-settings-container) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Anunțurile mele — containerul umple lățimea de referință (max-width
+     1400 + padding lateral 80px ajungeau oricum la plafon pe laptop). */
+  .ma-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    max-width: none !important;
+    box-sizing: border-box;
+  }
+  body:has(.ma-container) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Pagina de profil (contul propriu) — container full-width cu grid pe
+     două coloane; min-height în vh compensat, ca la celelalte pagini. */
+  .profile-page-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    max-width: none;
+    box-sizing: border-box;
+    min-height: calc(100vh / min(calc(100vw / 1264px), 2));
+  }
+  body:has(.profile-page-container) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Profilul public al unui utilizator (/profil/:userId) + pagina lui de
+     recenzii — .pp-page e full-bleed, cu secțiunile interioare centrate
+     la 1200px; min-height 100vh compensat. */
+  .pp-page {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    max-width: none;
+    box-sizing: border-box;
+    min-height: calc(100vh / min(calc(100vw / 1264px), 2));
+  }
+  body:has(.pp-page) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+
+  /* Panoul de administrare (setări/verificări/mesaje contact — toate
+     rutele /admin/* randează aceeași pagină cu Container MUI lg);
+     aceeași calibrare 1200px ca zona de setări cont. */
+  .av-container {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1200px !important;
+    max-width: none !important;
+    box-sizing: border-box;
+  }
+  body:has(.av-page) .footer {
+    zoom: min(calc(100vw / 1264px), 2);
+    width: 1404px;
+    box-sizing: border-box;
+  }
+}

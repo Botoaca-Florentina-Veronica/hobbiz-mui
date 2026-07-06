@@ -145,6 +145,8 @@ export default function AnnouncementDetails() {
   // ========== Admin delete dialog ==========
   const [adminDeleteOpen, setAdminDeleteOpen] = useState(false);
   const [adminDeleting, setAdminDeleting] = useState(false);
+  const [adminArchiveOpen, setAdminArchiveOpen] = useState(false);
+  const [adminArchiving, setAdminArchiving] = useState(false);
 
   // ========== Price proposal ==========
   const [priceModalOpen, setPriceModalOpen] = useState(false);
@@ -397,6 +399,35 @@ export default function AnnouncementDetails() {
     } else {
       // Fallback - copy to clipboard
       navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
+  // ========== Admin archive ==========
+  const handleAdminArchive = async () => {
+    try {
+      setAdminArchiving(true);
+      await apiClient.put(`/api/announcements/${announcement._id}/archive`);
+      setAdminArchiveOpen(false);
+      navigate('/');
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'Eroare la arhivarea anunțului.';
+      showErrorModal(msg);
+    } finally {
+      setAdminArchiving(false);
+    }
+  };
+
+  const handleAdminUnarchive = async () => {
+    if (adminArchiving) return;
+    try {
+      setAdminArchiving(true);
+      const res = await apiClient.put(`/api/announcements/${announcement._id}/unarchive`);
+      setAnnouncement(prev => ({ ...prev, ...res.data.announcement }));
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'Eroare la dezarhivarea anunțului.';
+      showErrorModal(msg);
+    } finally {
+      setAdminArchiving(false);
     }
   };
 
@@ -869,6 +900,18 @@ export default function AnnouncementDetails() {
                   {announcement.description}
                 </Typography>
 
+                {announcement.price && (
+                  <>
+                    <Divider sx={{ my: 3 }} />
+                    <Typography variant="h6" sx={{ color: getAccentCss(), mb: 1, fontWeight: 600 }}>
+                      {t('announcementDetails.price')}
+                    </Typography>
+                    <Typography variant="h5" sx={{ color: '#e53e3e', fontWeight: 700 }}>
+                      {announcement.price} RON
+                    </Typography>
+                  </>
+                )}
+
                 {/* Footer meta info under description */}
                 <Box
                   className="announcement-meta-footer"
@@ -927,6 +970,47 @@ export default function AnnouncementDetails() {
                   </Box>
                   {!isOwnAnnouncement && (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      {isAdminUser && !announcement.archived && (
+                        <Button
+                          size="small"
+                          onClick={() => setAdminArchiveOpen(true)}
+                          sx={{
+                            color: '#b45309',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': { bgcolor: 'rgba(180,83,9,0.08)' },
+                            fontSize: { xs: '.65rem', sm: '.75rem' },
+                            letterSpacing: '.5px',
+                            px: { xs: 1, sm: 1.5 },
+                            py: { xs: 0.5, sm: 0.75 },
+                            border: '1px solid #b45309',
+                            borderRadius: 1.5,
+                          }}
+                        >
+                          Arhivează (Admin)
+                        </Button>
+                      )}
+                      {isAdminUser && announcement.archived && (
+                        <Button
+                          size="small"
+                          onClick={handleAdminUnarchive}
+                          disabled={adminArchiving}
+                          sx={{
+                            color: '#15803d',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': { bgcolor: 'rgba(21,128,61,0.08)' },
+                            fontSize: { xs: '.65rem', sm: '.75rem' },
+                            letterSpacing: '.5px',
+                            px: { xs: 1, sm: 1.5 },
+                            py: { xs: 0.5, sm: 0.75 },
+                            border: '1px solid #15803d',
+                            borderRadius: 1.5,
+                          }}
+                        >
+                          {adminArchiving ? 'Se dezarhivează...' : 'Dezarhivează (Admin)'}
+                        </Button>
+                      )}
                       {isAdminUser && (
                         <Button
                           size="small"
@@ -970,18 +1054,6 @@ export default function AnnouncementDetails() {
                     </Box>
                   )}
                 </Box>
-
-                {announcement.price && (
-                  <>
-                    <Divider sx={{ my: 3 }} />
-                    <Typography variant="h6" sx={{ color: getAccentCss(), mb: 1, fontWeight: 600 }}>
-                      {t('announcementDetails.price')}
-                    </Typography>
-                    <Typography variant="h5" sx={{ color: '#e53e3e', fontWeight: 700 }}>
-                      {announcement.price} RON
-                    </Typography>
-                  </>
-                )}
 
               </CardContent>
             </Card>
@@ -1460,6 +1532,53 @@ export default function AnnouncementDetails() {
             }}
           >
             Am înțeles
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========== Admin Archive Confirmation Dialog ========== */}
+      <Dialog
+        open={adminArchiveOpen}
+        onClose={() => !adminArchiving && setAdminArchiveOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            bgcolor: getIsDarkMode() ? '#1a1a1a' : '#ffffff',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: getIsDarkMode() ? '#f5f5f5' : 'inherit', fontWeight: 700 }}>
+          Confirmare arhivare (Admin)
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: getIsDarkMode() ? '#d1d5db' : '#374151' }}>
+            Ești sigur că vrei să arhivezi acest anunț? Nu va mai fi vizibil public, dar proprietarul îl poate dezarhiva din secțiunea sa de anunțuri arhivate.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button
+            onClick={() => setAdminArchiveOpen(false)}
+            disabled={adminArchiving}
+            sx={{ color: getIsDarkMode() ? '#9ca3af' : '#6b7280', textTransform: 'none' }}
+          >
+            Anulează
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleAdminArchive}
+            disabled={adminArchiving}
+            sx={{
+              bgcolor: '#b45309',
+              '&:hover': { bgcolor: '#92400e' },
+              color: '#fff',
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2
+            }}
+          >
+            {adminArchiving ? 'Se arhivează...' : 'Arhivează'}
           </Button>
         </DialogActions>
       </Dialog>

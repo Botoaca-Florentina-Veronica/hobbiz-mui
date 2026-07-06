@@ -1104,6 +1104,13 @@ const unarchiveAnnouncement = async (req, res) => {
     if (!announcement) {
       return res.status(404).json({ error: 'Anunțul nu a fost găsit sau nu îți aparține.' });
     }
+    // Anunțurile arhivate de un administrator pot fi dezarhivate doar de un administrator
+    if (announcement.archivedByAdmin) {
+      return res.status(403).json({
+        error: 'Acest anunț a fost arhivat de un administrator și poate fi dezarhivat doar de un administrator.',
+        code: 'ARCHIVED_BY_ADMIN',
+      });
+    }
     announcement.archived = false;
     await announcement.save();
     res.json({ message: 'Anunț dezarhivat cu succes!', announcement });

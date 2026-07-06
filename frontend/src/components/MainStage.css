@@ -1272,10 +1272,10 @@ body:not(.dark-mode) .search-suggestions-dropdown {
 
 /* 7. RESPONSIVE / MOBILE
    ---------------------------------------------------------- */
-/* Large Screens */
-@media (min-width: 1600px) { .main-stage { min-height: 700px; padding: 60px 120px 120px; } .main-content { max-width: 1400px; } .main-stage-image img { width: 550px; } }
-@media (min-width: 1900px) { .main-stage { min-height: 800px; padding: 80px 140px 140px; } .main-content { max-width: 1500px; } .main-stage-image img { width: 600px; } }
-@media (min-width: 2200px) { .main-stage { min-height: 900px; padding: 100px 160px 160px; } .main-content { max-width: 1600px; } .main-stage-image img { width: 650px; } }
+/* Large Screens — regulile vechi cu praguri fixe (700/800/900px și
+   max-width pe .main-content) au fost înlocuite de blocul de scalare
+   proporțională ≥1500px de la finalul fișierului; max-width-ul de aici
+   comprima prin flex dimensiunile fluide și anula efectul scalării. */
 
 /* Intermediate Screens */
 @media (max-width: 1200px) and (min-width: 901px) {
@@ -1344,4 +1344,209 @@ body:not(.dark-mode) .search-suggestions-dropdown {
 @keyframes categorySlideIn {
   0% { opacity: 0; transform: translate3d(-20px, 0, 0) scale(0.95); }
   100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+/* =====================================================================
+   ECRANE LATE (≥1500px CSS) — SCALARE PROPORȚIONALĂ A SECȚIUNII HERO
+   ----------------------------------------------------------------------
+   Dimensiunile de bază (px) sunt calibrate pentru ~1280px lățime de
+   fereastră; pe monitoare mai late ele rămân fixe și secțiunea pare tot
+   mai mică față de ecran. Aici le exprimăm în vw, cu aceleași proporții
+   ca la referință (px / 11.38, compensând zoom-ul de 90% de pe html),
+   și cu plafoane min() ca pe ultrawide să nu devină exagerate.
+   Fără gate de mouse: la ≥1500px nu există telefoane, iar gate-ul
+   (pointer: fine) dezactiva blocul în emularea touch din DevTools.
+   ===================================================================== */
+@media (min-width: 1500px) {
+  .main-stage {
+    padding: 3.5vw 8.8vw 7vw;
+    min-height: min(max(500px, 39vw), 900px);
+  }
+  /* Fundalul cu grilă (dark mode) trebuie să acopere aceeași înălțime ca
+     .main-stage; declarăm min-height explicit și pe pseudo-element, ca
+     acoperirea să nu depindă de propagarea automată prin inset:0.
+     Estomparea de la bază e inclusă aici ca prim strat de background
+     (peste grilă), în loc să depindă de pseudo-elementul ::after —
+     astfel grila și estomparea ei nu pot fi separate de stacking. */
+  body.dark-mode .main-stage::before,
+  .dark-mode .main-stage::before {
+    min-height: min(max(500px, 39vw), 900px);
+    background-image:
+      linear-gradient(to bottom, transparent calc(100% - min(10.5vw, 260px)), #121212 100%),
+      linear-gradient(90deg, rgba(79,79,79,0.18) 1px, transparent 1px),
+      linear-gradient(rgba(79,79,79,0.18) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+    background-repeat: no-repeat, repeat, repeat;
+  }
+  /* Păstrăm și ::after scalat, pentru situațiile în care el chiar se
+     randează — cele două estompări se suprapun identic. */
+  .dark-mode .main-stage::after {
+    height: min(10.5vw, 260px);
+  }
+  .top-bar {
+    margin-bottom: 2.1vw;
+  }
+
+  /* Butonul Categorii */
+  .mainstage-staggered-menu .sm-toggle {
+    padding: 1.05vw 1.9vw;
+    gap: 0.9vw;
+    font-size: min(1.4vw, 32px);
+    border-radius: 1.05vw;
+  }
+  .mainstage-staggered-menu .sm-icon {
+    width: 1.9vw;
+    height: 1.9vw;
+    flex: 0 0 1.9vw;
+  }
+
+  /* Bara de căutare */
+  .search-container {
+    margin-left: 1.75vw;
+    border-radius: 2.8vw;
+  }
+  .search-input {
+    padding: 1.05vw 1.75vw;
+    font-size: min(1.4vw, 32px);
+  }
+  body:not(.dark-mode) .search-input,
+  .dark-mode .search-input {
+    border-radius: 2.8vw 0 0 2.8vw !important;
+  }
+  .location-section {
+    padding: 0 1.3vw;
+  }
+  .location-input {
+    padding: 1.05vw 0;
+    font-size: min(1.4vw, 32px);
+    min-width: 10.5vw;
+  }
+  .location-icon {
+    font-size: min(1.4vw, 32px);
+    margin-right: 0.7vw;
+  }
+  .search-button {
+    padding: 0 2.2vw;
+    font-size: min(1.4vw, 32px);
+  }
+  body:not(.dark-mode) .search-button,
+  .dark-mode .search-button {
+    border-radius: 0 2.8vw 2.8vw 0 !important;
+  }
+
+  /* Textul hero */
+  .main-text {
+    max-width: min(59.8vw, 1360px);
+    font-size: min(1.75vw, 40px);
+    padding: 2.45vw;
+    margin-right: 2.6vw;
+  }
+  .main-tagline-pill {
+    font-size: min(1.15vw, 26px);
+    padding: 0.44vw 1.25vw;
+    margin-bottom: 1.6vw;
+  }
+  #main-title {
+    font-size: min(3.95vw, 90px);
+    margin-bottom: 1.75vw;
+  }
+
+  /* Butoanele CTA */
+  .main-cta-buttons {
+    max-width: min(42.2vw, 960px);
+    gap: 1.4vw;
+    margin-top: 0.7vw;
+  }
+  .main-cta-buttons .sign-up-button,
+  .main-cta-buttons .how-it-works-button {
+    height: min(3.85vw, 88px);
+    font-size: min(1.4vw, 32px);
+    border-radius: 1.05vw;
+  }
+  .main-cta-buttons .sign-up-button { padding: 0 1.4vw; }
+  .main-cta-buttons .how-it-works-button { padding: 0 1.75vw; }
+  .how-it-works-icon {
+    width: 1.9vw;
+    height: 1.9vw;
+    font-size: min(1.05vw, 24px);
+  }
+
+  /* Imaginea hero */
+  .main-stage-image {
+    border-radius: 2.45vw;
+  }
+  .main-stage-image img {
+    width: min(41.3vw, 940px);
+    border-radius: 2.1vw;
+  }
+
+  /* Panoul de categorii (StaggeredMenu, varianta inline/fixed) — scalat
+     proporțional cu divizorul 12.64 (panourile fixe se randează 1:1 față
+     de px, fără zoom-ul html — valabil și la referință). Înălțimea e
+     legată de lățime (48vw, plafonată la viewport), ca gradul de umplere
+     cu itemi să fie constant pe orice monitor; prelayerele de animație
+     primesc exact aceeași cutie. */
+  .mainstage-staggered-menu.staggered-menu-wrapper.inline-menu .staggered-menu-panel,
+  .mainstage-staggered-menu.staggered-menu-wrapper.inline-menu .sm-prelayers {
+    top: 5.38vw;
+    bottom: auto;
+    left: 2.85vw;
+    width: 34.8vw;
+    height: min(calc(100vh - 6.96vw), 48vw);
+    border-radius: 0;
+  }
+  .mainstage-staggered-menu.staggered-menu-wrapper.inline-menu .staggered-menu-panel {
+    padding: 1.9vw;
+  }
+  .mainstage-staggered-menu .sm-panel-item {
+    font-size: min(1.25vw, 29px);
+    padding: 0.55vw 3.16vw 0.55vw 0.79vw;
+    border-radius: 0.95vw;
+  }
+  .mainstage-staggered-menu .sm-item-icon {
+    font-size: min(1.27vw, 29px);
+    margin-right: 0.79vw;
+  }
+  .mainstage-staggered-menu .sm-panel-list {
+    gap: 0.95vw;
+  }
+  .mainstage-staggered-menu .sm-panel-inner {
+    gap: 0.63vw;
+  }
+  .mainstage-staggered-menu .sm-panel-list[data-numbering] .sm-panel-item::after {
+    right: 1.11vw;
+    font-size: min(1.01vw, 23px);
+  }
+
+  /* Panoul de detalii al categoriei (hover) — tot fix, divizor 14.04;
+     !important necesar, regulile de bază îl folosesc */
+  .category-details {
+    top: 4.84vw !important;
+    bottom: 1.42vw !important;
+    left: 33.9vw !important;
+    width: 49.9vw !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .category-details-content {
+    padding: 1.71vw !important;
+  }
+  .category-details-title {
+    font-size: min(1.37vw, 32px) !important;
+    margin-bottom: 1.42vw !important;
+    padding-bottom: 0.71vw !important;
+  }
+  .category-details-grid {
+    column-gap: 1.71vw !important;
+  }
+  .category-item {
+    padding: 0.85vw 1.28vw !important;
+    height: 3.2vw !important;
+  }
+  .category-icon {
+    font-size: min(1.25vw, 29px) !important;
+    margin-right: 1vw !important;
+  }
+  .category-text {
+    font-size: min(1.14vw, 26px) !important;
+  }
 }
