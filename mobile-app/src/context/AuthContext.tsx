@@ -70,10 +70,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Backend returnează direct obiectul user fără wrapper
       if (userData && userData._id) {
-        // Hardcoded admin ID - acest user este întotdeauna admin
-        const ADMIN_USER_ID = '6808bf9a48e492acb8db7173';
-        const isHardcodedAdmin = userData._id === ADMIN_USER_ID;
-        
         const profile: UserProfile = {
           id: userData._id,
           email: userData.email,
@@ -84,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           localitate: userData.localitate,
           createdAt: userData.createdAt,
           isVerified: userData.isVerified || false,
-          isAdmin: isHardcodedAdmin || userData.isAdmin || false,
+          isAdmin: userData.isAdmin || false,
           collaborations: userData.collaborations || [],
           notificationSettings: userData.notificationSettings || {
             email: true,

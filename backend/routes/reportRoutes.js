@@ -18,9 +18,14 @@ const MESSAGE_REPORT_REASONS = new Set(['spam', 'abusive', 'harassment', 'inappr
 
 const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(value);
 
+const findAdminUsers = () => {
+  const ADMIN_ID = process.env.ADMIN_USER_ID;
+  const adminQuery = ADMIN_ID ? { $or: [{ isAdmin: true }, { _id: ADMIN_ID }] } : { isAdmin: true };
+  return User.find(adminQuery).select('_id').lean();
+};
+
 const notifyAdminsForNewReport = async (req, reportDoc, announcementTitle) => {
-  const ADMIN_ID = '6808bf9a48e492acb8db7173';
-  const admins = await User.find({ $or: [{ isAdmin: true }, { _id: ADMIN_ID }] }).select('_id').lean();
+  const admins = await findAdminUsers();
 
   for (const admin of admins) {
     await Notification.create({
@@ -39,8 +44,7 @@ const notifyAdminsForNewReport = async (req, reportDoc, announcementTitle) => {
 };
 
 const notifyAdminsForNewMessageReport = async (req, reportDoc, reportedUserName) => {
-  const ADMIN_ID = '6808bf9a48e492acb8db7173';
-  const admins = await User.find({ $or: [{ isAdmin: true }, { _id: ADMIN_ID }] }).select('_id').lean();
+  const admins = await findAdminUsers();
 
   for (const admin of admins) {
     await Notification.create({

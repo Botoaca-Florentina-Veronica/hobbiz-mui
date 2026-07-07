@@ -301,7 +301,14 @@ export default function ConversationScreen() {
         socket.off('bookingUpdated', handleBookingUpdated);
         socket.off('conversationCleared', handleConversationCleared);
     };
-  }, [socket, selectedConversation, userId, decrementUnreadCount]);
+  // Dependăm de conversationId/otherParticipant.id (primitive), NU de obiectul
+  // selectedConversation întreg — acesta e re-creat (referință nouă) și la
+  // actualizări care NU schimbă conversația (ex. titlul anunțului venit din
+  // negociere, sau numele proaspăt al interlocutorului), ceea ce dezabona și
+  // reabonează inutil listenerii de socket la fiecare astfel de update. În
+  // fereastra aia scurtă de teardown/re-attach, un eveniment 'userTyping' emis
+  // chiar atunci de celălalt utilizator se pierde silențios.
+  }, [socket, selectedConversation?.conversationId, selectedConversation?.otherParticipant?.id, userId, decrementUnreadCount]);
 
   // Typing handler
   const handleTypingInput = (text: string) => {

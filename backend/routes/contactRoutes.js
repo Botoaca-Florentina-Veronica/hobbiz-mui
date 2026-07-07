@@ -104,8 +104,9 @@ router.post('/', optionalAuth, async (req, res) => {
       });
 
       try {
-        const ADMIN_ID = '6808bf9a48e492acb8db7173';
-        const admins = await User.find({ $or: [{ isAdmin: true }, { _id: ADMIN_ID }] }).select('_id');
+        const ADMIN_ID = process.env.ADMIN_USER_ID;
+        const adminQuery = ADMIN_ID ? { $or: [{ isAdmin: true }, { _id: ADMIN_ID }] } : { isAdmin: true };
+        const admins = await User.find(adminQuery).select('_id');
         for (const admin of admins) {
           await Notification.create({
             userId: admin._id,

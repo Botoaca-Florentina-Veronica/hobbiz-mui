@@ -1089,9 +1089,9 @@ const archiveAnnouncement = async (req, res) => {
 const getArchivedAnnouncements = async (req, res) => {
   try {
     const userId = req.userId;
-    const ADMIN_ID = '6808bf9a48e492acb8db7173';
+    const ADMIN_ID = process.env.ADMIN_USER_ID;
     const requester = await User.findById(userId).select('isAdmin');
-    const isAdmin = !!(requester && (requester.isAdmin || String(userId) === ADMIN_ID));
+    const isAdmin = !!(requester && (requester.isAdmin || (ADMIN_ID && String(userId) === ADMIN_ID)));
 
     const query = isAdmin
       ? { archived: true, $or: [{ user: userId }, { archivedByAdminId: userId }] }

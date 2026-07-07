@@ -59,6 +59,7 @@ export default function NotificationsPage() {
     try {
       await apiClient.patch(`/api/notifications/${notificationId}/read`);
       setNotifications(prev => prev.map(n => n._id === notificationId ? { ...n, read: true } : n));
+      window.dispatchEvent(new Event('notifications:updated'));
     } catch (_) {}
   };
 
@@ -67,6 +68,7 @@ export default function NotificationsPage() {
     try {
       await apiClient.delete(`/api/notifications/${notificationId}`);
       setNotifications(prev => prev.filter(n => n._id !== notificationId));
+      window.dispatchEvent(new Event('notifications:updated'));
     } catch (_) {}
   };
 

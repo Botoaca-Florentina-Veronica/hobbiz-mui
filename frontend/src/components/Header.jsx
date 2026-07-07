@@ -263,6 +263,24 @@ export default function Header() {
     };
   }, [isAuthenticated]);
 
+  // Ascultă evenimentul global emis din NotificationsPage la ștergere/citire,
+  // ca să actualizeze instant contorul din clopoțel (nu doar la 30s/schimbare pagină).
+  useEffect(() => {
+    const handler = () => {
+      if (isAuthenticated) {
+        fetchUnreadCount();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('notifications:updated', handler);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('notifications:updated', handler);
+      }
+    };
+  }, [isAuthenticated]);
+
   // Detectare mobil + width pentru regula specială doar pe homepage
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' && window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches

@@ -11,12 +11,16 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Announcement = require('../models/Announcement');
 
-const ADMIN_ID = '6808bf9a48e492acb8db7173';
+const ADMIN_ID = process.env.ADMIN_USER_ID;
 
 async function run() {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
     console.error('No MONGODB_URI in env');
+    process.exit(1);
+  }
+  if (!ADMIN_ID) {
+    console.error('No ADMIN_USER_ID in env');
     process.exit(1);
   }
 
