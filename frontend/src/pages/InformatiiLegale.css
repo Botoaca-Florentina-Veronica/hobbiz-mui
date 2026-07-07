@@ -37,6 +37,47 @@
 .informatii-legale .account-mobile__menu{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px; }
 .informatii-legale .account-mobile__menu-btn{ display:flex; align-items:center; gap:10px; width:100%; padding:6px 10px; border-radius:10px; background:var(--acc-card); border:1px solid var(--acc-border); color:var(--acc-text); text-align:left; font-weight:600; cursor:pointer; box-shadow:none; }
 .informatii-legale .account-mobile__menu li:first-child { margin-top: -2rem; }
+
+/* `.mobile-header` e o denumire generică refolosită fără namespace în alte
+   fișiere CSS (inclusiv componenta globală MobileHeader.css, cu poziție
+   fixă + z-index mare, și o regulă `.mobile-header + *` care rezervă
+   padding-top pentru orice urmează unui `.mobile-header`, gândită pentru
+   header-ul global). Toate se scurg și aici, unde header-ul e doar o bară
+   simplă, needeplasată — de-acolo venea golul mare de deasupra butoanelor.
+   Specificitate mai mare + !important ca să câștige indiferent de ordinea
+   de încărcare a fișierelor CSS în bundle. */
+@media (max-width: 1024px) {
+  /* --header-height (72px) rezervă spațiu pentru bara de navigare desktop,
+     care e deja ascunsă sub 1024px — pe mobil e doar spațiu gol deasupra
+     titlului "Legal". Îl înlocuim cu un padding mic, doar pentru safe-area. */
+  .informatii-legale {
+    padding-top: calc(16px + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  .informatii-legale .mobile-header {
+    position: static !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 0 4px !important;
+    z-index: auto !important;
+    background: none !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .informatii-legale .mobile-header + * {
+    padding-top: 0 !important;
+  }
+
+  .informatii-legale .account-mobile__menu li:first-child {
+    margin-top: 0 !important;
+  }
+}
 .informatii-legale .account-mobile__menu-btn:hover{ transform:translateY(-2px); background:var(--acc-hover); }
 .informatii-legale .account-mobile__menu-icon{ width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(255,255,255,0.06); color:var(--acc-primary); }
 .informatii-legale .account-mobile__menu-label{ flex:1; }

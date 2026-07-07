@@ -22,19 +22,10 @@
   margin-right: auto;
 }
 
-.explore-mobile-title {
-  margin: 24px 0 0 0;
-  text-align: center;
-  font-weight: 800;
-  font-size: clamp(1.35rem, 5.1vw, 2.15rem);
-  line-height: 1.08;
-  color: var(--text-primary);
-}
-
 .explore-mobile-image-wrap {
-  width: min(92vw, 430px);
+  width: min(92%, 620px);
   aspect-ratio: 1 / 1;
-  border-radius: 18px;
+  border-radius: clamp(28px, 6vw, 48px);
   overflow: hidden;
 }
 
@@ -43,24 +34,6 @@
   height: 100%;
   object-fit: contain;
   display: block;
-}
-
-.explore-mobile-cta {
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: var(--bg-secondary);
-  width: 100%;
-  max-width: 680px;
-  box-sizing: border-box;
-}
-
-.explore-mobile-cta-text {
-  margin: 0;
-  font-size: clamp(1.1rem, 4.2vw, 1.45rem);
-  font-weight: 800;
-  text-align: center;
-  line-height: 1.1;
-  color: var(--text-primary);
 }
 
 .explore-mobile-section {

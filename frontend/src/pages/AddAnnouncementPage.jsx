@@ -1253,6 +1253,8 @@ export default function AddAnnouncementPage() {
           onChange={handleContactPhoneChange}
           onBlur={handleContactPhoneBlur}
         />
+      </div>
+      <div className="add-announcement-price-section">
         <label className="add-announcement-label">{t('addAnnouncement.priceLabel')}</label>
         <input
           className="add-announcement-contact-input"

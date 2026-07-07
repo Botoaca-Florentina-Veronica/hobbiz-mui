@@ -1083,11 +1083,21 @@ const archiveAnnouncement = async (req, res) => {
   }
 };
 
-// Returnează anunțurile arhivate ale utilizatorului
+// Returnează anunțurile arhivate ale utilizatorului; pentru administratori,
+// include suplimentar anunțurile altor utilizatori pe care chiar acest admin
+// le-a arhivat, ca să le poată regăsi și dezarhiva din același loc.
 const getArchivedAnnouncements = async (req, res) => {
   try {
     const userId = req.userId;
-    const announcements = await Announcement.find({ user: userId, archived: true }).sort({ createdAt: -1 });
+    const ADMIN_ID = '6808bf9a48e492acb8db7173';
+    const requester = await User.findById(userId).select('isAdmin');
+    const isAdmin = !!(requester && (requester.isAdmin || String(userId) === ADMIN_ID));
+
+    const query = isAdmin
+      ? { archived: true, $or: [{ user: userId }, { archivedByAdminId: userId }] }
+      : { user: userId, archived: true };
+
+    const announcements = await Announcement.find(query).sort({ createdAt: -1 });
     res.json(announcements);
   } catch (error) {
     console.error('Eroare la listare anunțuri arhivate:', error);

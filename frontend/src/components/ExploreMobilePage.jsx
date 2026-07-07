@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import apiClient, { searchAnnouncements } from '../api/api';
-import hobbyImage from '../assets/images/hobby_img.jpg';
+import hobbyImage from '../assets/images/principala.jpg';
 import { categories } from './Categories';
 import './ExploreMobilePage.css';
 
@@ -118,14 +118,8 @@ export default function ExploreMobilePage() {
   return (
     <div className="explore-mobile-page" role="main">
       <section className="explore-mobile-hero">
-        <h1 className="explore-mobile-title">{t('mainStage.title')}</h1>
-
         <div className="explore-mobile-image-wrap">
           <img src={hobbyImage} alt="Hobbiz" className="explore-mobile-image" loading="eager" />
-        </div>
-
-        <div className="explore-mobile-cta">
-          <p className="explore-mobile-cta-text">{t('mainStage.subtitle')}</p>
         </div>
       </section>
 

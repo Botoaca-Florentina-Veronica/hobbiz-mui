@@ -19,6 +19,8 @@ const announcementSchema = new mongoose.Schema({
   archived: { type: Boolean, default: false },
   // Arhivat de un administrator — doar un admin îl poate dezarhiva
   archivedByAdmin: { type: Boolean, default: false },
+  // Administratorul care a arhivat anunțul (nu neapărat proprietarul)
+  archivedByAdminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

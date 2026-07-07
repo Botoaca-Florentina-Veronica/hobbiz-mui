@@ -70,10 +70,29 @@
     color: #ffffff;
   }
 
+  /* Container-ul cardurilor devine flex-column ca să putem repoziționa
+     cardul de Preț (via `order`) fără să schimbăm ordinea din DOM —
+     desktopul rămâne neafectat, doar acest breakpoint reordonează vizual. */
+  .add-announcement-container.sell-applike {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .add-announcement-container.sell-applike .sell-mobile-header { order: 1; }
+  .add-announcement-container.sell-applike .add-announcement-form { order: 2; }
+  .add-announcement-container.sell-applike .add-announcement-images-section { order: 3; }
+  .add-announcement-container.sell-applike .add-announcement-description-section { order: 4; }
+  .add-announcement-container.sell-applike .add-announcement-price-section { order: 5; }
+  .add-announcement-container.sell-applike .add-announcement-location-section { order: 6; }
+  .add-announcement-container.sell-applike .add-announcement-contact-section { order: 7; }
+  .add-announcement-container.sell-applike .add-announcement-actions-section { order: 8; }
+
   /* Carduri secțiuni */
   .add-announcement-container.sell-applike .add-announcement-form,
   .add-announcement-container.sell-applike .add-announcement-images-section,
   .add-announcement-container.sell-applike .add-announcement-description-section,
+  .add-announcement-container.sell-applike .add-announcement-price-section,
   .add-announcement-container.sell-applike .add-announcement-location-section,
   .add-announcement-container.sell-applike .add-announcement-contact-section,
   .add-announcement-container.sell-applike .add-announcement-actions-section {
@@ -91,6 +110,7 @@
   .dark-mode .add-announcement-container.sell-applike .add-announcement-form,
   .dark-mode .add-announcement-container.sell-applike .add-announcement-images-section,
   .dark-mode .add-announcement-container.sell-applike .add-announcement-description-section,
+  .dark-mode .add-announcement-container.sell-applike .add-announcement-price-section,
   .dark-mode .add-announcement-container.sell-applike .add-announcement-location-section,
   .dark-mode .add-announcement-container.sell-applike .add-announcement-contact-section,
   .dark-mode .add-announcement-container.sell-applike .add-announcement-actions-section {
@@ -281,6 +301,7 @@
   .add-announcement-container.sell-applike .add-announcement-form,
   .add-announcement-container.sell-applike .add-announcement-images-section,
   .add-announcement-container.sell-applike .add-announcement-description-section,
+  .add-announcement-container.sell-applike .add-announcement-price-section,
   .add-announcement-container.sell-applike .add-announcement-location-section,
   .add-announcement-container.sell-applike .add-announcement-contact-section,
   .add-announcement-container.sell-applike .add-announcement-actions-section {
@@ -291,6 +312,7 @@
   .add-announcement-container.sell-applike .add-announcement-form,
   .add-announcement-container.sell-applike .add-announcement-images-section,
   .add-announcement-container.sell-applike .add-announcement-description-section,
+  .add-announcement-container.sell-applike .add-announcement-price-section,
   .add-announcement-container.sell-applike .add-announcement-location-section,
   .add-announcement-container.sell-applike .add-announcement-contact-section,
   .add-announcement-container.sell-applike .add-announcement-actions-section {

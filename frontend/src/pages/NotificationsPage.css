@@ -494,13 +494,164 @@
 [data-theme='dark'] .notif-type-strip { opacity: 0.9; }
 [data-theme='dark'] .notif-ann-context { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.6); }
 
+/* 6c. MOBILE NOTIFICATION CARD — REDESIGN (elegant/modern), doar ≤1024px
+   ---------------------------------------------------------- */
+@media (max-width: 1024px) {
+  /* Spațiu suficient sub ultima notificare ca să nu rămână acoperită de
+     dock-ul flotant de jos (footer-mobile-buttons). */
+  .notifications-page {
+    padding-bottom: max(40px, calc(var(--ft-mobile-height, 65px) + 32px + env(safe-area-inset-bottom, 0px)));
+  }
+
+  /* Listă "plată" în loc de card-în-card: containerul mare își pierde
+     propriul chenar/umbră, iar cardurile individuale devin singura
+     suprafață vizuală — mai apropiat de o listă de notificări nativă. */
+  .notifications-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .notification-item {
+    border-radius: 20px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark-mode .notification-item {
+    box-shadow: none;
+  }
+
+  /* Accent doar pe marginea din stânga pentru necitite — model clasic de
+     inbox (Gmail/Slack), mai discret decât chenarul colorat pe tot cardul. */
+  .notification-item.unread {
+    border-left: 4px solid var(--nt-indicator-color);
+  }
+
+  /* Estompăm doar textul la citite, nu tot cardul (butonul de acțiune și
+     iconițele rămân perfect lizibile). */
+  .notification-item.read { opacity: 1; }
+  .notification-item.read .notification-sender,
+  .notification-item.read .notification-message {
+    color: var(--nt-text-secondary);
+  }
+
+  .notification-item:hover {
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  /* align-items:flex-start (implicit din regula de bază) — iconița și
+     avatarul rămân ancorate la primul rând (nume+oră), nu centrate pe
+     toată înălțimea cardului (mesaj + chip + buton), care le făcea să
+     "floteze" în mijloc, deconectate vizual de antet. */
+  .notification-card-inner {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Iconița de tip devine o pastilă rotunjită compactă, nu o bară înaltă
+     lipită de marginea cardului. */
+  .notif-type-strip {
+    width: 34px;
+    height: 34px;
+    min-height: 0;
+    border-radius: 10px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .notification-avatar-container { padding-top: 0; }
+  .notification-avatar { width: 40px; height: 40px; }
+
+  .notification-content-column {
+    padding-right: 0;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* Numele + ora trebuie ancorate la primul rând, nu centrate pe toată
+     înălțimea antetului atunci când numele expeditorului trece pe mai
+     multe linii (ex. "Christian Andrei Cioarec"). */
+  .notification-header-row {
+    align-items: flex-start;
+  }
+
+  .notification-sender { font-size: 14px; }
+  .notification-date {
+    font-size: 10.5px;
+    padding-top: 2px;
+  }
+
+  .notification-message {
+    font-size: 13.5px;
+    -webkit-line-clamp: 2;
+  }
+
+  .notif-ann-context { font-size: 0.72rem; }
+
+  /* Butonul de ștergere devine un element normal în flux (nu mai e
+     poziționat absolut) — anterior offset-ul absolut se suprapunea peste
+     text de fiecare dată când antetul avea o singură linie, iar la nume
+     lungi (mai multe linii) rămânea "prins" în mijlocul mesajului. */
+  .notification-delete-btn {
+    position: static;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    opacity: 0.65;
+  }
+
+  .notification-delete-btn:hover,
+  .notification-delete-btn:active {
+    background: var(--nt-bg-item-hover, rgba(0, 0, 0, 0.04));
+    opacity: 1;
+  }
+
+  .dark-mode .notification-delete-btn:hover,
+  .dark-mode .notification-delete-btn:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .notification-delete-icon { font-size: 16px !important; }
+
+  /* Buton de acțiune plin, cu contrast bun — pastilă modernă în loc de
+     fundal tonal slab-contrastant. */
+  .notification-action-btn {
+    margin-top: 10px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    background: var(--nt-indicator-color);
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(45, 67, 97, 0.25);
+  }
+
+  .dark-mode .notification-action-btn {
+    background: #f51866;
+    box-shadow: 0 3px 10px rgba(245, 24, 102, 0.3);
+  }
+
+  .notification-action-btn:hover {
+    transform: none;
+    filter: brightness(1.08);
+  }
+}
+
+
 /* 7. RESPONSIVITATE SUPLIMENTARĂ
    ---------------------------------------------------------- */
 @media (max-width: 768px) {
   .notifications-page {
     /* Reduce top padding as we use MobileHeader logic */
-    padding: 20px 0;
     padding-top: 100px; /* Increased top padding so the container is not cut off by mobile status bars */
+    /* padding-bottom stays as set in the ≤1024px block above — clears the floating bottom dock */
   }
   
   .notifications-container { padding: 0 16px; }

@@ -231,6 +231,7 @@ router.put('/:id/archive', auth, adminAuth, async (req, res) => {
     }
     announcement.archived = true;
     announcement.archivedByAdmin = true;
+    announcement.archivedByAdminId = req.userId;
     await announcement.save();
     res.json({ message: 'Anunț arhivat de administrator.', announcement });
   } catch (error) {
@@ -252,6 +253,7 @@ router.put('/:id/unarchive', auth, adminAuth, async (req, res) => {
     }
     announcement.archived = false;
     announcement.archivedByAdmin = false;
+    announcement.archivedByAdminId = null;
     await announcement.save();
     res.json({ message: 'Anunț dezarhivat de administrator.', announcement });
   } catch (error) {

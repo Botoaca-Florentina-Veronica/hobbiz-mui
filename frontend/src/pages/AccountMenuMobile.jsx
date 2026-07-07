@@ -30,7 +30,7 @@ export default function AccountMenuMobile() {
   const { t, i18n } = useTranslation();
   const [isSmallViewport, setIsSmallViewport] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return window.matchMedia('(max-width: 1024px)').matches;
+    return window.matchMedia('(max-width: 1200px)').matches;
   });
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
@@ -88,7 +88,7 @@ export default function AccountMenuMobile() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const media = window.matchMedia('(max-width: 1024px)');
+    const media = window.matchMedia('(max-width: 1200px)');
     const onChange = (event) => setIsSmallViewport(event.matches);
 
     setIsSmallViewport(media.matches);
@@ -238,7 +238,7 @@ export default function AccountMenuMobile() {
             {displayFirstName}
             {displayLastName ? (
               <>
-                <br />
+                {' '}<br className="account-mobile__greeting-break" />
                 {displayLastName}
               </>
             ) : null}

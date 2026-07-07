@@ -245,16 +245,22 @@ body.categories-open .fixed-header {
 .add-button {
   background-color: var(--btn-add-bg);
   color: var(--btn-add-text);
-  border: none; 
+  border: none;
   border-radius: 4px;
-  padding: 14px 24px; 
+  padding: 14px 24px;
   cursor: pointer;
-  font-size: 1rem; 
+  font-size: 1rem;
   font-weight: bold;
   font-family: 'Poppins', sans-serif !important;
   margin-right: 40px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-right li:has(> .add-button) {
+  flex-shrink: 0;
 }
 
 /* FIX: Hover stiluri originale RESTAURATE complet */

@@ -34,6 +34,7 @@ interface Announcement {
   images?: string[];
   createdAt: string;
   archivedByAdmin?: boolean;
+  user?: string | { _id: string };
 }
 
 export default function ArchivedAnnouncementsScreen() {
@@ -41,7 +42,7 @@ export default function ArchivedAnnouncementsScreen() {
   const shortestSide = Math.min(width, height);
   const isLarge = shortestSide >= 600;
   const isNarrowTablet = isLarge && width >= 600 && width < 750;
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
   const { isDark, tokens } = useAppTheme();
   const { locale } = useLocale();
   const t = getArchivedAnnouncementsTranslations(locale);
@@ -65,6 +66,14 @@ export default function ArchivedAnnouncementsScreen() {
   // Confirm dialog state for unarchive
   const [unarchiveDialogVisible, setUnarchiveDialogVisible] = useState(false);
   const [announcementToUnarchive, setAnnouncementToUnarchive] = useState<string | null>(null);
+  const [unarchiveIsForeign, setUnarchiveIsForeign] = useState(false);
+
+  // Anunț arhivat de acest admin, dar care nu îi aparține — apare doar în
+  // lista de arhivate a unui administrator, ca urmare a arhivării admin.
+  const isForeignAnnouncement = (announcement: Announcement) => {
+    const ownerId = typeof announcement.user === 'object' ? announcement.user?._id : announcement.user;
+    return !!ownerId && !!user?.id && String(ownerId) !== String(user.id);
+  };
 
   // Toast state
   const [toastVisible, setToastVisible] = useState(false);
@@ -172,6 +181,7 @@ export default function ArchivedAnnouncementsScreen() {
 
   const handleUnarchive = (announcement: Announcement) => {
     setAnnouncementToUnarchive(announcement._id);
+    setUnarchiveIsForeign(isForeignAnnouncement(announcement));
     setUnarchiveDialogVisible(true);
   };
 
@@ -179,15 +189,20 @@ export default function ArchivedAnnouncementsScreen() {
     if (!announcementToUnarchive) return;
 
     try {
-      await api.put(`/api/users/my-announcements/${announcementToUnarchive}/unarchive`);
+      const url = unarchiveIsForeign
+        ? `/api/announcements/${announcementToUnarchive}/unarchive`
+        : `/api/users/my-announcements/${announcementToUnarchive}/unarchive`;
+      await api.put(url);
       setAnnouncements(announcements.filter((a) => a._id !== announcementToUnarchive));
       setUnarchiveDialogVisible(false);
       setAnnouncementToUnarchive(null);
+      setUnarchiveIsForeign(false);
       showToast(t.unarchiveSuccess, 'success');
     } catch (e: any) {
       console.error('Unarchive error:', e);
       setUnarchiveDialogVisible(false);
       setAnnouncementToUnarchive(null);
+      setUnarchiveIsForeign(false);
       showToast(e?.response?.data?.error || t.unarchiveError, 'error');
     }
   };
@@ -195,6 +210,7 @@ export default function ArchivedAnnouncementsScreen() {
   const cancelUnarchive = () => {
     setUnarchiveDialogVisible(false);
     setAnnouncementToUnarchive(null);
+    setUnarchiveIsForeign(false);
   };
 
   const getImageSrc = (img?: string) => {
@@ -358,11 +374,17 @@ export default function ArchivedAnnouncementsScreen() {
             const imageTargetHeight = isLarge
               ? undefined
               : Math.max(baseMobileHeight, measuredContentHeight || 0);
+            const foreign = isForeignAnnouncement(announcement);
 
           return (
             <View
               key={announcement._id}
-              style={[styles.card, isLarge && styles.cardLarge, { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle }]}
+              style={[
+                styles.card,
+                isLarge && styles.cardLarge,
+                { backgroundColor: isDark ? tokens.colors.darkModeContainer : tokens.colors.surface, ...containerBorderStyle },
+                foreign && styles.cardForeign,
+              ]}
             >
               {/* Image - Left side */}
               <TouchableOpacity
@@ -422,13 +444,29 @@ export default function ArchivedAnnouncementsScreen() {
                     <ThemedText style={styles.categoryText}>{announcement.category}</ThemedText>
                   </View>
 
+                  {foreign && (
+                    <View style={styles.foreignBadge}>
+                      <ThemedText style={styles.foreignBadgeText}>Arhivat de tine (Admin)</ThemedText>
+                    </View>
+                  )}
+
                   {/* Location placeholder spacing so buttons stay at bottom */}
                   <View style={styles.locationPlaceholder} />
                 </TouchableOpacity>
 
                 {/* Action buttons - Stacked vertically */}
                 <View style={styles.actionsContainer}>
-                  {announcement.archivedByAdmin ? (
+                  {foreign ? (
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.fullWidthButton, styles.foreignButton]}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleUnarchive(announcement);
+                      }}
+                    >
+                      <ThemedText numberOfLines={1} style={styles.foreignButtonText}>Dezarhivează (Admin)</ThemedText>
+                    </TouchableOpacity>
+                  ) : announcement.archivedByAdmin ? (
                     <View style={[styles.actionButton, styles.fullWidthButton, styles.adminLockBadge]}>
                       <Ionicons name="lock-closed-outline" size={13} color="#b45309" style={{ marginRight: 5 }} />
                       <ThemedText numberOfLines={1} style={styles.adminLockText}>{t.archivedByAdmin}</ThemedText>
@@ -444,6 +482,7 @@ export default function ArchivedAnnouncementsScreen() {
                     <ThemedText numberOfLines={1} style={styles.primaryButtonText}>{t.unarchive}</ThemedText>
                   </TouchableOpacity>
                   )}
+                  {!foreign && (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.fullWidthButton, styles.dangerButton, isDark ? { backgroundColor: '#121212' } : {}]}
                     onPress={(e) => {
@@ -453,6 +492,7 @@ export default function ArchivedAnnouncementsScreen() {
                   >
                     <ThemedText numberOfLines={1} style={styles.dangerButtonText}>Șterge</ThemedText>
                   </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </View>
@@ -852,6 +892,11 @@ const createStyles = (tokens: any) => StyleSheet.create({
       },
     }),
   },
+  cardForeign: {
+    borderWidth: 1.5,
+    borderColor: 'rgba(79, 70, 229, 0.45)',
+    backgroundColor: 'rgba(79, 70, 229, 0.05)',
+  },
   // Large screen variants (tablet / desktop)
   cardLarge: {
     flexDirection: 'row',
@@ -945,6 +990,19 @@ const createStyles = (tokens: any) => StyleSheet.create({
   locationPlaceholder: {
     height: 18,
     marginBottom: 6,
+  },
+  foreignBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(79, 70, 229, 0.12)',
+    borderRadius: 12,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    marginBottom: 4,
+  },
+  foreignBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#4f46e5',
   },
   idBadge: {
     backgroundColor: tokens.colors.bg,
@@ -1048,6 +1106,17 @@ const createStyles = (tokens: any) => StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
     color: '#b45309',
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  foreignButton: {
+    borderColor: '#4f46e5',
+    backgroundColor: 'rgba(79, 70, 229, 0.08)',
+  },
+  foreignButtonText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#4f46e5',
     textAlign: 'center',
     includeFontPadding: false,
   },

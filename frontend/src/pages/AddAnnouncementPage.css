@@ -111,6 +111,7 @@
 .add-announcement-description-section,
 .add-announcement-location-section,
 .add-announcement-contact-section,
+.add-announcement-price-section,
 .add-announcement-images-section {
   background: var(--bg-surface);
   border-radius: 14px;
@@ -128,6 +129,7 @@ body:not(.dark-mode) .add-announcement-actions-section,
 body:not(.dark-mode) .add-announcement-description-section,
 body:not(.dark-mode) .add-announcement-location-section,
 body:not(.dark-mode) .add-announcement-contact-section,
+body:not(.dark-mode) .add-announcement-price-section,
 body:not(.dark-mode) .add-announcement-images-section {
   border-color: #121212 !important;
 }
@@ -146,7 +148,8 @@ body:not(.dark-mode) .add-announcement-images-section {
 
 .add-announcement-description-section,
 .add-announcement-location-section,
-.add-announcement-contact-section {
+.add-announcement-contact-section,
+.add-announcement-price-section {
   flex-direction: column;
   gap: 18px;
 }

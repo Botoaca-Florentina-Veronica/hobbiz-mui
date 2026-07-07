@@ -570,7 +570,7 @@
   background: transparent;
   box-shadow: none;
   border-radius: 0;
-  padding: 16px 10px 16px 16px;
+  padding: 16px 34px 16px 16px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -611,7 +611,7 @@
 
 .account-mobile.account-mobile--applike .account-mobile__menu-control {
   margin-left: auto;
-  padding-right: 8px;
+  padding-right: 24px;
   flex-shrink: 0;
 }
 
@@ -975,8 +975,8 @@
    RESPONSIVE — toate breakpointurile, de la mare la mic
    ============================================================= */
 
-/* ── ≥1024px: DESKTOP — header mobil ascuns ─────────────────── */
-@media (min-width: 1024px) {
+/* ── ≥1200px: DESKTOP — header mobil ascuns ─────────────────── */
+@media (min-width: 1200px) {
   .account-mobile {
     padding-top: 16px;
     padding-bottom: 24px;
@@ -993,8 +993,8 @@
   }
 }
 
-/* ── ≤1024px: TABLETĂ + TELEFON ────────────────────────────── */
-@media (max-width: 1024px) {
+/* ── ≤1200px: TABLETĂ + TELEFON ────────────────────────────── */
+@media (max-width: 1200px) {
 
   /* Body fundal matching */
   body {
@@ -1018,6 +1018,13 @@
   .mobile-account-menu {
     min-height: auto !important;
     overflow-y: visible !important;
+  }
+}
+
+/* ── ≥650px: TABLETĂ — destul spațiu pentru salut pe un singur rând ── */
+@media (min-width: 650px) {
+  .account-mobile.account-mobile--applike .account-mobile__greeting-break {
+    display: none;
   }
 }
 

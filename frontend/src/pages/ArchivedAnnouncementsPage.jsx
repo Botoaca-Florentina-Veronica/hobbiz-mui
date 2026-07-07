@@ -215,10 +215,24 @@ export default function ArchivedAnnouncementsPage() {
     if (toggleFavorite) await toggleFavorite(announcementId);
   };
 
-  // Unarchive an announcement
-  const handleUnarchive = async (announcementId) => {
+  // Determină dacă anunțul NU aparține utilizatorului curent — apare în
+  // lista de arhivate a unui admin doar dacă el l-a arhivat prin
+  // instrumentul administrativ, nefiind proprietarul lui.
+  const isForeignAnnouncement = (announcement) => {
+    const ownerId = announcement?.user?._id || announcement?.user;
+    return !!ownerId && !!user?._id && String(ownerId) !== String(user._id);
+  };
+
+  // Unarchive an announcement — anunțurile care nu aparțin utilizatorului
+  // curent folosesc ruta administrativă (singura care le poate dezarhiva).
+  const handleUnarchive = async (announcement) => {
+    const announcementId = announcement._id;
+    const foreign = isForeignAnnouncement(announcement);
     try {
-      await apiClient.put(`/api/users/my-announcements/${announcementId}/unarchive`);
+      const url = foreign
+        ? `/api/announcements/${announcementId}/unarchive`
+        : `/api/users/my-announcements/${announcementId}/unarchive`;
+      await apiClient.put(url);
       setAnnouncements(prev => prev.filter(a => a._id !== announcementId));
       window.showToast?.(t('myAnnouncements.unarchiveSuccess'), 'success');
     } catch (err) {
@@ -410,10 +424,11 @@ export default function ArchivedAnnouncementsPage() {
                           ? announcement.images[0]
                           : `/uploads/${announcement.images[0].replace(/^.*[\\/]/, '')}`)
                       : null;
+                    const foreign = isForeignAnnouncement(announcement);
                     return (
                       <div
                         key={announcement._id}
-                        className="arch-card"
+                        className={`arch-card${foreign ? ' arch-card--foreign' : ''}`}
                         onClick={e => {
                           if (e.target.closest('.arch-actions')) return;
                           navigate(`/announcement/${announcement._id}`);
@@ -426,8 +441,8 @@ export default function ArchivedAnnouncementsPage() {
                             : <div className="arch-card-img" />
                           }
                           <div className="arch-card-image-overlay" />
-                          <span className={`arch-badge-archived${announcement.archivedByAdmin ? ' arch-badge-archived--admin' : ''}`}>
-                            {announcement.archivedByAdmin ? 'Arhivat de admin' : 'Arhivat'}
+                          <span className={`arch-badge-archived${foreign ? ' arch-badge-archived--foreign' : (announcement.archivedByAdmin ? ' arch-badge-archived--admin' : '')}`}>
+                            {foreign ? 'Arhivat de tine (Admin)' : (announcement.archivedByAdmin ? 'Arhivat de admin' : 'Arhivat')}
                           </span>
                           {announcement.category && (
                             <span className="arch-badge-category">
@@ -461,18 +476,26 @@ export default function ArchivedAnnouncementsPage() {
                               {announcement.price ? `${announcement.price} RON` : 'Preț negociabil'}
                             </span>
                             <div className="arch-actions">
-                              {announcement.archivedByAdmin ? (
+                              {foreign ? (
+                                <button
+                                  className="arch-btn-unarchive arch-btn-unarchive--admin"
+                                  onClick={ev => { ev.stopPropagation(); handleUnarchive(announcement); }}
+                                >
+                                  Dezarhivează (Admin)
+                                </button>
+                              ) : announcement.archivedByAdmin ? (
                                 <span className="arch-admin-lock" title="Acest anunț a fost arhivat de un administrator și poate fi dezarhivat doar de un administrator.">
                                   🔒 Doar adminul poate dezarhiva
                                 </span>
                               ) : (
                               <button
                                 className="arch-btn-unarchive"
-                                onClick={ev => { ev.stopPropagation(); handleUnarchive(announcement._id); }}
+                                onClick={ev => { ev.stopPropagation(); handleUnarchive(announcement); }}
                               >
                                 {t('myAnnouncements.unarchive')}
                               </button>
                               )}
+                              {!foreign && (
                               <button
                                 className="arch-btn-delete"
                                 title={t('myAnnouncements.deleteBtn') || 'Șterge'}
@@ -480,6 +503,7 @@ export default function ArchivedAnnouncementsPage() {
                               >
                                 🗑
                               </button>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -495,10 +519,11 @@ export default function ArchivedAnnouncementsPage() {
                           ? announcement.images[0]
                           : `/uploads/${announcement.images[0].replace(/^.*[\\/]/, '')}`)
                       : null;
+                    const foreign = isForeignAnnouncement(announcement);
                     return (
                       <div
                         key={announcement._id}
-                        className="arch-list-card"
+                        className={`arch-list-card${foreign ? ' arch-list-card--foreign' : ''}`}
                         onClick={e => {
                           if (e.target.closest('.arch-actions')) return;
                           navigate(`/announcement/${announcement._id}`);
@@ -510,8 +535,8 @@ export default function ArchivedAnnouncementsPage() {
                             ? <img src={imgSrc} alt={announcement.title} className="arch-list-img" />
                             : <div className="arch-list-img" />
                           }
-                          <span className={`arch-badge-archived${announcement.archivedByAdmin ? ' arch-badge-archived--admin' : ''}`}>
-                            {announcement.archivedByAdmin ? 'Arhivat de admin' : 'Arhivat'}
+                          <span className={`arch-badge-archived${foreign ? ' arch-badge-archived--foreign' : (announcement.archivedByAdmin ? ' arch-badge-archived--admin' : '')}`}>
+                            {foreign ? 'Arhivat de tine (Admin)' : (announcement.archivedByAdmin ? 'Arhivat de admin' : 'Arhivat')}
                           </span>
                         </div>
 
@@ -548,18 +573,26 @@ export default function ArchivedAnnouncementsPage() {
                               {announcement.price ? `${announcement.price} RON` : 'Preț negociabil'}
                             </span>
                             <div className="arch-actions">
-                              {announcement.archivedByAdmin ? (
+                              {foreign ? (
+                                <button
+                                  className="arch-btn-unarchive arch-btn-unarchive--admin"
+                                  onClick={e => { e.stopPropagation(); handleUnarchive(announcement); }}
+                                >
+                                  Dezarhivează (Admin)
+                                </button>
+                              ) : announcement.archivedByAdmin ? (
                                 <span className="arch-admin-lock" title="Acest anunț a fost arhivat de un administrator și poate fi dezarhivat doar de un administrator.">
                                   🔒 Doar adminul poate dezarhiva
                                 </span>
                               ) : (
                               <button
                                 className="arch-btn-unarchive"
-                                onClick={e => { e.stopPropagation(); handleUnarchive(announcement._id); }}
+                                onClick={e => { e.stopPropagation(); handleUnarchive(announcement); }}
                               >
                                 {t('myAnnouncements.unarchive')}
                               </button>
                               )}
+                              {!foreign && (
                               <button
                                 className="arch-btn-delete"
                                 title={t('myAnnouncements.deleteBtn') || 'Șterge'}
@@ -567,6 +600,7 @@ export default function ArchivedAnnouncementsPage() {
                               >
                                 🗑
                               </button>
+                              )}
                             </div>
                           </div>
                         </div>
