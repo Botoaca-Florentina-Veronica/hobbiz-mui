@@ -16,6 +16,7 @@ import './MobileHeader.css';
 import { useTranslation } from 'react-i18next';
 import Toast from './Toast';
 import { getEffectiveViewportWidth } from '../utils/devicePatch';
+import useSocket from '../hooks/useSocket';
 
 const MOBILE_BREAKPOINT = 1024;
 
@@ -37,6 +38,10 @@ export default function Header() {
   const [avatarError, setAvatarError] = useState(false);
   const [avatarIdx, setAvatarIdx] = useState(0);
   const [showLogoutToast, setShowLogoutToast] = useState(false);
+  const [messageToast, setMessageToast] = useState({ visible: false, text: '', conversationId: null });
+  // Reutilizează conexiunea socket partajată (aceeași cu cea deschisă de AuthContext) —
+  // nu creează o a doua conexiune, doar se abonează la evenimentele de mai jos.
+  const { on, off } = useSocket(isAuthenticated ? localStorage.getItem('userId') : null);
 
   // Helper: rezolvă URL relativ (ex: "/uploads/...") la URL absolut către backend
   const resolveAvatarUrl = (url) => {
@@ -280,6 +285,31 @@ export default function Header() {
       }
     };
   }, [isAuthenticated]);
+
+  // Orice notificare nouă venită prin socket (recenzie, negociere, rezervare,
+  // favorit, mesaj etc.) — actualizează instant clopoțelul, nu doar la polling.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const handler = () => fetchUnreadCount();
+    on('newNotification', handler);
+    return () => off('newNotification', handler);
+  }, [isAuthenticated, on, off]);
+
+  // Mesaj nou primit prin socket — actualizează instant AMBELE contoare
+  // (notificări + chat) și arată un toast. Backend-ul emite acest eveniment
+  // doar când destinatarul NU vizualizează deja acea conversație, deci nu
+  // apare un toast pentru un mesaj deja vizibil pe ecran.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const handler = (data) => {
+      fetchUnreadCount();
+      fetchChatUnreadCount();
+      const preview = data?.text ? `${data.senderName}: ${data.text}` : `${data.senderName} ți-a trimis un mesaj`;
+      setMessageToast({ visible: true, text: preview, conversationId: data?.conversationId || null });
+    };
+    on('newMessageNotification', handler);
+    return () => off('newMessageNotification', handler);
+  }, [isAuthenticated, on, off]);
 
   // Detectare mobil + width pentru regula specială doar pe homepage
   const [isMobile, setIsMobile] = useState(
@@ -596,6 +626,13 @@ export default function Header() {
             type="info"
             visible={showLogoutToast}
             onClose={() => setShowLogoutToast(false)}
+          />
+          <Toast
+            message={messageToast.text}
+            type="info"
+            visible={messageToast.visible}
+            onClose={() => setMessageToast((prev) => ({ ...prev, visible: false }))}
+            onClick={() => navigate('/chat', { state: { conversationId: messageToast.conversationId } })}
           />
         </>
       )}

@@ -26,6 +26,10 @@
   overflow: hidden;
 }
 
+.toast-clickable {
+  cursor: pointer;
+}
+
 .toast-content {
   display: flex;
   align-items: center;

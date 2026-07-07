@@ -341,13 +341,17 @@ const createMessage = async (req, res) => {
     const isRecipientViewingConversation = activeConversations &&
       activeConversations.get(destinatarId) === conversationId;
 
+    // Populat mai jos (dacă io + destinatar valid); refolosit și pentru
+    // evenimentul newMessageNotification, ca să nu mai facem un al doilea
+    // fetch al expeditorului pentru același request.
+    let senderInfo = null;
+
     if (
       io &&
       isValidObjectId(destinatarId) &&
       String(destinatarId) !== String(senderId)
     ) {
       // Get sender info for real-time message
-      let senderInfo = null;
       try {
         const sender = await User.findById(senderId).select(
           "firstName lastName avatar"
@@ -445,6 +449,30 @@ const createMessage = async (req, res) => {
             link,
             fromUserId: senderId,
           });
+
+          // Evenimente instant pentru client — acest bloc rulează doar când
+          // destinatarul NU vizualizează deja conversația (vezi guard-ul de
+          // mai sus), deci nu apare un toast pentru un mesaj deja vizibil.
+          if (io) {
+            // Generic — consistent cu toate celelalte tipuri de notificări
+            // (review, negociere, rezervare etc.), pentru orice ascultător
+            // generic (ex. aplicația mobilă).
+            io.to('user:' + String(destinatarId)).emit('newNotification', { userId: String(destinatarId) });
+
+            // Payload dedicat, cu tot ce are nevoie clientul web ca să arate
+            // un toast fără alt request (nume/avatar expeditor, previzualizare
+            // text, link către conversație).
+            io.to('user:' + String(destinatarId)).emit('newMessageNotification', {
+              conversationId,
+              messageId: String(message._id),
+              senderId: String(senderId),
+              senderName: senderInfo ? `${senderInfo.firstName || ''} ${senderInfo.lastName || ''}`.trim() : '',
+              senderAvatar: senderInfo ? senderInfo.avatar : null,
+              text: hasText ? String(text).slice(0, 160) : (messageData.image ? '📷 Imagine' : ''),
+              announcementTitle,
+              link,
+            });
+          }
         }
 
         // Trimite push notification dacă destinatarul are pushToken și permite push

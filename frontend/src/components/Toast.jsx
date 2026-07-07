@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Toast.css';
 
-export default function Toast({ message, type = 'success', visible, onClose, duration = 3000 }) {
+export default function Toast({ message, type = 'success', visible, onClose, duration = 3000, onClick }) {
   const [isExiting, setIsExiting] = useState(false);
   const durationMs = Number.isFinite(duration) ? duration : 3000;
 
@@ -55,19 +55,27 @@ export default function Toast({ message, type = 'success', visible, onClose, dur
     }
   };
 
-  const handleManualClose = () => {
+  const handleManualClose = (e) => {
+    e.stopPropagation();
     setIsExiting(true);
     setTimeout(() => {
       if (onClose) onClose();
     }, 220);
   };
 
+  const handleClick = () => {
+    if (!onClick) return;
+    onClick();
+    handleManualClose({ stopPropagation: () => {} });
+  };
+
   return (
     <div
-      className={`toast toast-${type} ${isExiting ? 'toast-exit' : ''}`}
+      className={`toast toast-${type} ${isExiting ? 'toast-exit' : ''} ${onClick ? 'toast-clickable' : ''}`}
       style={{ '--toast-duration': `${durationMs}ms` }}
       role="status"
       aria-live={type === 'error' ? 'assertive' : 'polite'}
+      onClick={onClick ? handleClick : undefined}
     >
       <div className="toast-content">
         <span className="toast-icon">{getIcon()}</span>
