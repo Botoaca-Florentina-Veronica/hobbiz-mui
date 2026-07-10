@@ -164,7 +164,10 @@ body.login-page .app.dark-mode {
    ===================================================================== */
 @media (min-width: 1500px) {
   .homepage {
-    --home-zoom: min(calc(100vw / 1264px), 2);
+    /* Plafon ridicat de la 2x la 3x, ca secțiunile să continue să crească
+       proporțional și pe ecrane foarte late (3024px, 3456px etc.), nu doar
+       până la ~2528px viewport. 3x acoperă confortabil până la ~3792px. */
+    --home-zoom: min(calc(100vw / 1264px), 3);
   }
   .homepage .content,
   .homepage .choose-us-section,
@@ -178,6 +181,12 @@ body.login-page .app.dark-mode {
        padding-urile orizontale proprii (ex. Categories) să nu o extindă. */
     width: 1404px;
     box-sizing: border-box;
+    /* Zoom-ul este plafonat la 2× (peste ~2528px viewport), deci lățimea
+       vizuală rămâne fixă (1404 * 2 = 2808px) pe ecrane și mai late.
+       Fără centrare explicită, secțiunea rămâne lipită de marginea stângă
+       a .homepage (100% viewport), lăsând tot spațiul gol în dreapta. */
+    margin-left: auto;
+    margin-right: auto;
   }
   /* min-height în vh ar fi multiplicat de zoom — compensăm împărțind */
   .homepage .content {
